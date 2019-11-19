@@ -300,7 +300,7 @@ edges.</p>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_2d" title="f/make_flux_module/make_rhoh_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_3d" title="f/make_flux_module/make_rhoh_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_2d" title="f/make_flux_module/make_rhox_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d" title="f/make_flux_module/make_rhox_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="f/make_flux_module/make_rhox_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr" title="f/make_flux_module/mk_rhoh_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">mk_rhoh_flux_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg" title="f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">mk_rhoh_flux_3d_sphr_irreg()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_2d" title="f/make_flux_module/make_rhoh_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_3d" title="f/make_flux_module/make_rhoh_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_3d_sphr" title="f/make_flux_module/make_rhoh_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_3d_sphr()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhoh_flux_3d_sphr_irreg" title="f/make_flux_module/make_rhoh_flux_3d_sphr_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhoh_flux_3d_sphr_irreg()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_2d" title="f/make_flux_module/make_rhox_flux_2d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_2d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d" title="f/make_flux_module/make_rhox_flux_3d"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d()</span></code></a>, <a class="reference internal" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="f/make_flux_module/make_rhox_flux_3d_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_rhox_flux_3d_sphr()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -377,47 +377,37 @@ edges.</p>
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/make_flux_module/make_rhox_flux_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">sflux</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoX_flux_2d</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fx_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fx_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>etarhoflux</strong> (eta_hi(1)-(eta_lo(1))+1,eta_hi(2)-(eta_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>eta_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>eta_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>x_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>x_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>etarhoflux</strong> (eta_hi(1)-(eta_lo(1))+1,eta_hi(2)-(eta_lo(2))+1,eta_hi(3)-(eta_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>eta_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>eta_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_predicted_edge</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
@@ -425,58 +415,37 @@ edges.</p>
 
 <dl class="subroutine">
 <dt id="f/make_flux_module/make_rhox_flux_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">sflux</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">etarhoflux</em>, <em class="sig-param">eta_lo</em>, <em class="sig-param">eta_hi</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rho0_predicted_edge</em>, <em class="sig-param">w0</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoX_flux_3d</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,fy_hi(3)-(fy_lo(3))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (fz_hi(1)-(fz_lo(1))+1,fz_hi(2)-(fz_lo(2))+1,fz_hi(3)-(fz_lo(3))+1,nc_fz)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>etarhoflux</strong> (eta_hi(1)-(eta_lo(1))+1,eta_hi(2)-(eta_lo(2))+1,eta_hi(3)-(eta_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>eta_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>eta_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_predicted_edge</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>w0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
@@ -484,66 +453,32 @@ edges.</p>
 
 <dl class="subroutine">
 <dt id="f/make_flux_module/make_rhox_flux_3d_sphr">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rho0_edgex</em>, <em class="sig-param">rx_lo</em>, <em class="sig-param">rx_hi</em>, <em class="sig-param">rho0_edgey</em>, <em class="sig-param">ry_lo</em>, <em class="sig-param">ry_hi</em>, <em class="sig-param">rho0_edgez</em>, <em class="sig-param">rz_lo</em>, <em class="sig-param">rz_hi</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhox_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sflux</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">w0mac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">rho0_edge</em>, <em class="sig-param">r_lo</em>, <em class="sig-param">r_hi</em>, <em class="sig-param">startcomp</em>, <em class="sig-param">endcomp</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhox_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoX_flux_3d_sphr</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,fy_hi(3)-(fy_lo(3))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (fz_hi(1)-(fz_lo(1))+1,fz_hi(2)-(fz_lo(2))+1,fz_hi(3)-(fz_lo(3))+1,nc_fz)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0mac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macx</strong> (wx_hi(1)-(wx_lo(1))+1,wx_hi(2)-(wx_lo(2))+1,wx_hi(3)-(wx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macy</strong> (wy_hi(1)-(wy_lo(1))+1,wy_hi(2)-(wy_lo(2))+1,wy_hi(3)-(wy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macz</strong> (wz_hi(1)-(wz_lo(1))+1,wz_hi(2)-(wz_lo(2))+1,wz_hi(3)-(wz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgex</strong> (rx_hi(1)-(rx_lo(1))+1,rx_hi(2)-(rx_lo(2))+1,rx_hi(3)-(rx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgey</strong> (ry_hi(1)-(ry_lo(1))+1,ry_hi(2)-(ry_lo(2))+1,ry_hi(3)-(ry_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ry_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ry_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgez</strong> (rz_hi(1)-(rz_lo(1))+1,rz_hi(2)-(rz_lo(2))+1,rz_hi(3)-(rz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_edge</strong> (r_hi(1)-(r_lo(1))+1,r_hi(2)-(r_lo(2))+1,r_hi(3)-(r_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>startcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>endcomp</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
@@ -551,36 +486,26 @@ edges.</p>
 
 <dl class="subroutine">
 <dt id="f/make_flux_module/make_rhoh_flux_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">sflux</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_2d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoh_flux_2d</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fx_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fx_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>x_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>x_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>u_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (2)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -597,47 +522,26 @@ edges.</p>
 
 <dl class="subroutine">
 <dt id="f/make_flux_module/make_rhoh_flux_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lev</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">idir</em>, <em class="sig-param">sflux</em>, <em class="sig-param">f_lo</em>, <em class="sig-param">f_hi</em>, <em class="sig-param">nc_f</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rho0_old</em>, <em class="sig-param">rho0_edge_old</em>, <em class="sig-param">rho0_new</em>, <em class="sig-param">rho0_edge_new</em>, <em class="sig-param">rhoh0_old</em>, <em class="sig-param">rhoh0_edge_old</em>, <em class="sig-param">rhoh0_new</em>, <em class="sig-param">rhoh0_edge_new</em>, <em class="sig-param">w0</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_3d" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoh_flux_3d</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,fy_hi(3)-(fy_lo(3))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (fz_hi(1)-(fz_lo(1))+1,fz_hi(2)-(fz_lo(2))+1,fz_hi(3)-(fz_lo(3))+1,nc_fz)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (f_hi(1)-(f_lo(1))+1,f_hi(2)-(f_lo(2))+1,f_hi(3)-(f_lo(3))+1,nc_f)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>f_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>f_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>nc_f</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_edge_old</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rho0_new</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -653,139 +557,63 @@ edges.</p>
 </dd></dl>
 
 <dl class="subroutine">
-<dt id="f/make_flux_module/mk_rhoh_flux_3d_sphr">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">mk_rhoh_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rho0_edgex</em>, <em class="sig-param">rx_lo</em>, <em class="sig-param">rx_hi</em>, <em class="sig-param">rho0_edgey</em>, <em class="sig-param">ry_lo</em>, <em class="sig-param">ry_hi</em>, <em class="sig-param">rho0_edgez</em>, <em class="sig-param">rz_lo</em>, <em class="sig-param">rz_hi</em>, <em class="sig-param">h0_edgex</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em>, <em class="sig-param">h0_edgey</em>, <em class="sig-param">hy_lo</em>, <em class="sig-param">hy_hi</em>, <em class="sig-param">h0_edgez</em>, <em class="sig-param">hz_lo</em>, <em class="sig-param">hz_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoh_flux_3d_sphr</span></code></p>
-<dl class="field-list simple">
+<dt id="f/make_flux_module/make_rhoh_flux_3d_sphr">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_3d_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sflux</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">w0mac</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">rho0_edge</em>, <em class="sig-param">rx_lo</em>, <em class="sig-param">rx_hi</em>, <em class="sig-param">h0_edge</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_3d_sphr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,fy_hi(3)-(fy_lo(3))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (fz_hi(1)-(fz_lo(1))+1,fz_hi(2)-(fz_lo(2))+1,fz_hi(3)-(fz_lo(3))+1,nc_fz)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macx</strong> (wx_hi(1)-(wx_lo(1))+1,wx_hi(2)-(wx_lo(2))+1,wx_hi(3)-(wx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0mac</strong> (wx_hi(1)-(wx_lo(1))+1,wx_hi(2)-(wx_lo(2))+1,wx_hi(3)-(wx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macy</strong> (wy_hi(1)-(wy_lo(1))+1,wy_hi(2)-(wy_lo(2))+1,wy_hi(3)-(wy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macz</strong> (wz_hi(1)-(wz_lo(1))+1,wz_hi(2)-(wz_lo(2))+1,wz_hi(3)-(wz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgex</strong> (rx_hi(1)-(rx_lo(1))+1,rx_hi(2)-(rx_lo(2))+1,rx_hi(3)-(rx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_edge</strong> (rx_hi(1)-(rx_lo(1))+1,rx_hi(2)-(rx_lo(2))+1,rx_hi(3)-(rx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>rx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgey</strong> (ry_hi(1)-(ry_lo(1))+1,ry_hi(2)-(ry_lo(2))+1,ry_hi(3)-(ry_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ry_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>ry_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rho0_edgez</strong> (rz_hi(1)-(rz_lo(1))+1,rz_hi(2)-(rz_lo(2))+1,rz_hi(3)-(rz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>h0_edgex</strong> (hx_hi(1)-(hx_lo(1))+1,hx_hi(2)-(hx_lo(2))+1,hx_hi(3)-(hx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>h0_edge</strong> (hx_hi(1)-(hx_lo(1))+1,hx_hi(2)-(hx_lo(2))+1,hx_hi(3)-(hx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>h0_edgey</strong> (hy_hi(1)-(hy_lo(1))+1,hy_hi(2)-(hy_lo(2))+1,hy_hi(3)-(hy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>h0_edgez</strong> (hz_hi(1)-(hz_lo(1))+1,hz_hi(2)-(hz_lo(2))+1,hz_hi(3)-(hz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="subroutine">
-<dt id="f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">mk_rhoh_flux_3d_sphr_irreg</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sfluxx</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sfluxy</em>, <em class="sig-param">fy_lo</em>, <em class="sig-param">fy_hi</em>, <em class="sig-param">nc_fy</em>, <em class="sig-param">sfluxz</em>, <em class="sig-param">fz_lo</em>, <em class="sig-param">fz_hi</em>, <em class="sig-param">nc_fz</em>, <em class="sig-param">sedgex</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">sedgey</em>, <em class="sig-param">y_lo</em>, <em class="sig-param">y_hi</em>, <em class="sig-param">nc_y</em>, <em class="sig-param">sedgez</em>, <em class="sig-param">z_lo</em>, <em class="sig-param">z_hi</em>, <em class="sig-param">nc_z</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">vmac</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">wmac</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">w0macx</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">w0macy</em>, <em class="sig-param">wy_lo</em>, <em class="sig-param">wy_hi</em>, <em class="sig-param">w0macz</em>, <em class="sig-param">wz_lo</em>, <em class="sig-param">wz_hi</em>, <em class="sig-param">rhoh0_edgex</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em>, <em class="sig-param">rhoh0_edgey</em>, <em class="sig-param">hy_lo</em>, <em class="sig-param">hy_hi</em>, <em class="sig-param">rhoh0_edgez</em>, <em class="sig-param">hz_lo</em>, <em class="sig-param">hz_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/mk_rhoh_flux_3d_sphr_irreg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">make_rhoh_flux_3d_sphr_irreg</span></code></p>
-<dl class="field-list simple">
+<dt id="f/make_flux_module/make_rhoh_flux_3d_sphr_irreg">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_flux_module/</code><code class="sig-name descname">make_rhoh_flux_3d_sphr_irreg</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">sflux</em>, <em class="sig-param">fx_lo</em>, <em class="sig-param">fx_hi</em>, <em class="sig-param">nc_fx</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">nc_x</em>, <em class="sig-param">umac</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">w0mac</em>, <em class="sig-param">wx_lo</em>, <em class="sig-param">wx_hi</em>, <em class="sig-param">rhoh0_edge</em>, <em class="sig-param">hx_lo</em>, <em class="sig-param">hx_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_flux_module/make_rhoh_flux_3d_sphr_irreg" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>sfluxx</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>sflux</strong> (fx_hi(1)-(fx_lo(1))+1,fx_hi(2)-(fx_lo(2))+1,fx_hi(3)-(fx_lo(3))+1,nc_fx)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>fx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>fx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxy</strong> (fy_hi(1)-(fy_lo(1))+1,fy_hi(2)-(fy_lo(2))+1,fy_hi(3)-(fy_lo(3))+1,nc_fy)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fy</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sfluxz</strong> (fz_hi(1)-(fz_lo(1))+1,fz_hi(2)-(fz_lo(2))+1,fz_hi(3)-(fz_lo(3))+1,nc_fz)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>fz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>fz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_fz</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgex</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>nc_fx</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,nc_x)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgey</strong> (y_hi(1)-(y_lo(1))+1,y_hi(2)-(y_lo(2))+1,y_hi(3)-(y_lo(3))+1,nc_y)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>y_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>y_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_y</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
-<li><p><strong>sedgez</strong> (z_hi(1)-(z_lo(1))+1,z_hi(2)-(z_lo(2))+1,z_hi(3)-(z_lo(3))+1,nc_z)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>z_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>z_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nc_z</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
+<li><p><strong>nc_x</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 <li><p><strong>umac</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>vmac</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wmac</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macx</strong> (wx_hi(1)-(wx_lo(1))+1,wx_hi(2)-(wx_lo(2))+1,wx_hi(3)-(wx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0mac</strong> (wx_hi(1)-(wx_lo(1))+1,wx_hi(2)-(wx_lo(2))+1,wx_hi(3)-(wx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>wx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macy</strong> (wy_hi(1)-(wy_lo(1))+1,wy_hi(2)-(wy_lo(2))+1,wy_hi(3)-(wy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>w0macz</strong> (wz_hi(1)-(wz_lo(1))+1,wz_hi(2)-(wz_lo(2))+1,wz_hi(3)-(wz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>wz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rhoh0_edgex</strong> (hx_hi(1)-(hx_lo(1))+1,hx_hi(2)-(hx_lo(2))+1,hx_hi(3)-(hx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhoh0_edge</strong> (hx_hi(1)-(hx_lo(1))+1,hx_hi(2)-(hx_lo(2))+1,hx_hi(3)-(hx_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hx_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hx_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rhoh0_edgey</strong> (hy_hi(1)-(hy_lo(1))+1,hy_hi(2)-(hy_lo(2))+1,hy_hi(3)-(hy_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hy_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hy_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>rhoh0_edgez</strong> (hz_hi(1)-(hz_lo(1))+1,hz_hi(2)-(hz_lo(2))+1,hz_hi(3)-(hz_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hz_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hz_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 </dl>
