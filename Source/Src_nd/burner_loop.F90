@@ -354,6 +354,7 @@ contains
        bind (C,name="burner_loop")
 
     use sdc_type_module, only: sdc_t
+    use integrator_module, only: integrator
     
     integer         , intent (in   ) :: lo(3), hi(3)
     integer, value  , intent (in   ) :: lev
@@ -435,7 +436,7 @@ contains
                    state_in % j = j
                    state_in % k = k
                    
-                   call burner(state_in, state_out, dt_in, time_in)
+                   call integrator(state_in, state_out, dt_in, time_in)
                    
                    rho_out  = sum(state_out % y(1:nspec))
                    rhox_out = state_out % y(1:nspec)
@@ -473,6 +474,7 @@ contains
        bind (C,name="burner_loop_sphr")
 
     use sdc_type_module, only: sdc_t
+    use integrator_module, only: integrator
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3)
@@ -550,7 +552,7 @@ contains
                    state_in % j = j
                    state_in % k = k
 
-                   call burner(state_in, state_out, dt_in, time_in)
+                   call integrator(state_in, state_out, dt_in, time_in)
 
                    rho_out  = sum(state_out % y(1:nspec))
                    rhox_out = state_out % y(1:nspec)
