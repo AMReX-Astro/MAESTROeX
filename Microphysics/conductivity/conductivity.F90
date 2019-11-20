@@ -37,16 +37,12 @@ contains
     integer       , intent(in   ) :: input
     type (eos_t)  , intent(inout) :: state
 
-    real(rt) :: conduct
-    
     !$gpu
 
     ! call the EOS, passing through the arguments we called conducteos with
     call eos(input, state)
 
-    call actual_conductivity(state, conduct)
-
-    state % conductivity = conduct
+    call actual_conductivity(state)
 
   end subroutine conducteos
 
@@ -59,11 +55,9 @@ contains
 
     type (eos_t)  , intent(inout) :: state
 
-    real(rt) :: conduct
+    !$gpu
 
-    call actual_conductivity(state, conduct)
-
-    state % conductivity = conduct
+    call actual_conductivity(state)
 
   end subroutine conductivity
 
