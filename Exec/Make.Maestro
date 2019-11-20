@@ -101,14 +101,10 @@ ifeq ($(USE_REACT_SPARSE_JACOBIAN), TRUE)
   endif
 endif
 
-# SDC Preprocessor variables
-# Maestro uses SDC_METHOD = 2
-# This is needed as a preprocessor variable by StarKiller Microphysics.
-SDC_METHOD=2
-
+# Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
 ifeq ($(USE_SDC), TRUE)
   DEFINES += -DSDC -DSIMPLIFIED_SDC -DPRIM_SPECIES_HAVE_SOURCES
-  DEFINES += -DSDC_METHOD=$(SDC_METHOD)
+  DEFINES += -DSDC_EVOLVE_ENTHALPY
   USE_SIMPLIFIED_SDC = TRUE
 endif
 

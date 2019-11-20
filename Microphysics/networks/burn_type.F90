@@ -44,8 +44,8 @@ module burn_type_module
     real(rt) :: aux(naux)
 #endif
 
-#if (SDC_METHOD == 2)
-    ! For SDC_METHOD = 2, make pressure available to RHS
+#ifdef SDC_EVOLVE_ENTHALPY
+    ! If we are evolving enthalpy, make pressure available to RHS
     real(rt) :: p0
 #endif
     

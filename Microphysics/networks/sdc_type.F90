@@ -7,7 +7,8 @@ module sdc_type_module
   ! A generic structure holding data necessary to do a nuclear burn
   ! in the SDC formalism.
 
-#if (SDC_METHOD == 1)
+#if defined(SDC_EVOLVE_ENERGY)
+
   ! these indicies represent the order that the conserved state comes
   ! into the ODE integration from the hydro code.
   !
@@ -27,7 +28,8 @@ module sdc_type_module
   integer, parameter :: SVAR  = SMZ
   integer, parameter :: SVAR_EVOLVE = SRHO - 1
 
-#elif (SDC_METHOD == 2)
+#elif defined(SDC_EVOLVE_ENTHALPY)
+
   ! integrate rho*X (species masses) and rho*h (enthalpy)
   ! carry pressure for EOS calls in RHS
 
@@ -35,6 +37,7 @@ module sdc_type_module
   integer, parameter :: SENTH = SFS + nspec
   integer, parameter :: SVAR  = SENTH
   integer, parameter :: SVAR_EVOLVE = SVAR
+
 #endif
   
   type :: sdc_t
@@ -42,9 +45,9 @@ module sdc_type_module
      double precision :: y(SVAR)
      double precision :: ydot_a(SVAR)
 
-#if (SDC_METHOD == 1)
+#if defined(SDC_EVOLVE_ENERGY)
      logical :: T_from_eden
-#elif (SDC_METHOD == 2)
+#elif defined(SDC_EVOLVE_ENTHALPY)
      ! Pressure in case we wish to use it for EOS calls
      double precision :: p0
      ! Density is defined by sum(rho*X) = rho in this method
