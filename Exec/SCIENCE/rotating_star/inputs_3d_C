@@ -4,7 +4,7 @@
 maestro.model_file = "15m_500_sec.hse.6400"
 maestro.perturb_model = false
 
-maestro.drdxfac = 5
+maestro.drdxfac = 2
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
@@ -27,8 +27,8 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
-amr.n_cell             = 64 64 64
-#amr.n_cell = 128 128 128
+#amr.n_cell             = 64 64 64
+amr.n_cell = 128 128 128
 #amr.n_cell = 384 384 384
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
@@ -50,6 +50,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
 maestro.evolve_base_state = false
+maestro.fix_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
@@ -102,7 +103,7 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.do_burning = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-maestro.burning_cutoff_density = 1e3
+maestro.burning_cutoff_density = 2.e5
 maestro.burning_invert_cutoff_density = true
 
 # ROTATION
