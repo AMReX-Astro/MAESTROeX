@@ -23,7 +23,11 @@ contains
        cp, cp_lo, cp_hi, &
        xi, xi_lo, xi_hi) bind(C,name="make_intra_coeffs")
     ! input box is grown to include boundary cell information
-    
+
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
+
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: s1_lo(3), s1_hi(3)
     double precision, intent(in   ) :: scalold(s1_lo(1):s1_hi(1),s1_lo(2):s1_hi(2),s1_lo(3):s1_hi(3),nscal)
@@ -37,6 +41,7 @@ contains
     ! local
     integer :: i,j,k,comp
     type (eos_t) :: eos_state
+    type (eos_xderivs_t) :: eos_xderivs
 
     !$gpu
     
@@ -52,10 +57,12 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state)
 
+             call composition_derivatives(eos_state, eos_xderivs)
+
              cp(i,j,k) = eos_state%cp
              
              do comp=1,nspec
-                xi(i,j,k,comp) = eos_state%dhdX(comp)
+                xi(i,j,k,comp) = eos_xderivs % dhdX(comp)
              enddo
 
              ! new state now -- average results
@@ -65,11 +72,13 @@ contains
              
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state)
+
+             call composition_derivatives(eos_state, eos_xderivs)
              
              cp(i,j,k) = HALF*(eos_state%cp + cp(i,j,k))
              
              do comp=1,nspec
-                xi(i,j,k,comp) = HALF*(eos_state%dhdX(comp) + xi(i,j,k,comp))
+                xi(i,j,k,comp) = HALF*(eos_xderivs % dhdX(comp) + xi(i,j,k,comp))
              enddo
 
           enddo
