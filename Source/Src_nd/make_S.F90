@@ -25,8 +25,9 @@ contains
        gradp0_cart, gp0_lo, gp0_hi, &
        gamma1bar_cart, g1_lo, g1_hi) bind (C,name="make_S_cc")
 
-    use eos_type_module, only : eos_t, eos_input_rt, composition_derivatives
+    use eos_type_module, only : eos_t, eos_input_rt
     use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -58,6 +59,7 @@ contains
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
+    type(eos_xderivs_t) :: eos_xderivs
 
     integer comp
     double precision sigma, xi_term, pres_term
@@ -78,6 +80,8 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
+             call composition_derivatives(eos_state, eos_xderivs)
+
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
 
@@ -85,10 +89,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_state % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_state % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
@@ -131,9 +135,10 @@ contains
        gamma1bar_cart, g1_lo, g1_hi, &
        normal, no_lo, no_hi) bind (C,name="make_S_cc_sphr")
        
-    use eos_type_module, only : eos_t, eos_input_rt, composition_derivatives
+    use eos_type_module, only : eos_t, eos_input_rt
     use eos_module
-    
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
+
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
     integer         , intent (in   ) :: dg_lo(3), dg_hi(3)
@@ -165,6 +170,7 @@ contains
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
+    type(eos_xderivs_t) :: eos_xderivs
     integer comp
     double precision sigma, xi_term, pres_term, Ut_dot_er
 
@@ -184,6 +190,8 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
+             call composition_derivatives(eos_state, eos_xderivs)
+
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
 
@@ -191,10 +199,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_state % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_state % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
