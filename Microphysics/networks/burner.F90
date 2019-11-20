@@ -4,7 +4,12 @@ module burner_module
   use network
   use eos_module
   use burn_type_module
+
+#ifdef SIMPLIFIED_SDC
+  use integrator_module
+#else
   use actual_burner_module
+#endif
 
   logical :: burner_initialized = .false.
 
@@ -14,14 +19,18 @@ contains
 
     implicit none
 
+#ifdef SIMPLIFIED_SDC
+    call integrator_init()
+#else
     call actual_burner_init()
+#endif
 
     burner_initialized = .true.
 
   end subroutine burner_init
 
 
-
+#ifndef SIMPLIFIED_SDC
   subroutine burner(state_in, state_out, dt, time_in)
 
     !$acc routine seq
@@ -56,5 +65,6 @@ contains
     call actual_burner(state_in, state_out, dt, time_in)
 
   end subroutine burner
+#endif
 
 end module burner_module
