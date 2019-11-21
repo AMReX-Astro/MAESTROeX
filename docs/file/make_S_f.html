@@ -175,6 +175,7 @@
 <li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_pi_cc_f.html">make_pi_cc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
@@ -290,7 +291,7 @@
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/make_s_module/make_s_cc">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_s_module/</code><code class="sig-name descname">make_s_cc</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">s_cc</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">delta_gamma1_term</em>, <em class="sig-param">dg_lo</em>, <em class="sig-param">dg_hi</em>, <em class="sig-param">delta_gamma1</em>, <em class="sig-param">df_lo</em>, <em class="sig-param">df_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">c_lo</em>, <em class="sig-param">c_hi</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rodot</em>, <em class="sig-param">r_lo</em>, <em class="sig-param">r_hi</em>, <em class="sig-param">rhnuc</em>, <em class="sig-param">n_lo</em>, <em class="sig-param">n_hi</em>, <em class="sig-param">rhext</em>, <em class="sig-param">e_lo</em>, <em class="sig-param">e_hi</em>, <em class="sig-param">therm</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em>, <em class="sig-param">gamma1bar_cart</em>, <em class="sig-param">g1_lo</em>, <em class="sig-param">g1_hi</em>, <em class="sig-param">dx</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_s_module/make_s_cc" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_s_module/</code><code class="sig-name descname">make_s_cc</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">s_cc</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">delta_gamma1_term</em>, <em class="sig-param">dg_lo</em>, <em class="sig-param">dg_hi</em>, <em class="sig-param">delta_gamma1</em>, <em class="sig-param">df_lo</em>, <em class="sig-param">df_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">c_lo</em>, <em class="sig-param">c_hi</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">rodot</em>, <em class="sig-param">r_lo</em>, <em class="sig-param">r_hi</em>, <em class="sig-param">rhnuc</em>, <em class="sig-param">n_lo</em>, <em class="sig-param">n_hi</em>, <em class="sig-param">rhext</em>, <em class="sig-param">e_lo</em>, <em class="sig-param">e_hi</em>, <em class="sig-param">therm</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em>, <em class="sig-param">gradp0_cart</em>, <em class="sig-param">gp0_lo</em>, <em class="sig-param">gp0_hi</em>, <em class="sig-param">gamma1bar_cart</em>, <em class="sig-param">g1_lo</em>, <em class="sig-param">g1_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_s_module/make_s_cc" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -327,10 +328,12 @@
 <li><p><strong>p0_cart</strong> (p0_hi(1)-(p0_lo(1))+1,p0_hi(2)-(p0_lo(2))+1,p0_hi(3)-(p0_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>p0_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>p0_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gradp0_cart</strong> (gp0_hi(1)-(gp0_lo(1))+1,gp0_hi(2)-(gp0_lo(2))+1,gp0_hi(3)-(gp0_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gp0_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>gp0_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>gamma1bar_cart</strong> (g1_hi(1)-(g1_lo(1))+1,g1_hi(2)-(g1_lo(2))+1,g1_hi(3)-(g1_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>g1_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>g1_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Use </dt>

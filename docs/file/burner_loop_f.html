@@ -175,6 +175,7 @@
 <li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_pi_cc_f.html">make_pi_cc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
@@ -280,7 +281,7 @@
 <dd class="field-odd"><p><a class="reference internal" href="#f/burner_loop_module/ispec_threshold" title="f/burner_loop_module/ispec_threshold"><code class="xref f f-var docutils literal notranslate"><span class="pre">ispec_threshold</span></code></a></p>
 </dd>
 <dt class="field-even">Routines</dt>
-<dd class="field-even"><p><a class="reference internal" href="#f/burner_loop_module/burner_loop" title="f/burner_loop_module/burner_loop"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop()</span></code></a>, <a class="reference internal" href="#f/burner_loop_module/burner_loop_init" title="f/burner_loop_module/burner_loop_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop_init()</span></code></a>, <a class="reference internal" href="#f/burner_loop_module/burner_loop_sphr" title="f/burner_loop_module/burner_loop_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop_sphr()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#f/burner_loop_module/burner_loop" title="f/burner_loop_module/burner_loop"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop()</span></code></a>, <a class="reference internal" href="#f/burner_loop_module/burner_loop_init" title="f/burner_loop_module/burner_loop_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop_init()</span></code></a>, <a class="reference internal" href="#f/burner_loop_module/burner_loop_sphr" title="f/burner_loop_module/burner_loop_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop_sphr()</span></code></a>, <a class="reference internal" href="#f/burner_loop_module/instantaneous_reaction_rates" title="f/burner_loop_module/instantaneous_reaction_rates"><code class="xref f f-func docutils literal notranslate"><span class="pre">instantaneous_reaction_rates()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -381,6 +382,98 @@
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>use_mask</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">burner_loop_module/</code><code class="sig-name descname">burner_loop</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">lev</em>, <em class="sig-param">s_in</em>, <em class="sig-param">i_lo</em>, <em class="sig-param">i_hi</em>, <em class="sig-param">s_out</em>, <em class="sig-param">o_lo</em>, <em class="sig-param">o_hi</em>, <em class="sig-param">source</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_in</em>, <em class="sig-param">dt_in</em>, <em class="sig-param">time_in</em>, <em class="sig-param">mask</em>, <em class="sig-param">m_lo</em>, <em class="sig-param">m_hi</em>, <em class="sig-param">use_mask</em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>s_in</strong> (i_hi(1)-(i_lo(1))+1,i_hi(2)-(i_lo(2))+1,i_hi(3)-(i_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>i_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>i_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_out</strong> (o_hi(1)-(o_lo(1))+1,o_hi(2)-(o_lo(2))+1,o_hi(3)-(o_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>o_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>o_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>source</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_in</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt_in</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>time_in</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>use_mask</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">sdc_type_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">sdc_t()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">integrator_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">integrator()</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">burner_loop_module/</code><code class="sig-name descname">burner_loop_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">s_in</em>, <em class="sig-param">i_lo</em>, <em class="sig-param">i_hi</em>, <em class="sig-param">s_out</em>, <em class="sig-param">o_lo</em>, <em class="sig-param">o_hi</em>, <em class="sig-param">source</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">dt_in</em>, <em class="sig-param">time_in</em>, <em class="sig-param">mask</em>, <em class="sig-param">m_lo</em>, <em class="sig-param">m_hi</em>, <em class="sig-param">use_mask</em><span class="sig-paren">)</span></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_in</strong> (i_hi(1)-(i_lo(1))+1,i_hi(2)-(i_lo(2))+1,i_hi(3)-(i_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>i_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>i_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_out</strong> (o_hi(1)-(o_lo(1))+1,o_hi(2)-(o_lo(2))+1,o_hi(3)-(o_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>o_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>o_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>source</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_cart</strong> (t_hi(1)-(t_lo(1))+1,t_hi(2)-(t_lo(2))+1,t_hi(3)-(t_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>dt_in</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>time_in</strong><em> [</em><em>double precision</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>use_mask</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">sdc_type_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">sdc_t()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">integrator_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">integrator()</span></code>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/burner_loop_module/instantaneous_reaction_rates">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">burner_loop_module/</code><code class="sig-name descname">instantaneous_reaction_rates</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">rho_omegadot</em>, <em class="sig-param">o_lo</em>, <em class="sig-param">o_hi</em>, <em class="sig-param">rho_hnuc</em>, <em class="sig-param">h_lo</em>, <em class="sig-param">h_hi</em>, <em class="sig-param">scal</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/burner_loop_module/instantaneous_reaction_rates" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho_omegadot</strong> (o_hi(1)-(o_lo(1))+1,o_hi(2)-(o_lo(2))+1,o_hi(3)-(o_lo(3))+1,nspec)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>o_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>o_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho_hnuc</strong> (h_hi(1)-(h_lo(1))+1,h_hi(2)-(h_lo(2))+1,h_hi(3)-(h_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>h_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>h_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>scal</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">aion()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">nspec_evolve()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">actual_rhs_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">actual_rhs()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">zero()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">burn_type_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">burn_to_eos()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">eos_to_burn()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">net_ienuc()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code>, <code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code></p>
 </dd>
 </dl>
 </dd></dl>
