@@ -3,12 +3,13 @@ module burner_module
   use amrex_constants_module
   use network
   use eos_module
-#ifndef SDC
-  use actual_burner_module
-#else
-  use integrator_module
-#endif
   use burn_type_module
+
+#ifdef SDC
+  use integrator_module
+#else
+  use actual_burner_module
+#endif
 
   logical :: burner_initialized = .false.
 
@@ -29,7 +30,6 @@ contains
   end subroutine burner_init
 
 
-
 #ifndef SDC
   subroutine burner(state_in, state_out, dt, time_in)
 
@@ -41,8 +41,6 @@ contains
     type (burn_t), intent(inout) :: state_out
     double precision, intent(in) :: dt
     double precision, intent(in) :: time_in
-
-    double precision :: time
 
     !$gpu
 

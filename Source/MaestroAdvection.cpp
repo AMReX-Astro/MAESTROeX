@@ -266,6 +266,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                                     BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
                                     BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
                                     startcomp, endcomp);
+
 	    } // end spherical
 #endif
 	} // end MFIter loop

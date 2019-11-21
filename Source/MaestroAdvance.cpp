@@ -434,9 +434,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
     }
 
+    // need full UMAC velocities for DensityAdvance
+    Addw0(umac,w0mac,1.);
+    
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
+    
     if (evolve_base_state) {
 
         if (use_etarho) {
@@ -820,9 +826,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         etarhoflux[lev].setVal(0.);
     }
 
+    // need full UMAC velocities for DensityAdvance
+    Addw0(umac,w0mac,1.);
+    
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
+    
     if (evolve_base_state) {
 
         if (use_etarho) {

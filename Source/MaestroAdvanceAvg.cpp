@@ -195,7 +195,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 	}
     }
 #endif
-
+    
     // initialize to zero
     std::fill(Sbar.begin(), Sbar.end(), 0.);
     std::fill(w0.begin()  , w0.end()  , 0.);
@@ -338,11 +338,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0mac from umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+        Addw0(umac,w0mac,-1.);
     }
 
     // wallclock time
@@ -355,6 +351,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (spherical == 1 && evolve_base_state && split_projection) {
+	// add w0mac back to umac
+	Addw0(umac,w0mac,1.);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 4 -- advect the full state through dt
@@ -462,15 +463,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
-
-    if (spherical == 1 && evolve_base_state && split_projection) {
-	// add w0mac back to umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
 
     if (evolve_base_state && use_etarho) {
 	// compute the new etarho
@@ -669,11 +661,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (spherical == 1 && evolve_base_state && split_projection) {
 	// subtract w0mac from umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Subtract(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
+	Addw0(umac,w0mac,-1.);
     }
 
     // wallclock time
@@ -686,6 +674,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // wallclock time
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+
+    if (spherical == 1 && evolve_base_state && split_projection) {
+	// add w0mac back to umac
+	Addw0(umac,w0mac,1.);
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 8 -- advect the full state through dt
@@ -771,15 +764,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
-
-    if (spherical == 1 && evolve_base_state && split_projection) {
-	// add w0mac back to umac
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
-		MultiFab::Add(umac[lev][dim],w0mac[lev][dim],0,0,1,1);
-	    }
-	}
-    }
 
     if (evolve_base_state && use_etarho) {
 	// compute the new etarho

@@ -37,9 +37,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     // calculate gradp0
     RealVector gradp0;
+    gradp0.resize((max_radial_level+1)*nr_fine);
 
     if (spherical == 1) {
-        gradp0.resize((max_radial_level+1)*nr_fine);
         if (use_delta_gamma1_term) {
             Real dr = r_cc_loc[1] - r_cc_loc[0];
             gradp0[0] = (p0[1] - p0[0]) / dr;
@@ -57,12 +57,33 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             gradp0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             gradp0_cart[lev].setVal(0.);
         }
-
+    } else {
         if (use_delta_gamma1_term) {
-            Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
+	    for (int lev=0; lev<=finest_level; ++lev) {
+	        int index;
+	        const Real* dx = geom[lev].CellSize();
+
+		// bottom and top edge cases for planar
+		gradp0[lev*nr_fine] = (p0[lev*nr_fine+1] - p0[lev*nr_fine]) / dx[AMREX_SPACEDIM-1];
+		gradp0[(lev+1)*nr_fine-1] = (p0[(lev+1)*nr_fine-1] - p0[(lev+1)*nr_fine-2]) / dx[AMREX_SPACEDIM-1];
+		
+		for (int r=1; r<nr_fine-1; r++) {
+		    index = lev*nr_fine + r;
+		    gradp0[index] = (p0[index+1] - p0[index-1]) / (2.0*dx[AMREX_SPACEDIM-1]);
+		}
+	    }
+        }
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            gradp0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            gradp0_cart[lev].setVal(0.);
         }
     }
-        
+
+    if (use_delta_gamma1_term) {
+        Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
+    }
+	
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -97,8 +118,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         const MultiFab& rho_Hext_mf = rho_Hext[lev];
         const MultiFab& thermal_mf = thermal[lev];
         const MultiFab& normal_mf = normal[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
-        const Real* dx = geom[lev].CellSize();
 
         const MultiFab& p0_mf = p0_cart[lev];
         const MultiFab& gradp0_mf = gradp0_cart[lev];
@@ -150,8 +169,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                           BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                          AMREX_REAL_ANYD(dx));
+			  BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
             }
         }
     }
@@ -170,7 +189,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             // get references to the MultiFabs at level lev
             MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
             const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
-            const Real* dx = geom[lev].CellSize();
 
             const MultiFab& p0_mf = p0_cart[lev];
             const MultiFab& psi_mf = psi_cart[lev];
