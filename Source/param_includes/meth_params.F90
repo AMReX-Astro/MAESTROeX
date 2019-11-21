@@ -86,6 +86,7 @@ module meth_params_module
   double precision , allocatable, save :: reaction_sum_tol
   double precision , allocatable, save :: small_temp
   double precision , allocatable, save :: small_dens
+  logical          , allocatable, save :: use_tfromp
   logical          , allocatable, save :: use_eos_e_instead_of_h
   logical          , allocatable, save :: use_pprime_in_tfromp
   integer          , allocatable, save :: s0_interp_type
@@ -145,6 +146,7 @@ module meth_params_module
   attributes(managed) :: reaction_sum_tol
   attributes(managed) :: small_temp
   attributes(managed) :: small_dens
+  attributes(managed) :: use_tfromp
   attributes(managed) :: use_eos_e_instead_of_h
   attributes(managed) :: use_pprime_in_tfromp
   attributes(managed) :: s0_interp_type
@@ -274,6 +276,8 @@ contains
     small_temp = 5.d6;
     allocate(small_dens)
     small_dens = 1.d-5;
+    allocate(use_tfromp)
+    use_tfromp = .false.;
     allocate(use_eos_e_instead_of_h)
     use_eos_e_instead_of_h = .false.;
     allocate(use_pprime_in_tfromp)
@@ -340,6 +344,7 @@ contains
     call pp%query("reaction_sum_tol", reaction_sum_tol)
     call pp%query("small_temp", small_temp)
     call pp%query("small_dens", small_dens)
+    call pp%query("use_tfromp", use_tfromp)
     call pp%query("use_eos_e_instead_of_h", use_eos_e_instead_of_h)
     call pp%query("use_pprime_in_tfromp", use_pprime_in_tfromp)
     call pp%query("s0_interp_type", s0_interp_type)
@@ -527,6 +532,9 @@ contains
     end if
     if (allocated(small_dens)) then
         deallocate(small_dens)
+    end if
+    if (allocated(use_tfromp)) then
+        deallocate(use_tfromp)
     end if
     if (allocated(use_eos_e_instead_of_h)) then
         deallocate(use_eos_e_instead_of_h)
