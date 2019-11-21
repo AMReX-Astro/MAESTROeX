@@ -5,7 +5,7 @@ module burner_module
   use eos_module
   use burn_type_module
 
-#ifdef SIMPLIFIED_SDC
+#ifdef SDC
   use integrator_module
 #else
   use actual_burner_module
@@ -19,7 +19,7 @@ contains
 
     implicit none
 
-#ifdef SIMPLIFIED_SDC
+#ifdef SDC
     call integrator_init()
 #else
     call actual_burner_init()
@@ -30,7 +30,7 @@ contains
   end subroutine burner_init
 
 
-#ifndef SIMPLIFIED_SDC
+#ifndef SDC
   subroutine burner(state_in, state_out, dt, time_in)
 
     !$acc routine seq
