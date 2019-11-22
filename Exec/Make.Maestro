@@ -8,6 +8,8 @@ EOS_HOME     ?= $(TOP)/Microphysics/EOS
 NETWORK_HOME ?= $(TOP)/Microphysics/networks
 COND_HOME    ?= $(TOP)/Microphysics/conductivity
 
+INTEGRATOR_DIR ?= VODE90
+
 EBASE := Maestro
 
 # EXTERN_CORE is simply a list of the directories we use in EOS,
