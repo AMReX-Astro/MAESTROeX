@@ -375,26 +375,31 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
               MultiFab&     rho_Hnuc_mf = rho_Hnuc[lev];
         const MultiFab&         scal_mf =     scal[lev];
 
+	if (!do_burning) {
+            rho_omegadot[lev].setVal(0.);
+            rho_Hnuc[lev].setVal(0.);
+	} else {
 
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+	    // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+	    for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            instantaneous_reaction_rates(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-					 BL_TO_FORTRAN_3D(rho_omegadot_mf[mfi]),
-					 BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-					 BL_TO_FORTRAN_3D(scal_mf[mfi]));
-        }
+		// Get the index space of the valid region
+		const Box& tileBox = mfi.tilebox();
+		const Real* dx = geom[lev].CellSize();
+		
+		// call fortran subroutine
+		// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+		// lo/hi coordinates (including ghost cells), and/or the # of components
+		// We will also pass "validBox", which specifies the "valid" region.
+		instantaneous_reaction_rates(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+					     BL_TO_FORTRAN_3D(rho_omegadot_mf[mfi]),
+					     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
+					     BL_TO_FORTRAN_3D(scal_mf[mfi]));
+	    }
+	}
     }
     
 }
