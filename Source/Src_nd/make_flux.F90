@@ -143,17 +143,17 @@ contains
                       ! edge states are rho' and X.  To make the (rho X) flux,
                       ! we need the edge state of rho0
                       sflux(i,j,k,comp) = &
-                           (umac(i,j,k)+w0(lev,j))*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
+                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rhoX) then
                       ! edge states are (rho X)
                       sflux(i,j,k,comp) = &
-                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,comp)
+                           umac(i,j,k)*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rho_and_X) then
                       ! edge state are rho and X
                       sflux(i,j,k,comp) = &
-                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
+                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
 
                    endif
 
@@ -270,16 +270,16 @@ contains
                    if (species_pred_type == predict_rhoprime_and_X) then
                       ! edge states are rho' and X.  To make the (rho X)
                       ! flux, we need the edge state of rho0
-                      sflux(i,j,k,comp) = (umac(i,j,k)+w0(lev,k))* &
+                      sflux(i,j,k,comp) = umac(i,j,k)* &
                            (rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rhoX) then
                       ! edge states are (rho X)
-                      sflux(i,j,k,comp) = (umac(i,j,k)+w0(lev,k))*sedge(i,j,k,comp)
+                      sflux(i,j,k,comp) = umac(i,j,k)*sedge(i,j,k,comp)
 
                    else if (species_pred_type == predict_rho_and_X) then
                       ! edge states are rho and X
-                      sflux(i,j,k,comp) = (umac(i,j,k)+w0(lev,k))* &
+                      sflux(i,j,k,comp) = umac(i,j,k)* &
                            sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
 
                    endif
@@ -349,16 +349,16 @@ contains
                 if (species_pred_type == predict_rhoprime_and_X) then
                    ! edge states are rho' and X.  To make the (rho X)
                    ! flux, we need the edge state of rho0
-                   sflux(i,j,k,comp) = (umac(i,j,k) + w0mac(i,j,k)) * &
+                   sflux(i,j,k,comp) = umac(i,j,k) * &
                         (rho0_edge(i,j,k) + sedge(i,j,k,rho_comp))*sedge(i,j,k,comp)
 
                 else if (species_pred_type == predict_rhoX) then
                    ! edge states are (rho X)
-                   sflux(i,j,k,comp) = (umac(i,j,k) + w0mac(i,j,k)) * sedge(i,j,k,comp)
+                   sflux(i,j,k,comp) = umac(i,j,k) * sedge(i,j,k,comp)
 
                 else if (species_pred_type == predict_rho_and_X) then
                    ! edge states are rho and X
-                   sflux(i,j,k,comp) = (umac(i,j,k) + w0mac(i,j,k)) * &
+                   sflux(i,j,k,comp) = umac(i,j,k) * &
                         sedge(i,j,k,rho_comp)*sedge(i,j,k,comp)
 
                 endif
@@ -502,7 +502,7 @@ contains
                    rho0_edge = HALF*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j))
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           (umac(i,j,k)+w0(lev,j))*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+                           umac(i,j,k)*(rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -514,7 +514,7 @@ contains
                 do j=lo(2),hi(2)
                    do i=lo(1),hi(1)
                       sflux(i,j,k,rhoh_comp) = &
-                           (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
+                           umac(i,j,k)*sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
              end do
@@ -532,7 +532,7 @@ contains
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,j))*sedge(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
@@ -544,7 +544,7 @@ contains
              do j=lo(2),hi(2)
                 rhoh0_edge = HALF*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j))
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,j))*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
                 end do
              end do
           end do
@@ -762,7 +762,7 @@ contains
                 rho0_edge = HALF*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k))
                 do j=lo(2),hi(2)
                    do i=lo(1),hi(1)
-                      sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))* &
+                      sflux(i,j,k,rhoh_comp) = umac(i,j,k)* &
                            (rho0_edge+sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
@@ -775,7 +775,7 @@ contains
              do k=lo(3),hi(3)
                 do j=lo(2),hi(2)
                    do i=lo(1),hi(1)
-                      sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))* &
+                      sflux(i,j,k,rhoh_comp) = umac(i,j,k)* &
                            sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
                    end do
                 end do
@@ -794,7 +794,7 @@ contains
           do k=lo(3),hi(3)
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0(lev,k))*sedge(i,j,k,rhoh_comp)
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
                 end do
              end do
           end do
@@ -808,7 +808,7 @@ contains
              do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
                    sflux(i,j,k,rhoh_comp) = &
-                        (umac(i,j,k)+w0(lev,k))*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
+                        umac(i,j,k)*(sedge(i,j,k,rhoh_comp)+rhoh0_edge)
                 end do
              end do
           end do
@@ -876,7 +876,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k) + w0mac(i,j,k)) * &
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         (rho0_edge(i,j,k) + sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
 
                 end do
@@ -891,7 +891,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k) + w0mac(i,j,k)) * &
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
 
                 end do
@@ -915,7 +915,7 @@ contains
              do j = lo(2), hi(2)
                 do i = lo(1), hi(1)
 
-                   sflux(i,j,k,rhoh_comp) = (umac(i,j,k)+w0mac(i,j,k)) * &
+                   sflux(i,j,k,rhoh_comp) = umac(i,j,k) * &
                         (sedge(i,j,k,rho_comp)+rho0_edge(i,j,k)) * (sedge(i,j,k,rhoh_comp)+h0_edge(i,j,k))
 
                 end do
@@ -941,7 +941,7 @@ contains
           do j = lo(2), hi(2)
              do i = lo(1), hi(1)
 
-                sflux(i,j,k,rhoh_comp) = (umac(i,j,k) + w0mac(i,j,k))*sedge(i,j,k,rhoh_comp)
+                sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
 
              end do
           end do
@@ -961,7 +961,7 @@ contains
                 ! where h_0 is computed from (rho h)_0 / rho_0
 
                 sflux(i,j,k,rhoh_comp) = &
-                     (umac(i,j,k)+w0mac(i,j,k))*(rho0_edge(i,j,k)*h0_edge(i,j,k)+sedge(i,j,k,rhoh_comp))
+                     umac(i,j,k)*(rho0_edge(i,j,k)*h0_edge(i,j,k)+sedge(i,j,k,rhoh_comp))
 
              end do
           end do
