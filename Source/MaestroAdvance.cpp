@@ -541,7 +541,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
+    // need full UMAC velocities for EnthalpyAdvance
+    Addw0(umac,w0mac,1.);
+    
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
@@ -945,7 +951,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
+    // need full UMAC velocities for EnthalpyAdvance
+    Addw0(umac,w0mac,1.);
+    
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
