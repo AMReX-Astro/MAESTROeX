@@ -1,6 +1,7 @@
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause) [![Build Status](https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development)](https://travis-ci.com/AMReX-Astro/MAESTROeX) [![DOI](https://zenodo.org/badge/104002862.svg)](https://zenodo.org/badge/latestdoi/104002862)
-
-
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![Build Status](https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development)](https://travis-ci.com/AMReX-Astro/MAESTROeX)
+[![DOI](https://zenodo.org/badge/104002862.svg)](https://zenodo.org/badge/latestdoi/104002862)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.01757/status.svg)](https://doi.org/10.21105/joss.01757)
 [![AMReX](https://amrex-codes.github.io/badges/powered%20by-AMReX-red.svg)](https://amrex-codes.github.io)
 
 ![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)

@@ -434,9 +434,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
     }
 
+    // need full UMAC velocities for DensityAdvance
+    Addw0(umac,w0mac,1.);
+    
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
+    
     if (evolve_base_state) {
 
         if (use_etarho) {
@@ -535,7 +541,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
+    // need full UMAC velocities for EnthalpyAdvance
+    Addw0(umac,w0mac,1.);
+    
     EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
@@ -820,9 +832,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         etarhoflux[lev].setVal(0.);
     }
 
+    // need full UMAC velocities for DensityAdvance
+    Addw0(umac,w0mac,1.);
+    
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
+    
     if (evolve_base_state) {
 
         if (use_etarho) {
@@ -933,7 +951,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
+    // need full UMAC velocities for EnthalpyAdvance
+    Addw0(umac,w0mac,1.);
+    
     EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    
+    // subtract w0mac from umac
+    Addw0(umac,w0mac,-1.);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());

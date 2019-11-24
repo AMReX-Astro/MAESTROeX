@@ -311,7 +311,10 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int ng_w = w0_cart[lev].nGrow();
     const int ng_r = rhcc_for_nodalproj[lev].nGrow();
     const int ng_p = pi[lev].nGrow();
-
+#ifdef SDC
+    const int ng_i = intra[lev].nGrow();
+#endif
+    
     MultiFab snew_state              (ba, dm,          Nscal, ng_s);
     MultiFab sold_state              (ba, dm,          Nscal, ng_s);
     MultiFab unew_state              (ba, dm, AMREX_SPACEDIM, ng_u);
@@ -323,7 +326,10 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     MultiFab w0_cart_state           (ba, dm, AMREX_SPACEDIM, ng_w);
     MultiFab rhcc_for_nodalproj_state(ba, dm,              1, ng_r);
     MultiFab pi_state                (convert(ba,nodal_flag), dm, 1, ng_p);
-
+#ifdef SDC
+    MultiFab intra_state             (ba, dm,          Nscal, ng_i);
+#endif
+    
     FillPatch(lev, time, sold_state, sold, sold, 0, 0, Nscal, 0, bcs_s);
     std::swap(sold_state, sold[lev]);
     std::swap(snew_state, snew[lev]);
@@ -345,6 +351,9 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::swap(           w0_cart_state,            w0_cart[lev]);
     std::swap(rhcc_for_nodalproj_state, rhcc_for_nodalproj[lev]);
     std::swap(                pi_state,                 pi[lev]);
+#ifdef SDC
+    std::swap(intra_state,intra[lev]);
+#endif
 
     if (spherical == 1) {
         const int ng_n = normal[lev].nGrow();
@@ -382,6 +391,9 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     rhcc_for_nodalproj[lev].define(ba, dm,              1, 1);
 
     pi[lev].define(convert(ba,nodal_flag), dm, 1, 0);     // nodal
+#ifdef SDC
+    intra[lev].define             (ba, dm,          Nscal, 0);
+#endif
 
     if (spherical == 1) {
         normal      [lev].define(ba, dm, 3, 1);
@@ -397,6 +409,9 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_old, 0, 0,              1, bcs_f);
     FillCoarsePatch(lev, time,      gpi[lev],      gpi,      gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time,     dSdt[lev],     dSdt,     dSdt, 0, 0,              1, bcs_f);
+#ifdef SDC
+    FillCoarsePatch(lev, time,    intra[lev],    intra,    intra, 0, 0,          Nscal, bcs_f);
+#endif
 }
 
 // within a call to AmrCore::regrid, this function deletes all data
@@ -419,6 +434,9 @@ Maestro::ClearLevel (int lev)
     w0_cart[lev].clear();
     rhcc_for_nodalproj[lev].clear();
     pi[lev].clear();
+#ifdef SDC
+    intra[lev].clear();
+#endif
     if (spherical == 1) {
         normal[lev].clear();
         cell_cc_to_r[lev].clear();

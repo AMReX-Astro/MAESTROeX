@@ -22,6 +22,7 @@ EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
 GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/H_He.net
+INTEGRATOR_DIR   := VODE90
 
 Bpack   := ./Make.package
 Blocs   := .

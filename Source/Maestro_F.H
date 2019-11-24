@@ -108,6 +108,7 @@ extern "C"
 
     //////////////////////
     // in burner_loop.f90
+#ifndef SDC
     void burner_loop(const int* lo, const int* hi,
                      const int lev,
                      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
@@ -130,7 +131,34 @@ extern "C"
                           const amrex::Real dt_in, const amrex::Real time_in, 
                           const int* mask, const int* m_lo, const int* m_hi,
                           const int use_mask);
+    
+#else
+    void burner_loop(const int* lo, const int* hi,
+			 const int lev,
+			 const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+			       amrex::Real* s_out,    const int* o_lo, const int* o_hi,
+			 const amrex::Real* source, const int* s_lo, const int* s_hi,
+			 const amrex::Real* p0_in,
+			 const amrex::Real dt_in,
+			 const amrex::Real time_in,
+			 const int* mask, const int* m_lo, const int* m_hi,
+			 const int use_mask);
 
+    void burner_loop_sphr(const int* lo, const int* hi,
+			      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
+                                    amrex::Real* s_out,    const int* o_lo, const int* o_hi,
+			      const amrex::Real* source, const int* s_lo, const int* s_hi,
+			      const amrex::Real* p0_cart, const int* t_lo, const int* t_hi,
+			      const amrex::Real dt_in,
+			      const amrex::Real time_in,
+			      const int* mask, const int* m_lo, const int* m_hi,
+			      const int use_mask);
+#endif
+    
+    void instantaneous_reaction_rates(const int* lo, const int* hi,
+				      amrex::Real* rho_omegadot, const int* o_lo, const int* o_hi,
+				      amrex::Real* rho_Hext, const int* h_lo, const int* h_hi,
+				      const amrex::Real* scal, const int* s_lo, const int* s_hi);
     //////////////////////
 
     //////////////////////
@@ -474,6 +502,15 @@ extern "C"
     //////////////////////
 
     //////////////////////
+    // in make_intra_coeffs.F90
+    void make_intra_coeffs(const int* lo,  const int* hi,
+			   const amrex::Real* scalold, const int* s1_lo, const int* s1_hi,
+			   const amrex::Real* scalnew, const int* s2_lo, const int* s2_hi,
+			   amrex::Real* cp, const int* cp_lo, const int* cp_hi,
+			   amrex::Real* xi, const int* xi_lo, const int* xi_hi);
+    //////////////////////
+
+    //////////////////////
     // in make_explicit_thermal.F90
     void make_thermal_coeffs(const int* lo,  const int* hi,
 			     const amrex::Real* scal, const int* s_lo, const int* s_hi,
@@ -666,7 +703,6 @@ extern "C"
     void make_abar(const int* lo, const int* hi,
                    const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                    amrex::Real* abar, const int* a_lo, const int* a_hi);
-/////////////////////
 
     //////////////////////
     // in make_psi.F90
@@ -706,8 +742,8 @@ extern "C"
                    const amrex::Real* rHext, const int* e_lo, const int* e_hi,
                    const amrex::Real* therm, const int* t_lo, const int* t_hi,
                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
-                   const amrex::Real* dx);
+		   const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
+                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi);
 
      void make_S_cc_sphr(const int* lo, const int* hi,
                          amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
