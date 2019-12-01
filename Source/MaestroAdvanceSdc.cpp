@@ -411,7 +411,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     // advect rhoX and rho
-    DensityAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+    DensityAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
     
 
     if (evolve_base_state) {
@@ -472,7 +472,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac_dummy,diff_old);
+    EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac,diff_old);
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -847,7 +847,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	}
 
 	// advect rhoX, rho, and tracers
-	DensityAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac_dummy,rho0_pred_edge_dummy);
+	DensityAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
     
 
 	if (evolve_base_state) {
@@ -903,7 +903,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 	    Print() << "            : enthalpy_advance >>>" << std::endl;
 	}
 	
-	EnthalpyAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,umac,w0mac_dummy,diff_old);
+	EnthalpyAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,umac,w0mac,diff_old);
 
         // base state enthalpy update
         if (evolve_base_state) {
