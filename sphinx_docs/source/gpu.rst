@@ -39,14 +39,28 @@ Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be s
 
       COMP := pgi 
 
-Finally, the integrator used by the Microphysics library must be set to ``VODE90``:
+The integrator used by the Microphysics library must be set to ``VODE90``:
 
 ::
 
     INTEGRATOR_DIR   := VODE90
 
+Depending on which system you are running on, it may be necessary to specify 
+the CUDA Capability using the ``CUDA_ARCH`` flag. The CUDA Capability will 
+depend on the specific GPU hardware you are running on. On a Linux system, the 
+capability of your device can typically be found by compiling and running the ``deviceQuery`` 
+script found in the CUDA samples directory: 
+``/usr/local/cuda/samples/1_Utilities/deviceQuery`` (its exact location may 
+vary depending on where CUDA is installed on your system). The default value of 
+this flag is 70, corresponding to a capability of 7.x. For a device with 
+capability 6.x, the flag should be set to:
+
+::
+
+    CUDA_ARCH := 60
+
 .. _sec:gpuporting:
-    
+
 Offloading a routine to GPU
 ===========================
 

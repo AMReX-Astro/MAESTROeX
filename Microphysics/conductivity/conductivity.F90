@@ -55,6 +55,8 @@ contains
 
     type (eos_t)  , intent(inout) :: state
 
+    !$gpu
+
     call actual_conductivity(state)
 
   end subroutine conductivity

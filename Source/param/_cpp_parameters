@@ -482,7 +482,7 @@ small_dens                          Real               1.e-5    y
 
 # When updating temperature, use $T=T(\rho,p_0,X) $ rather than
 # $T=T(\rho,h,X)$.
-use_tfromp                          bool            false
+use_tfromp                          bool            false    y
 
 # In deriving the temperature from the $h$, first subtract off
 # $p_0/\rho$ to define $e$, and use that as the input to the EOS.

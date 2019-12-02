@@ -559,7 +559,7 @@ contains
     double precision, intent(in   ) :: dt,dtold
 
     ! Local variables
-    integer                    :: r
+    integer                    :: r, max_cutoff
     double precision            :: dpdr, volume_discrepancy, w0_avg, div_avg, dt_avg
 
     double precision ::    w0_old_cen(0:nr_fine-1)
@@ -628,8 +628,10 @@ contains
 
     ! Note that we are solving for (r^2 delta w0), not just w0.
 
+    max_cutoff = min(base_cutoff_density_coord(0), nr_fine-1)
+    
     !$OMP PARALLEL DO PRIVATE(r,dpdr)
-    do r=1,base_cutoff_density_coord(0)
+    do r=1,max_cutoff
        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
        A(r) = A(r) / dr(0)**2
 
@@ -659,25 +661,25 @@ contains
     F(0) = zero
 
     ! Upper boundary
-    A(base_cutoff_density_coord(0)+1) = -one
-    B(base_cutoff_density_coord(0)+1) = one
-    C(base_cutoff_density_coord(0)+1) = zero
-    F(base_cutoff_density_coord(0)+1) = zero
+    A(max_cutoff+1) = -one
+    B(max_cutoff+1) = one
+    C(max_cutoff+1) = zero
+    F(max_cutoff+1) = zero
 
     ! Call the tridiagonal solver
-    call tridiag(A, B, C, F, u, base_cutoff_density_coord(0)+2)
+    call tridiag(A, B, C, F, u, max_cutoff+2)
 
     w0(0) = ZERO + w0_from_Sbar(0)
 
     !$OMP PARALLEL DO PRIVATE(r)
-    do r=1,base_cutoff_density_coord(0)+1
+    do r=1,max_cutoff+1
        w0(r) = u(r) / r_edge_loc(0,r)**2 + w0_from_Sbar(r)
     end do
     !$OMP END PARALLEL DO
 
-    do r=base_cutoff_density_coord(0)+2,nr_fine
-       w0(r) = w0(base_cutoff_density_coord(0)+1)&
-            *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
+    do r=max_cutoff+2,nr_fine
+       w0(r) = w0(max_cutoff+1)&
+            *r_edge_loc(0,max_cutoff+1)**2/r_edge_loc(0,r)**2
     end do
 
     ! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
@@ -714,7 +716,7 @@ contains
     double precision, intent(in   ) :: dt
 
     ! Local variables
-    integer :: r
+    integer :: r, max_cutoff
     double precision :: LHS, RHS
 
     double precision ::      rho0_nph(0:0,0:nr_fine-1)
@@ -733,7 +735,9 @@ contains
 
     w0(0) = 0.d0
 
-    do r=1,base_cutoff_density_coord(0)+1
+    max_cutoff = min(base_cutoff_density_coord(0)+1, nr_fine)
+    
+    do r=1,max_cutoff
        LHS = r_edge_loc(0,r)**2 / (dr(0)*r_cc_loc(0,r-1)**2) - &
             (rho0_nph(0,r-1)*grav_cell(0,r-1) / (2.d0*gamma1bar_nph(r-1)*p0_nph(r-1)) )
 
@@ -745,7 +749,7 @@ contains
        w0(r) = RHS / LHS
     end do
 
-    do r=base_cutoff_density_coord(0)+2,nr_fine
+    do r=max_cutoff+1,nr_fine
        w0(r) = w0(base_cutoff_density_coord(0)+1)&
             *r_edge_loc(0,base_cutoff_density_coord(0)+1)**2/r_edge_loc(0,r)**2
     end do

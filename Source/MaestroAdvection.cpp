@@ -98,7 +98,13 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        int start_comp, int num_comp)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeRhoXFlux()",MakeRhoXFlux);
+    BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
@@ -106,115 +112,164 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf        = state[lev];
-              MultiFab& sedgex_mf      = sedge[lev][0];
-	      MultiFab& sfluxx_mf      = sflux[lev][0];
-	      MultiFab& etarhoflux_mf = etarhoflux[lev];
-        const MultiFab& umac_mf        = umac[lev][0];
-
-              MultiFab& sedgey_mf      = sedge[lev][1];
-	      MultiFab& sfluxy_mf      = sflux[lev][1];
-        const MultiFab& vmac_mf        = umac[lev][1];
+// get references to the MultiFabs at level lev
+        const MultiFab& scal_mf  = state[lev];
+        MultiFab& sedgex_mf      = sedge[lev][0];
+        MultiFab& sfluxx_mf      = sflux[lev][0];
+        MultiFab& etarhoflux_mf  = etarhoflux[lev];
+        const MultiFab& umac_mf  = umac[lev][0];
+        MultiFab& sedgey_mf      = sedge[lev][1];
+        MultiFab& sfluxy_mf      = sflux[lev][1];
+        const MultiFab& vmac_mf  = umac[lev][1];
 
 #if (AMREX_SPACEDIM == 3)
-              MultiFab& sedgez_mf      = sedge[lev][2];
-	      MultiFab& sfluxz_mf      = sflux[lev][2];
-        const MultiFab& wmac_mf        = umac[lev][2];
+        MultiFab& sedgez_mf      = sedge[lev][2];
+        MultiFab& sfluxz_mf      = sflux[lev][2];
+        const MultiFab& wmac_mf  = umac[lev][2];
 
-	// if spherical == 1
-	const MultiFab& w0macx_mf = w0mac[lev][0];
-	const MultiFab& w0macy_mf = w0mac[lev][1];
-	const MultiFab& w0macz_mf = w0mac[lev][2];
-	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
-	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+    	// if spherical == 1
+    	const MultiFab& w0macx_mf = w0mac[lev][0];
+    	const MultiFab& w0macy_mf = w0mac[lev][1];
+    	const MultiFab& w0macz_mf = w0mac[lev][2];
+    	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
+    	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+    	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+    	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 
-	if (spherical == 1) {
-	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
-	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
-	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
-	}
+    	if (spherical == 1) {
+    	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
+    	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
+    	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
+    	}
 #endif
-
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-		// NOTE: not sure if this should be tiled
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-
-	    // call fortran subroutine
-	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-	    // lo/hi coordinates (including ghost cells), and/or the # of components
-	    // We will also pass "validBox", which specifies the "valid" region.
-	    if (spherical == 0) {
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = amrex::growHi(tileBox,2, 1);
+#endif
 
 #if (AMREX_SPACEDIM == 2)
-	        make_rhoX_flux_2d(
+                // x-direction
+#pragma gpu box(xbx)
+                make_rhoX_flux_2d(AMREX_INT_ANYD(xbx.loVect()),
+                    AMREX_INT_ANYD(xbx.hiVect()), lev, 1,
+                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                    r0_predicted_edge.dataPtr(),
+                    w0.dataPtr(),
+                    startcomp, endcomp);
+
+                // y-direction
+#pragma gpu box(ybx)
+                make_rhoX_flux_2d(AMREX_INT_ANYD(ybx.loVect()),
+                    AMREX_INT_ANYD(ybx.hiVect()), lev, 2,
+                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                    r0_predicted_edge.dataPtr(),
+                    w0.dataPtr(),
+                    startcomp, endcomp);
+
 #elif (AMREX_SPACEDIM == 3)
-                make_rhoX_flux_3d(
-#endif
-				  &lev, tileBox.loVect(), tileBox.hiVect(),
-				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-#endif
-				  BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
-				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-#endif
-				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
-				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
-				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
-				  r0_predicted_edge.dataPtr(),
-				  w0.dataPtr(),
-				  &startcomp, &endcomp);
-	    } else {
 
-#if (AMREX_SPACEDIM == 3)
-		// if (use_exact_base_state)
-		// {
-		//     // add make_rhoX_flux_3d_sphr_irreg()
-		// }
-		// else
-		// {
-		    make_rhoX_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
-			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
-				       &startcomp, &endcomp);
-		// }
-#else
-	        Abort("MakeRhoXFlux: Spherical is not valid for DIM < 3");
-#endif
+    	    // call fortran subroutine
+    	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+    	    // lo/hi coordinates (including ghost cells), and/or the # of components
+    	    // We will also pass "validBox", which specifies the "valid" region.
+    	    if (spherical == 0) {
+                // x-direction
+#pragma gpu box(xbx)
+                make_rhoX_flux_3d(AMREX_INT_ANYD(xbx.loVect()),
+                                AMREX_INT_ANYD(xbx.hiVect()),
+                                lev, 1,
+                                BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                                r0_predicted_edge.dataPtr(),
+                                w0.dataPtr(),
+                                startcomp, endcomp);
+                // y-direction
+#pragma gpu box(ybx)
+                make_rhoX_flux_3d(AMREX_INT_ANYD(ybx.loVect()),
+                                AMREX_INT_ANYD(ybx.hiVect()),
+                                lev, 2,
+                                BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                                r0_predicted_edge.dataPtr(),
+                                w0.dataPtr(),
+                                startcomp, endcomp);
+                // z-direction
+#pragma gpu box(zbx)
+                make_rhoX_flux_3d(AMREX_INT_ANYD(zbx.loVect()),
+                                AMREX_INT_ANYD(zbx.hiVect()),
+                                lev, 3,
+                                BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                                r0_predicted_edge.dataPtr(),
+                                w0.dataPtr(),
+                                startcomp, endcomp);
+    	    } else {
+                // x-direction
+#pragma gpu box(xbx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                                    AMREX_INT_ANYD(xbx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
+                                    startcomp, endcomp);
+                // y-direction
+#pragma gpu box(ybx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                                    AMREX_INT_ANYD(ybx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
+                                    startcomp, endcomp);
+                // z-direction
+#pragma gpu box(zbx)
+    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                                    AMREX_INT_ANYD(zbx.hiVect()),
+                                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                    BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
+                                    startcomp, endcomp);
+
 	    } // end spherical
+#endif
 	} // end MFIter loop
-
 
 	// increment or decrement the flux registers by area and time-weighted fluxes
         // Note that the fluxes need to be scaled by dt and area
@@ -226,16 +281,16 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
         if (reflux_type == 2) {
 
-	    // Get the grid size
-	    const Real* dx = geom[lev].CellSize();
-	    // NOTE: areas are different in DIM=2 and DIM=3
+    	    // Get the grid size
+    	    const Real* dx = geom[lev].CellSize();
+    	    // NOTE: areas are different in DIM=2 and DIM=3
 #if (AMREX_SPACEDIM == 3)
-	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+    	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
-	    const Real area[2] = {dx[1], dx[0]};
+    	    const Real area[2] = {dx[1], dx[0]};
 #endif
 
-	    if (flux_reg_s[lev+1])
+    	    if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)
@@ -244,7 +299,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,Rho,Rho,1, -1.0*dt*area[i]);
                 }
             }
-	    if (flux_reg_s[lev])
+    	    if (flux_reg_s[lev])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev)
@@ -254,20 +309,26 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 }
             }
 
-	    if (spherical == 0) {
-		// need edge_restrict for etarhoflux
-	    }
+    	    if (spherical == 0) {
+    		// need edge_restrict for etarhoflux
+    	    }
         }
 
     } // end loop over levels
 
     // average down fluxes
     if (reflux_type == 1) {
-	AverageDownFaces(sflux);
+    	AverageDownFaces(sflux);
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
+
 
 void
 Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
@@ -291,148 +352,221 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& h0mac_new)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeRhoHFlux()",MakeRhoHFlux);
+    BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         const MultiFab& scal_mf   = state[lev];
-              MultiFab& sedgex_mf = sedge[lev][0];
-	      MultiFab& sfluxx_mf = sflux[lev][0];
+        MultiFab& sedgex_mf = sedge[lev][0];
+        MultiFab& sfluxx_mf = sflux[lev][0];
         const MultiFab& umac_mf   = umac[lev][0];
-
-              MultiFab& sedgey_mf = sedge[lev][1];
-	      MultiFab& sfluxy_mf = sflux[lev][1];
+        MultiFab& sedgey_mf = sedge[lev][1];
+        MultiFab& sfluxy_mf = sflux[lev][1];
         const MultiFab& vmac_mf   = umac[lev][1];
 
 #if (AMREX_SPACEDIM == 3)
-              MultiFab& sedgez_mf = sedge[lev][2];
-	      MultiFab& sfluxz_mf = sflux[lev][2];
+        MultiFab& sedgez_mf = sedge[lev][2];
+        MultiFab& sfluxz_mf = sflux[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
 
-	// if spherical == 1
-	const MultiFab& w0macx_mf = w0mac[lev][0];
-	const MultiFab& w0macy_mf = w0mac[lev][1];
-	const MultiFab& w0macz_mf = w0mac[lev][2];
-	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
-	MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
-	MultiFab rhoh0mac_edgex, rhoh0mac_edgey, rhoh0mac_edgez;
-	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-	rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
-	h0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-	h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-	h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
-	rhoh0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
-	rhoh0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
-	rhoh0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+        // if spherical == 1
+        const MultiFab& w0macx_mf = w0mac[lev][0];
+        const MultiFab& w0macy_mf = w0mac[lev][1];
+        const MultiFab& w0macz_mf = w0mac[lev][2];
+        MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
+        MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
+        MultiFab rhoh0mac_edgex, rhoh0mac_edgey, rhoh0mac_edgez;
+        rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
+        rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
+        rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+        h0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
+        h0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
+        h0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
+        rhoh0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
+        rhoh0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
+        rhoh0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
-	if (spherical == 1) {
-	    if (use_exact_base_state) {
-		MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
-		MultiFab::LinComb(rhoh0mac_edgey,0.5,rh0mac_old[lev][1],0,0.5,rh0mac_new[lev][1],0,0,1,0);
-		MultiFab::LinComb(rhoh0mac_edgez,0.5,rh0mac_old[lev][2],0,0.5,rh0mac_new[lev][2],0,0,1,0);
-	    } else {
-		MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
-		MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
-		MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
-		MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
-		MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
-		MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
-	    }
-	}
+        if (spherical == 1) {
+            if (use_exact_base_state) {
+                MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
+                MultiFab::LinComb(rhoh0mac_edgey,0.5,rh0mac_old[lev][1],0,0.5,rh0mac_new[lev][1],0,0,1,0);
+                MultiFab::LinComb(rhoh0mac_edgez,0.5,rh0mac_old[lev][2],0,0.5,rh0mac_new[lev][2],0,0,1,0);
+            } else {
+                MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,0);
+                MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,0);
+                MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,0);
+                MultiFab::LinComb(h0mac_edgex,0.5,h0mac_old[lev][0],0,0.5,h0mac_new[lev][0],0,0,1,0);
+                MultiFab::LinComb(h0mac_edgey,0.5,h0mac_old[lev][1],0,0.5,h0mac_new[lev][1],0,0,1,0);
+                MultiFab::LinComb(h0mac_edgez,0.5,h0mac_old[lev][2],0,0.5,h0mac_new[lev][2],0,0,1,0);
+            }
+        }
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	        // NOTE: not sure if this should be tiled (see make_rhoX_flux above)
         for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = amrex::growHi(tileBox,2, 1);
+#endif
 
-	    // call fortran subroutine
-	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-	    // lo/hi coordinates (including ghost cells), and/or the # of components
-	    // We will also pass "validBox", which specifies the "valid" region.
-	    if (spherical == 0) {
+            // call fortran subroutine
+            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+            // lo/hi coordinates (including ghost cells), and/or the # of components
+            // We will also pass "validBox", which specifies the "valid" region.
 #if (AMREX_SPACEDIM == 2)
-		make_rhoh_flux_2d(
-#elif (AMREX_SPACEDIM == 3)
-                make_rhoh_flux_3d(
-#endif
-				  &lev, tileBox.loVect(), tileBox.hiVect(),
-				  BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-				  BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-#endif
-				  BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-				  BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-#endif
-				  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-				  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-#endif
-				  r0_old.dataPtr(), r0_edge_old.dataPtr(),
-				  r0_new.dataPtr(), r0_edge_new.dataPtr(),
-				  rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
-				  rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
-				  w0.dataPtr());
-	    } else {
+            // x-direction
+#pragma gpu box(xbx)
+            make_rhoh_flux_2d(AMREX_INT_ANYD(xbx.loVect()),
+                              AMREX_INT_ANYD(xbx.hiVect()),
+                              lev, 1,
+                              BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                              BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                              BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                              r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                              r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                              rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
+                              rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+                              w0.dataPtr());
 
-#if (AMREX_SPACEDIM == 3)
-	        if (use_exact_base_state)
-		{
-		    make_rhoh_flux_3d_sphr_irreg(tileBox.loVect(), tileBox.hiVect(),
-						 BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-						 BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-						 BL_TO_FORTRAN_3D(umac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-						 BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgex[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgey[mfi]),
-						 BL_TO_FORTRAN_3D(rhoh0mac_edgez[mfi]));
-		}
-		else
-		{
-		    make_rhoh_flux_3d_sphr(tileBox.loVect(), tileBox.hiVect(),
-			               BL_TO_FORTRAN_FAB(sfluxx_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxy_mf[mfi]),
-			               BL_TO_FORTRAN_FAB(sfluxz_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgex_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgey_mf[mfi]),
-				       BL_TO_FORTRAN_FAB(sedgez_mf[mfi]),
-				       BL_TO_FORTRAN_3D(umac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				       BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgex[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgey[mfi]),
-				       BL_TO_FORTRAN_3D(rho0mac_edgez[mfi]),
-				       BL_TO_FORTRAN_3D(h0mac_edgex[mfi]),
-				       BL_TO_FORTRAN_3D(h0mac_edgey[mfi]),
-				       BL_TO_FORTRAN_3D(h0mac_edgez[mfi]));
-		}
-#else
-	        Abort("MakeRhoHFlux: Spherical is not valid for DIM < 3");
+            // y-direction
+#pragma gpu box(ybx)
+            make_rhoh_flux_2d(AMREX_INT_ANYD(ybx.loVect()),
+                              AMREX_INT_ANYD(ybx.hiVect()),
+                              lev, 2,
+                              BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                              BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                              BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                              r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                              r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                              rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
+                              rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+                              w0.dataPtr());
+
+#elif (AMREX_SPACEDIM == 3)
+
+            if (spherical == 0) {
+                // x-direction
+#pragma gpu box(xbx)
+                make_rhoh_flux_3d(AMREX_INT_ANYD(xbx.loVect()),
+                    AMREX_INT_ANYD(xbx.hiVect()),
+                    lev, 1,
+                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                    rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
+                    rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+                    w0.dataPtr());
+
+                // y-direction
+#pragma gpu box(ybx)
+                make_rhoh_flux_3d(AMREX_INT_ANYD(ybx.loVect()),
+                    AMREX_INT_ANYD(ybx.hiVect()),
+                    lev, 2,
+                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                    rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
+                    rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+                    w0.dataPtr());
+
+                // z-direction
+#pragma gpu box(zbx)
+                make_rhoh_flux_3d(AMREX_INT_ANYD(zbx.loVect()),
+                    AMREX_INT_ANYD(zbx.hiVect()),
+                    lev, 3,
+                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
+                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
+                    rh0_old.dataPtr(), rh0_edge_old.dataPtr(),
+                    rh0_new.dataPtr(), rh0_edge_new.dataPtr(),
+                    w0.dataPtr());
+            } else {
+
+                if (use_exact_base_state) {
+                    // x-direction
+#pragma gpu box(xbx)
+                    make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(xbx.loVect()),
+                                                 AMREX_INT_ANYD(xbx.hiVect()),
+                                                 BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                                 BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                                 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                                 BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                                 BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]));
+                     // y-direction
+#pragma gpu box(ybx)
+                     make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(ybx.loVect()),
+                                                  AMREX_INT_ANYD(ybx.hiVect()),
+                                                  BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                                  BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                                  BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                                  BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]));
+                  // z-direction
+#pragma gpu box(zbx)
+                  make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(zbx.loVect()),
+                                               AMREX_INT_ANYD(zbx.hiVect()),
+                                               BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                               BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                               BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                               BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                               BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]));
+                }
+                else
+                {
+                    // x-direction
+#pragma gpu box(xbx)
+                    make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                                           AMREX_INT_ANYD(xbx.hiVect()),
+                                           BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+                                           BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+                                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                           BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
+                                           BL_TO_FORTRAN_ANYD(h0mac_edgex[mfi]));
+                   // y-direction
+#pragma gpu box(ybx)
+                   make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                                          AMREX_INT_ANYD(ybx.hiVect()),
+                                          BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+                                          BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+                                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                          BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
+                                          BL_TO_FORTRAN_ANYD(h0mac_edgey[mfi]));
+                  // z-direction
+#pragma gpu box(zbx)
+                  make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                                         AMREX_INT_ANYD(zbx.hiVect()),
+                                         BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+                                         BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+                                         BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                         BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
+                                         BL_TO_FORTRAN_ANYD(h0mac_edgez[mfi]));
+                }
+            }
 #endif
-	    }
-	} // end MFIter loop
+        } // end MFIter loop
 
 
         // increment or decrement the flux registers by area and time-weighted fluxes
@@ -445,23 +579,23 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
         if (reflux_type == 2) {
 
-	    // Get the grid size
-	    const Real* dx = geom[lev].CellSize();
-            	    // NOTE: areas are different in DIM=2 and DIM=3
+            // Get the grid size
+            const Real* dx = geom[lev].CellSize();
+            // NOTE: areas are different in DIM=2 and DIM=3
 #if (AMREX_SPACEDIM == 3)
-	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+            const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
-	    const Real area[2] = {dx[1], dx[0]};
+            const Real area[2] = {dx[1], dx[0]};
 #endif
 
-	    if (flux_reg_s[lev+1])
+            if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,RhoH,RhoH,1, -1.0*dt*area[i]);
                 }
             }
-	    if (flux_reg_s[lev])
+            if (flux_reg_s[lev])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev)
@@ -472,10 +606,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
     } // end loop over levels
 
     if (reflux_type == 1) {
-	AverageDownFaces(sflux);
+        AverageDownFaces(sflux);
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 

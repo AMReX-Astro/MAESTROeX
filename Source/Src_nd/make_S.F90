@@ -1,8 +1,6 @@
 module make_S_module
 
   use amrex_error_module
-  use eos_type_module
-  use eos_module
   use network, only: nspec
   use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_density_coord, nr, dr
@@ -24,8 +22,12 @@ contains
        rHext, e_lo, e_hi, &
        therm, t_lo, t_hi, &
        p0_cart, p0_lo, p0_hi, &
-       gamma1bar_cart, g1_lo, g1_hi, &
-       dx) bind (C,name="make_S_cc")
+       gradp0_cart, gp0_lo, gp0_hi, &
+       gamma1bar_cart, g1_lo, g1_hi) bind (C,name="make_S_cc")
+
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
 
     integer  , value, intent (in   ) :: lev
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -39,6 +41,7 @@ contains
     integer         , intent (in   ) :: e_lo(3), e_hi(3)
     integer         , intent (in   ) :: t_lo(3), t_hi(3)
     integer         , intent (in   ) :: p0_lo(3), p0_hi(3)
+    integer         , intent (in   ) :: gp0_lo(3), gp0_hi(3)
     integer         , intent (in   ) :: g1_lo(3), g1_hi(3)
     double precision, intent (inout) :: S_cc (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3))
     double precision, intent (inout) :: delta_gamma1_term(dg_lo(1):dg_hi(1),dg_lo(2):dg_hi(2),dg_lo(3):dg_hi(3))
@@ -50,15 +53,16 @@ contains
     double precision, intent (in   ) :: rHext(e_lo(1):e_hi(1),e_lo(2):e_hi(2),e_lo(3):e_hi(3))
     double precision, intent (in   ) :: therm(t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
     double precision, intent (in) :: p0_cart (p0_lo(1):p0_hi(1),p0_lo(2):p0_hi(2),p0_lo(3):p0_hi(3))
+    double precision, intent (in) :: gradp0_cart (gp0_lo(1):gp0_hi(1),gp0_lo(2):gp0_hi(2),gp0_lo(3):gp0_hi(3))
     double precision, intent (in) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
-    double precision, intent(in   ) :: dx(3)
 
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
+    type(eos_xderivs_t) :: eos_xderivs
 
     integer comp
-    double precision sigma, xi_term, pres_term, gradp0
+    double precision sigma, xi_term, pres_term
 
     !$gpu
 
@@ -76,6 +80,8 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
+             call composition_derivatives(eos_state, eos_xderivs)
+
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
 
@@ -83,10 +89,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_state%dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_state%dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
@@ -99,28 +105,10 @@ contains
              r = k
 #endif
              if (use_delta_gamma1_term .and. r < anelastic_cutoff_density_coord(lev)) then
-#if (AMREX_SPACEDIM == 2)
-                if (r .eq. 0) then
-                   gradp0 = (p0_cart(i,j+1,k) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
-                else if (r .eq. nr(lev)-1) then
-                   gradp0 = (p0_cart(i,j,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
-                else
-                   gradp0 = 0.5d0*(p0_cart(i,j+1,k) - p0_cart(i,j-1,k))/dx(AMREX_SPACEDIM)
-                endif
-#else
-                if (r .eq. 0) then
-                gradp0 = (p0_cart(i,j,k+1) - p0_cart(i,j,k))/dx(AMREX_SPACEDIM)
-                else if (r .eq. nr(lev)-1) then
-                gradp0 = (p0_cart(i,j,k) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
-                else
-                gradp0 = 0.5d0*(p0_cart(i,j,k+1) - p0_cart(i,j,k-1))/dx(AMREX_SPACEDIM)
-                endif
-#endif
-
                 delta_gamma1(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k)
 
                 delta_gamma1_term(i,j,k) = (eos_state%gam1 - gamma1bar_cart(i,j,k))*u(i,j,k,AMREX_SPACEDIM)* &
-                     gradp0/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
+                     gradp0_cart(i,j,k)/(gamma1bar_cart(i,j,k)**2*p0_cart(i,j,k))
              else
                 delta_gamma1_term(i,j,k) = 0.0d0
                 delta_gamma1(i,j,k) = 0.0d0
@@ -146,6 +134,10 @@ contains
        gradp0_cart, gp0_lo, gp0_hi, &
        gamma1bar_cart, g1_lo, g1_hi, &
        normal, no_lo, no_hi) bind (C,name="make_S_cc_sphr")
+       
+    use eos_type_module, only : eos_t, eos_input_rt
+    use eos_module
+    use eos_composition_module, only : eos_xderivs_t, composition_derivatives
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: s_lo(3), s_hi(3)
@@ -178,7 +170,7 @@ contains
     integer i,j,k,r
     integer pt_index(3)
     type(eos_t) :: eos_state
-
+    type(eos_xderivs_t) :: eos_xderivs
     integer comp
     double precision sigma, xi_term, pres_term, Ut_dot_er
 
@@ -198,6 +190,8 @@ contains
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state, pt_index)
 
+             call composition_derivatives(eos_state, eos_xderivs)
+
              sigma = eos_state%dpdt / &
                   (eos_state%rho * eos_state%cp * eos_state%dpdr)
 
@@ -205,10 +199,10 @@ contains
              pres_term = 0.d0
              do comp = 1, nspec
                 xi_term = xi_term - &
-                     eos_state%dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
                 pres_term = pres_term + &
-                     eos_state%dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
              enddo
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &

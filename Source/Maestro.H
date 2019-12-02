@@ -16,11 +16,6 @@
 
 #include <PhysBCFunctMaestro.H>
 
-#ifdef AMREX_USE_CUDA
-// #include <AMReX_CudaAllocators.H>
-#include <AMReX_CudaContainers.H>
-#endif
-
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
@@ -104,6 +99,10 @@ private:
     ///
     /// @param is_initIter is it the initial iteration?
     void AdvanceTimeStepAverage (bool is_initIter);
+    
+    // advance solution at all levels for a single time step using SDC
+    // instead of Strang splitting
+    void AdvanceTimeStepSDC (bool is_initIter);
 
     // end MaestroAdvance.cpp functions
     ////////////
@@ -414,6 +413,18 @@ private:
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
 			 const RealVector& rho0_predicted_edge);
+
+    // SDC
+    void DensityAdvanceSDC (int which_step,
+			    amrex::Vector<amrex::MultiFab>& scalold,
+			    amrex::Vector<amrex::MultiFab>& scalnew,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+			    amrex::Vector<amrex::MultiFab>& scal_force,
+			    amrex::Vector<amrex::MultiFab>& etarhoflux,
+			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			    const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+			    const RealVector& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -468,6 +479,17 @@ private:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
 			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::MultiFab>& thermal);
+
+    // SDC
+    void EnthalpyAdvanceSDC (int which_step,
+                          amrex::Vector<amrex::MultiFab>& scalold,
+                          amrex::Vector<amrex::MultiFab>& scalnew,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                          amrex::Vector<amrex::MultiFab>& scal_force,
+                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                          const amrex::Vector<amrex::MultiFab>& diff);
     ////////////////////////
 
     ////////////////////////
@@ -671,6 +693,8 @@ private:
 
     /// Performs the divu iteration
     void DivuIter (int istep_divu_iter);
+    // SDC
+    void DivuIterSDC (int istep_divu_iter);
 
     /// Performs the initial iteration to initialize `gradpi`
     void InitIter ();
@@ -800,7 +824,8 @@ private:
     /// Perform a nodal projection
     void NodalProj (int proj_type,
                     amrex::Vector<amrex::MultiFab>& rhcc,
-                    int istep_divu_iter=0);
+                    int istep_divu_iter=0,
+		    bool sdc_off=true);
 
     /// Fill in `Vproj`
     ///
@@ -946,18 +971,46 @@ private:
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const RealVector& p0,
                 const amrex::Real dt_react,
-		const amrex::Real time_in);
+                const amrex::Real time_react);
 
+    void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
+		   amrex::Vector<amrex::MultiFab>& s_out,
+		   amrex::Vector<amrex::MultiFab>& rho_Hext,
+		   const RealVector& p0,
+		   const amrex::Real dt_react,
+		   const amrex::Real time_react,
+		   amrex::Vector<amrex::MultiFab>& source);
+
+#ifndef SDC
+    void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
+                amrex::Vector<amrex::MultiFab>& s_out,
+                const amrex::Vector<amrex::MultiFab>& rho_Hext,
+                amrex::Vector<amrex::MultiFab>& rho_omegadot,
+                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                const RealVector& p0,
+                const amrex::Real dt_react,
+                const amrex::Real time_react);
+
+#else
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
 		 amrex::Vector<amrex::MultiFab>& s_out,
-		 const amrex::Vector<amrex::MultiFab>& rho_Hext,
-		 amrex::Vector<amrex::MultiFab>& rho_omegadot,
-		 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 		 const RealVector& p0,
 		 const amrex::Real dt_react,
-		 const amrex::Real time_in);
+		 const amrex::Real time_react,
+		 const amrex::Vector<amrex::MultiFab>& source);
+#endif
+    
+    // compute heating terms, rho_omegadot and rho_Hnuc
+    void MakeReactionRates (amrex::Vector<amrex::MultiFab>& rho_omegadot,
+			    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+			    const amrex::Vector<amrex::MultiFab>& scal);
 
-    /// Compute heating term, `rho_Hext`
+    void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& scal1,
+			  const amrex::Vector<amrex::MultiFab>& scal2,
+			  amrex::Vector<amrex::MultiFab>& cp,
+			  amrex::Vector<amrex::MultiFab>& xi);
+
+    // compute heating term, rho_Hext
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
                       const amrex::Vector<amrex::MultiFab>& scal);
 
@@ -1152,6 +1205,23 @@ private:
 			 const amrex::Vector<amrex::MultiFab>& hcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
 			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
+
+    void ThermalConductSDC(int which_step,
+			   const amrex::Vector<amrex::MultiFab>& s_old,
+			         amrex::Vector<amrex::MultiFab>& s_hat,
+			   const amrex::Vector<amrex::MultiFab>& s_new,
+			   const RealVector& p0old,
+			   const RealVector& p0new,
+			   const amrex::Vector<amrex::MultiFab>& hcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& pcoeff1,
+			   const amrex::Vector<amrex::MultiFab>& hcoeff2,
+			   const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
+			   const amrex::Vector<amrex::MultiFab>& pcoeff2);
+
+    void MakeExplicitThermalHterm (amrex::Vector<amrex::MultiFab>& thermal,
+			       const amrex::Vector<amrex::MultiFab>& scal,
+			       const amrex::Vector<amrex::MultiFab>& hcoeff);
     ////////////////////////
 
     ////////////////////////
@@ -1229,7 +1299,8 @@ private:
     // these MultiFabs are persistant and need to be regridded as well
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
-    amrex::Vector<amrex::MultiFab> pi;   //< nodal
+    amrex::Vector<amrex::MultiFab> pi;   // nodal
+    amrex::Vector<amrex::MultiFab> intra; // for sdc
 
     /// this doesn't have to be persistent, but we make it so that we avoid
     /// continually creating and filling temporaries

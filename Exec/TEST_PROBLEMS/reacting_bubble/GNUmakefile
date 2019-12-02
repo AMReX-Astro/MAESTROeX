@@ -5,6 +5,8 @@ USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
 
+USE_SDC    = 
+
 TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
 
@@ -21,6 +23,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_simple
+INTEGRATOR_DIR   := VODE90
 
 Bpack   := ./Make.package
 Blocs   := .

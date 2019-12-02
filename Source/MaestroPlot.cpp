@@ -342,19 +342,33 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> rho_Hext          (finest_level+1);
     Vector<MultiFab> rho_omegadot      (finest_level+1);
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
+    Vector<MultiFab> sdc_source        (finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
         rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
         rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+	sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+	
+	sdc_source[lev].setVal(0.);
     }
 
+#ifndef SDC
     if (dt_in < small_dt) {
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);
     } else {
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in*0.5, t_in);
     }
+#else	
+    if (dt_in < small_dt) {
+	ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_in, sdc_source);
+    } else {
+	ReactSDC(s_in, stemp, rho_Hext, p0_in, dt_in*0.5, t_in, sdc_source);
+    }
+    
+    MakeReactionRates(rho_omegadot,rho_Hnuc,s_in);
+#endif
 
     if (plot_spec || plot_omegadot) {
         // omegadot
@@ -1108,7 +1122,22 @@ Maestro::WriteJobInfo (const std::string& dir) const
 
         jobInfoFile << "\n\n";
 
+#ifdef AMREX_USE_GPU
+        // This output assumes for simplicity that every rank uses the
+        // same type of GPU.
+
+        jobInfoFile << PrettyLine;
+        jobInfoFile << "GPU Information:       " << "\n";
+        jobInfoFile << PrettyLine;
+
+        jobInfoFile << "GPU model name: " << Gpu::Device::deviceName() << "\n";
+        jobInfoFile << "Number of GPUs used: " << Gpu::Device::numDevicesUsed() << "\n";
+
+        jobInfoFile << "\n\n";
+#endif
+
         // build information
+
         jobInfoFile << PrettyLine;
         jobInfoFile << " Build Information\n";
         jobInfoFile << PrettyLine;
@@ -1681,7 +1710,7 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
                             BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
                             BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
-			
+
         }
     }
 
@@ -1891,7 +1920,7 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
                    Vector<MultiFab>& abar)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakePiDivu()",MakeAbar);
+    BL_PROFILE_VAR("Maestro::MakeAbar()",MakeAbar);
 
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
