@@ -93,4 +93,3 @@ John Bell (LBL), Chris Malone (LANL), and Michael Lijewski (LBL).
 
 # References
 
-{% bibliography --cited --file paper.bib  %}
