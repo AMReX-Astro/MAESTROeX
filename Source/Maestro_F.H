@@ -379,7 +379,8 @@ extern "C"
 			       const amrex::Real* dx,
 			       const amrex::Real* r_cc_loc);
 
-    void make_normal(amrex::Real* normal, const int* n_lo, const int* n_hi,
+    void make_normal(const int* lo, const int* hi,
+			       amrex::Real* normal, const int* n_lo, const int* n_hi,
 		     const amrex::Real* dx);
 
     void put_data_on_faces(const int* lo, const int* hi,

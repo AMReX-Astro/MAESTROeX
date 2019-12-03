@@ -16,6 +16,12 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
@@ -131,6 +137,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     // it matches fortran MAESTRO but is that correct?
     FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
               bcs_u, 1);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 

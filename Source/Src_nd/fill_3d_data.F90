@@ -1387,14 +1387,16 @@ contains
 
   end subroutine make_s0mac_sphr_irreg
 
-  subroutine make_normal(normal,n_lo,n_hi,dx) bind(C, name="make_normal")
+  subroutine make_normal(lo,hi,normal,n_lo,n_hi,dx) bind(C, name="make_normal")
 
-    integer         , intent(in   ) :: n_lo(3), n_hi(3)
+    integer         , intent(in   ) :: lo(3), hi(3), n_lo(3), n_hi(3)
     double precision, intent(  out) :: normal(n_lo(1):n_hi(1),n_lo(2):n_hi(2),n_lo(3):n_hi(3),3)
     double precision, intent(in   ) :: dx(3)
 
     integer          :: i,j,k
     double precision :: x,y,z,radius
+
+    !$gpu
 
     ! normal is the unit vector in the radial direction (e_r) in spherical
     ! coordinates.
@@ -1406,11 +1408,11 @@ contains
 
     if (spherical .eq. 1) then
 
-       do k = n_lo(3),n_hi(3)
+       do k = lo(3),hi(3)
           z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-          do j = n_lo(2),n_hi(2)
+          do j = lo(2),hi(2)
              y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-             do i = n_lo(1),n_hi(1)
+             do i = lo(1),hi(1)
                 x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
 
                 radius = sqrt(x**2 + y**2 + z**2)
@@ -1422,9 +1424,10 @@ contains
              end do
           end do
        end do
-
+#ifndef AMREX_USE_CUDA
     else
        call amrex_error('SHOULDNT CALL MAKE_3D_NORMAL WITH SPHERICAL = 0')
+#endif
     end if
 
   end subroutine make_normal
