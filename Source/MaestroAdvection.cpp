@@ -632,7 +632,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #ifdef AMREX_USE_CUDA
     auto not_launched = Gpu::notInLaunchRegion();
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     // Make sure to pass in comp+1 for fortran indexing

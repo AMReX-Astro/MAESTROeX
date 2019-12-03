@@ -291,7 +291,9 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Gpu::setLaunchRegion(true);
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
 #endif
 
     // Note that umac = beta0*mac
@@ -334,7 +336,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
 #ifdef AMREX_USE_CUDA
     // turn on GPU
-    Gpu::setLaunchRegion(false);
+    if (not_launched) Gpu::setLaunchRegion(false);
 #endif
 
 }

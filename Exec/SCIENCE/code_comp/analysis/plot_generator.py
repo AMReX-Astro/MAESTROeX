@@ -159,8 +159,8 @@ def plot_generator(args):
     for ds in ts:
         
         settings = {}
-        settings['center'] = get_center(ds, args.xlim, args.ylim)
-        settings['width'] = get_width(ds, args.xlim, args.ylim)
+        settings['center'] = get_center(ds, args.xlim, args.ylim, args.zlim)
+        settings['width'] = get_width(ds, args.xlim, args.ylim, args.zlim)
         settings['normal'] = args.normal
 
         plot = func(ds, fields=field, **settings)
