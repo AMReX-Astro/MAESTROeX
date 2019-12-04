@@ -47,6 +47,7 @@
 	  <div id="sidebar" class="4u 12u$(small)">
 	    <section>
 	      <ul class="unstyled">
+
 		<li><h3>acknowledging MAESTROeX</h3>
 		  If you find MAESTROeX useful for your
 		  research, please cite the appropriate
@@ -57,6 +58,16 @@
 		  <var>\software{}</var> tag to highlight your
 		  use of MAESTROeX.
 		</li>
+
+                <li><h3>PhD theses using MAESTRO / MAESTROeX</h3>
+                  <ul>
+                    <li>Chris Malone (Stony Brook, 2011)</li>
+                    <li>Candace Gilet (Berkeley, 2012)</li>
+                    <li>Brendan Krueger (Stony Brook, 2012)</li>
+                    <li>Adam Jacobs (Stony Brook, 2016)</li>
+                    <li>Don Willcox (Stony Brook, 2018)</li>
+                  </ul>
+                </li>
 
 	      </ul>
 	    </section>
