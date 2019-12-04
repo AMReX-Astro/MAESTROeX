@@ -348,6 +348,12 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -369,18 +375,41 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
-
-            // call fortran subroutine
-            mac_bcoef_face(&lev,ARLIM_3D(validBox.loVect()),ARLIM_3D(validBox.hiVect()),
-                           BL_TO_FORTRAN_3D(xbcoef_mf[mfi]),
-                           BL_TO_FORTRAN_3D(ybcoef_mf[mfi]),
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_3D(zbcoef_mf[mfi]),
+            const Box& zbx = amrex::growHi(tileBox, 2, 1);
 #endif
-                           BL_TO_FORTRAN_3D(rhocc_mf[mfi]));
+            // call fortran subroutine
+            // x-direction
+#pragma gpu box(xbx)
+            mac_bcoef_face(AMREX_INT_ANYD(xbx.loVect()),AMREX_INT_ANYD(xbx.hiVect()),
+                           lev, 1,
+                           BL_TO_FORTRAN_ANYD(xbcoef_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+
+            // y-direction
+#pragma gpu box(ybx)
+            mac_bcoef_face(AMREX_INT_ANYD(ybx.loVect()),AMREX_INT_ANYD(ybx.hiVect()),
+                           lev, 2,
+                           BL_TO_FORTRAN_ANYD(ybcoef_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+#if (AMREX_SPACEDIM == 3)
+            // z-direction
+#pragma gpu box(zbx)
+            mac_bcoef_face(AMREX_INT_ANYD(zbx.loVect()),AMREX_INT_ANYD(zbx.hiVect()),
+                           lev, 3,
+                           BL_TO_FORTRAN_ANYD(zbcoef_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+#endif
 
         }
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 
 }
