@@ -14,6 +14,12 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
@@ -359,6 +365,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 	FillPatchUedge(utrans);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
 }
 
 void
@@ -371,6 +382,12 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPred()",VelPred);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1135,6 +1152,11 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 
     // edge_restriction
     AverageDownFaces(umac);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
 }
 

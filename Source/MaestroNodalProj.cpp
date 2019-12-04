@@ -570,6 +570,12 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& phi_mf = phi[lev];
         MultiFab& gphi_mf = gphi[lev];
@@ -595,8 +601,12 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
         }
     }
 
-}
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
+}
 
 
 // average nodal pi to cell-centers and put in the Pi component of snew
