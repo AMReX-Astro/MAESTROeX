@@ -992,6 +992,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
 
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
     // now update temperature
     if (use_tfromp) {
         TfromRhoP(s2,p0_new,0);

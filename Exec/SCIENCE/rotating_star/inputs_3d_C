@@ -94,7 +94,7 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
+maestro.eps_hg             = 1.e-10
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
@@ -103,8 +103,11 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.do_burning = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-maestro.burning_cutoff_density = 2.e5
+maestro.burning_cutoff_density = 1.e6
 maestro.burning_invert_cutoff_density = true
+
+#SDC 
+maestro.sdc_couple_velocity = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)

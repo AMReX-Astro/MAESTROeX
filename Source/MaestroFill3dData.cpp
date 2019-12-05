@@ -255,7 +255,7 @@ Maestro::MakeS0mac (const RealVector& s0,
         Abort("Error: only call MakeS0mac for spherical");
     }
 
-    // Construct a cartesian version of w0
+    // Construct a cartesian version of s0
     Vector<MultiFab> s0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         s0_cart[lev].define(grids[lev], dmap[lev], 1, 2);
@@ -319,6 +319,12 @@ Maestro::MakeNormal ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -331,13 +337,22 @@ Maestro::MakeNormal ()
 #endif
         for ( MFIter mfi(normal_mf, true); mfi.isValid(); ++mfi ) {
 
+            const Box& tileBox = mfi.tilebox();
+
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            make_normal(BL_TO_FORTRAN_3D(normal_mf[mfi]), dx);
+#pragma gpu box(tileBox)
+            make_normal(AMREX_INT_ANYD(tileBox.loVect()),
+                        AMREX_INT_ANYD(tileBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(normal_mf[mfi]), 
+                        AMREX_REAL_ANYD(dx));
         }
     }
-
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
 
 
@@ -347,6 +362,12 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                         int harmonic_avg) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
+
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -367,24 +388,46 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Box& xbx = amrex::growHi(tileBox,0, 1);
+            const Box& ybx = amrex::growHi(tileBox,1, 1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = amrex::growHi(tileBox, 2, 1);
+#endif
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            put_data_on_faces(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                              BL_TO_FORTRAN_3D(scc_mf[mfi]),
-                              BL_TO_FORTRAN_3D(facex_mf[mfi]),
-                              BL_TO_FORTRAN_3D(facey_mf[mfi]),
+            // x-direction
+#pragma gpu box(xbx)
+            put_data_on_faces(AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),1,
+                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(facex_mf[mfi]),
+                              harmonic_avg);
+            // y-direction
+#pragma gpu box(ybx)
+            put_data_on_faces(AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),2,
+                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(facey_mf[mfi]),
+                              harmonic_avg);
+            // z-direction
 #if (AMREX_SPACEDIM == 3)
-                              BL_TO_FORTRAN_3D(facez_mf[mfi]),
+#pragma gpu box(zbx)
+            put_data_on_faces(AMREX_INT_ANYD(zbx.loVect()), AMREX_INT_ANYD(zbx.hiVect()),3,
+                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
+                              BL_TO_FORTRAN_ANYD(facez_mf[mfi]),
+                              harmonic_avg);
 #endif
-                              &harmonic_avg);
         }
     }
 
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
+
 }
 
 

@@ -438,7 +438,8 @@ contains
                    state_in % i = i
                    state_in % j = j
                    state_in % k = k
-                   
+                   state_in % success = .true.
+
                    call integrator(state_in, state_out, dt_in, time_in)
                    
                    rho_out  = sum(state_out % y(1:nspec))
@@ -659,6 +660,9 @@ contains
                 
                 ! initialize arbitrary time
                 state % time = ZERO
+
+                ! we don't need the temperature RHS so set self_heat = False
+                state % self_heat = .false.
                 
                 call actual_rhs(state)
                 
