@@ -243,7 +243,7 @@ contains
     !$gpu
 
     rho_min = 1.d-20
-    dt_temp = 1.e99
+    dt_temp = 1.d99
 
     eps = 1.0d-8
 
