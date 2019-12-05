@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "ECSN-ONe6040-final.hse.40960"
+maestro.model_file = "ecsn.hse.25600"
 maestro.drdxfac = 5
 
 #amrex.fpe_trap_invalid = 1
