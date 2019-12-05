@@ -659,6 +659,9 @@ contains
                 
                 ! initialize arbitrary time
                 state % time = ZERO
+
+                ! we don't need the temperature RHS so set self_heat = False
+                state % self_heat = .false.
                 
                 call actual_rhs(state)
                 
