@@ -53,7 +53,7 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             if (state(i,j,k,rho_comp) .ge. tag_density_1) then
+             if (state(i,j,k,temp_comp) .ge. 7.e8 .or. i .eq. 0 .and. j .eq. 0 .and. k .eq. 0) then
                 tag(i,j,k) = set
              endif
           enddo
