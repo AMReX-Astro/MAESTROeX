@@ -5,10 +5,10 @@ maestro.drdxfac = 5
 #amrex.fpe_trap_invalid = 1
 
 # GRIDDING AND REFINEMENT
-amr.max_level          = 2       # maximum level number allowed
-amr.n_cell             = 512 512 512
-amr.max_grid_size      = 32
-#amr.ref_ratio          = 2 
+amr.max_level          = 3       # maximum level number allowed
+amr.n_cell             = 128 128 128
+amr.max_grid_size      = 64
+#amr.ref_ratio          = 2 2 2 2  
 
 amr.refine_grid_layout = 1       # chop grids up into smaller grids
 if nprocs > ngrids
@@ -27,7 +27,7 @@ maestro.octant = true
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
-geometry.prob_hi     =  2.e8   2.e8   2.e8
+geometry.prob_hi     =  4.e7   4.e7   4.e7
 # geometry.prob_hi     =  5.e7   5.e7   5.e7
 
 # TIME STEPPING
