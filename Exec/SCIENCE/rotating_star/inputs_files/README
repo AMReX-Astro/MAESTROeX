@@ -8,4 +8,15 @@ inputs_3d - the "baseline" run
   -average_base_state=F (original temporal integrator)
 
 inputs_3d_MESA
-  -MESA initial model
+  -maestro.model_file = "initial_models/15m_500_sec.hse.6400" (MESA initial model)
+
+inputs_3d_cutoff
+  -maestro.anelastic_cutoff_density = 1.e5
+
+inputs_3d_heating
+  -maestro.do_burning = false
+  -maestro.do_heating = true
+  -use_analytic_heating = T
+
+inputs_3d_noburn
+  -maestro.do_burning = false
