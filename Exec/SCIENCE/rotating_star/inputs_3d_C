@@ -122,6 +122,7 @@ maestro.rotation_radius = 2.e8
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 1.e7
+  use_analytic_heating = F
 
   !extern
 

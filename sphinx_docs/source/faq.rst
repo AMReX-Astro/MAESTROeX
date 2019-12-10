@@ -149,7 +149,7 @@ Running
 
    ::
 
-       ./Maestro.exe --display
+       ./Maestro.exe --describe
 
 Debugging
 =========
