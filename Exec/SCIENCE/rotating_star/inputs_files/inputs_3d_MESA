@@ -71,8 +71,8 @@ maestro.use_exact_base_state = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt_    # root name of plot file
-maestro.plot_int   = 50      # number of timesteps between plot files
-maestro.plot_deltat = 100.0e0
+maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
 # CHECKPOINT
