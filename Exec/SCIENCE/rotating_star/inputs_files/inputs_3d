@@ -1,9 +1,9 @@
 
 # INITIAL MODEL
-maestro.model_file = "18m_500_s_rot_b_eq_1.hse.6400"
+maestro.model_file = "initial_models/initdat.256"
 maestro.perturb_model = false
 
-maestro.drdxfac = 5
+maestro.drdxfac = 2
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
@@ -15,7 +15,7 @@ geometry.prob_hi     =   5.e8   5.e8   5.e8
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
 maestro.lo_bc = 3 3 3
-maestro.hi_bc = 3 3 3
+maestro.hi_bc = 2 2 2
 geometry.is_periodic =  0 0 0
 
 # VERBOSITY
@@ -25,10 +25,13 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 48 48 48
-amr.max_grid_size      = 32
+#amr.n_cell             = 160 160 160
+#amr.n_cell             = 64 64 64
+amr.n_cell = 128 128 128
+#amr.n_cell = 384 384 384
+amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
+maestro.regrid_int     = 10      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
@@ -46,19 +49,20 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
 maestro.evolve_base_state = false
+maestro.fix_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 
-maestro.anelastic_cutoff_density = 1.e6
-maestro.base_cutoff_density = 1.e5
+maestro.anelastic_cutoff_density = 1.e3
+maestro.base_cutoff_density = 1.e1
 
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 3.333e0
 maestro.sponge_kappa = 10.e0
 
-maestro.init_shrink = 0.01e0
+maestro.init_shrink = 0.001
 maestro.use_soundspeed_firstdt = true
 maestro.use_divu_firstdt = true
 
@@ -66,13 +70,14 @@ maestro.use_tfromp = true
 maestro.use_exact_base_state = false
 
 # PLOTFILES
-maestro.plot_base_name  = rot1e3_    # root name of plot file
-maestro.plot_int   = -1      # number of timesteps between plot files
+maestro.plot_base_name  = plt_    # root name of plot file
+maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = -1
+maestro.chk_int         = 1000
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -88,12 +93,20 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 1.e-11
+maestro.eps_hg             = 1.e-10
 maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+# BURNING 
 maestro.do_burning = true
+maestro.small_dens = 1.e0
+maestro.small_temp = 1.e5
+maestro.burning_cutoff_density = 1.e6
+maestro.burning_invert_cutoff_density = true
+
+#SDC 
+maestro.sdc_couple_velocity = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
@@ -108,11 +121,7 @@ maestro.rotation_radius = 2.e8
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 1.e7
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
+  use_analytic_heating = F
 
   !extern
 
@@ -127,10 +136,19 @@ maestro.rotation_radius = 2.e8
 
   use_eos_coulomb = T
 
-  rtol_spec = 1.e-6
-  rtol_enuc = 1.e-5
-  rtol_temp = 1.e-5
-
   retry_burn = T
+
+  call_eos_in_rhs = T
+  jacobian = 1
+  
+  atol_spec = 1.e-6
+  atol_temp = 1.e-6
+  atol_enuc = 1.e-6
+
+  rtol_spec = 1.e-6
+  rtol_temp = 1.e-6
+  rtol_enuc = 1.e-6
+
+  renormalize_abundances = T
 
 /

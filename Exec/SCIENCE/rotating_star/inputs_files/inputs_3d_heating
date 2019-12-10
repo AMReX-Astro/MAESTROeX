@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
-maestro.model_file = "15m_500_sec.hse.6400"
-maestro.perturb_model = initial_models/initdat.256
+maestro.model_file = "initial_models/initdat.256"
+maestro.perturb_model = false
 
 maestro.drdxfac = 2
 #maestro.ppm_type = 1
@@ -71,8 +71,8 @@ maestro.use_exact_base_state = false
 
 # PLOTFILES
 maestro.plot_base_name  = plt_    # root name of plot file
-maestro.plot_int   = 50      # number of timesteps between plot files
-maestro.plot_deltat = 100.0e0
+maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
 # CHECKPOINT
@@ -99,7 +99,8 @@ maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
 # BURNING 
-maestro.do_burning = true
+maestro.do_burning = false
+maestro.do_heating = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
 maestro.burning_cutoff_density = 1.e6
@@ -121,7 +122,7 @@ maestro.rotation_radius = 2.e8
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 1.e7
-  use_analytic_heating = F
+  use_analytic_heating = T
 
   !extern
 
