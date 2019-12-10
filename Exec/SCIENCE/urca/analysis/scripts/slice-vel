@@ -19,14 +19,14 @@ parser.add_argument('-ezc', '--enuc_zero_contour', action='store_true',
                     help='If supplied, draw a contour for enucdot=0.')
 args = parser.parse_args()
 
-@derived_field(name='pos_radial_velocity', units='cm/s')
+@derived_field(name='pos_radial_velocity', units='')
 def _pos_radial_velocity(field, data):
     return np.maximum(data[('boxlib','radial_velocity')],
-                      yt.YTQuantity(1.0e-99, 'cm/s'))
-@derived_field(name='neg_radial_velocity', units='cm/s')
+                      yt.YTQuantity(1.0e-99, ''))
+@derived_field(name='neg_radial_velocity', units='')
 def _neg_radial_velocity(field, data):
     return np.maximum(-data[('boxlib','radial_velocity')],
-                      yt.YTQuantity(1.0e-99, 'cm/s'))
+                      yt.YTQuantity(1.0e-99, ''))
 
 # Check axis input
 axes_list = ['x', 'y', 'z']
@@ -86,10 +86,10 @@ s.save('{}.slice.{}.vel_radial.png'.format(args.infile, args.axis))
 if args.octant:
     dcenter = width.in_units('cm').v/2.0
     cpos    = ds.arr([dcenter, dcenter, dcenter], 'cm')
-    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circum_velocity'),
+    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circ_velocity'),
                      center=cpos, width=width, origin="native")
 else:
-    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circum_velocity'),
+    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circ_velocity'),
                      center='c', width=width)
 
 if args.rhocontours:
