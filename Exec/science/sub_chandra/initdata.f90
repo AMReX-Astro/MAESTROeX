@@ -79,7 +79,7 @@ contains
     end do
 
     ! set velocity to zero
-    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
   end subroutine initdata
 
@@ -96,11 +96,11 @@ contains
     integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
     double precision, intent(in   ) :: time
     double precision, intent(inout) :: scal(scal_lo(1):scal_hi(1), &
-         scal_lo(2):scal_hi(2), &
-         scal_lo(3):scal_hi(3), nc_s)
+                                            scal_lo(2):scal_hi(2), &
+                                            scal_lo(3):scal_hi(3), nc_s)
     double precision, intent(inout) :: vel(vel_lo(1):vel_hi(1), &
-         vel_lo(2):vel_hi(2), &
-         vel_lo(3):vel_hi(3), nc_v)
+                                           vel_lo(2):vel_hi(2), &
+                                           vel_lo(3):vel_hi(3), nc_v)
     double precision, intent(in   ) :: s0_init(0:max_radial_level,0:nr_fine-1,1:nscal)
     double precision, intent(in   ) :: p0_init(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dx(3)
@@ -158,18 +158,18 @@ contains
 
     ! initialize temp
     call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
-         s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
+                                   s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
+                                   cc_to_r,ccr_lo,ccr_hi)
 
     ! initialize p0_cart
     call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
+                                   cc_to_r,ccr_lo,ccr_hi)
 
     ! initialize species
     do comp = spec_comp, spec_comp+nspec-1
        call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,comp),scal_lo,scal_hi,1, &
-            s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
+                                      s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, &
+                                      cc_to_r,ccr_lo,ccr_hi)
     end do
 
     ! initialize rho as sum of partial densities rho*X_i
@@ -208,7 +208,7 @@ contains
     call bl_deallocate(p0_cart)
 
     ! set velocity to zero
-    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! compute the radial bounds of the perturbation
     do i = 0, nr_fine-1
