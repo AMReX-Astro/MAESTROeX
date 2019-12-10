@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
-maestro.model_file = "15m_500_sec.hse.6400"
-maestro.perturb_model = initial_models/initdat.256
+maestro.model_file = "initial_models/initdat.256"
+maestro.perturb_model = false
 
 maestro.drdxfac = 2
 #maestro.ppm_type = 1
