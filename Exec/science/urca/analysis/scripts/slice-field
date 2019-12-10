@@ -42,10 +42,11 @@ def slicefield(ds, field, field_short_name):
     if ds.dimensionality == 3:
         slice_function = yt.SlicePlot
     elif ds.dimensionality == 2:
-        slice_function = yt.plot_2d
+        # slice_function = yt.plot_2d
+        slice_function = yt.SlicePlot
 
     if not args.width:
-        width = max(ds.domain_width)
+        width = ds.domain_width
     else:
         width = yt.YTQuantity(args.width, 'cm')
 
@@ -62,7 +63,7 @@ def slicefield(ds, field, field_short_name):
     else:
         if args.center and len(args.center) == 3:
             center_loc = ds.arr(args.center, 'cm')
-        elif ds.dimensionality == 3:
+        else:
             center_loc = 'c'
         if args.native_origin:
             s = slice_function(ds, args.axis, field, center=center_loc, width=width, origin="native")
@@ -111,7 +112,8 @@ def slicefield(ds, field, field_short_name):
         s.set_zlim(field, zmin, zmax)
 
     # Annotations
-    s.annotate_scale()
+    if (ds.geometry != 'cylindrical'):
+        s.annotate_scale()
     if args.drawcells:
         s.annotate_cell_edges()
     if args.drawgrids:
@@ -167,7 +169,7 @@ if __name__=="__main__":
         exit()
 
     # Check axis input
-    axes_list = ['x', 'y', 'z', 'r']
+    axes_list = ['x', 'y', 'z', 'r', 'theta']
     if not args.axis.lower() in axes_list:
         print('Improper axis argument -- axis should be one of {}'.format(axes_list))
         exit()

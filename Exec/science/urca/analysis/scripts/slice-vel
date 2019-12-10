@@ -14,19 +14,20 @@ parser.add_argument('-dg', '--drawgrids', action='store_true', help='If supplied
 parser.add_argument('-octant', '--octant', action='store_true', help='Sets slice view appropriately for octant dataset.')
 parser.add_argument('-rho', '--rhocontours', type=float, nargs='+', help='Draws contours for the densities provided (g/cm^3).')
 parser.add_argument('-res', '--resolution', type=int, default=2048, help='Resolution for output plot.')
+parser.add_argument('-lth', '--linthresh', type=float, default=1.e3, help='Linear threshold for symlog axis.')
 parser.add_argument('-vel', '--velocityarrows', action='store_true', help='If supplied, annotate velocity arrows.')
 parser.add_argument('-ezc', '--enuc_zero_contour', action='store_true',
-                    help='If supplied, draw a contour for enucdot=0.')
+                    help='If supplied, draw a contour for Hnuc=0.')
 args = parser.parse_args()
 
-@derived_field(name='pos_radial_velocity', units='cm/s')
+@derived_field(name='pos_radial_velocity', units='')
 def _pos_radial_velocity(field, data):
     return np.maximum(data[('boxlib','radial_velocity')],
-                      yt.YTQuantity(1.0e-99, 'cm/s'))
-@derived_field(name='neg_radial_velocity', units='cm/s')
+                      yt.YTQuantity(1.0e-99, ''))
+@derived_field(name='neg_radial_velocity', units='')
 def _neg_radial_velocity(field, data):
     return np.maximum(-data[('boxlib','radial_velocity')],
-                      yt.YTQuantity(1.0e-99, 'cm/s'))
+                      yt.YTQuantity(1.0e-99, ''))
 
 # Check axis input
 axes_list = ['x', 'y', 'z']
@@ -54,7 +55,7 @@ if args.octant:
                      center=cpos, width=width, origin='native')
 else:
     s = yt.SlicePlot(ds, args.axis, ('boxlib', 'radial_velocity'),
-                     center='c', width=width)
+                     center='c', width=width, origin='native')
 
 if args.rhocontours:
     for rhoc in args.rhocontours:
@@ -62,15 +63,15 @@ if args.rhocontours:
         s.annotate_contour('density', ncont=1, clim=(rhounit, rhounit))
 
 s.set_cmap(('boxlib', 'radial_velocity'), 'RdBu')
-s.set_log(('boxlib', 'radial_velocity'), True, linthresh=1.0e3)
+s.set_log(('boxlib', 'radial_velocity'), True, linthresh=args.linthresh)
 s.set_zlim(('boxlib', 'radial_velocity'), -10.0**maxv, 10.0**maxv)
 
 if args.velocityarrows:
     s.annotate_velocity(normalize=False)
 
 if args.enuc_zero_contour:
-    s.annotate_contour(('boxlib', 'enucdot'), ncont=1, factor=1, take_log=False,
-                       clim=(0.0,0.0), label='enucdot = 0')
+    s.annotate_contour(('boxlib', 'Hnuc'), ncont=1, factor=1, take_log=False,
+                       clim=(0.0,0.0), label='Hnuc = 0')
 
 s.annotate_scale()
 
@@ -86,10 +87,10 @@ s.save('{}.slice.{}.vel_radial.png'.format(args.infile, args.axis))
 if args.octant:
     dcenter = width.in_units('cm').v/2.0
     cpos    = ds.arr([dcenter, dcenter, dcenter], 'cm')
-    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circum_velocity'),
+    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circ_velocity'),
                      center=cpos, width=width, origin="native")
 else:
-    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circum_velocity'),
+    s = yt.SlicePlot(ds, args.axis, ('boxlib', 'circ_velocity'),
                      center='c', width=width)
 
 if args.rhocontours:
@@ -101,8 +102,8 @@ if args.velocityarrows:
     s.annotate_velocity(normalize=False)
 
 if args.enuc_zero_contour:
-    s.annotate_contour(('boxlib', 'enucdot'), ncont=1, factor=1, take_log=False,
-                       clim=(0.0,0.0), label='enucdot = 0')
+    s.annotate_contour(('boxlib', 'Hnuc'), ncont=1, factor=1, take_log=False,
+                       clim=(0.0,0.0), label='Hnuc = 0')
 
 s.annotate_scale()
 
