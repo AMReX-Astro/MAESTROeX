@@ -1,6 +1,6 @@
 inputs_3d - the "baseline" run
   -CASTRO initial model
-  -disable burning for rho > 5.e6
+  -burning_cutoff_density_hi = 5.e6 (disable burning for rho > 5.e6)
   -anelastic_cutoff_density = 1.e3
   -no velocity perturbation
   -HOEXTRAP boundary conditions
@@ -23,3 +23,6 @@ inputs_3d_heating
 
 inputs_3d_noburn
   -maestro.do_burning = false
+
+inputs_3d_burnrange
+  -burning_cutoff_density_lo = 5.e5 (restrict burning to the Si shell)
