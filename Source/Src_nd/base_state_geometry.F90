@@ -11,7 +11,7 @@ module base_state_geometry_module
   use amrex_constants_module
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff_density, base_cutoff_density, &
-       burning_cutoff_density, prob_lo, prob_hi, &
+       burning_cutoff_density_lo, burning_cutoff_density_hi, prob_lo, prob_hi, &
        use_exact_base_state
 
   implicit none
@@ -39,7 +39,8 @@ module base_state_geometry_module
 
   integer         , allocatable, save, public  :: anelastic_cutoff_density_coord(:)
   integer         , allocatable, save, public  :: base_cutoff_density_coord(:)
-  integer         , pointer, save, public  :: burning_cutoff_density_coord(:)
+  integer         , pointer, save, public  :: burning_cutoff_density_lo_coord(:)
+  integer         , pointer, save, public  :: burning_cutoff_density_hi_coord(:)
 
 #ifdef AMREX_USE_CUDA
   attributes(managed) :: max_radial_level, finest_radial_level, nr_fine, dr_fine
@@ -154,7 +155,8 @@ contains
     end if
 
     ! call bl_allocate(   base_cutoff_density_coord,0,max_radial_level)
-    call bl_allocate(burning_cutoff_density_coord,0,max_radial_level)
+    call bl_allocate(burning_cutoff_density_lo_coord,0,max_radial_level)
+    call bl_allocate(burning_cutoff_density_hi_coord,0,max_radial_level)
 
   end subroutine init_base_state_geometry
 
@@ -310,8 +312,8 @@ contains
 
           if (.not. found) then
              do r=r_start_coord(n,i),r_end_coord(n,i)
-                if (rho0(n,r) .le. burning_cutoff_density) then
-                   burning_cutoff_density_coord(n) = r
+                if (rho0(n,r) .le. burning_cutoff_density_lo) then
+                   burning_cutoff_density_lo_coord(n) = r
                    which_lev = n
                    found = .true.
                    exit
@@ -326,20 +328,63 @@ contains
     ! it to above the top of the domain on the finest level
     if (.not. found) then
        which_lev = finest_radial_level
-       burning_cutoff_density_coord(finest_radial_level) = nr(finest_radial_level)
+       burning_cutoff_density_lo_coord(finest_radial_level) = nr(finest_radial_level)
     endif
 
     ! set the burning cutoff coordinate on the finer levels
     do n=which_lev+1,finest_radial_level
-       burning_cutoff_density_coord(n) = 2*burning_cutoff_density_coord(n-1)+1
+       burning_cutoff_density_lo_coord(n) = 2*burning_cutoff_density_lo_coord(n-1)+1
     end do
 
     ! set the burning cutoff coordinate on the coarser levels
     do n=which_lev-1,0,-1
-       if (mod(burning_cutoff_density_coord(n+1),2) .eq. 0) then
-          burning_cutoff_density_coord(n) = burning_cutoff_density_coord(n+1) / 2
+       if (mod(burning_cutoff_density_lo_coord(n+1),2) .eq. 0) then
+          burning_cutoff_density_lo_coord(n) = burning_cutoff_density_lo_coord(n+1) / 2
        else
-          burning_cutoff_density_coord(n) = burning_cutoff_density_coord(n+1) / 2 + 1
+          burning_cutoff_density_lo_coord(n) = burning_cutoff_density_lo_coord(n+1) / 2 + 1
+       end if
+    end do
+
+    ! compute the coordinates of the burning cutoff density upper limit
+    found = .false.
+
+    ! find the finest level containing the burning cutoff density,
+    ! and set the burning cutoff coord for this level
+    do n=finest_radial_level,0,-1
+       do i=1,numdisjointchunks(n)
+
+          if (.not. found) then
+             do r=r_end_coord(n,i),r_start_coord(n,i),1
+                if (rho0(n,r) .ge. burning_cutoff_density_hi) then
+                   burning_cutoff_density_hi_coord(n) = r
+                   which_lev = n
+                   found = .true.
+                   exit
+                end if
+             end do
+          end if
+
+       end do
+    end do
+
+    ! if the burning cutoff density was not found anywhere, then set
+    ! it to above the bottom of the domain
+    if (.not. found) then
+       which_lev = finest_radial_level
+       burning_cutoff_density_hi_coord(finest_radial_level) = 0
+    endif
+
+    ! set the burning cutoff coordinate on the finer levels
+    do n=which_lev+1,finest_radial_level
+       burning_cutoff_density_hi_coord(n) = 0
+    end do
+
+    ! set the burning cutoff coordinate on the coarser levels
+    do n=which_lev-1,0,-1
+       if (mod(burning_cutoff_density_hi_coord(n+1),2) .eq. 0) then
+          burning_cutoff_density_hi_coord(n) = 0
+       else
+          burning_cutoff_density_hi_coord(n) = 0
        end if
     end do
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -600,7 +645,8 @@ contains
     deallocate(nr)
     deallocate(anelastic_cutoff_density_coord)
     deallocate(base_cutoff_density_coord)
-    call bl_deallocate(burning_cutoff_density_coord)
+    call bl_deallocate(burning_cutoff_density_lo_coord)
+    call bl_deallocate(burning_cutoff_density_hi_coord)
     deallocate(numdisjointchunks)
     deallocate(r_start_coord)
     deallocate(r_end_coord)
