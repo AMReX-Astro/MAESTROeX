@@ -301,9 +301,6 @@ anelastic_cutoff_density            Real               -1.0     y
 base_cutoff_density                 Real               -1.0     y
 
 # The density below which we disable burning
-burning_cutoff_density              Real               -1.0     y
-
-# The density below which we disable burning
 burning_cutoff_density_lo           Real               -1.0     y
 
 # The density above which we disable burning

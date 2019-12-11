@@ -63,17 +63,13 @@ contains
        call amrex_error("must supply anelastic_cutoff_density")
     end if
 
-    if (burning_cutoff_density .eq. -1.d0 .and. burning_cutoff_density_lo .eq. -1.d0) then
+    if (burning_cutoff_density_lo .eq. -1.d0) then
        if (parallel_IOProcessor()) then
-          print*,'WARNING: burning_cutoff_density not supplied in the inputs file'
-          print*,'WARNING: setting burning_cutoff_density = base_cutoff_density'
+          print*,'WARNING: burning_cutoff_density_lo not supplied in the inputs file'
+          print*,'WARNING: setting burning_cutoff_density_lo = base_cutoff_density'
        end if
-       burning_cutoff_density = base_cutoff_density
+       burning_cutoff_density_lo = base_cutoff_density
     end if
-
-    if (burning_cutoff_density_lo .eq. -1.d0) then 
-       burning_cutoff_density_lo = burning_cutoff_density
-    end if 
 
   end subroutine read_method_params
 

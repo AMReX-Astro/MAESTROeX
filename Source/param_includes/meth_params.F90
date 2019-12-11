@@ -54,10 +54,8 @@ module meth_params_module
   double precision , allocatable, save :: sponge_start_factor
   double precision , allocatable, save :: anelastic_cutoff_density
   double precision , allocatable, save :: base_cutoff_density
-  double precision , allocatable, save :: burning_cutoff_density
   double precision , allocatable, save :: burning_cutoff_density_lo
   double precision , allocatable, save :: burning_cutoff_density_hi
-  logical          , allocatable, save :: burning_invert_cutoff_density
   double precision , allocatable, save :: buoyancy_cutoff_factor
   double precision , allocatable, save :: dpdt_factor
   logical          , allocatable, save :: do_planar_invsq_grav
@@ -116,10 +114,8 @@ module meth_params_module
   attributes(managed) :: sponge_start_factor
   attributes(managed) :: anelastic_cutoff_density
   attributes(managed) :: base_cutoff_density
-  attributes(managed) :: burning_cutoff_density
   attributes(managed) :: burning_cutoff_density_lo
   attributes(managed) :: burning_cutoff_density_hi
-  attributes(managed) :: burning_invert_cutoff_density
   attributes(managed) :: buoyancy_cutoff_factor
   attributes(managed) :: dpdt_factor
   attributes(managed) :: do_planar_invsq_grav
@@ -216,14 +212,10 @@ contains
     anelastic_cutoff_density = -1.0d0;
     allocate(base_cutoff_density)
     base_cutoff_density = -1.0d0;
-    allocate(burning_cutoff_density)
-    burning_cutoff_density = -1.0d0;
     allocate(burning_cutoff_density_lo)
     burning_cutoff_density_lo = -1.0d0;
     allocate(burning_cutoff_density_hi)
     burning_cutoff_density_hi = 1.d100;
-    allocate(burning_invert_cutoff_density)
-    burning_invert_cutoff_density = .false.;
     allocate(buoyancy_cutoff_factor)
     buoyancy_cutoff_factor = 5.0d0;
     allocate(dpdt_factor)
@@ -320,10 +312,8 @@ contains
     call pp%query("sponge_start_factor", sponge_start_factor)
     call pp%query("anelastic_cutoff_density", anelastic_cutoff_density)
     call pp%query("base_cutoff_density", base_cutoff_density)
-    call pp%query("burning_cutoff_density", burning_cutoff_density)
     call pp%query("burning_cutoff_density_lo", burning_cutoff_density_lo)
     call pp%query("burning_cutoff_density_hi", burning_cutoff_density_hi)
-    call pp%query("burning_invert_cutoff_density", burning_invert_cutoff_density)
     call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)
     call pp%query("dpdt_factor", dpdt_factor)
     call pp%query("do_planar_invsq_grav", do_planar_invsq_grav)
@@ -374,17 +364,13 @@ contains
        call amrex_error("must supply anelastic_cutoff_density")
     end if
 
-    if (burning_cutoff_density .eq. -1.d0 .and. burning_cutoff_density_lo .eq. -1.d0) then
+    if (burning_cutoff_density_lo .eq. -1.d0) then
        if (parallel_IOProcessor()) then
-          print*,'WARNING: burning_cutoff_density not supplied in the inputs file'
-          print*,'WARNING: setting burning_cutoff_density = base_cutoff_density'
+          print*,'WARNING: burning_cutoff_density_lo not supplied in the inputs file'
+          print*,'WARNING: setting burning_cutoff_density_lo = base_cutoff_density'
        end if
-       burning_cutoff_density = base_cutoff_density
+       burning_cutoff_density_lo = base_cutoff_density
     end if
-
-    if (burning_cutoff_density_lo .eq. -1.d0) then 
-       burning_cutoff_density_lo = burning_cutoff_density
-    end if 
 
   end subroutine read_method_params
 
@@ -450,17 +436,11 @@ contains
     if (allocated(base_cutoff_density)) then
         deallocate(base_cutoff_density)
     end if
-    if (allocated(burning_cutoff_density)) then
-        deallocate(burning_cutoff_density)
-    end if
     if (allocated(burning_cutoff_density_lo)) then
         deallocate(burning_cutoff_density_lo)
     end if
     if (allocated(burning_cutoff_density_hi)) then
         deallocate(burning_cutoff_density_hi)
-    end if
-    if (allocated(burning_invert_cutoff_density)) then
-        deallocate(burning_invert_cutoff_density)
     end if
     if (allocated(buoyancy_cutoff_factor)) then
         deallocate(buoyancy_cutoff_factor)
