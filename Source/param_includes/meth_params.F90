@@ -55,6 +55,8 @@ module meth_params_module
   double precision , allocatable, save :: anelastic_cutoff_density
   double precision , allocatable, save :: base_cutoff_density
   double precision , allocatable, save :: burning_cutoff_density
+  double precision , allocatable, save :: burning_cutoff_density_lo
+  double precision , allocatable, save :: burning_cutoff_density_hi
   logical          , allocatable, save :: burning_invert_cutoff_density
   double precision , allocatable, save :: buoyancy_cutoff_factor
   double precision , allocatable, save :: dpdt_factor
@@ -115,6 +117,8 @@ module meth_params_module
   attributes(managed) :: anelastic_cutoff_density
   attributes(managed) :: base_cutoff_density
   attributes(managed) :: burning_cutoff_density
+  attributes(managed) :: burning_cutoff_density_lo
+  attributes(managed) :: burning_cutoff_density_hi
   attributes(managed) :: burning_invert_cutoff_density
   attributes(managed) :: buoyancy_cutoff_factor
   attributes(managed) :: dpdt_factor
@@ -214,6 +218,10 @@ contains
     base_cutoff_density = -1.0d0;
     allocate(burning_cutoff_density)
     burning_cutoff_density = -1.0d0;
+    allocate(burning_cutoff_density_lo)
+    burning_cutoff_density_lo = -1.0d0;
+    allocate(burning_cutoff_density_hi)
+    burning_cutoff_density_hi = 1.d100;
     allocate(burning_invert_cutoff_density)
     burning_invert_cutoff_density = .false.;
     allocate(buoyancy_cutoff_factor)
@@ -313,6 +321,8 @@ contains
     call pp%query("anelastic_cutoff_density", anelastic_cutoff_density)
     call pp%query("base_cutoff_density", base_cutoff_density)
     call pp%query("burning_cutoff_density", burning_cutoff_density)
+    call pp%query("burning_cutoff_density_lo", burning_cutoff_density_lo)
+    call pp%query("burning_cutoff_density_hi", burning_cutoff_density_hi)
     call pp%query("burning_invert_cutoff_density", burning_invert_cutoff_density)
     call pp%query("buoyancy_cutoff_factor", buoyancy_cutoff_factor)
     call pp%query("dpdt_factor", dpdt_factor)
@@ -364,7 +374,7 @@ contains
        call amrex_error("must supply anelastic_cutoff_density")
     end if
 
-    if (burning_cutoff_density .eq. -1.d0) then
+    if (burning_cutoff_density .eq. -1.d0 .and. burning_cutoff_density_lo .eq. -1.d0) then
        if (parallel_IOProcessor()) then
           print*,'WARNING: burning_cutoff_density not supplied in the inputs file'
           print*,'WARNING: setting burning_cutoff_density = base_cutoff_density'
@@ -372,6 +382,9 @@ contains
        burning_cutoff_density = base_cutoff_density
     end if
 
+    if (burning_cutoff_density_lo .eq. -1.d0) then 
+       burning_cutoff_density_lo = burning_cutoff_density
+    end if 
 
   end subroutine read_method_params
 
@@ -439,6 +452,12 @@ contains
     end if
     if (allocated(burning_cutoff_density)) then
         deallocate(burning_cutoff_density)
+    end if
+    if (allocated(burning_cutoff_density_lo)) then
+        deallocate(burning_cutoff_density_lo)
+    end if
+    if (allocated(burning_cutoff_density_hi)) then
+        deallocate(burning_cutoff_density_hi)
     end if
     if (allocated(burning_invert_cutoff_density)) then
         deallocate(burning_invert_cutoff_density)

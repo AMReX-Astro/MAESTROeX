@@ -6,7 +6,7 @@ module burner_loop_module
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
-       burning_cutoff_density, burning_invert_cutoff_density, reaction_sum_tol, &
+       burning_cutoff_density_lo, burning_cutoff_density_hi, reaction_sum_tol, &
        drive_initial_convection
   use base_state_geometry_module, only: max_radial_level, nr_fine
 
@@ -118,10 +118,7 @@ contains
                 ! if the threshold species is not in the network, then we burn
                 ! normally.  if it is in the network, make sure the mass
                 ! fraction is above the cutoff.
-                if (((burning_invert_cutoff_density .and. &
-                rho < burning_cutoff_density) .or. &
-                (.not. burning_invert_cutoff_density .and. &
-                rho > burning_cutoff_density)) .and.                &
+                if ((rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
                    ! Initialize burn state_in and state_out
@@ -270,10 +267,7 @@ contains
                 ! if the threshold species is not in the network, then we burn
                 ! normally.  if it is in the network, make sure the mass
                 ! fraction is above the cutoff.
-                if (((burning_invert_cutoff_density .and. &
-                rho < burning_cutoff_density) .or. &
-                (.not. burning_invert_cutoff_density .and. &
-                rho > burning_cutoff_density)) .and.                &
+                if ((rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
                    ! Initialize burn state_in and state_out
@@ -422,10 +416,7 @@ contains
                 ! if the threshold species is not in the network, then we burn
                 ! normally.  if it is in the network, make sure the mass
                 ! fraction is above the cutoff.
-                if (((burning_invert_cutoff_density .and. &
-                rho_in < burning_cutoff_density) .or. &
-                (.not. burning_invert_cutoff_density .and. &
-                rho_in > burning_cutoff_density)) .and.                &
+                if ((rho_in > burning_cutoff_density_lo .and. rho_in < burning_cutoff_density_hi) .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
 
@@ -542,10 +533,7 @@ contains
                 ! if the threshold species is not in the network, then we burn
                 ! normally.  if it is in the network, make sure the mass
                 ! fraction is above the cutoff.
-                if (((burning_invert_cutoff_density .and. &
-                rho_in < burning_cutoff_density) .or. &
-                (.not. burning_invert_cutoff_density .and. &
-                rho_in > burning_cutoff_density)) .and.                &
+                if ((rho_in > burning_cutoff_density_lo .and. rho_in < burning_cutoff_density_hi) .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
 
@@ -638,10 +626,7 @@ contains
              ! if the threshold species is not in the network, then we burn
              ! normally.  if it is in the network, make sure the mass
              ! fraction is above the cutoff.
-             if (((burning_invert_cutoff_density .and. &
-                rho < burning_cutoff_density) .or. &
-                (.not. burning_invert_cutoff_density .and. &
-                rho > burning_cutoff_density)) .and.                &
+             if ((rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) .and.                &
                      ( ispec_threshold < 0 .or.                       &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
                    

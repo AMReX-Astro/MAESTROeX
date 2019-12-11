@@ -103,8 +103,7 @@ maestro.do_burning = false
 maestro.do_heating = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-maestro.burning_cutoff_density = 5.e6
-maestro.burning_invert_cutoff_density = true
+maestro.burning_cutoff_density_hi = 5.e6
 
 #SDC 
 maestro.sdc_couple_velocity = true

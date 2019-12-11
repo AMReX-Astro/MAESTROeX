@@ -77,6 +77,8 @@ pp.query("plot_sponge_fdamp", plot_sponge_fdamp);
 pp.query("anelastic_cutoff_density", anelastic_cutoff_density);
 pp.query("base_cutoff_density", base_cutoff_density);
 pp.query("burning_cutoff_density", burning_cutoff_density);
+pp.query("burning_cutoff_density_lo", burning_cutoff_density_lo);
+pp.query("burning_cutoff_density_hi", burning_cutoff_density_hi);
 pp.query("burning_invert_cutoff_density", burning_invert_cutoff_density);
 pp.query("buoyancy_cutoff_factor", buoyancy_cutoff_factor);
 pp.query("dpdt_factor", dpdt_factor);
