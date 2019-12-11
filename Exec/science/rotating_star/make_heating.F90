@@ -60,12 +60,12 @@ contains
                     end if
 
 
-                    rho = scal(i,j,k,rho_comp)
-                    if (rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) then
+!                    rho = scal(i,j,k,rho_comp)
+!                    if (rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) then
                        rho_Hext(i,j,k)  = interpolate(rloc, ienuc_model) * scal(i,j,k,rho_comp)
-                    else
-                       rho_Hext(i,j,k) = 0.d0
-                    end if
+!                    else
+!                       rho_Hext(i,j,k) = 0.d0
+!                    end if
                 end do
             end do
         end do
