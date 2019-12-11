@@ -3,7 +3,7 @@ module make_heating_module
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use model_parser_module
   use amrex_constants_module
-  use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level
+  use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level, center
   use meth_params_module, only: nscal, model_file, rho_comp, prob_lo, spherical
   use probin_module, only: use_analytic_heating
   
@@ -26,7 +26,7 @@ contains
     double precision, intent (in   ) :: dx(3), time
 
     integer :: n, r
-    double precision :: rloc,model_dr,rmax,starting_rad,mod_dr
+    double precision :: rloc,model_dr,rmax,starting_rad,mod_dr,xloc(3)
     integer :: i, j, k
     double precision :: enuc(0:max_radial_level,0:nr_fine-1)
 
@@ -45,23 +45,38 @@ contains
             end do
         enddo
 
+
         do k=lo(3),hi(3)
             do j=lo(2),hi(2)
                 do i=lo(1),hi(1)
-
-                        if (AMREX_SPACEDIM .eq. 2) then
-                            r = j
-                        else if (AMREX_SPACEDIM .eq. 3) then
+                    if (AMREX_SPACEDIM .eq. 2) then
+                        r = j
+                    else if (AMREX_SPACEDIM .eq. 3) then
+                        if (spherical .eq. 0) then
                             r = k
-                        end if
+                        else
+                            ! compute where we physically are
+                            xloc(1) = prob_lo(1) + (dble(i)+0.5d0)*dx(1) - center(1)
+                            xloc(2) = prob_lo(2) + (dble(j)+0.5d0)*dx(2) - center(2)
+                            xloc(3) = prob_lo(3) + (dble(k)+0.5d0)*dx(3) - center(3)
 
-                        rho_Hext(i,j,k)  = enuc(0, r) * scal(i,j,k,rho_comp)
+                            ! compute distance to the center of the star
+                            rloc = ZERO
+                            do n=1,3
+                               rloc = rloc + xloc(n)**2
+                            enddo
+                            rloc = sqrt(rloc)
+                            r = int((rloc - starting_rad)/dr(0) - HALF)
+                        end if
+                    end if
+
+                    rho_Hext(i,j,k)  = enuc(0,r) * scal(i,j,k,rho_comp)
                 end do
             end do
-        end do  
+        end do
 
     endif
-    
+
   end subroutine make_heating
 
 end module make_heating_module
