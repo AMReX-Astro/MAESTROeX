@@ -1,6 +1,6 @@
 inputs_3d - the "baseline" run
   -CASTRO initial model
-  -disable burning for rho > 1e6
+  -disable burning for rho > 5.e6
   -anelastic_cutoff_density = 1.e3
   -no velocity perturbation
   -HOEXTRAP boundary conditions
