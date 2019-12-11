@@ -37,7 +37,7 @@ contains
     integer          :: i,j,k,r
 
     ! set velocity to zero
-    vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
+    vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)

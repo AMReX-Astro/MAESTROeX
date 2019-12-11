@@ -102,7 +102,7 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.do_burning = false
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-maestro.burning_cutoff_density = 1.e6
+maestro.burning_cutoff_density = 5.e6
 maestro.burning_invert_cutoff_density = true
 
 #SDC 
