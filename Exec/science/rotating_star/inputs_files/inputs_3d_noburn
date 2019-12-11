@@ -115,7 +115,7 @@ maestro.rotation_radius = 2.e8
 &probin
 
   ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e5
+  velpert_amplitude = 1.e6
   velpert_radius = 2.e7
   velpert_scale = 1.e7
   velpert_steep = 1.e5
