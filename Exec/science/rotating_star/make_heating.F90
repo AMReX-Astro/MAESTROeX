@@ -4,7 +4,7 @@ module make_heating_module
   use model_parser_module
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level, center
-  use meth_params_module, only: nscal, model_file, rho_comp, prob_lo, spherical
+  use meth_params_module, only: nscal, model_file, rho_comp, prob_lo, spherical, burning_cutoff_density_lo, burning_cutoff_density_hi
   use probin_module, only: use_analytic_heating
   
   implicit none
@@ -26,7 +26,7 @@ contains
     double precision, intent (in   ) :: dx(3), time
 
     integer :: n, r
-    double precision :: rloc, starting_rad, xloc(3)
+    double precision :: rloc, starting_rad, xloc(3), rho
     integer :: i, j, k
 
     if (use_analytic_heating) then
@@ -59,7 +59,13 @@ contains
                         end if
                     end if
 
-                    rho_Hext(i,j,k)  = interpolate(rloc, ienuc_model) * scal(i,j,k,rho_comp)
+
+                    rho = scal(i,j,k,rho_comp)
+                    if (rho > burning_cutoff_density_lo .and. rho < burning_cutoff_density_hi) then
+                       rho_Hext(i,j,k)  = interpolate(rloc, ienuc_model) * scal(i,j,k,rho_comp)
+                    else
+                       rho_Hext(i,j,k) = 0.d0
+                    end if
                 end do
             end do
         end do
