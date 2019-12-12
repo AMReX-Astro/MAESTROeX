@@ -1,6 +1,6 @@
 inputs_3d - the "baseline" run
   -CASTRO initial model
-  -burning_cutoff_density_hi = 5.e6 (disable burning for rho > 5.e6)
+  -burning_cutoff_density_hi = 5.e6 (disable burning for rho > 5.e6, which is r~2.2e8)
   -anelastic_cutoff_density = 1.e3
   -no velocity perturbation
   -HOEXTRAP boundary conditions
@@ -20,6 +20,12 @@ inputs_3d_heating
   -maestro.do_burning = false
   -maestro.do_heating = true
   -use_analytic_heating = T
+  
+inputs_3d_heatinner
+  -maestro.do_burning = false
+  -maestro.do_heating = true
+  -use_analytic_heating = T
+  -maestro.heating_cutoff_density_lo = 5.e5  # apply heating in the inner part of the star only
 
 inputs_3d_noburn
   -maestro.do_burning = false
