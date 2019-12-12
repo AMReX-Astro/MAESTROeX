@@ -202,13 +202,15 @@ contains
 
              xi_term = 0.d0
              pres_term = 0.d0
-             do comp = 1, nspec
-                xi_term = xi_term - &
-                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+             if (use_omegadot_terms_in_S) then
+                do comp = 1, nspec
+                   xi_term = xi_term - &
+                        eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
-                pres_term = pres_term + &
-                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
-             enddo
+                   pres_term = pres_term + &
+                        eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                enddo
+             end if
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
                   ( rHext(i,j,k) + rHnuc(i,j,k) + therm(i,j,k) ) &
