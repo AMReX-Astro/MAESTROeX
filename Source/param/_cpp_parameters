@@ -306,6 +306,12 @@ burning_cutoff_density_lo           Real               -1.0     y
 # The density above which we disable burning
 burning_cutoff_density_hi           Real               1.e100     y
 
+# The density below which we disable heating
+heating_cutoff_density_lo           Real               -1.0     y
+
+# The density above which we disable heating
+heating_cutoff_density_hi           Real               1.e100     y
+
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
 buoyancy_cutoff_factor              Real               5.0      y

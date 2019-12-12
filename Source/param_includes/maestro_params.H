@@ -78,6 +78,8 @@ static amrex::Real anelastic_cutoff_density;
 static amrex::Real base_cutoff_density;
 static amrex::Real burning_cutoff_density_lo;
 static amrex::Real burning_cutoff_density_hi;
+static amrex::Real heating_cutoff_density_lo;
+static amrex::Real heating_cutoff_density_hi;
 static amrex::Real buoyancy_cutoff_factor;
 static amrex::Real dpdt_factor;
 static bool        do_planar_invsq_grav;
