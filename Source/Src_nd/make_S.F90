@@ -2,7 +2,9 @@ module make_S_module
 
   use amrex_error_module
   use network, only: nspec
-  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, dpdt_factor, base_cutoff_density, use_delta_gamma1_term
+  use meth_params_module, only: rho_comp, temp_comp, spec_comp, nscal, &
+                                dpdt_factor, base_cutoff_density, &
+                                use_delta_gamma1_term, use_omegadot_terms_in_S
   use base_state_geometry_module, only:  max_radial_level, nr_fine, base_cutoff_density_coord, anelastic_cutoff_density_coord, nr, dr
 
   implicit none
@@ -87,13 +89,16 @@ contains
 
              xi_term = 0.d0
              pres_term = 0.d0
-             do comp = 1, nspec
-                xi_term = xi_term - &
-                     eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
 
-                pres_term = pres_term + &
-                     eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
-             enddo
+             if (use_omegadot_terms_in_S) then
+                do comp = 1, nspec
+                   xi_term = xi_term - &
+                        eos_xderivs % dhdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+
+                   pres_term = pres_term + &
+                        eos_xderivs % dpdX(comp)*rodot(i,j,k,comp)/eos_state%rho
+                enddo
+             end if
 
              S_cc(i,j,k) = (sigma/eos_state%rho) * &
                   ( rHext(i,j,k) + rHnuc(i,j,k) + therm(i,j,k) ) &

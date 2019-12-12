@@ -80,6 +80,7 @@ module meth_params_module
   double precision , allocatable, save :: co_latitude
   logical          , allocatable, save :: drive_initial_convection
   logical          , allocatable, save :: use_alt_energy_fix
+  logical          , allocatable, save :: use_omegadot_terms_in_S
   integer          , allocatable, save :: temp_diffusion_formulation
   integer          , allocatable, save :: thermal_diffusion_type
   logical          , allocatable, save :: limit_conductivity
@@ -142,6 +143,7 @@ module meth_params_module
   attributes(managed) :: co_latitude
   attributes(managed) :: drive_initial_convection
   attributes(managed) :: use_alt_energy_fix
+  attributes(managed) :: use_omegadot_terms_in_S
   attributes(managed) :: temp_diffusion_formulation
   attributes(managed) :: thermal_diffusion_type
   attributes(managed) :: limit_conductivity
@@ -268,6 +270,8 @@ contains
     drive_initial_convection = .false.;
     allocate(use_alt_energy_fix)
     use_alt_energy_fix = .true.;
+    allocate(use_omegadot_terms_in_S)
+    use_omegadot_terms_in_S = .true.;
     allocate(temp_diffusion_formulation)
     temp_diffusion_formulation = 2;
     allocate(thermal_diffusion_type)
@@ -346,6 +350,7 @@ contains
     call pp%query("co_latitude", co_latitude)
     call pp%query("drive_initial_convection", drive_initial_convection)
     call pp%query("use_alt_energy_fix", use_alt_energy_fix)
+    call pp%query("use_omegadot_terms_in_S", use_omegadot_terms_in_S)
     call pp%query("temp_diffusion_formulation", temp_diffusion_formulation)
     call pp%query("thermal_diffusion_type", thermal_diffusion_type)
     call pp%query("limit_conductivity", limit_conductivity)
@@ -523,6 +528,9 @@ contains
     end if
     if (allocated(use_alt_energy_fix)) then
         deallocate(use_alt_energy_fix)
+    end if
+    if (allocated(use_omegadot_terms_in_S)) then
+        deallocate(use_omegadot_terms_in_S)
     end if
     if (allocated(temp_diffusion_formulation)) then
         deallocate(temp_diffusion_formulation)

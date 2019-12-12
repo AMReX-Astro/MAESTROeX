@@ -435,6 +435,8 @@ restart_with_vel_field              bool            false
 # instead of just $(1/\rho) \nabla (\pi)$
 use_alt_energy_fix                  bool            true        y
 
+# do we include the explicit omegadot terms in the constraint RHS source S?
+use_omegadot_terms_in_S             bool            true        y
 
 #-----------------------------------------------------------------------------
 # category: thermal diffusion

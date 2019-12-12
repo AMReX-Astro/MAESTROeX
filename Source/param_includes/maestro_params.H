@@ -109,6 +109,7 @@ static bool        drive_initial_convection;
 static int         stop_initial_convection;
 static bool        restart_with_vel_field;
 static bool        use_alt_energy_fix;
+static bool        use_omegadot_terms_in_S;
 static bool        use_thermal_diffusion;
 static int         temp_diffusion_formulation;
 static int         thermal_diffusion_type;

@@ -109,6 +109,7 @@ bool        Maestro::drive_initial_convection = false;
 int         Maestro::stop_initial_convection = -1;
 bool        Maestro::restart_with_vel_field = false;
 bool        Maestro::use_alt_energy_fix = true;
+bool        Maestro::use_omegadot_terms_in_S = true;
 bool        Maestro::use_thermal_diffusion = false;
 int         Maestro::temp_diffusion_formulation = 2;
 int         Maestro::thermal_diffusion_type = 1;

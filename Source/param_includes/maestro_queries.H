@@ -109,6 +109,7 @@ pp.query("drive_initial_convection", drive_initial_convection);
 pp.query("stop_initial_convection", stop_initial_convection);
 pp.query("restart_with_vel_field", restart_with_vel_field);
 pp.query("use_alt_energy_fix", use_alt_energy_fix);
+pp.query("use_omegadot_terms_in_S", use_omegadot_terms_in_S);
 pp.query("use_thermal_diffusion", use_thermal_diffusion);
 pp.query("temp_diffusion_formulation", temp_diffusion_formulation);
 pp.query("thermal_diffusion_type", thermal_diffusion_type);
