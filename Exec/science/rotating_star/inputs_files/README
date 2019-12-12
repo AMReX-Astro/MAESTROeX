@@ -32,3 +32,7 @@ inputs_3d_noburn
 
 inputs_3d_burnrange
   -burning_cutoff_density_lo = 5.e5 (restrict burning to the Si shell)
+
+inputs_3d_burntocore
+  -maestro.init_shrink = 0.00001
+  -no burning_cutoff_density_hi
