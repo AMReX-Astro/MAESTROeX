@@ -387,6 +387,9 @@ namespace: ``maestro``
 |                                        | \nabla (\pi/\beta_0)$ instead of just $(1/\rho) \nabla  |               |
 |                                        | (\pi)$                                                  |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_omegadot_terms_in_S``            | do we include the explicit omegadot terms in the        | true          |
+|                                        | constraint RHS source S?                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
 
 
 
