@@ -584,7 +584,7 @@ contains
     use network, only: aion, nspec_evolve
     use actual_rhs_module, only: actual_rhs
     use amrex_constants_module   , only: ZERO
-    use burn_type_module, only: burn_to_eos, eos_to_burn, net_ienuc
+    use burn_type_module, only: burn_t, burn_to_eos, eos_to_burn, net_ienuc, neqs
     use eos_type_module
     use eos_module
     
@@ -604,6 +604,7 @@ contains
     double precision :: temp_max, temp_min
     type (burn_t)    :: state
     type (eos_t)     :: eos_state
+    double precision :: ydot(neqs)
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)
@@ -649,12 +650,12 @@ contains
                 ! we don't need the temperature RHS so set self_heat = False
                 state % self_heat = .false.
                 
-                call actual_rhs(state)
+                call actual_rhs(state, ydot)
                 
                 rho_omegadot(i,j,k,1:nspec_evolve) = state % rho * aion(1:nspec_evolve) * &
-                     state % ydot(1:nspec_evolve)
+                     ydot(1:nspec_evolve)
                 rho_omegadot(i,j,k,nspec_evolve+1:nspec) = ZERO
-                rho_Hnuc(i,j,k) = state % rho * state % ydot(net_ienuc)
+                rho_Hnuc(i,j,k) = state % rho * ydot(net_ienuc)
              else
                 rho_omegadot(i,j,k,1:nspec) = ZERO
                 rho_Hnuc(i,j,k) = ZERO
