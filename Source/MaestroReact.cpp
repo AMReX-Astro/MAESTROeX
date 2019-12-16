@@ -221,6 +221,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         }
     }
 
+    int burn_success = 1;
+    Real burn_failed = 0.0;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -241,7 +244,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel reduction(+:burn_failed)
 #endif
         for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
 
@@ -263,7 +266,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]), dt_in, time_in, 
-                                 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+                                 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask,
+	               AMREX_MFITER_REDUCE_SUM(&burn_failed));
             } else {
 #pragma gpu box(tileBox)
                 burner_loop(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
@@ -274,9 +278,14 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                             tempbar_init.dataPtr(), dt_in, time_in, 
-                            BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+                            BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask,
+	               AMREX_MFITER_REDUCE_SUM(&burn_failed));
             }
         }
+
+        if (burn_failed != 0.0) burn_success = 0;
+
+        ParallelDescriptor::ReduceIntMin(burn_success);
     }
 }
 
@@ -305,6 +314,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
         }
     }
+
+    int burn_success = 1;
+    Real burn_failed = 0.0;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -342,7 +354,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 				 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(source_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(p0_cart_mf[mfi]), dt_in, time_in,
-				 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+				 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask,
+	               AMREX_MFITER_REDUCE_SUM(&burn_failed));
             } else {
 // #pragma gpu box(tileBox)
                 burner_loop(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
@@ -351,9 +364,14 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 			    BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
 			    BL_TO_FORTRAN_ANYD(source_mf[mfi]), 
 			    p0.dataPtr(), dt_in, time_in,
-			    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+			    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask,
+	               AMREX_MFITER_REDUCE_SUM(&burn_failed));
             }
         }
+
+        if (burn_failed != 0.0) burn_success = 0;
+
+        ParallelDescriptor::ReduceIntMin(burn_success);
     }
 }
 #endif

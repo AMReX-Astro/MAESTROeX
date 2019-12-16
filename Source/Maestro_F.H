@@ -119,7 +119,7 @@ extern "C"
                      const amrex::Real* tempbar_init_in,
                      const amrex::Real dt_in, const amrex::Real time_in, 
                      const int* mask, const int* m_lo, const int* m_hi,
-                     const int use_mask);
+                     const int use_mask, amrex::Real* burn_failed);
 
     void burner_loop_sphr(const int* lo, const int* hi,
                           const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
@@ -130,7 +130,7 @@ extern "C"
                           const amrex::Real* tempbar_init_cart, const int* t_lo, const int* t_hi,
                           const amrex::Real dt_in, const amrex::Real time_in, 
                           const int* mask, const int* m_lo, const int* m_hi,
-                          const int use_mask);
+                          const int use_mask, amrex::Real* burn_failed);
     
 #else
     void burner_loop(const int* lo, const int* hi,
@@ -142,7 +142,7 @@ extern "C"
 			 const amrex::Real dt_in,
 			 const amrex::Real time_in,
 			 const int* mask, const int* m_lo, const int* m_hi,
-			 const int use_mask);
+			 const int use_mask, amrex::Real* burn_failed);
 
     void burner_loop_sphr(const int* lo, const int* hi,
 			      const amrex::Real* s_in,     const int* i_lo, const int* i_hi,
@@ -152,7 +152,7 @@ extern "C"
 			      const amrex::Real dt_in,
 			      const amrex::Real time_in,
 			      const int* mask, const int* m_lo, const int* m_hi,
-			      const int use_mask);
+			      const int use_mask, amrex::Real* burn_failed);
 #endif
     
     void instantaneous_reaction_rates(const int* lo, const int* hi,

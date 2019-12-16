@@ -41,7 +41,7 @@ contains
        rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_in, dt_in, time_in, &
-       mask,     m_lo, m_hi, use_mask) &
+       mask,     m_lo, m_hi, use_mask, failed) &
        bind (C,name="burner_loop")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -62,6 +62,7 @@ contains
     double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
+    double precision, intent (inout) :: failed
 
     ! local
     integer          :: i, j, k, n, r
@@ -195,7 +196,7 @@ contains
        rho_odot, r_lo, r_hi, &
        rho_Hnuc, n_lo, n_hi, &
        tempbar_init_cart, t_lo, t_hi, dt_in, time_in, &
-       mask,     m_lo, m_hi, use_mask) &
+       mask,     m_lo, m_hi, use_mask, failed) &
        bind (C,name="burner_loop_sphr")
 
     integer         , intent (in   ) :: lo(3), hi(3)
@@ -216,6 +217,7 @@ contains
     double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
+    double precision, intent (inout) :: failed
 
     ! local
     integer          :: i, j, k, n
@@ -344,7 +346,7 @@ contains
        s_out,    o_lo, o_hi, &
        source, s_lo, s_hi, &
        p0_in, dt_in, time_in, &
-       mask,     m_lo, m_hi, use_mask) &
+       mask,     m_lo, m_hi, use_mask, failed) &
        bind (C,name="burner_loop")
 
     use sdc_type_module, only: sdc_t
@@ -364,6 +366,7 @@ contains
     double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
+    double precision, intent (inout) :: failed
 
     ! local
     integer          :: i, j, k, r
@@ -465,7 +468,7 @@ contains
        s_out,    o_lo, o_hi, &
        source,   s_lo, s_hi, &
        p0_cart, t_lo, t_hi, dt_in, time_in, &
-       mask,     m_lo, m_hi, use_mask) &
+       mask,     m_lo, m_hi, use_mask, failed) &
        bind (C,name="burner_loop_sphr")
 
     use sdc_type_module, only: sdc_t
@@ -485,6 +488,7 @@ contains
     double precision, value, intent (in) :: time_in
     integer         , intent (in   ) :: mask(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     integer, value  , intent (in   ) :: use_mask
+    double precision, intent (inout) :: failed
 
     ! local
     integer          :: i, j, k
