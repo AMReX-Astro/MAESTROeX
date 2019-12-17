@@ -165,19 +165,19 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel = std::min(eps_mac*pow(mac_level_factor,finest_level), eps_mac_max);
     
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     // turn off GPU
+//     if (not_launched) Gpu::setLaunchRegion(false);
+// #endif
 
     // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs), mac_tol_rel, mac_tol_abs);
 
-#ifdef AMREX_USE_CUDA
-    not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
+// #ifdef AMREX_USE_CUDA
+//     not_launched = Gpu::notInLaunchRegion();
+//     // turn on GPU
+//     if (not_launched) Gpu::setLaunchRegion(true);
+// #endif
 
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
 

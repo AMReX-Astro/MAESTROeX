@@ -1093,6 +1093,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // STEP 11 -- update the velocity
     //////////////////////////////////////////////////////////////////////////////
 
+#ifdef AMREX_USE_CUDA
+    not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
     advect_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
@@ -1179,6 +1185,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     for(int i=0; i<beta0_nm1.size(); ++i) {
         beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
     ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());
