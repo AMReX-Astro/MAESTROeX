@@ -982,7 +982,7 @@ private:
 		   amrex::Vector<amrex::MultiFab>& source);
 
 #ifndef SDC
-    void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
+    bool Burner (const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
                 const amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
@@ -992,7 +992,7 @@ private:
                 const amrex::Real time_react);
 
 #else
-    void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
+    bool Burner (const amrex::Vector<amrex::MultiFab>& s_in,
 		 amrex::Vector<amrex::MultiFab>& s_out,
 		 const RealVector& p0,
 		 const amrex::Real dt_react,

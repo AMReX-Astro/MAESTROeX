@@ -56,7 +56,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 #ifndef SDC
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,time_in);
+        auto burn_success = Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,time_in);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -156,7 +156,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     if (do_burning) {
 #ifdef SDC
         // do the burning, update s_out
-        Burner(s_in,s_out,p0,dt_in,time_in,source);
+        auto burn_success = Burner(s_in,s_out,p0,dt_in,time_in,source);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -195,7 +195,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 
 
 #ifndef SDC
-void Maestro::Burner(const Vector<MultiFab>& s_in,
+bool Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& s_out,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot,
@@ -287,11 +287,17 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
         ParallelDescriptor::ReduceIntMin(burn_success);
     }
+
+    if (burn_success) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 #else
 // SDC burner
-void Maestro::Burner(const Vector<MultiFab>& s_in,
+bool Maestro::Burner(const Vector<MultiFab>& s_in,
 		     Vector<MultiFab>& s_out,
 		     const RealVector& p0,
 		     const Real dt_in,
@@ -372,6 +378,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         if (burn_failed != 0.0) burn_success = 0;
 
         ParallelDescriptor::ReduceIntMin(burn_success);
+    }
+
+    if (burn_success) {
+        return true;
+    } else {
+        return false;
     }
 }
 #endif
