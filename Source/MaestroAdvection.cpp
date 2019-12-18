@@ -15,6 +15,13 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
 
+#ifdef AMREX_USE_CUDA
+    auto not_launched = Gpu::notInLaunchRegion();
+    // turn on GPU
+    if (not_launched) Gpu::setLaunchRegion(true);
+#endif
+
+
 	// create a uold with filled ghost cells
 	Vector<MultiFab> utilde(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -78,6 +85,11 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Addw0 (utrans,w0mac,1.);
 
 	VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
+
+#ifdef AMREX_USE_CUDA
+    // turn off GPU
+    if (not_launched) Gpu::setLaunchRegion(false);
+#endif
 }
 
 
