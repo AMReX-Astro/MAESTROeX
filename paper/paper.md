@@ -35,6 +35,8 @@ affiliations:
     index: 2
 date: 30 August 2019
 bibliography: paper.bib
+aas-journal: Astrophysical Journal
+aas-doi: 10.3847/1538-4357/ab4f75
 ---
 
 # Summary
