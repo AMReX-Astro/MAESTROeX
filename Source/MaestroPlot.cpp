@@ -1374,12 +1374,6 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()",MakeMagvel);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
 #if (AMREX_SPACEDIM == 3)
@@ -1455,11 +1449,6 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
     // average down and fill ghost cells
     AverageDown(magvel,0,1);
     FillPatch(t_old,magvel,magvel,magvel,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -1471,12 +1460,6 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelrc()",MakeVelrc);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1514,11 +1497,6 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
     FillPatch(t_old,rad_vel,rad_vel,rad_vel,0,0,1,0,bcs_f);
     AverageDown(circ_vel,0,1);
     FillPatch(t_old,circ_vel,circ_vel,circ_vel,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -1528,12 +1506,6 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeAdExcess()",MakeAdExcess);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1591,11 +1563,6 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
     // average down and fill ghost cells
     AverageDown(ad_excess,0,1);
     FillPatch(t_old,ad_excess,ad_excess,ad_excess,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -1677,12 +1644,6 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDeltaGamma()",MakeDeltaGamma);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -1717,11 +1678,6 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
     // average down and fill ghost cells
     AverageDown(deltagamma,0,1);
     FillPatch(t_old,deltagamma,deltagamma,deltagamma,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -1730,12 +1686,6 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEntropy()",MakeEntropy);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1768,11 +1718,6 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
     // average down and fill ghost cells
     AverageDown(entropy,0,1);
     FillPatch(t_old,entropy,entropy,entropy,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -1781,12 +1726,6 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDivw0()",MakeDivw0);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1853,11 +1792,6 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     // average down and fill ghost cells
     AverageDown(divw0,0,1);
     FillPatch(t_old,divw0,divw0,divw0,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -1867,12 +1801,6 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiDivu()",MakePiDivu);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1908,11 +1836,6 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
     // average down and fill ghost cells
     AverageDown(pidivu,0,1);
     FillPatch(t_old,pidivu,pidivu,pidivu,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -1921,12 +1844,6 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeAbar()",MakeAbar);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -1960,9 +1877,4 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
     // average down and fill ghost cells
     AverageDown(abar,0,1);
     FillPatch(t_old,abar,abar,abar,0,0,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }

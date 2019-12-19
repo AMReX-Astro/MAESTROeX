@@ -861,12 +861,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // STEP 11 -- update the velocity
     //////////////////////////////////////////////////////////////////////////////
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     if (maestro_verbose >= 1) {
 	Print() << "<<< STEP 11: update and project new velocity >>>" << std::endl;
     }
@@ -948,11 +942,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
     // wallclock time
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;

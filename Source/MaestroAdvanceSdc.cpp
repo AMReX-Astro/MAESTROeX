@@ -1193,12 +1193,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     for (int lev=0; lev<=finest_level; ++lev) {
 	MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
     }
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
     
     // Define rho at half time using the new rho from Step 4
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
@@ -1283,11 +1277,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // call nodal projection
     NodalProj(proj_type,rhcc_for_nodalproj,0,false);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
     // wallclock time
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;

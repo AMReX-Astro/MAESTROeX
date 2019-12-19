@@ -20,12 +20,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // external heating
     if (do_heating) {
 
@@ -96,11 +90,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
         TfromRhoH(s_out,p0);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 // SDC subroutines
@@ -117,12 +106,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()",ReactSDC);
-
-// #ifdef AMREX_USE_CUDA
-//     auto not_launched = Gpu::notInLaunchRegion();
-//     // turn on GPU
-//     if (not_launched) Gpu::setLaunchRegion(true);
-// #endif
 
     // external heating
     if (do_heating) {
@@ -185,11 +168,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     else {
         TfromRhoH(s_out,p0);
     }
-
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     if (not_launched) Gpu::setLaunchRegion(false);
-// #endif
 
 }
 

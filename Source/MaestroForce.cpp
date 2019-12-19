@@ -16,12 +16,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
@@ -138,11 +132,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
               bcs_u, 1);
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 
@@ -159,12 +148,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ModifyScalForce()",ModifyScalForce);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     Vector<MultiFab> s0_edge_cart(finest_level+1);
 
@@ -274,11 +257,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -292,12 +270,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHForce()",MakeRhoHForce);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // if we are doing the prediction, then it only makes sense to be in
     // this routine if the quantity we are predicting is rhoh', h, or rhoh
@@ -428,11 +400,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     // average down and fill ghost cells
     AverageDown(scal_force,RhoH,1);
     FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -445,12 +412,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeTempForce()",MakeTempForce);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // if we are doing the prediction, then it only makes sense to be in
     // this routine if the quantity we are predicting is rhoh', h, or rhoh
@@ -529,9 +490,4 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     // average down and fill ghost cells
     AverageDown(temp_force,Temp,1);
     FillPatch(t_old,temp_force,temp_force,temp_force,Temp,Temp,1,0,bcs_f);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }

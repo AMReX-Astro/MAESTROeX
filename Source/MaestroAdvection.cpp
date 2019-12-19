@@ -15,13 +15,6 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
-
 	// create a uold with filled ghost cells
 	Vector<MultiFab> utilde(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
@@ -85,11 +78,6 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Addw0 (utrans,w0mac,1.);
 
 	VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -111,12 +99,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
@@ -334,11 +316,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -365,12 +342,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -623,11 +594,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
     // Something analogous to edge_restriction is done in UpdateScal()
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 void
@@ -640,12 +606,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
@@ -744,11 +704,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
         AverageDown(statenew,Rho,1);
         FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -760,12 +715,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -848,10 +797,5 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // fill ghost cells
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }

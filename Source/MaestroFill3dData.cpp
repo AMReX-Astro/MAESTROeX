@@ -18,12 +18,6 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     int ng = s0_cart[0].nGrow();
     if (ng > 0 && bcs.size() == 0) {
         Abort("Put1dArrayOnCart with ghost cells requires bcs input");
@@ -45,11 +39,6 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
                   variable_type);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 void
@@ -63,12 +52,6 @@ Maestro::Put1dArrayOnCart (int level,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[level];
@@ -105,11 +88,6 @@ Maestro::Put1dArrayOnCart (int level,
     				      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
     	}
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }
 
@@ -319,12 +297,6 @@ Maestro::MakeNormal ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNormal()",MakeNormal);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -349,10 +321,6 @@ Maestro::MakeNormal ()
                         AMREX_REAL_ANYD(dx));
         }
     }
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -362,12 +330,6 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                         int harmonic_avg) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -422,11 +384,6 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }
 

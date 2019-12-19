@@ -211,6 +211,7 @@ Maestro::Init ()
             DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
         }
     }
+
 }
 
 // fill in multifab and base state data
@@ -409,12 +410,6 @@ void Maestro::InitProj ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitProj()",InitProj);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     Vector<MultiFab>       rho_omegadot(finest_level+1);
     Vector<MultiFab>            thermal(finest_level+1);
     Vector<MultiFab>           rho_Hnuc(finest_level+1);
@@ -489,11 +484,6 @@ void Maestro::InitProj ()
 #else
     NodalProj(initial_projection_comp,rhcc_for_nodalproj,false);
 #endif
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
     
 }
 
@@ -502,12 +492,6 @@ void Maestro::DivuIter (int istep_divu_iter)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     Vector<MultiFab> stemp             (finest_level+1);
     Vector<MultiFab> rho_Hext          (finest_level+1);
@@ -614,12 +598,6 @@ void Maestro::DivuIter (int istep_divu_iter)
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
 
     Real dt_hold = dt;
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 
     // compute new time step
     EstDt();

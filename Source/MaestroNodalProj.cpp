@@ -570,12 +570,6 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& phi_mf = phi[lev];
         MultiFab& gphi_mf = gphi[lev];
@@ -601,11 +595,6 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 
@@ -614,12 +603,6 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
         const MultiFab& pi_mf = pi[lev];
@@ -645,10 +628,5 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
                        BL_TO_FORTRAN_ANYD(beta0_cart_mf[mfi]));
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }

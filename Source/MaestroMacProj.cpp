@@ -20,12 +20,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -164,20 +158,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // tolerance parameters taken from original MAESTRO fortran code
     const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel = std::min(eps_mac*pow(mac_level_factor,finest_level), eps_mac_max);
-    
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     if (not_launched) Gpu::setLaunchRegion(false);
-// #endif
 
     // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs), mac_tol_rel, mac_tol_abs);
-
-// #ifdef AMREX_USE_CUDA
-//     not_launched = Gpu::notInLaunchRegion();
-//     // turn on GPU
-//     if (not_launched) Gpu::setLaunchRegion(true);
-// #endif
 
     // update velocity, beta0 * Utilde = beta0 * Utilde^* - B grad phi
 
@@ -236,12 +219,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         // fill level n ghost cells using interpolation from level n-1 data
         FillPatchUedge(umac);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 // multiply (or divide) face-data by beta0
@@ -297,12 +274,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -341,11 +312,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 // Average bcoefs at faces using inverse of rho
@@ -354,12 +320,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
@@ -412,13 +372,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
-
 }
 
 // Set boundaries for MAC velocities

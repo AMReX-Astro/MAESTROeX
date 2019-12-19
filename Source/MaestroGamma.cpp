@@ -12,12 +12,6 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     Vector<MultiFab> gamma1(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
 
@@ -66,9 +60,4 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
     // call average to create gamma1bar
     Average(gamma1,gamma1bar,0);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
