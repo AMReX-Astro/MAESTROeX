@@ -123,7 +123,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 
             // Get the index space of the valid region
             // const Box& validBox = mfi.validbox();
-            const Box& tileBox = mfi.tilebox();
+            // const Box& tileBox = mfi.validbox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -131,11 +131,11 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
-                const Box& obx = amrex::grow(tileBox, 1);
+                // const Box& obx = amrex::grow(tileBox, 1);
 #if (AMREX_SPACEDIM == 2)
-                const Box& ybx = amrex::growLo(obx, 1, -1);
+                const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0,0));
 #else
-                const Box& zbx = amrex::growLo(obx, 2, -1);
+                const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
 #endif
 
 #if (AMREX_SPACEDIM == 2)
@@ -147,7 +147,8 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
                       w0.dataPtr(),mult);
 #else 
 #pragma gpu box(zbx)
-                addw0(ARLIM_3D(zbx.loVect()), ARLIM_3D(zbx.hiVect()), 
+                addw0(AMREX_INT_ANYD(zbx.loVect()), 
+                      AMREX_INT_ANYD(zbx.hiVect()), 
                       lev,
                       BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
                       w0.dataPtr(),mult);
@@ -157,9 +158,9 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 
 #if (AMREX_SPACEDIM == 3)
 
-                const Box& xbx = amrex::growHi(tileBox,0, 1);
-                const Box& ybx = amrex::growHi(tileBox,1, 1);
-                const Box& zbx = amrex::growHi(tileBox,2, 1);
+                const Box& xbx = mfi.nodaltilebox(0); 
+                const Box& ybx = mfi.nodaltilebox(1); 
+                const Box& zbx = mfi.nodaltilebox(2); 
                 
 #pragma gpu box(xbx)
                 addw0_sphr(AMREX_INT_ANYD(xbx.loVect()), 
