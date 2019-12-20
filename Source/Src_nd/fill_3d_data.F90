@@ -506,107 +506,61 @@ contains
 
   end subroutine quad_interp
 
-  subroutine addw0(lev, lo, hi, &
+  subroutine addw0(lo, hi, lev, &
        uedge, u_lo, u_hi, &
-       vedge, v_lo, v_hi, &
-#if (AMREX_SPACEDIM == 3)
-       wedge, w_lo, w_hi, &
-#endif
-       w0,mult) bind(C, name="addw0")
+       w0, mult) bind(C, name="addw0")
 
-    integer         , intent(in   ) :: lev, lo(3), hi(3)
+    integer,   value, intent(in   ) :: lev
+    integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) :: uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(inout) :: vedge(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-#if (AMREX_SPACEDIM == 3)
-    integer         , intent(in   ) :: w_lo(3), w_hi(3)
-    double precision, intent(inout) :: wedge(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-#endif
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: mult
+    double precision, value, intent(in   ) :: mult
 
     ! local
-    integer i,j,k
+    integer i,j,k,r
 
+    !$gpu
+
+    do k = lo(3),hi(3)
+        do j = lo(2),hi(2)
+            do i = lo(1),hi(1)
 #if (AMREX_SPACEDIM == 2)
-    k = lo(3)
-    do j = lo(2),hi(2)+1
-       do i = lo(1)-1,hi(1)+1
-          vedge(i,j,k) = vedge(i,j,k) + mult * w0(lev,j)
-       end do
-    end do
-#elif (AMREX_SPACEDIM == 3)
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)+1
-       do j = lo(2)-1,hi(2)+1
-          do i = lo(1)-1,hi(1)+1
-             wedge(i,j,k) = wedge(i,j,k) + mult * w0(lev,k)
-          end do
-       end do
-    end do
-    !$OMP END PARALLEL DO
-
+                r = j
+#else 
+                r = k 
 #endif
+                uedge(i,j,k) = uedge(i,j,k) + mult * w0(lev,r)
+            end do
+        end do
+    end do
 
   end subroutine addw0
 
   subroutine addw0_sphr(lo, hi, &
        umac, u_lo, u_hi, &
-       vmac, v_lo, v_hi, &
-       wmac, w_lo, w_hi, &
-       w0macx, x_lo, x_hi, &
-       w0macy, y_lo, y_hi, &
-       w0macz, z_lo, z_hi, &
+       w0mac, x_lo, x_hi, &
        mult) bind(C, name="addw0_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     integer         , intent(in   ) :: u_lo(3), u_hi(3)
     double precision, intent(inout) ::   umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: v_lo(3), v_hi(3)
-    double precision, intent(inout) ::   vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-    integer         , intent(in   ) :: w_lo(3), w_hi(3)
-    double precision, intent(inout) ::   wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
-    double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    integer         , intent(in   ) :: y_lo(3), y_hi(3)
-    double precision, intent(in   ) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
-    integer         , intent(in   ) :: z_lo(3), z_hi(3)
-    double precision, intent(in   ) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
-    double precision, intent(in   ) :: mult
+    double precision, intent(in   ) :: w0mac(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+    double precision, value, intent(in   ) :: mult
 
-    ! local variable
+    ! local variables
     integer :: i,j,k
 
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
+    !$gpu
+
     do k = lo(3),hi(3)
        do j = lo(2),hi(2)
-          do i = lo(1),hi(1)+1
-             umac(i,j,k) = umac(i,j,k) + mult * w0macx(i,j,k)
-          end do
-       end do
-    end do
-    !$OMP END PARALLEL DO
-
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)+1
           do i = lo(1),hi(1)
-             vmac(i,j,k) = vmac(i,j,k) + mult * w0macy(i,j,k)
+             umac(i,j,k) = umac(i,j,k) + mult * w0mac(i,j,k)
           end do
        end do
     end do
-    !$OMP END PARALLEL DO
-
-    !$OMP PARALLEL DO PRIVATE(i,j,k)
-    do k = lo(3),hi(3)+1
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-             wmac(i,j,k) = wmac(i,j,k) + mult * w0macz(i,j,k)
-          end do
-       end do
-    end do
-    !$OMP END PARALLEL DO
 
   end subroutine addw0_sphr
 
@@ -869,8 +823,10 @@ contains
 
        call bl_deallocate(w0_nodal)
 
+#ifndef AMREX_USE_CUDA
     else
        call amrex_error('Error: w0mac_interp_type not defined')
+#endif
     end if
 
   end subroutine make_w0mac_sphr
@@ -1161,10 +1117,10 @@ contains
           end do
        end do
 
+#ifndef AMREX_USE_CUDA
     else
-
        call amrex_error('Error: s0mac_interp_type not defined')
-
+#endif
     end if
 
   end subroutine make_s0mac_sphr
@@ -1408,10 +1364,10 @@ contains
           end do
        end do
 
+#ifndef AMREX_USE_CUDA
     else
-
        call amrex_error('Error: s0mac_interp_type not defined')
-
+#endif
     end if
 
   end subroutine make_s0mac_sphr_irreg
@@ -1518,95 +1474,6 @@ contains
             end do 
         end do
     end if
-
-!        k = lo(3)
-!        j = lo(2)
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)
-! #endif
-!           do j = lo(2),hi(2)
-!              do i = lo(1),hi(1)+1
-!                 denom = (scc(i,j,k) + scc(i-1,j,k))
-!                 if (denom .ne. 0.d0) then
-!                    facex(i,j,k) = TWO*(scc(i,j,k) * scc(i-1,j,k)) / denom
-!                 else
-!                    facex(i,j,k) = HALF*denom
-!                 end if
-!              end do
-!           end do
-! #if (AMREX_SPACEDIM == 3)
-!        end do
-! #endif
-
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)
-! #endif
-!           do j = lo(2),hi(2)+1
-!              do i = lo(1),hi(1)
-!                 denom = (scc(i,j,k) + scc(i,j-1,k))
-!                 if (denom .ne. 0.d0) then
-!                    facey(i,j,k) = TWO*(scc(i,j,k) * scc(i-1,j,k)) / denom
-!                 else
-!                    facey(i,j,k) = HALF*denom
-!                 end if
-!              end do
-!           end do
-! #if (AMREX_SPACEDIM == 3)
-!        end do
-! #endif
-
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)+1
-!           do j = lo(2),hi(2)
-!              do i = lo(1),hi(1)
-!                 denom = (scc(i,j,k) + scc(i,j,k-1))
-!                 if (denom .ne. 0.d0) then
-!                    facez(i,j,k) = TWO*(scc(i,j,k) * scc(i,j,k-1)) / denom
-!                 else
-!                    facez(i,j,k) = HALF*denom
-!                 end if
-!              end do
-!           end do
-!        end do
-! #endif
-
-!     else
-
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)
-! #endif
-!           do j = lo(2),hi(2)
-!              do i = lo(1),hi(1)+1
-!                 facex(i,j,k) = HALF*(scc(i,j,k)+scc(i-1,j,k))
-!              end do
-!           end do
-! #if (AMREX_SPACEDIM == 3)
-!        end do
-! #endif
-
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)
-! #endif
-!           do j = lo(2),hi(2)+1
-!              do i = lo(1),hi(1)
-!                 facey(i,j,k) = HALF*(scc(i,j,k)+scc(i,j-1,k))
-!              end do
-!           end do
-! #if (AMREX_SPACEDIM == 3)
-!        end do
-! #endif
-
-! #if (AMREX_SPACEDIM == 3)
-!        do k = lo(3),hi(3)+1
-!           do j = lo(2),hi(2)
-!              do i = lo(1),hi(1)
-!                 facez(i,j,k) = HALF*(scc(i,j,k)+scc(i,j,k-1))
-!              end do
-!           end do
-!        end do
-! #endif
-
-!     end if
 
   end subroutine put_data_on_faces
 

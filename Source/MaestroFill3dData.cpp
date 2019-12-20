@@ -116,11 +116,14 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
         MultiFab& sold_mf = sold[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        // NOTE: don't use tiling - put OpenMP into F90
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validBox = mfi.validbox();
+            // const Box& validBox = mfi.validbox();
+            const Box& tileBox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -128,25 +131,54 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
-                addw0(&lev,ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                      BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-                      BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                      BL_TO_FORTRAN_3D(wedge_mf[mfi]),
+                const Box& obx = amrex::grow(tileBox, 1);
+#if (AMREX_SPACEDIM == 2)
+                const Box& ybx = amrex::growLo(obx, 1, -1);
+#else
+                const Box& zbx = amrex::growLo(obx, 2, -1);
 #endif
-                      w0.dataPtr(),&mult);
+
+#if (AMREX_SPACEDIM == 2)
+#pragma gpu box(ybx)
+                addw0(AMREX_INT_ANYD(ybx.loVect()), 
+                      AMREX_INT_ANYD(ybx.hiVect()), 
+                      lev,
+                      BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+                      w0.dataPtr(),mult);
+#else 
+#pragma gpu box(zbx)
+                addw0(ARLIM_3D(zbx.loVect()), ARLIM_3D(zbx.hiVect()), 
+                      lev,
+                      BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+                      w0.dataPtr(),mult);
+#endif
 
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                addw0_sphr(ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                           BL_TO_FORTRAN_3D(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(vedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(wedge_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                           &mult);
+
+                const Box& xbx = amrex::growHi(tileBox,0, 1);
+                const Box& ybx = amrex::growHi(tileBox,1, 1);
+                const Box& zbx = amrex::growHi(tileBox,2, 1);
+                
+#pragma gpu box(xbx)
+                addw0_sphr(AMREX_INT_ANYD(xbx.loVect()), 
+                           AMREX_INT_ANYD(xbx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                           mult);
+#pragma gpu box(ybx)
+                addw0_sphr(AMREX_INT_ANYD(ybx.loVect()), 
+                           AMREX_INT_ANYD(ybx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                           mult);
+#pragma gpu box(zbx)
+                addw0_sphr(AMREX_INT_ANYD(zbx.loVect()), 
+                           AMREX_INT_ANYD(zbx.hiVect()),
+                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                           mult);
 #else
                 Abort("Addw0: Spherical is not valid for DIM < 3");
 #endif

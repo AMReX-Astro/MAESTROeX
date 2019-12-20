@@ -335,22 +335,14 @@ extern "C"
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void addw0(const int* lev, const int* lo, const int* hi,
+    void addw0(const int* lo, const int* hi, const int lev, 
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
-               amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-               amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
-               const amrex::Real* w0, const amrex::Real* mult);
+               amrex::Real* w0, const amrex::Real mult);
 
     void addw0_sphr(const int* lo, const int* hi,
 		    amrex::Real* umac, const int* u_lo, const int* u_hi,
-		    amrex::Real* vmac, const int* v_lo, const int* v_hi,
-		    amrex::Real* wmac, const int* w_lo, const int* w_hi,
-		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-		    const amrex::Real* mult);
+		    const amrex::Real* w0mac, const int* x_lo, const int* x_hi,
+		    const amrex::Real mult);
 
     void make_w0mac_sphr(const int* lo, const int* hi,
 			 const amrex::Real* w0,
