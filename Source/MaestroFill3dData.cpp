@@ -120,11 +120,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 #pragma omp parallel
 #endif
         for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            // const Box& validBox = mfi.validbox();
-            // const Box& tileBox = mfi.validbox();
-
+            
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
@@ -222,6 +218,13 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
         Abort("Error: MakeW0mac assumes one ghost cell");
     }
 
+    // make nodal w0
+    Vector<MultiFab> w0_nodal(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0_nodal[lev].define(convert(grids[lev],nodal_flag), dmap[lev], AMREX_SPACEDIM, 1);
+    }
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -229,6 +232,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
         MultiFab& w0macy_mf = w0mac[lev][1];
         MultiFab& w0macz_mf = w0mac[lev][2];
         MultiFab& w0cart_mf = w0_cart[lev];
+        MultiFab& w0_nodal_mf = w0_nodal[lev];
         const Real* dx = geom[lev].CellSize();
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -238,7 +242,17 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
         for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
+            const Box& gntbx = mfi.grownnodaltilebox(-1, 1);
             const Box& tileBox = mfi.tilebox();
+
+            if (w0mac_interp_type == 4) {
+                make_w0mac_nodal(ARLIM_3D(gntbx.loVect()), 
+                            ARLIM_3D(gntbx.hiVect()),
+                            w0.dataPtr(),
+                            BL_TO_FORTRAN_3D(w0_nodal_mf[mfi]), 
+                            ZFILL(dx));
+
+            }
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -249,7 +263,8 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                             BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
                             BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
                             BL_TO_FORTRAN_FAB(w0cart_mf[mfi]),
-                            dx, r_edge_loc.dataPtr());
+                            BL_TO_FORTRAN_3D(w0_nodal_mf[mfi]),
+                            ZFILL(dx), r_edge_loc.dataPtr());
         }
     }
 }

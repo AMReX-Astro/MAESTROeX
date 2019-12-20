@@ -569,6 +569,7 @@ contains
        w0macy, y_lo, y_hi, &
        w0macz, z_lo, z_hi, &
        w0_cart, w0_lo, w0_hi, nc_w0, &
+       w0_nodal, wn_lo, wn_hi, &
        dx, &
        r_edge_loc) bind(C, name="make_w0mac_sphr")
 
@@ -583,6 +584,9 @@ contains
     integer         , intent(in   ) :: w0_lo(3), w0_hi(3), nc_w0
     double precision, intent(inout) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2), &
          w0_lo(3):w0_hi(3),nc_w0)
+    integer         , intent(in   ) :: wn_lo(3), wn_hi(3)
+    double precision, intent(inout) :: w0_nodal(wn_lo(1):wn_hi(1),wn_lo(2):wn_hi(2), &
+        wn_lo(3):wn_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
 
@@ -590,8 +594,6 @@ contains
     integer          :: i,j,k,index
     double precision :: x,y,z
     double precision :: radius,w0_cart_val,rfac
-    double precision, pointer :: w0_nodal(:,:,:,:)
-
     ! we currently have three different ideas for computing w0mac
     ! 1.  Interpolate w0 to cell centers, then average to edges
     ! 2.  Interpolate w0 to edges directly using linear interpolation
@@ -789,10 +791,10 @@ contains
 
     else if (w0mac_interp_type .eq. 4) then
 
-       call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
+    !    call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
 
-       call make_w0mac_nodal(lo, hi, w0, w0_nodal, lo-1, hi+2, 3, &
-        dx, r_edge_loc)
+    !    call make_w0mac_nodal(lo, hi, w0, w0_nodal, lo-1, hi+2, 3, &
+    !     dx, r_edge_loc)
 
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+1
@@ -821,7 +823,7 @@ contains
           end do
        end do
 
-       call bl_deallocate(w0_nodal)
+    !    call bl_deallocate(w0_nodal)
 
 #ifndef AMREX_USE_CUDA
     else
@@ -832,18 +834,16 @@ contains
   end subroutine make_w0mac_sphr
 
   subroutine make_w0mac_nodal(lo, hi, w0, &
-       w0_nodal, w0_lo, w0_hi, nc_w0, &
-       dx, &
-       r_edge_loc) bind(C, name="make_w0mac_nodal")
+       w0_nodal, w0_lo, w0_hi, &
+       dx) bind(C, name="make_w0mac_nodal")
 
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: w0_lo(3), w0_hi(3), nc_w0
+    integer         , intent(in   ) :: w0_lo(3), w0_hi(3)
     double precision, intent(inout) :: w0_nodal(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2), &
-         w0_lo(3):w0_hi(3),nc_w0)
+         w0_lo(3):w0_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-
+    
     ! Local variables
     integer          :: i,j,k,index
     double precision :: x,y,z
@@ -851,11 +851,11 @@ contains
 
     !    call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
 
-    do k = lo(3)-1,hi(3)+2
+    do k = lo(3),hi(3)
         z = prob_lo(3) + (dble(k))*dx(3) - center(3)
-        do j = lo(2)-1,hi(2)+2
+        do j = lo(2),hi(2)
            y = prob_lo(2) + (dble(j))*dx(2) - center(2)
-           do i = lo(1)-1,hi(1)+2
+           do i = lo(1),hi(1)
               x = prob_lo(1) + (dble(i))*dx(1) - center(1)
 
               radius = sqrt(x**2 + y**2 + z**2)
