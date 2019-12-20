@@ -298,7 +298,7 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& gtbx = mfi.growntilebox(1);

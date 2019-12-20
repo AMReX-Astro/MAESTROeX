@@ -61,7 +61,7 @@ Maestro::Put1dArrayOnCart (int level,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for ( MFIter mfi(s0_cart_mf, true); mfi.isValid(); ++mfi ) {
+    for ( MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
     	// Get the index space of the valid region
     	const Box& tileBox = mfi.tilebox();
@@ -202,7 +202,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(w0cart_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -261,7 +261,7 @@ Maestro::MakeS0mac (const RealVector& s0,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s0cart_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -307,7 +307,7 @@ Maestro::MakeNormal ()
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(normal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(normal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             const Box& tileBox = mfi.tilebox();
 
@@ -346,7 +346,7 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

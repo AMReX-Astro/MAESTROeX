@@ -28,7 +28,7 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s1_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s1_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& gtbx = mfi.growntilebox(1);

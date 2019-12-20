@@ -72,7 +72,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -465,7 +465,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -682,7 +682,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -1242,7 +1242,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -1424,7 +1424,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -1522,7 +1522,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();

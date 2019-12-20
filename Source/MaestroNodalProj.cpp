@@ -576,7 +576,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(gphi_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(gphi_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the tile's valid region
             const Box& tilebox = mfi.tilebox();
@@ -611,7 +611,7 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(snew_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(snew_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the tile's valid region
             const Box& tileBox = mfi.tilebox();

@@ -214,7 +214,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     Vector<int> itags;
 
     // if you add openMP here, make sure to collect tag_array across threads
-    for (MFIter mfi(state, true); mfi.isValid(); ++mfi) {
+    for (MFIter mfi(state, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         const Box& tilebox  = mfi.tilebox();
 
@@ -256,7 +256,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
 
         // NOTE: adding OpenMP breaks the code - not exactly sure why
-        for (MFIter mfi(state, true); mfi.isValid(); ++mfi) {
+        for (MFIter mfi(state, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             const Box& tilebox  = mfi.tilebox();
 

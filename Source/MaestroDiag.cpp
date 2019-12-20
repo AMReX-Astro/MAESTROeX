@@ -146,7 +146,7 @@ Maestro::DiagFile (const int step,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sin_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sin_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
