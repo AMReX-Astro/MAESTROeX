@@ -1,4 +1,4 @@
-inlet_bc.f90
+inlet_bc.F90
 ============
 
 inlet\_bc\_module

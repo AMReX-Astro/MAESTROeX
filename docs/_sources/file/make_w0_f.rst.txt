@@ -1,4 +1,4 @@
-make_w0.f90
+make_w0.F90
 ===========
 
 make\_w0\_module

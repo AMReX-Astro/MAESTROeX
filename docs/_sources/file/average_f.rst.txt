@@ -1,4 +1,4 @@
-average.f90
+average.F90
 ===========
 
 average\_module

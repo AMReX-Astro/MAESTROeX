@@ -1,4 +1,4 @@
-initdata.f90
+initdata.F90
 ============
 
 initdata\_module

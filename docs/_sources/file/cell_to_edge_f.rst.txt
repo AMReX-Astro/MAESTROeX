@@ -1,4 +1,4 @@
-cell_to_edge.f90
+cell_to_edge.F90
 ================
 
 cell\_to\_edge\_module

@@ -1,4 +1,4 @@
-maestro_init.f90
+maestro_init.F90
 ================
 
 maestro\_init\_module

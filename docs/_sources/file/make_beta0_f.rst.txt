@@ -1,4 +1,4 @@
-make_beta0.f90
+make_beta0.F90
 ==============
 
 make\_beta0\_module
