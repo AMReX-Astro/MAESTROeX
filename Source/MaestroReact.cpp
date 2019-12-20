@@ -221,7 +221,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s_in_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -304,7 +304,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s_in_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -362,7 +362,7 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	    for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+	    for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
 		// Get the index space of the valid region
 		const Box& tileBox = mfi.tilebox();

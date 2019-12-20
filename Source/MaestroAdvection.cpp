@@ -141,7 +141,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -396,7 +396,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -628,7 +628,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scalold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scalold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -742,7 +742,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

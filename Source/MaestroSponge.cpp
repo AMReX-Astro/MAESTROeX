@@ -19,7 +19,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sponge_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sponge_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

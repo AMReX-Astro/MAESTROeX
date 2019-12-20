@@ -121,7 +121,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -192,7 +192,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(delta_gamma1_term_mf, true); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(delta_gamma1_term_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -253,7 +253,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -332,7 +332,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(correction_cc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(correction_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -430,7 +430,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

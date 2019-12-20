@@ -68,7 +68,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel_force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(vel_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -204,7 +204,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -355,7 +355,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -452,7 +452,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(temp_force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(temp_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

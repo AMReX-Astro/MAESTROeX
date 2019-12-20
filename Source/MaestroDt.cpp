@@ -140,7 +140,7 @@ Maestro::EstDt ()
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
 
-        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(uold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -343,7 +343,7 @@ Maestro::FirstDt ()
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
 
-        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf,TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
