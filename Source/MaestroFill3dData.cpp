@@ -223,6 +223,8 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
     for (int lev=0; lev<=finest_level; ++lev) {
         w0_nodal[lev].define(convert(grids[lev],nodal_flag), dmap[lev], AMREX_SPACEDIM, 1);
+
+        w0_nodal[lev].setVal(0.);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -246,25 +248,57 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
             const Box& tileBox = mfi.tilebox();
 
             if (w0mac_interp_type == 4) {
-                make_w0mac_nodal(ARLIM_3D(gntbx.loVect()), 
-                            ARLIM_3D(gntbx.hiVect()),
+#pragma gpu box(gntbx)
+                make_w0mac_nodal(AMREX_INT_ANYD(gntbx.loVect()), 
+                            AMREX_INT_ANYD(gntbx.hiVect()),
                             w0.dataPtr(),
-                            BL_TO_FORTRAN_3D(w0_nodal_mf[mfi]), 
-                            ZFILL(dx));
+                            BL_TO_FORTRAN_ANYD(w0_nodal_mf[mfi]), 
+                            AMREX_REAL_ANYD(dx));
 
             }
+        }
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            const Box& xbx = mfi.grownnodaltilebox(0, 1);
+            const Box& ybx = mfi.grownnodaltilebox(1, 1);
+            const Box& zbx = mfi.grownnodaltilebox(2, 1);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            make_w0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(xbx)
+            make_w0mac_sphr(AMREX_INT_ANYD(xbx.loVect()), 
+                            AMREX_INT_ANYD(xbx.hiVect()),1,
                             w0.dataPtr(),
-                            BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                            BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                            BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                            BL_TO_FORTRAN_FAB(w0cart_mf[mfi]),
-                            BL_TO_FORTRAN_3D(w0_nodal_mf[mfi]),
-                            ZFILL(dx), r_edge_loc.dataPtr());
+                            BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]), 
+                            w0cart_mf.nComp(),
+                            BL_TO_FORTRAN_ANYD(w0_nodal_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_edge_loc.dataPtr());
+
+#pragma gpu box(ybx)
+            make_w0mac_sphr(AMREX_INT_ANYD(ybx.loVect()), 
+                            AMREX_INT_ANYD(ybx.hiVect()),2,
+                            w0.dataPtr(),
+                            BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]), 
+                            w0cart_mf.nComp(),
+                            BL_TO_FORTRAN_ANYD(w0_nodal_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_edge_loc.dataPtr());
+
+#pragma gpu box(zbx)
+            make_w0mac_sphr(AMREX_INT_ANYD(zbx.loVect()), 
+                            AMREX_INT_ANYD(zbx.hiVect()),3,
+                            w0.dataPtr(),
+                            BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]), 
+                            w0cart_mf.nComp(),
+                            BL_TO_FORTRAN_ANYD(w0_nodal_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_edge_loc.dataPtr());
         }
     }
 }

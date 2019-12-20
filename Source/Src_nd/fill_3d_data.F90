@@ -493,7 +493,7 @@ contains
 
   subroutine quad_interp(x,x0,x1,x2,y,y0,y1,y2)
 
-    double precision, intent(in   ) :: x,x0,x1,x2,y0,y1,y2
+    double precision, value, intent(in   ) :: x,x0,x1,x2,y0,y1,y2
     double precision, intent(  out) :: y
 
     !$gpu
@@ -564,28 +564,24 @@ contains
 
   end subroutine addw0_sphr
 
-  subroutine make_w0mac_sphr(lo, hi, w0, &
-       w0macx, x_lo, x_hi, &
-       w0macy, y_lo, y_hi, &
-       w0macz, z_lo, z_hi, &
+  subroutine make_w0mac_sphr(lo, hi, idir, w0, &
+       w0mac, x_lo, x_hi, &
        w0_cart, w0_lo, w0_hi, nc_w0, &
        w0_nodal, wn_lo, wn_hi, &
        dx, &
        r_edge_loc) bind(C, name="make_w0mac_sphr")
 
     integer         , intent(in   ) :: lo(3), hi(3)
+    integer  , value, intent(in   ) :: idir
     double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
-    double precision, intent(inout) ::  w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    integer         , intent(in   ) :: y_lo(3), y_hi(3)
-    double precision, intent(inout) ::  w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
-    integer         , intent(in   ) :: z_lo(3), z_hi(3)
-    double precision, intent(inout) ::  w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
-    integer         , intent(in   ) :: w0_lo(3), w0_hi(3), nc_w0
+    double precision, intent(inout) ::  w0mac(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
+    integer         , intent(in   ) :: w0_lo(3), w0_hi(3)
+    integer  , value, intent(in   ) :: nc_w0
     double precision, intent(inout) :: w0_cart(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2), &
          w0_lo(3):w0_hi(3),nc_w0)
     integer         , intent(in   ) :: wn_lo(3), wn_hi(3)
-    double precision, intent(inout) :: w0_nodal(wn_lo(1):wn_hi(1),wn_lo(2):wn_hi(2), &
+    double precision, intent(in   ) :: w0_nodal(wn_lo(1):wn_hi(1),wn_lo(2):wn_hi(2), &
         wn_lo(3):wn_hi(3),AMREX_SPACEDIM)
     double precision, intent(in   ) :: dx(3)
     double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
@@ -602,228 +598,235 @@ contains
 
     if (w0mac_interp_type .eq. 1) then
 
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+2
-                w0macx(i,j,k) = HALF* (w0_cart(i-1,j,k,1) + w0_cart(i,j,k,1))
-             end do
-          end do
-       end do
+        if (idir == 1) then 
 
-       do k=lo(3)-1,hi(3)+1
-          do j=lo(2)-1,hi(2)+2
-             do i=lo(1)-1,hi(1)+1
-                w0macy(i,j,k) = HALF* (w0_cart(i,j-1,k,2) + w0_cart(i,j,k,2))
-             end do
-          end do
-       end do
+            do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                    do i=lo(1),hi(1)
+                        w0mac(i,j,k) = HALF* (w0_cart(i-1,j,k,1) + w0_cart(i,j,k,1))
+                    end do
+                end do
+            end do
 
-       do k=lo(3)-1,hi(3)+2
-          do j=lo(2)-1,hi(2)+1
-             do i=lo(1)-1,hi(1)+1
-                w0macz(i,j,k) = HALF* (w0_cart(i,j,k-1,3) + w0_cart(i,j,k,3))
-             end do
-          end do
-       end do
+        else if (idir == 2) then 
 
-    else if (w0mac_interp_type .eq. 2) then
+            do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                    do i=lo(1),hi(1)
+                        w0mac(i,j,k) = HALF* (w0_cart(i,j-1,k,2) + w0_cart(i,j,k,2))
+                    end do
+                end do
+            end do
+        
+        else
 
-       do k = lo(3)-1,hi(3)+1
-          z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+1
-             y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+2
-                x = prob_lo(1) + (dble(i)     )*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+            do k=lo(3),hi(3)
+                do j=lo(2),hi(2)
+                    do i=lo(1),hi(1)
+                        w0mac(i,j,k) = HALF* (w0_cart(i,j,k-1,3) + w0_cart(i,j,k,3))
+                    end do
+                end do
+            end do
 
-                rfac = (radius - dble(index)*dr(0)) / dr(0)
+        endif
 
-                if (index .lt. nr_fine) then
-                   w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
-                else
-                   w0_cart_val = w0(0,nr_fine)
-                end if
+    ! else if (w0mac_interp_type .eq. 2) then
 
-                w0macx(i,j,k) = w0_cart_val * x / radius
+    !    do k = lo(3)-1,hi(3)+1
+    !       z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+1
+    !          y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+2
+    !             x = prob_lo(1) + (dble(i)     )*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             rfac = (radius - dble(index)*dr(0)) / dr(0)
 
-       do k = lo(3)-1,hi(3)+1
-          z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+2
-             y = prob_lo(2) + (dble(j)     )*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+1
-                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+    !             if (index .lt. nr_fine) then
+    !                w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
+    !             else
+    !                w0_cart_val = w0(0,nr_fine)
+    !             end if
 
-                rfac = (radius - dble(index)*dr(0)) / dr(0)
+    !             w0macx(i,j,k) = w0_cart_val * x / radius
 
-                if (index .lt. nr_fine) then
-                   w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
-                else
-                   w0_cart_val = w0(0,nr_fine)
-                end if
+    !          end do
+    !       end do
+    !    end do
 
-                w0macy(i,j,k) = w0_cart_val * y / radius
+    !    do k = lo(3)-1,hi(3)+1
+    !       z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+2
+    !          y = prob_lo(2) + (dble(j)     )*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+1
+    !             x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             rfac = (radius - dble(index)*dr(0)) / dr(0)
 
-       do k = lo(3)-1,hi(3)+2
-          z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+1
-             y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+1
-                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+    !             if (index .lt. nr_fine) then
+    !                w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
+    !             else
+    !                w0_cart_val = w0(0,nr_fine)
+    !             end if
 
-                rfac = (radius - dble(index)*dr(0)) / dr(0)
+    !             w0macy(i,j,k) = w0_cart_val * y / radius
 
-                if (index .lt. nr_fine) then
-                   w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
-                else
-                   w0_cart_val = w0(0,nr_fine)
-                end if
+    !          end do
+    !       end do
+    !    end do
 
-                w0macz(i,j,k) = w0_cart_val * z / radius
+    !    do k = lo(3)-1,hi(3)+2
+    !       z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+1
+    !          y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+1
+    !             x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             rfac = (radius - dble(index)*dr(0)) / dr(0)
 
-    else if (w0mac_interp_type .eq. 3) then
+    !             if (index .lt. nr_fine) then
+    !                w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
+    !             else
+    !                w0_cart_val = w0(0,nr_fine)
+    !             end if
 
-       do k = lo(3)-1,hi(3)+1
-          z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+1
-             y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+2
-                x = prob_lo(1) + (dble(i)     )*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+    !             w0macz(i,j,k) = w0_cart_val * z / radius
 
-                ! index refers to the lo point in the quadratic stencil
-                if (index .le. 0) then
-                   index = 0
-                else if (index .ge. nr_fine-1) then
-                   index = nr_fine-2
-                else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
-                   index = index-1
-                end if
+    !          end do
+    !       end do
+    !    end do
 
-                call quad_interp(radius, &
-                     r_edge_loc(0,index),r_edge_loc(0,index+1), &
-                     r_edge_loc(0,index+2), &
-                     w0_cart_val, &
-                     w0(0,index),w0(0,index+1),w0(0,index+2))
+    ! else if (w0mac_interp_type .eq. 3) then
 
-                w0macx(i,j,k) = w0_cart_val * x / radius
+    !    do k = lo(3)-1,hi(3)+1
+    !       z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+1
+    !          y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+2
+    !             x = prob_lo(1) + (dble(i)     )*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             ! index refers to the lo point in the quadratic stencil
+    !             if (index .le. 0) then
+    !                index = 0
+    !             else if (index .ge. nr_fine-1) then
+    !                index = nr_fine-2
+    !             else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
+    !                index = index-1
+    !             end if
 
-       do k = lo(3)-1,hi(3)+1
-          z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+2
-             y = prob_lo(2) + (dble(j)     )*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+1
-                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+    !             call quad_interp(radius, &
+    !                  r_edge_loc(0,index),r_edge_loc(0,index+1), &
+    !                  r_edge_loc(0,index+2), &
+    !                  w0_cart_val, &
+    !                  w0(0,index),w0(0,index+1),w0(0,index+2))
 
-                ! index refers to the lo point in the quadratic stencil
-                if (index .le. 0) then
-                   index = 0
-                else if (index .ge. nr_fine-1) then
-                   index = nr_fine-2
-                else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
-                   index = index-1
-                end if
+    !             w0macx(i,j,k) = w0_cart_val * x / radius
 
-                call quad_interp(radius, &
-                     r_edge_loc(0,index),r_edge_loc(0,index+1), &
-                     r_edge_loc(0,index+2), &
-                     w0_cart_val, &
-                     w0(0,index),w0(0,index+1),w0(0,index+2))
+    !          end do
+    !       end do
+    !    end do
 
-                w0macy(i,j,k) = w0_cart_val * y / radius
+    !    do k = lo(3)-1,hi(3)+1
+    !       z = prob_lo(3) + (dble(k)+HALF)*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+2
+    !          y = prob_lo(2) + (dble(j)     )*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+1
+    !             x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             ! index refers to the lo point in the quadratic stencil
+    !             if (index .le. 0) then
+    !                index = 0
+    !             else if (index .ge. nr_fine-1) then
+    !                index = nr_fine-2
+    !             else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
+    !                index = index-1
+    !             end if
 
-       do k = lo(3)-1,hi(3)+2
-          z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+1
-             y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+1
-                x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
+    !             call quad_interp(radius, &
+    !                  r_edge_loc(0,index),r_edge_loc(0,index+1), &
+    !                  r_edge_loc(0,index+2), &
+    !                  w0_cart_val, &
+    !                  w0(0,index),w0(0,index+1),w0(0,index+2))
 
-                ! index refers to the lo point in the quadratic stencil
-                if (index .le. 0) then
-                   index = 0
-                else if (index .ge. nr_fine-1) then
-                   index = nr_fine-2
-                else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
-                   index = index-1
-                end if
+    !             w0macy(i,j,k) = w0_cart_val * y / radius
 
-                call quad_interp(radius, &
-                     r_edge_loc(0,index),r_edge_loc(0,index+1), &
-                     r_edge_loc(0,index+2), &
-                     w0_cart_val, &
-                     w0(0,index),w0(0,index+1),w0(0,index+2))
+    !          end do
+    !       end do
+    !    end do
 
-                w0macz(i,j,k) = w0_cart_val * z / radius
+    !    do k = lo(3)-1,hi(3)+2
+    !       z = prob_lo(3) + (dble(k)     )*dx(3) - center(3)
+    !       do j = lo(2)-1,hi(2)+1
+    !          y = prob_lo(2) + (dble(j)+HALF)*dx(2) - center(2)
+    !          do i = lo(1)-1,hi(1)+1
+    !             x = prob_lo(1) + (dble(i)+HALF)*dx(1) - center(1)
+    !             radius = sqrt(x**2 + y**2 + z**2)
+    !             index  = int(radius / dr(0))
 
-             end do
-          end do
-       end do
+    !             ! index refers to the lo point in the quadratic stencil
+    !             if (index .le. 0) then
+    !                index = 0
+    !             else if (index .ge. nr_fine-1) then
+    !                index = nr_fine-2
+    !             else if (radius-r_edge_loc(0,index) .lt. r_edge_loc(0,index+1)) then
+    !                index = index-1
+    !             end if
+
+    !             call quad_interp(radius, &
+    !                  r_edge_loc(0,index),r_edge_loc(0,index+1), &
+    !                  r_edge_loc(0,index+2), &
+    !                  w0_cart_val, &
+    !                  w0(0,index),w0(0,index+1),w0(0,index+2))
+
+    !             w0macz(i,j,k) = w0_cart_val * z / radius
+
+    !          end do
+    !       end do
+    !    end do
 
     else if (w0mac_interp_type .eq. 4) then
 
-    !    call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
+        if (idir .eq. 1) then
 
-    !    call make_w0mac_nodal(lo, hi, w0, w0_nodal, lo-1, hi+2, 3, &
-    !     dx, r_edge_loc)
+            do k = lo(3),hi(3)
+                do j = lo(2),hi(2)
+                    do i = lo(1),hi(1)
+                        w0mac(i,j,k) = FOURTH*( w0_nodal(i,j,k  ,1) + w0_nodal(i,j+1,k  ,1) &
+                            +w0_nodal(i,j,k+1,1) + w0_nodal(i,j+1,k+1,1))
+                    end do
+                end do
+            end do 
+        else if (idir .eq.  2) then 
 
-       do k = lo(3)-1,hi(3)+1
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+2
-                w0macx(i,j,k) = FOURTH*( w0_nodal(i,j,k  ,1) + w0_nodal(i,j+1,k  ,1) &
-                     +w0_nodal(i,j,k+1,1) + w0_nodal(i,j+1,k+1,1))
-             end do
-          end do
-       end do
+            do k = lo(3),hi(3)
+                do j = lo(2),hi(2)
+                    do i = lo(1),hi(1)
+                        w0mac(i,j,k) = FOURTH*( w0_nodal(i,j,k  ,2) + w0_nodal(i+1,j,k  ,2) &
+                            +w0_nodal(i,j,k+1,2) + w0_nodal(i+1,j,k+1,2))
+                    end do
+                end do
+            end do
 
-       do k = lo(3)-1,hi(3)+1
-          do j = lo(2)-1,hi(2)+2
-             do i = lo(1)-1,hi(1)+1
-                w0macy(i,j,k) = FOURTH*( w0_nodal(i,j,k  ,2) + w0_nodal(i+1,j,k  ,2) &
-                     +w0_nodal(i,j,k+1,2) + w0_nodal(i+1,j,k+1,2))
-             end do
-          end do
-       end do
+        else
 
-       do k = lo(3)-1,hi(3)+2
-          do j = lo(2)-1,hi(2)+1
-             do i = lo(1)-1,hi(1)+1
-                w0macz(i,j,k) = FOURTH*( w0_nodal(i,j  ,k,3) + w0_nodal(i+1,j  ,k,3) &
-                     +w0_nodal(i,j+1,k,3) + w0_nodal(i+1,j+1,k,3))
-             end do
-          end do
-       end do
-
-    !    call bl_deallocate(w0_nodal)
+            do k = lo(3),hi(3)
+                do j = lo(2),hi(2)
+                    do i = lo(1),hi(1)
+                        w0mac(i,j,k) = FOURTH*( w0_nodal(i,j  ,k,3) + w0_nodal(i+1,j  ,k,3) &
+                            +w0_nodal(i,j+1,k,3) + w0_nodal(i+1,j+1,k,3))
+                    end do
+                end do
+            end do
+        endif
 
 #ifndef AMREX_USE_CUDA
     else
@@ -849,7 +852,7 @@ contains
     double precision :: x,y,z
     double precision :: radius,w0_cart_val,rfac
 
-    !    call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
+    !$gpu
 
     do k = lo(3),hi(3)
         z = prob_lo(3) + (dble(k))*dx(3) - center(3)
