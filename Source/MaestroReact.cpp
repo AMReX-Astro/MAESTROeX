@@ -366,16 +366,17 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
 
 		// Get the index space of the valid region
 		const Box& tileBox = mfi.tilebox();
-		const Real* dx = geom[lev].CellSize();
 		
 		// call fortran subroutine
 		// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 		// lo/hi coordinates (including ghost cells), and/or the # of components
 		// We will also pass "validBox", which specifies the "valid" region.
-		instantaneous_reaction_rates(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-					     BL_TO_FORTRAN_3D(rho_omegadot_mf[mfi]),
-					     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-					     BL_TO_FORTRAN_3D(scal_mf[mfi]));
+#pragma gpu box(tileBox)
+		instantaneous_reaction_rates(AMREX_INT_ANYD(tileBox.loVect()), 
+                         AMREX_INT_ANYD(tileBox.hiVect()),
+					     BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+					     BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+					     BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
 	    }
 	}
     }
