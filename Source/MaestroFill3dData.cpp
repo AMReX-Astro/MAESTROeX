@@ -354,37 +354,39 @@ Maestro::MakeS0mac (const RealVector& s0,
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-	    if (use_exact_base_state) {
-		make_s0mac_sphr_irreg(ARLIM_3D(tileBox.loVect()), 
-                      ARLIM_3D(tileBox.hiVect()),
-				      s0.dataPtr(),
-				      BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
-				      BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
-				      BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
-				      BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-				      dx, r_cc_loc.dataPtr());
-	    } else {
-            make_s0mac_sphr(ARLIM_3D(xbx.loVect()), 
-                    ARLIM_3D(xbx.hiVect()),1,
-                    s0.dataPtr(),
-                    BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
-                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-                    dx, r_cc_loc.dataPtr());
-                    
-            make_s0mac_sphr(ARLIM_3D(ybx.loVect()), 
-                    ARLIM_3D(ybx.hiVect()),2,
-                    s0.dataPtr(),
-                    BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
-                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-                    dx, r_cc_loc.dataPtr());
+            if (use_exact_base_state) {
+                make_s0mac_sphr_irreg(ARLIM_3D(tileBox.loVect()), 
+                            ARLIM_3D(tileBox.hiVect()),
+                            s0.dataPtr(),
+                            BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
+                            BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
+                            dx, r_cc_loc.dataPtr());
+            } else {
 
-            make_s0mac_sphr(ARLIM_3D(zbx.loVect()), 
-                    ARLIM_3D(zbx.hiVect()),3,
-                    s0.dataPtr(),
-                    BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
-                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-                    dx, r_cc_loc.dataPtr());
-	    }
+#pragma gpu box(xbx)
+                make_s0mac_sphr(AMREX_INT_ANYD(xbx.loVect()), 
+                        AMREX_INT_ANYD(xbx.hiVect()),1,
+                        s0.dataPtr(),
+                        BL_TO_FORTRAN_ANYD(s0macx_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                        AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
+#pragma gpu box(ybx)   
+                make_s0mac_sphr(AMREX_INT_ANYD(ybx.loVect()), 
+                        AMREX_INT_ANYD(ybx.hiVect()),2,
+                        s0.dataPtr(),
+                        BL_TO_FORTRAN_ANYD(s0macy_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                        AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
+#pragma gpu box(zbx)
+                make_s0mac_sphr(AMREX_INT_ANYD(zbx.loVect()), 
+                        AMREX_INT_ANYD(zbx.hiVect()),3,
+                        s0.dataPtr(),
+                        BL_TO_FORTRAN_ANYD(s0macz_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                        AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
+            }
         }
     }
 }
