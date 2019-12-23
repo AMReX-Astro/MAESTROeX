@@ -500,6 +500,8 @@ contains
 
     type (sdc_t)       :: state_in, state_out
 
+    !$gpu
+
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -512,7 +514,7 @@ contains
 
              if (cell_valid) then
                 
-                sdc_rhoX(:) = source(i,j,k,spec_comp:spec_comp+nspec-1)
+                sdc_rhoX(1:nspec) = source(i,j,k,spec_comp:spec_comp+nspec-1)
                 sdc_rhoh = source(i,j,k,rhoh_comp)
 
                 p0_in = p0_cart(i,j,k)

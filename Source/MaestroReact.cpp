@@ -314,8 +314,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // call fortran subroutine
 	    
             if (spherical == 1) {
-// #pragma gpu box(tileBox)
-                burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(tileBox)
+                burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), 
+                 AMREX_INT_ANYD(tileBox.hiVect()),
 				 BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
 				 BL_TO_FORTRAN_ANYD(source_mf[mfi]),
