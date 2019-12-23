@@ -179,8 +179,8 @@ contains
     if ( spherical .eq. 0 ) then
 #ifndef AMREX_USE_CUDA
        print*,'init_base_state_map_sphr() does not work for planar'
-#endif
        call abort()
+#endif
     end if
 
     ! map cell centers to base state indices
