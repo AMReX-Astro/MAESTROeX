@@ -145,10 +145,10 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
 #if (AMREX_SPACEDIM == 2)
@@ -376,6 +376,18 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         rhoh0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
         rhoh0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
+        rho0mac_edgex.setVal(0.);
+        rho0mac_edgey.setVal(0.);
+        rho0mac_edgez.setVal(0.);
+
+        h0mac_edgex.setVal(0.);
+        h0mac_edgey.setVal(0.);
+        h0mac_edgez.setVal(0.);
+
+        rhoh0mac_edgex.setVal(0.);
+        rhoh0mac_edgey.setVal(0.);
+        rhoh0mac_edgez.setVal(0.);
+
         if (spherical == 1) {
             if (use_exact_base_state) {
                 MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
@@ -400,10 +412,10 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
             // call fortran subroutine

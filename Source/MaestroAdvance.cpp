@@ -184,6 +184,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // initialize umac
         for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+            sedge[lev][d].setVal(0.);
+            sflux[lev][d].setVal(0.);
         }
 
         w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
@@ -426,14 +428,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     for (int lev=0; lev<=finest_level; ++lev) {
         etarhoflux[lev].setVal(0.);
     }
-    // set sedge and sflux to zero
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-            sedge[lev][idim].setVal(0.);
-            sflux[lev][idim].setVal(0.);
-        }
-    }
-
+  
     // need full UMAC velocities for DensityAdvance
     Addw0(umac,w0mac,1.);
     

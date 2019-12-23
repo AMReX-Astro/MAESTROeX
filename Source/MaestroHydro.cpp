@@ -77,10 +77,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox, 2, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
 #if (AMREX_SPACEDIM == 2)
@@ -470,8 +470,8 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
             const Box& mxbx = amrex::growLo(obx,0, -1);
             const Box& mybx = amrex::growLo(obx,1, -1);
 
@@ -687,9 +687,9 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
             const Box& mxbx = amrex::growLo(obx,0, -1);
             const Box& mybx = amrex::growLo(obx,1, -1);
             const Box& mzbx = amrex::growLo(obx,2, -1);
@@ -1247,8 +1247,8 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
             const Box& mxbx = amrex::growLo(obx,0, -1);
             const Box& mybx = amrex::growLo(obx,1, -1);
 
@@ -1429,9 +1429,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
                 const Box& obx = amrex::grow(tileBox, 1);
-                const Box& xbx = amrex::growHi(tileBox, 0, 1);
-                const Box& ybx = amrex::growHi(tileBox, 1, 1);
-                const Box& zbx = amrex::growHi(tileBox, 2, 1);
+                const Box& xbx = mfi.nodaltilebox(0);
+                const Box& ybx = mfi.nodaltilebox(1);
+                const Box& zbx = mfi.nodaltilebox(2);
                 const Box& mxbx = amrex::growLo(obx, 0, -1);
                 const Box& mybx = amrex::growLo(obx, 1, -1);
                 const Box& mzbx = amrex::growLo(obx, 2, -1);
@@ -1527,9 +1527,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
                 const Box& obx = amrex::grow(tileBox, 1);
-                const Box& xbx = amrex::growHi(tileBox, 0, 1);
-                const Box& ybx = amrex::growHi(tileBox, 1, 1);
-                const Box& zbx = amrex::growHi(tileBox, 2, 1);
+                const Box& xbx = mfi.nodaltilebox(0);
+                const Box& ybx = mfi.nodaltilebox(1);
+                const Box& zbx = mfi.nodaltilebox(2);
                 const Box& mxbx = amrex::growLo(obx, 0, -1);
                 const Box& mybx = amrex::growLo(obx, 1, -1);
                 const Box& mzbx = amrex::growLo(obx, 2, -1);
@@ -1592,8 +1592,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                                             nbccomp, scomp, bccomp);
 
                 // simhxy
-                Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
-                imhbox = amrex::growHi(imhbox, 0, 1);
+                Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
 #pragma gpu box(imhbox)
                 make_edge_scal_transverse_3d(
                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,2,
@@ -1617,8 +1616,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhxz
-                imhbox = amrex::grow(mfi.tilebox(), 1, 1);
-                imhbox = amrex::growHi(imhbox, 0, 1);
+                imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0)); 
 #pragma gpu box(imhbox)
                 make_edge_scal_transverse_3d(
                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,3,
@@ -1642,6 +1640,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhyx
+                // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
                 imhbox = amrex::grow(mfi.tilebox(), 2, 1);
                 imhbox = amrex::growHi(imhbox, 1, 1);
 #pragma gpu box(imhbox)
@@ -1667,6 +1666,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhyz
+                // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
                 imhbox = amrex::grow(mfi.tilebox(), 0, 1);
                 imhbox = amrex::growHi(imhbox, 1, 1);
 #pragma gpu box(imhbox)
@@ -1692,6 +1692,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhzx
+                // imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
                 imhbox = amrex::grow(mfi.tilebox(), 1, 1);
                 imhbox = amrex::growHi(imhbox, 2, 1);
 #pragma gpu box(imhbox)
@@ -1717,6 +1718,7 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhzy
+                // imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
                 imhbox = amrex::grow(mfi.tilebox(), 0, 1);
                 imhbox = amrex::growHi(imhbox, 2, 1);
 #pragma gpu box(imhbox)
