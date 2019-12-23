@@ -924,14 +924,11 @@ extern "C"
 #endif
 			const amrex::Real* dx);
 
-    void mult_beta0(const int* lev, const int* lo, const int* hi,
+    void mult_beta0(const int* lo, const int* hi, const int lev, 
+                    const int idir,
                     amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                    amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                    amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
                     const amrex::Real* beta0_edge,
-                    const amrex::Real* beta0, const int* mult_or_div);
+                    const amrex::Real* beta0, const int mult_or_div);
 
     void mac_bcoef_face(const int* lo, const int* hi,
             const int lev, const int idir,
