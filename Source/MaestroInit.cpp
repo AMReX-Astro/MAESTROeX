@@ -385,7 +385,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                      s0_init.dataPtr(), p0_init.dataPtr(),
                      ZFILL(dx));
         } else {
-            init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+            init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi), 
+                                     BL_TO_FORTRAN_3D(cc_to_r[mfi]),
                                      ZFILL(dx_fine),
                                      ZFILL(dx));
 

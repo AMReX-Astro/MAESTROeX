@@ -73,7 +73,8 @@ extern "C"
                                   const amrex::Real* dx_fine,
 				  int* nr_irreg_in);
 
-    void init_base_state_map_sphr(amrex::Real* cc_to_r, const int* lo, const int* hi,
+    void init_base_state_map_sphr(const int* lo, const int* hi,
+                  amrex::Real* cc_to_r, const int* c_lo, const int* c_hi,
 				  const amrex::Real* dx_fine,
 				  const amrex::Real* dx_lev);
 
@@ -364,11 +365,9 @@ extern "C"
 			 const amrex::Real* dx,
 			 const amrex::Real* r_cc_loc);
 
-    void make_s0mac_sphr_irreg(const int* lo, const int* hi,
+    void make_s0mac_sphr_irreg(const int* lo, const int* hi, const int idir,
 			       const amrex::Real* s0,
-			       amrex::Real* s0macx, const int* x_lo, const int* x_hi,
-			       amrex::Real* s0macy, const int* y_lo, const int* y_hi,
-			       amrex::Real* s0macz, const int* z_lo, const int* z_hi,
+			       amrex::Real* s0mac, const int* x_lo, const int* x_hi,
 			       amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
 			       const amrex::Real* dx,
 			       const amrex::Real* r_cc_loc);

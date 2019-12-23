@@ -127,7 +127,6 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
-                // const Box& obx = amrex::grow(tileBox, 1);
 #if (AMREX_SPACEDIM == 2)
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0,0));
 #else
@@ -245,7 +244,6 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
             // Get the index space of the valid region
             const Box& gntbx = mfi.grownnodaltilebox(-1, 1);
-            const Box& tileBox = mfi.tilebox();
 
             if (w0mac_interp_type == 4) {
 #pragma gpu box(gntbx)
@@ -346,7 +344,6 @@ Maestro::MakeS0mac (const RealVector& s0,
         for ( MFIter mfi(s0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
             const Box& xbx = mfi.grownnodaltilebox(0, 1);
             const Box& ybx = mfi.grownnodaltilebox(1, 1);
             const Box& zbx = mfi.grownnodaltilebox(2, 1);
@@ -355,14 +352,27 @@ Maestro::MakeS0mac (const RealVector& s0,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             if (use_exact_base_state) {
-                make_s0mac_sphr_irreg(ARLIM_3D(tileBox.loVect()), 
-                            ARLIM_3D(tileBox.hiVect()),
+#pragma gpu box(xbx)
+                make_s0mac_sphr_irreg(AMREX_INT_ANYD(xbx.loVect()), 
+                            AMREX_INT_ANYD(xbx.hiVect()),1,
                             s0.dataPtr(),
-                            BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
-                            BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
-                            BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
-                            BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-                            dx, r_cc_loc.dataPtr());
+                            BL_TO_FORTRAN_ANYD(s0macx_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
+#pragma gpu box(ybx)
+                make_s0mac_sphr_irreg(AMREX_INT_ANYD(ybx.loVect()), 
+                            AMREX_INT_ANYD(ybx.hiVect()),2,
+                            s0.dataPtr(),
+                            BL_TO_FORTRAN_ANYD(s0macy_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
+#pragma gpu box(zbx)
+                make_s0mac_sphr_irreg(AMREX_INT_ANYD(zbx.loVect()), 
+                            AMREX_INT_ANYD(zbx.hiVect()),3,
+                            s0.dataPtr(),
+                            BL_TO_FORTRAN_ANYD(s0macz_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
+                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
             } else {
 
 #pragma gpu box(xbx)
@@ -450,11 +460,10 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
         for ( MFIter mfi(scc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox, 2, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
             // call fortran subroutine
@@ -462,20 +471,23 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // x-direction
 #pragma gpu box(xbx)
-            put_data_on_faces(AMREX_INT_ANYD(xbx.loVect()), AMREX_INT_ANYD(xbx.hiVect()),1,
+            put_data_on_faces(AMREX_INT_ANYD(xbx.loVect()), 
+                              AMREX_INT_ANYD(xbx.hiVect()),1,
                               BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
                               BL_TO_FORTRAN_ANYD(facex_mf[mfi]),
                               harmonic_avg);
             // y-direction
 #pragma gpu box(ybx)
-            put_data_on_faces(AMREX_INT_ANYD(ybx.loVect()), AMREX_INT_ANYD(ybx.hiVect()),2,
+            put_data_on_faces(AMREX_INT_ANYD(ybx.loVect()), 
+                              AMREX_INT_ANYD(ybx.hiVect()),2,
                               BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
                               BL_TO_FORTRAN_ANYD(facey_mf[mfi]),
                               harmonic_avg);
             // z-direction
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(zbx)
-            put_data_on_faces(AMREX_INT_ANYD(zbx.loVect()), AMREX_INT_ANYD(zbx.hiVect()),3,
+            put_data_on_faces(AMREX_INT_ANYD(zbx.loVect()), 
+                              AMREX_INT_ANYD(zbx.hiVect()),3,
                               BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
                               BL_TO_FORTRAN_ANYD(facez_mf[mfi]),
                               harmonic_avg);
@@ -499,17 +511,23 @@ Maestro::MakeCCtoRadii ()
 
         // get references to the MultiFabs at level lev
         const Real* dx = geom[lev].CellSize();
-	const Real* dx_fine = geom[max_level].CellSize();
+        const Real* dx_fine = geom[max_level].CellSize();
 
-	MultiFab& cc_to_r = cell_cc_to_r[lev];
+        MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(cc_to_r); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(cc_to_r, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            const Box& tilebox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            init_base_state_map_sphr(BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+#pragma gpu box(tilebox)
+            init_base_state_map_sphr(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 				     ZFILL(dx_fine),
 				     ZFILL(dx));
         }
