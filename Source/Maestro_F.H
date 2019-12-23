@@ -485,10 +485,7 @@ extern "C"
 			    const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi,
 			    const amrex::Real* normal,  const int* n_lo,  const int* n_hi,
 			    amrex::Real* eta_cart, const int* e_lo,  const int* e_hi,
-			    const amrex::Real* rho0_old, const amrex::Real* rho0_new,
-			    const amrex::Real* dx,
-			    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-			    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+			    const amrex::Real* rho0_nph_cart, const int* rp_lo, const int* rp_hi);
     //////////////////////
 
     //////////////////////

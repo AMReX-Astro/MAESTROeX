@@ -75,6 +75,8 @@ contains
     ! local
     integer i,j,k
 
+    !$gpu
+
     ! Neglecting ghost cells
     if (mult_or_div .eq. 1) then
         ! Multiply
@@ -91,7 +93,7 @@ contains
 
         else
 
-            ! Use cell-centered beta0 to update vertical velocity
+            ! Use edge-based beta0 to update vertical velocity
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
@@ -118,7 +120,7 @@ contains
 
         else 
 
-            ! Use cell-centered beta0 to update vertical velocity
+            ! Use edge-based beta0 to update vertical velocity
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
