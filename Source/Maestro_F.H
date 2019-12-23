@@ -357,11 +357,9 @@ extern "C"
 			 amrex::Real* w0_nodal, const int* w0_lo, const int* w0_hi, 
 			 const amrex::Real* dx);
 
-    void make_s0mac_sphr(const int* lo, const int* hi,
+    void make_s0mac_sphr(const int* lo, const int* hi, const int idir,
 			 const amrex::Real* s0,
-			 amrex::Real* s0macx, const int* x_lo, const int* x_hi,
-			 amrex::Real* s0macy, const int* y_lo, const int* y_hi,
-			 amrex::Real* s0macz, const int* z_lo, const int* z_hi,
+			 amrex::Real* s0mac, const int* x_lo, const int* x_hi,
 			 amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
 			 const amrex::Real* dx,
 			 const amrex::Real* r_cc_loc);

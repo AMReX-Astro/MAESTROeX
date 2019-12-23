@@ -347,12 +347,16 @@ Maestro::MakeS0mac (const RealVector& s0,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Box& xbx = mfi.grownnodaltilebox(0, 1);
+            const Box& ybx = mfi.grownnodaltilebox(1, 1);
+            const Box& zbx = mfi.grownnodaltilebox(2, 1);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
 	    if (use_exact_base_state) {
-		make_s0mac_sphr_irreg(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+		make_s0mac_sphr_irreg(ARLIM_3D(tileBox.loVect()), 
+                      ARLIM_3D(tileBox.hiVect()),
 				      s0.dataPtr(),
 				      BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
 				      BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
@@ -360,13 +364,26 @@ Maestro::MakeS0mac (const RealVector& s0,
 				      BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
 				      dx, r_cc_loc.dataPtr());
 	    } else {
-		make_s0mac_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				s0.dataPtr(),
-				BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
-				BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
-				BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
-				BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
-				dx, r_cc_loc.dataPtr());
+            make_s0mac_sphr(ARLIM_3D(xbx.loVect()), 
+                    ARLIM_3D(xbx.hiVect()),1,
+                    s0.dataPtr(),
+                    BL_TO_FORTRAN_3D(s0macx_mf[mfi]),
+                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
+                    dx, r_cc_loc.dataPtr());
+                    
+            make_s0mac_sphr(ARLIM_3D(ybx.loVect()), 
+                    ARLIM_3D(ybx.hiVect()),2,
+                    s0.dataPtr(),
+                    BL_TO_FORTRAN_3D(s0macy_mf[mfi]),
+                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
+                    dx, r_cc_loc.dataPtr());
+
+            make_s0mac_sphr(ARLIM_3D(zbx.loVect()), 
+                    ARLIM_3D(zbx.hiVect()),3,
+                    s0.dataPtr(),
+                    BL_TO_FORTRAN_3D(s0macz_mf[mfi]),
+                    BL_TO_FORTRAN_3D(s0cart_mf[mfi]),
+                    dx, r_cc_loc.dataPtr());
 	    }
         }
     }
