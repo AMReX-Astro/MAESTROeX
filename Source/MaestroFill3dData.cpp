@@ -527,9 +527,11 @@ Maestro::MakeCCtoRadii ()
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
 #pragma gpu box(tilebox)
-            init_base_state_map_sphr(ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()), BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-				     ZFILL(dx_fine),
-				     ZFILL(dx));
+            init_base_state_map_sphr(AMREX_INT_ANYD(tilebox.loVect()), 
+                     AMREX_INT_ANYD(tilebox.hiVect()), 
+                     BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
+				     AMREX_REAL_ANYD(dx_fine),
+				     AMREX_REAL_ANYD(dx));
         }
     }
 
