@@ -1590,7 +1590,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                                             nbccomp, scomp, bccomp);
 
                 // simhxy
-                Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
+                Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+                imhbox = amrex::growHi(imhbox, 0, 1);
+                // Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
 #pragma gpu box(imhbox)
                 make_edge_scal_transverse_3d(
                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,2,
@@ -1614,7 +1616,9 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                     nbccomp, scomp, bccomp, is_conservative);
 
                 // simhxz
-                imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0)); 
+                imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+                imhbox = amrex::growHi(imhbox, 0, 1);
+                // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0)); 
 #pragma gpu box(imhbox)
                 make_edge_scal_transverse_3d(
                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,3,
