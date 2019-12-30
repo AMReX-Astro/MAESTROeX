@@ -128,7 +128,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
             if (spherical == 0) {
 
 #if (AMREX_SPACEDIM == 2)
-                const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0,0));
+                const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
 #else
                 const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
 #endif
