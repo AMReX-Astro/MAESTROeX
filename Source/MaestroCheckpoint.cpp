@@ -282,7 +282,7 @@ Maestro::ReadCheckPoint ()
 
         is >> previousCPUTimeUsed;
 
-        std::cout << "read CPU time: " << previousCPUTimeUsed << "\n";
+        Print() << "read CPU time: " << previousCPUTimeUsed << "\n";
 
     }
 
