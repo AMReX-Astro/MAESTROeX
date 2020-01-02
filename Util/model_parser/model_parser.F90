@@ -213,7 +213,7 @@ contains
 
   end subroutine read_model_file
 
-  subroutine ca_read_model_file(model_file, namelen) bind(C, name="read_model_file")
+  subroutine ca_read_model_file(model_file, namelen) bind(C, name="ca_read_model_file")
 
     use amrex_error_module, only: amrex_error
 
