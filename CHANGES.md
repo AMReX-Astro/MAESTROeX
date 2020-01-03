@@ -1,3 +1,35 @@
+# 20.01
+
+  * Various initialization and checkpoint-restart fixes
+
+  * Converted all .f90 files to .F90 files
+
+  * Various tiling and GPU updates and bugfixes
+
+  * Offloading more routines to GPU, including nodal and cell-centered solvers
+
+  * Options to apply cutoff densities for heating and burning to a bound range of densiites
+
+  * Work on the rotating_star problem - models, heating profiles, initialization
+
+  * Renname subdirectories within Exec/ to lower-case to sync with Castro
+
+# 19.12
+
+  * Add option to switch to SDC algorithm (USE_SDC)
+
+  * Continue to port hydro subroutines to GPU
+
+  * Set default Microphysics integrator to VODE90
+
+  * Add Zenodo DOI for JOSS publication
+
+  * GPU-specific changes to Makefile
+
+  * Bugfix: w0 is computed even when base cutoff density is outside domain
+
+  * Update test: rotating_star
+
 # 19.11
 
   * Port 3d hydro subroutine to GPU
