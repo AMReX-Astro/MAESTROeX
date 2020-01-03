@@ -20,12 +20,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // this will hold solver RHS = macrhs - div(beta0*umac)
     Vector<MultiFab> solverrhs(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -169,11 +163,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         FillPatchUedge(umac);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 // Set up implicit solve using MLABecLaplacian class
@@ -183,6 +172,7 @@ void Maestro::MacLevelSolve(const int& ilev,
                             const MultiFab& solverrhs,
                             const MultiFab& acoef,
                             const std::array< MultiFab, AMREX_SPACEDIM >& face_bcoef) {
+
     LPInfo info;
     MLABecLaplacian mlabec({geom[ilev]}, {grids[ilev]}, {dmap[ilev]}, info);
 
@@ -289,13 +279,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeMACSolverRHS()",ComputeMACSolverRHS);
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
@@ -312,7 +295,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(solverrhs_mf, true); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(solverrhs_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
@@ -334,11 +317,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
         }
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 // Average bcoefs at faces using inverse of rho
@@ -347,12 +325,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
@@ -371,7 +343,7 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(rhocc_mf, true); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(rhocc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
@@ -405,13 +377,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
-
 }
 
 // Set boundaries for MAC velocities

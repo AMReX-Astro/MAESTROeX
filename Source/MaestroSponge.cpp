@@ -10,12 +10,6 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeSponge()", MakeSponge);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -25,7 +19,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sponge_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sponge_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -44,10 +38,5 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
     // average fine data onto coarser cells
     AverageDown(sponge,0,1);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }

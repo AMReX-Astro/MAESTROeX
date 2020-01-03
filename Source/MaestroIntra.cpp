@@ -14,12 +14,6 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeIntraCoeffs()",MakeIntraCoeffs);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -34,7 +28,7 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s1_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s1_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& gtbx = mfi.growntilebox(1);
@@ -49,9 +43,4 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
 			      BL_TO_FORTRAN_ANYD(xi_mf[mfi]));
         }
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }

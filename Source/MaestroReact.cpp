@@ -20,12 +20,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // external heating
     if (do_heating) {
 
@@ -96,11 +90,6 @@ Maestro::React (const Vector<MultiFab>& s_in,
         TfromRhoH(s_out,p0);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 // SDC subroutines
@@ -117,12 +106,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()",ReactSDC);
-
-// #ifdef AMREX_USE_CUDA
-//     auto not_launched = Gpu::notInLaunchRegion();
-//     // turn on GPU
-//     if (not_launched) Gpu::setLaunchRegion(true);
-// #endif
 
     // external heating
     if (do_heating) {
@@ -186,11 +169,6 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
         TfromRhoH(s_out,p0);
     }
 
-// #ifdef AMREX_USE_CUDA
-//     // turn off GPU
-//     if (not_launched) Gpu::setLaunchRegion(false);
-// #endif
-
 }
 
 
@@ -246,7 +224,7 @@ bool Maestro::Burner(const Vector<MultiFab>& s_in,
 #ifdef _OPENMP
 #pragma omp parallel reduction(+:burn_failed)
 #endif
-        for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s_in_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -344,7 +322,7 @@ bool Maestro::Burner(const Vector<MultiFab>& s_in,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(s_in_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(s_in_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -414,7 +392,7 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	    for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+	    for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
 		// Get the index space of the valid region
 		const Box& tileBox = mfi.tilebox();

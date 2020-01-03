@@ -100,12 +100,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
     const int endcomp = startcomp + num_comp - 1;
@@ -147,14 +141,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& xbx = amrex::growHi(tileBox,0, 1);
             const Box& ybx = amrex::growHi(tileBox,1, 1);
+            // const Box& xbx = mfi.nodaltilebox(0);
+            // const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
             const Box& zbx = amrex::growHi(tileBox,2, 1);
+            // const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
 #if (AMREX_SPACEDIM == 2)
@@ -322,11 +319,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 
@@ -353,12 +345,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -393,6 +379,18 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         rhoh0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
         rhoh0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
 
+        rho0mac_edgex.setVal(0.);
+        rho0mac_edgey.setVal(0.);
+        rho0mac_edgez.setVal(0.);
+
+        h0mac_edgex.setVal(0.);
+        h0mac_edgey.setVal(0.);
+        h0mac_edgez.setVal(0.);
+
+        rhoh0mac_edgex.setVal(0.);
+        rhoh0mac_edgey.setVal(0.);
+        rhoh0mac_edgez.setVal(0.);
+
         if (spherical == 1) {
             if (use_exact_base_state) {
                 MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
@@ -413,14 +411,14 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
             // call fortran subroutine
@@ -611,11 +609,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
     // Something analogous to edge_restriction is done in UpdateScal()
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
 }
 
 void
@@ -628,12 +621,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
@@ -656,7 +643,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scalold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scalold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -732,11 +719,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
         AverageDown(statenew,Rho,1);
         FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 }
 
 void
@@ -748,12 +730,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -781,7 +757,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(force_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -836,10 +812,5 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // fill ghost cells
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
 }

@@ -184,6 +184,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // initialize umac
         for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+            sedge[lev][d].setVal(0.);
+            sflux[lev][d].setVal(0.);
         }
 
         w0_force_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
@@ -426,14 +428,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     for (int lev=0; lev<=finest_level; ++lev) {
         etarhoflux[lev].setVal(0.);
     }
-    // set sedge and sflux to zero
-    for (int lev=0; lev<=finest_level; ++lev) {
-        for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-            sedge[lev][idim].setVal(0.);
-            sflux[lev][idim].setVal(0.);
-        }
-    }
-
+  
     // need full UMAC velocities for DensityAdvance
     Addw0(umac,w0mac,1.);
     
@@ -549,12 +544,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // subtract w0mac from umac
     Addw0(umac,w0mac,-1.);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&advect_time,1,ParallelDescriptor::IOProcessorNumber());
@@ -585,11 +574,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MultiFab::Copy(s2[lev],s1[lev],Temp,Temp,1,ng_s);
         MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
     // now update temperature
     if (use_tfromp) {
@@ -884,12 +868,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
                     grav_cell_new.dataPtr(),
@@ -992,11 +970,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MultiFab::Copy(s2[lev],s1[lev],  Pi,  Pi,1,ng_s);
     }
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
     // now update temperature
     if (use_tfromp) {
         TfromRhoP(s2,p0_new,0);
@@ -1093,12 +1066,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // STEP 11 -- update the velocity
     //////////////////////////////////////////////////////////////////////////////
 
-#ifdef AMREX_USE_CUDA
-    not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     advect_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
@@ -1185,11 +1152,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     for(int i=0; i<beta0_nm1.size(); ++i) {
         beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
     }
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
     ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());

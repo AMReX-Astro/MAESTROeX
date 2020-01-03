@@ -15,12 +15,6 @@ Maestro::EstDt ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
 
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
-
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
@@ -146,7 +140,7 @@ Maestro::EstDt ()
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
 
-        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(uold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -218,11 +212,6 @@ Maestro::EstDt ()
 
     }     // end loop over levels
 
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
-
     if (maestro_verbose > 0) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
     }
@@ -257,12 +246,6 @@ Maestro::FirstDt ()
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FirstDt()",FirstDt);
-
-#ifdef AMREX_USE_CUDA
-    auto not_launched = Gpu::notInLaunchRegion();
-    // turn on GPU
-    if (not_launched) Gpu::setLaunchRegion(true);
-#endif
 
     dt = 1.e20;
 
@@ -360,7 +343,7 @@ Maestro::FirstDt ()
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
 
-        for ( MFIter mfi(sold_mf,true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf,TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -434,11 +417,6 @@ Maestro::FirstDt ()
         dt = std::min(dt,dt_lev);
 
     }     // end loop over levels
-
-#ifdef AMREX_USE_CUDA
-    // turn off GPU
-    if (not_launched) Gpu::setLaunchRegion(false);
-#endif
 
     if (maestro_verbose > 0) {
         Print() << "Minimum firstdt over all levels = " << dt << std::endl;

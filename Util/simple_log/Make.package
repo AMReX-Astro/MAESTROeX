@@ -1,1 +1,1 @@
-f90EXE_sources += simple_log.f90
+F90EXE_sources += simple_log.F90

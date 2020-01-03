@@ -837,31 +837,8 @@ contains
 
        call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
 
-       do k = lo(3)-1,hi(3)+2
-          z = prob_lo(3) + (dble(k))*dx(3) - center(3)
-          do j = lo(2)-1,hi(2)+2
-             y = prob_lo(2) + (dble(j))*dx(2) - center(2)
-             do i = lo(1)-1,hi(1)+2
-                x = prob_lo(1) + (dble(i))*dx(1) - center(1)
-
-                radius = sqrt(x**2 + y**2 + z**2)
-                index  = int(radius / dr(0))
-
-                rfac = (radius - dble(index)*dr(0)) / dr(0)
-
-                if (index .lt. nr_fine) then
-                   w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
-                else
-                   w0_cart_val = w0(0,nr_fine)
-                end if
-
-                w0_nodal(i,j,k,1) = w0_cart_val * x * (ONE / radius)
-                w0_nodal(i,j,k,2) = w0_cart_val * y * (ONE / radius)
-                w0_nodal(i,j,k,3) = w0_cart_val * z * (ONE / radius)
-
-             end do
-          end do
-       end do
+       call make_w0mac_nodal(lo, hi, w0, w0_nodal, lo-1, hi+2, 3, &
+        dx, r_edge_loc)
 
        do k = lo(3)-1,hi(3)+1
           do j = lo(2)-1,hi(2)+1
@@ -897,6 +874,58 @@ contains
     end if
 
   end subroutine make_w0mac_sphr
+
+  subroutine make_w0mac_nodal(lo, hi, w0, &
+       w0_nodal, w0_lo, w0_hi, nc_w0, &
+       dx, &
+       r_edge_loc) bind(C, name="make_w0mac_nodal")
+
+    integer         , intent(in   ) :: lo(3), hi(3)
+    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
+    integer         , intent(in   ) :: w0_lo(3), w0_hi(3), nc_w0
+    double precision, intent(inout) :: w0_nodal(w0_lo(1):w0_hi(1),w0_lo(2):w0_hi(2), &
+         w0_lo(3):w0_hi(3),nc_w0)
+    double precision, intent(in   ) :: dx(3)
+    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
+
+    ! Local variables
+    integer          :: i,j,k,index
+    double precision :: x,y,z
+    double precision :: radius,w0_cart_val,rfac
+
+    !    call bl_allocate(w0_nodal,lo(1)-1,hi(1)+2,lo(2)-1,hi(2)+2,lo(3)-1,hi(3)+2,1,3)
+
+    do k = lo(3)-1,hi(3)+2
+        z = prob_lo(3) + (dble(k))*dx(3) - center(3)
+        do j = lo(2)-1,hi(2)+2
+           y = prob_lo(2) + (dble(j))*dx(2) - center(2)
+           do i = lo(1)-1,hi(1)+2
+              x = prob_lo(1) + (dble(i))*dx(1) - center(1)
+
+              radius = sqrt(x**2 + y**2 + z**2)
+              index  = int(radius / dr(0))
+
+              rfac = (radius - dble(index)*dr(0)) / dr(0)
+
+              if (index .lt. nr_fine) then
+                 w0_cart_val = rfac * w0(0,index+1) + (ONE-rfac) * w0(0,index)
+              else
+                 w0_cart_val = w0(0,nr_fine)
+              end if
+
+              if (radius .eq. 0.0d0) then 
+                  w0_nodal(i,j,k,1:3) = w0_cart_val
+              else
+                  w0_nodal(i,j,k,1) = w0_cart_val * x * (ONE / radius)
+                  w0_nodal(i,j,k,2) = w0_cart_val * y * (ONE / radius)
+                  w0_nodal(i,j,k,3) = w0_cart_val * z * (ONE / radius)
+              endif
+
+           end do
+        end do
+     end do
+
+  end subroutine make_w0mac_nodal
 
   subroutine make_s0mac_sphr(lo, hi, s0, &
        s0macx, x_lo, x_hi, &
