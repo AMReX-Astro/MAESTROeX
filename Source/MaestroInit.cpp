@@ -600,7 +600,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     Real dt_hold = dt;
 
     // compute new time step
-    EstDt();
+    dt = EstDt();
 
     if (maestro_verbose > 0) {
         Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
@@ -745,7 +745,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Real dt_hold = dt;
     
     // compute new time step
-    EstDt();
+    dt = EstDt();
     
     if (maestro_verbose > 0) {
 	Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter

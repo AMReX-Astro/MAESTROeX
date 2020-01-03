@@ -9,13 +9,13 @@
 
 using namespace amrex;
 
-void
+Real
 Maestro::EstDt (bool quiet)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
 
-    dt = 1.e20;
+    Real new_dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
     RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
@@ -208,7 +208,7 @@ Maestro::EstDt (bool quiet)
         }
 
         // update dt over all levels
-        dt = std::min(dt,dt_lev);
+        new_dt = std::min(new_dt,dt_lev);
 
     }     // end loop over levels
 
@@ -216,28 +216,30 @@ Maestro::EstDt (bool quiet)
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
     }
 
-    if (dt < small_dt) {
+    if (new_dt < small_dt) {
         Abort("EstDt: dt < small_dt");
     }
 
-    if (dt > max_dt) {
+    if (new_dt > max_dt) {
         if (maestro_verbose > 0 && !quiet) {
             Print() << "max_dt limits the new dt = " << max_dt << std::endl;
         }
-        dt = max_dt;
+        new_dt = max_dt;
     }
 
     if (fixed_dt != -1.0) {
         // fixed dt
-        dt = fixed_dt;
+        new_dt = fixed_dt;
         if (maestro_verbose > 0 && !quiet) {
-            Print() << "Setting fixed dt = " << dt << std::endl;
+            Print() << "Setting fixed dt = " << new_dt << std::endl;
         }
     }
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
     set_rel_eps(&umax);
+
+    return new_dt;
 }
 
 

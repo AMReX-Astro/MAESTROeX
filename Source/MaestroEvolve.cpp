@@ -40,24 +40,25 @@ Maestro::Evolve ()
 		if (istep > 1) {
 
             if (!is_retry)
-			    EstDt();
+			    dt = EstDt();
 
-			if (verbose > 0) {
+			if (maestro_verbose > 0 && !is_retry) {
 				Print() << "Call to estdt at beginning of step " << istep
-				        << " gives dt =" << dt << std::endl;
+				        << " gives dt = " << dt << std::endl;
 			}
 
 			// fixme - add nuclear_dt_scalefac timestep limiter
+            Print() << "dt = " << dt << " dtold = " << dtold << std::endl;
 
 			if (dt > max_dt_growth*dtold) {
 				dt = max_dt_growth*dtold;
-				if (verbose > 0) {
+				if (maestro_verbose > 0) {
 					Print() << "dt_growth factor limits the new dt = " << dt << std::endl;
 				}
 			}
 
 			if (dt > max_dt) {
-				if (verbose > 0) {
+				if (maestro_verbose > 0) {
 					Print() << "max_dt limits the new dt = " << max_dt << std::endl;
 				}
 				dt = max_dt;
@@ -106,6 +107,8 @@ Maestro::Evolve ()
 
         // If we're allowing for retries, check for that here.
         if (use_retry) {
+
+            dtold = dt;
 
             // If we hit a retry, exit loop here before anything gets printed or reset.
             if (RetryAdvance(t_new, advance_success)) {
