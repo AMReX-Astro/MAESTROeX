@@ -142,3 +142,12 @@ Add Zenodo DOI for JOSS publication
 GPU-specific changes to Makefile
 Bugfix: w0 is computed even when base cutoff density is outside domain
 Update test: rotating_star
+
+01-03-2020
+Various initialization and checkpoint-restart fixes
+Converted all .f90 files to .F90 files
+Various tiling and GPU updates and bugfixes
+Offloading more routines to GPU, including nodal and cell-centered solvers
+options to apply cutoff densities for heating and burning to a bound range of densiites
+Work on the rotating_star problem - models, heating profiles, initialization
+renname subdirectories within Exec/ to lower-case to sync with Castro
