@@ -10,7 +10,7 @@
 using namespace amrex;
 
 void
-Maestro::EstDt ()
+Maestro::EstDt (bool quiet)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
@@ -203,7 +203,7 @@ Maestro::EstDt ()
         // update umax over all levels
         umax = std::max(umax,umax_lev);
 
-        if (maestro_verbose > 0) {
+        if (maestro_verbose > 0 && !quiet) {
             Print() << "Call to estdt for level " << lev << " gives dt_lev = " << dt_lev << std::endl;
         }
 
@@ -212,7 +212,7 @@ Maestro::EstDt ()
 
     }     // end loop over levels
 
-    if (maestro_verbose > 0) {
+    if (maestro_verbose > 0 && !quiet) {
         Print() << "Minimum estdt over all levels = " << dt << std::endl;
     }
 
@@ -221,7 +221,7 @@ Maestro::EstDt ()
     }
 
     if (dt > max_dt) {
-        if (maestro_verbose > 0) {
+        if (maestro_verbose > 0 && !quiet) {
             Print() << "max_dt limits the new dt = " << max_dt << std::endl;
         }
         dt = max_dt;
@@ -230,7 +230,7 @@ Maestro::EstDt ()
     if (fixed_dt != -1.0) {
         // fixed dt
         dt = fixed_dt;
-        if (maestro_verbose > 0) {
+        if (maestro_verbose > 0 && !quiet) {
             Print() << "Setting fixed dt = " << dt << std::endl;
         }
     }

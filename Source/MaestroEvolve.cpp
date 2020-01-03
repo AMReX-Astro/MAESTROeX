@@ -21,6 +21,8 @@ Maestro::Evolve ()
 	// index for diag array buffer
 	int diag_index=0;
 
+    bool is_retry = false;
+
 	for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 	{
 
@@ -29,14 +31,16 @@ Maestro::Evolve ()
 			Regrid();
 		}
 
-		dtold = dt;
+		if (!is_retry)
+            dtold = dt;
 
 		// compute time step
 		// if this is the first time step we already have a dt from either FirstDt()
 		// or EstDt called during the divu_iters
 		if (istep > 1) {
 
-			EstDt();
+            if (!is_retry)
+			    EstDt();
 
 			if (verbose > 0) {
 				Print() << "Call to estdt at beginning of step " << istep
@@ -74,6 +78,8 @@ Maestro::Evolve ()
 			t_new = t_old + dt;
 		}
 
+        is_retry = false;
+
         // wallclock time
         Real start_total = ParallelDescriptor::second();
 
@@ -93,9 +99,7 @@ Maestro::Evolve ()
 #endif
 
         if (!advance_success) {
-            if (use_retry) {
-                Print() << "Advance was unsuccessful; proceeding to a retry." << std::endl << std::endl;
-            } else {
+            if (!use_retry) {
                 Abort("Advance was unsuccessful.");
             }
         }
@@ -103,20 +107,20 @@ Maestro::Evolve ()
         // If we're allowing for retries, check for that here.
         if (use_retry) {
 
-            // If we hit a retry, exit here before anything gets printed or reset.
+            // If we hit a retry, exit loop here before anything gets printed or reset.
             if (RetryAdvance(t_new, advance_success)) {
 
                 Real end_total = ParallelDescriptor::second() - start_total;
                 ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
 
                 // roll iteration counter back 
-                Print() << "Rolling step counter back from " << istep;
+                Print() << "  Rolling step counter back." << std::endl << std::endl;
                 istep--;
-                Print() << " to " << istep << std::endl;
-            
-                return;
-            }
 
+                is_retry = true;
+            
+                continue;
+            }
         }
 		
 		t_old = t_new;

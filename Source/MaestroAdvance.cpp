@@ -1221,7 +1221,8 @@ bool Maestro::RetryAdvance(Real & time, bool advance_success) {
 
     Real old_dt = dt;
 
-    EstDt();
+    Print() << std::endl;
+    EstDt(true);
 
     if (dt * (1.0 + retry_tolerance) < old_dt)
         do_retry = true;
@@ -1233,11 +1234,10 @@ bool Maestro::RetryAdvance(Real & time, bool advance_success) {
 
         auto new_dt = old_dt * retry_factor;
 
-        if (verbose && ParallelDescriptor::IOProcessor()) {
-            std::cout << std::endl;
-            std::cout << "  Timestep " << old_dt << " rejected." << std::endl;
-            std::cout << "  Performing a retry, with timestep of length dt = " << new_dt << std::endl;
-            std::cout << std::endl;
+        if (maestro_verbose) {
+            Print() << std::endl;
+            Print() << "  Timestep " << old_dt << " rejected." << std::endl;
+            Print() << "  Performing a RETRY with timestep of length dt = " << new_dt << std::endl;
         }
 
         // TODO: Restore the original values of the state data

@@ -450,7 +450,7 @@ private:
     // Time step computation in `MaestroDt.cpp`
 
     /// Compute the time step
-    void EstDt ();
+    void EstDt (bool quiet=false);
 
     /// Compute initial time step
     void FirstDt ();
