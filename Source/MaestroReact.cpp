@@ -95,7 +95,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 // SDC subroutines
 // compute heating term, rho_Hext, then
 // react the state over dt_in and update s_out
-void
+bool
 Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 		   Vector<MultiFab>& s_out,
 		   Vector<MultiFab>& rho_Hext,
@@ -106,6 +106,9 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()",ReactSDC);
+
+    // Start off assuming a successful burn.
+    auto burn_success = true;
 
     // external heating
     if (do_heating) {
@@ -139,7 +142,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     if (do_burning) {
 #ifdef SDC
         // do the burning, update s_out
-        auto burn_success = Burner(s_in,s_out,p0,dt_in,time_in,source);
+        burn_success = Burner(s_in,s_out,p0,dt_in,time_in,source);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -168,6 +171,8 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     else {
         TfromRhoH(s_out,p0);
     }
+
+    return burn_success;
 
 }
 

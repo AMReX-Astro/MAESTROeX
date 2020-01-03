@@ -102,7 +102,7 @@ private:
     
     // advance solution at all levels for a single time step using SDC
     // instead of Strang splitting
-    void AdvanceTimeStepSDC (bool is_initIter);
+    bool AdvanceTimeStepSDC (bool is_initIter);
 
     // end MaestroAdvance.cpp functions
     ////////////
@@ -973,7 +973,7 @@ private:
                 const amrex::Real dt_react,
                 const amrex::Real time_react);
 
-    void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
+    bool ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
 		   amrex::Vector<amrex::MultiFab>& s_out,
 		   amrex::Vector<amrex::MultiFab>& rho_Hext,
 		   const RealVector& p0,

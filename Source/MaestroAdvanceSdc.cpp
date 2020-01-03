@@ -5,7 +5,7 @@
 using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
-void
+bool
 Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // timer for profiling
@@ -527,12 +527,18 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
+
+    bool burn_success = true;
     
-    ReactSDC(sold,snew,rho_Hext,p0_old,dt,t_old,sdc_source);
+    burn_success = ReactSDC(sold,snew,rho_Hext,p0_old,dt,t_old,sdc_source);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
     ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+
+    // Skip the rest of the advance if the burn was unsuccessful.
+    if (!burn_success)
+        return false;
 
     // extract IR =  [ (snew - sold)/dt - sdc_source ]
 
@@ -975,11 +981,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // wallclock time
         Real start_total_react = ParallelDescriptor::second();
     
-        ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
+        burn_success = ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
 
         // wallclock time
         Real end_total_react = ParallelDescriptor::second() - start_total_react;
         ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+
+        // Skip the rest of the advance if the burn was unsuccessful.
+        if (!burn_success)
+            return false;
 
         // extract IR =  [ (snew - sold)/dt - sdc_source ]
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -1311,5 +1321,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
+
+    return true;
 
 }
