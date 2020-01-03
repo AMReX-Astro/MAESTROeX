@@ -74,21 +74,50 @@ Maestro::Evolve ()
 			t_new = t_old + dt;
 		}
 
-                // wallclock time
-                Real start_total = ParallelDescriptor::second();
+        // wallclock time
+        Real start_total = ParallelDescriptor::second();
+
+        bool advance_success = true;
 
 		// advance the solution by dt
 #ifdef SDC
-		AdvanceTimeStepSDC(false);
+		advance_success = AdvanceTimeStepSDC(false);
 #else
 		if (use_exact_base_state) {
 			AdvanceTimeStepIrreg(false);
 		} else if (average_base_state) {
 			AdvanceTimeStepAverage(false);
 		} else {
-			AdvanceTimeStep(false);
+			advance_success = AdvanceTimeStep(false);
 		}
 #endif
+
+        if (!advance_success) {
+            if (use_retry) {
+                Print() << "Advance was unsuccessful; proceeding to a retry." << std::endl << std::endl;
+            } else {
+                Abort("Advance was unsuccessful.");
+            }
+        }
+
+        // If we're allowing for retries, check for that here.
+        if (use_retry) {
+
+            // If we hit a retry, exit here before anything gets printed or reset.
+            if (RetryAdvance(t_new, advance_success)) {
+
+                Real end_total = ParallelDescriptor::second() - start_total;
+                ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+
+                // roll iteration counter back 
+                Print() << "Rolling step counter back from " << istep;
+                istep--;
+                Print() << " to " << istep << std::endl;
+            
+                return;
+            }
+
+        }
 		
 		t_old = t_new;
 
@@ -108,7 +137,6 @@ Maestro::Evolve ()
 
             Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
         }
-
 
         Real end_total = ParallelDescriptor::second() - start_total;
         ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());

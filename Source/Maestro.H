@@ -87,7 +87,7 @@ private:
     /// temporal integration scheme.
     ///
     /// @param is_initIter is it the initial iteration?
-    void AdvanceTimeStep (bool is_initIter);
+    bool AdvanceTimeStep (bool is_initIter);
 
     /// Advance solution for a single time step with irregular base state spacing
     ///
@@ -103,6 +103,8 @@ private:
     // advance solution at all levels for a single time step using SDC
     // instead of Strang splitting
     bool AdvanceTimeStepSDC (bool is_initIter);
+
+    bool RetryAdvance(amrex::Real& time, bool advance_success);
 
     // end MaestroAdvance.cpp functions
     ////////////
@@ -964,7 +966,7 @@ private:
 
     /// Compute heating term, `rho_Hext`, then
     /// react the state over `dt_react` and update `rho_omegadot`, `rho_Hnuc`
-    void React (const amrex::Vector<amrex::MultiFab>& s_in,
+    bool React (const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
                 amrex::Vector<amrex::MultiFab>& rho_Hext,
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
@@ -1282,6 +1284,11 @@ private:
     amrex::Real t_old;
     amrex::Real dt;
     amrex::Real dtold;
+
+    ///
+    /// for keeping track of mass changes from negative density resets
+    ///
+    static amrex::Real      frac_change;
 
     /// number of ghost cells needed for hyperbolic step
     int ng_adv;

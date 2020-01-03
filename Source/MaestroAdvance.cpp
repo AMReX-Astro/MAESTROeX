@@ -5,7 +5,7 @@
 using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
-void
+bool
 Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // timer for profiling
@@ -219,11 +219,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
 
-    React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
+    bool burn_success = React(sold,s1,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    // Skip the rest of the advance if the burn was unsuccessful.
+    if (!burn_success)
+        return false;
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
@@ -605,11 +609,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
+    burn_success = React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    // Skip the rest of the advance if the burn was unsuccessful.
+    if (!burn_success)
+        return false;
 
     misc_time_start = ParallelDescriptor::second();
 
@@ -992,11 +1000,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
+    burn_success = React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+
+    // Skip the rest of the advance if the burn was unsuccessful.
+    if (!burn_success)
+        return false;
 
     misc_time_start = ParallelDescriptor::second();
 
@@ -1186,5 +1198,56 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "Misc       :" << misc_time << " seconds\n";
         Print() << "Base State :" << base_time << " seconds\n";
     }
+
+    return true;
+
+}
+
+bool Maestro::RetryAdvance(Real & time, bool advance_success) {
+
+    BL_PROFILE("Maestro::RetryAdvance()");
+
+    bool do_retry = false;
+
+    // Do the retry if the suggested timestep is smaller than the actual one.
+    // A user-specified tolerance parameter can be used here to prevent
+    // retries that are caused by small differences. Note that we are going
+    // to intentionally ignore the actual suggested new dt, and just go with
+    // retry_factor * the current timestep. The reason is that shrinking
+    // the timestep by that factor will substantially change the evolution, and it
+    // could be enough to get the simulation to become sane again. If this is the
+    // case, we end up saving a lot of timesteps relative to the potentially very
+    // small timestep recommended by the above limiters.
+
+    Real old_dt = dt;
+
+    EstDt();
+
+    if (dt * (1.0 + retry_tolerance) < old_dt)
+        do_retry = true;
+
+    if (!advance_success)
+        do_retry = true;
+
+    if (do_retry) {
+
+        auto new_dt = old_dt * retry_factor;
+
+        if (verbose && ParallelDescriptor::IOProcessor()) {
+            std::cout << std::endl;
+            std::cout << "  Timestep " << old_dt << " rejected." << std::endl;
+            std::cout << "  Performing a retry, with timestep of length dt = " << new_dt << std::endl;
+            std::cout << std::endl;
+        }
+
+        // TODO: Restore the original values of the state data
+
+        // set dt 
+        dt = new_dt;
+
+    }
+
+    return do_retry;
+
 
 }

@@ -56,6 +56,8 @@ Real Maestro::previousCPUTimeUsed = 0.0;
 
 Real Maestro::startCPUTime = 0.0;
 
+Real Maestro::frac_change   = 1.e200;
+
 Maestro::Maestro ()
 {
 }
