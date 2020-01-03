@@ -1203,7 +1203,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 }
 
-bool Maestro::RetryAdvance(Real & time, bool advance_success) {
+bool Maestro::RetryAdvance(bool advance_success) {
 
     BL_PROFILE("Maestro::RetryAdvance()");
 
@@ -1221,9 +1221,25 @@ bool Maestro::RetryAdvance(Real & time, bool advance_success) {
 
     Real old_dt = dt;
 
-    Print() << std::endl;
     Real new_dt = EstDt(true);
 
+    if (new_dt > max_dt_growth*dtold) {
+        new_dt = max_dt_growth*dtold;
+    }
+
+    if (new_dt > max_dt) {
+        new_dt = max_dt;
+    }
+
+    if (fixed_dt != -1.) {
+        new_dt = fixed_dt;
+    }
+
+    if (stop_time >= 0. && t_old+new_dt > stop_time) {
+        new_dt = std::min(new_dt,stop_time-t_old);
+    }
+
+    Print() << "new_dt = " << new_dt << " old_dt = " << old_dt << std::endl;
     if (new_dt * (1.0 + retry_tolerance) < old_dt)
         do_retry = true;
 
@@ -1235,7 +1251,7 @@ bool Maestro::RetryAdvance(Real & time, bool advance_success) {
         dt = old_dt * retry_factor;
 
         if (maestro_verbose) {
-            Print() << std::endl;
+            Print() << std::endl << std::endl;
             Print() << "  Timestep " << old_dt << " rejected." << std::endl;
             Print() << "  Performing a RETRY with timestep of length dt = " << dt << std::endl;
         }

@@ -104,7 +104,7 @@ private:
     // instead of Strang splitting
     bool AdvanceTimeStepSDC (bool is_initIter);
 
-    bool RetryAdvance(amrex::Real& time, bool advance_success);
+    bool RetryAdvance(bool advance_success);
 
     // end MaestroAdvance.cpp functions
     ////////////

@@ -39,16 +39,16 @@ Maestro::Evolve ()
 		// or EstDt called during the divu_iters
 		if (istep > 1) {
 
-            if (!is_retry)
+            if (!is_retry) {
 			    dt = EstDt();
 
-			if (maestro_verbose > 0 && !is_retry) {
-				Print() << "Call to estdt at beginning of step " << istep
-				        << " gives dt = " << dt << std::endl;
-			}
+                if (maestro_verbose > 0) {
+                    Print() << "Call to estdt at beginning of step " << istep
+                            << " gives dt = " << dt << std::endl;
+                }
+            }
 
 			// fixme - add nuclear_dt_scalefac timestep limiter
-            Print() << "dt = " << dt << " dtold = " << dtold << std::endl;
 
 			if (dt > max_dt_growth*dtold) {
 				dt = max_dt_growth*dtold;
@@ -111,7 +111,7 @@ Maestro::Evolve ()
             dtold = dt;
 
             // If we hit a retry, exit loop here before anything gets printed or reset.
-            if (RetryAdvance(t_new, advance_success)) {
+            if (RetryAdvance(advance_success)) {
 
                 Real end_total = ParallelDescriptor::second() - start_total;
                 ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());

@@ -107,7 +107,7 @@ retry_neg_dens_factor               Real          1.e-1
 
 # When performing a retry, the factor to multiply the current
 # timestep by when trying again.
-retry_factor        Real          0.5
+retry_factor                        Real          0.5
 
 #-----------------------------------------------------------------------------
 # category: grid
