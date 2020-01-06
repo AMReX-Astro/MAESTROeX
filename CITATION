@@ -2,21 +2,27 @@ MAESTROeX derives from MAESTRO.  When citing the code, please cite the
 two primary alrogithm papers below as well as any of the MAESTRO papers appropriate
 to the discussion.
 
-   @ARTICLE{2019ApJ...submitted,
-       author = {{Fan}, D. and {Nonaka}, A. and {Almgren},
-                  A.~S. and {Harpole}, A. and {Zingale}, M.},
-	title = "{MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver}",
-      journal = {\apj},
-    archivePrefix = "arXiv",
-       eprint = {1908.0363},
-     primaryClass = "astro-ph.SR",
-     keywords = {convection, hydrodynamics, methods: numerical,
-                  nuclear reactions, nucleosynthesis, abundances,
-                  supernovae: general, white dwarfs},
-	 year = 2019,
-      adsnote = {submitted for publication}
-    }
-    
+   @ARTICLE{2019ApJ...887..212F,
+          author = {{Fan}, Duoming and {Nonaka}, Andrew and {Almgren}, Ann S. and
+            {Harpole}, Alice and {Zingale}, Michael},
+           title = "{MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver}",
+         journal = {\apj},
+        keywords = {Stellar convective zones, Hydrodynamics, Computational methods, Nuclear astrophysics, Nucleosynthesis, Nuclear abundances, Physics - Computational Physics, Astrophysics - Solar and Stellar Astrophysics},
+            year = "2019",
+           month = "Dec",
+          volume = {887},
+          number = {2},
+             eid = {212},
+           pages = {212},
+             doi = {10.3847/1538-4357/ab4f75},
+   archivePrefix = {arXiv},
+          eprint = {1908.03634},
+    primaryClass = {physics.comp-ph},
+          adsurl = {https://ui.adsabs.harvard.edu/abs/2019ApJ...887..212F},
+         adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+   }
+
+
     @ARTICLE{2010ApJS..188..358N,
        author = {{Nonaka}, A. and {Almgren}, A.~S. and {Bell},
                   J.~B. and {Lijewski}, M.~J. and {Malone}, C.~M. and
@@ -38,6 +44,28 @@ to the discussion.
        adsurl = {http://adsabs.harvard.edu/abs/2010ApJS..188..358N},
       adsnote = {Provided by the SAO/NASA Astrophysics Data System}
     }
+
+
+For the software itself, please cite the JOSS paper:
+
+    @ARTICLE{2019JOSS....4.1757F,
+           author = {{Fan}, Duoming and {Nonaka}, Andrew and {Almgren}, Ann and
+             {Willcox}, Donald and {Harpole}, Alice and {Zingale}, Michael},
+            title = "{MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver}",
+          journal = {The Journal of Open Source Software},
+         keywords = {abundances, supernovae, Fortran, Fortran90, nucleosynthesis, C++, Python, Jupyter Notebook, nuclear reactions, hydrodynamics, convection},
+             year = "2019",
+            month = "Nov",
+           volume = {4},
+           number = {43},
+              eid = {1757},
+            pages = {1757},
+              doi = {10.21105/joss.01757},
+           adsurl = {https://ui.adsabs.harvard.edu/abs/2019JOSS....4.1757F},
+          adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+    }
+
+
 
 There are several other papers that may be appropriate to cite,
 depending on which capabilities you are using.  These are discussed
