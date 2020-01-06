@@ -73,7 +73,7 @@ contains
     integer  , value, intent(in   ) :: mult_or_div
 
     ! local
-    integer i,j,k
+    integer i,j,k,r
 
     !$gpu
 
@@ -86,7 +86,12 @@ contains
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
-                        uedge(i,j,k) = uedge(i,j,k) * beta0(lev,k)
+#if (AMREX_SPACEDIM == 2)
+                        r = j
+#else 
+                        r = k
+#endif
+                        uedge(i,j,k) = uedge(i,j,k) * beta0(lev,r)
                     end do
                 end do
             end do
@@ -97,7 +102,12 @@ contains
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
-                        uedge(i,j,k) = uedge(i,j,k) * beta0_edge(lev,k)
+#if (AMREX_SPACEDIM == 2)
+                        r = j
+#else 
+                        r = k
+#endif
+                        uedge(i,j,k) = uedge(i,j,k) * beta0_edge(lev,r)
                     end do
                 end do
             end do
@@ -113,7 +123,12 @@ contains
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
-                        uedge(i,j,k) = uedge(i,j,k) / beta0(lev,k)
+#if (AMREX_SPACEDIM == 2)
+                        r = j
+#else 
+                        r = k
+#endif
+                        uedge(i,j,k) = uedge(i,j,k) / beta0(lev,r)
                     end do
                 end do
             end do
@@ -124,7 +139,12 @@ contains
             do k = lo(3),hi(3)
                 do j = lo(2),hi(2)
                     do i = lo(1),hi(1)
-                        uedge(i,j,k) = uedge(i,j,k) / beta0_edge(lev,k)
+#if (AMREX_SPACEDIM == 2)
+                        r = j
+#else 
+                        r = k
+#endif
+                        uedge(i,j,k) = uedge(i,j,k) / beta0_edge(lev,r)
                     end do
                 end do
             end do
