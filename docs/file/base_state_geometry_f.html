@@ -417,14 +417,16 @@ the base state arrays begin with index 0, not 1.</p>
 
 <dl class="subroutine">
 <dt id="f/base_state_geometry_module/init_base_state_map_sphr">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_base_state_map_sphr</code><span class="sig-paren">(</span><em class="sig-param">cc_to_r</em>, <em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">dx_fine</em>, <em class="sig-param">dx_lev</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_base_state_map_sphr" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_base_state_map_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">cc_to_r</em>, <em class="sig-param">c_lo</em>, <em class="sig-param">c_hi</em>, <em class="sig-param">dx_fine</em>, <em class="sig-param">dx_lev</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_base_state_map_sphr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state_map_sphr</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>cc_to_r</strong> (hi(1)-(lo(1))+1,hi(2)-(lo(2))+1,hi(3)-(lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>cc_to_r</strong> (c_hi(1)-(c_lo(1))+1,c_hi(2)-(c_lo(2))+1,c_hi(3)-(c_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>c_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>c_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dx_fine</strong> (amrex_spacedim-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dx_lev</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
