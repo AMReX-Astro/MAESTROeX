@@ -119,12 +119,11 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf, true); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
             
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
 #if (AMREX_SPACEDIM == 2)
