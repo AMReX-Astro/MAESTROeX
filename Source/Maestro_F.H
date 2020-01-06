@@ -73,7 +73,8 @@ extern "C"
                                   const amrex::Real* dx_fine,
 				  int* nr_irreg_in);
 
-    void init_base_state_map_sphr(amrex::Real* cc_to_r, const int* lo, const int* hi,
+    void init_base_state_map_sphr(const int* lo, const int* hi,
+                  amrex::Real* cc_to_r, const int* c_lo, const int* c_hi,
 				  const amrex::Real* dx_fine,
 				  const amrex::Real* dx_lev);
 
@@ -335,52 +336,38 @@ extern "C"
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void addw0(const int* lev, const int* lo, const int* hi,
+    void addw0(const int* lo, const int* hi, const int lev, 
                amrex::Real* uedge, const int* u_lo, const int* u_hi,
-               amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-               amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
-               const amrex::Real* w0, const amrex::Real* mult);
+               amrex::Real* w0, const amrex::Real mult);
 
     void addw0_sphr(const int* lo, const int* hi,
 		    amrex::Real* umac, const int* u_lo, const int* u_hi,
-		    amrex::Real* vmac, const int* v_lo, const int* v_hi,
-		    amrex::Real* wmac, const int* w_lo, const int* w_hi,
-		    const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-		    const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-		    const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-		    const amrex::Real* mult);
+		    const amrex::Real* w0mac, const int* x_lo, const int* x_hi,
+		    const amrex::Real mult);
 
-    void make_w0mac_sphr(const int* lo, const int* hi,
+    void make_w0mac_sphr(const int* lo, const int* hi, const int idir,
 			 const amrex::Real* w0,
 			 amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-			 amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-			 amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-			 amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int* nc_w0,
+			 amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int nc_w0,
+			 amrex::Real* w0_nodal, const int* wn_lo, const int* wn_hi,
 			 const amrex::Real* dx,
 			 const amrex::Real* r_edge_loc);
 
     void make_w0mac_nodal(const int* lo, const int* hi,
 			 const amrex::Real* w0,
-			 amrex::Real* w0_nodal, const int* w0_lo, const int* w0_hi, const int* nc_w0,
-			 const amrex::Real* dx,
-			 const amrex::Real* r_edge_loc);
+			 amrex::Real* w0_nodal, const int* w0_lo, const int* w0_hi, 
+			 const amrex::Real* dx);
 
-    void make_s0mac_sphr(const int* lo, const int* hi,
+    void make_s0mac_sphr(const int* lo, const int* hi, const int idir,
 			 const amrex::Real* s0,
-			 amrex::Real* s0macx, const int* x_lo, const int* x_hi,
-			 amrex::Real* s0macy, const int* y_lo, const int* y_hi,
-			 amrex::Real* s0macz, const int* z_lo, const int* z_hi,
+			 amrex::Real* s0mac, const int* x_lo, const int* x_hi,
 			 amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
 			 const amrex::Real* dx,
 			 const amrex::Real* r_cc_loc);
 
-    void make_s0mac_sphr_irreg(const int* lo, const int* hi,
+    void make_s0mac_sphr_irreg(const int* lo, const int* hi, const int idir,
 			       const amrex::Real* s0,
-			       amrex::Real* s0macx, const int* x_lo, const int* x_hi,
-			       amrex::Real* s0macy, const int* y_lo, const int* y_hi,
-			       amrex::Real* s0macz, const int* z_lo, const int* z_hi,
+			       amrex::Real* s0mac, const int* x_lo, const int* x_hi,
 			       amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
 			       const amrex::Real* dx,
 			       const amrex::Real* r_cc_loc);

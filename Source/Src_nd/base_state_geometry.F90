@@ -160,23 +160,27 @@ contains
 
   end subroutine init_base_state_geometry
 
-  subroutine init_base_state_map_sphr(cc_to_r, lo, hi, &
+  subroutine init_base_state_map_sphr(lo, hi, cc_to_r, c_lo, c_hi, &
        dx_fine, dx_lev) &
        bind(C, name="init_base_state_map_sphr")
     ! Binds to C function ``init_base_state_map_sphr``
 
-    integer          , intent(in   ) :: lo(3), hi(3)
-    double precision , intent(inout) :: cc_to_r(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
+    integer          , intent(in   ) :: lo(3), hi(3), c_lo(3), c_hi(3)
+    double precision , intent(inout) :: cc_to_r(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision , intent(in   ) :: dx_fine(0:amrex_spacedim-1)
-    double precision , intent(in   ) ::  dx_lev(3)
+    double precision , intent(in   ) :: dx_lev(3)
 
     ! local
     integer :: i,j,k
     double precision :: index,x,y,z
 
+    !$gpu
+
     if ( spherical .eq. 0 ) then
+#ifndef AMREX_USE_CUDA
        print*,'init_base_state_map_sphr() does not work for planar'
        call abort()
+#endif
     end if
 
     ! map cell centers to base state indices

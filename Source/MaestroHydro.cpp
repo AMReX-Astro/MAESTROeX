@@ -1256,7 +1256,6 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
             for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
 
                 int vcomp = scomp - start_scomp - 1;
-
                 int bccomp = start_bccomp + scomp - start_scomp;
 
                 // x-direction
@@ -1285,7 +1284,6 @@ Maestro::MakeEdgeScal (const Vector<MultiFab>& state,
                               AMREX_INT_ANYD(domainBox.loVect()),
                               AMREX_INT_ANYD(domainBox.hiVect()),
                               1,bc_f,nbccomp,bccomp);
-
 
                 } else {
 #pragma gpu box(obx)

@@ -369,6 +369,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
         MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
         MultiFab rhoh0mac_edgex, rhoh0mac_edgey, rhoh0mac_edgez;
+        
         rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 0);
         rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 0);
         rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 0);
