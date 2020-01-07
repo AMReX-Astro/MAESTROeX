@@ -34,49 +34,49 @@ contains
         call read_model_file(model_file)
     endif
 
-    if (use_analytic_heating) then
+    ! if (use_analytic_heating) then
 
-        if (spherical .eq. 0) then
-            starting_rad = prob_lo(AMREX_SPACEDIM)
-        else
-            starting_rad = ZERO
-        endif
+    if (spherical .eq. 0) then
+        starting_rad = prob_lo(AMREX_SPACEDIM)
+    else
+        starting_rad = ZERO
+    endif
 
-        do k=lo(3),hi(3)
-            do j=lo(2),hi(2)
-                do i=lo(1),hi(1)
-                    xloc(1) = prob_lo(1) + (dble(i)+0.5d0)*dx(1) - center(1)
-                    xloc(2) = prob_lo(2) + (dble(j)+0.5d0)*dx(2) - center(2)
-                    xloc(3) = prob_lo(3) + (dble(k)+0.5d0)*dx(3) - center(3)
+    do k=lo(3),hi(3)
+        do j=lo(2),hi(2)
+            do i=lo(1),hi(1)
+                xloc(1) = prob_lo(1) + (dble(i)+0.5d0)*dx(1) - center(1)
+                xloc(2) = prob_lo(2) + (dble(j)+0.5d0)*dx(2) - center(2)
+                xloc(3) = prob_lo(3) + (dble(k)+0.5d0)*dx(3) - center(3)
 
-                    if (AMREX_SPACEDIM .eq. 2) then
-                        rloc = xloc(2)
-                    else if (AMREX_SPACEDIM .eq. 3) then
-                        if (spherical .eq. 0) then
-                            rloc = xloc(3)
-                        else
-                            ! compute distance to the center of the star
-                            rloc = ZERO
-                            do n=1,3
-                               rloc = rloc + xloc(n)**2
-                            enddo
-                            rloc = sqrt(rloc)
-                        end if
-                    end if
-
-
-                    rho = scal(i,j,k,rho_comp)
-                    if (rho > heating_cutoff_density_lo .and. rho < heating_cutoff_density_hi) then
-                       rho_Hext(i,j,k)  = interpolate(rloc, ienuc_model) * scal(i,j,k,rho_comp)
+                if (AMREX_SPACEDIM .eq. 2) then
+                    rloc = xloc(2)
+                else if (AMREX_SPACEDIM .eq. 3) then
+                    if (spherical .eq. 0) then
+                        rloc = xloc(3)
                     else
-                       rho_Hext(i,j,k) = 0.d0
+                        ! compute distance to the center of the star
+                        rloc = ZERO
+                        do n=1,3
+                            rloc = rloc + xloc(n)**2
+                        enddo
+                        rloc = sqrt(rloc)
                     end if
-                    
-                end do
+                end if
+
+
+                rho = scal(i,j,k,rho_comp)
+                if (rho > heating_cutoff_density_lo .and. rho < heating_cutoff_density_hi) then
+                    rho_Hext(i,j,k)  = interpolate(rloc, ienuc_model) * scal(i,j,k,rho_comp)
+                else
+                    rho_Hext(i,j,k) = 0.d0
+                end if
+                
             end do
         end do
+    end do
 
-    endif
+    ! endif
 
   end subroutine make_heating
 
