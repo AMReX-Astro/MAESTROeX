@@ -95,7 +95,7 @@ contains
              end if
 
              ! impose lo i side bc's
-             if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+             if (i .eq. domlo(1)) then
                 select case(phys_bc(1,1))
                 case (Inflow)
                    ulx = utilde(i-1,j,k,1)
@@ -112,10 +112,9 @@ contains
                    call amrex_error("mkutrans_2d: invalid boundary type phys_bc(1,1)")
 #endif
                 end select
-             end if
 
              ! impose hi i side bc's
-             if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+             else if (i .eq. domhi(1)+1) then
                 select case(phys_bc(1,2))
                 case (Inflow)
                    ulx = utilde(i,j,k,1)
@@ -164,7 +163,7 @@ contains
              end if
 
              ! impose lo side bc's
-             if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+             if (j .eq. domlo(2)) then
                 select case(phys_bc(2,1))
                 case (Inflow)
                    vly = utilde(i,j-1,k,2)
@@ -181,10 +180,9 @@ contains
                    call amrex_error("mkutrans_2d: invalid boundary type phys_bc(2,1)")
 #endif
                 end select
-             end if
 
              ! impose hi side bc's
-             if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+             else if (j .eq. domhi(2)+1) then
                 select case(phys_bc(2,2))
                 case (Inflow)
                    vly = utilde(i,j,k,2)
@@ -301,7 +299,7 @@ contains
                 end if
 
                 ! impose lo side bc's
-                if (i .eq. lo(1) .and. lo(1) .eq. domlo(1)) then
+                if (i .eq. domlo(1)) then
                    select case(phys_bc(1,1))
                    case (Inflow)
                       ulx = utilde(i-1,j,k,1)
@@ -318,10 +316,9 @@ contains
                       call amrex_error("mkutrans_3d: invalid boundary type phys_bc(1,1)")
 #endif
                    end select
-                end if
 
                 ! impose hi side bc's
-                if (i .eq. hi(1) .and. hi(1)-1 .eq. domhi(1)) then
+                else if (i .eq. domhi(1)+1) then
                    select case(phys_bc(1,2))
                    case (Inflow)
                       ulx = utilde(i+1,j,k,1)
@@ -390,7 +387,7 @@ contains
                 end if
 
                 ! impose lo side bc's
-                if (j .eq. lo(2) .and. lo(2) .eq. domlo(2)) then
+                if (j .eq. domlo(2)) then
                    select case(phys_bc(2,1))
                    case (Inflow)
                       vly = utilde(i,j-1,k,2)
@@ -407,10 +404,9 @@ contains
                       call amrex_error("mkutrans_3d: invalid boundary type phys_bc(2,1)")
 #endif
                    end select
-                end if
 
                 ! impose hi side bc's
-                if (j .eq. hi(2) .and. hi(2)-1 .eq. domhi(2)) then
+                else if (j .eq. domhi(2)+1) then
                    select case(phys_bc(2,2))
                    case (Inflow)
                       vly = utilde(i,j+1,k,2)
@@ -473,7 +469,7 @@ contains
                 end if
 
                 ! impose lo side bc's
-                if (k .eq. lo(3) .and. lo(3) .eq. domlo(3)) then
+                if (k .eq. domlo(3)) then
                    select case(phys_bc(3,1))
                    case (Inflow)
                       wlz = utilde(i,j,k-1,3)
@@ -490,10 +486,9 @@ contains
                       call amrex_error("mkutrans_3d: invalid boundary type phys_bc(3,1)")
 #endif
                    end select
-                end if
 
                 ! impose hi side bc's
-                if (k .eq. hi(3) .and. hi(3)-1 .eq. domhi(3)) then
+                else if (k .eq. domhi(3)+1) then
                    select case(phys_bc(3,2))
                    case (Inflow)
                       wlz = utilde(i,j,k+1,3)

@@ -160,9 +160,8 @@ contains
                    sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)))
                    sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
                 end if
-             end if
 
-             if (i .eq. domlo(1)+1) then
+             else if (i .eq. domlo(1)+1) then
                 if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
@@ -190,9 +189,8 @@ contains
                       sm = THREE*s(i,j,k,n) - TWO*sp
                    end if
                 end if
-             end if
 
-             if (i .eq. domhi(1)) then
+             else if (i .eq. domhi(1)) then
                 if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
                    ! the value in the first cc ghost cell represents the edge value
                    sp = s(i+1,j,k,n)
@@ -209,9 +207,8 @@ contains
                    sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                 end if
-             end if
 
-             if (i .eq. domhi(1)-1) then
+             else if (i .eq. domhi(1)-1) then
                 if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                    ! make sure sedge lies in between adjacent cell-centered values
@@ -803,10 +800,9 @@ contains
                    sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
                    sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
                 end if
-             end if
 
              ! different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's
-             if (j .eq. domlo(2)+1) then
+             else if (j .eq. domlo(2)+1) then
                 if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                    ! use a modified stencil to get sm on the first interior edge
@@ -833,9 +829,8 @@ contains
                    end if
                    ! end do
                 end if
-             end if
 
-             if (j .eq. domhi(2)) then
+             else if (j .eq. domhi(2)) then
                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
                    ! the value in the first cc ghost cell represents the edge value
@@ -852,9 +847,8 @@ contains
                    sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                 end if
-             end if
 
-             if (j .eq. domhi(2)-1) then
+            else if (j .eq. domhi(2)-1) then
                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
                    ! use a modified stencil to get sp on the first interior edge
@@ -1501,9 +1495,8 @@ contains
                       sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)))
 
                    end if
-                end if
 
-                if (i .eq. domlo(1) + 1) then
+                else if (i .eq. domlo(1) + 1) then
                    if (adv_bc(1,1,bccomp) .eq. EXT_DIR  .or. adv_bc(1,1,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -1535,9 +1528,8 @@ contains
                       end if
 
                    end if
-                end if
 
-                if (i .eq. domhi(1)) then
+                else if (i .eq. domhi(1)) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       ! The value in the first cc ghost cell represents the edge value.
@@ -1558,9 +1550,8 @@ contains
                       sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)))
 
                    end if
-                end if
 
-                if (i .eq. domhi(1)-1) then
+                else if (i .eq. domhi(1)-1) then
                    if (adv_bc(1,2,bccomp) .eq. EXT_DIR  .or. adv_bc(1,2,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -2211,9 +2202,8 @@ contains
                       sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
 
                    end if
-                end if
 
-                if (j .eq. domlo(2)+1) then
+                else if (j .eq. domlo(2)+1) then
                    if (adv_bc(2,1,bccomp) .eq. EXT_DIR  .or. adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -2244,9 +2234,8 @@ contains
                       end if
 
                    end if
-                end if
 
-                if (j .eq. domhi(2)) then
+                else if (j .eq. domhi(2)) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
                       !
                       ! The value in the first cc ghost cell represents the edge value.
@@ -2266,9 +2255,8 @@ contains
                       sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)))
 
                    end if
-                end if
 
-                if (j .eq. domhi(2)-1) then
+                else if (j .eq. domhi(2)-1) then
                    if (adv_bc(2,2,bccomp) .eq. EXT_DIR  .or. adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
 
                       ! Use a modified stencil to get sp on the first interior edge.
@@ -2930,9 +2918,8 @@ contains
                       sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)))
 
                    end if
-                end if
 
-                if (k .eq. domlo(3)+1) then
+                else if (k .eq. domlo(3)+1) then
                    if (adv_bc(3,1,bccomp) .eq. EXT_DIR  .or. adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -2963,9 +2950,8 @@ contains
                       end if
 
                    end if
-                end if
 
-                if (k .eq. domhi(3)) then
+                else if (k .eq. domhi(3)) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !
@@ -2986,9 +2972,8 @@ contains
                       sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)))
                       sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)))
                    end if
-                end if
 
-                if (k .eq. domhi(3)-1) then
+                else if (k .eq. domhi(3)-1) then
                    if (adv_bc(3,2,bccomp) .eq. EXT_DIR  .or. adv_bc(3,2,bccomp) .eq. HOEXTRAP) then
 
                       !

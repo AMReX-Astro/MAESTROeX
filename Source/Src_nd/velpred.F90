@@ -131,10 +131,9 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
 #endif
               end select
-           end if
 
            ! impose hi side bc's
-           if (i .eq. domhi(1)+1) then
+           else if (i .eq. domhi(1)+1) then
               select case(phys_bc(1,2))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i,j,k,1:2)
@@ -212,10 +211,9 @@ subroutine velpred_interface_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
 #endif
               end select
-           end if
 
            ! impose hi side bc's
-           if (j .eq. domhi(2)+1) then
+           else if (j .eq. domhi(2)+1) then
               select case(phys_bc(2,2))
               case (Inflow)
                  ul(i,j,k,1:2) = utilde(i,j,k,1:2)
@@ -370,10 +368,9 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
                  call amrex_error("velpred_2d: invalid boundary type phys_bc(1,1)")
 #endif
               end select
-           end if
 
            ! impose hi side bc's
-           if (i .eq. domhi(1)+1) then
+           else if (i .eq. domhi(1)+1) then
               select case(phys_bc(1,2))
               case (Inflow)
                  umac(i,j,k) = utilde(i,j,k,1)
@@ -429,10 +426,9 @@ subroutine velpred_2d(lo, hi, lev, idir, domlo, domhi, &
                  call amrex_error("velpred_2d: invalid boundary type phys_bc(2,1)")
 #endif
               end select
-           end if
 
            ! impose hi side bc's
-           if (j .eq. domhi(2)+1) then
+           else if (j .eq. domhi(2)+1) then
               select case(phys_bc(2,2))
               case (Inflow)
                  vmac(i,j,k) = utilde(i,j,k,2)
@@ -582,10 +578,9 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:)
@@ -683,10 +678,9 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:3)
@@ -784,10 +778,9 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     ul(i,j,k,1:3) = utilde(i,j,k,1:3)
@@ -946,10 +939,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     ulyz = utilde(i,j,k,1)
@@ -1010,10 +1002,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     ulzy = utilde(i,j,k,1)
@@ -1074,10 +1065,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     vlxz = utilde(i,j,k,2)
@@ -1137,10 +1127,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     vlzx = utilde(i,j,k,2)
@@ -1200,10 +1189,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     wlxy = utilde(i,j,k,3)
@@ -1263,10 +1251,9 @@ subroutine velpred_transverse_3d(lo, hi, base_dir, norm_dir, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     wlyx = utilde(i,j,k,3)
@@ -1460,10 +1447,9 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(1,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  select case(phys_bc(1,2))
                  case (Inflow)
                     umac(i,j,k) = utilde(i,j,k,1)
@@ -1541,10 +1527,9 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(2,1)")
 #endif
                  end select
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  select case(phys_bc(2,2))
                  case (Inflow)
                     vmac(i,j,k) = utilde(i,j,k,2)
@@ -1624,10 +1609,9 @@ subroutine velpred_3d(lo, hi, lev, idir, domlo, domhi, &
                     call amrex_error("velpred_3d: invalid boundary type phys_bc(3,1)")
 #endif
                  end select
-              end if
 
               ! impose lo side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  select case(phys_bc(3,2))
                  case (Inflow)
                     wmac(i,j,k) = utilde(i,j,k,3)

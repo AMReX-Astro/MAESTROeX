@@ -118,10 +118,9 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
 #endif
               end if
-           end if
 
-           ! impose hi side bc's
-           if (i .eq. domhi(1)+1) then
+            ! impose hi side bc's
+            else if (i .eq. domhi(1)+1) then
               if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i,j,k,comp)
                  sr(i,j,k) = s(i,j,k,comp)
@@ -189,10 +188,9 @@ subroutine make_edge_scal_predictor_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
 #endif
               end if
-           end if
 
-           ! impose hi side bc's
-           if (j .eq. domhi(2)+1) then
+            ! impose hi side bc's
+            else if (j .eq. domhi(2)+1) then
               if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                  sl(i,j,k) = s(i,j,k,comp)
                  sr(i,j,k) = s(i,j,k,comp)
@@ -347,10 +345,9 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(1,1)")
 #endif
               end if
-           end if
 
            ! impose hi side bc's
-           if (i .eq. domhi(1)+1) then
+            else if (i .eq. domhi(1)+1) then
               if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i,j,k,comp)
               else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -428,10 +425,9 @@ subroutine make_edge_scal_2d(lo, hi, idir, domlo, domhi, &
                  call amrex_error("make_edge_scal_2d: invalid boundary type adv_bc(2,1)")
 #endif
               end if
-           end if
 
            ! impose hi side bc's
-           if (j .eq. domhi(2)+1) then
+            else if (j .eq. domhi(2)+1) then
               if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                  sedge(i,j,k,comp) = s(i,j,k,comp)
               else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -604,10 +600,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -682,10 +677,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -758,10 +752,9 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     sl(i,j,k) = s(i,j,k,comp)
                     sr(i,j,k) = s(i,j,k,comp)
@@ -939,10 +932,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     slxy = s(i,j,k,comp)
                     srxy = s(i,j,k,comp)
@@ -1024,10 +1016,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     slxz = s(i,j,k,comp)
                     srxz = s(i,j,k,comp)
@@ -1110,10 +1101,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     slyx = s(i,j,k,comp)
                     sryx = s(i,j,k,comp)
@@ -1196,10 +1186,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     slyz = s(i,j,k,comp)
                     sryz = s(i,j,k,comp)
@@ -1282,10 +1271,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     slzx = s(i,j,k,comp)
                     srzx = s(i,j,k,comp)
@@ -1368,10 +1356,9 @@ subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domh
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     slzy = s(i,j,k,comp)
                     srzy = s(i,j,k,comp)
@@ -1571,10 +1558,9 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(1,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (i .eq. domhi(1)+1) then
+              else if (i .eq. domhi(1)+1) then
                  if (adv_bc(1,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(1,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1673,10 +1659,9 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (j .eq. domhi(2)+1) then
+              else if (j .eq. domhi(2)+1) then
                  if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
@@ -1775,10 +1760,9 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
 #endif
                  end if
-              end if
 
               ! impose hi side bc's
-              if (k .eq. domhi(3)+1) then
+              else if (k .eq. domhi(3)+1) then
                  if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
                     sedge(i,j,k,comp) = s(i,j,k,comp)
                  else if (adv_bc(3,2,bccomp) .eq. FOEXTRAP .or. &
