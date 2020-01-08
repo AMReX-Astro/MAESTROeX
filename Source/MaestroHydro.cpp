@@ -1551,6 +1551,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 Array4<Real> const Ip_arr = Ip.array(mfi);
                 Array4<Real> const Im_arr = Im.array(mfi);
+                Array4<Real> const slopez_arr = slopez.array(mfi);
 
                 Real ppm_type_local = ppm_type;
 
@@ -1559,7 +1560,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     if (ppm_type_local == 0) {
                         slx_arr(i,j,k) = scal_arr(i-1,j,k,scomp-1) + 0.5 * (1.0 - dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i-1,j,k,0);
-                        srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 - dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i,j,k,0);
+                        srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slx_arr(i,j,k) = Ip_arr(i-1,j,k,0);
                         srx_arr(i,j,k) = Im_arr(i,j,k,0);
@@ -1571,7 +1572,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     if (ppm_type_local == 0) {
                         sly_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1) + 0.5 * (1.0 - dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j-1,k,0);
-                        sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 - dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j,k,0);
+                        sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         sly_arr(i,j,k) = Ip_arr(i,j-1,k,1);
                         sry_arr(i,j,k) = Im_arr(i,j,k,1);
@@ -1582,8 +1583,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
                 {
                     if (ppm_type_local == 0) {
-                        slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1) + 0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * Ip_arr(i,j,k-1,0);
-                        srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * Ip_arr(i,j,k,0);
+                        slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1) + 0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k-1);
+                        srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slz_arr(i,j,k) = Ip_arr(i,j,k-1,2);
                         srz_arr(i,j,k) = Im_arr(i,j,k,2);
@@ -1641,34 +1642,34 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // impose lo side bc's
                     if (j == jlo) {
                         if (bclo == EXT_DIR) {
-                            slx_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1);
-                            srx_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1);
+                            sly_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1);
+                            sry_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1);
                         } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                             if (is_vel == 1 && scomp-1 == 1) {
-                                srx_arr(i,j,k) = min(srx_arr(i,j,k), 0.0);
+                                sry_arr(i,j,k) = min(sry_arr(i,j,k), 0.0);
                             }
-                            slx_arr(i,j,k) = srx_arr(i,j,k);
+                            sly_arr(i,j,k) = sry_arr(i,j,k);
                         } else if (bclo == REFLECT_EVEN) {
-                            slx_arr(i,j,k) = srx_arr(i,j,k);
+                            sly_arr(i,j,k) = sry_arr(i,j,k);
                         } else if (bclo == REFLECT_ODD) {
-                            slx_arr(i,j,k) = 0.0;
-                            srx_arr(i,j,k) = 0.0;
+                            sly_arr(i,j,k) = 0.0;
+                            sry_arr(i,j,k) = 0.0;
                         }
                     // impose hi side bc's
                     } else if (j == jhi+1) {
                         if (bchi == EXT_DIR) {
-                            slx_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
-                            srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
+                            sly_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
+                            sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
                         } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                             if (is_vel == 1 && scomp-1 == 1) {
-                                slx_arr(i,j,k) = max(slx_arr(i,j,k), 0.0);
+                                sly_arr(i,j,k) = max(sly_arr(i,j,k), 0.0);
                             }
-                            srx_arr(i,j,k) = slx_arr(i,j,k);
+                            sry_arr(i,j,k) = sly_arr(i,j,k);
                         } else if (bchi == REFLECT_EVEN) {
-                            srx_arr(i,j,k) = slx_arr(i,j,k);
+                            sry_arr(i,j,k) = sly_arr(i,j,k);
                         } else if (bchi == REFLECT_ODD) {
-                            slx_arr(i,j,k) = 0.0;
-                            srx_arr(i,j,k) = 0.0;
+                            sly_arr(i,j,k) = 0.0;
+                            sry_arr(i,j,k) = 0.0;
                         }
 
                     }
@@ -1682,138 +1683,61 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     // impose lo side bc's
                     if (k == klo) {
-                        // if (bclo == EXT_DIR) {
-                        //     slx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
-                        //     srx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
-                        // } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
-                        //     if (is_vel == 1 && scomp-1 == 2) {
-                        //         srx_arr(i,j,k) = min(srx_arr(i,j,k), 0.0);
-                        //     }
-                        //     slx_arr(i,j,k) = srx_arr(i,j,k);
-                        // } else if (bclo == REFLECT_EVEN) {
-                        //     slx_arr(i,j,k) = srx_arr(i,j,k);
-                        // } else if (bclo == REFLECT_ODD) {
-                        //     slx_arr(i,j,k) = 0.0;
-                        //     srx_arr(i,j,k) = 0.0;
-                        // }
+                        if (bclo == EXT_DIR) {
+                            slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
+                            srz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
+                        } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                srz_arr(i,j,k) = min(srz_arr(i,j,k), 0.0);
+                            }
+                            slz_arr(i,j,k) = srz_arr(i,j,k);
+                        } else if (bclo == REFLECT_EVEN) {
+                            slz_arr(i,j,k) = srz_arr(i,j,k);
+                        } else if (bclo == REFLECT_ODD) {
+                            slz_arr(i,j,k) = 0.0;
+                            srz_arr(i,j,k) = 0.0;
+                        }
                     // impose hi side bc's
                     } else if (k == khi+1) {
                         if (bchi == EXT_DIR) {
-                            slx_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
-                            srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
+                            slz_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
+                            srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
                         } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                             if (is_vel == 1 && scomp-1 == 2) {
-                                slx_arr(i,j,k) = max(slx_arr(i,j,k), 0.0);
+                                slz_arr(i,j,k) = max(slz_arr(i,j,k), 0.0);
                             }
-                            srx_arr(i,j,k) = slx_arr(i,j,k);
+                            srz_arr(i,j,k) = slz_arr(i,j,k);
                         } else if (bchi == REFLECT_EVEN) {
-                            srx_arr(i,j,k) = slx_arr(i,j,k);
+                            srz_arr(i,j,k) = slz_arr(i,j,k);
                         } else if (bchi == REFLECT_ODD) {
-                            slx_arr(i,j,k) = 0.0;
-                            srx_arr(i,j,k) = 0.0;
+                            slz_arr(i,j,k) = 0.0;
+                            srz_arr(i,j,k) = 0.0;
                         }
 
                     }
                 });
 
-                // x-direction
-// #pragma gpu box(mxbx)
-//                 make_edge_scal_predictor_3d(AMREX_INT_ANYD(mxbx.loVect()),
-//                                             AMREX_INT_ANYD(mxbx.hiVect()), 1,
-//                                             AMREX_INT_ANYD(domainBox.loVect()),
-//                                             AMREX_INT_ANYD(domainBox.hiVect()),
-//                                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                             BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slopez[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slx[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(srx[mfi]),
-//                                             AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                             nbccomp, scomp, bccomp);
-
-                // y-direction
-// #pragma gpu box(mybx)
-//                 make_edge_scal_predictor_3d(AMREX_INT_ANYD(mybx.loVect()),
-//                                             AMREX_INT_ANYD(mybx.hiVect()), 2,
-//                                             AMREX_INT_ANYD(domainBox.loVect()),
-//                                             AMREX_INT_ANYD(domainBox.hiVect()),
-//                                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                             BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slopez[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(sly[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(sry[mfi]),
-//                                             AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                             nbccomp, scomp, bccomp);
-
-                // z-direction
-#pragma gpu box(mzbx)
-                make_edge_scal_predictor_3d(AMREX_INT_ANYD(mzbx.loVect()),
-                                            AMREX_INT_ANYD(mzbx.hiVect()), 3,
-                                            AMREX_INT_ANYD(domainBox.loVect()),
-                                            AMREX_INT_ANYD(domainBox.hiVect()),
-                                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                                            BL_TO_FORTRAN_ANYD(Im[mfi]),
-                                            BL_TO_FORTRAN_ANYD(slopez[mfi]),
-                                            BL_TO_FORTRAN_ANYD(slz[mfi]),
-                                            BL_TO_FORTRAN_ANYD(srz[mfi]),
-                                            AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                                            nbccomp, scomp, bccomp);
-
+                // make simhx by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {
                     simhx_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ? slx_arr(i,j,k) : srx_arr(i,j,k);
                     simhx_arr(i,j,k) = (abs(umac_arr(i,j,k)) > 0.0) ? simhx_arr(i,j,k) : 0.5 * (slx_arr(i,j,k) + srx_arr(i,j,k));
                 });
 
+                // make simhy by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
                 {
                     simhy_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ? sly_arr(i,j,k) : sry_arr(i,j,k);
                     simhy_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > 0.0) ? simhy_arr(i,j,k) : 0.5 * (sly_arr(i,j,k) + sry_arr(i,j,k));
                 });
 
+                // make simhz by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
                 {
                     simhz_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ? slz_arr(i,j,k) : srz_arr(i,j,k);
                     simhz_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > 0.0) ? simhz_arr(i,j,k) : 0.5 * (slz_arr(i,j,k) + srz_arr(i,j,k));
                 });
 
-//                 // x-direction
-// #pragma gpu box(mxbx)
-//                 make_edge_scal_merge_3d(AMREX_INT_ANYD(mxbx.loVect()),
-//                                             AMREX_INT_ANYD(mxbx.hiVect()), 
-//                                             BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slx[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(srx[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(simhx[mfi]));
-
-//                 // y-direction
-// #pragma gpu box(mybx)
-//                 make_edge_scal_merge_3d(AMREX_INT_ANYD(mybx.loVect()),
-//                                             AMREX_INT_ANYD(mybx.hiVect()), 
-//                                             BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(sly[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(sry[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(simhy[mfi]));
-
-//                 // z-direction
-// #pragma gpu box(mzbx)
-//                 make_edge_scal_merge_3d(AMREX_INT_ANYD(mzbx.loVect()),
-//                                             AMREX_INT_ANYD(mzbx.hiVect()),
-//                                             BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slz[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(srz[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(simhz[mfi]));
 
                 // simhxy
                 Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
