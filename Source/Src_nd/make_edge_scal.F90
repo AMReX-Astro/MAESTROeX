@@ -613,7 +613,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
                     end if
                     sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_EVEN) then
-                    sr(i,j,k) = sl(i+1,j,k)
+                    sr(i,j,k) = sl(i,j,k)
                  else if (adv_bc(1,2,bccomp) .eq. REFLECT_ODD) then
                     sl(i,j,k) = 0.d0
                     sr(i,j,k) = 0.d0
@@ -733,8 +733,8 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
               ! impose lo side bc's
               if (k .eq. domlo(3)) then
                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    sl(i,j,k) = s(i,j,k,comp)
-                    sr(i,j,k) = s(i,j,k,comp)
+                    sl(i,j,k) = s(i,j,k-1,comp)
+                    sr(i,j,k) = s(i,j,k-1,comp)
                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
                     if (is_vel .eq. 1 .and. comp .eq. 3) then
