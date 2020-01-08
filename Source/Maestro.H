@@ -74,7 +74,7 @@ public:
     /// Dump build info
     static void WriteBuildInfo ();
 
-private:
+// private:
 
     /*
       private member functions
@@ -170,9 +170,9 @@ private:
     /// @param start_bccomp     index of component of `bcs` to begin with
     /// @param num_comp         number of components to perform calculation for
     /// @param is_conservative  are these conserved quantities?
-    void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
+    void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative);
