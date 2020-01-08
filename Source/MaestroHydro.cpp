@@ -1592,8 +1592,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 
                 int ilo = domainBox.loVect()[0];
                 int ihi = domainBox.hiVect()[0];
-                int bclo = bcs[scomp-1].lo()[0];
-                int bchi = bcs[scomp-1].hi()[0];
+                int bclo = bcs[bccomp-1].lo()[0];
+                int bchi = bcs[bccomp-1].hi()[0];
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {
                     // impose lo side bc's
@@ -1619,7 +1619,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                             srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1);
                         } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                             if (is_vel == 1 && scomp-1 == 0) {
-                                slx_arr(ihi,j,k) = max(slx_arr(i,j,k), 0.0);
+                                slx_arr(i,j,k) = max(slx_arr(i,j,k), 0.0);
                             }
                             srx_arr(i,j,k) = slx_arr(i,j,k);
                         } else if (bchi == REFLECT_EVEN) {
@@ -1634,8 +1634,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 
                 int jlo = domainBox.loVect()[1];
                 int jhi = domainBox.hiVect()[1];
-                bclo = bcs[scomp-1].lo()[1];
-                bchi = bcs[scomp-1].hi()[1];
+                bclo = bcs[bccomp-1].lo()[1];
+                bchi = bcs[bccomp-1].hi()[1];
                 AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
                 {
                     // impose lo side bc's
@@ -1676,26 +1676,26 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 
                 int klo = domainBox.loVect()[2];
                 int khi = domainBox.hiVect()[2];
-                bclo = bcs[scomp-1].lo()[2];
-                bchi = bcs[scomp-1].hi()[2];
+                bclo = bcs[bccomp-1].lo()[2];
+                bchi = bcs[bccomp-1].hi()[2];
                 AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
                 {
                     // impose lo side bc's
                     if (k == klo) {
-                        if (bclo == EXT_DIR) {
-                            slx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
-                            srx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
-                        } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
-                            if (is_vel == 1 && scomp-1 == 2) {
-                                srx_arr(i,j,k) = min(srx_arr(i,j,k), 0.0);
-                            }
-                            slx_arr(i,j,k) = srx_arr(i,j,k);
-                        } else if (bclo == REFLECT_EVEN) {
-                            slx_arr(i,j,k) = srx_arr(i,j,k);
-                        } else if (bclo == REFLECT_ODD) {
-                            slx_arr(i,j,k) = 0.0;
-                            srx_arr(i,j,k) = 0.0;
-                        }
+                        // if (bclo == EXT_DIR) {
+                        //     slx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
+                        //     srx_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1);
+                        // } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                        //     if (is_vel == 1 && scomp-1 == 2) {
+                        //         srx_arr(i,j,k) = min(srx_arr(i,j,k), 0.0);
+                        //     }
+                        //     slx_arr(i,j,k) = srx_arr(i,j,k);
+                        // } else if (bclo == REFLECT_EVEN) {
+                        //     slx_arr(i,j,k) = srx_arr(i,j,k);
+                        // } else if (bclo == REFLECT_ODD) {
+                        //     slx_arr(i,j,k) = 0.0;
+                        //     srx_arr(i,j,k) = 0.0;
+                        // }
                     // impose hi side bc's
                     } else if (k == khi+1) {
                         if (bchi == EXT_DIR) {
@@ -1734,7 +1734,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 //                                             AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
 //                                             nbccomp, scomp, bccomp);
 
-//                 // y-direction
+                // y-direction
 // #pragma gpu box(mybx)
 //                 make_edge_scal_predictor_3d(AMREX_INT_ANYD(mybx.loVect()),
 //                                             AMREX_INT_ANYD(mybx.hiVect()), 2,
@@ -1752,23 +1752,23 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 //                                             AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
 //                                             nbccomp, scomp, bccomp);
 
-//                 // z-direction
-// #pragma gpu box(mzbx)
-//                 make_edge_scal_predictor_3d(AMREX_INT_ANYD(mzbx.loVect()),
-//                                             AMREX_INT_ANYD(mzbx.hiVect()), 3,
-//                                             AMREX_INT_ANYD(domainBox.loVect()),
-//                                             AMREX_INT_ANYD(domainBox.hiVect()),
-//                                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                             BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slopez[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(slz[mfi]),
-//                                             BL_TO_FORTRAN_ANYD(srz[mfi]),
-//                                             AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                             nbccomp, scomp, bccomp);
+                // z-direction
+#pragma gpu box(mzbx)
+                make_edge_scal_predictor_3d(AMREX_INT_ANYD(mzbx.loVect()),
+                                            AMREX_INT_ANYD(mzbx.hiVect()), 3,
+                                            AMREX_INT_ANYD(domainBox.loVect()),
+                                            AMREX_INT_ANYD(domainBox.hiVect()),
+                                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+                                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+                                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slopez[mfi]),
+                                            BL_TO_FORTRAN_ANYD(slz[mfi]),
+                                            BL_TO_FORTRAN_ANYD(srz[mfi]),
+                                            AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+                                            nbccomp, scomp, bccomp);
 
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {

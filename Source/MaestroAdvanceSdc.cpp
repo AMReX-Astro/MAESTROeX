@@ -188,6 +188,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // initialize intra_rhoh0
         intra_rhoh0[lev].setVal(0.);
+
+        rho_Hext[lev].setVal(0.);
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -327,7 +329,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     if (evolve_base_state && !split_projection) {
         for (int i=0; i<Sbar.size(); ++i) {
-            Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+                Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
         }
     }
 

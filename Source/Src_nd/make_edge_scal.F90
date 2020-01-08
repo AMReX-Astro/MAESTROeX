@@ -653,52 +653,52 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
             !     sr(i,j,k) = Im(i,j  ,k,2)
             !  end if
 
-             ! impose lo side bc's
-!              if (j .eq. domlo(2)) then
-!                 if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
-!                    sl(i,j,k) = s(i,j-1,k,comp)
-!                    sr(i,j,k) = s(i,j-1,k,comp)
-!                 else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
-!                      adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
-!                    if (is_vel .eq. 1 .and. comp .eq. 2) then
-!                       sr(i,j,k) = min(sr(i,j,k),0.d0)
-!                    end if
-!                    sl(i,j,k) = sr(i,j,k)
-!                 else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
-!                    sl(i,j,k) = sr(i,j,k)
-!                 else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
-!                    sl(i,j,k) = 0.d0
-!                    sr(i,j,k) = 0.d0
-!                 else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
-!                 else
-! #ifndef AMREX_USE_GPU
-!                    call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
-! #endif
-!                 end if
+            !  impose lo side bc's
+             if (j .eq. domlo(2)) then
+                if (adv_bc(2,1,bccomp) .eq. EXT_DIR) then
+                   sl(i,j,k) = s(i,j-1,k,comp)
+                   sr(i,j,k) = s(i,j-1,k,comp)
+                else if (adv_bc(2,1,bccomp) .eq. FOEXTRAP .or. &
+                     adv_bc(2,1,bccomp) .eq. HOEXTRAP) then
+                   if (is_vel .eq. 1 .and. comp .eq. 2) then
+                      sr(i,j,k) = min(sr(i,j,k),0.d0)
+                   end if
+                   sl(i,j,k) = sr(i,j,k)
+                else if (adv_bc(2,1,bccomp) .eq. REFLECT_EVEN) then
+                   sl(i,j,k) = sr(i,j,k)
+                else if (adv_bc(2,1,bccomp) .eq. REFLECT_ODD) then
+                   sl(i,j,k) = 0.d0
+                   sr(i,j,k) = 0.d0
+                else if (adv_bc(2,1,bccomp) .eq. INT_DIR) then
+                else
+#ifndef AMREX_USE_GPU
+                   call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,1)")
+#endif
+                end if
 
-!              ! impose hi side bc's
-!              else if (j .eq. domhi(2)+1) then
-!                 if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
-!                    sl(i,j,k) = s(i,j,k,comp)
-!                    sr(i,j,k) = s(i,j,k,comp)
-!                 else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
-!                      adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
-!                    if (is_vel .eq. 1 .and. comp .eq. 2) then
-!                       sl(i,j,k) = max(sl(i,j,k),0.d0)
-!                    end if
-!                    sr(i,j,k) = sl(i,j,k)
-!                 else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
-!                    sr(i,j,k) = sl(i,j,k)
-!                 else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
-!                    sl(i,j,k) = 0.d0
-!                    sr(i,j,k) = 0.d0
-!                 else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
-!                 else
-! #ifndef AMREX_USE_GPU
-!                    call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
-! #endif
-!                 end if
-!              end if
+             ! impose hi side bc's
+             else if (j .eq. domhi(2)+1) then
+                if (adv_bc(2,2,bccomp) .eq. EXT_DIR) then
+                   sl(i,j,k) = s(i,j,k,comp)
+                   sr(i,j,k) = s(i,j,k,comp)
+                else if (adv_bc(2,2,bccomp) .eq. FOEXTRAP .or. &
+                     adv_bc(2,2,bccomp) .eq. HOEXTRAP) then
+                   if (is_vel .eq. 1 .and. comp .eq. 2) then
+                      sl(i,j,k) = max(sl(i,j,k),0.d0)
+                   end if
+                   sr(i,j,k) = sl(i,j,k)
+                else if (adv_bc(2,2,bccomp) .eq. REFLECT_EVEN) then
+                   sr(i,j,k) = sl(i,j,k)
+                else if (adv_bc(2,2,bccomp) .eq. REFLECT_ODD) then
+                   sl(i,j,k) = 0.d0
+                   sr(i,j,k) = 0.d0
+                else if (adv_bc(2,2,bccomp) .eq. INT_DIR) then
+                else
+#ifndef AMREX_USE_GPU
+                   call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(2,2)")
+#endif
+                end if
+             end if
 
              ! make simhy by solving Riemann problem
             !  simh(i,j,k) = merge(sl(i,j,k),sr(i,j,k),vmac(i,j,k) .gt. 0.d0)
@@ -728,30 +728,30 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
             !     sr(i,j,k) = Im(i,j,k  ,3)
             !  end if
 
-             ! impose lo side bc's
-!              if (k .eq. domlo(3)) then
-!                 if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-!                    sl(i,j,k) = s(i,j,k,comp)
-!                    sr(i,j,k) = s(i,j,k,comp)
-!                 else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-!                      adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-!                    if (is_vel .eq. 1 .and. comp .eq. 3) then
-!                       sr(i,j,k) = min(sr(i,j,k),0.d0)
-!                    end if
-!                    sl(i,j,k) = sr(i,j,k)
-!                 else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-!                    sl(i,j,k) = sr(i,j,k)
-!                 else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-!                    sl(i,j,k) = 0.d0
-!                    sr(i,j,k) = 0.d0
-!                 else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
-!                 else
-! #ifndef AMREX_USE_GPU
-!                    call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-! #endif
-!                 end if
+            !  impose lo side bc's
+             if (k .eq. domlo(3)) then
+                if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+                   sl(i,j,k) = s(i,j,k-1,comp)
+                   sr(i,j,k) = s(i,j,k-1,comp)
+                else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+                     adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+                   if (is_vel .eq. 1 .and. comp .eq. 3) then
+                      sr(i,j,k) = min(sr(i,j,k),0.d0)
+                   end if
+                   sl(i,j,k) = sr(i,j,k)
+                else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
+                   sl(i,j,k) = sr(i,j,k)
+                else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+                   sl(i,j,k) = 0.d0
+                   sr(i,j,k) = 0.d0
+                else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+                else
+#ifndef AMREX_USE_GPU
+                   call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+#endif
+                end if
 
-!              ! impose hi side bc's
+             ! impose hi side bc's
 !              else if (k .eq. domhi(3)+1) then
 !                 if (adv_bc(3,2,bccomp) .eq. EXT_DIR) then
 !                    sl(i,j,k) = s(i,j,k,comp)
@@ -773,7 +773,7 @@ subroutine make_edge_scal_predictor_3d(lo, hi, idir, domlo, domhi, &
 !                    call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,2)")
 ! #endif
 !                 end if
-!              end if
+             end if
 
              ! make simhz by solving Riemann problem
             !  simh(i,j,k) = merge(sl(i,j,k),sr(i,j,k),wmac(i,j,k) .gt. 0.d0)

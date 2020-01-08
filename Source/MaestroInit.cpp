@@ -1,6 +1,7 @@
 
 #include <Maestro.H>
 #include <Maestro_F.H>
+#include <model_parser_F.H>
 #include <AMReX_VisMF.H>
 using namespace amrex;
 
@@ -44,6 +45,12 @@ Maestro::Init ()
     }
     else {
         Print() << "Initializing from checkpoint " << restart_file << std::endl;
+
+        const int model_file_length = model_file.length();
+        Vector<int> model_file_name(model_file_length);
+        for (int i = 0; i < model_file_length; i++)
+            model_file_name[i] = model_file[i];
+        ca_read_model_file(model_file_name.dataPtr(), &model_file_length);
 
         // read in checkpoint file
         // this builds (defines) and fills the following MultiFabs:

@@ -485,10 +485,7 @@ extern "C"
 			    const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi,
 			    const amrex::Real* normal,  const int* n_lo,  const int* n_hi,
 			    amrex::Real* eta_cart, const int* e_lo,  const int* e_hi,
-			    const amrex::Real* rho0_old, const amrex::Real* rho0_new,
-			    const amrex::Real* dx,
-			    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
-			    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+			    const amrex::Real* rho0_nph_cart, const int* rp_lo, const int* rp_hi);
     //////////////////////
 
     //////////////////////
@@ -924,14 +921,11 @@ extern "C"
 #endif
 			const amrex::Real* dx);
 
-    void mult_beta0(const int* lev, const int* lo, const int* hi,
+    void mult_beta0(const int* lo, const int* hi, const int lev, 
+                    const int idir,
                     amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                    amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                    amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
                     const amrex::Real* beta0_edge,
-                    const amrex::Real* beta0, const int* mult_or_div);
+                    const amrex::Real* beta0, const int mult_or_div);
 
     void mac_bcoef_face(const int* lo, const int* hi,
             const int lev, const int idir,
