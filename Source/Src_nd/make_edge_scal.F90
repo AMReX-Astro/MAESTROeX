@@ -459,44 +459,6 @@ end subroutine make_edge_scal_2d
 #endif
 
 #if (AMREX_SPACEDIM == 3)
-subroutine make_divu(lo, hi, &
-     divu, d_lo, d_hi, &
-     umac,   u_lo, u_hi, &
-     vmac,   v_lo, v_hi, &
-     wmac,   w_lo, w_hi, &
-     dx, is_conservative) bind(C,name="make_divu")
-
-  integer         , intent(in   ) :: lo(3), hi(3)
-  integer         , intent(in   ) :: d_lo(3), d_hi(3)
-  integer         , intent(in   ) :: u_lo(3), u_hi(3)
-  integer         , intent(in   ) :: v_lo(3), v_hi(3)
-  integer         , intent(in   ) :: w_lo(3), w_hi(3)
-  double precision, intent(inout) :: divu(d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-  double precision, intent(in   ) :: umac  (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-  double precision, intent(in   ) :: vmac  (v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-  double precision, intent(in   ) :: wmac  (w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-  double precision, intent(in   ) :: dx(3)
-  integer, value, intent(in   ) :: is_conservative
-
-  integer :: i,j,k
-
-  !$gpu
-
-  if (is_conservative .eq. 1) then
-     do k=lo(3),hi(3)
-        do j=lo(2),hi(2)
-           do i=lo(1),hi(1)
-              divu(i,j,k) = (  umac(i+1,j,k)-umac(i,j,k) &
-                   + vmac(i,j+1,k)-vmac(i,j,k) &
-                   + wmac(i,j,k+1)-wmac(i,j,k) ) / dx(1)
-           end do
-        end do
-     end do
-  end if
-
-end subroutine make_divu
-
-
 subroutine make_edge_scal_transverse_3d(lo, hi, norm_dir, trans_dir, domlo, domhi, &
      s,      s_lo, s_hi, nc_s, &
      umac,   u_lo, u_hi, &

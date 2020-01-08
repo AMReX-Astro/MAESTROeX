@@ -44,34 +44,6 @@ extern "C"
                     const int is_conservative);
 
 #elif (AMREX_SPACEDIM == 3)
-    void make_divu(const int* lo, const int* hi,
-                      amrex::Real* divu, const int* d_lo, const int* d_hi,
-                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-                      const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
-                      const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-                      const amrex::Real* dx, const int is_conservative);
-
-    void make_edge_scal_predictor_3d(const int* lo, const int* hi,
-                      const int idir,
-                      const int* domlo, const int* domhi,
-                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s,
-                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-                      const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
-                      const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
-                      const amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
-                      const amrex::Real* Im, const int* im_lo, const int* im_hi,
-                      const amrex::Real* slopez, const int* slo_lo, const int* slo_hi,
-                      amrex::Real* sl, const int* sl_lo, const int* sl_hi,
-                      amrex::Real* sr, const int* sr_lo, const int* sr_hi,
-                      const amrex::Real* dx, const amrex::Real dt, const int is_vel,
-                      const int* adv_bc, const int nbccomp, const int comp, const int bccomp);
-
-    void make_edge_scal_merge_3d(const int* lo, const int* hi,
-                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-                      const amrex::Real* sl, const int* sl_lo, const int* sl_hi,
-                      const amrex::Real* sr, const int* sr_lo, const int* sr_hi,
-                      amrex::Real* simh, const int* si_lo, const int* si_hi);
-
     void make_edge_scal_transverse_3d(const int* lo, const int* hi,
                       const int norm_dir, const int trans_dir,
                       const int* domlo, const int* domhi,

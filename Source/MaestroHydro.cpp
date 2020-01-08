@@ -1434,14 +1434,23 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 const Box& mybx = amrex::growLo(obx, 1, -1);
                 const Box& mzbx = amrex::growLo(obx, 2, -1);
 
-#pragma gpu box(obx)
-                make_divu(AMREX_INT_ANYD(obx.loVect()),
-                          AMREX_INT_ANYD(obx.hiVect()),
-                          BL_TO_FORTRAN_ANYD(divu[mfi]),
-                          BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                          AMREX_REAL_ANYD(dx), is_conservative);
+                // make divu 
+                if (is_conservative == 1) {
+
+                    Array4<Real> const divu_arr = divu.array(mfi);
+                    Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
+                    Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
+                    Array4<Real> const wmac_arr = (umac[lev][2]).array(mfi);
+
+                    AMREX_PARALLEL_FOR_3D(obx, i, j, k, 
+                    {
+                        divu_arr(i,j,k) = 
+                            umac_arr(i+1,j,k) - umac_arr(i,j,k) +
+                            vmac_arr(i,j+1,k) - vmac_arr(i,j,k) +
+                            wmac_arr(i,j,k+1) - wmac_arr(i,j,k);
+                        divu_arr(i,j,k) /= dx[0];
+                    });
+                }
                           
                 // x-direction
                 if (ppm_type == 0) {
@@ -1559,8 +1568,10 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {
                     if (ppm_type_local == 0) {
-                        slx_arr(i,j,k) = scal_arr(i-1,j,k,scomp-1) + 0.5 * (1.0 - dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i-1,j,k,0);
-                        srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i,j,k,0);
+                        slx_arr(i,j,k) = scal_arr(i-1,j,k,scomp-1) + 
+                            0.5 * (1.0 - dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i-1,j,k,0);
+                        srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
+                            0.5 * (1.0 + dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slx_arr(i,j,k) = Ip_arr(i-1,j,k,0);
                         srx_arr(i,j,k) = Im_arr(i,j,k,0);
@@ -1571,8 +1582,10 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
                 {
                     if (ppm_type_local == 0) {
-                        sly_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1) + 0.5 * (1.0 - dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j-1,k,0);
-                        sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j,k,0);
+                        sly_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1) + 
+                            0.5 * (1.0 - dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j-1,k,0);
+                        sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
+                            0.5 * (1.0 + dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         sly_arr(i,j,k) = Ip_arr(i,j-1,k,1);
                         sry_arr(i,j,k) = Im_arr(i,j,k,1);
@@ -1583,8 +1596,10 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
                 {
                     if (ppm_type_local == 0) {
-                        slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1) + 0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k-1);
-                        srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 0.5 * (1.0 + dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k);
+                        slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1) + 
+                            0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k-1);
+                        srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
+                            0.5 * (1.0 + dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slz_arr(i,j,k) = Ip_arr(i,j,k-1,2);
                         srz_arr(i,j,k) = Im_arr(i,j,k,2);
@@ -1720,22 +1735,28 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 // make simhx by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {
-                    simhx_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ? slx_arr(i,j,k) : srx_arr(i,j,k);
-                    simhx_arr(i,j,k) = (abs(umac_arr(i,j,k)) > 0.0) ? simhx_arr(i,j,k) : 0.5 * (slx_arr(i,j,k) + srx_arr(i,j,k));
+                    simhx_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ? 
+                        slx_arr(i,j,k) : srx_arr(i,j,k);
+                    simhx_arr(i,j,k) = (abs(umac_arr(i,j,k)) > 0.0) ? 
+                        simhx_arr(i,j,k) : 0.5 * (slx_arr(i,j,k) + srx_arr(i,j,k));
                 });
 
                 // make simhy by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
                 {
-                    simhy_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ? sly_arr(i,j,k) : sry_arr(i,j,k);
-                    simhy_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > 0.0) ? simhy_arr(i,j,k) : 0.5 * (sly_arr(i,j,k) + sry_arr(i,j,k));
+                    simhy_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ? 
+                        sly_arr(i,j,k) : sry_arr(i,j,k);
+                    simhy_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > 0.0) ? 
+                        simhy_arr(i,j,k) : 0.5 * (sly_arr(i,j,k) + sry_arr(i,j,k));
                 });
 
                 // make simhz by solving Riemann problem
                 AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
                 {
-                    simhz_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ? slz_arr(i,j,k) : srz_arr(i,j,k);
-                    simhz_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > 0.0) ? simhz_arr(i,j,k) : 0.5 * (slz_arr(i,j,k) + srz_arr(i,j,k));
+                    simhz_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ? 
+                        slz_arr(i,j,k) : srz_arr(i,j,k);
+                    simhz_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > 0.0) ?
+                        simhz_arr(i,j,k) : 0.5 * (slz_arr(i,j,k) + srz_arr(i,j,k));
                 });
 
 
