@@ -1185,6 +1185,10 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         sry.setVal(0.);
         simhy.setVal(0.);
 
+        MultiFab sl, sr;
+        sl.define(grids[lev],dmap[lev],1,1);
+        sr.define(grids[lev],dmap[lev],1,1);
+
 #if (AMREX_SPACEDIM == 3)
         MultiFab& sedgez_mf = sedge[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
@@ -1526,6 +1530,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 }
             }
 
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -1563,6 +1568,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 Array4<Real> const slopez_arr = slopez.array(mfi);
 
                 Real ppm_type_local = ppm_type;
+                Real rel_eps;
+                get_rel_eps(&rel_eps);
 
                 // loop over appropriate x-faces
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
@@ -1759,162 +1766,540 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                         simhz_arr(i,j,k) : 0.5 * (slz_arr(i,j,k) + srz_arr(i,j,k));
                 });
 
+                ////////////////////////////////////////////////////////
+                // Create transverse terms, s_{\i-\half\e_x}^{x|y}, etc.
+                ////////////////////////////////////////////////////////
+                Real dt2 = 0.5 * dt;
+                Real dt3 = dt / 3.0;
+                Real dt4 = 0.25 * dt;
+                Real dt6 = dt / 6.0;
+
+                Array4<Real> const divu_arr = divu.array(mfi);
+                Array4<Real> const simhxy_arr = simhxy.array(mfi);
+                Array4<Real> const sl_arr = sl.array(mfi);
+                Array4<Real> const sr_arr = sr.array(mfi);
+
+                Real slxy, srxy;
 
                 // simhxy
                 Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
                 imhbox = amrex::growHi(imhbox, 0, 1);
                 // Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+                bclo = bcs[bccomp-1].lo()[0];
+                bchi = bcs[bccomp-1].hi()[0];
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    
+                    // loop over appropriate xy faces
+                    if (is_conservative == 1) {
+                        // make slxy, srxy by updating 1D extrapolation
+                        slxy = slx_arr(i,j,k) 
+                            - (dt3/dx[1]) * (simhy_arr(i-1,j+1,k)*vmac_arr(i-1,j+1,k) 
+                            - simhy_arr(i-1,j,k)*vmac_arr(i-1,j,k)) 
+                            - dt3*scal_arr(i-1,j,k,scomp-1)*divu_arr(i-1,j,k) 
+                            + (dt3/dx[1])*scal_arr(i-1,j,k,scomp-1)*
+                            (vmac_arr(i-1,j+1,k)-vmac_arr(i-1,j,k));
+                        srxy = srx_arr(i,j,k) 
+                            - (dt3/dx[1])*(simhy_arr(i,j+1,k)*vmac_arr(i,j+1,k)
+                            - simhy_arr(i,j,k)*vmac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[1])*scal_arr(i,j,k,scomp-1)*
+                            (vmac_arr(i,j+1,k)-vmac_arr(i,j,k));
+                    } else {
+                        // make slxy, srxy by updating 1D extrapolation
+                        slxy = slx_arr(i,j,k) 
+                            - (dt6/dx[1])*(vmac_arr(i-1,j+1,k)+vmac_arr(i-1,j,k)) 
+                            *(simhy_arr(i-1,j+1,k)-simhy_arr(i-1,j,k));
+                        srxy = srx_arr(i,j,k) 
+                            - (dt6/dx[1])*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k)) 
+                            *(simhy_arr(i,j+1,k)-simhy_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (i == ilo) {
+                        if (bclo == EXT_DIR) {
+                            slxy = scal_arr(i-1,j,k,scomp-1);
+                            srxy = scal_arr(i-1,j,k,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                srxy = min(srxy,0.0);
+                            }
+                            slxy = srxy;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slxy = srxy;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slxy = 0.0;
+                            srxy = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (i == ihi+1) {
+                        if (bchi == EXT_DIR) {
+                            slxy = scal_arr(i,j,k,scomp-1);
+                            srxy = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                slxy = max(slxy,0.0);
+                            }
+                            srxy = slxy;
+                        } else if (bchi == REFLECT_EVEN) {
+                            srxy = slxy;
+                        } else if (bchi == REFLECT_ODD) {
+                            slxy = 0.0;
+                            srxy = 0.0;
+                        }
+                    }
+
+                    sl_arr(i,j,k) = slxy;
+                    sr_arr(i,j,k) = srxy;
+
+                    // make simhxy by solving Riemann problem
+                    simhxy_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ?
+                        slxy : srxy;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhxy_arr(i,j,k) = (abs(umac_arr(i,j,k)) > rel_eps) ?
+                    //     simhxy_arr(i,j,k) : 0.5 * (slxy + srxy);
+     
+                });
 
                 // simhxz
                 imhbox = amrex::grow(mfi.tilebox(), 1, 1);
                 imhbox = amrex::growHi(imhbox, 0, 1);
-                // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0)); 
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),1,3,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+                // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
+
+                Array4<Real> const simhxz_arr = simhxz.array(mfi);
+                Real slxz, srxz;
+
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    // loop over appropriate xz faces
+                    if (is_conservative == 1) {
+                        // make slxz, srxz by updating 1D extrapolation
+                        slxz = slx_arr(i,j,k) 
+                            - (dt3/dx[2]) * (simhz_arr(i-1,j,k+1)*wmac_arr(i-1,j,k+1) 
+                            - simhz_arr(i-1,j,k)*wmac_arr(i-1,j,k)) 
+                            - dt3*scal_arr(i-1,j,k,scomp-1)*divu_arr(i-1,j,k) 
+                            + (dt3/dx[2])*scal_arr(i-1,j,k,scomp-1)*
+                            (wmac_arr(i-1,j,k+1)-wmac_arr(i-1,j,k));
+                        srxz = srx_arr(i,j,k) 
+                            - (dt3/dx[2])*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
+                            - simhz_arr(i,j,k)*wmac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[2])*scal_arr(i,j,k,scomp-1)*
+                            (wmac_arr(i,j,k+1)-wmac_arr(i,j,k));
+                    } else {
+                        // make slxz, srxz by updating 1D extrapolation
+                        slxz = slx_arr(i,j,k) 
+                            - (dt6/dx[2])*(wmac_arr(i-1,j,k+1)+wmac_arr(i-1,j,k)) 
+                            *(simhz_arr(i-1,j,k+1)-simhz_arr(i-1,j,k));
+                        srxz = srx_arr(i,j,k) 
+                            - (dt6/dx[2])*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
+                            *(simhz_arr(i,j,k+1)-simhz_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (i == ilo) {
+                        if (bclo == EXT_DIR) {
+                            slxz = scal_arr(i-1,j,k,scomp-1);
+                            srxz = scal_arr(i-1,j,k,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                srxz = min(srxz,0.0);
+                            }
+                            slxz = srxz;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slxz = srxz;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slxz = 0.0;
+                            srxz = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (i == ihi+1) {
+                        if (bchi == EXT_DIR) {
+                            slxz = scal_arr(i,j,k,scomp-1);
+                            srxz = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                slxz = max(slxz,0.0);
+                            }
+                            srxz = slxz;
+                        } else if (bchi == REFLECT_EVEN) {
+                            srxz = slxz;
+                        } else if (bchi == REFLECT_ODD) {
+                            slxz = 0.0;
+                            srxz = 0.0;
+                        }
+                    }
+
+                    // make simhxy by solving Riemann problem
+                    simhxz_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ?
+                        slxz : srxz;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhxz_arr(i,j,k) = (abs(umac_arr(i,j,k)) > rel_eps) ?
+                    //     simhxz_arr(i,j,k) : 0.5 * (slxz + srxz);
+     
+                });
 
                 // simhyx
                 // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
                 imhbox = amrex::grow(mfi.tilebox(), 2, 1);
                 imhbox = amrex::growHi(imhbox, 1, 1);
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),2,1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+
+                Array4<Real> const simhyx_arr = simhyx.array(mfi);
+                Real slyx, sryx;
+
+                bclo = bcs[bccomp-1].lo()[1];
+                bchi = bcs[bccomp-1].hi()[1];
+
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    // loop over appropriate yx faces
+                    if (is_conservative == 1) {
+                        // make slyx, sryx by updating 1D extrapolation
+                        slyx = sly_arr(i,j,k) 
+                            - (dt3/dx[0]) * (simhx_arr(i+1,j-1,k)*umac_arr(i+1,j-1,k) 
+                            - simhx_arr(i,j-1,k)*umac_arr(i,j-1,k)) 
+                            - dt3*scal_arr(i,j-1,k,scomp-1)*divu_arr(i,j-1,k) 
+                            + (dt3/dx[0])*scal_arr(i,j-1,k,scomp-1)*
+                            (umac_arr(i+1,j-1,k)-umac_arr(i,j-1,k));
+                        sryx = sry_arr(i,j,k) 
+                            - (dt3/dx[0])*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
+                            - simhx_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[0])*scal_arr(i,j,k,scomp-1)*
+                            (umac_arr(i+1,j,k)-umac_arr(i,j,k));
+                    } else {
+                        // make slyx, sryx by updating 1D extrapolation
+                        slyx = sly_arr(i,j,k) 
+                            - (dt6/dx[0])*(umac_arr(i+1,j-1,k)+umac_arr(i,j-1,k)) 
+                            *(simhx_arr(i+1,j-1,k)-simhx_arr(i,j-1,k));
+                        sryx = sry_arr(i,j,k) 
+                            - (dt6/dx[0])*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
+                            *(simhx_arr(i+1,j,k)-simhx_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (j == jlo) {
+                        if (bclo == EXT_DIR) {
+                            slyx = scal_arr(i,j-1,k,scomp-1);
+                            sryx = scal_arr(i,j-1,k,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                sryx = min(sryx,0.0);
+                            }
+                            slyx = sryx;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slyx = sryx;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slyx = 0.0;
+                            sryx = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (j == jhi+1) {
+                        if (bchi == EXT_DIR) {
+                            slyx = scal_arr(i,j,k,scomp-1);
+                            sryx = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                slyx = max(slyx,0.0);
+                            }
+                            sryx = slyx;
+                        } else if (bchi == REFLECT_EVEN) {
+                            sryx = slyx;
+                        } else if (bchi == REFLECT_ODD) {
+                            slyx = 0.0;
+                            sryx = 0.0;
+                        }
+                    }
+
+                    // make simhxy by solving Riemann problem
+                    simhyx_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ?
+                        slyx : sryx;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhyx_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > rel_eps) ?
+                    //     simhyx_arr(i,j,k) : 0.5 * (slyx + sryx);
+     
+                });
 
                 // simhyz
                 // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
                 imhbox = amrex::grow(mfi.tilebox(), 0, 1);
                 imhbox = amrex::growHi(imhbox, 1, 1);
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),2,3,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+
+                Array4<Real> const simhyz_arr = simhyz.array(mfi);
+                Real slyz, sryz;
+
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    // loop over appropriate yz faces
+                    if (is_conservative == 1) {
+                        // make slyz, sryz by updating 1D extrapolation
+                        slyz = sly_arr(i,j,k) 
+                            - (dt3/dx[2]) * (simhz_arr(i,j-1,k+1)*wmac_arr(i,j-1,k+1) 
+                            - simhz_arr(i,j-1,k)*umac_arr(i,j-1,k)) 
+                            - dt3*scal_arr(i,j-1,k,scomp-1)*divu_arr(i,j-1,k) 
+                            + (dt3/dx[2])*scal_arr(i,j-1,k,scomp-1)*
+                            (wmac_arr(i,j-1,k+1)-wmac_arr(i,j-1,k));
+                        sryz = sry_arr(i,j,k) 
+                            - (dt3/dx[2])*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
+                            - simhz_arr(i,j,k)*wmac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[2])*scal_arr(i,j,k,scomp-1)*
+                            (wmac_arr(i,j,k+1)-wmac_arr(i,j,k));
+                    } else {
+                        // make slyz, sryz by updating 1D extrapolation
+                        slyz = sly_arr(i,j,k) 
+                            - (dt6/dx[2])*(wmac_arr(i,j-1,k+1)+wmac_arr(i,j-1,k)) 
+                            *(simhz_arr(i,j-1,k+1)-simhz_arr(i,j-1,k));
+                        sryz = sry_arr(i,j,k) 
+                            - (dt6/dx[2])*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
+                            *(simhz_arr(i,j,k+1)-simhz_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (j == jlo) {
+                        if (bclo == EXT_DIR) {
+                            slyz = scal_arr(i,j-1,k,scomp-1);
+                            sryz = scal_arr(i,j-1,k,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                sryz = min(sryz,0.0);
+                            }
+                            slyz = sryz;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slyz = sryz;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slyz = 0.0;
+                            sryz = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (j == jhi+1) {
+                        if (bchi == EXT_DIR) {
+                            slyz = scal_arr(i,j,k,scomp-1);
+                            sryz = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                slyz = max(slyz,0.0);
+                            }
+                            sryz = slyz;
+                        } else if (bchi == REFLECT_EVEN) {
+                            sryz = slyz;
+                        } else if (bchi == REFLECT_ODD) {
+                            slyz = 0.0;
+                            sryz = 0.0;
+                        }
+                    }
+
+                    // make simhyz by solving Riemann problem
+                    simhyz_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ?
+                        slyz : sryz;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhyz_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > rel_eps) ?
+                    //     simhyz_arr(i,j,k) : 0.5 * (slyz + sryz);
+     
+                });
 
                 // simhzx
                 // imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
                 imhbox = amrex::grow(mfi.tilebox(), 1, 1);
                 imhbox = amrex::growHi(imhbox, 2, 1);
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+
+                Array4<Real> const simhzx_arr = simhzx.array(mfi);
+                Real slzx, srzx;
+
+                bclo = bcs[bccomp-1].lo()[2];
+                bchi = bcs[bccomp-1].hi()[2];
+
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    // loop over appropriate zx faces
+                    if (is_conservative == 1) {
+                        // make slzx, srzx by updating 1D extrapolation
+                        slzx = slz_arr(i,j,k) 
+                            - (dt3/dx[0]) * (simhx_arr(i+1,j,k-1)*umac_arr(i+1,j,k-1) 
+                            - simhx_arr(i,j,k-1)*umac_arr(i,j,k-1)) 
+                            - dt3*scal_arr(i,j,k-1,scomp-1)*divu_arr(i,j,k-1) 
+                            + (dt3/dx[0])*scal_arr(i,j,k-1,scomp-1)*
+                            (umac_arr(i+1,j,k-1)-umac_arr(i,j,k-1));
+                        srzx = srz_arr(i,j,k) 
+                            - (dt3/dx[0])*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
+                            - simhx_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[0])*scal_arr(i,j,k,scomp-1)*
+                            (umac_arr(i+1,j,k)-umac_arr(i,j,k));
+                    } else {
+                        // make slzx, srzx by updating 1D extrapolation
+                        slzx = slz_arr(i,j,k) 
+                            - (dt6/dx[0])*(umac_arr(i+1,j,k-1)+umac_arr(i,j,k-1)) 
+                            *(simhx_arr(i+1,j,k-1)-simhx_arr(i,j,k-1));
+                        srzx = srz_arr(i,j,k) 
+                            - (dt6/dx[0])*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
+                            *(simhx_arr(i+1,j,k)-simhx_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (k == klo) {
+                        if (bclo == EXT_DIR) {
+                            slzx = scal_arr(i,j,k-1,scomp-1);
+                            srzx = scal_arr(i,j,k-1,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                srzx = min(srzx,0.0);
+                            }
+                            slzx = srzx;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slzx = srzx;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slzx = 0.0;
+                            srzx = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (k == khi+1) {
+                        if (bchi == EXT_DIR) {
+                            slzx = scal_arr(i,j,k,scomp-1);
+                            srzx = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                slzx = max(slzx,0.0);
+                            }
+                            srzx = slzx;
+                        } else if (bchi == REFLECT_EVEN) {
+                            srzx = slzx;
+                        } else if (bchi == REFLECT_ODD) {
+                            slzx = 0.0;
+                            srzx = 0.0;
+                        }
+                    }
+
+                    // make simhzx by solving Riemann problem
+                    simhzx_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ?
+                        slzx : srzx;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhzx_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > rel_eps) ?
+                    //     simhzx_arr(i,j,k) : 0.5 * (slzx + srzx);
+     
+                });
 
                 // simhzy
                 // imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
                 imhbox = amrex::grow(mfi.tilebox(), 0, 1);
                 imhbox = amrex::growHi(imhbox, 2, 1);
-#pragma gpu box(imhbox)
-                make_edge_scal_transverse_3d(
-                    AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(divu[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    BL_TO_FORTRAN_ANYD(slz[mfi]),
-                    BL_TO_FORTRAN_ANYD(srz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhz[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp, is_conservative);
+
+                Array4<Real> const simhzy_arr = simhzy.array(mfi);
+                Real slzy, srzy;
+
+                AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+                {
+                    // loop over appropriate zy faces
+                    if (is_conservative == 1) {
+                        // make slzy, srzy by updating 1D extrapolation
+                        slzy = slz_arr(i,j,k) 
+                            - (dt3/dx[1]) * (simhy_arr(i,j+1,k-1)*umac_arr(i,j+1,k-1) 
+                            - simhy_arr(i,j,k-1)*umac_arr(i,j,k-1)) 
+                            - dt3*scal_arr(i,j,k-1,scomp-1)*divu_arr(i,j,k-1) 
+                            + (dt3/dx[1])*scal_arr(i,j,k-1,scomp-1)*
+                            (umac_arr(i,j+1,k-1)-umac_arr(i,j,k-1));
+                        srzy = srz_arr(i,j,k) 
+                            - (dt3/dx[1])*(simhy_arr(i,j+1,k)*umac_arr(i,j+1,k)
+                            - simhy_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
+                            + (dt3/dx[1])*scal_arr(i,j,k,scomp-1)*
+                            (umac_arr(i,j+1,k)-umac_arr(i,j,k));
+                    } else {
+                        // make slzy, srzy by updating 1D extrapolation
+                        slzy = slz_arr(i,j,k) 
+                            - (dt6/dx[1])*(umac_arr(i,j+1,k-1)+umac_arr(i,j,k-1)) 
+                            *(simhy_arr(i,j+1,k-1)-simhy_arr(i,j,k-1));
+                        srzy = srz_arr(i,j,k) 
+                            - (dt6/dx[1])*(umac_arr(i,j+1,k)+umac_arr(i,j,k)) 
+                            *(simhy_arr(i,j+1,k)-simhy_arr(i,j,k));
+                    }
+
+                    // impose lo side bc's
+                    if (k == klo) {
+                        if (bclo == EXT_DIR) {
+                            slzy = scal_arr(i,j,k-1,scomp-1);
+                            srzy = scal_arr(i,j,k-1,scomp-1);
+                        } else if (bclo ==  FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                srzy = min(srzy,0.0);
+                            }
+                            slzy = srzy;
+                        } else if (bclo == REFLECT_EVEN) {
+                            slzy = srzy;
+                        } else if (bclo ==  REFLECT_ODD) {
+                            slzy = 0.0;
+                            srzy = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (k == khi+1) {
+                        if (bchi == EXT_DIR) {
+                            slzy = scal_arr(i,j,k,scomp-1);
+                            srzy = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                slzy = max(slzy,0.0);
+                            }
+                            srzy = slzy;
+                        } else if (bchi == REFLECT_EVEN) {
+                            srzy = slzy;
+                        } else if (bchi == REFLECT_ODD) {
+                            slzy = 0.0;
+                            srzy = 0.0;
+                        }
+                    }
+
+                    // make simhzy by solving Riemann problem
+                    simhzy_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ?
+                        slzy : srzy;
+
+                    // NOTE: this should be here but for some reason 
+                    // it doesn't agree with the dev results
+                    // simhzy_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > rel_eps) ?
+                    //     simhzy_arr(i,j,k) : 0.5 * (slzy + srzy);
+     
+                });
+
+
+
+// #pragma gpu box(imhbox)
+//                 make_edge_scal_transverse_3d(
+//                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,2,
+//                     AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+//                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+//                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(divu[mfi]),
+//                     BL_TO_FORTRAN_ANYD(slx[mfi]),
+//                     BL_TO_FORTRAN_ANYD(srx[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhx[mfi]),
+//                     BL_TO_FORTRAN_ANYD(sly[mfi]),
+//                     BL_TO_FORTRAN_ANYD(sry[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhy[mfi]),
+//                     BL_TO_FORTRAN_ANYD(slz[mfi]),
+//                     BL_TO_FORTRAN_ANYD(srz[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhz[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhzy[mfi]),
+//                     AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                     nbccomp, scomp, bccomp, is_conservative,
+//                     BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                     BL_TO_FORTRAN_ANYD(sr[mfi]));
 
                 // x-direction
 #pragma gpu box(xbx)
