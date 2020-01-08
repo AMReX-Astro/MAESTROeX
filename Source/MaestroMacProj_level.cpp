@@ -250,25 +250,40 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
-            const Box& tileBox = mfi.tilebox();
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+#if (AMREX_SPACEDIM == 3)
+            const Box& zbx = mfi.nodaltilebox(2);
+#endif
 
             // call fortran subroutine
-            mult_beta0(&lev,ARLIM_3D(tileBox.loVect()),ARLIM_3D(tileBox.hiVect()),
-                       BL_TO_FORTRAN_3D(xedge_mf[mfi]),
-                       BL_TO_FORTRAN_3D(yedge_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                       BL_TO_FORTRAN_3D(zedge_mf[mfi]),
-#endif
+#pragma gpu(xbx)
+            mult_beta0(AMREX_INT_ANYD(xbx.loVect()),
+                       AMREX_INT_ANYD(xbx.hiVect()),lev,1,
+                       BL_TO_FORTRAN_ANYD(xedge_mf[mfi]),
                        beta0_edge.dataPtr(),
-                       beta0.dataPtr(), &mult_or_div);
+                       beta0.dataPtr(), mult_or_div);
+#pragma gpu(ybx)
+            mult_beta0(AMREX_INT_ANYD(ybx.loVect()),
+                       AMREX_INT_ANYD(ybx.hiVect()),lev,2,
+                       BL_TO_FORTRAN_ANYD(yedge_mf[mfi]),
+                       beta0_edge.dataPtr(),
+                       beta0.dataPtr(), mult_or_div);
+
+#if (AMREX_SPACEDIM == 3)
+#pragma gpu(zbx)
+            mult_beta0(AMREX_INT_ANYD(zbx.loVect()),
+                       AMREX_INT_ANYD(zbx.hiVect()),lev,3,
+                       BL_TO_FORTRAN_ANYD(zedge_mf[mfi]),
+                       beta0_edge.dataPtr(),
+                       beta0.dataPtr(), mult_or_div);
+#endif
 
         }
     }
-
-
 }
 
 // compute the RHS for the solve, RHS = macrhs - div(beta0*umac)

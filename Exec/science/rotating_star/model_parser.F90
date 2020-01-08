@@ -48,11 +48,11 @@ module model_parser_module
 
   integer, parameter :: MAX_VARNAME_LENGTH=80
 
-  public :: read_model_file, interpolate, close_model_file
+  public :: read_model_file, ca_read_model_file, interpolate, close_model_file
 
 contains
 
-  subroutine read_model_file(model_file)
+  subroutine read_model_file(model_file) 
 
     use amrex_constants_module
     use amrex_error_module
@@ -239,6 +239,29 @@ contains
     deallocate(vars_stored,varnames_stored)
 
   end subroutine read_model_file
+
+  subroutine ca_read_model_file(model_file, namelen) bind(C, name="ca_read_model_file")
+
+    use amrex_error_module, only: amrex_error
+
+    integer :: namelen 
+    integer :: model_file(namelen)
+
+    integer, parameter :: maxlen = 256 
+    character (len=maxlen) :: filename
+    integer :: i
+
+    if (namelen > maxlen) then 
+        call amrex_error("model file name too long")
+    end if
+
+    do i = 1, namelen
+        filename(i:i) = char(model_file(i))
+    end do
+
+    call read_model_file(filename(1:namelen))
+
+  end subroutine ca_read_model_file
 
 
   function get_model_npts(model_file)

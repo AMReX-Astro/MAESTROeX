@@ -314,22 +314,24 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // call fortran subroutine
 	    
             if (spherical == 1) {
-// #pragma gpu box(tileBox)
-                burner_loop_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				 BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(source_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(p0_cart_mf[mfi]), dt_in, time_in,
-				 BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+#pragma gpu box(tileBox)
+                burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), 
+                    AMREX_INT_ANYD(tileBox.hiVect()),
+                    BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(source_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(p0_cart_mf[mfi]), dt_in, time_in,
+                    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             } else {
-// #pragma gpu box(tileBox)
-                burner_loop(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			    lev,
-			    BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
-			    BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
-			    BL_TO_FORTRAN_ANYD(source_mf[mfi]), 
-			    p0.dataPtr(), dt_in, time_in,
-			    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+#pragma gpu box(tileBox)
+                burner_loop(AMREX_INT_ANYD(tileBox.loVect()), 
+                    AMREX_INT_ANYD(tileBox.hiVect()),
+                    lev,
+                    BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
+                    BL_TO_FORTRAN_ANYD(source_mf[mfi]), 
+                    p0.dataPtr(), dt_in, time_in,
+                    BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }
     }
@@ -366,16 +368,17 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
 
 		// Get the index space of the valid region
 		const Box& tileBox = mfi.tilebox();
-		const Real* dx = geom[lev].CellSize();
 		
 		// call fortran subroutine
 		// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 		// lo/hi coordinates (including ghost cells), and/or the # of components
 		// We will also pass "validBox", which specifies the "valid" region.
-		instantaneous_reaction_rates(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-					     BL_TO_FORTRAN_3D(rho_omegadot_mf[mfi]),
-					     BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-					     BL_TO_FORTRAN_3D(scal_mf[mfi]));
+#pragma gpu box(tileBox)
+		instantaneous_reaction_rates(AMREX_INT_ANYD(tileBox.loVect()), 
+                         AMREX_INT_ANYD(tileBox.hiVect()),
+					     BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+					     BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+					     BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
 	    }
 	}
     }

@@ -342,7 +342,7 @@ contains
        lev, &
        s_in,     i_lo, i_hi, &
        s_out,    o_lo, o_hi, &
-       source, s_lo, s_hi, &
+       source,   s_lo, s_hi, &
        p0_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
@@ -377,7 +377,9 @@ contains
     double precision :: sdc_rhoh
     double precision :: p0
     
-    type (sdc_t)       :: state_in, state_out
+    type (sdc_t)     :: state_in, state_out
+
+    !$gpu
 
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
@@ -395,7 +397,7 @@ contains
 #elif (AMREX_SPACEDIM == 3)
                 r = k
 #endif
-                sdc_rhoX(:) = source(i,j,k,spec_comp:spec_comp+nspec-1)
+                sdc_rhoX(1:nspec) = source(i,j,k,spec_comp:spec_comp+nspec-1)
                 sdc_rhoh = source(i,j,k,rhoh_comp)
 
                 p0 = p0_in(lev,r)
@@ -416,8 +418,8 @@ contains
                 ! if the threshold species is not in the network, then we burn
                 ! normally.  if it is in the network, make sure the mass
                 ! fraction is above the cutoff.
-                if ((rho_in > burning_cutoff_density_lo .and. rho_in < burning_cutoff_density_hi) .and.                &
-                     ( ispec_threshold < 0 .or.                       &
+                if ((rho_in > burning_cutoff_density_lo .and. rho_in < burning_cutoff_density_hi) .and. &
+                     ( ispec_threshold < 0 .or.  &
                      (ispec_threshold > 0 .and. x_test > burner_threshold_cutoff) ) ) then
 
                    state_in % p0  = p0
@@ -500,6 +502,8 @@ contains
 
     type (sdc_t)       :: state_in, state_out
 
+    !$gpu
+
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
@@ -512,7 +516,7 @@ contains
 
              if (cell_valid) then
                 
-                sdc_rhoX(:) = source(i,j,k,spec_comp:spec_comp+nspec-1)
+                sdc_rhoX(1:nspec) = source(i,j,k,spec_comp:spec_comp+nspec-1)
                 sdc_rhoh = source(i,j,k,rhoh_comp)
 
                 p0_in = p0_cart(i,j,k)
@@ -605,6 +609,8 @@ contains
     type (burn_t)    :: state
     type (eos_t)     :: eos_state
     double precision :: ydot(neqs)
+
+    !$gpu
 
     do k=lo(3),hi(3)
        do j=lo(2),hi(2)

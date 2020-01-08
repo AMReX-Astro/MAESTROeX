@@ -74,9 +74,19 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);
 
     Vector<MultiFab> eta_cart(finest_level+1);
+    Vector<MultiFab> rho0_nph_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         eta_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_nph_cart[lev].define(grids[lev],dmap[lev],1,0);
     }
+
+    RealVector rho0_nph( (max_radial_level+1)*nr_fine );
+
+    for (int i=0; i<rho0_nph.size(); ++i) {
+        rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
+    }
+
+    Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
 
 #if (AMREX_SPACEDIM == 3)
 
@@ -93,31 +103,34 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         const MultiFab& w0macz_mf = w0mac[lev][2];
         const MultiFab& normal_mf = normal[lev];
         MultiFab& etacart_mf = eta_cart[lev];
-        const MultiFab& cc_to_r = cell_cc_to_r[lev];
+        const MultiFab& rho0_nph_cart_mf = rho0_nph_cart[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(scalold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scalold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& validbox = mfi.validbox();
-            const Real* dx = geom[lev].CellSize();
+            const Box& tilebox = mfi.tilebox();
 
-            construct_eta_cart( validbox.loVect(), validbox.hiVect(),
+#pragma gpu box(tilebox)
+            construct_eta_cart( AMREX_INT_ANYD(tilebox.loVect()), AMREX_INT_ANYD(tilebox.hiVect()),
                                 scalold_mf[mfi].dataPtr(Rho),
-                                scalold_mf[mfi].loVect(), scalold_mf[mfi].hiVect(),
+                                AMREX_INT_ANYD(scalold_mf[mfi].loVect()), 
+                                AMREX_INT_ANYD(scalold_mf[mfi].hiVect()),
                                 scalnew_mf[mfi].dataPtr(Rho),
-                                scalnew_mf[mfi].loVect(), scalnew_mf[mfi].hiVect(),
-                                BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(wmac_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                                BL_TO_FORTRAN_3D(normal_mf[mfi]),
-                                BL_TO_FORTRAN_3D(etacart_mf[mfi]),
-                                rho0_old.dataPtr(), rho0_new.dataPtr(),
-                                dx, r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                                BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                                AMREX_INT_ANYD(scalnew_mf[mfi].loVect()), 
+                                AMREX_INT_ANYD(scalnew_mf[mfi].hiVect()),
+                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(etacart_mf[mfi]),
+                                BL_TO_FORTRAN_ANYD(rho0_nph_cart_mf[mfi]));
         }         // end MFIter loop
     }     // end loop over levels
 
