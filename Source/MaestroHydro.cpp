@@ -1185,10 +1185,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         sry.setVal(0.);
         simhy.setVal(0.);
 
-        MultiFab sl, sr;
-        sl.define(grids[lev],dmap[lev],1,1);
-        sr.define(grids[lev],dmap[lev],1,1);
-
 #if (AMREX_SPACEDIM == 3)
         MultiFab& sedgez_mf = sedge[lev][2];
         const MultiFab& wmac_mf   = umac[lev][2];
@@ -1209,6 +1205,13 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhyz.define(grids[lev],dmap[lev],1,1);
         simhzx.define(grids[lev],dmap[lev],1,1);
         simhzy.define(grids[lev],dmap[lev],1,1);
+
+        MultiFab sl, sr;
+        sl.define(grids[lev],dmap[lev],1,1);
+        sr.define(grids[lev],dmap[lev],1,1);
+        sl.setVal(0.);
+        sr.setVal(0);
+
 
         slx.setVal(0.);
         srx.setVal(0.);
@@ -1567,18 +1570,25 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 Array4<Real> const Im_arr = Im.array(mfi);
                 Array4<Real> const slopez_arr = slopez.array(mfi);
 
+                Array4<Real> const sl_arr = sl.array(mfi);
+                Array4<Real> const sr_arr = sr.array(mfi);
+
                 Real ppm_type_local = ppm_type;
                 Real rel_eps;
                 get_rel_eps(&rel_eps);
+
+                Real hx = dx[0];
+                Real hy = dx[1];
+                Real hz = dx[2];
 
                 // loop over appropriate x-faces
                 AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
                 {
                     if (ppm_type_local == 0) {
                         slx_arr(i,j,k) = scal_arr(i-1,j,k,scomp-1) + 
-                            0.5 * (1.0 - dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i-1,j,k,0);
+                            0.5 * (1.0 - dt * umac_arr(i,j,k) / hx) * Ip_arr(i-1,j,k,0);
                         srx_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
-                            0.5 * (1.0 + dt * umac_arr(i,j,k) / dx[0]) * Ip_arr(i,j,k,0);
+                            0.5 * (1.0 + dt * umac_arr(i,j,k) / hx) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slx_arr(i,j,k) = Ip_arr(i-1,j,k,0);
                         srx_arr(i,j,k) = Im_arr(i,j,k,0);
@@ -1590,9 +1600,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     if (ppm_type_local == 0) {
                         sly_arr(i,j,k) = scal_arr(i,j-1,k,scomp-1) + 
-                            0.5 * (1.0 - dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j-1,k,0);
+                            0.5 * (1.0 - dt * vmac_arr(i,j,k) / hy) * Ip_arr(i,j-1,k,0);
                         sry_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
-                            0.5 * (1.0 + dt * vmac_arr(i,j,k) / dx[1]) * Ip_arr(i,j,k,0);
+                            0.5 * (1.0 + dt * vmac_arr(i,j,k) / hy) * Ip_arr(i,j,k,0);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         sly_arr(i,j,k) = Ip_arr(i,j-1,k,1);
                         sry_arr(i,j,k) = Im_arr(i,j,k,1);
@@ -1604,9 +1614,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     if (ppm_type_local == 0) {
                         slz_arr(i,j,k) = scal_arr(i,j,k-1,scomp-1) + 
-                            0.5 * (1.0 - dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k-1);
+                            0.5 * (1.0 - dt * wmac_arr(i,j,k) / hz) * slopez_arr(i,j,k-1);
                         srz_arr(i,j,k) = scal_arr(i,j,k,scomp-1) - 
-                            0.5 * (1.0 + dt * wmac_arr(i,j,k) / dx[2]) * slopez_arr(i,j,k);
+                            0.5 * (1.0 + dt * wmac_arr(i,j,k) / hz) * slopez_arr(i,j,k);
                     } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                         slz_arr(i,j,k) = Ip_arr(i,j,k-1,2);
                         srz_arr(i,j,k) = Im_arr(i,j,k,2);
@@ -1776,44 +1786,45 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 Array4<Real> const divu_arr = divu.array(mfi);
                 Array4<Real> const simhxy_arr = simhxy.array(mfi);
-                Array4<Real> const sl_arr = sl.array(mfi);
-                Array4<Real> const sr_arr = sr.array(mfi);
-
-                Real slxy, srxy;
 
                 // simhxy
-                Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
-                imhbox = amrex::growHi(imhbox, 0, 1);
-                // Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
+                // Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+                // imhbox = amrex::growHi(imhbox, 0, 1);
+                Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
                 bclo = bcs[bccomp-1].lo()[0];
                 bchi = bcs[bccomp-1].hi()[0];
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slxy = 0.0;
+                    Real srxy = 0.0;
                     
                     // loop over appropriate xy faces
                     if (is_conservative == 1) {
                         // make slxy, srxy by updating 1D extrapolation
                         slxy = slx_arr(i,j,k) 
-                            - (dt3/dx[1]) * (simhy_arr(i-1,j+1,k)*vmac_arr(i-1,j+1,k) 
+                            - (dt3/hy) * (simhy_arr(i-1,j+1,k)*vmac_arr(i-1,j+1,k) 
                             - simhy_arr(i-1,j,k)*vmac_arr(i-1,j,k)) 
                             - dt3*scal_arr(i-1,j,k,scomp-1)*divu_arr(i-1,j,k) 
-                            + (dt3/dx[1])*scal_arr(i-1,j,k,scomp-1)*
+                            + (dt3/hy)*scal_arr(i-1,j,k,scomp-1)*
                             (vmac_arr(i-1,j+1,k)-vmac_arr(i-1,j,k));
                         srxy = srx_arr(i,j,k) 
-                            - (dt3/dx[1])*(simhy_arr(i,j+1,k)*vmac_arr(i,j+1,k)
+                            - (dt3/hy)*(simhy_arr(i,j+1,k)*vmac_arr(i,j+1,k)
                             - simhy_arr(i,j,k)*vmac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[1])*scal_arr(i,j,k,scomp-1)*
+                            + (dt3/hy)*scal_arr(i,j,k,scomp-1)*
                             (vmac_arr(i,j+1,k)-vmac_arr(i,j,k));
                     } else {
                         // make slxy, srxy by updating 1D extrapolation
                         slxy = slx_arr(i,j,k) 
-                            - (dt6/dx[1])*(vmac_arr(i-1,j+1,k)+vmac_arr(i-1,j,k)) 
+                            - (dt6/hy)*(vmac_arr(i-1,j+1,k)+vmac_arr(i-1,j,k)) 
                             *(simhy_arr(i-1,j+1,k)-simhy_arr(i-1,j,k));
                         srxy = srx_arr(i,j,k) 
-                            - (dt6/dx[1])*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k)) 
+                            - (dt6/hy)*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k))
                             *(simhy_arr(i,j+1,k)-simhy_arr(i,j,k));
                     }
+
+                    // sl_arr(i,j,k) = slxy;
+                    // sr_arr(i,j,k) = srxy;
 
                     // impose lo side bc's
                     if (i == ilo) {
@@ -1850,9 +1861,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                         }
                     }
 
-                    sl_arr(i,j,k) = slxy;
-                    sr_arr(i,j,k) = srxy;
-
                     // make simhxy by solving Riemann problem
                     simhxy_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ?
                         slxy : srxy;
@@ -1865,37 +1873,38 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 });
 
                 // simhxz
-                imhbox = amrex::grow(mfi.tilebox(), 1, 1);
-                imhbox = amrex::growHi(imhbox, 0, 1);
-                // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
+                // imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+                // imhbox = amrex::growHi(imhbox, 0, 1);
+                imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
 
                 Array4<Real> const simhxz_arr = simhxz.array(mfi);
-                Real slxz, srxz;
 
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slxz = 0.0;
+                    Real srxz = 0.0;
                     // loop over appropriate xz faces
                     if (is_conservative == 1) {
                         // make slxz, srxz by updating 1D extrapolation
                         slxz = slx_arr(i,j,k) 
-                            - (dt3/dx[2]) * (simhz_arr(i-1,j,k+1)*wmac_arr(i-1,j,k+1) 
+                            - (dt3/hz) * (simhz_arr(i-1,j,k+1)*wmac_arr(i-1,j,k+1) 
                             - simhz_arr(i-1,j,k)*wmac_arr(i-1,j,k)) 
                             - dt3*scal_arr(i-1,j,k,scomp-1)*divu_arr(i-1,j,k) 
-                            + (dt3/dx[2])*scal_arr(i-1,j,k,scomp-1)*
+                            + (dt3/hz)*scal_arr(i-1,j,k,scomp-1)*
                             (wmac_arr(i-1,j,k+1)-wmac_arr(i-1,j,k));
                         srxz = srx_arr(i,j,k) 
-                            - (dt3/dx[2])*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
+                            - (dt3/hz)*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
                             - simhz_arr(i,j,k)*wmac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[2])*scal_arr(i,j,k,scomp-1)*
+                            + (dt3/hz)*scal_arr(i,j,k,scomp-1)*
                             (wmac_arr(i,j,k+1)-wmac_arr(i,j,k));
                     } else {
                         // make slxz, srxz by updating 1D extrapolation
                         slxz = slx_arr(i,j,k) 
-                            - (dt6/dx[2])*(wmac_arr(i-1,j,k+1)+wmac_arr(i-1,j,k)) 
+                            - (dt6/hz)*(wmac_arr(i-1,j,k+1)+wmac_arr(i-1,j,k)) 
                             *(simhz_arr(i-1,j,k+1)-simhz_arr(i-1,j,k));
                         srxz = srx_arr(i,j,k) 
-                            - (dt6/dx[2])*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
+                            - (dt6/hz)*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
                             *(simhz_arr(i,j,k+1)-simhz_arr(i,j,k));
                     }
 
@@ -1946,40 +1955,41 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 });
 
                 // simhyx
-                // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
-                imhbox = amrex::grow(mfi.tilebox(), 2, 1);
-                imhbox = amrex::growHi(imhbox, 1, 1);
+                imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
+                // imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+                // imhbox = amrex::growHi(imhbox, 1, 1);
 
                 Array4<Real> const simhyx_arr = simhyx.array(mfi);
-                Real slyx, sryx;
-
+                
                 bclo = bcs[bccomp-1].lo()[1];
                 bchi = bcs[bccomp-1].hi()[1];
 
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slyx = 0.0;
+                    Real sryx = 0.0;
                     // loop over appropriate yx faces
                     if (is_conservative == 1) {
                         // make slyx, sryx by updating 1D extrapolation
                         slyx = sly_arr(i,j,k) 
-                            - (dt3/dx[0]) * (simhx_arr(i+1,j-1,k)*umac_arr(i+1,j-1,k) 
+                            - (dt3/hx) * (simhx_arr(i+1,j-1,k)*umac_arr(i+1,j-1,k) 
                             - simhx_arr(i,j-1,k)*umac_arr(i,j-1,k)) 
                             - dt3*scal_arr(i,j-1,k,scomp-1)*divu_arr(i,j-1,k) 
-                            + (dt3/dx[0])*scal_arr(i,j-1,k,scomp-1)*
+                            + (dt3/hx)*scal_arr(i,j-1,k,scomp-1)*
                             (umac_arr(i+1,j-1,k)-umac_arr(i,j-1,k));
                         sryx = sry_arr(i,j,k) 
-                            - (dt3/dx[0])*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
+                            - (dt3/hx)*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
                             - simhx_arr(i,j,k)*umac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[0])*scal_arr(i,j,k,scomp-1)*
+                            + (dt3/hx)*scal_arr(i,j,k,scomp-1)*
                             (umac_arr(i+1,j,k)-umac_arr(i,j,k));
                     } else {
                         // make slyx, sryx by updating 1D extrapolation
                         slyx = sly_arr(i,j,k) 
-                            - (dt6/dx[0])*(umac_arr(i+1,j-1,k)+umac_arr(i,j-1,k)) 
+                            - (dt6/hx)*(umac_arr(i+1,j-1,k)+umac_arr(i,j-1,k)) 
                             *(simhx_arr(i+1,j-1,k)-simhx_arr(i,j-1,k));
                         sryx = sry_arr(i,j,k) 
-                            - (dt6/dx[0])*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
+                            - (dt6/hx)*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
                             *(simhx_arr(i+1,j,k)-simhx_arr(i,j,k));
                     }
 
@@ -2030,37 +2040,38 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 });
 
                 // simhyz
-                // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
-                imhbox = amrex::grow(mfi.tilebox(), 0, 1);
-                imhbox = amrex::growHi(imhbox, 1, 1);
+                imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
+                // imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+                // imhbox = amrex::growHi(imhbox, 1, 1);
 
                 Array4<Real> const simhyz_arr = simhyz.array(mfi);
-                Real slyz, sryz;
 
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slyz = 0.0;
+                    Real sryz = 0.0;
                     // loop over appropriate yz faces
                     if (is_conservative == 1) {
                         // make slyz, sryz by updating 1D extrapolation
                         slyz = sly_arr(i,j,k) 
-                            - (dt3/dx[2]) * (simhz_arr(i,j-1,k+1)*wmac_arr(i,j-1,k+1) 
+                            - (dt3/hz) * (simhz_arr(i,j-1,k+1)*wmac_arr(i,j-1,k+1) 
                             - simhz_arr(i,j-1,k)*umac_arr(i,j-1,k)) 
                             - dt3*scal_arr(i,j-1,k,scomp-1)*divu_arr(i,j-1,k) 
-                            + (dt3/dx[2])*scal_arr(i,j-1,k,scomp-1)*
+                            + (dt3/hz)*scal_arr(i,j-1,k,scomp-1)*
                             (wmac_arr(i,j-1,k+1)-wmac_arr(i,j-1,k));
                         sryz = sry_arr(i,j,k) 
-                            - (dt3/dx[2])*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
+                            - (dt3/hz)*(simhz_arr(i,j,k+1)*wmac_arr(i,j,k+1)
                             - simhz_arr(i,j,k)*wmac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[2])*scal_arr(i,j,k,scomp-1)*
+                            + (dt3/hz)*scal_arr(i,j,k,scomp-1)*
                             (wmac_arr(i,j,k+1)-wmac_arr(i,j,k));
                     } else {
                         // make slyz, sryz by updating 1D extrapolation
                         slyz = sly_arr(i,j,k) 
-                            - (dt6/dx[2])*(wmac_arr(i,j-1,k+1)+wmac_arr(i,j-1,k)) 
+                            - (dt6/hz)*(wmac_arr(i,j-1,k+1)+wmac_arr(i,j-1,k)) 
                             *(simhz_arr(i,j-1,k+1)-simhz_arr(i,j-1,k));
                         sryz = sry_arr(i,j,k) 
-                            - (dt6/dx[2])*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
+                            - (dt6/hz)*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k)) 
                             *(simhz_arr(i,j,k+1)-simhz_arr(i,j,k));
                     }
 
@@ -2111,40 +2122,41 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 });
 
                 // simhzx
-                // imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
-                imhbox = amrex::grow(mfi.tilebox(), 1, 1);
-                imhbox = amrex::growHi(imhbox, 2, 1);
+                imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
+                // imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+                // imhbox = amrex::growHi(imhbox, 2, 1);
 
                 Array4<Real> const simhzx_arr = simhzx.array(mfi);
-                Real slzx, srzx;
 
                 bclo = bcs[bccomp-1].lo()[2];
                 bchi = bcs[bccomp-1].hi()[2];
 
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slzx = 0.0;
+                    Real srzx = 0.0;
                     // loop over appropriate zx faces
                     if (is_conservative == 1) {
                         // make slzx, srzx by updating 1D extrapolation
                         slzx = slz_arr(i,j,k) 
-                            - (dt3/dx[0]) * (simhx_arr(i+1,j,k-1)*umac_arr(i+1,j,k-1) 
+                            - (dt3/hx) * (simhx_arr(i+1,j,k-1)*umac_arr(i+1,j,k-1) 
                             - simhx_arr(i,j,k-1)*umac_arr(i,j,k-1)) 
                             - dt3*scal_arr(i,j,k-1,scomp-1)*divu_arr(i,j,k-1) 
-                            + (dt3/dx[0])*scal_arr(i,j,k-1,scomp-1)*
+                            + (dt3/hx)*scal_arr(i,j,k-1,scomp-1)*
                             (umac_arr(i+1,j,k-1)-umac_arr(i,j,k-1));
                         srzx = srz_arr(i,j,k) 
-                            - (dt3/dx[0])*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
+                            - (dt3/hx)*(simhx_arr(i+1,j,k)*umac_arr(i+1,j,k)
                             - simhx_arr(i,j,k)*umac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[0])*scal_arr(i,j,k,scomp-1)*
+                            + (dt3/hx)*scal_arr(i,j,k,scomp-1)*
                             (umac_arr(i+1,j,k)-umac_arr(i,j,k));
                     } else {
                         // make slzx, srzx by updating 1D extrapolation
                         slzx = slz_arr(i,j,k) 
-                            - (dt6/dx[0])*(umac_arr(i+1,j,k-1)+umac_arr(i,j,k-1)) 
+                            - (dt6/hx)*(umac_arr(i+1,j,k-1)+umac_arr(i,j,k-1)) 
                             *(simhx_arr(i+1,j,k-1)-simhx_arr(i,j,k-1));
                         srzx = srz_arr(i,j,k) 
-                            - (dt6/dx[0])*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
+                            - (dt6/hx)*(umac_arr(i+1,j,k)+umac_arr(i,j,k)) 
                             *(simhx_arr(i+1,j,k)-simhx_arr(i,j,k));
                     }
 
@@ -2195,37 +2207,38 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 });
 
                 // simhzy
-                // imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
-                imhbox = amrex::grow(mfi.tilebox(), 0, 1);
-                imhbox = amrex::growHi(imhbox, 2, 1);
+                imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
+                // imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+                // imhbox = amrex::growHi(imhbox, 2, 1);
 
                 Array4<Real> const simhzy_arr = simhzy.array(mfi);
-                Real slzy, srzy;
 
                 AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
                 {
+                    Real slzy = 0.0;
+                    Real srzy = 0.0;
                     // loop over appropriate zy faces
                     if (is_conservative == 1) {
                         // make slzy, srzy by updating 1D extrapolation
                         slzy = slz_arr(i,j,k) 
-                            - (dt3/dx[1]) * (simhy_arr(i,j+1,k-1)*umac_arr(i,j+1,k-1) 
-                            - simhy_arr(i,j,k-1)*umac_arr(i,j,k-1)) 
+                            - (dt3/hy) * (simhy_arr(i,j+1,k-1)*vmac_arr(i,j+1,k-1) 
+                            - simhy_arr(i,j,k-1)*vmac_arr(i,j,k-1)) 
                             - dt3*scal_arr(i,j,k-1,scomp-1)*divu_arr(i,j,k-1) 
-                            + (dt3/dx[1])*scal_arr(i,j,k-1,scomp-1)*
-                            (umac_arr(i,j+1,k-1)-umac_arr(i,j,k-1));
+                            + (dt3/hy)*scal_arr(i,j,k-1,scomp-1)*
+                            (umac_arr(i,j+1,k-1)-vmac_arr(i,j,k-1));
                         srzy = srz_arr(i,j,k) 
-                            - (dt3/dx[1])*(simhy_arr(i,j+1,k)*umac_arr(i,j+1,k)
-                            - simhy_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - (dt3/hy)*(simhy_arr(i,j+1,k)*vmac_arr(i,j+1,k)
+                            - simhy_arr(i,j,k)*vmac_arr(i,j,k)) 
                             - dt3*scal_arr(i,j,k,scomp-1)*divu_arr(i,j,k) 
-                            + (dt3/dx[1])*scal_arr(i,j,k,scomp-1)*
-                            (umac_arr(i,j+1,k)-umac_arr(i,j,k));
+                            + (dt3/hy)*scal_arr(i,j,k,scomp-1)*
+                            (vmac_arr(i,j+1,k)-vmac_arr(i,j,k));
                     } else {
                         // make slzy, srzy by updating 1D extrapolation
                         slzy = slz_arr(i,j,k) 
-                            - (dt6/dx[1])*(umac_arr(i,j+1,k-1)+umac_arr(i,j,k-1)) 
+                            - (dt6/hy)*(vmac_arr(i,j+1,k-1)+vmac_arr(i,j,k-1)) 
                             *(simhy_arr(i,j+1,k-1)-simhy_arr(i,j,k-1));
                         srzy = srz_arr(i,j,k) 
-                            - (dt6/dx[1])*(umac_arr(i,j+1,k)+umac_arr(i,j,k)) 
+                            - (dt6/hy)*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k)) 
                             *(simhy_arr(i,j+1,k)-simhy_arr(i,j,k));
                     }
 
@@ -2274,32 +2287,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     //     simhzy_arr(i,j,k) : 0.5 * (slzy + srzy);
      
                 });
-
-
-
-// #pragma gpu box(imhbox)
-//                 make_edge_scal_transverse_3d(
-//                     AMREX_INT_ANYD(imhbox.loVect()), AMREX_INT_ANYD(imhbox.hiVect()),3,2,
-//                     AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-//                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                     BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                     BL_TO_FORTRAN_ANYD(divu[mfi]),
-//                     BL_TO_FORTRAN_ANYD(slx[mfi]),
-//                     BL_TO_FORTRAN_ANYD(srx[mfi]),
-//                     BL_TO_FORTRAN_ANYD(simhx[mfi]),
-//                     BL_TO_FORTRAN_ANYD(sly[mfi]),
-//                     BL_TO_FORTRAN_ANYD(sry[mfi]),
-//                     BL_TO_FORTRAN_ANYD(simhy[mfi]),
-//                     BL_TO_FORTRAN_ANYD(slz[mfi]),
-//                     BL_TO_FORTRAN_ANYD(srz[mfi]),
-//                     BL_TO_FORTRAN_ANYD(simhz[mfi]),
-//                     BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-//                     AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                     nbccomp, scomp, bccomp, is_conservative,
-//                     BL_TO_FORTRAN_ANYD(sl[mfi]),
-//                     BL_TO_FORTRAN_ANYD(sr[mfi]));
 
                 // x-direction
 #pragma gpu box(xbx)

@@ -459,6 +459,7 @@ end subroutine make_edge_scal_2d
 #endif
 
 #if (AMREX_SPACEDIM == 3)
+
 subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
      s,      s_lo, s_hi, nc_s, &
      sedge, x_lo, x_hi, nc_x, &
@@ -802,7 +803,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               ! boundary conditions enforced outside of i,j,k loop
               sedge(i,j,k,comp) = merge(sedgelz,sedgerz,wmac(i,j,k) .gt. 0.d0)
               savg = HALF*(sedgelz+sedgerz)
-              sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)\
+              sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)
 
               ! impose lo side bc's
               if (k .eq. domlo(3)) then

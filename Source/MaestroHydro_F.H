@@ -44,6 +44,33 @@ extern "C"
                     const int is_conservative);
 
 #elif (AMREX_SPACEDIM == 3)
+
+    void make_edge_scal_transverse_3d(const int* lo, const int* hi,
+                      const int norm_dir, const int trans_dir,
+                      const int* domlo, const int* domhi,
+                      const amrex::Real* s,      const int* s_lo, const int* s_hi, const int nc_s,
+                      const amrex::Real* umac,   const int* u_lo, const int* u_hi,
+                      const amrex::Real* vmac,   const int* v_lo, const int* v_hi,
+                      const amrex::Real* wmac,   const int* w_lo, const int* w_hi,
+                      const amrex::Real* divu, const int* d_lo, const int* d_hi,
+                      const amrex::Real* slx, const int* slx_lo, const int* slx_hi,
+                      const amrex::Real* srx, const int* srx_lo, const int* srx_hi,
+                      const amrex::Real* simhx, const int* six_lo, const int* six_hi,
+                      const amrex::Real* sly, const int* sly_lo, const int* sly_hi,
+                      const amrex::Real* sry, const int* sry_lo, const int* sry_hi,
+                      const amrex::Real* simhy, const int* siy_lo, const int* siy_hi,
+                      const amrex::Real* slz, const int* slz_lo, const int* slz_hi,
+                      const amrex::Real* srz, const int* srz_lo, const int* srz_hi,
+                      const amrex::Real* simhz, const int* siz_lo, const int* siz_hi,
+                      amrex::Real* simh_trans, const int* sit_lo, const int* sit_hi,
+                      const amrex::Real* dx, const amrex::Real dt, const int is_vel,
+                      const int* adv_bc, const int nbccomp, const int comp, const int bccomp,
+                      const int is_conservative,
+                      const amrex::Real* sl, const int* sl_lo, const int* sl_hi,
+                      const amrex::Real* sr, const int* sr_lo, const int* sr_hi);
+
+
+
     void make_edge_scal_3d(const int* lo, const int* hi,
                       const int idir,
                       const int* domlo, const int* domhi,
