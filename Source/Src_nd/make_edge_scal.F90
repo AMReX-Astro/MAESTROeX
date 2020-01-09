@@ -580,7 +580,7 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
               else
                  ! make sedgelx, sedgerx
                  fl = merge(force(i-1,j,k,comp), Ipf(i-1,j,k,1), ppm_trace_forces == 0)
-                 fr = merge(force(i  ,j,k,comp), Ipf(i  ,j,k,1), ppm_trace_forces == 0)
+                 fr = merge(force(i  ,j,k,comp), Imf(i  ,j,k,1), ppm_trace_forces == 0)
 
                  sedgelx = sl(i,j,k) &
                       - (dt4/hy)*(vmac(i-1,j+1,k  )+vmac(i-1,j,k))* &
