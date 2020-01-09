@@ -173,7 +173,7 @@ public:
     void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                       const amrex::Vector<amrex::MultiFab>& force,
+                       amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative);
 

@@ -1142,7 +1142,7 @@ void
 Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                       const Vector<MultiFab>& force,
+                       Vector<MultiFab>& force,
                        int is_vel, const Vector<BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative)
 {
@@ -1754,7 +1754,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     simhx_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ? 
                         slx_arr(i,j,k) : srx_arr(i,j,k);
-                    simhx_arr(i,j,k) = (abs(umac_arr(i,j,k)) > 0.0) ? 
+                    simhx_arr(i,j,k) = (fabs(umac_arr(i,j,k)) > 0.0) ? 
                         simhx_arr(i,j,k) : 0.5 * (slx_arr(i,j,k) + srx_arr(i,j,k));
                 });
 
@@ -1763,7 +1763,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     simhy_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ? 
                         sly_arr(i,j,k) : sry_arr(i,j,k);
-                    simhy_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > 0.0) ? 
+                    simhy_arr(i,j,k) = (fabs(vmac_arr(i,j,k)) > 0.0) ? 
                         simhy_arr(i,j,k) : 0.5 * (sly_arr(i,j,k) + sry_arr(i,j,k));
                 });
 
@@ -1772,7 +1772,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 {
                     simhz_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ? 
                         slz_arr(i,j,k) : srz_arr(i,j,k);
-                    simhz_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > 0.0) ?
+                    simhz_arr(i,j,k) = (fabs(wmac_arr(i,j,k)) > 0.0) ?
                         simhz_arr(i,j,k) : 0.5 * (slz_arr(i,j,k) + srz_arr(i,j,k));
                 });
 
@@ -1823,9 +1823,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                             *(simhy_arr(i,j+1,k)-simhy_arr(i,j,k));
                     }
 
-                    // sl_arr(i,j,k) = slxy;
-                    // sr_arr(i,j,k) = srxy;
-
                     // impose lo side bc's
                     if (i == ilo) {
                         if (bclo == EXT_DIR) {
@@ -1864,11 +1861,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhxy by solving Riemann problem
                     simhxy_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ?
                         slxy : srxy;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhxy_arr(i,j,k) = (abs(umac_arr(i,j,k)) > rel_eps) ?
-                    //     simhxy_arr(i,j,k) : 0.5 * (slxy + srxy);
+                    simhxy_arr(i,j,k) = (fabs(umac_arr(i,j,k)) > rel_eps) ?
+                        simhxy_arr(i,j,k) : 0.5 * (slxy + srxy);
      
                 });
 
@@ -1946,11 +1940,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhxy by solving Riemann problem
                     simhxz_arr(i,j,k) = (umac_arr(i,j,k) > 0.0) ?
                         slxz : srxz;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhxz_arr(i,j,k) = (abs(umac_arr(i,j,k)) > rel_eps) ?
-                    //     simhxz_arr(i,j,k) : 0.5 * (slxz + srxz);
+                    simhxz_arr(i,j,k) = (fabs(umac_arr(i,j,k)) > rel_eps) ?
+                        simhxz_arr(i,j,k) : 0.5 * (slxz + srxz);
      
                 });
 
@@ -2031,11 +2022,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhxy by solving Riemann problem
                     simhyx_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ?
                         slyx : sryx;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhyx_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > rel_eps) ?
-                    //     simhyx_arr(i,j,k) : 0.5 * (slyx + sryx);
+                    simhyx_arr(i,j,k) = (fabs(vmac_arr(i,j,k)) > rel_eps) ?
+                        simhyx_arr(i,j,k) : 0.5 * (slyx + sryx);
      
                 });
 
@@ -2113,11 +2101,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhyz by solving Riemann problem
                     simhyz_arr(i,j,k) = (vmac_arr(i,j,k) > 0.0) ?
                         slyz : sryz;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhyz_arr(i,j,k) = (abs(vmac_arr(i,j,k)) > rel_eps) ?
-                    //     simhyz_arr(i,j,k) : 0.5 * (slyz + sryz);
+                    simhyz_arr(i,j,k) = (fabs(vmac_arr(i,j,k)) > rel_eps) ?
+                        simhyz_arr(i,j,k) : 0.5 * (slyz + sryz);
      
                 });
 
@@ -2198,11 +2183,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhzx by solving Riemann problem
                     simhzx_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ?
                         slzx : srzx;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhzx_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > rel_eps) ?
-                    //     simhzx_arr(i,j,k) : 0.5 * (slzx + srzx);
+                    simhzx_arr(i,j,k) = (fabs(wmac_arr(i,j,k)) > rel_eps) ?
+                        simhzx_arr(i,j,k) : 0.5 * (slzx + srzx);
      
                 });
 
@@ -2280,88 +2262,380 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // make simhzy by solving Riemann problem
                     simhzy_arr(i,j,k) = (wmac_arr(i,j,k) > 0.0) ?
                         slzy : srzy;
-
-                    // NOTE: this should be here but for some reason 
-                    // it doesn't agree with the dev results
-                    // simhzy_arr(i,j,k) = (abs(wmac_arr(i,j,k)) > rel_eps) ?
-                    //     simhzy_arr(i,j,k) : 0.5 * (slzy + srzy);
+                    simhzy_arr(i,j,k) = (fabs(wmac_arr(i,j,k)) > rel_eps) ?
+                        simhzy_arr(i,j,k) : 0.5 * (slzy + srzy);
      
                 });
 
+                ///////////////////////////////////////////////
+                // Create sedgelx, etc.
+                ///////////////////////////////////////////////
+
+                Array4<Real> const Ipf_arr = Ipf.array(mfi);
+                Array4<Real> const Imf_arr = Imf.array(mfi);
+                Array4<Real> const force_arr = force[lev].array(mfi);
+
+                Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
+                Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
+                Array4<Real> const sedgez_arr = sedge[lev][2].array(mfi);
+
+                int ppm_trace_forces_local = ppm_trace_forces;
+
                 // x-direction
-#pragma gpu box(xbx)
-                make_edge_scal_3d(AMREX_INT_ANYD(xbx.loVect()),
-                                  AMREX_INT_ANYD(xbx.hiVect()),1,
-                                  AMREX_INT_ANYD(domainBox.loVect()),
-                                  AMREX_INT_ANYD(domainBox.hiVect()),
-                                  BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(slx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(srx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-                                  AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                                  nbccomp, scomp, bccomp, is_conservative);
+                
+
+
+
+// #pragma gpu box(xbx)
+//                 make_edge_scal_3d(AMREX_INT_ANYD(xbx.loVect()),
+//                                   AMREX_INT_ANYD(xbx.hiVect()),1,
+//                                   AMREX_INT_ANYD(domainBox.loVect()),
+//                                   AMREX_INT_ANYD(domainBox.hiVect()),
+//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(slx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(srx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                                   nbccomp, scomp, bccomp, is_conservative,
+//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
+
+
+                bclo = bcs[bccomp-1].lo()[0];
+                bchi = bcs[bccomp-1].hi()[0];
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
+                {
+                    Real sedgelx = 0.0;
+                    Real sedgerx = 0.0;
+
+                    Real fl = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i-1,j,k,scomp-1) : Ipf_arr(i-1,j,k,0);
+                    Real fr = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i,j,k,scomp-1) : Imf_arr(i,j,k,0);
+
+                    // make sedgelx, sedgerx
+                    if (is_conservative == 1) {
+                        sedgelx = slx_arr(i,j,k) 
+                            - (dt2/hy)*(simhyz_arr(i-1,j+1,k  )*vmac_arr(i-1,j+1,k) 
+                            - simhyz_arr(i-1,j,k)*vmac_arr(i-1,j,k)) 
+                            - (dt2/hz)*(simhzy_arr(i-1,j,k+1)*wmac_arr(i-1,j,k+1) 
+                            - simhzy_arr(i-1,j,k)*wmac_arr(i-1,j,k)) 
+                            - (dt2/hx)*scal_arr(i-1,j,k,scomp-1)*(umac_arr(i,j,k)-umac_arr(i-1,j,k)) 
+                            + dt2*fl;
+
+                        sedgerx = srx_arr(i,j,k) 
+                            - (dt2/hy)*(simhyz_arr(i,j+1,k)*vmac_arr(i,j+1,k) 
+                            - simhyz_arr(i,j,k)*vmac_arr(i,j,k)) 
+                            - (dt2/hz)*(simhzy_arr(i,j,k+1)*wmac_arr(i,j,k+1) 
+                            - simhzy_arr(i,j,k)*wmac_arr(i,j,k)) 
+                            - (dt2/hx)*scal_arr(i,j,k,scomp-1)*(umac_arr(i+1,j,k)-umac_arr(i,j,k)) 
+                            + dt2*fr;
+                    } else {
+                        sedgelx = slx_arr(i,j,k) 
+                            - (dt4/hy)*(vmac_arr(i-1,j+1,k)+vmac_arr(i-1,j,k))* 
+                            (simhyz_arr(i-1,j+1,k)-simhyz_arr(i-1,j,k)) 
+                            - (dt4/hz)*(wmac_arr(i-1,j,k+1)+wmac_arr(i-1,j,k))* 
+                            (simhzy_arr(i-1,j,k+1)-simhzy_arr(i-1,j,k)) 
+                            + dt2*fl;
+
+                        sedgerx = srx_arr(i,j,k) 
+                            - (dt4/hy)*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k))* 
+                            (simhyz_arr(i,j+1,k)-simhyz_arr(i,j,k)) 
+                            - (dt4/hz)*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k))* 
+                            (simhzy_arr(i,j,k+1)-simhzy_arr(i,j,k)) 
+                            + dt2*fr;
+                    } 
+
+                    // make sedgex by solving Riemann problem
+                    // boundary conditions enforced outside of i,j,k loop
+                    sedgex_arr(i,j,k,scomp-1) = (umac_arr(i,j,k) > 0.0) ? 
+                        sedgelx : sedgerx;
+                    sedgex_arr(i,j,k,scomp-1) = (fabs(umac_arr(i,j,k))  > rel_eps) ? 
+                        sedgex_arr(i,j,k,scomp-1) : 0.5*(sedgelx+sedgerx);
+
+                    // impose lo side bc's
+                    if (i == ilo) {
+                        if (bclo == EXT_DIR) {
+                            sedgex_arr(i,j,k,scomp-1) = scal_arr(i-1,j,k,scomp-1);
+                        } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                sedgex_arr(i,j,k,scomp-1) = min(sedgerx,0.0);
+                            } else {
+                                sedgex_arr(i,j,k,scomp-1) = sedgerx;
+                            } 
+                        } else if (bclo == REFLECT_EVEN) {
+                            sedgex_arr(i,j,k,scomp-1) = sedgerx;
+                        } else if (bclo == REFLECT_ODD) {
+                            sedgex_arr(i,j,k,scomp-1) = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (i == ihi+1) {
+                        if (bchi == EXT_DIR) {
+                            sedgex_arr(i,j,k,scomp-1) = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 0) {
+                                sedgex_arr(i,j,k,scomp-1) = max(sedgelx,0.0);
+                            } else {
+                                sedgex_arr(i,j,k,scomp-1) = sedgelx;
+                            } 
+                        } else if (bchi == REFLECT_EVEN) {
+                            sedgex_arr(i,j,k,scomp-1) = sedgelx;
+                        } else if (bchi == REFLECT_ODD) {
+                            sedgex_arr(i,j,k,scomp-1) = 0.0;
+                        } 
+                    } 
+     
+                });
 
                 // y-direction
-#pragma gpu box(ybx)
-                make_edge_scal_3d(AMREX_INT_ANYD(ybx.loVect()),
-                                  AMREX_INT_ANYD(ybx.hiVect()),2,
-                                  AMREX_INT_ANYD(domainBox.loVect()),
-                                  AMREX_INT_ANYD(domainBox.hiVect()),
-                                  BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(sly[mfi]),
-                                  BL_TO_FORTRAN_ANYD(sry[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-                                  AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                                  nbccomp, scomp, bccomp, is_conservative);
+                bclo = bcs[bccomp-1].lo()[1];
+                bchi = bcs[bccomp-1].hi()[1];
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
+                {
+                    Real sedgely = 0.0;
+                    Real sedgery = 0.0;
+
+                    Real fl = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i,j-1,k,scomp-1) : Ipf_arr(i,j-1,k,1);
+                    Real fr = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i,j,k,scomp-1) : Imf_arr(i,j,k,1);
+
+                    // make sedgely, sedgery
+                    if (is_conservative == 1) {
+                        sedgely = sly_arr(i,j,k) 
+                            - (dt2/hx)*(simhxz_arr(i+1,j-1,k  )*umac_arr(i+1,j-1,k) 
+                            - simhxz_arr(i,j-1,k)*umac_arr(i,j-1,k)) 
+                            - (dt2/hz)*(simhzx_arr(i,j-1,k+1)*wmac_arr(i,j-1,k+1) 
+                            - simhzx_arr(i,j-1,k)*wmac_arr(i,j-1,k)) 
+                            - (dt2/hy)*scal_arr(i,j-1,k,scomp-1)*(vmac_arr(i,j,k)-vmac_arr(i,j-1,k)) 
+                            + dt2*fl;
+
+                        sedgery = sry_arr(i,j,k) 
+                            - (dt2/hx)*(simhxz_arr(i+1,j,k)*umac_arr(i+1,j,k) 
+                            - simhxz_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - (dt2/hz)*(simhzx_arr(i,j,k+1)*wmac_arr(i,j,k+1) 
+                            - simhzx_arr(i,j,k)*wmac_arr(i,j,k)) 
+                            - (dt2/hy)*scal_arr(i,j,k,scomp-1)*(vmac_arr(i,j+1,k)-vmac_arr(i,j,k)) 
+                            + dt2*fr;
+                    } else {
+                        sedgely = sly_arr(i,j,k) 
+                            - (dt4/hx)*(umac_arr(i+1,j-1,k)+umac_arr(i,j-1,k))* 
+                            (simhxz_arr(i+1,j-1,k)-simhxz_arr(i,j-1,k)) 
+                            - (dt4/hz)*(wmac_arr(i,j-1,k+1)+wmac_arr(i,j-1,k))* 
+                            (simhzx_arr(i,j-1,k+1)-simhzx_arr(i,j-1,k)) 
+                            + dt2*fl;
+
+                        sedgery = sry_arr(i,j,k) 
+                            - (dt4/hx)*(umac_arr(i+1,j,k)+umac_arr(i,j,k))* 
+                            (simhxz_arr(i+1,j,k)-simhxz_arr(i,j,k)) 
+                            - (dt4/hz)*(wmac_arr(i,j,k+1)+wmac_arr(i,j,k))* 
+                            (simhzx_arr(i,j,k+1)-simhzx_arr(i,j,k)) 
+                            + dt2*fr;
+                    } 
+
+                    // make sedgey by solving Riemann problem
+                    // boundary conditions enforced outside of i,j,k loop
+                    sedgey_arr(i,j,k,scomp-1) = (vmac_arr(i,j,k) > 0.0) ? 
+                        sedgely : sedgery;
+                    sedgey_arr(i,j,k,scomp-1) = (fabs(vmac_arr(i,j,k))  > rel_eps) ? 
+                        sedgey_arr(i,j,k,scomp-1) : 0.5*(sedgely+sedgery);
+
+                    // impose lo side bc's
+                    if (j == jlo) {
+                        if (bclo == EXT_DIR) {
+                            sedgey_arr(i,j,k,scomp-1) = scal_arr(i,j-1,k,scomp-1);
+                        } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                sedgey_arr(i,j,k,scomp-1) = min(sedgery,0.0);
+                            } else {
+                                sedgey_arr(i,j,k,scomp-1) = sedgery;
+                            } 
+                        } else if (bclo == REFLECT_EVEN) {
+                            sedgey_arr(i,j,k,scomp-1) = sedgery;
+                        } else if (bclo == REFLECT_ODD) {
+                            sedgey_arr(i,j,k,scomp-1) = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (j == jhi+1) {
+                        if (bchi == EXT_DIR) {
+                            sedgey_arr(i,j,k,scomp-1) = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 1) {
+                                sedgey_arr(i,j,k,scomp-1) = max(sedgely,0.0);
+                            } else {
+                                sedgey_arr(i,j,k,scomp-1) = sedgely;
+                            } 
+                        } else if (bchi == REFLECT_EVEN) {
+                            sedgey_arr(i,j,k,scomp-1) = sedgely;
+                        } else if (bchi == REFLECT_ODD) {
+                            sedgey_arr(i,j,k,scomp-1) = 0.0;
+                        } 
+                    } 
+     
+                });
+
+
+
+
+// #pragma gpu box(ybx)
+//                 make_edge_scal_3d(AMREX_INT_ANYD(ybx.loVect()),
+//                                   AMREX_INT_ANYD(ybx.hiVect()),2,
+//                                   AMREX_INT_ANYD(domainBox.loVect()),
+//                                   AMREX_INT_ANYD(domainBox.hiVect()),
+//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(sly[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(sry[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                                   nbccomp, scomp, bccomp, is_conservative,
+//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
 
                 // z-direction
-#pragma gpu box(zbx)
-                make_edge_scal_3d(AMREX_INT_ANYD(zbx.loVect()),
-                                  AMREX_INT_ANYD(zbx.hiVect()),3,
-                                  AMREX_INT_ANYD(domainBox.loVect()),
-                                  AMREX_INT_ANYD(domainBox.hiVect()),
-                                  BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(slz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(srz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-                                  BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-                                  BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-                                  AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                                  nbccomp, scomp, bccomp, is_conservative);
+                bclo = bcs[bccomp-1].lo()[2];
+                bchi = bcs[bccomp-1].hi()[2];
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
+                {
+                    Real sedgelz = 0.0;
+                    Real sedgerz = 0.0;
+
+                    Real fl = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i,j,k-1,scomp-1) : Ipf_arr(i,j,k-1,2);
+                    Real fr = (ppm_trace_forces_local == 0) ? 
+                        force_arr(i,j,k,scomp-1) : Imf_arr(i,j,k,2);
+
+                    // make sedgelz, sedgerz
+                    if (is_conservative == 1) {
+                        sedgelz = slz_arr(i,j,k) 
+                            - (dt2/hx)*(simhxy_arr(i+1,j,k-1)*umac_arr(i+1,j,k-1) 
+                            - simhxy_arr(i,j,k-1)*umac_arr(i,j,k-1)) 
+                            - (dt2/hy)*(simhyx_arr(i,j+1,k-1)*vmac_arr(i,j+1,k-1) 
+                            - simhyx_arr(i,j,k-1)*vmac_arr(i,j,k-1)) 
+                            - (dt2/hz)*scal_arr(i,j,k-1,scomp-1)*(wmac_arr(i,j,k)-wmac_arr(i,j,k-1)) 
+                            + dt2*fl;
+
+                        sedgerz = srz_arr(i,j,k) 
+                            - (dt2/hx)*(simhxy_arr(i+1,j,k)*umac_arr(i+1,j,k) 
+                            - simhxy_arr(i,j,k)*umac_arr(i,j,k)) 
+                            - (dt2/hy)*(simhyx_arr(i,j+1,k)*vmac_arr(i,j+1,k) 
+                            - simhyx_arr(i,j,k)*vmac_arr(i,j,k)) 
+                            - (dt2/hz)*scal_arr(i,j,k,scomp-1)*(wmac_arr(i,j,k+1)-wmac_arr(i,j,k)) 
+                            + dt2*fr;
+                    } else {
+                        sedgelz = slz_arr(i,j,k) 
+                            - (dt4/hx)*(umac_arr(i+1,j,k-1)+umac_arr(i,j,k-1))* 
+                            (simhxy_arr(i+1,j,k-1)-simhxy_arr(i,j,k-1)) 
+                            - (dt4/hy)*(vmac_arr(i,j+1,k-1)+vmac_arr(i,j,k-1))* 
+                            (simhyx_arr(i,j+1,k-1)-simhyx_arr(i,j,k-1)) 
+                            + dt2*fl;
+
+                        sedgerz = srz_arr(i,j,k) 
+                            - (dt4/hx)*(umac_arr(i+1,j,k)+umac_arr(i,j,k))* 
+                            (simhxy_arr(i+1,j,k)-simhxy_arr(i,j,k)) 
+                            - (dt4/hy)*(vmac_arr(i,j+1,k)+vmac_arr(i,j,k))* 
+                            (simhyx_arr(i,j+1,k)-simhyx_arr(i,j,k)) 
+                            + dt2*fr;
+                    } 
+
+                    sl_arr(i,j,k) = sedgelz;
+                    sr_arr(i,j,k) = sedgerz;
+
+                    // make sedgez by solving Riemann problem
+                    // boundary conditions enforced outside of i,j,k loop
+                    sedgez_arr(i,j,k,scomp-1) = (wmac_arr(i,j,k) > 0.0) ? 
+                        sedgelz : sedgerz;
+                    sedgez_arr(i,j,k,scomp-1) = (fabs(wmac_arr(i,j,k))  > rel_eps) ? 
+                        sedgez_arr(i,j,k,scomp-1) : 0.5*(sedgelz+sedgerz);
+
+                    // impose lo side bc's
+                    if (k == klo) {
+                        if (bclo == EXT_DIR) {
+                            sedgez_arr(i,j,k,scomp-1) = scal_arr(i,j,k-1,scomp-1);
+                        } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                sedgez_arr(i,j,k,scomp-1) = min(sedgerz,0.0);
+                            } else {
+                                sedgez_arr(i,j,k,scomp-1) = sedgerz;
+                            } 
+                        } else if (bclo == REFLECT_EVEN) {
+                            sedgez_arr(i,j,k,scomp-1) = sedgerz;
+                        } else if (bclo == REFLECT_ODD) {
+                            sedgez_arr(i,j,k,scomp-1) = 0.0;
+                        }
+
+                    // impose hi side bc's
+                    } else if (k == khi+1) {
+                        if (bchi == EXT_DIR) {
+                            sedgez_arr(i,j,k,scomp-1) = scal_arr(i,j,k,scomp-1);
+                        } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                            if (is_vel == 1 && scomp-1 == 2) {
+                                sedgez_arr(i,j,k,scomp-1) = max(sedgelz,0.0);
+                            } else {
+                                sedgez_arr(i,j,k,scomp-1) = sedgelz;
+                            } 
+                        } else if (bchi == REFLECT_EVEN) {
+                            sedgez_arr(i,j,k,scomp-1) = sedgelz;
+                        } else if (bchi == REFLECT_ODD) {
+                            sedgez_arr(i,j,k,scomp-1) = 0.0;
+                        } 
+                    } 
+     
+                });
+
+
+
+                
+// #pragma gpu box(zbx)
+//                 make_edge_scal_3d(AMREX_INT_ANYD(zbx.loVect()),
+//                                   AMREX_INT_ANYD(zbx.hiVect()),3,
+//                                   AMREX_INT_ANYD(domainBox.loVect()),
+//                                   AMREX_INT_ANYD(domainBox.hiVect()),
+//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(slz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(srz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
+//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                                   nbccomp, scomp, bccomp, is_conservative,
+//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
 
             } // end MFIter loop
         } // end loop over components

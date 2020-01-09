@@ -478,7 +478,9 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
      simhzy, zy_lo, zy_hi, &
      force,  f_lo, f_hi, nc_f, &
      dx, dt, is_vel, adv_bc, nbccomp, &
-     comp, bccomp, is_conservative) bind(C,name="make_edge_scal_3d")
+     comp, bccomp, is_conservative, &
+     sll, sll_lo, sll_hi, &
+     srr, srr_lo, srr_hi) bind(C,name="make_edge_scal_3d")
 
   integer         , intent(in   ) :: domlo(3), domhi(3), lo(3), hi(3)
   integer         , intent(in   ) :: s_lo(3), s_hi(3)
@@ -499,6 +501,8 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   integer         , intent(in   ) :: zx_lo(3), zx_hi(3)
   integer         , intent(in   ) :: zy_lo(3), zy_hi(3)
   integer         , intent(in   ) :: f_lo(3), f_hi(3)
+  integer         , intent(in   ) :: sll_lo(3), sll_hi(3)
+  integer         , intent(in   ) :: srr_lo(3), srr_hi(3)
   integer, value,   intent(in   ) :: nc_f
   double precision, intent(in   ) :: s     (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
   double precision, intent(inout) :: sedge(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3),nc_x)
@@ -516,6 +520,8 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
   double precision, intent(in   ) :: simhzx(zx_lo(1):zx_hi(1),zx_lo(2):zx_hi(2),zx_lo(3):zx_hi(3))
   double precision, intent(in   ) :: simhzy(zy_lo(1):zy_hi(1),zy_lo(2):zy_hi(2),zy_lo(3):zy_hi(3))
   double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
+  double precision, intent(inout) :: sll    (sll_lo(1):sll_hi(1),sll_lo(2):sll_hi(2),sll_lo(3):sll_hi(3))
+  double precision, intent(inout) :: srr    (srr_lo(1):srr_hi(1),srr_lo(2):srr_hi(2),srr_lo(3):srr_hi(3))
   double precision, intent(in   ) :: dx(3)
   double precision, value, intent(in   ) :: dt
   integer,   value, intent(in   ) :: is_vel, nbccomp, comp, bccomp, is_conservative
@@ -555,6 +561,9 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
      do k=lo(3),hi(3)
         do j=lo(2),hi(2)
            do i=lo(1),hi(1)
+
+            sedgelx = sll(i,j,k)
+            sedgerx = srr(i,j,k)
 
               ! loop over appropriate x-faces
               if (is_conservative .eq. 1) then
@@ -596,6 +605,13 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
                       (simhzy(i  ,j  ,k+1)-simhzy(i  ,j,k)) &
                       + dt2*fr
               end if
+
+              if (i .eq. domlo(1)+1 .and. j .eq. domlo(2)+1 .and. k .eq. domlo(3)+1) then 
+                write(*,*) "fortran fl, fr  =", fl, fr
+              endif
+
+              sll(i,j,k) = sedgelx
+              srr(i,j,k) = sedgerx
 
               ! make sedgex by solving Riemann problem
               ! boundary conditions enforced outside of i,j,k loop
@@ -758,74 +774,77 @@ subroutine make_edge_scal_3d(lo, hi, idir, domlo, domhi, &
         do j=lo(2),hi(2)
            do i=lo(1),hi(1)
 
+            sedgelz = sll(i,j,k)
+            sedgerz = srr(i,j,k)
+
               ! loop over appropriate z-faces
-              if (is_conservative .eq. 1) then
-                 ! make sedgelz, sedgerz
-                 fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
-                 fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
+            !   if (is_conservative .eq. 1) then
+            !      ! make sedgelz, sedgerz
+            !      fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
+            !      fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
 
-                 sedgelz = sl(i,j,k) &
-                      - (dt2/hx)*(simhxy(i+1,j  ,k-1)*umac(i+1,j  ,k-1) &
-                      - simhxy(i,j,k-1)*umac(i,j,k-1)) &
-                      - (dt2/hy)*(simhyx(i  ,j+1,k-1)*vmac(i  ,j+1,k-1) &
-                      - simhyx(i,j,k-1)*vmac(i,j,k-1)) &
-                      - (dt2/hz)*s(i,j,k-1,comp)*(wmac(i,j,k  )-wmac(i,j,k-1)) &
-                      + dt2*fl
+            !      sedgelz = sl(i,j,k) &
+            !           - (dt2/hx)*(simhxy(i+1,j  ,k-1)*umac(i+1,j  ,k-1) &
+            !           - simhxy(i,j,k-1)*umac(i,j,k-1)) &
+            !           - (dt2/hy)*(simhyx(i  ,j+1,k-1)*vmac(i  ,j+1,k-1) &
+            !           - simhyx(i,j,k-1)*vmac(i,j,k-1)) &
+            !           - (dt2/hz)*s(i,j,k-1,comp)*(wmac(i,j,k  )-wmac(i,j,k-1)) &
+            !           + dt2*fl
 
-                 sedgerz = sr(i,j,k) &
-                      - (dt2/hx)*(simhxy(i+1,j  ,k  )*umac(i+1,j  ,k  ) &
-                      - simhxy(i,j,k  )*umac(i,j,k  )) &
-                      - (dt2/hy)*(simhyx(i  ,j+1,k  )*vmac(i  ,j+1,k  ) &
-                      - simhyx(i,j,k  )*vmac(i,j,k  )) &
-                      - (dt2/hz)*s(i,j,k  ,comp)*(wmac(i,j,k+1)-wmac(i,j,k  )) &
-                      + dt2*fr
-              else
-                 ! make sedgelz, sedgerz
-                 fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
-                 fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
+            !      sedgerz = sr(i,j,k) &
+            !           - (dt2/hx)*(simhxy(i+1,j  ,k  )*umac(i+1,j  ,k  ) &
+            !           - simhxy(i,j,k  )*umac(i,j,k  )) &
+            !           - (dt2/hy)*(simhyx(i  ,j+1,k  )*vmac(i  ,j+1,k  ) &
+            !           - simhyx(i,j,k  )*vmac(i,j,k  )) &
+            !           - (dt2/hz)*s(i,j,k  ,comp)*(wmac(i,j,k+1)-wmac(i,j,k  )) &
+            !           + dt2*fr
+            !   else
+            !      ! make sedgelz, sedgerz
+            !      fl = merge(force(i,j,k-1,comp), Ipf(i,j,k-1,3), ppm_trace_forces == 0)
+            !      fr = merge(force(i,j,k  ,comp), Imf(i,j,k  ,3), ppm_trace_forces == 0)
 
-                 sedgelz = sl(i,j,k) &
-                      - (dt4/hx)*(umac(i+1,j  ,k-1)+umac(i,j,k-1)) &
-                      *(simhxy(i+1,j  ,k-1)-simhxy(i,j,k-1)) &
-                      - (dt4/hy)*(vmac(i  ,j+1,k-1)+vmac(i,j,k-1)) &
-                      *(simhyx(i  ,j+1,k-1)-simhyx(i,j,k-1)) &
-                      + dt2*fl
+            !      sedgelz = sl(i,j,k) &
+            !           - (dt4/hx)*(umac(i+1,j  ,k-1)+umac(i,j,k-1)) &
+            !           *(simhxy(i+1,j  ,k-1)-simhxy(i,j,k-1)) &
+            !           - (dt4/hy)*(vmac(i  ,j+1,k-1)+vmac(i,j,k-1)) &
+            !           *(simhyx(i  ,j+1,k-1)-simhyx(i,j,k-1)) &
+            !           + dt2*fl
 
-                 sedgerz = sr(i,j,k) &
-                      - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j,k  )) &
-                      *(simhxy(i+1,j  ,k  )-simhxy(i,j,k  )) &
-                      - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i,j,k  )) &
-                      *(simhyx(i  ,j+1,k  )-simhyx(i,j,k  )) &
-                      + dt2*fr
-              end if
+            !      sedgerz = sr(i,j,k) &
+            !           - (dt4/hx)*(umac(i+1,j  ,k  )+umac(i,j,k  )) &
+            !           *(simhxy(i+1,j  ,k  )-simhxy(i,j,k  )) &
+            !           - (dt4/hy)*(vmac(i  ,j+1,k  )+vmac(i,j,k  )) &
+            !           *(simhyx(i  ,j+1,k  )-simhyx(i,j,k  )) &
+            !           + dt2*fr
+            !   end if
 
               ! make sedgez by solving Riemann problem
               ! boundary conditions enforced outside of i,j,k loop
-              sedge(i,j,k,comp) = merge(sedgelz,sedgerz,wmac(i,j,k) .gt. 0.d0)
-              savg = HALF*(sedgelz+sedgerz)
-              sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)
+            !   sedge(i,j,k,comp) = merge(sedgelz,sedgerz,wmac(i,j,k) .gt. 0.d0)
+            !   savg = HALF*(sedgelz+sedgerz)
+            !   sedge(i,j,k,comp) = merge(sedge(i,j,k,comp),savg,abs(wmac(i,j,k)).gt.rel_eps)
 
-              ! impose lo side bc's
+!               ! impose lo side bc's
               if (k .eq. domlo(3)) then
-                 if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
-                    sedge(i,j,k,comp) = s(i,j,k-1,comp)
-                 else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
-                      adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
-                    if (is_vel .eq. 1 .and. comp .eq. 3) then
-                       sedge(i,j,k,comp) = min(sedgerz,0.d0)
-                    else
-                       sedge(i,j,k,comp) = sedgerz
-                    end if
-                 else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
-                    sedge(i,j,k,comp) = sedgerz
-                 else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
-                    sedge(i,j,k,comp) = 0.d0
-                 else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
-                 else
-#ifndef AMREX_USE_GPU
-                    call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
-#endif
-                 end if
+!                  if (adv_bc(3,1,bccomp) .eq. EXT_DIR) then
+!                     sedge(i,j,k,comp) = s(i,j,k-1,comp)
+!                  else if (adv_bc(3,1,bccomp) .eq. FOEXTRAP .or. &
+!                       adv_bc(3,1,bccomp) .eq. HOEXTRAP) then
+!                     if (is_vel .eq. 1 .and. comp .eq. 3) then
+!                        sedge(i,j,k,comp) = min(sedgerz,0.d0)
+!                     else
+!                        sedge(i,j,k,comp) = sedgerz
+!                     end if
+!                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_EVEN) then
+!                     sedge(i,j,k,comp) = sedgerz
+!                  else if (adv_bc(3,1,bccomp) .eq. REFLECT_ODD) then
+!                     sedge(i,j,k,comp) = 0.d0
+!                  else if (adv_bc(3,1,bccomp) .eq. INT_DIR) then
+!                  else
+! #ifndef AMREX_USE_GPU
+!                     call amrex_error("make_edge_scal_3d: invalid boundary type adv_bc(3,1)")
+! #endif
+!                  end if
 
               ! impose hi side bc's
               else if (k .eq. domhi(3)+1) then
