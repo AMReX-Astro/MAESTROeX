@@ -2282,37 +2282,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 int ppm_trace_forces_local = ppm_trace_forces;
 
                 // x-direction
-                
-
-
-
-// #pragma gpu box(xbx)
-//                 make_edge_scal_3d(AMREX_INT_ANYD(xbx.loVect()),
-//                                   AMREX_INT_ANYD(xbx.hiVect()),1,
-//                                   AMREX_INT_ANYD(domainBox.loVect()),
-//                                   AMREX_INT_ANYD(domainBox.hiVect()),
-//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(slx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(srx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                   nbccomp, scomp, bccomp, is_conservative,
-//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
-
-
                 bclo = bcs[bccomp-1].lo()[0];
                 bchi = bcs[bccomp-1].hi()[0];
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
@@ -2488,35 +2457,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
      
                 });
 
-
-
-
-// #pragma gpu box(ybx)
-//                 make_edge_scal_3d(AMREX_INT_ANYD(ybx.loVect()),
-//                                   AMREX_INT_ANYD(ybx.hiVect()),2,
-//                                   AMREX_INT_ANYD(domainBox.loVect()),
-//                                   AMREX_INT_ANYD(domainBox.hiVect()),
-//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(sly[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(sry[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                   nbccomp, scomp, bccomp, is_conservative,
-//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
-
                 // z-direction
                 bclo = bcs[bccomp-1].lo()[2];
                 bchi = bcs[bccomp-1].hi()[2];
@@ -2608,34 +2548,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
      
                 });
 
-
-
-                
-// #pragma gpu box(zbx)
-//                 make_edge_scal_3d(AMREX_INT_ANYD(zbx.loVect()),
-//                                   AMREX_INT_ANYD(zbx.hiVect()),3,
-//                                   AMREX_INT_ANYD(domainBox.loVect()),
-//                                   AMREX_INT_ANYD(domainBox.hiVect()),
-//                                   BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-//                                   BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(Imf[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(slz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(srz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhxz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhyz[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzx[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(simhzy[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(force_mf[mfi]), force_mf.nComp(),
-//                                   AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-//                                   nbccomp, scomp, bccomp, is_conservative,
-//                                   BL_TO_FORTRAN_ANYD(sl[mfi]),
-//                                   BL_TO_FORTRAN_ANYD(sr[mfi]));
 
             } // end MFIter loop
         } // end loop over components

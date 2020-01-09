@@ -27,6 +27,7 @@ CEXE_sources += MaestroMakeEta.cpp
 CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroNodalProj.cpp
 CEXE_sources += MaestroPlot.cpp
+CEXE_sources += MaestroPPM.cpp
 CEXE_sources += MaestroReact.cpp
 CEXE_sources += MaestroRegrid.cpp
 CEXE_sources += MaestroRhoHT.cpp
