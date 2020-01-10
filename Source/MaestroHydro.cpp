@@ -1539,22 +1539,22 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            domainBox, bcs, dx, 
                            true, scomp-1, bccomp-1, rel_eps);
 
-#pragma gpu box(obx)
-                    ppm_3d(AMREX_INT_ANYD(obx.loVect()),
-                           AMREX_INT_ANYD(obx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                           scal_mf.nComp(),
-                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                           BL_TO_FORTRAN_ANYD(Im[mfi]),
-                           BL_TO_FORTRAN_ANYD(sl[mfi]),
-                           BL_TO_FORTRAN_ANYD(sr[mfi]),
-                           AMREX_INT_ANYD(domainBox.loVect()),
-                           AMREX_INT_ANYD(domainBox.hiVect()),
-                           bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                           scomp, bccomp, nbccomp, true);
+// #pragma gpu box(obx)
+//                     ppm_3d(AMREX_INT_ANYD(obx.loVect()),
+//                            AMREX_INT_ANYD(obx.hiVect()),
+//                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+//                            scal_mf.nComp(),
+//                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                            BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                            BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                            BL_TO_FORTRAN_ANYD(sr[mfi]),
+//                            AMREX_INT_ANYD(domainBox.loVect()),
+//                            AMREX_INT_ANYD(domainBox.hiVect()),
+//                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
+//                            scomp, bccomp, nbccomp, true);
 
                     if (ppm_trace_forces == 1) {
 #pragma gpu box(obx)
