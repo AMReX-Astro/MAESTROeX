@@ -20,6 +20,8 @@ parser.add_argument('-octant', '--octant', action='store_true', help='Sets slice
 parser.add_argument('-res', '--resolution', type=int, default=2048, help='Resolution for output plot.')
 args = parser.parse_args()
 
+yt.enable_parallelism()
+
 # Check axis input
 axes_list = ['x', 'y', 'z']
 vel_list = []

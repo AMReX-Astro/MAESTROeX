@@ -37,6 +37,8 @@ parser.add_argument('-ls', '--list_fields', action='store_true', help='If suppli
 parser.add_argument('-extrema', '--print_extrema', action='store_true', help='If supplied, list the max and min of the field(s).')
 args = parser.parse_args()
 
+yt.enable_parallelism()
+
 def slicefield(ds, field, field_short_name):
     slice_function = None
     if ds.dimensionality == 3:

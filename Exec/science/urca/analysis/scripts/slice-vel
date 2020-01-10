@@ -20,6 +20,8 @@ parser.add_argument('-ezc', '--enuc_zero_contour', action='store_true',
                     help='If supplied, draw a contour for Hnuc=0.')
 args = parser.parse_args()
 
+yt.enable_parallelism()
+
 @derived_field(name='pos_radial_velocity', units='')
 def _pos_radial_velocity(field, data):
     return np.maximum(data[('boxlib','radial_velocity')],
