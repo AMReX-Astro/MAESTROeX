@@ -1397,11 +1397,12 @@ contains
 
     ! compute s at x-edges
     if (ppm_type .eq. 1) then
+        if (use_cpp .eq. 0) then 
 
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
-        if (use_cpp .eq. 0) then
+        
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
@@ -1590,10 +1591,11 @@ contains
                    end if
                 end if
 
-                if (use_cpp .eq. 1) then 
-                    sp = spp(i,j,k)
-                    sm = smm(i,j,k)
-                endif
+                ! if (use_cpp .eq. 1) then 
+                !     sp = spp(i,j,k)
+                !     sm = smm(i,j,k)
+                ! endif
+
 
                 !-------------------------------------------------------------------------
                 ! Compute x-component of Ip and Im.
@@ -2115,8 +2117,7 @@ contains
     ! Compute s at y-edges.
     !
     if (ppm_type .eq. 1) then
-        if (use_cpp .eq. 0) then
-
+        if (use_cpp .eq. 0) then 
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
@@ -2177,6 +2178,11 @@ contains
                 !
                 sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)))
                 sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)))
+
+                ! if (use_cpp .eq. 1) then 
+                !     sp = spp(i,j,k)
+                !     ! sm = smm(i,j,k)
+                ! endif
 
                 ! save for later 
                 sedgel = sp
@@ -2354,6 +2360,7 @@ contains
              end do
           end do
        end do
+
     endif
     else if (ppm_type .eq. 2) then
 
@@ -2830,7 +2837,7 @@ contains
     ! Compute s at z-edges.
     !
     if (ppm_type .eq. 1) then
-
+        if (use_cpp .eq. 0) then 
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
@@ -3070,7 +3077,7 @@ contains
              end do
           end do
        end do
-
+    endif
     else if (ppm_type .eq. 2) then
 
        !----------------------------------------------------------------------

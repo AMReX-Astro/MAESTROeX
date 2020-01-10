@@ -976,8 +976,7 @@ public:
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
                 const amrex::Real* dx,
-                bool is_umac, int comp, int bccomp,
-                const amrex::Real rel_eps);
+                bool is_umac, int comp, int bccomp);
 #endif
     ////////////
 

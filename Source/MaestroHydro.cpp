@@ -1519,6 +1519,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 } else {
 
                     Array4<Real> const scal_arr = state[lev].array(mfi);
+                    Array4<Real> const force_arr = force[lev].array(mfi);
 
                     Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
                     Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
@@ -1526,8 +1527,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                     Array4<Real> const Ip_arr = Ip.array(mfi);
                     Array4<Real> const Im_arr = Im.array(mfi);
-                    Real rel_eps;
-                    get_rel_eps(&rel_eps);
+                    Array4<Real> const Ipf_arr = Ipf.array(mfi);
+                    Array4<Real> const Imf_arr = Imf.array(mfi);
 
                     Array4<Real> const sp_arr = sl.array(mfi);
                     Array4<Real> const sm_arr = sr.array(mfi);
@@ -1537,7 +1538,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            Ip_arr, Im_arr, 
                            sp_arr, sm_arr, 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1, rel_eps);
+                           true, scomp-1, bccomp-1);
 
 // #pragma gpu box(obx)
 //                     ppm_3d(AMREX_INT_ANYD(obx.loVect()),
@@ -1554,29 +1555,35 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 //                            AMREX_INT_ANYD(domainBox.loVect()),
 //                            AMREX_INT_ANYD(domainBox.hiVect()),
 //                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
-//                            scomp, bccomp, nbccomp, true);
+//                            scomp, bccomp, nbccomp,true);
 
                     if (ppm_trace_forces == 1) {
-#pragma gpu box(obx)
-                        ppm_3d(AMREX_INT_ANYD(obx.loVect()),
-                               AMREX_INT_ANYD(obx.hiVect()),
-                               BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                               force_mf.nComp(),
-                               BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                               BL_TO_FORTRAN_ANYD(sl[mfi]),
-                               BL_TO_FORTRAN_ANYD(sr[mfi]),
-                               AMREX_INT_ANYD(domainBox.loVect()),
-                               AMREX_INT_ANYD(domainBox.hiVect()),
-                               bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                               scomp, bccomp, nbccomp, false);
+// #pragma gpu box(obx)
+//                         ppm_3d(AMREX_INT_ANYD(obx.loVect()),
+//                                AMREX_INT_ANYD(obx.hiVect()),
+//                                BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+//                                force_mf.nComp(),
+//                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(Imf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(sl[mfi]),
+//                                BL_TO_FORTRAN_ANYD(sr[mfi]),
+//                                AMREX_INT_ANYD(domainBox.loVect()),
+//                                AMREX_INT_ANYD(domainBox.hiVect()),
+//                                bc_f, AMREX_REAL_ANYD(dx), dt, true,
+//                                scomp, bccomp, nbccomp,false);
+
+                        PPM_3d(obx, force_arr, 
+                           umac_arr, vmac_arr, wmac_arr,
+                           Ipf_arr, Imf_arr, 
+                           sp_arr, sm_arr, 
+                           domainBox, bcs, dx, 
+                           true, scomp-1, bccomp-1);
                     }
                 }
             }
-
 
 #ifdef _OPENMP
 #pragma omp parallel
