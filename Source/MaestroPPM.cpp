@@ -326,7 +326,7 @@ Maestro::PPM_3d (const Box& bx,
             Real alphap = sedger-s(i,j,k,n);
             Real alpham = sedge-s(i,j,k,n);
             bool bigp = fabs(alphap) > 2*fabs(alpham);
-            bool bigm = fabs(alpham)> 2*fabs(alphap);
+            bool bigm = fabs(alpham) > 2*fabs(alphap);
             bool extremum = false;
 
             if (alpham*alphap >= 0.0) {
@@ -560,8 +560,8 @@ Maestro::PPM_3d (const Box& bx,
 
                     Real alphap = sedger-s(i,j,k,n);
                     Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2*abs(alpham);
-                    bool bigm = fabs(alpham) > 2*abs(alphap);
+                    bool bigp = fabs(alphap) > 2*fabs(alpham);
+                    bool bigm = fabs(alpham) > 2*fabs(alphap);
                     bool extremum = false;
 
                     if (alpham*alphap >= 0.0) {
@@ -758,7 +758,7 @@ Maestro::PPM_3d (const Box& bx,
             
             // Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (j == jlo) {
-                if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+                if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                   
                     // The value in the first cc ghost cell represents the edge value.
                     sm = s(i,j-1,k,n);
@@ -777,7 +777,7 @@ Maestro::PPM_3d (const Box& bx,
                 }
 
             } else if (j == jlo+1) {
-                if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+                if (bclo == EXT_DIR || bclo == HOEXTRAP) {
 
                     // Use a modified stencil to get sm on the first interior edge.
                     sm = -0.2 *s(i,j-2,k,n) 
@@ -801,7 +801,6 @@ Maestro::PPM_3d (const Box& bx,
                     } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
                         sm = 3.0*s(i,j,k,n) - 2.0*sp;
                     }
-
                 }
 
             } else if (j == jhi) {
@@ -847,7 +846,6 @@ Maestro::PPM_3d (const Box& bx,
                     } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
                         sm = 3.0*s(i,j,k,n) - 2.0*sp;
                     }
-
                 }
             }
 
@@ -861,32 +859,32 @@ Maestro::PPM_3d (const Box& bx,
                 // v is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(v(i,j+1,k))*dt/hy;
                 if (v(i,j+1,k) > rel_eps) {
-                    Ip(i,j,k,2) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt/hy;
                 if (v(i,j,k) < -rel_eps) {
-                    Im(i,j,k,2) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i,j,k,1) = s(i,j,k,n);
                 }
 
             } else {
 
                 Real sigma = fabs(v(i,j,k))*dt/hy;
                 if (v(i,j,k) > rel_eps) {
-                    Ip(i,j,k,2) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt/hy;
                 if (v(i,j,k) < -rel_eps) {
-                    Im(i,j,k,2) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i,j,k,1) = s(i,j,k,n);
                 }
 
             }
@@ -1287,16 +1285,16 @@ Maestro::PPM_3d (const Box& bx,
                 // v is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(v(i,j+1,k))*dt/hy;
                 if (v(i,j+1,k) > rel_eps) {
-                    Ip(i,j,k,2) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt/hy;
                 if (v(i,j,k) < -rel_eps) {
-                    Im(i,j,k,2) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i,j,k,1) = s(i,j,k,n);
                 }
 
             } else {
@@ -1305,14 +1303,14 @@ Maestro::PPM_3d (const Box& bx,
                 if (v(i,j,k) > rel_eps) {
                     Ip(i,j,k,2) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt/hy;
                 if (v(i,j,k) < -rel_eps) {
-                    Im(i,j,k,2) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i,j,k,1) = s(i,j,k,n);
                 }
             }
         });

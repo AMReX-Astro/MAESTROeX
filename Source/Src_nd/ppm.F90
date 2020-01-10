@@ -2115,6 +2115,7 @@ contains
     ! Compute s at y-edges.
     !
     if (ppm_type .eq. 1) then
+        if (use_cpp .eq. 0) then
 
        !----------------------------------------------------------------------
        ! ppm_type = 1
@@ -2353,7 +2354,7 @@ contains
              end do
           end do
        end do
-
+    endif
     else if (ppm_type .eq. 2) then
 
        !----------------------------------------------------------------------
