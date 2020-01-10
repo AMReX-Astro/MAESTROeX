@@ -964,13 +964,15 @@ public:
 #if (AMREX_SPACEDIM == 2)
     void PPM_2d();
 #else
-    void PPM_3d(const amrex::Box bx, 
+    void PPM_3d(const amrex::Box& bx, 
                 amrex::Array4<amrex::Real> const scal,
                 amrex::Array4<amrex::Real> const u,
                 amrex::Array4<amrex::Real> const v,
                 amrex::Array4<amrex::Real> const w,
                 amrex::Array4<amrex::Real> const Ip,
                 amrex::Array4<amrex::Real> const Im,
+                amrex::Array4<amrex::Real> const sp_arr,
+                amrex::Array4<amrex::Real> const sm_arr,
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
                 const amrex::Real* dx,

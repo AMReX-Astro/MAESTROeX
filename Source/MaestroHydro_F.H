@@ -107,11 +107,13 @@ extern "C"
         const amrex::Real* w,  const int* w_lo, const int* w_hi,
         amrex::Real* Ip, const int* ip_lo, const int* ip_hi,
         amrex::Real* Im, const int* im_lo, const int* im_hi,
+        amrex::Real* sp, const int* sp_lo, const int* sp_hi,
+        amrex::Real* sm, const int* sm_lo, const int* sm_hi,
         const int* domlo, const int* domhi,
         const int* adv_bc,
         const amrex::Real* dx, const amrex::Real dt,
         const int is_umac, const int comp, const int bccomp, 
-        const int nbccomp);
+        const int nbccomp, const int use_cpp);
 #endif
 
     //////////////////////

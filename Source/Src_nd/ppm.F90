@@ -1349,12 +1349,15 @@ contains
   subroutine ppm_3d(lo,hi,s,s_lo,s_hi,nc_s, &
        u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
        Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
+       spp,sp_lo,sp_hi,smm,sm_lo,sm_hi, &
        domlo,domhi, &
-       adv_bc,dx,dt,is_umac,comp,bccomp,nbccomp) bind(C,name="ppm_3d")
+       adv_bc,dx,dt,is_umac,comp,bccomp,nbccomp, &
+       use_cpp) bind(C,name="ppm_3d")
 
     integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
     integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
     integer         , intent(in   ) :: im_lo(3),im_hi(3),ip_lo(3),ip_hi(3)
+    integer         , intent(in   ) :: sm_lo(3),sm_hi(3),sp_lo(3),sp_hi(3)
     integer,   value, intent(in   ) :: nc_s
     double precision, intent(in   ) ::  s(s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) ::  u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
@@ -1362,10 +1365,12 @@ contains
     double precision, intent(in   ) ::  w(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
     double precision, intent(inout) :: Ip(ip_lo(1):ip_hi(1),ip_lo(2):ip_hi(2),ip_lo(3):ip_hi(3),AMREX_SPACEDIM)
     double precision, intent(inout) :: Im(im_lo(1):im_hi(1),im_lo(2):im_hi(2),im_lo(3):im_hi(3),AMREX_SPACEDIM)
+    double precision, intent(inout) :: spp(sp_lo(1):sp_hi(1),sp_lo(2):sp_hi(2),sp_lo(3):sp_hi(3))
+    double precision, intent(inout) :: smm(sm_lo(1):sm_hi(1),sm_lo(2):sm_hi(2),sm_lo(3):sm_hi(3))
     integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer,   value, intent(in   ) :: is_umac, comp, bccomp, nbccomp
+    integer,   value, intent(in   ) :: is_umac, comp, bccomp, nbccomp, use_cpp
 
     ! local
     integer :: i,j,k,n
@@ -1396,13 +1401,14 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
-
+        if (use_cpp .eq. 0) then
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
                 !
                 ! Compute van Leer slopes in x-direction.
                 !
+                
 
                 ! sm
                 dsvl_l = ZERO
@@ -1584,11 +1590,18 @@ contains
                    end if
                 end if
 
+                if (use_cpp .eq. 1) then 
+                    sp = spp(i,j,k)
+                    sm = smm(i,j,k)
+                endif
+
                 !-------------------------------------------------------------------------
                 ! Compute x-component of Ip and Im.
                 !-------------------------------------------------------------------------
-
+                
                 if (is_umac == 1) then
+
+                    ! if (use_cpp .eq. 0) then 
 
                    ! u is MAC velocity -- use edge-based indexing
                    sigma = abs(u(i+1,j,k))*dt/dx(1)
@@ -1633,6 +1646,7 @@ contains
              end do
           end do
        end do
+    endif
 
 
     else if (ppm_type .eq. 2) then

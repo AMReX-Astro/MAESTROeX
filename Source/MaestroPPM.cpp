@@ -18,13 +18,15 @@ Maestro::PPM_2d ()
 #else
 
 void
-Maestro::PPM_3d (const Box bx, 
+Maestro::PPM_3d (const Box& bx, 
                  Array4<Real> const s,
                  Array4<Real> const u,
                  Array4<Real> const v,
                  Array4<Real> const w,
                  Array4<Real> const Ip,
                  Array4<Real> const Im,
+                 Array4<Real> const sp_arr,
+                 Array4<Real> const sm_arr,
                  const Box& domainBox,
                  const Vector<BCRec>& bcs,
                  const Real* dx,
@@ -58,18 +60,14 @@ Maestro::PPM_3d (const Box bx,
         {
             // Compute van Leer slopes in x-direction 
 
-            Real dsc = 0.0;
-            Real dsl = 0.0;
-            Real dsr = 0.0;
-
             // sm
             Real dsvl_l = 0.0;
             Real dsvl_r = 0.0;
 
             // left side 
-            dsc = 0.5 * (s(i,j,k,n) - s(i-2,j,k,n));
-            dsl = 2   * (s(i-1,j,k,n) - s(i-2,j,k,n));
-            dsr = 2   * (s(i,j,k,n) - s(i-1,j,k,n));
+            Real dsc = 0.5 * (s(i,j,k,n) - s(i-2,j,k,n));
+            Real dsl = 2   * (s(i-1,j,k,n) - s(i-2,j,k,n));
+            Real dsr = 2   * (s(i,j,k,n) - s(i-1,j,k,n));
             if (dsl*dsr > 0.0) 
                 dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
 
@@ -144,7 +142,7 @@ Maestro::PPM_3d (const Box bx,
                     sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
                 }
 
-            } else if (i == ilo + 1) {
+            } else if (i == ilo+1) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                     
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -210,55 +208,51 @@ Maestro::PPM_3d (const Box bx,
                         sm = s(i,j,k,n);
                     } else if (fabs(sp-s(i,j,k,n)) >= 2*fabs(sm-s(i,j,k,n))) {
                         sp = 3*s(i,j,k,n) - 2*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2*abs(sp-s(i,j,k,n))) {
+                    } else if (fabs(sm-s(i,j,k,n)) >= 2*fabs(sp-s(i,j,k,n))) {
                         sm = 3*s(i,j,k,n) - 2*sp;
                     }
                 }
             }
 
+            sp_arr(i,j,k) = sp;
+            sm_arr(i,j,k) = sm;
+
+            // continue;
+
             ////////////////////////////////////
             // Compute x-component of Ip and Im.
             ////////////////////////////////////
-            Real sigma = 0.0;
-            Real s6 = 0.0;
+            Real s6 = 6*s(i,j,k,n) - 3*(sm+sp);
 
             if (is_umac) {
 
                 // u is MAC velocity -- use edge-based indexing
-                sigma = fabs(u(i+1,j,k)) * dt / hx;
-                s6 = 6*s(i,j,k,n) - 3*(sm+sp);
+                Real sigma = fabs(u(i+1,j,k)) * dt / hx;
                 if (u(i+1,j,k) > rel_eps) {
-                    Ip(i,j,k,0) = sp - 
-                        0.5*sigma*(sp-sm-(1-2.0/3.0*sigma)*s6);
+                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
                 sigma = fabs(u(i,j,k)) * dt / hx;
-                s6 = 6*s(i,j,k,n) - 3*(sm+sp);
                 if (u(i,j,k) < -rel_eps) {
-                    Im(i,j,k,0) = sm + 
-                        0.5*sigma*(sp-sm+(1-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
                }
 
             } else {
 
-                sigma = fabs(u(i,j,k))*dt/hx;
-                s6 = 6*s(i,j,k,n) - 3*(sm+sp);
+                Real sigma = fabs(u(i,j,k))*dt/hx;
                 if (u(i,j,k) > rel_eps) {
-                    Ip(i,j,k,0) = sp - 
-                        0.5*sigma*(sp-sm-(1-2.0/3.0*sigma)*s6);
+                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
                 sigma = fabs(u(i,j,k))*dt/hx;
-                s6 = 6*s(i,j,k,n) - 3*(sm+sp);
                 if (u(i,j,k) < -rel_eps) {
-                    Im(i,j,k,0) = sm + 
-                        0.5*sigma*(sp-sm+(1-2.0/3.0*sigma)*s6);
+                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
                 }
@@ -679,9 +673,7 @@ Maestro::PPM_3d (const Box bx,
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
                 }
-
             }
-
         });
 
     }
