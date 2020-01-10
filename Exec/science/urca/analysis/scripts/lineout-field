@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import yt
 from yt import derived_field
 import numpy as np
-from UrcaAnalysis import UrcaShellFields, DatasetHelpers
+from UrcaAnalysis.yt_extensions import UrcaShellFields, DatasetHelpers
 import argparse
 
 parser = argparse.ArgumentParser()

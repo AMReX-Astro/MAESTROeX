@@ -7,7 +7,7 @@ from yt.visualization.volume_rendering.transfer_function_helper import TransferF
 from yt.visualization.volume_rendering.api import Scene, VolumeSource, Camera, ColorTransferFunction
 import numpy as np
 import argparse
-from yt_urca_fields import UrcaShellFields, DatasetHelpers
+from UrcaAnalysis.yt_extensions import UrcaShellFields, DatasetHelpers
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
