@@ -139,9 +139,9 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     {
         if (ppm_type_local == 0) {
             sly(i,j,k) = scal(i,j-1,k,comp) + 
-                0.5 * (1.0 - dt * vmac(i,j,k) / hy) * Ip(i,j-1,k,0);
+                0.5 * (1.0 - dt * vmac(i,j,k) / hy) * Im(i,j-1,k,0);
             sry(i,j,k) = scal(i,j,k,comp) - 
-                0.5 * (1.0 + dt * vmac(i,j,k) / hy) * Ip(i,j,k,0);
+                0.5 * (1.0 + dt * vmac(i,j,k) / hy) * Im(i,j,k,0);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             sly(i,j,k) = Ip(i,j-1,k,1);
             sry(i,j,k) = Im(i,j,k,1);
