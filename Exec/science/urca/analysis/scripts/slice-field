@@ -8,7 +8,7 @@ import yt
 from yt import derived_field
 import numpy as np
 import argparse
-from UrcaAnalysis import UrcaShellFields
+from UrcaAnalysis.yt_extensions import UrcaShellFields
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
@@ -36,6 +36,8 @@ parser.add_argument('-natorg', '--native_origin', action='store_true', help='Use
 parser.add_argument('-ls', '--list_fields', action='store_true', help='If supplied, do nothing except list the available fields.')
 parser.add_argument('-extrema', '--print_extrema', action='store_true', help='If supplied, list the max and min of the field(s).')
 args = parser.parse_args()
+
+yt.enable_parallelism()
 
 def slicefield(ds, field, field_short_name):
     slice_function = None
