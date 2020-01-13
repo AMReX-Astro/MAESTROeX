@@ -551,7 +551,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             // make slyz, sryz by updating 1D extrapolation
             slyz = sly(i,j,k) 
                 - (dt3/hz) * (simhz(i,j-1,k+1)*wmac(i,j-1,k+1) 
-                - simhz(i,j-1,k)*umac(i,j-1,k)) 
+                - simhz(i,j-1,k)*wmac(i,j-1,k)) 
                 - dt3*scal(i,j-1,k,comp)*divu(i,j-1,k) 
                 + (dt3/hz)*scal(i,j-1,k,comp)*
                 (wmac(i,j-1,k+1)-wmac(i,j-1,k));
@@ -711,7 +711,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
                 - simhy(i,j,k-1)*vmac(i,j,k-1)) 
                 - dt3*scal(i,j,k-1,comp)*divu(i,j,k-1) 
                 + (dt3/hy)*scal(i,j,k-1,comp)*
-                (umac(i,j+1,k-1)-vmac(i,j,k-1));
+                (vmac(i,j+1,k-1)-vmac(i,j,k-1));
             srzy = srz(i,j,k) 
                 - (dt3/hy)*(simhy(i,j+1,k)*vmac(i,j+1,k)
                 - simhy(i,j,k)*vmac(i,j,k)) 
