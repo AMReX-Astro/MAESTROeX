@@ -1343,42 +1343,66 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     }
                 }
 
+                Array4<Real> const scal_arr = state[lev].array(mfi);
+
+                Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
+                Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
+
+                Array4<Real> const slx_arr = slx.array(mfi);
+                Array4<Real> const srx_arr = srx.array(mfi);
+                Array4<Real> const sly_arr = sly.array(mfi);
+                Array4<Real> const sry_arr = sry.array(mfi);
+
+                Array4<Real> const simhx_arr = simhx.array(mfi);
+                Array4<Real> const simhy_arr = simhy.array(mfi);
+
+                // Create s_{\i-\half\e_x}^x, etc.
+
+                MakeEdgeScalPredictor(mfi, slx_arr, srx_arr,
+                                      sly_arr, sry_arr,
+                                      scal_arr, 
+                                      Ip.array(mfi), Im.array(mfi), 
+                                      umac_arr, vmac_arr, 
+                                      simhx_arr, simhy_arr, 
+                                      domainBox, bcs, dx,
+                                      scomp-1, bccomp-1, is_vel);
+
                 // call fortran subroutine
                 // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
                 // lo/hi coordinates (including ghost cells), and/or the # of components
                 // We will also pass "validBox", which specifies the "valid" region.
 
                 // x-direction
-#pragma gpu box(mxbx)
-                make_edge_scal_predictor_2d(
-                    AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-                    BL_TO_FORTRAN_ANYD(slx[mfi]),
-                    BL_TO_FORTRAN_ANYD(srx[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhx[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+// #pragma gpu box(mxbx)
+//                 make_edge_scal_predictor_2d(
+//                     AMREX_INT_ANYD(mxbx.loVect()), AMREX_INT_ANYD(mxbx.hiVect()), 1,
+//                     AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+//                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+//                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                     BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                     BL_TO_FORTRAN_ANYD(slx[mfi]),
+//                     BL_TO_FORTRAN_ANYD(srx[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhx[mfi]),
+//                     AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                     nbccomp, scomp, bccomp);
 
-                // y-direction
-#pragma gpu box(mybx)
-                make_edge_scal_predictor_2d(
-                    AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
-                    AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                    BL_TO_FORTRAN_ANYD(Im[mfi]),
-                    BL_TO_FORTRAN_ANYD(sly[mfi]),
-                    BL_TO_FORTRAN_ANYD(sry[mfi]),
-                    BL_TO_FORTRAN_ANYD(simhy[mfi]),
-                    AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
-                    nbccomp, scomp, bccomp);
+//                 // y-direction
+// #pragma gpu box(mybx)
+//                 make_edge_scal_predictor_2d(
+//                     AMREX_INT_ANYD(mybx.loVect()), AMREX_INT_ANYD(mybx.hiVect()), 2,
+//                     AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
+//                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]), scal_mf.nComp(), scal_mf.nGrow(),
+//                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                     BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                     BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                     BL_TO_FORTRAN_ANYD(sly[mfi]),
+//                     BL_TO_FORTRAN_ANYD(sry[mfi]),
+//                     BL_TO_FORTRAN_ANYD(simhy[mfi]),
+//                     AMREX_REAL_ANYD(dx), dt, is_vel, bc_f,
+//                     nbccomp, scomp, bccomp);
 
                 // x-direction
 #pragma gpu box(xbx)
