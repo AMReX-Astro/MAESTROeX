@@ -1,7 +1,6 @@
 
 #include <Maestro.H>
 #include <MaestroHydro_F.H>
-#include <MaestroBCThreads.H>
 
 using namespace amrex;
 
@@ -25,8 +24,6 @@ Maestro::PPM_3d (const Box& bx,
                  Array4<Real> const w,
                  Array4<Real> const Ip,
                  Array4<Real> const Im,
-                 Array4<Real> const sp_arr,
-                 Array4<Real> const sm_arr,
                  const Box& domainBox,
                  const Vector<BCRec>& bcs,
                  const Real* dx,
@@ -217,11 +214,6 @@ Maestro::PPM_3d (const Box& bx,
                 }
             }
 
-            // sp_arr(i,j,k) = sp;
-            // sm_arr(i,j,k) = sm;
-
-            // continue;
-
             ////////////////////////////////////
             // Compute x-component of Ip and Im.
             ////////////////////////////////////
@@ -273,7 +265,8 @@ Maestro::PPM_3d (const Box& bx,
                     - (1.0/12.0)*(s(i-3,j,k,n)+s(i,j,k,n));
 
             // Limit sedge.
-            if ((sedgel-s(i-2,j,k,n))*(s(i-1,j,k,n)-sedgel) < 0.0) {               Real D2  = 3*(s(i-2,j,k,n)-2*sedgel+s(i-1,j,k,n));
+            if ((sedgel-s(i-2,j,k,n))*(s(i-1,j,k,n)-sedgel) < 0.0) {
+                Real D2  = 3*(s(i-2,j,k,n)-2*sedgel+s(i-1,j,k,n));
                 Real D2L = s(i-3,j,k,n)-2*s(i-2,j,k,n)+s(i-1,j,k,n);
                 Real D2R = s(i-2,j,k,n)-2*s(i-1,j,k,n)+s(i,j,k,n);
                 Real sgn = copysign(1.0,D2);
@@ -746,11 +739,6 @@ Maestro::PPM_3d (const Box& bx,
             // Make sure sedge lies in between adjacent cell-centered values.
             sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)));
             sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
-
-            // sp_arr(i,j,k) = sp;
-            // sm_arr(i,j,k) = sm;
-
-            // continue;
 
             // save for later 
             Real sedgel = sp;

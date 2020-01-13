@@ -752,6 +752,97 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakeEdgeScal.cpp functions
+
+    void MakeDivU(const amrex::Box& bx, 
+                  amrex::Array4<amrex::Real> const divu,
+                  amrex::Array4<amrex::Real> const umac,
+                  amrex::Array4<amrex::Real> const vmac,
+                  amrex::Array4<amrex::Real> const wmac,
+                  const amrex::Real* dx);
+
+    void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
+                               amrex::Array4<amrex::Real> const slx,
+                               amrex::Array4<amrex::Real> const srx,
+                               amrex::Array4<amrex::Real> const sly,
+                               amrex::Array4<amrex::Real> const sry,
+                               amrex::Array4<amrex::Real> const slz,
+                               amrex::Array4<amrex::Real> const srz,
+                               amrex::Array4<amrex::Real> const scal,
+                               amrex::Array4<amrex::Real> const Ip,
+                               amrex::Array4<amrex::Real> const Im, 
+                               amrex::Array4<amrex::Real> const slopez, 
+                               amrex::Array4<amrex::Real> const umac,
+                               amrex::Array4<amrex::Real> const vmac,
+                               amrex::Array4<amrex::Real> const wmac,
+                               amrex::Array4<amrex::Real> const simhx,
+                               amrex::Array4<amrex::Real> const simhy,
+                               amrex::Array4<amrex::Real> const simhz,
+                               const amrex::Box& domainBox,
+                               const amrex::Vector<amrex::BCRec>& bcs,
+                               const amrex::Real* dx,
+                               int comp, int bccomp, bool is_vel);
+
+    void MakeEdgeScalTransverse(const amrex::MFIter& mfi,
+                               amrex::Array4<amrex::Real> const slx,
+                               amrex::Array4<amrex::Real> const srx,
+                               amrex::Array4<amrex::Real> const sly,
+                               amrex::Array4<amrex::Real> const sry,
+                               amrex::Array4<amrex::Real> const slz,
+                               amrex::Array4<amrex::Real> const srz,
+                               amrex::Array4<amrex::Real> const scal,
+                               amrex::Array4<amrex::Real> const divu,
+                               amrex::Array4<amrex::Real> const umac,
+                               amrex::Array4<amrex::Real> const vmac,
+                               amrex::Array4<amrex::Real> const wmac,
+                               amrex::Array4<amrex::Real> const simhx,
+                               amrex::Array4<amrex::Real> const simhy,
+                               amrex::Array4<amrex::Real> const simhz,
+                               amrex::Array4<amrex::Real> const simhxy,
+                               amrex::Array4<amrex::Real> const simhxz,
+                               amrex::Array4<amrex::Real> const simhyx,
+                               amrex::Array4<amrex::Real> const simhyz,
+                               amrex::Array4<amrex::Real> const simhzx,
+                               amrex::Array4<amrex::Real> const simhzy,
+                               const amrex::Box& domainBox,
+                               const amrex::Vector<amrex::BCRec>& bcs,
+                               const amrex::Real* dx,
+                               int comp, int bccomp, 
+                               bool is_vel, bool is_conservative);
+
+    void MakeEdgeScalEdges(const amrex::MFIter& mfi,
+                            amrex::Array4<amrex::Real> const slx,
+                            amrex::Array4<amrex::Real> const srx,
+                            amrex::Array4<amrex::Real> const sly,
+                            amrex::Array4<amrex::Real> const sry,
+                            amrex::Array4<amrex::Real> const slz,
+                            amrex::Array4<amrex::Real> const srz,
+                            amrex::Array4<amrex::Real> const scal,
+                            amrex::Array4<amrex::Real> const sedgex,
+                            amrex::Array4<amrex::Real> const sedgey,
+                            amrex::Array4<amrex::Real> const sedgez,
+                            amrex::Array4<amrex::Real> const force,
+                            amrex::Array4<amrex::Real> const umac,
+                            amrex::Array4<amrex::Real> const vmac,
+                            amrex::Array4<amrex::Real> const wmac,
+                            amrex::Array4<amrex::Real> const Ipf,
+                            amrex::Array4<amrex::Real> const Imf,
+                            amrex::Array4<amrex::Real> const simhxy,
+                            amrex::Array4<amrex::Real> const simhxz,
+                            amrex::Array4<amrex::Real> const simhyx,
+                            amrex::Array4<amrex::Real> const simhyz,
+                            amrex::Array4<amrex::Real> const simhzx,
+                            amrex::Array4<amrex::Real> const simhzy,
+                            const amrex::Box& domainBox,
+                            const amrex::Vector<amrex::BCRec>& bcs,
+                            const amrex::Real* dx,
+                            int comp, int bccomp, 
+                            bool is_vel, bool is_conservative);
+
+    // end MaestroMakeEdgeScal.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeEta.cpp functions
 
     /// Compute `eta_rho` at edge- and cell-centers
@@ -971,8 +1062,6 @@ public:
                 amrex::Array4<amrex::Real> const w,
                 amrex::Array4<amrex::Real> const Ip,
                 amrex::Array4<amrex::Real> const Im,
-                amrex::Array4<amrex::Real> const sp_arr,
-                amrex::Array4<amrex::Real> const sm_arr,
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
                 const amrex::Real* dx,
