@@ -770,6 +770,27 @@ public:
                                const amrex::Vector<amrex::BCRec>& bcs,
                                const amrex::Real* dx,
                                int comp, int bccomp, bool is_vel);
+
+    void MakeEdgeScalEdges(const amrex::MFIter& mfi,
+                            amrex::Array4<amrex::Real> const slx,
+                            amrex::Array4<amrex::Real> const srx,
+                            amrex::Array4<amrex::Real> const sly,
+                            amrex::Array4<amrex::Real> const sry,
+                            amrex::Array4<amrex::Real> const scal,
+                            amrex::Array4<amrex::Real> const sedgex,
+                            amrex::Array4<amrex::Real> const sedgey,
+                            amrex::Array4<amrex::Real> const force,
+                            amrex::Array4<amrex::Real> const umac,
+                            amrex::Array4<amrex::Real> const vmac,
+                            amrex::Array4<amrex::Real> const Ipf,
+                            amrex::Array4<amrex::Real> const Imf,
+                            amrex::Array4<amrex::Real> const simhx,
+                            amrex::Array4<amrex::Real> const simhy,
+                            const amrex::Box& domainBox,
+                            const amrex::Vector<amrex::BCRec>& bcs,
+                            const amrex::Real* dx,
+                            int comp, int bccomp, 
+                            bool is_vel, bool is_conservative);
 #else
     void MakeDivU(const amrex::Box& bx, 
                   amrex::Array4<amrex::Real> const divu,
