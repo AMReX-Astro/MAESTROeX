@@ -458,9 +458,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     });
 
     // simhyx
-    imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
-    // imhbox = amrex::grow(mfi.tilebox(), 2, 1);
-    // imhbox = amrex::growHi(imhbox, 1, 1);
+    // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(0,0,1));
+    imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+    imhbox = amrex::growHi(imhbox, 1, 1);
 
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
@@ -538,9 +538,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     });
 
     // simhyz
-    imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
-    // imhbox = amrex::grow(mfi.tilebox(), 0, 1);
-    // imhbox = amrex::growHi(imhbox, 1, 1);
+    // imhbox = mfi.grownnodaltilebox(1, amrex::IntVect(1,0,0)); 
+    imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+    imhbox = amrex::growHi(imhbox, 1, 1);
 
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
     {
@@ -615,9 +615,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     });
 
     // simhzx
-    imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
-    // imhbox = amrex::grow(mfi.tilebox(), 1, 1);
-    // imhbox = amrex::growHi(imhbox, 2, 1);
+    // imhbox = mfi.grownnodaltilebox(2, amrex::IntVect(0,1,0));
+    imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+    imhbox = amrex::growHi(imhbox, 2, 1);
 
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
@@ -695,9 +695,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     });
 
     // simhzy
-    imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
-    // imhbox = amrex::grow(mfi.tilebox(), 0, 1);
-    // imhbox = amrex::growHi(imhbox, 2, 1);
+    // imhbox = mfi.grownnodaltilebox(2, IntVect(1,0,0));
+    imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+    imhbox = amrex::growHi(imhbox, 2, 1);
 
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
     {
