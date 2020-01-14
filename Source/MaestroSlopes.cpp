@@ -22,8 +22,14 @@ Maestro::Slopex(const Box& bx,
 
     int ilo = domainBox.loVect()[0];
     int ihi = domainBox.hiVect()[0];
-    int bclo = bcs[bc_start_comp].lo()[0];
-    int bchi = bcs[bc_start_comp].hi()[0];
+
+    // create lo and hi vectors 
+    IntVector bclo(ncomp);
+    IntVector bchi(ncomp);
+    for (int i = 0; i < ncomp; ++i) {
+        bclo[i] = bcs[bc_start_comp+i].lo()[0];
+        bchi[i] = bcs[bc_start_comp+i].hi()[0];
+    }
 
     if (slope_order == 0) {
         // 1st order
@@ -36,7 +42,6 @@ Maestro::Slopex(const Box& bx,
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-            int bccomp = bc_start_comp + n;
 
             Real del = 0.5*(s(i+1,j,k,n) - s(i-1,j,k,n));
             Real dpls = 2.0*(s(i+1,j,k,n) - s(i  ,j,k,n));
@@ -46,7 +51,7 @@ Maestro::Slopex(const Box& bx,
             Real sflag = copysign(1.0,del);
             slx(i,j,k,n)= sflag*min(slim,fabs(del));
 
-            if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR  || bclo[n] == HOEXTRAP) {
                 if (i == ilo-1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ilo) {
@@ -61,7 +66,7 @@ Maestro::Slopex(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR  || bchi[n] == HOEXTRAP) {
                 if (i == ihi+1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ihi) {
@@ -81,8 +86,6 @@ Maestro::Slopex(const Box& bx,
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-
-            int bccomp = bc_start_comp + n;
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i-2,j,k,n));
@@ -113,7 +116,7 @@ Maestro::Slopex(const Box& bx,
             Real ds = 4.0/3.0 * dcen - (dxr + dxl) / 6.0;
             slx(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
-            if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR  || bclo[n] == HOEXTRAP) {
                 if (i == ilo-1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ilo) {
@@ -141,7 +144,7 @@ Maestro::Slopex(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR  || bchi[n] == HOEXTRAP) {
                 if (i == ihi+1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ihi) {
@@ -192,8 +195,14 @@ Maestro::Slopey(const Box& bx,
 
     int jlo = domainBox.loVect()[1];
     int jhi = domainBox.hiVect()[1];
-    int bclo = bcs[bc_start_comp].lo()[1];
-    int bchi = bcs[bc_start_comp].hi()[1];
+
+    // create lo and hi vectors 
+    IntVector bclo(ncomp);
+    IntVector bchi(ncomp);
+    for (int i = 0; i < ncomp; ++i) {
+        bclo[i] = bcs[bc_start_comp+i].lo()[1];
+        bchi[i] = bcs[bc_start_comp+i].hi()[1];
+    }
 
     if (slope_order == 0) {
         // 1st order
@@ -206,7 +215,6 @@ Maestro::Slopey(const Box& bx,
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-            int bccomp = bc_start_comp + n;
 
             Real del  = 0.5*(s(i,j+1,k,n) - s(i,j-1,k,n));
             Real dpls = 2.0 *(s(i,j+1,k,n) - s(i,j  ,k,n));
@@ -217,7 +225,7 @@ Maestro::Slopey(const Box& bx,
             sly(i,j,k,n)= sflag*min(slim,fabs(del));
 
 
-            if (bclo == EXT_DIR || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
                 if (j == jlo-1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jlo) {
@@ -232,7 +240,7 @@ Maestro::Slopey(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
                 if (j == jhi+1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jhi) {
@@ -251,7 +259,6 @@ Maestro::Slopey(const Box& bx,
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-            int bccomp = bc_start_comp + n;
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i,j-2,k,n));
@@ -283,7 +290,7 @@ Maestro::Slopey(const Box& bx,
             sly(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
 
-            if (bclo == EXT_DIR || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
                 if (j == jlo-1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jlo) {
@@ -311,7 +318,7 @@ Maestro::Slopey(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
                 if (j == jhi+1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jhi) {
@@ -361,8 +368,14 @@ Maestro::Slopez(const Box& bx,
 
     int klo = domainBox.loVect()[2];
     int khi = domainBox.hiVect()[2];
-    int bclo = bcs[bc_start_comp].lo()[2];
-    int bchi = bcs[bc_start_comp].hi()[2];
+
+    // create lo and hi vectors 
+    IntVector bclo(ncomp);
+    IntVector bchi(ncomp);
+    for (int i = 0; i < ncomp; ++i) {
+        bclo[i] = bcs[bc_start_comp+i].lo()[2];
+        bchi[i] = bcs[bc_start_comp+i].hi()[2];
+    }
 
     if (slope_order == 0) {
         // 1st order
@@ -375,7 +388,6 @@ Maestro::Slopez(const Box& bx,
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-            int bccomp = bc_start_comp + n;
 
             Real del  = 0.5*(s(i,j,k+1,n) - s(i,j,k-1,n));
             Real dpls = 2.0 *(s(i,j,k+1,n) - s(i,j,k  ,n));
@@ -385,7 +397,7 @@ Maestro::Slopez(const Box& bx,
             Real sflag = copysign(1.0,del);
             slz(i,j,k,n)= sflag*min(slim,fabs(del));
 
-            if (bclo == EXT_DIR || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
                 if (k == klo-1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == klo) {
@@ -400,7 +412,7 @@ Maestro::Slopez(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
                 if (k == khi+1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == khi) {
@@ -419,7 +431,6 @@ Maestro::Slopez(const Box& bx,
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
-            int bccomp = bc_start_comp + n;
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i,j,k-2,n));
@@ -450,7 +461,7 @@ Maestro::Slopez(const Box& bx,
             Real ds = 4.0/3.0 * dcen - (dzr + dzl) / 6.0;
             slz(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
-            if (bclo == EXT_DIR || bclo == HOEXTRAP) {
+            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
                 if (k == klo-1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == klo) {
@@ -478,7 +489,7 @@ Maestro::Slopez(const Box& bx,
                 }
             }
 
-            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
+            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
                 if (k == khi+1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == khi) {
@@ -505,8 +516,6 @@ Maestro::Slopez(const Box& bx,
                     slz(i,j,k,n) = dflag*min(fabs(ds),dlim);
                 }
             }
-
         });
-
     }
 }

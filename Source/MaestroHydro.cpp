@@ -1206,13 +1206,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhzx.define(grids[lev],dmap[lev],1,1);
         simhzy.define(grids[lev],dmap[lev],1,1);
 
-        MultiFab sl, sr;
-        sl.define(grids[lev],dmap[lev],1,1);
-        sr.define(grids[lev],dmap[lev],1,1);
-        sl.setVal(0.);
-        sr.setVal(0);
-
-
         slx.setVal(0.);
         srx.setVal(0.);
         simhx.setVal(0.);
@@ -1256,9 +1249,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
             const Box& obx = amrex::grow(tileBox, 1);
 
             // Be careful to pass in comp+1 for fortran indexing
-            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+            for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
 
-                int vcomp = scomp - start_scomp - 1;
+                int vcomp = scomp - start_scomp;
                 int bccomp = start_bccomp + scomp - start_scomp;
 
                 Array4<Real> const scal_arr = state[lev].array(mfi);
@@ -1282,7 +1275,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
                            Ip.array(mfi), 
                            domainBox, bcs, dx, 
-                           1,bccomp-1);
+                           1,bccomp);
 // #pragma gpu box(obx)
 //                     slopex_2d(AMREX_INT_ANYD(obx.loVect()),
 //                               AMREX_INT_ANYD(obx.hiVect()),
@@ -1297,7 +1290,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
                            Im.array(mfi), 
                            domainBox, bcs, dx, 
-                           1,bccomp-1);
+                           1,bccomp);
 // #pragma gpu box(obx)
 //                     slopey_2d(AMREX_INT_ANYD(obx.loVect()),
 //                               AMREX_INT_ANYD(obx.hiVect()),
@@ -1314,7 +1307,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            umac_arr, vmac_arr, 
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
@@ -1324,7 +1317,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            umac_arr, vmac_arr, 
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
                     }
                 }
 
@@ -1337,7 +1330,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                       umac_arr, vmac_arr, 
                                       simhx_arr, simhy_arr, 
                                       domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, is_vel);
+                                      scomp, bccomp, is_vel);
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
                 Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
@@ -1353,7 +1346,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                 Ipf.array(mfi), Imf.array(mfi),
                                 simhx_arr, simhy_arr, 
                                 domainBox, bcs, dx,
-                                scomp-1, bccomp-1, 
+                                scomp, bccomp, 
                                 is_vel, is_conservative);
             } // end loop over components
         } // end MFIter loop
@@ -1378,9 +1371,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         }
 
         // Be careful to pass in comp+1 for fortran indexing
-        for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+        for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
 
-            int vcomp = scomp - start_scomp - 1;
+            int vcomp = scomp - start_scomp;
 
             int bccomp = start_bccomp + scomp - start_scomp;
 
@@ -1415,37 +1408,49 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // as they have the correct number of ghost zones
 
                     // x-direction
-#pragma gpu box(obx)
-                    slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, dx, 
+                           1,bccomp);
+// #pragma gpu box(obx)
+//                     slopex_2d(AMREX_INT_ANYD(obx.loVect()),
+//                               AMREX_INT_ANYD(obx.hiVect()),
+//                               BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+//                               vec_scal_mf[vcomp].nComp(),
+//                               BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
+//                               AMREX_INT_ANYD(domainBox.loVect()),
+//                               AMREX_INT_ANYD(domainBox.hiVect()),
+//                               1,bc_f,nbccomp,bccomp);
 
                     // y-direction
-#pragma gpu box(obx)
-                    slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, dx, 
+                           1,bccomp);
+// #pragma gpu box(obx)
+//                     slopey_2d(AMREX_INT_ANYD(obx.loVect()),
+//                               AMREX_INT_ANYD(obx.hiVect()),
+//                               BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+//                               vec_scal_mf[vcomp].nComp(),
+//                               BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
+//                               AMREX_INT_ANYD(domainBox.loVect()),
+//                               AMREX_INT_ANYD(domainBox.hiVect()),
+//                               1,bc_f,nbccomp,bccomp);
 
                     // z-direction
-#pragma gpu box(obx)
-                    slopez_3d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(slopez[mfi]),slopez.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopez(obx, vec_scal_mf[vcomp].array(mfi), 
+                           slopez.array(mfi), 
+                           domainBox, bcs, dx, 
+                           1,bccomp);
+// #pragma gpu box(obx)
+//                     slopez_3d(AMREX_INT_ANYD(obx.loVect()),
+//                               AMREX_INT_ANYD(obx.hiVect()),
+//                               BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+//                               vec_scal_mf[vcomp].nComp(),
+//                               BL_TO_FORTRAN_ANYD(slopez[mfi]),slopez.nComp(),
+//                               AMREX_INT_ANYD(domainBox.loVect()),
+//                               AMREX_INT_ANYD(domainBox.hiVect()),
+//                               1,bc_f,nbccomp,bccomp);
 
 
                 } else {
@@ -1457,7 +1462,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            umac_arr, vmac_arr, wmac_arr,
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
@@ -1465,7 +1470,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            umac_arr, vmac_arr, wmac_arr,
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
                     }
                 }
             }
@@ -1503,7 +1508,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                       umac_arr, vmac_arr, wmac_arr,
                                       simhx_arr, simhy_arr, simhz_arr,
                                       domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, is_vel);
+                                      scomp, bccomp, is_vel);
 
                 Array4<Real> const simhxy_arr = simhxy.array(mfi);
                 Array4<Real> const simhxz_arr = simhxz.array(mfi);
@@ -1523,7 +1528,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                       simhxy_arr, simhxz_arr, simhyx_arr,
                                       simhyz_arr, simhzx_arr, simhzy_arr,
                                       domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, 
+                                      scomp, bccomp, 
                                       is_vel, is_conservative);
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
@@ -1542,7 +1547,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                 simhxy_arr, simhxz_arr, simhyx_arr,
                                 simhyz_arr, simhzx_arr, simhzy_arr,
                                 domainBox, bcs, dx,
-                                scomp-1, bccomp-1, 
+                                scomp, bccomp, 
                                 is_vel, is_conservative);
 
 
