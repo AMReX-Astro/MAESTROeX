@@ -1261,6 +1261,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 int vcomp = scomp - start_scomp - 1;
                 int bccomp = start_bccomp + scomp - start_scomp;
 
+                Array4<Real> const scal_arr = state[lev].array(mfi);
+
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+
+                Array4<Real> const slx_arr = slx.array(mfi);
+                Array4<Real> const srx_arr = srx.array(mfi);
+                Array4<Real> const sly_arr = sly.array(mfi);
+                Array4<Real> const sry_arr = sry.array(mfi);
+
+                Array4<Real> const simhx_arr = simhx.array(mfi);
+                Array4<Real> const simhy_arr = simhy.array(mfi);
+
                 // x-direction
                 if (ppm_type == 0) {
                     // we're going to reuse Ip here as slopex and Im as slopey
@@ -1289,50 +1302,53 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                               1,bc_f,nbccomp,bccomp);
 
                 } else {
-#pragma gpu box(obx)
-                    ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-                           AMREX_INT_ANYD(obx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                           scal_mf.nComp(),
-                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                           BL_TO_FORTRAN_ANYD(Im[mfi]),
-                           AMREX_INT_ANYD(domainBox.loVect()),
-                           AMREX_INT_ANYD(domainBox.hiVect()),
-                           bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                           scomp, bccomp, nbccomp);
+
+                    Array4<Real> const scal_arr = state[lev].array(mfi);
+                    Array4<Real> const force_arr = force[lev].array(mfi);
+
+                    PPM_2d(obx, scal_arr, 
+                           umac_arr, vmac_arr, 
+                           Ip.array(mfi), Im.array(mfi), 
+                           domainBox, bcs, dx, 
+                           true, scomp-1, bccomp-1);
+// #pragma gpu box(obx)
+//                     ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+//                            AMREX_INT_ANYD(obx.hiVect()),
+//                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+//                            scal_mf.nComp(),
+//                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                            BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                            AMREX_INT_ANYD(domainBox.loVect()),
+//                            AMREX_INT_ANYD(domainBox.hiVect()),
+//                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
+//                            scomp, bccomp, nbccomp);
 
                     if (ppm_trace_forces == 1) {
-#pragma gpu box(obx)
-                        ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-                               AMREX_INT_ANYD(obx.hiVect()),
-                               BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                               force_mf.nComp(),
-                               BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-                               BL_TO_FORTRAN_ANYD(Imf[mfi]),
-                               AMREX_INT_ANYD(domainBox.loVect()),
-                               AMREX_INT_ANYD(domainBox.hiVect()),
-                               bc_f, AMREX_REAL_ANYD(dx), dt, true,
-                               scomp, bccomp, nbccomp);
+
+                        PPM_2d(obx, force_arr, 
+                           umac_arr, vmac_arr, 
+                           Ipf.array(mfi), Imf.array(mfi), 
+                           domainBox, bcs, dx, 
+                           true, scomp-1, bccomp-1);
+
+// #pragma gpu box(obx)
+//                         ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+//                                AMREX_INT_ANYD(obx.hiVect()),
+//                                BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+//                                force_mf.nComp(),
+//                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(Ipf[mfi]),
+//                                BL_TO_FORTRAN_ANYD(Imf[mfi]),
+//                                AMREX_INT_ANYD(domainBox.loVect()),
+//                                AMREX_INT_ANYD(domainBox.hiVect()),
+//                                bc_f, AMREX_REAL_ANYD(dx), dt, true,
+//                                scomp, bccomp, nbccomp);
 
                     }
                 }
-
-                Array4<Real> const scal_arr = state[lev].array(mfi);
-
-                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
-                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
-
-                Array4<Real> const slx_arr = slx.array(mfi);
-                Array4<Real> const srx_arr = srx.array(mfi);
-                Array4<Real> const sly_arr = sly.array(mfi);
-                Array4<Real> const sry_arr = sry.array(mfi);
-
-                Array4<Real> const simhx_arr = simhx.array(mfi);
-                Array4<Real> const simhy_arr = simhy.array(mfi);
 
                 // Create s_{\i-\half\e_x}^x, etc.
 
