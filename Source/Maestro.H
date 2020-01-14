@@ -1294,6 +1294,36 @@ public:
     ////////////
 
     ////////////
+    // MaestroSlopes.cpp function
+    void Slopex(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const slx,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                int ncomp,
+                int bc_start_comp);
+
+    void Slopey(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const sly,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                int ncomp,
+                int bc_start_comp);
+
+    void Slopez(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const slz,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                int ncomp,
+                int bc_start_comp);
+    ////////////
+
+    ////////////
     // MaestroSponge.cpp functions
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);

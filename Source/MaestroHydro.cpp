@@ -1279,31 +1279,36 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // as they have the correct number of ghost zones
 
                     // x-direction
-#pragma gpu box(obx)
-                    slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, dx, 
+                           1,bccomp-1);
+// #pragma gpu box(obx)
+//                     slopex_2d(AMREX_INT_ANYD(obx.loVect()),
+//                               AMREX_INT_ANYD(obx.hiVect()),
+//                               BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+//                               vec_scal_mf[vcomp].nComp(),
+//                               BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
+//                               AMREX_INT_ANYD(domainBox.loVect()),
+//                               AMREX_INT_ANYD(domainBox.hiVect()),
+//                               1,bc_f,nbccomp,bccomp);
 
                     // y-direction
-#pragma gpu box(obx)
-                    slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, dx, 
+                           1,bccomp-1);
+// #pragma gpu box(obx)
+//                     slopey_2d(AMREX_INT_ANYD(obx.loVect()),
+//                               AMREX_INT_ANYD(obx.hiVect()),
+//                               BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
+//                               vec_scal_mf[vcomp].nComp(),
+//                               BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
+//                               AMREX_INT_ANYD(domainBox.loVect()),
+//                               AMREX_INT_ANYD(domainBox.hiVect()),
+//                               1,bc_f,nbccomp,bccomp);
 
                 } else {
-
-                    Array4<Real> const scal_arr = state[lev].array(mfi);
-                    Array4<Real> const force_arr = force[lev].array(mfi);
 
                     PPM_2d(obx, scal_arr, 
                            umac_arr, vmac_arr, 
@@ -1312,6 +1317,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            true, scomp-1, bccomp-1);
 
                     if (ppm_trace_forces == 1) {
+
+                        Array4<Real> const force_arr = force[lev].array(mfi);
 
                         PPM_2d(obx, force_arr, 
                            umac_arr, vmac_arr, 
