@@ -1274,7 +1274,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 Array4<Real> const simhx_arr = simhx.array(mfi);
                 Array4<Real> const simhy_arr = simhy.array(mfi);
 
-                // x-direction
                 if (ppm_type == 0) {
                     // we're going to reuse Ip here as slopex and Im as slopey
                     // as they have the correct number of ghost zones
@@ -1311,19 +1310,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
                            true, scomp-1, bccomp-1);
-// #pragma gpu box(obx)
-//                     ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-//                            AMREX_INT_ANYD(obx.hiVect()),
-//                            BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-//                            scal_mf.nComp(),
-//                            BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                            BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                            BL_TO_FORTRAN_ANYD(Ip[mfi]),
-//                            BL_TO_FORTRAN_ANYD(Im[mfi]),
-//                            AMREX_INT_ANYD(domainBox.loVect()),
-//                            AMREX_INT_ANYD(domainBox.hiVect()),
-//                            bc_f, AMREX_REAL_ANYD(dx), dt, true,
-//                            scomp, bccomp, nbccomp);
 
                     if (ppm_trace_forces == 1) {
 
@@ -1332,21 +1318,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
                            true, scomp-1, bccomp-1);
-
-// #pragma gpu box(obx)
-//                         ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-//                                AMREX_INT_ANYD(obx.hiVect()),
-//                                BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-//                                force_mf.nComp(),
-//                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                BL_TO_FORTRAN_ANYD(Ipf[mfi]),
-//                                BL_TO_FORTRAN_ANYD(Imf[mfi]),
-//                                AMREX_INT_ANYD(domainBox.loVect()),
-//                                AMREX_INT_ANYD(domainBox.hiVect()),
-//                                bc_f, AMREX_REAL_ANYD(dx), dt, true,
-//                                scomp, bccomp, nbccomp);
-
                     }
                 }
 

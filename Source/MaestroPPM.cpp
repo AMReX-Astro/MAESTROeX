@@ -204,7 +204,6 @@ Maestro::PPM_2d (const Box& bx,
                 }
             }
 
-
             ////////////////////////////////////
             // compute x-component of Ip and Im
             ////////////////////////////////////
@@ -861,7 +860,6 @@ Maestro::PPM_2d (const Box& bx,
                 }
             }
 
-
         });
 
     } else if (ppm_type == 2) {
@@ -1268,7 +1266,6 @@ Maestro::PPM_2d (const Box& bx,
 
         });
     }
-
 }
 
 #else
