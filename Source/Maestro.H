@@ -74,7 +74,7 @@ public:
     /// Dump build info
     static void WriteBuildInfo ();
 
-private:
+// private:
 
     /*
       private member functions
@@ -170,10 +170,10 @@ private:
     /// @param start_bccomp     index of component of `bcs` to begin with
     /// @param num_comp         number of components to perform calculation for
     /// @param is_conservative  are these conserved quantities?
-    void MakeEdgeScal (const amrex::Vector<amrex::MultiFab>& state,
+    void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
 		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                       const amrex::Vector<amrex::MultiFab>& force,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
                        int start_scomp, int start_bccomp, int num_comp, int is_conservative);
 
@@ -752,6 +752,97 @@ private:
     ////////////
 
     ////////////
+    // MaestroMakeEdgeScal.cpp functions
+
+    void MakeDivU(const amrex::Box& bx, 
+                  amrex::Array4<amrex::Real> const divu,
+                  amrex::Array4<amrex::Real> const umac,
+                  amrex::Array4<amrex::Real> const vmac,
+                  amrex::Array4<amrex::Real> const wmac,
+                  const amrex::Real* dx);
+
+    void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
+                               amrex::Array4<amrex::Real> const slx,
+                               amrex::Array4<amrex::Real> const srx,
+                               amrex::Array4<amrex::Real> const sly,
+                               amrex::Array4<amrex::Real> const sry,
+                               amrex::Array4<amrex::Real> const slz,
+                               amrex::Array4<amrex::Real> const srz,
+                               amrex::Array4<amrex::Real> const scal,
+                               amrex::Array4<amrex::Real> const Ip,
+                               amrex::Array4<amrex::Real> const Im, 
+                               amrex::Array4<amrex::Real> const slopez, 
+                               amrex::Array4<amrex::Real> const umac,
+                               amrex::Array4<amrex::Real> const vmac,
+                               amrex::Array4<amrex::Real> const wmac,
+                               amrex::Array4<amrex::Real> const simhx,
+                               amrex::Array4<amrex::Real> const simhy,
+                               amrex::Array4<amrex::Real> const simhz,
+                               const amrex::Box& domainBox,
+                               const amrex::Vector<amrex::BCRec>& bcs,
+                               const amrex::Real* dx,
+                               int comp, int bccomp, bool is_vel);
+
+    void MakeEdgeScalTransverse(const amrex::MFIter& mfi,
+                               amrex::Array4<amrex::Real> const slx,
+                               amrex::Array4<amrex::Real> const srx,
+                               amrex::Array4<amrex::Real> const sly,
+                               amrex::Array4<amrex::Real> const sry,
+                               amrex::Array4<amrex::Real> const slz,
+                               amrex::Array4<amrex::Real> const srz,
+                               amrex::Array4<amrex::Real> const scal,
+                               amrex::Array4<amrex::Real> const divu,
+                               amrex::Array4<amrex::Real> const umac,
+                               amrex::Array4<amrex::Real> const vmac,
+                               amrex::Array4<amrex::Real> const wmac,
+                               amrex::Array4<amrex::Real> const simhx,
+                               amrex::Array4<amrex::Real> const simhy,
+                               amrex::Array4<amrex::Real> const simhz,
+                               amrex::Array4<amrex::Real> const simhxy,
+                               amrex::Array4<amrex::Real> const simhxz,
+                               amrex::Array4<amrex::Real> const simhyx,
+                               amrex::Array4<amrex::Real> const simhyz,
+                               amrex::Array4<amrex::Real> const simhzx,
+                               amrex::Array4<amrex::Real> const simhzy,
+                               const amrex::Box& domainBox,
+                               const amrex::Vector<amrex::BCRec>& bcs,
+                               const amrex::Real* dx,
+                               int comp, int bccomp, 
+                               bool is_vel, bool is_conservative);
+
+    void MakeEdgeScalEdges(const amrex::MFIter& mfi,
+                            amrex::Array4<amrex::Real> const slx,
+                            amrex::Array4<amrex::Real> const srx,
+                            amrex::Array4<amrex::Real> const sly,
+                            amrex::Array4<amrex::Real> const sry,
+                            amrex::Array4<amrex::Real> const slz,
+                            amrex::Array4<amrex::Real> const srz,
+                            amrex::Array4<amrex::Real> const scal,
+                            amrex::Array4<amrex::Real> const sedgex,
+                            amrex::Array4<amrex::Real> const sedgey,
+                            amrex::Array4<amrex::Real> const sedgez,
+                            amrex::Array4<amrex::Real> const force,
+                            amrex::Array4<amrex::Real> const umac,
+                            amrex::Array4<amrex::Real> const vmac,
+                            amrex::Array4<amrex::Real> const wmac,
+                            amrex::Array4<amrex::Real> const Ipf,
+                            amrex::Array4<amrex::Real> const Imf,
+                            amrex::Array4<amrex::Real> const simhxy,
+                            amrex::Array4<amrex::Real> const simhxz,
+                            amrex::Array4<amrex::Real> const simhyx,
+                            amrex::Array4<amrex::Real> const simhyz,
+                            amrex::Array4<amrex::Real> const simhzx,
+                            amrex::Array4<amrex::Real> const simhzy,
+                            const amrex::Box& domainBox,
+                            const amrex::Vector<amrex::BCRec>& bcs,
+                            const amrex::Real* dx,
+                            int comp, int bccomp, 
+                            bool is_vel, bool is_conservative);
+
+    // end MaestroMakeEdgeScal.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeEta.cpp functions
 
     /// Compute `eta_rho` at edge- and cell-centers
@@ -957,6 +1048,25 @@ private:
                 amrex::Vector<amrex::MultiFab>& abar);
 
     // end MaestroPlot.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroPPM.cpp functions
+#if (AMREX_SPACEDIM == 2)
+    void PPM_2d();
+#else
+    void PPM_3d(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const u,
+                amrex::Array4<amrex::Real> const v,
+                amrex::Array4<amrex::Real> const w,
+                amrex::Array4<amrex::Real> const Ip,
+                amrex::Array4<amrex::Real> const Im,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                bool is_umac, int comp, int bccomp);
+#endif
     ////////////
 
     ////////////

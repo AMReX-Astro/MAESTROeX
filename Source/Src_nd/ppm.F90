@@ -1350,7 +1350,8 @@ contains
        u,u_lo,u_hi,v,v_lo,v_hi,w,w_lo,w_hi, &
        Ip,ip_lo,ip_hi,Im,im_lo,im_hi, &
        domlo,domhi, &
-       adv_bc,dx,dt,is_umac,comp,bccomp,nbccomp) bind(C,name="ppm_3d")
+       adv_bc,dx,dt,is_umac,comp,bccomp,nbccomp, &
+       use_cpp) bind(C,name="ppm_3d")
 
     integer         , intent(in   ) :: domlo(3),domhi(3),lo(3),hi(3),s_lo(3),s_hi(3)
     integer         , intent(in   ) :: u_lo(3),u_hi(3),v_lo(3),v_hi(3),w_lo(3),w_hi(3)
@@ -1365,7 +1366,7 @@ contains
     integer         , intent(in   ) :: adv_bc(AMREX_SPACEDIM,2,nbccomp)
     double precision, intent(in   ) :: dx(3)
     double precision, value, intent(in   ) :: dt
-    integer,   value, intent(in   ) :: is_umac, comp, bccomp, nbccomp
+    integer,   value, intent(in   ) :: is_umac, comp, bccomp, nbccomp, use_cpp
 
     ! local
     integer :: i,j,k,n
@@ -1396,13 +1397,14 @@ contains
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
-
+        
        do k=lo(3),hi(3)
           do j=lo(2),hi(2)
              do i=lo(1),hi(1)
                 !
                 ! Compute van Leer slopes in x-direction.
                 !
+                
 
                 ! sm
                 dsvl_l = ZERO
@@ -1584,11 +1586,14 @@ contains
                    end if
                 end if
 
+
                 !-------------------------------------------------------------------------
                 ! Compute x-component of Ip and Im.
                 !-------------------------------------------------------------------------
-
+                
                 if (is_umac == 1) then
+
+                    ! if (use_cpp .eq. 0) then 
 
                    ! u is MAC velocity -- use edge-based indexing
                    sigma = abs(u(i+1,j,k))*dt/dx(1)
@@ -1636,7 +1641,6 @@ contains
 
 
     else if (ppm_type .eq. 2) then
-
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
@@ -2090,7 +2094,7 @@ contains
           end do
        end do
 
-    end if
+    endif
 
 
     !-------------------------------------------------------------------------
@@ -2100,9 +2104,7 @@ contains
     !
     ! Compute s at y-edges.
     !
-    if (ppm_type .eq. 1) then
-
-       !----------------------------------------------------------------------
+    if (ppm_type .eq. 1) then !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
 
@@ -2341,7 +2343,6 @@ contains
        end do
 
     else if (ppm_type .eq. 2) then
-
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
@@ -2805,7 +2806,7 @@ contains
           end do
        end do
 
-    end if
+    endif
 
     !-------------------------------------------------------------------------
     ! z-direction
@@ -2815,7 +2816,6 @@ contains
     ! Compute s at z-edges.
     !
     if (ppm_type .eq. 1) then
-
        !----------------------------------------------------------------------
        ! ppm_type = 1
        !----------------------------------------------------------------------
@@ -3055,9 +3055,7 @@ contains
              end do
           end do
        end do
-
     else if (ppm_type .eq. 2) then
-
        !----------------------------------------------------------------------
        ! ppm_type = 2
        !----------------------------------------------------------------------
@@ -3513,8 +3511,7 @@ contains
              end do
           end do
        end do
-
-    end if
+    endif
 
   end subroutine ppm_3d
 
