@@ -492,9 +492,9 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     {
         if (ppm_type_local == 0) {
             sly(i,j,k) = scal(i,j-1,k,comp) + 
-                0.5 * (1.0 - dt * vmac(i,j,k) / hy) * Ip(i,j-1,k,0);
+                0.5 * (1.0 - dt * vmac(i,j,k) / hy) * Im(i,j-1,k,0);
             sry(i,j,k) = scal(i,j,k,comp) - 
-                0.5 * (1.0 + dt * vmac(i,j,k) / hy) * Ip(i,j,k,0);
+                0.5 * (1.0 + dt * vmac(i,j,k) / hy) * Im(i,j,k,0);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             sly(i,j,k) = Ip(i,j-1,k,1);
             sry(i,j,k) = Im(i,j,k,1);
@@ -655,9 +655,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     get_rel_eps(&rel_eps);
 
     // simhxy
-    // Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
-    // imhbox = amrex::growHi(imhbox, 0, 1);
-    Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
+    Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+    imhbox = amrex::growHi(imhbox, 0, 1);
+    // Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1)); 
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
@@ -734,9 +734,9 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     });
 
     // simhxz
-    // imhbox = amrex::grow(mfi.tilebox(), 1, 1);
-    // imhbox = amrex::growHi(imhbox, 0, 1);
-    imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
+    imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+    imhbox = amrex::growHi(imhbox, 0, 1);
+    // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
 
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
     {
@@ -904,7 +904,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             // make slyz, sryz by updating 1D extrapolation
             slyz = sly(i,j,k) 
                 - (dt3/hz) * (simhz(i,j-1,k+1)*wmac(i,j-1,k+1) 
-                - simhz(i,j-1,k)*umac(i,j-1,k)) 
+                - simhz(i,j-1,k)*wmac(i,j-1,k)) 
                 - dt3*scal(i,j-1,k,comp)*divu(i,j-1,k) 
                 + (dt3/hz)*scal(i,j-1,k,comp)*
                 (wmac(i,j-1,k+1)-wmac(i,j-1,k));
@@ -1064,7 +1064,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
                 - simhy(i,j,k-1)*vmac(i,j,k-1)) 
                 - dt3*scal(i,j,k-1,comp)*divu(i,j,k-1) 
                 + (dt3/hy)*scal(i,j,k-1,comp)*
-                (umac(i,j+1,k-1)-vmac(i,j,k-1));
+                (vmac(i,j+1,k-1)-vmac(i,j,k-1));
             srzy = srz(i,j,k) 
                 - (dt3/hy)*(simhy(i,j+1,k)*vmac(i,j+1,k)
                 - simhy(i,j,k)*vmac(i,j,k)) 
