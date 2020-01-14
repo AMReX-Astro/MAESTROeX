@@ -1091,7 +1091,16 @@ public:
     ////////////
     // MaestroPPM.cpp functions
 #if (AMREX_SPACEDIM == 2)
-    void PPM_2d();
+    void PPM_2d(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const u,
+                amrex::Array4<amrex::Real> const v,
+                amrex::Array4<amrex::Real> const Ip,
+                amrex::Array4<amrex::Real> const Im,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                bool is_umac, int comp, int bccomp);
 #else
     void PPM_3d(const amrex::Box& bx, 
                 amrex::Array4<amrex::Real> const scal,

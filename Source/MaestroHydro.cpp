@@ -1323,8 +1323,8 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 Array4<Real> const scal_arr = state[lev].array(mfi);
 
-                Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
-                Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
 
                 Array4<Real> const slx_arr = slx.array(mfi);
                 Array4<Real> const srx_arr = srx.array(mfi);

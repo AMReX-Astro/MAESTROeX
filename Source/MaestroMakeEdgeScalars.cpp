@@ -52,11 +52,11 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     int bchi = bcs[bccomp].hi()[0];
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
     {
-        if (ppm_type == 0) {
+        if (ppm_type_local == 0) {
             // make slx, srx with 1D extrapolation
             slx(i,j,k) = s(i-1,j,k,comp) + (0.5 - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,0);
             srx(i,j,k) = s(i,j,k,comp) - (0.5 + dt2*umac(i,j,k)/hx)*Ip(i,j,k,0);
-        } else if (ppm_type == 1 || ppm_type == 2) {
+        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             // make slx, srx with 1D extrapolation
             slx(i,j,k) = Ip(i-1,j,k,0);
             srx(i,j,k) = Im(i,j,k,0);
@@ -112,11 +112,11 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
     {
 
-        if (ppm_type == 0) {
+        if (ppm_type_local == 0) {
             // make sly, sry with 1D extrapolation
             sly(i,j,k) = s(i,j-1,k,comp) + (0.5 - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,0);
             sry(i,j,k) = s(i,j,k,comp) - (0.5 + dt2*vmac(i,j,k)/hy)*Im(i,j,k,0);
-        } else if (ppm_type == 1 || ppm_type == 2) {
+        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             // make sly, sry with 1D extrapolation
             sly(i,j,k) = Ip(i,j-1,k,1);
             sry(i,j,k) = Im(i,j,k,1);
