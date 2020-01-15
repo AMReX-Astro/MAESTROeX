@@ -30,6 +30,9 @@ Maestro::Slopex(const Box& bx,
         bchi[i] = bcs[bc_start_comp+i].hi()[0];
     }
 
+    int * AMREX_RESTRICT bclo_p = bclo.dataPtr();
+    int * AMREX_RESTRICT bchi_p = bchi.dataPtr();
+
     if (slope_order == 0) {
         // 1st order
 
@@ -50,7 +53,7 @@ Maestro::Slopex(const Box& bx,
             Real sflag = copysign(1.0,del);
             slx(i,j,k,n)= sflag*min(slim,fabs(del));
 
-            if (bclo[n] == EXT_DIR  || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR  || bclo_p[n] == HOEXTRAP) {
                 if (i == ilo-1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ilo) {
@@ -65,7 +68,7 @@ Maestro::Slopex(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR  || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR  || bchi_p[n] == HOEXTRAP) {
                 if (i == ihi+1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ihi) {
@@ -115,7 +118,7 @@ Maestro::Slopex(const Box& bx,
             Real ds = 4.0/3.0 * dcen - (dxr + dxl) / 6.0;
             slx(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
-            if (bclo[n] == EXT_DIR  || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR  || bclo_p[n] == HOEXTRAP) {
                 if (i == ilo-1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ilo) {
@@ -143,7 +146,7 @@ Maestro::Slopex(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR  || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR  || bchi_p[n] == HOEXTRAP) {
                 if (i == ihi+1) {
                     slx(i,j,k,n) = 0.0;
                 } else if (i == ihi) {
@@ -201,6 +204,10 @@ Maestro::Slopey(const Box& bx,
         bchi[i] = bcs[bc_start_comp+i].hi()[1];
     }
 
+    int * AMREX_RESTRICT bclo_p = bclo.dataPtr();
+    int * AMREX_RESTRICT bchi_p = bchi.dataPtr();
+
+
     if (slope_order == 0) {
         // 1st order
 
@@ -222,7 +229,7 @@ Maestro::Slopey(const Box& bx,
             sly(i,j,k,n)= sflag*min(slim,fabs(del));
 
 
-            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
                 if (j == jlo-1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jlo) {
@@ -237,7 +244,7 @@ Maestro::Slopey(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
                 if (j == jhi+1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jhi) {
@@ -288,7 +295,7 @@ Maestro::Slopey(const Box& bx,
             sly(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
 
-            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
                 if (j == jlo-1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jlo) {
@@ -316,7 +323,7 @@ Maestro::Slopey(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
                 if (j == jhi+1) {
                     sly(i,j,k,n) = 0.0;
                 } else if (j == jhi) {
@@ -373,6 +380,9 @@ Maestro::Slopez(const Box& bx,
         bchi[i] = bcs[bc_start_comp+i].hi()[2];
     }
 
+    int * AMREX_RESTRICT bclo_p = bclo.dataPtr();
+    int * AMREX_RESTRICT bchi_p = bchi.dataPtr();
+
     if (slope_order == 0) {
         // 1st order
 
@@ -393,7 +403,7 @@ Maestro::Slopez(const Box& bx,
             Real sflag = copysign(1.0,del);
             slz(i,j,k,n)= sflag*min(slim,fabs(del));
 
-            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
                 if (k == klo-1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == klo) {
@@ -408,7 +418,7 @@ Maestro::Slopez(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
                 if (k == khi+1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == khi) {
@@ -458,7 +468,7 @@ Maestro::Slopez(const Box& bx,
             Real ds = 4.0/3.0 * dcen - (dzr + dzl) / 6.0;
             slz(i,j,k,n) = dflag*min(fabs(ds),dlim);
 
-            if (bclo[n] == EXT_DIR || bclo[n] == HOEXTRAP) {
+            if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
                 if (k == klo-1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == klo) {
@@ -486,7 +496,7 @@ Maestro::Slopez(const Box& bx,
                 }
             }
 
-            if (bchi[n] == EXT_DIR || bchi[n] == HOEXTRAP) {
+            if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
                 if (k == khi+1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == khi) {
