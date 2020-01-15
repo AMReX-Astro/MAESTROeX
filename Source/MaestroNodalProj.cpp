@@ -564,34 +564,50 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
 }
 
 // given a nodal phi, compute grad(phi) at cell centers
-void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
-                             Vector<MultiFab>& gphi)
+void Maestro::ComputeGradPhi(Vector<MultiFab>& phi_in,
+                             Vector<MultiFab>& gphi_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        const MultiFab& phi_mf = phi[lev];
-        MultiFab& gphi_mf = gphi[lev];
-#ifdef _OPENMP
-#pragma omp parallel
+
+	const MultiFab& phi_mf = phi_in[lev];
+	MultiFab& gphi_mf = gphi_in[lev];
+	
+	// Get grid spacing
+	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+	
+        for ( MFIter mfi(gphi_in[0], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+	    Array4<Real const> const& phi = phi_mf.array(mfi);
+	    const Array4<Real> & gphi = gphi_mf.array(mfi);
+
+	    // Use valid region
+	    const Box& tileBox = mfi.tilebox();
+
+	    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
+	    {
+#if (AMREX_SPACEDIM == 2)
+		gphi(i,j,k,0) = 0.5*(phi(i+1,j,k) + phi(i+1,j+1,k) - 
+				     phi(i  ,j,k) - phi(i  ,j+1,k) ) /dx[0];
+		gphi(i,j,k,1) = 0.5*(phi(i,j+1,k) + phi(i+1,j+1,k) - 
+				     phi(i,j  ,k) - phi(i+1,j  ,k) ) /dx[1];
+#elif (AMREX_SPACEDIM == 3)
+		gphi(i,j,k,0) = 0.25*(phi(i+1,j,k  ) + phi(i+1,j+1,k  ) 
+				      +phi(i+1,j,k+1) + phi(i+1,j+1,k+1) 
+				      -phi(i  ,j,k  ) - phi(i  ,j+1,k  ) 
+				      -phi(i  ,j,k+1) - phi(i  ,j+1,k+1) ) /dx[0];
+		gphi(i,j,k,1) = 0.25*(phi(i,j+1,k  ) + phi(i+1,j+1,k  ) 
+				      +phi(i,j+1,k+1) + phi(i+1,j+1,k+1) 
+				      -phi(i,j  ,k  ) - phi(i+1,j  ,k  ) 
+				      -phi(i,j  ,k+1) - phi(i+1,j  ,k+1) ) /dx[1];
+		gphi(i,j,k,2) = 0.25*(phi(i,j  ,k+1) + phi(i+1,j  ,k+1) 
+				      +phi(i,j+1,k+1) + phi(i+1,j+1,k+1) 
+				      -phi(i,j  ,k  ) - phi(i+1,j  ,k  ) 
+				      -phi(i,j+1,k  ) - phi(i+1,j+1,k  ) ) /dx[2];
 #endif
-        for ( MFIter mfi(gphi_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the tile's valid region
-            const Box& tilebox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "tileox", which specifies the tile's "valid" region.
-#pragma gpu box(tilebox)
-            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()),
-                             AMREX_INT_ANYD(tilebox.hiVect()),
-                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
-                             AMREX_REAL_ANYD(dx));
+	    });
         }
     }
 
