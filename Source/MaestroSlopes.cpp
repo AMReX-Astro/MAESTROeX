@@ -5,13 +5,12 @@ using namespace amrex;
 
 void 
 Maestro::Slopex(const Box& bx, 
-                 Array4<Real> const s,
-                 Array4<Real> const slx,
-                 const Box& domainBox,
-                 const Vector<BCRec>& bcs,
-                 const Real* dx,
-                 int ncomp,
-                 int bc_start_comp) 
+                Array4<Real> const s,
+                Array4<Real> const slx,
+                const Box& domainBox,
+                const Vector<BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Slopex()",Slopex);
@@ -38,7 +37,7 @@ Maestro::Slopex(const Box& bx,
             slx(i,j,k,n) = 0.0;
         });
 
-    } else if (slope_order == 1) {
+    } else if (slope_order == 2) {
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
@@ -60,7 +59,7 @@ Maestro::Slopex(const Box& bx,
                     dpls = 2.0*(s(i+1,j,k,n) - s(i,j,k,n));
                     dmin = 2.0*(s(i,j,k,n) - s(i-1,j,k,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     slx(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
@@ -75,14 +74,14 @@ Maestro::Slopex(const Box& bx,
                     dpls = 2.0*(s(i,j,k,n) - s(i-1,j,k,n));
                     dmin = 2.0*(s(i+1,j,k,n) - s(i,j,k,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     slx(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
             }
         });
 
-    } else {
+    } else if (slope_order == 4) {
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
@@ -171,20 +170,18 @@ Maestro::Slopex(const Box& bx,
                     slx(i,j,k,n) = dflag*min(fabs(ds),dlim);
                 }
             }
-
         });
     }
 }
 
 void 
 Maestro::Slopey(const Box& bx, 
-                 Array4<Real> const s,
-                 Array4<Real> const sly,
-                 const Box& domainBox,
-                 const Vector<BCRec>& bcs,
-                 const Real* dx,
-                 int ncomp,
-                 int bc_start_comp) 
+                Array4<Real> const s,
+                Array4<Real> const sly,
+                const Box& domainBox,
+                const Vector<BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Slopey()",Slopey);
@@ -211,7 +208,7 @@ Maestro::Slopey(const Box& bx,
             sly(i,j,k,n) = 0.0;
         });
 
-    } else if (slope_order == 1) {
+    } else if (slope_order == 2) {
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
@@ -220,7 +217,7 @@ Maestro::Slopey(const Box& bx,
             Real dpls = 2.0 *(s(i,j+1,k,n) - s(i,j  ,k,n));
             Real dmin = 2.0 *(s(i,j  ,k,n) - s(i,j-1,k,n));
             Real slim = min(fabs(dpls),fabs(dmin));
-            slim = dpls*dmin>0.0 ? slim : 0.0;
+            slim = dpls*dmin > 0.0 ? slim : 0.0;
             Real sflag = copysign(1.0,del);
             sly(i,j,k,n)= sflag*min(slim,fabs(del));
 
@@ -234,7 +231,7 @@ Maestro::Slopey(const Box& bx,
                     dpls = 2.0*(s(i,j+1,k,n) - s(i,j,k,n));
                     dmin = 2.0*(s(i,j,k,n) - s(i,j-1,k,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     sly(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
@@ -249,13 +246,14 @@ Maestro::Slopey(const Box& bx,
                     dpls = 2.0*(s(i,j+1,k,n) - s(i,j,k,n));
                     dmin = 2.0*(s(i,j,k,n) - s(i,j-1,k,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     sly(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
             }
         });
-    } else {
+
+    } else if (slope_order == 4) {
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
@@ -344,20 +342,18 @@ Maestro::Slopey(const Box& bx,
                     sly(i,j,k,n) = dflag*min(fabs(ds),dlim);
                 }
             }
-
         });
     }
 }
 
 void 
 Maestro::Slopez(const Box& bx, 
-                 Array4<Real> const s,
-                 Array4<Real> const slz,
-                 const Box& domainBox,
-                 const Vector<BCRec>& bcs,
-                 const Real* dx,
-                 int ncomp,
-                 int bc_start_comp) 
+                Array4<Real> const s,
+                Array4<Real> const slz,
+                const Box& domainBox,
+                const Vector<BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Slopez()",Slopez);
@@ -384,16 +380,16 @@ Maestro::Slopez(const Box& bx,
             slz(i,j,k,n) = 0.0;
         });
 
-    } else if (slope_order == 1) {
+    } else if (slope_order == 2) {
         // 2nd order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
 
             Real del  = 0.5*(s(i,j,k+1,n) - s(i,j,k-1,n));
-            Real dpls = 2.0 *(s(i,j,k+1,n) - s(i,j,k  ,n));
-            Real dmin = 2.0 *(s(i,j,k  ,n) - s(i,j,k-1,n));
+            Real dpls = 2.0*(s(i,j,k+1,n) - s(i,j,k  ,n));
+            Real dmin = 2.0*(s(i,j,k  ,n) - s(i,j,k-1,n));
             Real slim = min(fabs(dpls),fabs(dmin));
-            slim = dpls*dmin>0.0 ? slim : 0.0;
+            slim = dpls*dmin > 0.0 ? slim : 0.0;
             Real sflag = copysign(1.0,del);
             slz(i,j,k,n)= sflag*min(slim,fabs(del));
 
@@ -401,12 +397,12 @@ Maestro::Slopez(const Box& bx,
                 if (k == klo-1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == klo) {
-                    del = (s(i,j,k+1,n)+3.0*s(i,j,k,n)- 
+                    del = (s(i,j,k+1,n) + 3.0*s(i,j,k,n) - 
                         4.0*s(i,j,k-1,n)) / 3.0;
                     dpls = 2.0*(s(i,j,k+1,n) - s(i,j,k,n));
                     dmin = 2.0*(s(i,j,k,n) - s(i,j,k-1,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     slz(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
@@ -416,18 +412,19 @@ Maestro::Slopez(const Box& bx,
                 if (k == khi+1) {
                     slz(i,j,k,n) = 0.0;
                 } else if (k == khi) {
-                    del = -(s(i,j,k-1,n)+3.0*s(i,j,k,n)- 
+                    del = -(s(i,j,k-1,n ) + 3.0*s(i,j,k,n)- 
                         4.0*s(i,j,k+1,n)) / 3.0;
                     dpls = 2.0*(s(i,j,k+1,n) - s(i,j,k,n));
                     dmin = 2.0*(s(i,j,k,n) - s(i,j,k-1,n));
                     slim = min(fabs(dpls), fabs(dmin));
-                    slim = dpls*dmin>0.0 ? slim : 0.0;
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
                     slz(i,j,k,n)= sflag*min(slim,fabs(del));
                 }
             }
         });
-    } else {
+
+    } else  if (slope_order == 4) {
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
