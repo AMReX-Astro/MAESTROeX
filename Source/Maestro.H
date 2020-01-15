@@ -753,6 +753,7 @@ public:
 
     ////////////
     // MaestroMakeEdgeScal.cpp functions
+<<<<<<< HEAD
 #if (AMREX_SPACEDIM == 2)
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,
@@ -792,6 +793,9 @@ public:
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative);
 #else
+=======
+
+>>>>>>> 109e909ecb232aaaef5e574ae17a9b782fd9a701
     void MakeDivU(const amrex::Box& bx, 
                   amrex::Array4<amrex::Real> const divu,
                   amrex::Array4<amrex::Real> const umac,
@@ -876,7 +880,11 @@ public:
                             const amrex::Real* dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative);
+<<<<<<< HEAD
 #endif
+=======
+
+>>>>>>> 109e909ecb232aaaef5e574ae17a9b782fd9a701
     // end MaestroMakeEdgeScal.cpp functions
     ////////////
 
