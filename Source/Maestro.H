@@ -753,7 +753,49 @@ public:
 
     ////////////
     // MaestroMakeEdgeScal.cpp functions
+<<<<<<< HEAD
+#if (AMREX_SPACEDIM == 2)
+    void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
+                               amrex::Array4<amrex::Real> const slx,
+                               amrex::Array4<amrex::Real> const srx,
+                               amrex::Array4<amrex::Real> const sly,
+                               amrex::Array4<amrex::Real> const sry,
+                               amrex::Array4<amrex::Real> const scal,
+                               amrex::Array4<amrex::Real> const Ip,
+                               amrex::Array4<amrex::Real> const Im, 
+                               amrex::Array4<amrex::Real> const umac,
+                               amrex::Array4<amrex::Real> const vmac,
+                               amrex::Array4<amrex::Real> const simhx,
+                               amrex::Array4<amrex::Real> const simhy,
+                               const amrex::Box& domainBox,
+                               const amrex::Vector<amrex::BCRec>& bcs,
+                               const amrex::Real* dx,
+                               int comp, int bccomp, bool is_vel);
 
+    void MakeEdgeScalEdges(const amrex::MFIter& mfi,
+                            amrex::Array4<amrex::Real> const slx,
+                            amrex::Array4<amrex::Real> const srx,
+                            amrex::Array4<amrex::Real> const sly,
+                            amrex::Array4<amrex::Real> const sry,
+                            amrex::Array4<amrex::Real> const scal,
+                            amrex::Array4<amrex::Real> const sedgex,
+                            amrex::Array4<amrex::Real> const sedgey,
+                            amrex::Array4<amrex::Real> const force,
+                            amrex::Array4<amrex::Real> const umac,
+                            amrex::Array4<amrex::Real> const vmac,
+                            amrex::Array4<amrex::Real> const Ipf,
+                            amrex::Array4<amrex::Real> const Imf,
+                            amrex::Array4<amrex::Real> const simhx,
+                            amrex::Array4<amrex::Real> const simhy,
+                            const amrex::Box& domainBox,
+                            const amrex::Vector<amrex::BCRec>& bcs,
+                            const amrex::Real* dx,
+                            int comp, int bccomp, 
+                            bool is_vel, bool is_conservative);
+#else
+=======
+
+>>>>>>> 109e909ecb232aaaef5e574ae17a9b782fd9a701
     void MakeDivU(const amrex::Box& bx, 
                   amrex::Array4<amrex::Real> const divu,
                   amrex::Array4<amrex::Real> const umac,
@@ -838,7 +880,11 @@ public:
                             const amrex::Real* dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative);
+<<<<<<< HEAD
+#endif
+=======
 
+>>>>>>> 109e909ecb232aaaef5e574ae17a9b782fd9a701
     // end MaestroMakeEdgeScal.cpp functions
     ////////////
 
@@ -1053,7 +1099,16 @@ public:
     ////////////
     // MaestroPPM.cpp functions
 #if (AMREX_SPACEDIM == 2)
-    void PPM_2d();
+    void PPM_2d(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const u,
+                amrex::Array4<amrex::Real> const v,
+                amrex::Array4<amrex::Real> const Ip,
+                amrex::Array4<amrex::Real> const Im,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                const amrex::Real* dx,
+                bool is_umac, int comp, int bccomp);
 #else
     void PPM_3d(const amrex::Box& bx, 
                 amrex::Array4<amrex::Real> const scal,

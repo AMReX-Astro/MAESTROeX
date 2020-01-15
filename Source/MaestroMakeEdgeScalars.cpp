@@ -6,6 +6,359 @@ using namespace amrex;
 
 #if (AMREX_SPACEDIM == 2)
 
+void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
+                                    Array4<Real> const slx,
+                                    Array4<Real> const srx,
+                                    Array4<Real> const sly,
+                                    Array4<Real> const sry,
+                                    Array4<Real> const s,
+                                    Array4<Real> const Ip,
+                                    Array4<Real> const Im, 
+                                    Array4<Real> const umac,
+                                    Array4<Real> const vmac,
+                                    Array4<Real> const simhx,
+                                    Array4<Real> const simhy,
+                                    const Box& domainBox,
+                                    const Vector<BCRec>& bcs,
+                                    const Real* dx,
+                                    int comp, int bccomp, bool is_vel)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEdgeScalPredictor()",MakeEdgeScalPredictor);
+
+    ///////////////////////////////////////
+    // Create s_{\i-\half\e_x}^x, etc.
+    ///////////////////////////////////////
+
+    Real ppm_type_local = ppm_type;
+    Real hx = dx[0];
+    Real hy = dx[1];
+
+    Real dt2 = 0.5 * dt;
+
+    // Get the index space of the valid region
+    const Box& tileBox = mfi.tilebox();
+    const Box& obx = amrex::grow(tileBox, 1);
+    const Box& mxbx = amrex::growLo(obx, 0, -1);
+    const Box& mybx = amrex::growLo(obx, 1, -1);
+
+    Real rel_eps;
+    get_rel_eps(&rel_eps);
+
+    // loop over appropriate x-faces
+    int ilo = domainBox.loVect()[0];
+    int ihi = domainBox.hiVect()[0];
+    int bclo = bcs[bccomp].lo()[0];
+    int bchi = bcs[bccomp].hi()[0];
+    AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
+    {
+        if (ppm_type_local == 0) {
+            // make slx, srx with 1D extrapolation
+            slx(i,j,k) = s(i-1,j,k,comp) + (0.5 - dt2*umac(i,j,k)/hx)*Ip(i-1,j,k,0);
+            srx(i,j,k) = s(i,j,k,comp) - (0.5 + dt2*umac(i,j,k)/hx)*Ip(i,j,k,0);
+        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+            // make slx, srx with 1D extrapolation
+            slx(i,j,k) = Ip(i-1,j,k,0);
+            srx(i,j,k) = Im(i,j,k,0);
+        }
+
+        // impose lo side bc's
+        if (i == ilo) {
+            if (bclo == EXT_DIR) {
+                slx(i,j,k) = s(i-1,j,k,comp);
+                srx(i,j,k) = s(i-1,j,k,comp);
+            } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                if (is_vel && comp == 0) {
+                    srx(i,j,k) = min(srx(i,j,k),0.0);
+                }
+                slx(i,j,k) = srx(i,j,k);
+            } else if (bclo == REFLECT_EVEN) {
+                slx(i,j,k) = srx(i,j,k);
+            } else if (bclo == REFLECT_ODD) {
+                slx(i,j,k) = 0.0;
+                srx(i,j,k) = 0.0;
+            }
+
+        // impose hi side bc's
+        } else if (i == ihi+1) {
+            if (bchi == EXT_DIR) {
+                slx(i,j,k) = s(i,j,k,comp);
+                srx(i,j,k) = s(i,j,k,comp);
+            } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                if (is_vel && comp == 0) {
+                    slx(i,j,k) = max(slx(i,j,k),0.0);
+                }
+                srx(i,j,k) = slx(i,j,k);
+            } else if (bchi == REFLECT_EVEN) {
+                srx(i,j,k) = slx(i,j,k);
+            } else if (bchi == REFLECT_ODD) {
+                slx(i,j,k) = 0.0;
+                srx(i,j,k) = 0.0;
+            }
+        }
+
+        // make simhx by solving Riemann problem
+        simhx(i,j,k) = (umac(i,j,k) > 0.0) ? slx(i,j,k) : srx(i,j,k);
+        simhx(i,j,k) = (fabs(umac(i,j,k)) > rel_eps) ? 
+            simhx(i,j,k) : 0.5*(slx(i,j,k)+srx(i,j,k));
+
+    });
+
+    // loop over appropriate y-faces
+    int jlo = domainBox.loVect()[1];
+    int jhi = domainBox.hiVect()[1];
+    bclo = bcs[bccomp].lo()[1];
+    bchi = bcs[bccomp].hi()[1];
+    AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
+    {
+
+        if (ppm_type_local == 0) {
+            // make sly, sry with 1D extrapolation
+            sly(i,j,k) = s(i,j-1,k,comp) + (0.5 - dt2*vmac(i,j,k)/hy)*Im(i,j-1,k,0);
+            sry(i,j,k) = s(i,j,k,comp) - (0.5 + dt2*vmac(i,j,k)/hy)*Im(i,j,k,0);
+        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+            // make sly, sry with 1D extrapolation
+            sly(i,j,k) = Ip(i,j-1,k,1);
+            sry(i,j,k) = Im(i,j,k,1);
+        }
+
+        // impose lo side bc's
+        if (j == jlo) {
+            if (bclo == EXT_DIR) {
+                sly(i,j,k) = s(i,j-1,k,comp);
+                sry(i,j,k) = s(i,j-1,k,comp);
+            } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                if (is_vel && comp == 1) {
+                    sry(i,j,k) = min(sry(i,j,k),0.0);
+                }
+                sly(i,j,k) = sry(i,j,k);
+            } else if (bclo == REFLECT_EVEN) {
+                sly(i,j,k) = sry(i,j,k);
+            } else if (bclo == REFLECT_ODD) {
+                sly(i,j,k) = 0.0;
+                sry(i,j,k) = 0.0;
+            }
+
+        // impose hi side bc's
+        } else if (j == jhi+1) {
+            if (bchi == EXT_DIR) {
+                sly(i,j,k) = s(i,j,k,comp);
+                sry(i,j,k) = s(i,j,k,comp);
+            } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                if (is_vel && comp == 1) {
+                    sly(i,j,k) = max(sly(i,j,k),0.0);
+                }
+                sry(i,j,k) = sly(i,j,k);
+            } else if (bchi == REFLECT_EVEN) {
+                sry(i,j,k) = sly(i,j,k);
+            } else if (bchi == REFLECT_ODD) {
+                sly(i,j,k) = 0.0;
+                sry(i,j,k) = 0.0;
+            }
+        }
+
+        // make simhy by solving Riemann problem
+        simhy(i,j,k) = (vmac(i,j,k) > 0.0) ? sly(i,j,k) : sry(i,j,k);
+        simhy(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ? 
+            simhy(i,j,k) : 0.5*(sly(i,j,k)+sry(i,j,k));
+    });
+}
+
+void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
+                            Array4<Real> const slx,
+                            Array4<Real> const srx,
+                            Array4<Real> const sly,
+                            Array4<Real> const sry,
+                            Array4<Real> const s,
+                            Array4<Real> const sedgex,
+                            Array4<Real> const sedgey,
+                            Array4<Real> const force,
+                            Array4<Real> const umac,
+                            Array4<Real> const vmac,
+                            Array4<Real> const Ipf,
+                            Array4<Real> const Imf,
+                            Array4<Real> const simhx,
+                            Array4<Real> const simhy,
+                            const Box& domainBox,
+                            const Vector<BCRec>& bcs,
+                            const Real* dx,
+                            int comp, int bccomp, 
+                            bool is_vel, bool is_conservative) 
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEdgeScalEdges()",MakeEdgeScalEdges);
+
+    ///////////////////////////////////////////////
+    // Create sedgelx, etc.
+    ///////////////////////////////////////////////
+
+    int ppm_trace_forces_local = ppm_trace_forces;
+
+    Real dt2 = 0.5 * dt;
+    Real dt4 = 0.25 * dt;
+
+    Real hx = dx[0];
+    Real hy = dx[1];
+
+    int ilo = domainBox.loVect()[0];
+    int ihi = domainBox.hiVect()[0];
+    int jlo = domainBox.loVect()[1];
+    int jhi = domainBox.hiVect()[1];
+
+    const Box& xbx = mfi.nodaltilebox(0);
+    const Box& ybx = mfi.nodaltilebox(1);
+
+    Real rel_eps;
+    get_rel_eps(&rel_eps);
+
+    // x-direction
+    int bclo = bcs[bccomp].lo()[0];
+    int bchi = bcs[bccomp].hi()[0];
+    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
+    {
+        Real sedgelx = 0.0;
+        Real sedgerx = 0.0;
+
+        Real fl = (ppm_trace_forces_local == 0) ? 
+            force(i-1,j,k,comp) : Ipf(i-1,j,k,0);
+        Real fr = (ppm_trace_forces_local == 0) ? 
+            force(i,j,k,comp) : Imf(i,j,k,0);
+
+        if (is_conservative) {
+            sedgelx = slx(i,j,k)
+                - (dt2/hy)*(simhy(i-1,j+1,k)*vmac(i-1,j+1,k) 
+                - simhy(i-1,j,k)*vmac(i-1,j,k));
+                - (dt2/hx)*s(i-1,j,k,comp)*(umac(i  ,j,k)-umac(i-1,j,k))
+                + dt2*fl;
+            sedgerx = srx(i,j,k)
+                - (dt2/hy)*(simhy(i  ,j+1,k)*vmac(i  ,j+1,k) 
+                - simhy(i  ,j,k)*vmac(i  ,j,k))
+                - (dt2/hx)*s(i  ,j,k,comp)*(umac(i+1,j,k)-umac(i  ,j,k))
+                + dt2*fr;
+        } else {
+            sedgelx = slx(i,j,k)
+                - (dt4/hy)*(vmac(i-1,j+1,k)+vmac(i-1,j,k))*
+                (simhy(i-1,j+1,k)-simhy(i-1,j,k))
+                + dt2*fl;
+            sedgerx = srx(i,j,k)
+                - (dt4/hy)*(vmac(i  ,j+1,k)+vmac(i  ,j,k))*
+                (simhy(i  ,j+1,k)-simhy(i  ,j,k))
+                + dt2*fr;
+        }
+
+        // make sedgex by solving Riemann problem
+        // boundary conditions enforced outside of i,j loop
+        sedgex(i,j,k,comp) = (umac(i,j,k) > 0.0) ? sedgelx : sedgerx;
+        sedgex(i,j,k,comp) = (fabs(umac(i,j,k)) > rel_eps) ? 
+            sedgex(i,j,k,comp) : 0.5*(sedgelx+sedgerx);
+
+        // impose lo side bc's
+        if (i == ilo) {
+            if (bclo == EXT_DIR) {
+                sedgex(i,j,k,comp) = s(i-1,j,k,comp);
+            } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                if (is_vel && comp == 0) {
+                    sedgex(i,j,k,comp) = min(sedgerx,0.0);
+                } else {
+                    sedgex(i,j,k,comp) = sedgerx;
+                }
+            } else if (bclo == REFLECT_EVEN) {
+                sedgex(i,j,k,comp) = sedgerx;
+            } else if (bclo == REFLECT_ODD) {
+                sedgex(i,j,k,comp) = 0.0;
+            }
+
+        // impose hi side bc's
+        } else if (i == ihi+1) {
+            if (bchi == EXT_DIR) {
+                sedgex(i,j,k,comp) = s(i,j,k,comp);
+            } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                if (is_vel && comp == 0) {
+                    sedgex(i,j,k,comp) = max(sedgelx,0.0);
+                } else {
+                    sedgex(i,j,k,comp) = sedgelx;
+                }
+            } else if (bchi == REFLECT_EVEN) {
+                sedgex(i,j,k,comp) = sedgelx;
+            } else if (bchi == REFLECT_ODD) {
+                sedgex(i,j,k,comp) = 0.0;
+            }
+        }
+    });
+
+    // y-direction
+    bclo = bcs[bccomp].lo()[1];
+    bchi = bcs[bccomp].hi()[1];
+    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
+    {
+        Real sedgely = 0.0;
+        Real sedgery = 0.0;
+
+        Real fl = (ppm_trace_forces_local == 0) ? 
+            force(i,j-1,k,comp) : Ipf(i,j-1,k,1);
+        Real fr = (ppm_trace_forces_local == 0) ? 
+            force(i,j,k,comp) : Imf(i,j,k,1);
+
+        // make sedgely, sedgery
+        if (is_conservative) {
+            sedgely = sly(i,j,k)
+                   - (dt2/hx)*(simhx(i+1,j-1,k)*umac(i+1,j-1,k) - simhx(i,j-1,k)*umac(i,j-1,k))
+                   - (dt2/hy)*s(i,j-1,k,comp)*(vmac(i,j,k)-vmac(i,j-1,k))
+                   + dt2*fl;
+            sedgery = sry(i,j,k)
+                - (dt2/hx)*(simhx(i+1,j,k)*umac(i+1,j,k) - simhx(i,j,k)*umac(i,j,k))
+                - (dt2/hy)*s(i,j,k,comp)*(vmac(i,j+1,k)-vmac(i,j,k))
+                + dt2*fr;
+        } else {
+            sedgely = sly(i,j,k)
+                - (dt4/hx)*(umac(i+1,j-1,k)+umac(i,j-1,k))*(simhx(i+1,j-1,k)-simhx(i,j-1,k))
+                + dt2*fl;
+            sedgery = sry(i,j,k)
+                - (dt4/hx)*(umac(i+1,j,k)+umac(i,j,k))*(simhx(i+1,j,k)-simhx(i,j,k))
+                + dt2*fr;
+        }
+
+        // make sedgey by solving Riemann problem
+        // boundary conditions enforced outside of i,j loop
+        sedgey(i,j,k,comp) = (vmac(i,j,k) > 0.0) ? sedgely : sedgery;
+        sedgey(i,j,k,comp) = (fabs(vmac(i,j,k)) > rel_eps) ? 
+            sedgey(i,j,k,comp): 0.5*(sedgely+sedgery);
+
+        // impose lo side bc's
+        if (j == jlo) {
+            if (bclo == EXT_DIR) {
+                sedgey(i,j,k,comp) = s(i,j-1,k,comp);
+            } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
+                if (is_vel && comp == 1) {
+                    sedgey(i,j,k,comp) = min(sedgery,0.0);
+                } else {
+                    sedgey(i,j,k,comp) = sedgery;
+                }
+            } else if (bclo == REFLECT_EVEN) {
+                sedgey(i,j,k,comp) = sedgery;
+            } else if (bclo == REFLECT_ODD) {
+                sedgey(i,j,k,comp) = 0.0;
+            }
+
+        // impose hi side bc's
+        } else if (j == jhi+1) {
+            if (bchi == EXT_DIR) {
+                sedgey(i,j,k,comp) = s(i,j,k,comp);
+            } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
+                if (is_vel && comp == 1) {
+                    sedgey(i,j,k,comp) = max(sedgely,0.0);
+                } else {
+                    sedgey(i,j,k,comp) = sedgely;
+                }
+            } else if (bchi == REFLECT_EVEN) {
+                sedgey(i,j,k,comp) = sedgely;
+            } else if (bchi == REFLECT_ODD) {
+                sedgey(i,j,k,comp) = 0.0;
+            }
+        }
+    });
+}
+
 #else
 
 void Maestro::MakeDivU(const Box& bx, 
