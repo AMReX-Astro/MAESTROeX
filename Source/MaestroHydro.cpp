@@ -1206,6 +1206,13 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhzx.define(grids[lev],dmap[lev],1,1);
         simhzy.define(grids[lev],dmap[lev],1,1);
 
+        MultiFab sl, sr;
+        sl.define(grids[lev],dmap[lev],1,1);
+        sr.define(grids[lev],dmap[lev],1,1);
+        sl.setVal(0.);
+        sr.setVal(0);
+
+
         slx.setVal(0.);
         srx.setVal(0.);
         simhx.setVal(0.);
@@ -1303,7 +1310,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 } else {
 
-                    PPM_2d(obx, scal_arr, 
+                    PPM_2d(obx, state[lev].array(mfi), 
                            umac_arr, vmac_arr, 
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
@@ -1313,7 +1320,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                         Array4<Real> const force_arr = force[lev].array(mfi);
 
-                        PPM_2d(obx, force_arr, 
+                        PPM_2d(obx, force[lev].array(mfi), 
                            umac_arr, vmac_arr, 
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
