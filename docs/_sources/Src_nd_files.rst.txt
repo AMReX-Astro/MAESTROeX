@@ -24,7 +24,6 @@ Src_nd
    file/maestro_init_f
    file/make_S_f
    file/make_beta0_f
-   file/make_edge_scal_f
    file/make_edge_state_f
    file/make_eta_f
    file/make_explicit_thermal_f
