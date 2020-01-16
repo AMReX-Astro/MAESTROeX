@@ -6,7 +6,7 @@
 using namespace amrex;
 
 void
-Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
+Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                      const Vector<MultiFab>& ufull,
                      Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
 		     const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
@@ -21,7 +21,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Real* dx = geom[lev].CellSize();
 
         // get references to the MultiFabs at level lev
-        const MultiFab& utilde_mf  = utilde[lev];
+              MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& utrans_mf  = utrans[lev][0];
               MultiFab& vtrans_mf  = utrans[lev][1];
@@ -88,31 +88,32 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
                 // correct number of ghost zones
-#pragma gpu box(obx)
-                slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                       u_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,1);
-
+                // x-direction
+                Slopex(obx, u_mf.array(mfi), 
+                       Ip.array(mfi), 
+                       domainBox, bcs_u, 
+                       1,0);
             } else {
 
-#pragma gpu box(obx)
-                ppm_2d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
-                       utilde_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(v_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                       BL_TO_FORTRAN_ANYD(Im[mfi]),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       1,1,AMREX_SPACEDIM);
+                PPM_2d(obx, utilde_mf.array(mfi), 
+                       u_mf.array(mfi), v_mf.array(mfi), 
+                       Ip.array(mfi), Im.array(mfi), 
+                       domainBox, bcs_u, dx, 
+                       false, 0, 0);
+
+// #pragma gpu box(obx)
+//                 ppm_2d(AMREX_INT_ANYD(obx.loVect()),
+//                        AMREX_INT_ANYD(obx.hiVect()),
+//                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+//                        utilde_mf.nComp(),
+//                        BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+//                        BL_TO_FORTRAN_ANYD(v_mf[mfi]),
+//                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                        BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                        AMREX_INT_ANYD(domainBox.loVect()),
+//                        AMREX_INT_ANYD(domainBox.hiVect()),
+//                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
+//                        1,1,AMREX_SPACEDIM);
            }
 
 
@@ -139,17 +140,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Im here as slopey as it has the
                 // correct number of ghost zones
-#pragma gpu box(obx)
-                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(v_mf[mfi]),
-                       v_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,2);
-
+                Slopey(obx, v_mf.array(mfi), 
+                       Im.array(mfi), 
+                       domainBox, bcs_u, 
+                       1,1);
             } else {
+                // PPM_2d(obx, utilde_mf.array(mfi), 
+                //        u_mf.array(mfi), v_mf.array(mfi), 
+                //        Ip.array(mfi), Im.array(mfi), 
+                //        domainBox, bcs_u, dx, 
+                //        false, 1, 1);
 
 #pragma gpu box(obx)
                 ppm_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -187,31 +187,30 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
                 // correct number of ghost zones
-
-#pragma gpu box(obx)
-                slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                       u_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,1);
+                Slopex(obx, u_mf.array(mfi), 
+                       Ip.array(mfi), 
+                       domainBox, bcs_u, 
+                       1,0);
             } else {
-#pragma gpu box(obx)
-                ppm_3d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
-                       utilde_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(v_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(w_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(Ip[mfi]),
-                       BL_TO_FORTRAN_ANYD(Im[mfi]),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       bc_f, AMREX_REAL_ANYD(dx), dt, false,
-                       1,1,AMREX_SPACEDIM,false);
+                PPM_3d(obx, utilde_mf.array(mfi), 
+                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                       Ip.array(mfi), Im.array(mfi), 
+                       domainBox, bcs_u, dx, 
+                       false, 0, 0);
+// #pragma gpu box(obx)
+//                 ppm_3d(AMREX_INT_ANYD(obx.loVect()),
+//                        AMREX_INT_ANYD(obx.hiVect()),
+//                        BL_TO_FORTRAN_ANYD(utilde_mf[mfi]),
+//                        utilde_mf.nComp(),
+//                        BL_TO_FORTRAN_ANYD(u_mf[mfi]),
+//                        BL_TO_FORTRAN_ANYD(v_mf[mfi]),
+//                        BL_TO_FORTRAN_ANYD(w_mf[mfi]),
+//                        BL_TO_FORTRAN_ANYD(Ip[mfi]),
+//                        BL_TO_FORTRAN_ANYD(Im[mfi]),
+//                        AMREX_INT_ANYD(domainBox.loVect()),
+//                        AMREX_INT_ANYD(domainBox.hiVect()),
+//                        bc_f, AMREX_REAL_ANYD(dx), dt, false,
+//                        1,1,AMREX_SPACEDIM,false);
             }
 
 #pragma gpu box(xbx)
@@ -237,17 +236,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Im here as slopey as it has the
                 // correct number of ghost zones
-
-#pragma gpu box(obx)
-                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(v_mf[mfi]),
-                       v_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,2);
+                Slopey(obx, v_mf.array(mfi), 
+                       Im.array(mfi), 
+                       domainBox, bcs_u, 
+                       1,1);
             } else {
+                // PPM_3d(obx, utilde_mf.array(mfi), 
+                //        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                //        Ip.array(mfi), Im.array(mfi), 
+                //        domainBox, bcs_u, dx, 
+                //        false, 1, 1);
 #pragma gpu box(obx)
                 ppm_3d(AMREX_INT_ANYD(obx.loVect()),
                        AMREX_INT_ANYD(obx.hiVect()),
@@ -287,17 +285,16 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Im here as slopez as it has the
                 // correct number of ghost zones
-
-#pragma gpu box(obx)
-                slopez_3d(AMREX_INT_ANYD(obx.loVect()),
-                       AMREX_INT_ANYD(obx.hiVect()),
-                       BL_TO_FORTRAN_ANYD(w_mf[mfi]),
-                       w_mf.nComp(),
-                       BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                       AMREX_INT_ANYD(domainBox.loVect()),
-                       AMREX_INT_ANYD(domainBox.hiVect()),
-                       1,bc_f,AMREX_SPACEDIM,3);
+                Slopez(obx, w_mf.array(mfi), 
+                       Im.array(mfi), 
+                       domainBox, bcs_u,  
+                       1,2);
             } else {
+                // PPM_3d(obx, utilde_mf.array(mfi), 
+                //        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                //        Ip.array(mfi), Im.array(mfi), 
+                //        domainBox, bcs_u, dx, 
+                //        false, 2, 2);
 #pragma gpu box(obx)
                 ppm_3d(AMREX_INT_ANYD(obx.loVect()),
                         AMREX_INT_ANYD(obx.hiVect()),
@@ -342,31 +339,31 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
     } // end loop over levels
 
     if (finest_level == 0) {
-	// fill periodic ghost cells
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    for (int d=0; d<AMREX_SPACEDIM; ++d) {
-				utrans[lev][d].FillBoundary(geom[lev].periodicity());
-	    }
-	}
+        // fill periodic ghost cells
+        for (int lev=0; lev<=finest_level; ++lev) {
+            for (int d=0; d<AMREX_SPACEDIM; ++d) {
+                    utrans[lev][d].FillBoundary(geom[lev].periodicity());
+            }
+        }
 
-	// fill ghost cells behind physical boundaries
-	FillUmacGhost(utrans);
+        // fill ghost cells behind physical boundaries
+        FillUmacGhost(utrans);
     } else {
-	// edge_restriction
-	AverageDownFaces(utrans);
+        // edge_restriction
+        AverageDownFaces(utrans);
 
-	// fill ghost cells for all levels
-	FillPatchUedge(utrans);
+        // fill ghost cells for all levels
+        FillPatchUedge(utrans);
     }
 
 }
 
 void
-Maestro::VelPred (const Vector<MultiFab>& utilde,
+Maestro::VelPred (Vector<MultiFab>& utilde,
                   const Vector<MultiFab>& ufull,
                   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-		  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+		          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const Vector<MultiFab>& force)
 {
     // timer for profiling
@@ -379,31 +376,32 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const Real* dx = geom[lev].CellSize();
 
         // get references to the MultiFabs at level lev
-        const MultiFab& utilde_mf  = utilde[lev];
+              MultiFab& utilde_mf  = utilde[lev];
         const MultiFab& ufull_mf   = ufull[lev];
               MultiFab& umac_mf    = umac[lev][0];
         const MultiFab& utrans_mf  = utrans[lev][0];
         const MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab& vmac_mf    = umac[lev][1];
-              MultiFab Ipu, Imu, Ipv, Imv;
-              Ipu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Imu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Ipv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Imv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
 
-              MultiFab Ipfx, Imfx, Ipfy, Imfy;
-              Ipfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Imfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Ipfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              Imfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        MultiFab Ipu, Imu, Ipv, Imv;
+        Ipu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
 
-              MultiFab ulx, urx, uimhx, uly, ury, uimhy;
-              ulx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              urx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              uimhx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              uly.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              ury.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-              uimhy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        MultiFab Ipfx, Imfx, Ipfy, Imfy;
+        Ipfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab ulx, urx, uimhx, uly, ury, uimhy;
+        ulx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        urx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uimhx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uly.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        ury.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uimhy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wtrans_mf  = utrans[lev][2];
         MultiFab& wmac_mf    = umac[lev][2];
@@ -435,8 +433,6 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
         const MultiFab& force_mf = force[lev];
         const MultiFab& w0_mf = w0_cart[lev];
 
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-
 #if (AMREX_SPACEDIM == 2)
 
 #ifdef AMREX_USE_CUDA
@@ -462,6 +458,7 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
         }
 
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -478,6 +475,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
                 // correct number of ghost zones
+                // Slopex(obx, utilde_mf.array(mfi), 
+                //        Ipu.array(mfi), 
+                //        domainBox, bcs_u, 
+                //        AMREX_SPACEDIM,0);
 #pragma gpu box(obx)
                 slopex_2d(AMREX_INT_ANYD(obx.loVect()),
                        AMREX_INT_ANYD(obx.hiVect()),
@@ -524,6 +525,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                // we're going to reuse Im here as slopey as it has the
                // correct number of ghost zones
+            //    Slopey(obx, utilde_mf.array(mfi), 
+            //           Imv.array(mfi), 
+            //           domainBox, bcs_u, 
+            //           AMREX_SPACEDIM,0);
 #pragma gpu box(obx)
                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
                       AMREX_INT_ANYD(obx.hiVect()),
@@ -698,6 +703,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                 // we're going to reuse Ipu here as slopex as it has the
                 // correct number of ghost zones
+                // Slopex(obx, utilde_mf.array(mfi), 
+                //        Ipu.array(mfi), 
+                //        domainBox, bcs_u, 
+                //        AMREX_SPACEDIM,0);
 #pragma gpu box(obx)
                 slopex_2d(AMREX_INT_ANYD(obx.loVect()),
                        AMREX_INT_ANYD(obx.hiVect()),
@@ -709,6 +718,11 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
                        3,bc_f,AMREX_SPACEDIM,1);
 
             } else {
+                // PPM_3d(obx, utilde_mf.array(mfi), 
+                //        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                //        Ipu.array(mfi), Imu.array(mfi), 
+                //        domainBox, bcs_u, dx, 
+                //        false, 0, 0);
 
 #pragma gpu box(obx)
                 ppm_3d(AMREX_INT_ANYD(obx.loVect()),
@@ -747,6 +761,10 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                // we're going to reuse Imv here as slopey as it has the
                // correct number of ghost zones
+            //    Slopey(obx, utilde_mf.array(mfi), 
+            //            Imv.array(mfi), 
+            //            domainBox, bcs_u, 
+            //            AMREX_SPACEDIM,0);
 #pragma gpu box(obx)
                slopey_2d(AMREX_INT_ANYD(obx.loVect()),
                       AMREX_INT_ANYD(obx.hiVect()),
@@ -796,6 +814,11 @@ Maestro::VelPred (const Vector<MultiFab>& utilde,
             if (ppm_type == 0) {
                // we're going to reuse Imw here as slopey as it has the
                // correct number of ghost zones
+
+            //    Slopez(obx, utilde_mf.array(mfi), 
+            //           Imw.array(mfi), 
+            //           domainBox, bcs_u, 
+            //           AMREX_SPACEDIM,0);
 #pragma gpu box(obx)
                slopez_3d(AMREX_INT_ANYD(obx.loVect()),
                       AMREX_INT_ANYD(obx.hiVect()),
@@ -1157,10 +1180,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
         // get references to the MultiFabs at level lev
         const MultiFab& scal_mf   = state[lev];
-        MultiFab& sedgex_mf = sedge[lev][0];
-        const MultiFab& umac_mf   = umac[lev][0];
-        MultiFab& sedgey_mf = sedge[lev][1];
-        const MultiFab& vmac_mf   = umac[lev][1];
 
         MultiFab Ip, Im, Ipf, Imf;
         Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
@@ -1186,8 +1205,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhy.setVal(0.);
 
 #if (AMREX_SPACEDIM == 3)
-        MultiFab& sedgez_mf = sedge[lev][2];
-        const MultiFab& wmac_mf   = umac[lev][2];
 
         MultiFab slopez, divu;
         slopez.define(grids[lev],dmap[lev],1,1);
@@ -1205,13 +1222,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhyz.define(grids[lev],dmap[lev],1,1);
         simhzx.define(grids[lev],dmap[lev],1,1);
         simhzy.define(grids[lev],dmap[lev],1,1);
-
-        MultiFab sl, sr;
-        sl.define(grids[lev],dmap[lev],1,1);
-        sr.define(grids[lev],dmap[lev],1,1);
-        sl.setVal(0.);
-        sr.setVal(0);
-
 
         slx.setVal(0.);
         srx.setVal(0.);
@@ -1235,11 +1245,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #if (AMREX_SPACEDIM == 2)
 
-#ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs[0].data(), 1);
-#else
-        const int* bc_f = bcs[0].data();
-#endif
         Vector<MultiFab> vec_scal_mf(num_comp);
         for (int comp=0; comp < num_comp; ++comp) {
             vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
@@ -1256,9 +1261,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
             const Box& obx = amrex::grow(tileBox, 1);
 
             // Be careful to pass in comp+1 for fortran indexing
-            for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+            for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
 
-                int vcomp = scomp - start_scomp - 1;
+                int vcomp = scomp - start_scomp;
                 int bccomp = start_bccomp + scomp - start_scomp;
 
                 Array4<Real> const scal_arr = state[lev].array(mfi);
@@ -1279,45 +1284,32 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                     // as they have the correct number of ghost zones
 
                     // x-direction
-#pragma gpu box(obx)
-                    slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
 
                     // y-direction
-#pragma gpu box(obx)
-                    slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
 
                 } else {
-
-                    Array4<Real> const scal_arr = state[lev].array(mfi);
-                    Array4<Real> const force_arr = force[lev].array(mfi);
 
                     PPM_2d(obx, scal_arr, 
                            umac_arr, vmac_arr, 
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_2d(obx, force_arr, 
+                        PPM_2d(obx, force[lev].array(mfi), 
                            umac_arr, vmac_arr, 
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
                     }
                 }
 
@@ -1330,7 +1322,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                       umac_arr, vmac_arr, 
                                       simhx_arr, simhy_arr, 
                                       domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, is_vel);
+                                      scomp, bccomp, is_vel);
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
                 Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
@@ -1338,30 +1330,21 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 // Create sedgelx, etc.
 
                 MakeEdgeScalEdges(mfi, slx_arr, srx_arr,
-                                sly_arr, sry_arr,
-                                scal_arr, 
-                                sedgex_arr, sedgey_arr, 
-                                force[lev].array(mfi),
-                                umac_arr, vmac_arr, 
-                                Ipf.array(mfi), Imf.array(mfi),
-                                simhx_arr, simhy_arr, 
-                                domainBox, bcs, dx,
-                                scomp-1, bccomp-1, 
-                                is_vel, is_conservative);
+                                  sly_arr, sry_arr,
+                                  scal_arr, 
+                                  sedgex_arr, sedgey_arr, 
+                                  force[lev].array(mfi),
+                                  umac_arr, vmac_arr, 
+                                  Ipf.array(mfi), Imf.array(mfi),
+                                  simhx_arr, simhy_arr, 
+                                  domainBox, bcs, dx,
+                                  scomp, bccomp, 
+                                  is_vel, is_conservative);
             } // end loop over components
         } // end MFIter loop
 
-#ifdef AMREX_USE_CUDA
-        clean_bc(bc_f);
-#endif
-
 #elif (AMREX_SPACEDIM == 3)
 
-#ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs[0].data(), 1);
-#else
-        const int* bc_f = bcs[0].data();
-#endif
         Vector<MultiFab> vec_scal_mf(num_comp);
         for (int comp=0; comp < num_comp; ++comp) {
             vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
@@ -1371,10 +1354,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         }
 
         // Be careful to pass in comp+1 for fortran indexing
-        for (int scomp = start_scomp+1; scomp <= start_scomp + num_comp; ++scomp) {
+        for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
 
-            int vcomp = scomp - start_scomp - 1;
-
+            int vcomp = scomp - start_scomp;
             int bccomp = start_bccomp + scomp - start_scomp;
 
 #ifdef _OPENMP
@@ -1392,9 +1374,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 const Box& mybx = amrex::growLo(obx, 1, -1);
                 const Box& mzbx = amrex::growLo(obx, 2, -1);
 
-                Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
-                Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
-                Array4<Real> const wmac_arr = (umac[lev][2]).array(mfi);
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+                Array4<Real> const wmac_arr = umac[lev][2].array(mfi);
 
                 // make divu 
                 if (is_conservative) {
@@ -1402,63 +1384,43 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                              umac_arr, vmac_arr, wmac_arr, dx);
                 }
                           
-                // x-direction
                 if (ppm_type == 0) {
                     // we're going to reuse Ip here as slopex and Im as slopey
                     // as they have the correct number of ghost zones
 
                     // x-direction
-#pragma gpu box(obx)
-                    slopex_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Ip[mfi]),Ip.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
 
                     // y-direction
-#pragma gpu box(obx)
-                    slopey_2d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(Im[mfi]),Im.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
 
                     // z-direction
-#pragma gpu box(obx)
-                    slopez_3d(AMREX_INT_ANYD(obx.loVect()),
-                              AMREX_INT_ANYD(obx.hiVect()),
-                              BL_TO_FORTRAN_ANYD(vec_scal_mf[vcomp][mfi]),
-                              vec_scal_mf[vcomp].nComp(),
-                              BL_TO_FORTRAN_ANYD(slopez[mfi]),slopez.nComp(),
-                              AMREX_INT_ANYD(domainBox.loVect()),
-                              AMREX_INT_ANYD(domainBox.hiVect()),
-                              1,bc_f,nbccomp,bccomp);
-
+                    Slopez(obx, vec_scal_mf[vcomp].array(mfi), 
+                           slopez.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
 
                 } else {
 
-                    Array4<Real> const scal_arr = state[lev].array(mfi);
-                    Array4<Real> const force_arr = force[lev].array(mfi);
-
-                    PPM_3d(obx, scal_arr, 
+                    PPM_3d(obx, state[lev].array(mfi), 
                            umac_arr, vmac_arr, wmac_arr,
                            Ip.array(mfi), Im.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_3d(obx, force_arr, 
+                        PPM_3d(obx, force[lev].array(mfi), 
                            umac_arr, vmac_arr, wmac_arr,
                            Ipf.array(mfi), Imf.array(mfi), 
                            domainBox, bcs, dx, 
-                           true, scomp-1, bccomp-1);
+                           true, scomp, bccomp);
                     }
                 }
             }
@@ -1470,9 +1432,9 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 Array4<Real> const scal_arr = state[lev].array(mfi);
 
-                Array4<Real> const umac_arr = (umac[lev][0]).array(mfi);
-                Array4<Real> const vmac_arr = (umac[lev][1]).array(mfi);
-                Array4<Real> const wmac_arr = (umac[lev][2]).array(mfi);
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+                Array4<Real> const wmac_arr = umac[lev][2].array(mfi);
 
                 Array4<Real> const slx_arr = slx.array(mfi);
                 Array4<Real> const srx_arr = srx.array(mfi);
@@ -1496,7 +1458,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                                       umac_arr, vmac_arr, wmac_arr,
                                       simhx_arr, simhy_arr, simhz_arr,
                                       domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, is_vel);
+                                      scomp, bccomp, is_vel);
 
                 Array4<Real> const simhxy_arr = simhxy.array(mfi);
                 Array4<Real> const simhxz_arr = simhxz.array(mfi);
@@ -1508,16 +1470,16 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 // Create transverse terms, s_{\i-\half\e_x}^{x|y}, etc.
 
                 MakeEdgeScalTransverse(mfi, slx_arr, srx_arr,
-                                      sly_arr, sry_arr,
-                                      slz_arr, srz_arr,
-                                      scal_arr, divu.array(mfi),
-                                      umac_arr, vmac_arr, wmac_arr,
-                                      simhx_arr, simhy_arr, simhz_arr,
-                                      simhxy_arr, simhxz_arr, simhyx_arr,
-                                      simhyz_arr, simhzx_arr, simhzy_arr,
-                                      domainBox, bcs, dx,
-                                      scomp-1, bccomp-1, 
-                                      is_vel, is_conservative);
+                                       sly_arr, sry_arr,
+                                       slz_arr, srz_arr,
+                                       scal_arr, divu.array(mfi),
+                                       umac_arr, vmac_arr, wmac_arr,
+                                       simhx_arr, simhy_arr, simhz_arr,
+                                       simhxy_arr, simhxz_arr, simhyx_arr,
+                                       simhyz_arr, simhzx_arr, simhzy_arr,
+                                       domainBox, bcs, dx,
+                                       scomp, bccomp, 
+                                       is_vel, is_conservative);
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
                 Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
@@ -1526,26 +1488,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 // Create sedgelx, etc.
 
                 MakeEdgeScalEdges(mfi, slx_arr, srx_arr,
-                                sly_arr, sry_arr,
-                                slz_arr, srz_arr, scal_arr, 
-                                sedgex_arr, sedgey_arr, sedgez_arr,
-                                force[lev].array(mfi),
-                                umac_arr, vmac_arr, wmac_arr,
-                                Ipf.array(mfi), Imf.array(mfi),
-                                simhxy_arr, simhxz_arr, simhyx_arr,
-                                simhyz_arr, simhzx_arr, simhzy_arr,
-                                domainBox, bcs, dx,
-                                scomp-1, bccomp-1, 
-                                is_vel, is_conservative);
-
-
+                                  sly_arr, sry_arr,
+                                  slz_arr, srz_arr, scal_arr, 
+                                  sedgex_arr, sedgey_arr, sedgez_arr,
+                                  force[lev].array(mfi),
+                                  umac_arr, vmac_arr, wmac_arr,
+                                  Ipf.array(mfi), Imf.array(mfi),
+                                  simhxy_arr, simhxz_arr, simhyx_arr,
+                                  simhyz_arr, simhzx_arr, simhzy_arr,
+                                  domainBox, bcs, dx,
+                                  scomp, bccomp, 
+                                  is_vel, is_conservative);
             } // end MFIter loop
         } // end loop over components
-
-#ifdef AMREX_USE_CUDA
-        clean_bc(bc_f);
-#endif
-
 #endif
     } // end loop over levels
 

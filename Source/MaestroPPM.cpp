@@ -26,19 +26,19 @@ Maestro::PPM_2d (const Box& bx,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    int n = comp;
+    const int n = comp;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
 
-    Real dt_local = dt;
+    const Real dt_local = dt;
 
     /////////////
     // x-dir
     /////////////
 
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
 
@@ -614,9 +614,9 @@ Maestro::PPM_2d (const Box& bx,
                     sp = s(i,j,k,n) + alphap;
                 }
             }
-            //-------------------------------------------------------------------------
+            ////////////////////////////////////
             // compute x-component of Ip and Im
-            //-------------------------------------------------------------------------
+            ////////////////////////////////////
 
             Real s6 = 6*s(i,j,k,n) - 3.0*(sm+sp);
 
@@ -653,7 +653,6 @@ Maestro::PPM_2d (const Box& bx,
                     Im(i,j,k,0) = s(i,j,k,n);
                 }
             }
-
         });
     }
 
@@ -661,8 +660,8 @@ Maestro::PPM_2d (const Box& bx,
     // y-dir
     /////////////
 
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
+    const int jlo = domainBox.loVect()[1];
+    const int jhi = domainBox.hiVect()[1];
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
 
@@ -670,7 +669,6 @@ Maestro::PPM_2d (const Box& bx,
 
         AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
         { 
-
             // compute van Leer slopes in y-direction
 
             // sm
@@ -859,14 +857,12 @@ Maestro::PPM_2d (const Box& bx,
                     Im(i,j,k,1) = s(i,j,k,n);
                 }
             }
-
         });
 
     } else if (ppm_type == 2) {
 
         AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
         {
-
             // interpolate s to y-edges
 
             // -1
@@ -1263,7 +1259,6 @@ Maestro::PPM_2d (const Box& bx,
                     Im(i,j,k,1) = s(i,j,k,n);
                 }
             }
-
         });
     }
 }
@@ -1291,20 +1286,20 @@ Maestro::PPM_3d (const Box& bx,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    int n = comp;
+    const int n = comp;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
-    Real hz = dx[2];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
 
-    Real dt_local = dt;
+    const Real dt_local = dt;
 
     /////////////
     // x-dir
     /////////////
 
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
 
@@ -1505,7 +1500,6 @@ Maestro::PPM_3d (const Box& bx,
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
                 }
-
             }
         });
 
@@ -1879,7 +1873,6 @@ Maestro::PPM_3d (const Box& bx,
 
                     sm = s(i,j,k,n) + alpham;
                     sp = s(i,j,k,n) + alphap;
-
                 }
             }
 
@@ -1927,13 +1920,13 @@ Maestro::PPM_3d (const Box& bx,
             }
         });
     }
-// return;
+
     /////////////
     // y-dir
     /////////////
 
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
+    const int jlo = domainBox.loVect()[1];
+    const int jhi = domainBox.hiVect()[1];
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
 
@@ -1941,7 +1934,6 @@ Maestro::PPM_3d (const Box& bx,
 
         AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
         {
-
             // Compute van Leer slopes in y-direction.
 
             // sm
@@ -2138,9 +2130,7 @@ Maestro::PPM_3d (const Box& bx,
                 } else {
                     Im(i,j,k,1) = s(i,j,k,n);
                 }
-
             }
-
         });
 
     } else if (ppm_type == 2) {
@@ -2567,13 +2557,13 @@ Maestro::PPM_3d (const Box& bx,
             }
         });
     }
-// return;
+
     /////////////
     // z-dir
     /////////////
 
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
+    const int klo = domainBox.loVect()[2];
+    const int khi = domainBox.hiVect()[2];
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
 
@@ -2763,7 +2753,6 @@ Maestro::PPM_3d (const Box& bx,
                 } else {
                     Im(i,j,k,2) = s(i,j,k,n);
                 }
-
             } else {
 
                 Real sigma = fabs(w(i,j,k))*dt_local/hz;
@@ -2784,7 +2773,6 @@ Maestro::PPM_3d (const Box& bx,
                     Im(i,j,k,2) = s(i,j,k,n);
                 }
             }
-
         });
 
     } else if (ppm_type == 2) {
@@ -3194,7 +3182,6 @@ Maestro::PPM_3d (const Box& bx,
                 } else {
                     Im(i,j,k,2) = s(i,j,k,n);
                 }
-
             } else {
                 Real sigma = fabs(w(i,j,k))*dt_local/hz;
                 
@@ -3213,13 +3200,9 @@ Maestro::PPM_3d (const Box& bx,
                 } else {
                     Im(i,j,k,2) = s(i,j,k,n);
                 }
-
             }
-
-        });
-        
+        });  
     }
-
 }
 
 #endif
