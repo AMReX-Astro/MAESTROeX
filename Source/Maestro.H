@@ -1465,6 +1465,29 @@ public:
                         const amrex::Real* dx,
                         const amrex::Vector<amrex::BCRec>& bcs);
 #else 
+    void VelPredInterface(const amrex::MFIter& mfi, 
+                        amrex::Array4<const amrex::Real> const utilde,
+                        amrex::Array4<const amrex::Real> const ufull,
+                        amrex::Array4<const amrex::Real> const utrans,
+                        amrex::Array4<const amrex::Real> const vtrans,
+                        amrex::Array4<const amrex::Real> const wtrans,
+                        amrex::Array4<const amrex::Real> const Imu,
+                        amrex::Array4<const amrex::Real> const Ipu,
+                        amrex::Array4<const amrex::Real> const Imv,
+                        amrex::Array4<const amrex::Real> const Ipv,
+                        amrex::Array4<const amrex::Real> const Imw,
+                        amrex::Array4<const amrex::Real> const Ipw,
+                        amrex::Array4<amrex::Real> const ulx,
+                        amrex::Array4<amrex::Real> const urx,
+                        amrex::Array4<amrex::Real> const uimhx,
+                        amrex::Array4<amrex::Real> const uly,
+                        amrex::Array4<amrex::Real> const ury,
+                        amrex::Array4<amrex::Real> const uimhy,
+                        amrex::Array4<amrex::Real> const ulz,
+                        amrex::Array4<amrex::Real> const urz,
+                        amrex::Array4<amrex::Real> const uimhz,
+                        const amrex::Box& domainBox,
+                        const amrex::Real* dx);
 #endif
     ////////////////////////
 
