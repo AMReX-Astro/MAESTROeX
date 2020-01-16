@@ -1422,6 +1422,52 @@ public:
 			  const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
 
+    ////////////////////////
+    // MaestroVelPredInterfacevoid.cpp functions
+#if (AMREX_SPACEDIM == 2)
+    void VelPredInterface(const amrex::MFIter& mfi, 
+                        amrex::Array4<const amrex::Real> const utilde,
+                        amrex::Array4<const amrex::Real> const ufull,
+                        amrex::Array4<const amrex::Real> const utrans,
+                        amrex::Array4<const amrex::Real> const vtrans,
+                        amrex::Array4<const amrex::Real> const Imu,
+                        amrex::Array4<const amrex::Real> const Ipu,
+                        amrex::Array4<const amrex::Real> const Imv,
+                        amrex::Array4<const amrex::Real> const Ipv,
+                        amrex::Array4<amrex::Real> const ulx,
+                        amrex::Array4<amrex::Real> const urx,
+                        amrex::Array4<amrex::Real> const uimhx,
+                        amrex::Array4<amrex::Real> const uly,
+                        amrex::Array4<amrex::Real> const ury,
+                        amrex::Array4<amrex::Real> const uimhy,
+                        const amrex::Box& domainBox,
+                        const amrex::Real* dx);
+                        
+    void VelPredVelocities(const amrex::MFIter& mfi, 
+                        amrex::Array4<const amrex::Real> const utilde,
+                        amrex::Array4<const amrex::Real> const utrans,
+                        amrex::Array4<const amrex::Real> const vtrans,
+                        amrex::Array4<amrex::Real> const umac,
+                        amrex::Array4<amrex::Real> const vmac,
+                        amrex::Array4<const amrex::Real> const Imfx,
+                        amrex::Array4<const amrex::Real> const Ipfx,
+                        amrex::Array4<const amrex::Real> const Imfy,
+                        amrex::Array4<const amrex::Real> const Ipfy,
+                        amrex::Array4<const amrex::Real> const ulx,
+                        amrex::Array4<const amrex::Real> const urx,
+                        amrex::Array4<const amrex::Real> const uimhx,
+                        amrex::Array4<const amrex::Real> const uly,
+                        amrex::Array4<const amrex::Real> const ury,
+                        amrex::Array4<const amrex::Real> const uimhy,
+                        amrex::Array4<const amrex::Real> const force,
+                        amrex::Array4<const amrex::Real> const w0_cart,
+                        const amrex::Box& domainBox,
+                        const amrex::Real* dx,
+                        const amrex::Vector<amrex::BCRec>& bcs);
+#else 
+#endif
+    ////////////////////////
+
 
     /*
       private data members
