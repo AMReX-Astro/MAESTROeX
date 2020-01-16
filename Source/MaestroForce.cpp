@@ -39,7 +39,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     if (use_exact_base_state || average_base_state) {
         std::fill(gradw0.begin(), gradw0.end(), 0.);
     } else {
-        compute_grad_phi_rad(w0.dataPtr(), gradw0.dataPtr());
+	for (int i=0; i<gradw0.size(); ++i) {
+	    gradw0[i] = (w0[i+1] - w0[i])/dr_fine;
+	}
     }
 
     Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);

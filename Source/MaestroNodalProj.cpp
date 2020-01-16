@@ -580,8 +580,8 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi_in,
 	
         for ( MFIter mfi(gphi_in[0], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-	    Array4<Real const> const& phi = phi_mf.array(mfi);
-	    const Array4<Real> & gphi = gphi_mf.array(mfi);
+	    const Array4<const Real>& phi = phi_mf.array(mfi);
+	    const Array4<Real>& gphi = gphi_mf.array(mfi);
 
 	    // Use valid region
 	    const Box& tileBox = mfi.tilebox();
