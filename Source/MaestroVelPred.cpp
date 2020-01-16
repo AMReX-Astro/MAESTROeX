@@ -27,7 +27,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredInterface()",VelPredInterface);
 
-    // NOTE: for ppm_type_local == 0, slopex == Ipu, slopey == Imv
+    // NOTE: for ppm_type == 0, slopex == Ipu, slopey == Imv
 
     ////////////////////////////////////
     // Create u_{\i-\half\e_x}^x, etc.
@@ -99,9 +99,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         urx(i,j,k,n) = ulx(i,j,k,n);
                     }
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(1,1)" << std::endl;
+                    break; 
             }
 
         // impose hi side bc's
@@ -129,8 +127,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(1,2)" << std::endl;
             }
         }
 
@@ -193,8 +189,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(2,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -222,8 +216,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
         // No need to compute uimh(:,:,1) since it's equal to utrans-w0
@@ -317,8 +309,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     umac(i,j,k) = min(umacr,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(1,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -333,8 +323,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                 case Outflow:
                     umac(i,j,k) = max(umacl,0.0);
                 case Interior:
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(1,2)" << std::endl;
             }
         }
     });
@@ -380,8 +368,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     vmac(i,j,k) = min(vmacr,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(2,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -397,8 +383,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     vmac(i,j,k) = max(vmacl,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_2d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
     });
@@ -438,7 +422,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     // Create u_{\i-\half\e_x}^x, etc.
     ////////////////////////////////////
 
-    // NOTE: for ppm_type_local == 0, slopex == Ipu, slopey == Imv
+    // NOTE: for ppm_type == 0, slopex == Ipu, slopey == Imv
 
     // normal predictor states
      // Allocated from lo:hi+1 in the normal direction
@@ -459,7 +443,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hy = dx[1];
     const Real hz = dx[2];
 
-    static const int ppm_type_local = ppm_type;
+    int ppm_type_local = ppm_type;
 
     // x-direction
     const int ilo = domainBox.loVect()[0];
@@ -471,8 +455,8 @@ Maestro::VelPredInterface(const MFIter& mfi,
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
     {
         if (ppm_type_local == 0) {
-            Real maxu = (0.5 - dt2*max(0.0,ufull(i-1,j,k,0))/hx);
-            Real minu = (0.5 + dt2*min(0.0,ufull(i  ,j,k,0))/hx);
+            Real maxu = 0.5 - dt2*max(0.0,ufull(i-1,j,k,0))/hx;
+            Real minu = 0.5 + dt2*min(0.0,ufull(i  ,j,k,0))/hx;
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                 // extrapolate all components of velocity to left face
@@ -518,8 +502,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -547,9 +529,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         urx(i,j,k,n) = ulx(i,j,k,n);
                     }
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+                    break; 
             }
         }
 
@@ -621,9 +601,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         uly(i,j,k,n) = ury(i,j,k,n);
                     }
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+                    break;      
             }
 
         // impose hi side bc's
@@ -652,8 +630,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                         break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
 
@@ -726,8 +702,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                         break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -756,8 +730,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
                     }
                 case Interior:
                         break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
             }
         }
 
@@ -851,9 +823,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     ulyz = 0.0;
                     uryz = 0.0;
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+                    break;   
             }
 
         // impose hi side bc's
@@ -871,8 +841,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     uryz = 0.0;
                 case Interior:
                     break;
-                default:
-                Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
 
@@ -908,9 +876,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     ulzy = 0.0;
                     urzy = 0.0;
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
+                    break; 
             }
 
         // impose hi side bc's
@@ -928,8 +894,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     urzy = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
             }
         }
 
@@ -966,8 +930,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     vrxz = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -985,8 +947,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     vrxz = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
             }
         }
 
@@ -1023,8 +983,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     vrzx = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -1042,8 +1000,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 vrzx = 0.0;
             case Interior:
                 break;
-            default:
-                Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
             }
         }
 
@@ -1080,13 +1036,11 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     wrxy = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
             }
 
         // impose hi side bc's
         } else if (i == ihi+1) {
-            switch (phys_bc[AMREX_SPACEDIM]) {
+            switch (physbc[AMREX_SPACEDIM]) {
                 case Inflow:
                     wlxy = utilde(i,j,k,2);
                     wrxy = utilde(i,j,k,2);
@@ -1098,9 +1052,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     wlxy = 0.0;
                     wrxy = 0.0;
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+                    break; 
             }
         }
 
@@ -1137,8 +1089,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     wryx = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
             }
 
         // impose hi side bc's
@@ -1156,8 +1106,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                     wryx = 0.0;
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
 
@@ -1236,7 +1184,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         physbc[n] = phys_bc[n];
     } 
 
-    static const int ppm_trace_forces_local = ppm_trace_forces;
+    const int ppm_trace_forces_local = ppm_trace_forces;
+    const int spherical_local = spherical;
 
     // x-direction
     AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
@@ -1259,7 +1208,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (uimhzy(i  ,j  ,k+1)-uimhzy(i  ,j,k))
             + dt2*fr;
 
-        if (spherical == 1) {
+        if (spherical_local == 1) {
             // solve Riemann problem using full velocity
             bool test = (umacl+w0macx(i,j,k) <= 0.0 &&
                          umacr+w0macx(i,j,k) >= 0.0) ||
@@ -1286,9 +1235,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                 case Outflow:
                     umac(i,j,k) = min(umacr,0.0);
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
+                    break; 
             }
 
         // impose hi side bc's
@@ -1303,9 +1250,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                 case Outflow:
                     umac(i,j,k) = max(umacl,0.0);
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+                    break;   
             }
         }
     });
@@ -1331,7 +1276,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (vimhzx(i  ,j  ,k+1)-vimhzx(i,j  ,k))
             + dt2*fr;
 
-        if (spherical == 1) {
+        if (spherical_local == 1) {
             // solve Riemann problem using full velocity
             bool test = (vmacl+w0macy(i,j,k) <= 0.0 &&
                          vmacr+w0macy(i,j,k) >= 0.0) ||
@@ -1358,9 +1303,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                 case Outflow:
                     vmac(i,j,k) = min(vmacr,0.0);
                 case Interior:
-                    break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+                    break;     
             }
 
         // impose hi side bc's
@@ -1376,8 +1319,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     vmac(i,j,k) = max(vmacl,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
             }
         }
     });
@@ -1403,7 +1344,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (wimhyx(i  ,j+1,k  )-wimhyx(i,j,k  ))
             + dt2*fr;
 
-        if (spherical == 1) {
+        if (spherical_local == 1) {
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
                     wmacr+w0macz(i,j,k) >= 0.0) ||
@@ -1433,8 +1374,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     wmac(i,j,k) = min(wmacr,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
             }
 
         // impose lo side bc's
@@ -1450,8 +1389,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                     wmac(i,j,k) = max(wmacl,0.0);
                 case Interior:
                     break;
-                default:
-                    Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
             }
         }
     });
