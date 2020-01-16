@@ -127,7 +127,7 @@ public:
     /// @param ufull            full velocity
     /// @param utrans           transverse velocity
     /// @param w0mac            MAC base-state velocity
-    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
+    void MakeUtrans (amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
                      amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
                      const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
@@ -141,7 +141,7 @@ public:
     /// @param umac             MAC velocity
     /// @param w0mac            MAC base-state velocity
     /// @param force            velocity force
-    void VelPred (const amrex::Vector<amrex::MultiFab>& utilde,
+    void VelPred (amrex::Vector<amrex::MultiFab>& utilde,
                   const amrex::Vector<amrex::MultiFab>& ufull,
                   const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
                   amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
@@ -1291,6 +1291,33 @@ public:
     void BCSetup ();
 
     // end MaestroSetup.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroSlopes.cpp function
+    void Slopex(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const slx,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp);
+
+    void Slopey(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const sly,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp);
+
+    void Slopez(const amrex::Box& bx, 
+                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const slz,
+                const amrex::Box& domainBox,
+                const amrex::Vector<amrex::BCRec>& bcs,
+                int ncomp,
+                int bc_start_comp);
     ////////////
 
     ////////////
