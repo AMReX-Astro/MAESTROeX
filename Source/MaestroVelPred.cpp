@@ -41,19 +41,19 @@ Maestro::VelPredInterface(const MFIter& mfi,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    Real dt2 = 0.5 * dt;
+    const Real dt2 = 0.5 * dt;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+
+    static const int ppm_type_local = ppm_type;
 
     // x-direction
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
-
-    int ppm_type_local = ppm_type;
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
     {
@@ -255,8 +255,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                             Array4<const Real> const force,
                             Array4<const Real> const w0_cart,
                             const Box& domainBox,
-                            const Real* dx,
-                            const Vector<BCRec>& bcs)
+                            const Real* dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredVelocities()",VelPredVelocities);
@@ -271,17 +270,17 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    Real dt2 = 0.5 * dt;
-    Real dt4 = 0.25 * dt;
+    const Real dt2 = 0.5 * dt;
+    const Real dt4 = 0.25 * dt;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
 
-    int ppm_trace_forces_local = ppm_trace_forces;
+    static const int ppm_trace_forces_local = ppm_trace_forces;
 
     // x-direction
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
@@ -341,8 +340,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     });
 
     // y-direction
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
+    const int jlo = domainBox.loVect()[1];
+    const int jhi = domainBox.hiVect()[1];
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM+1];
 
@@ -454,20 +453,20 @@ Maestro::VelPredInterface(const MFIter& mfi,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    Real dt2 = 0.5 * dt;
+    const Real dt2 = 0.5 * dt;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
-    Real hz = dx[2];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
+
+    static const int ppm_type_local = ppm_type;
 
     // x-direction
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
-
-    int ppm_type_local = ppm_type;
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
     {
@@ -809,25 +808,26 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     Real rel_eps;
     get_rel_eps(&rel_eps);
 
-    Real dt6 = dt / 6.0;
+    const Real dt6 = dt / 6.0;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
-    Real hz = dx[2];
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
+    const int jlo = domainBox.loVect()[1];
+    const int jhi = domainBox.hiVect()[1];
+    const int klo = domainBox.loVect()[2];
+    const int khi = domainBox.hiVect()[2];
 
-    // uimhyz, 1, 2
-    Box imhbox = amrex::grow(mfi.tilebox(), 0, 1);
-    imhbox = amrex::growHi(imhbox, 1, 1);
     GpuArray<int,AMREX_SPACEDIM*2> physbc;
     for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
         physbc[n] = phys_bc[n];
     } 
+
+    // uimhyz, 1, 2
+    Box imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+    imhbox = amrex::growHi(imhbox, 1, 1);
 
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
     {
@@ -1166,7 +1166,295 @@ Maestro::VelPredTransverse(const MFIter& mfi,
         wimhyx(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps ? 
             0.5*(wlyx+wryx) : wimhyx(i,j,k);
     });
+}
 
+void 
+Maestro::VelPredVelocities(const MFIter& mfi, 
+                            Array4<const Real> const utilde,
+                            Array4<const Real> const utrans,
+                            Array4<const Real> const vtrans,
+                            Array4<const Real> const wtrans,
+                            Array4<Real> const umac,
+                            Array4<Real> const vmac,
+                            Array4<Real> const wmac,
+                            Array4<const Real> const w0macx,
+                            Array4<const Real> const w0macy,
+                            Array4<const Real> const w0macz,
+                            Array4<const Real> const Imfx,
+                            Array4<const Real> const Ipfx,
+                            Array4<const Real> const Imfy,
+                            Array4<const Real> const Ipfy,
+                            Array4<const Real> const Imfz,
+                            Array4<const Real> const Ipfz,
+                            Array4<const Real> const ulx,
+                            Array4<const Real> const urx,
+                            Array4<const Real> const uly,
+                            Array4<const Real> const ury,
+                            Array4<const Real> const ulz,
+                            Array4<const Real> const urz,
+                            Array4<const Real> const uimhyz,
+                            Array4<const Real> const uimhzy,
+                            Array4<const Real> const vimhxz,
+                            Array4<const Real> const vimhzx,
+                            Array4<const Real> const wimhxy,
+                            Array4<const Real> const wimhyx,
+                            Array4<const Real> const force,
+                            Array4<const Real> const w0_cart,
+                            const Box& domainBox,
+                            const Real* dx)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelPredVelocities()",VelPredVelocities);
+
+    //******************************************************************
+    // Create umac and vmac
+    //******************************************************************
+
+    const Box& xbx = mfi.nodaltilebox(0);
+    const Box& ybx = mfi.nodaltilebox(1);
+    const Box& zbx = mfi.nodaltilebox(2);
+
+    Real rel_eps;
+    get_rel_eps(&rel_eps);
+
+    const Real dt2 = 0.5 * dt;
+    const Real dt4 = 0.25 * dt;
+
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
+
+    const int ilo = domainBox.loVect()[0];
+    const int ihi = domainBox.hiVect()[0];
+    const int jlo = domainBox.loVect()[1];
+    const int jhi = domainBox.hiVect()[1];
+    const int klo = domainBox.loVect()[2];
+    const int khi = domainBox.hiVect()[2];
+    
+    GpuArray<int,AMREX_SPACEDIM*2> physbc;
+    for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
+        physbc[n] = phys_bc[n];
+    } 
+
+    static const int ppm_trace_forces_local = ppm_trace_forces;
+
+    // x-direction
+    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
+    {
+        // use the traced force if ppm_trace_forces = 1
+        Real fl = ppm_trace_forces_local == 0 ? force(i-1,j,k,0) : Ipfx(i-1,j,k,0);
+        Real fr = ppm_trace_forces_local == 0 ? force(i  ,j,k,0) : Imfx(i  ,j,k,0);
+
+        // extrapolate to edges
+        Real umacl = ulx(i,j,k,0)
+            - (dt4/hy)*(vtrans(i-1,j+1,k  )+vtrans(i-1,j,k))
+            * (uimhyz(i-1,j+1,k  )-uimhyz(i-1,j,k))
+            - (dt4/hz)*(wtrans(i-1,j  ,k+1)+wtrans(i-1,j,k))
+            * (uimhzy(i-1,j  ,k+1)-uimhzy(i-1,j,k))
+            + dt2*fl;
+        Real umacr = urx(i,j,k,0)
+            - (dt4/hy)*(vtrans(i  ,j+1,k  )+vtrans(i  ,j,k))
+            * (uimhyz(i  ,j+1,k  )-uimhyz(i  ,j,k))
+            - (dt4/hz)*(wtrans(i  ,j  ,k+1)+wtrans(i  ,j,k))
+            * (uimhzy(i  ,j  ,k+1)-uimhzy(i  ,j,k))
+            + dt2*fr;
+
+        if (spherical == 1) {
+            // solve Riemann problem using full velocity
+            bool test = (umacl+w0macx(i,j,k) <= 0.0 &&
+                         umacr+w0macx(i,j,k) >= 0.0) ||
+                        (fabs(umacl+umacr+2*w0macx(i,j,k)) < rel_eps);
+            umac(i,j,k) = 0.5*(umacl+umacr)+w0macx(i,j,k) > 0.0 ? umacl : umacr;
+            umac(i,j,k) = test ? 0.0 : umac(i,j,k);
+        } else {
+            // solve Riemann problem using full velocity
+            bool test = (umacl <= 0.0 && umacr >= 0.0) || 
+                        (fabs(umacl+umacr) < rel_eps);
+            umac(i,j,k) = 0.5*(umacl+umacr) > 0.0 ? umacl : umacr;
+            umac(i,j,k) = test ? 0.0 : umac(i,j,k);
+        }
+
+        // impose lo side bc's
+        if (i == ilo) {
+            switch (physbc[0]) {
+                case Inflow:
+                    umac(i,j,k) = utilde(i-1,j,k,0);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    umac(i,j,k) = 0.0;
+                case Outflow:
+                    umac(i,j,k) = min(umacr,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (i == ihi+1) {
+            switch (physbc[AMREX_SPACEDIM]) {
+                case Inflow:
+                    umac(i,j,k) = utilde(i,j,k,0);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    umac(i,j,k) = 0.0;
+                case Outflow:
+                    umac(i,j,k) = max(umacl,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+            }
+        }
+    });
+
+    // y-direction
+    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
+    {
+        // use the traced force if ppm_trace_forces = 1
+        Real fl = ppm_trace_forces_local == 0 ? force(i,j-1,k,1) : Ipfy(i,j-1,k,1);
+        Real fr = ppm_trace_forces_local == 0 ? force(i,j  ,k,1) : Imfy(i,j  ,k,1);
+
+        // extrapolate to edges
+        Real vmacl = uly(i,j,k,1)
+            - (dt4/hx)*(utrans(i+1,j-1,k  )+utrans(i,j-1,k))
+            * (vimhxz(i+1,j-1,k  )-vimhxz(i,j-1,k))
+            - (dt4/hz)*(wtrans(i  ,j-1,k+1)+wtrans(i,j-1,k))
+            * (vimhzx(i  ,j-1,k+1)-vimhzx(i,j-1,k))
+            + dt2*fl;
+        Real vmacr = ury(i,j,k,1)
+            - (dt4/hx)*(utrans(i+1,j  ,k  )+utrans(i,j  ,k))
+            * (vimhxz(i+1,j  ,k  )-vimhxz(i,j  ,k))
+            - (dt4/hz)*(wtrans(i  ,j  ,k+1)+wtrans(i,j  ,k))
+            * (vimhzx(i  ,j  ,k+1)-vimhzx(i,j  ,k))
+            + dt2*fr;
+
+        if (spherical == 1) {
+            // solve Riemann problem using full velocity
+            bool test = (vmacl+w0macy(i,j,k) <= 0.0 &&
+                         vmacr+w0macy(i,j,k) >= 0.0) ||
+                        (fabs(vmacl+vmacr+2*w0macy(i,j,k)) < rel_eps);
+            vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0macy(i,j,k) > 0.0 ? vmacl : vmacr;
+            vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
+        } else {
+            // solve Riemann problem using full velocity
+            bool test = (vmacl <= 0.0 && vmacr >= 0.0) ||
+                        (fabs(vmacl+vmacr) < rel_eps);
+            vmac(i,j,k) = 0.5*(vmacl+vmacr) > 0.0 ? vmacl : vmacr;
+            vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
+        }
+
+        // impose lo side bc's
+        if (j == jlo) {
+            switch (physbc[1]) {
+                case Inflow:
+                    vmac(i,j,k) = utilde(i,j-1,k,1);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    vmac(i,j,k) = 0.0;
+                case Outflow:
+                    vmac(i,j,k) = min(vmacr,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (j == jhi+1) {
+            switch (physbc[AMREX_SPACEDIM+1]) {
+                case Inflow:
+                    vmac(i,j,k) = utilde(i,j,k,1);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    vmac(i,j,k) = 0.0;
+                case Outflow:
+                    vmac(i,j,k) = max(vmacl,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
+            }
+        }
+    });
+
+    // z-direction
+    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
+    {
+        // use the traced force if ppm_trace_forces = 1
+        Real fl = ppm_trace_forces_local == 0 ? force(i,j,k-1,2) : Ipfz(i,j,k-1,2);
+        Real fr = ppm_trace_forces_local == 0 ? force(i,j,k  ,2) : Imfz(i,j,k  ,2); 
+
+        // extrapolate to edges
+        Real wmacl = ulz(i,j,k,2)
+            - (dt4/hx)*(utrans(i+1,j  ,k-1)+utrans(i,j,k-1))
+            * (wimhxy(i+1,j  ,k-1)-wimhxy(i,j,k-1))
+            - (dt4/hy)*(vtrans(i  ,j+1,k-1)+vtrans(i,j,k-1))
+            * (wimhyx(i  ,j+1,k-1)-wimhyx(i,j,k-1))
+            + dt2*fl;
+        Real wmacr = urz(i,j,k,2)
+            - (dt4/hx)*(utrans(i+1,j  ,k  )+utrans(i,j,k  ))
+            * (wimhxy(i+1,j  ,k  )-wimhxy(i,j,k  ))
+            - (dt4/hy)*(vtrans(i  ,j+1,k  )+vtrans(i,j,k  ))
+            * (wimhyx(i  ,j+1,k  )-wimhyx(i,j,k  ))
+            + dt2*fr;
+
+        if (spherical == 1) {
+            // solve Riemann problem using full velocity
+            bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
+                    wmacr+w0macz(i,j,k) >= 0.0) ||
+                   (fabs(wmacl+wmacr+2*w0macz(i,j,k)) < rel_eps);
+            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0macz(i,j,k) > 0.0 ? wmacl : wmacr;
+            wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
+        } else {
+            // solve Riemann problem using full velocity
+            bool test = (wmacl+w0_cart(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
+                         wmacr+w0_cart(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
+                        (fabs(wmacl+wmacr+2*w0_cart(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
+                wmacl : wmacr;
+            wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
+        }
+
+        // impose hi side bc's
+        if (k == klo) {
+            switch (physbc[2]) {
+                case Inflow:
+                    wmac(i,j,k) = utilde(i,j,k-1,2);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    wmac(i,j,k) = 0.0;
+                case Outflow:
+                    wmac(i,j,k) = min(wmacr,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
+            }
+
+        // impose lo side bc's
+        } else if (k == khi+1) {
+            switch (physbc[AMREX_SPACEDIM+2]) {
+                case Inflow:
+                    wmac(i,j,k) = utilde(i,j,k,2);
+                case SlipWall:
+                case Symmetry:
+                case NoSlipWall:
+                    wmac(i,j,k) = 0.0;
+                case Outflow:
+                    wmac(i,j,k) = max(wmacl,0.0);
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
+            }
+        }
+    });
 }
 
 #endif
