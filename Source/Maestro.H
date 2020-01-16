@@ -1487,6 +1487,29 @@ public:
                         amrex::Array4<amrex::Real> const urz,
                         amrex::Array4<amrex::Real> const uimhz,
                         const amrex::Box& domainBox,
+                        const amrex::Real* dx); 
+
+    void VelPredTransverse(const amrex::MFIter& mfi, 
+                        amrex::Array4<const amrex::Real> const utilde,
+                        amrex::Array4<const amrex::Real> const utrans,
+                        amrex::Array4<const amrex::Real> const vtrans,
+                        amrex::Array4<const amrex::Real> const wtrans,
+                        amrex::Array4<const amrex::Real> const ulx,
+                        amrex::Array4<const amrex::Real> const urx,
+                        amrex::Array4<const amrex::Real> const uimhx,
+                        amrex::Array4<const amrex::Real> const uly,
+                        amrex::Array4<const amrex::Real> const ury,
+                        amrex::Array4<const amrex::Real> const uimhy,
+                        amrex::Array4<const amrex::Real> const ulz,
+                        amrex::Array4<const amrex::Real> const urz,
+                        amrex::Array4<const amrex::Real> const uimhz,
+                        amrex::Array4<amrex::Real> const uimhyz,
+                        amrex::Array4<amrex::Real> const uimhzy,
+                        amrex::Array4<amrex::Real> const vimhxz,
+                        amrex::Array4<amrex::Real> const vimhzx,
+                        amrex::Array4<amrex::Real> const wimhxy,
+                        amrex::Array4<amrex::Real> const wimhyx,
+                        const amrex::Box& domainBox,
                         const amrex::Real* dx);
 #endif
     ////////////////////////

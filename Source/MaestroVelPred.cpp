@@ -773,6 +773,399 @@ Maestro::VelPredInterface(const MFIter& mfi,
         uimhz(i,j,k,1) = fabs(wtrans(i,j,k)) < rel_eps ? 
             0.5*(ulz(i,j,k,1)+urz(i,j,k,1)) : uimhz(i,j,k,1);
     });
+}
+
+void 
+Maestro::VelPredTransverse(const MFIter& mfi, 
+                          Array4<const Real> const utilde,
+                          Array4<const Real> const utrans,
+                          Array4<const Real> const vtrans,
+                          Array4<const Real> const wtrans,
+                          Array4<const Real> const ulx,
+                          Array4<const Real> const urx,
+                          Array4<const Real> const uimhx,
+                          Array4<const Real> const uly,
+                          Array4<const Real> const ury,
+                          Array4<const Real> const uimhy,
+                          Array4<const Real> const ulz,
+                          Array4<const Real> const urz,
+                          Array4<const Real> const uimhz,
+                          Array4<Real> const uimhyz,
+                          Array4<Real> const uimhzy,
+                          Array4<Real> const vimhxz,
+                          Array4<Real> const vimhzx,
+                          Array4<Real> const wimhxy,
+                          Array4<Real> const wimhyx,
+                          const Box& domainBox,
+                          const Real* dx)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelPredTransverse()",VelPredTransverse);
+
+    //////////////////////////////////////
+    // Create u_{\i-\half\e_y}^{y|z}, etc.
+    //////////////////////////////////////
+
+    Real rel_eps;
+    get_rel_eps(&rel_eps);
+
+    Real dt6 = dt / 6.0;
+
+    Real hx = dx[0];
+    Real hy = dx[1];
+    Real hz = dx[2];
+    int ilo = domainBox.loVect()[0];
+    int ihi = domainBox.hiVect()[0];
+    int jlo = domainBox.loVect()[1];
+    int jhi = domainBox.hiVect()[1];
+    int klo = domainBox.loVect()[2];
+    int khi = domainBox.hiVect()[2];
+
+    // uimhyz, 1, 2
+    Box imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+    imhbox = amrex::growHi(imhbox, 1, 1);
+    GpuArray<int,AMREX_SPACEDIM*2> physbc;
+    for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
+        physbc[n] = phys_bc[n];
+    } 
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real ulyz = uly(i,j,k,0) - (dt6/hz)*(wtrans(i,j-1,k+1)+wtrans(i,j-1,k)) 
+            * (uimhz(i,j-1,k+1,0)-uimhz(i,j-1,k,0));
+        Real uryz = ury(i,j,k,0) - (dt6/hz)*(wtrans(i,j  ,k+1)+wtrans(i,j  ,k)) 
+            * (uimhz(i,j  ,k+1,0)-uimhz(i,j  ,k,0));
+
+        // impose lo side bc's
+        if (j == jlo) {
+            switch (physbc[1]) {
+                case Inflow:
+                    ulyz = utilde(i,j-1,k,0);
+                    uryz = utilde(i,j-1,k,0);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    ulyz = uryz;
+                case NoSlipWall:
+                    ulyz = 0.0;
+                    uryz = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (j == jhi+1) {
+            switch (physbc[AMREX_SPACEDIM+1]) {
+                case Inflow:
+                    ulyz = utilde(i,j,k,0);
+                    uryz = utilde(i,j,k,0);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    uryz = ulyz;
+                case NoSlipWall:
+                    ulyz = 0.0;
+                    uryz = 0.0;
+                case Interior:
+                    break;
+                default:
+                Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        uimhyz(i,j,k) = vtrans(i,j,k) > 0.0 ? ulyz : uryz;
+        uimhyz(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps ? 
+            0.5*(ulyz+uryz) : uimhyz(i,j,k);    
+    });
+
+    // uimhzy, 1, 3
+    imhbox = amrex::grow(mfi.tilebox(), 0, 1);
+    imhbox = amrex::growHi(imhbox, 2, 1);
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real ulzy = ulz(i,j,k,0) - (dt6/hy)*(vtrans(i,j+1,k-0)+vtrans(i,j,k-1)) 
+            * (uimhy(i,j+1,k-1,0)-uimhy(i,j,k-1,0));
+        Real urzy = urz(i,j,k,0) - (dt6/hy)*(vtrans(i,j+1,k  )+vtrans(i,j,k  )) 
+            * (uimhy(i,j+1,k  ,0)-uimhy(i,j,k  ,0));
+
+        // impose lo side bc's
+        if (k == klo) {
+            switch (physbc[2]) {
+                case Inflow:
+                    ulzy = utilde(i,j,k-1,0);
+                    urzy = utilde(i,j,k-1,0);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    ulzy = urzy;
+                case NoSlipWall:
+                    ulzy = 0.0;
+                    urzy = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (k == khi+1) {
+            switch (physbc[AMREX_SPACEDIM+2]) {
+                case Inflow:
+                    ulzy = utilde(i,j,k,0);
+                    urzy = utilde(i,j,k,0);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    urzy = ulzy;
+                case NoSlipWall:
+                    ulzy = 0.0;
+                    urzy = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        uimhzy(i,j,k) = wtrans(i,j,k) > 0.0 ? ulzy : urzy;
+        uimhzy(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps ? 
+            0.5*(ulzy+urzy) : uimhzy(i,j,k);
+    });
+
+    // vimhxz, 2, 1
+    imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+    imhbox = amrex::growHi(imhbox, 0, 1);
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real vlxz = ulx(i,j,k,1) - (dt6/hz)*(wtrans(i-1,j,k+1)+wtrans(i-1,j,k)) 
+            * (uimhz(i-1,j,k+1,1)-uimhz(i-1,j,k,1));
+        Real vrxz = urx(i,j,k,1) - (dt6/hz)*(wtrans(i  ,j,k+1)+wtrans(i  ,j,k)) 
+            * (uimhz(i  ,j,k+1,1)-uimhz(i  ,j,k,1));
+
+        // impose lo side bc's
+        if (i == ilo) {
+            switch (physbc[0]) {
+                case Inflow:
+                    vlxz = utilde(i-1,j,k,1);
+                    vrxz = utilde(i-1,j,k,1);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    vlxz = vrxz;
+                case NoSlipWall:
+                    vlxz = 0.0;
+                    vrxz = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (i == ihi+1) {
+            switch (physbc[AMREX_SPACEDIM]) {
+                case Inflow:
+                    vlxz = utilde(i,j,k,1);
+                    vrxz = utilde(i,j,k,1);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    vrxz = vlxz;
+                case NoSlipWall:
+                    vlxz = 0.0;
+                    vrxz = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        vimhxz(i,j,k) = utrans(i,j,k) > 0.0 ? vlxz : vrxz;
+        vimhxz(i,j,k) = fabs(utrans(i,j,k)) < rel_eps ? 
+            0.5*(vlxz+vrxz) : vimhxz(i,j,k);
+    });
+
+    // vimhzx, 2, 3
+    imhbox = amrex::grow(mfi.tilebox(), 1, 1);
+    imhbox = amrex::growHi(imhbox, 2, 1);
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real vlzx = ulz(i,j,k,1) - (dt6/hx)*(utrans(i+1,j,k-1)+utrans(i,j,k-1)) 
+            * (uimhx(i+1,j,k-1,1)-uimhx(i,j,k-1,1));
+        Real vrzx = urz(i,j,k,1) - (dt6/hx)*(utrans(i+1,j,k  )+utrans(i,j,k  )) 
+            * (uimhx(i+1,j,k  ,1)-uimhx(i,j,k  ,1));
+
+        // impose lo side bc's
+        if (k == klo) {
+            switch (physbc[2]) {
+                case Inflow:
+                    vlzx = utilde(i,j,k-1,1);
+                    vrzx = utilde(i,j,k-1,1);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    vlzx = vrzx;
+                case NoSlipWall:
+                    vlzx = 0.0;
+                    vrzx = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(3,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (k == khi+1) {
+            switch (physbc[AMREX_SPACEDIM+2]) {
+            case Inflow:
+                vlzx = utilde(i,j,k,1);
+                vrzx = utilde(i,j,k,1);
+            case SlipWall:
+            case Symmetry:
+            case Outflow:
+                vrzx = vlzx;
+            case NoSlipWall:
+                vlzx = 0.0;
+                vrzx = 0.0;
+            case Interior:
+                break;
+            default:
+                Print() << "velpred_3d: invalid boundary type phys_bc(3,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        vimhzx(i,j,k) = wtrans(i,j,k) > 0.0 ? vlzx : vrzx;
+        vimhzx(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps ?
+            0.5*(vlzx+vrzx) : vimhzx(i,j,k);
+    });
+
+    // wimhxy, 3, 1
+    imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+    imhbox = amrex::growHi(imhbox, 0, 1);
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real wlxy = ulx(i,j,k,2) - (dt6/hy)*(vtrans(i-1,j+1,k)+vtrans(i-1,j,k)) 
+            * (uimhy(i-1,j+1,k,2)-uimhy(i-1,j,k,2));
+        Real wrxy = urx(i,j,k,2) - (dt6/hy)*(vtrans(i  ,j+1,k)+vtrans(i  ,j,k)) 
+            * (uimhy(i  ,j+1,k,2)-uimhy(i  ,j,k,2));
+
+        // impose lo side bc's
+        if (i == ilo) {
+            switch (physbc[0]) {
+                case Inflow:
+                    wlxy = utilde(i-1,j,k,2);
+                    wrxy = utilde(i-1,j,k,2);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    wlxy = wrxy;
+                case NoSlipWall:
+                    wlxy = 0.0;
+                    wrxy = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (i == ihi+1) {
+            switch (phys_bc[AMREX_SPACEDIM]) {
+                case Inflow:
+                    wlxy = utilde(i,j,k,2);
+                    wrxy = utilde(i,j,k,2);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    wrxy = wlxy;
+                case NoSlipWall:
+                    wlxy = 0.0;
+                    wrxy = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(1,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        wimhxy(i,j,k) = utrans(i,j,k) > 0.0 ? wlxy : wrxy;
+        wimhxy(i,j,k) = fabs(utrans(i,j,k)) < rel_eps ? 
+            0.5*(wlxy+wrxy) : wimhxy(i,j,k);
+    });
+
+    // wimhyx, 3, 2
+    imhbox = amrex::grow(mfi.tilebox(), 2, 1);
+    imhbox = amrex::growHi(imhbox, 1, 1);
+
+    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
+    {
+        // extrapolate to faces
+        Real wlyx = uly(i,j,k,2) - (dt6/hx)*(utrans(i+1,j-1,k)+utrans(i,j-1,k)) 
+            * (uimhx(i+1,j-1,k,2)-uimhx(i,j-1,k,2));
+        Real wryx = ury(i,j,k,2) - (dt6/hx)*(utrans(i+1,j  ,k)+utrans(i,j  ,k)) 
+            * (uimhx(i+1,j  ,k,2)-uimhx(i,j  ,k,2));
+
+        // impose lo side bc's
+        if (j == jlo) {
+            switch (physbc[1]) {
+                case Inflow:
+                    wlyx = utilde(i,j-1,k,2);
+                    wryx = utilde(i,j-1,k,2);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    wlyx = wryx;
+                case NoSlipWall:
+                    wlyx = 0.0;
+                    wryx = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(2,1)" << std::endl;
+            }
+
+        // impose hi side bc's
+        } else if (j == jhi+1) {
+            switch (physbc[AMREX_SPACEDIM+1]) {
+                case Inflow:
+                    wlyx = utilde(i,j,k,2);
+                    wryx = utilde(i,j,k,2);
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    wryx = wlyx;
+                case NoSlipWall:
+                    wlyx = 0.0;
+                    wryx = 0.0;
+                case Interior:
+                    break;
+                default:
+                    Print() << "velpred_3d: invalid boundary type phys_bc(2,2)" << std::endl;
+            }
+        }
+
+        // upwind using full velocity
+        wimhyx(i,j,k) = vtrans(i,j,k) > 0.0 ? wlyx : wryx;
+        wimhyx(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps ? 
+            0.5*(wlyx+wryx) : wimhyx(i,j,k);
+    });
 
 }
 
