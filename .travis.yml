@@ -38,8 +38,8 @@ matrix:
         - export AMREX_HOME=~/amrex
         - export MICROPHYSICS_HOME=~/Microphysics
       script:
-        - cd Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3
-        - cd Exec/science/flame; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=2
+        - cd ~/MAESTROeX/Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3
+        - cd ~/MAESTROeX/Exec/science/flame; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=2
 
 # deploy:
 #   provider: pages
