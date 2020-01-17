@@ -39,8 +39,6 @@ matrix:
         - export MICROPHYSICS_HOME=~/Microphysics
       script:
         - cd $TRAVIS_BUILD_DIR/Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3
-        - cd $TRAVIS_BUILD_DIR/Exec/science/flame; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=2
-
 # deploy:
 #   provider: pages
 #   skip-cleanup: true
