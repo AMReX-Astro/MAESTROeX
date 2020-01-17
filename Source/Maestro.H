@@ -127,7 +127,7 @@ public:
     /// @param ufull            full velocity
     /// @param utrans           transverse velocity
     /// @param w0mac            MAC base-state velocity
-    void MakeUtrans (amrex::Vector<amrex::MultiFab>& utilde,
+    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
                      const amrex::Vector<amrex::MultiFab>& ufull,
                      amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
                      const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
@@ -930,6 +930,12 @@ public:
 				 const RealVector& p0,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakeUtrans.cpp functions
+
+    // end MaestroMakeUtrans.cpp functions
     ////////////
 
     ////////////

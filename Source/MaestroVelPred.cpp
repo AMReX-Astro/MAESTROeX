@@ -1794,8 +1794,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         }
     });
 
-    Print() << "physbc, Outflow = " << physbc[2] << ' ' << Outflow << std::endl;
-
     // z-direction
     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
     {
@@ -1816,11 +1814,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             - (dt4/hy)*(vtrans(i  ,j+1,k  )+vtrans(i,j,k  ))
             * (wimhyx(i  ,j+1,k  )-wimhyx(i,j,k  ))
             + dt2*fr;
-
-        if (i == 1 && j == 1 && k == 1) {
-            Print() << "wmacl, wmacr = " << wmacl << ' ' << wmacr << std::endl;
-            Print() << "w0mac_cart = " << w0_cart(i,j,k,2) << std::endl;
-        }
 
         if (spherical_local == 1) {
             // solve Riemann problem using full velocity
