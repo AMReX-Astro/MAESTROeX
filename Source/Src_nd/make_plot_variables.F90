@@ -277,8 +277,7 @@ contains
        enddo
     enddo
 
-    if (bc(1,1) .eq. Inflow .or. bc(1,1) .eq. SlipWall .or. bc(1,1) .eq. NoSlipWall) then
-       i = domlo(1)
+    if ((bc(1,1) .eq. Inflow .or. bc(1,1) .eq. SlipWall .or. bc(1,1) .eq. NoSlipWall) .and. i .eq. domlo(1)) then
        do j = lo(2), hi(2)
           vx = (vel(i+1,j,k,2) + 3.d0*vel(i,j,k,2) - 4.d0*vel(i-1,j,k,2)) / dx(1)
           uy = (vel(i,j+1,k,1) - vel(i,j-1,k,1)) / (2.d0*dx(2))
@@ -286,8 +285,7 @@ contains
        end do
     end if
 
-    if (bc(1,2) .eq. Inflow .or. bc(1,2) .eq. SlipWall .or. bc(1,2) .eq. NoSlipWall) then
-       i = domhi(1)+1
+    if ((bc(1,2) .eq. Inflow .or. bc(1,2) .eq. SlipWall .or. bc(1,2) .eq. NoSlipWall) .and. i .eq. domhi(1)+1) then
        do j = lo(2), hi(2)
           vx = -(vel(i-1,j,k,2) + 3.d0*vel(i,j,k,2) - 4.d0*vel(i+1,j,k,2)) / dx(1)
           uy = (vel(i,j+1,k,1) - vel(i,j-1,k,1)) / (2.d0*dx(2))
@@ -295,8 +293,7 @@ contains
        end do
     end if
 
-    if (bc(2,1) .eq. Inflow .or. bc(2,1) .eq. SlipWall .or. bc(2,1) .eq. NoSlipWall) then
-       j = domlo(2)
+    if ((bc(2,1) .eq. Inflow .or. bc(2,1) .eq. SlipWall .or. bc(2,1) .eq. NoSlipWall) .and. j .eq. domlo(2)) then
        do i = lo(1), hi(1)
           vx = (vel(i+1,j,k,2) - vel(i-1,j,k,2)) / (2.d0*dx(1))
           uy = (vel(i,j+1,k,1) + 3.d0*vel(i,j,k,1) - 4.d0*vel(i,j-1,k,1)) / dx(2)
@@ -304,8 +301,7 @@ contains
        end do
     end if
 
-    if (bc(2,2) .eq. Inflow .or. bc(2,2) .eq. SlipWall .or. bc(2,2) .eq. NoSlipWall) then
-       j = domhi(2)+1
+    if ((bc(2,2) .eq. Inflow .or. bc(2,2) .eq. SlipWall .or. bc(2,2) .eq. NoSlipWall) .and. j .eq. domhi(2)+1) then
        do i = lo(1), hi(1)
           vx =  (vel(i+1,j,k,2) - vel(i-1,j,k,2)) / (2.d0*dx(1))
           uy = -(vel(i,j-1,k,1) + 3.d0*vel(i,j,k,1) - 4.d0*vel(i,j+1,k,1)) / dx(2)
@@ -456,9 +452,7 @@ contains
        end do
     end if
 
-    if (fix_hi_x .and. fix_lo_y) then
-       i = domhi(1)+1
-       j = domlo(2)
+    if (fix_hi_x .and. fix_lo_y .and. i .eq. domhi(1)+1 .and. j .eq. domlo(2)) then
        do k = lo(3),hi(3)
           vx = vxhi(i,j,k)
           wx = wxhi(i,j,k)
@@ -470,9 +464,7 @@ contains
        end do
     end if
 
-    if (fix_lo_x .and. fix_hi_y) then
-       i = domlo(1)
-       j = domhi(2)+1
+    if (fix_lo_x .and. fix_hi_y .and. i .eq. domlo(1) .and. j .eq. domhi(2)+1) then
        do k = lo(3),hi(3)
           vx = vxlo(i,j,k)
           wx = wxlo(i,j,k)
@@ -484,9 +476,7 @@ contains
        end do
     end if
 
-    if (fix_hi_x .and. fix_hi_y) then
-       i = domhi(1)+1
-       j = domhi(2)+1
+    if (fix_hi_x .and. fix_hi_y .and. i .eq. domhi(1)+1 .and. j .eq. domhi(2)+1) then
        do k = lo(3),hi(3)
           vx = vxhi(i,j,k)
           wx = wxhi(i,j,k)
@@ -498,9 +488,7 @@ contains
        end do
     end if
 
-    if (fix_lo_x .and. fix_lo_z) then
-       i = domlo(1)
-       k = domlo(3)
+    if (fix_lo_x .and. fix_lo_z .and. i .eq. domlo(1) .and. k .eq. domlo(3)) then
        do j = lo(2),hi(2)
           vx = vxlo(i,j,k)
           wx = wxlo(i,j,k)
@@ -512,9 +500,7 @@ contains
        end do
     end if
 
-    if (fix_hi_x .and. fix_lo_z) then
-       i = domhi(1)+1
-       k = domlo(3)
+    if (fix_hi_x .and. fix_lo_z .and. i .eq. domhi(1)+1 .and. k .eq. domlo(3)) then
        do j = lo(2),hi(2)
           vx = vxhi(i,j,k)
           wx = wxhi(i,j,k)
@@ -526,9 +512,7 @@ contains
        end do
     end if
 
-    if (fix_lo_x .and. fix_hi_z) then
-       i = domlo(1)
-       k = domhi(3)+1
+    if (fix_lo_x .and. fix_hi_z .and. i .eq. domlo(1) .and. k .eq. domhi(3)+1) then
        do j = lo(2),hi(2)
           vx = vxlo(i,j,k)
           wx = wxlo(i,j,k)
@@ -540,9 +524,7 @@ contains
        end do
     end if
 
-    if (fix_hi_x .and. fix_hi_z) then
-       i = domhi(1)+1
-       k = domhi(3)+1
+    if (fix_hi_x .and. fix_hi_z .and. i .eq. domhi(1)+1 .and. k .eq. domhi(3)+1) then
        do j = lo(2),hi(2)
           vx = vxhi(i,j,k)
           wx = wxhi(i,j,k)
@@ -554,9 +536,7 @@ contains
        end do
     end if
 
-    if (fix_lo_y .and. fix_lo_z) then
-       j = domlo(2)
-       k = domlo(3)
+    if (fix_lo_y .and. fix_lo_z .and. j .eq. domlo(2) .and. k .eq. domlo(3)) then
        do i = lo(1),hi(1)
           vx = vxcen(i,j,k)
           wx = wxcen(i,j,k)
@@ -568,9 +548,7 @@ contains
        end do
     end if
 
-    if (fix_hi_y .and. fix_lo_z) then
-       j = domhi(2)+1
-       k = domlo(3)
+    if (fix_hi_y .and. fix_lo_z .and. j .eq. domhi(2)+1 .and. k .eq. domlo(3)) then
        do i = lo(1),hi(1)
           vx = vxcen(i,j,k)
           wx = wxcen(i,j,k)
@@ -582,9 +560,7 @@ contains
        end do
     end if
 
-    if (fix_lo_y .and. fix_hi_z) then
-       j = domlo(2)
-       k = domhi(3)+1
+    if (fix_lo_y .and. fix_hi_z .and. j .eq. domlo(2) .and. k .eq. domhi(3)+1) then
        do i = lo(1),hi(1)
           vx = vxcen(i,j,k)
           wx = wxcen(i,j,k)
@@ -596,9 +572,7 @@ contains
        end do
     end if
 
-    if (fix_hi_y .and. fix_hi_z) then
-       j = domhi(2)+1
-       k = domhi(3)+1
+    if (fix_hi_y .and. fix_hi_z .and. j .eq. domhi(2)+1 .and. k .eq. domhi(3)+1) then
        do i = lo(1),hi(1)
           vx = vxcen(i,j,k)
           wx = wxcen(i,j,k)
@@ -612,10 +586,7 @@ contains
     !
     !     Finally do all the corners
     !
-    if (fix_lo_x .and. fix_lo_y .and. fix_lo_z) then
-       i = domlo(1)
-       j = domlo(2)
-       k = domlo(3)
+    if (fix_lo_x .and. fix_lo_y .and. fix_lo_z .and. i .eq. domlo(1) .and. j .eq. domlo(2) .and. k .eq. domlo(3)) then
        vx = vxlo(i,j,k)
        wx = wxlo(i,j,k)
        uy = uylo(i,j,k)
@@ -625,10 +596,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_hi_x .and. fix_lo_y .and. fix_lo_z) then
-       i = domhi(1)+1
-       j = domlo(2)
-       k = domlo(3)
+    if (fix_hi_x .and. fix_lo_y .and. fix_lo_z .and. i .eq. domhi(1)+1 .and. j .eq. domlo(2) .and. k .eq. domlo(3)) then
        vx = vxhi(i,j,k)
        wx = wxhi(i,j,k)
        uy = uylo(i,j,k)
@@ -638,10 +606,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_lo_x .and. fix_hi_y .and. fix_lo_z) then
-       i = domlo(1)
-       j = domhi(2)+1
-       k = domlo(3)
+    if (fix_lo_x .and. fix_hi_y .and. fix_lo_z .and. i .eq. domlo(1) .and. j .eq. domhi(2)+1 .and. k .eq. domlo(3)) then
        vx = vxlo(i,j,k)
        wx = wxlo(i,j,k)
        uy = uyhi(i,j,k)
@@ -651,10 +616,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_hi_x .and. fix_hi_y .and. fix_lo_z) then
-       i = domhi(1)+1
-       j = domhi(2)+1
-       k = domlo(3)
+    if (fix_hi_x .and. fix_hi_y .and. fix_lo_z .and. i .eq. domhi(1)+1 .and. j .eq. domhi(2)+1 .and. k .eq. domlo(3)) then
        vx = vxhi(i,j,k)
        wx = wxhi(i,j,k)
        uy = uyhi(i,j,k)
@@ -664,10 +626,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_lo_x .and. fix_lo_y .and. fix_hi_z) then
-       i = domlo(1)
-       j = domlo(2)
-       k = domhi(3)+1
+    if (fix_lo_x .and. fix_lo_y .and. fix_hi_z .and. i .eq. domlo(1) .and. j .eq. domlo(2) .and. k .eq. domhi(3)+1) then
        vx = vxlo(i,j,k)
        wx = wxlo(i,j,k)
        uy = uylo(i,j,k)
@@ -677,10 +636,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_hi_x .and. fix_lo_y .and. fix_hi_z) then
-       i = domhi(1)+1
-       j = domlo(2)
-       k = domhi(3)+1
+    if (fix_hi_x .and. fix_lo_y .and. fix_hi_z .and. i .eq. domhi(1)+1 .and. j .eq. domlo(2) .and. k .eq. domhi(3)+1) then
        vx = vxhi(i,j,k)
        wx = wxhi(i,j,k)
        uy = uylo(i,j,k)
@@ -690,10 +646,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_lo_x .and. fix_hi_y .and. fix_hi_z) then
-       i = domlo(1)
-       j = domhi(2)+1
-       k = domhi(3)+1
+    if (fix_lo_x .and. fix_hi_y .and. fix_hi_z .and. i .eq. domlo(1) .and. j .eq. domhi(2)+1 .and. k .eq. domhi(3)+1) then
        vx = vxlo(i,j,k)
        wx = wxlo(i,j,k)
        uy = uyhi(i,j,k)
@@ -703,10 +656,7 @@ contains
        vort(i,j,k) = vorfun(uy,uz,vx,vz,wx,wy)
     end if
 
-    if (fix_hi_x .and. fix_hi_y .and. fix_hi_z) then
-       i = domhi(1)+1
-       j = domhi(2)+1
-       k = domhi(3)+1
+    if (fix_hi_x .and. fix_hi_y .and. fix_hi_z .and. i .eq. domhi(1)+1 .and. j .eq. domhi(2)+1 .and. k .eq. domhi(3)+1) then
        vx = vxhi(i,j,k)
        wx = wxhi(i,j,k)
        uy = uyhi(i,j,k)
