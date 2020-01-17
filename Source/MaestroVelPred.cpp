@@ -83,21 +83,25 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulx(i,j,k,n) = utilde(i-1,j,k,n);
                         urx(i,j,k,n) = utilde(i-1,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry: 
                     ulx(i,j,k,0) = 0.0;
                     urx(i,j,k,0) = 0.0;
                     ulx(i,j,k,1) = urx(i,j,k,1);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulx(i,j,k,n) = 0.0;
                         urx(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     urx(i,j,k,0) = min(urx(i,j,k,0),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i,j,k,n) = ulx(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break; 
             }
@@ -110,21 +114,25 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulx(i,j,k,n) = utilde(i,j,k,n);
                         urx(i,j,k,n) = utilde(i,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ulx(i,j,k,0) = 0.0;
                     urx(i,j,k,0) = 0.0;
                     urx(i,j,k,1) = ulx(i,j,k,1);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulx(i,j,k,n) = 0.0;
                         urx(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     ulx(i,j,k,0) = max(ulx(i,j,k,0),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i,j,k,n) = ulx(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break;
             }
@@ -172,21 +180,25 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         uly(i,j,k,n) = utilde(i,j-1,k,n);
                         ury(i,j,k,n) = utilde(i,j-1,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     uly(i,j,k,0) = ury(i,j,k,0);
                     uly(i,j,k,1) = 0.0;
                     ury(i,j,k,1) = 0.0;
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = 0.0;
                         ury(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     ury(i,j,k,1) = min(ury(i,j,k,1),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = ury(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break;
             }
@@ -199,21 +211,25 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         uly(i,j,k,n) = utilde(i,j,k,n);
                         ury(i,j,k,n) = utilde(i,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ury(i,j,k,0) = uly(i,j,k,0);
                     uly(i,j,k,1) = 0.0;
                     ury(i,j,k,1) = 0.0;
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = 0.0;
                         ury(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     uly(i,j,k,1) = max(uly(i,j,k,1),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ury(i,j,k,n) = uly(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break;
             }
@@ -301,12 +317,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (bclo) {
                 case Inflow:
                     umac(i,j,k) = utilde(i-1,j,k,0);
+                    break;
                 case SlipWall:
                 case NoSlipWall:
                 case Symmetry:
                     umac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     umac(i,j,k) = min(umacr,0.0);
+                    break;
                 case Interior:
                     break;
             }
@@ -316,12 +335,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (bchi) {
                 case Inflow:
                     umac(i,j,k) = utilde(i,j,k,0);
+                    break;
                 case SlipWall:
                 case NoSlipWall:
                 case Symmetry:
                     umac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     umac(i,j,k) = max(umacl,0.0);
+                    break;
                 case Interior:
                     break;
             }
@@ -361,12 +383,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (bclo) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j-1,k,1);
+                    break;
                 case SlipWall:
                 case NoSlipWall:
                 case Symmetry:
                     vmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     vmac(i,j,k) = min(vmacr,0.0);
+                    break;
                 case Interior:
                     break;
             }
@@ -376,12 +401,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (bchi) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j,k,1);
+                    break;
                 case SlipWall:
                 case NoSlipWall:
                 case Symmetry:
                     vmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     vmac(i,j,k) = max(vmacl,0.0);
+                    break;
                 case Interior:
                     break;
             }
@@ -485,22 +513,26 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulx(i,j,k,n) = utilde(i-1,j,k,n);
                         urx(i,j,k,n) = utilde(i-1,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ulx(i,j,k,0) = 0.0;
                     urx(i,j,k,0) = 0.0;
                     ulx(i,j,k,1) = urx(i,j,k,1);
                     ulx(i,j,k,2) = urx(i,j,k,2);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulx(i,j,k,n) = 0.0;
                         urx(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     urx(i,j,k,0) = min(urx(i,j,k,0),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i,j,k,n) = ulx(i,j,k,n);
+                        ulx(i,j,k,n) = urx(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break;
             }
@@ -513,22 +545,26 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulx(i,j,k,n) = utilde(i,j,k,n);
                         urx(i,j,k,n) = utilde(i,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ulx(i,j,k,0) = 0.0;
                     urx(i,j,k,0) = 0.0;
                     urx(i,j,k,1) = ulx(i,j,k,1);
                     urx(i,j,k,2) = ulx(i,j,k,2);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulx(i,j,k,n) = 0.0;
                         urx(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     ulx(i,j,k,0) = max(ulx(i,j,k,0),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i,j,k,n) = ulx(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break; 
             }
@@ -585,22 +621,26 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         uly(i,j,k,n) = utilde(i,j-1,k,n);
                         ury(i,j,k,n) = utilde(i,j-1,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     uly(i,j,k,0) = ury(i,j,k,0);
                     uly(i,j,k,1) = 0.0;
                     ury(i,j,k,1) = 0.0;
                     uly(i,j,k,2) = ury(i,j,k,2);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = 0.0;
                         ury(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     ury(i,j,k,1) = min(ury(i,j,k,1),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = ury(i,j,k,n);
                     }
+                    break;
                 case Interior:
                     break;      
             }
@@ -613,24 +653,28 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         uly(i,j,k,n) = utilde(i,j,k,n);
                         ury(i,j,k,n) = utilde(i,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ury(i,j,k,0) = uly(i,j,k,0);
                     uly(i,j,k,1) = 0.0;
                     ury(i,j,k,1) = 0.0;
                     ury(i,j,k,2) = uly(i,j,k,2);
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i,j,k,n) = 0.0;
                         ury(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     uly(i,j,k,1) = max(uly(i,j,k,1),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ury(i,j,k,n) = uly(i,j,k,n);
                     }
+                    break;
                 case Interior:
-                        break;
+                    break;
             }
         }
 
@@ -685,24 +729,28 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulz(i,j,k,n) = utilde(i,j,k-1,n);
                         urz(i,j,k,n) = utilde(i,j,k-1,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     ulz(i,j,k,0) = urz(i,j,k,0);
                     ulz(i,j,k,1) = urz(i,j,k,1);
                     ulz(i,j,k,2) = 0.0;
                     urz(i,j,k,2) = 0.0;
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulz(i,j,k,n) = 0.0;
                         urz(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     urz(i,j,k,2) = min(urz(i,j,k,2),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulz(i,j,k,n) = urz(i,j,k,n);
                     }
+                    break;
                 case Interior:
-                        break;
+                    break;
             }
 
         // impose hi side bc's
@@ -713,24 +761,28 @@ Maestro::VelPredInterface(const MFIter& mfi,
                         ulz(i,j,k,n) = utilde(i,j,k,n);
                         urz(i,j,k,n) = utilde(i,j,k,n);
                     }
+                    break;
                 case SlipWall:
                 case Symmetry:
                     urz(i,j,k,0) = ulz(i,j,k,0);
                     urz(i,j,k,1) = ulz(i,j,k,1);
                     ulz(i,j,k,2) = 0.0;
                     urz(i,j,k,2) = 0.0;
+                    break;
                 case NoSlipWall:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulz(i,j,k,n) = 0.0;
                         urz(i,j,k,n) = 0.0;
                     }
+                    break;
                 case Outflow:
                     ulz(i,j,k,2) = max(ulz(i,j,k,2),0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urz(i,j,k,n) = ulz(i,j,k,n);
                     }
+                    break;
                 case Interior:
-                        break;
+                    break;
             }
         }
 
@@ -816,13 +868,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     ulyz = utilde(i,j-1,k,0);
                     uryz = utilde(i,j-1,k,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     ulyz = uryz;
+                    break;
                 case NoSlipWall:
                     ulyz = 0.0;
                     uryz = 0.0;
+                    break;
                 case Interior:
                     break;   
             }
@@ -833,13 +888,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     ulyz = utilde(i,j,k,0);
                     uryz = utilde(i,j,k,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     uryz = ulyz;
+                    break;
                 case NoSlipWall:
                     ulyz = 0.0;
                     uryz = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -869,13 +927,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     ulzy = utilde(i,j,k-1,0);
                     urzy = utilde(i,j,k-1,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     ulzy = urzy;
+                    break;
                 case NoSlipWall:
                     ulzy = 0.0;
                     urzy = 0.0;
+                    break;
                 case Interior:
                     break; 
             }
@@ -886,13 +947,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     ulzy = utilde(i,j,k,0);
                     urzy = utilde(i,j,k,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     urzy = ulzy;
+                    break;
                 case NoSlipWall:
                     ulzy = 0.0;
                     urzy = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -922,13 +986,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     vlxz = utilde(i-1,j,k,1);
                     vrxz = utilde(i-1,j,k,1);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     vlxz = vrxz;
+                    break;
                 case NoSlipWall:
                     vlxz = 0.0;
                     vrxz = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -939,13 +1006,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     vlxz = utilde(i,j,k,1);
                     vrxz = utilde(i,j,k,1);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     vrxz = vlxz;
+                    break;
                 case NoSlipWall:
                     vlxz = 0.0;
                     vrxz = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -975,13 +1045,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     vlzx = utilde(i,j,k-1,1);
                     vrzx = utilde(i,j,k-1,1);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     vlzx = vrzx;
+                    break;
                 case NoSlipWall:
                     vlzx = 0.0;
                     vrzx = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -989,18 +1062,21 @@ Maestro::VelPredTransverse(const MFIter& mfi,
         // impose hi side bc's
         } else if (k == khi+1) {
             switch (physbc[AMREX_SPACEDIM+2]) {
-            case Inflow:
-                vlzx = utilde(i,j,k,1);
-                vrzx = utilde(i,j,k,1);
-            case SlipWall:
-            case Symmetry:
-            case Outflow:
-                vrzx = vlzx;
-            case NoSlipWall:
-                vlzx = 0.0;
-                vrzx = 0.0;
-            case Interior:
-                break;
+                case Inflow:
+                    vlzx = utilde(i,j,k,1);
+                    vrzx = utilde(i,j,k,1);
+                    break;
+                case SlipWall:
+                case Symmetry:
+                case Outflow:
+                    vrzx = vlzx;
+                    break;
+                case NoSlipWall:
+                    vlzx = 0.0;
+                    vrzx = 0.0;
+                    break;
+                case Interior:
+                    break;
             }
         }
 
@@ -1028,13 +1104,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     wlxy = utilde(i-1,j,k,2);
                     wrxy = utilde(i-1,j,k,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     wlxy = wrxy;
+                    break;
                 case NoSlipWall:
                     wlxy = 0.0;
                     wrxy = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -1045,13 +1124,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     wlxy = utilde(i,j,k,2);
                     wrxy = utilde(i,j,k,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     wrxy = wlxy;
+                    break;
                 case NoSlipWall:
                     wlxy = 0.0;
                     wrxy = 0.0;
+                    break;
                 case Interior:
                     break; 
             }
@@ -1081,13 +1163,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     wlyx = utilde(i,j-1,k,2);
                     wryx = utilde(i,j-1,k,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     wlyx = wryx;
+                    break;
                 case NoSlipWall:
                     wlyx = 0.0;
                     wryx = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -1098,13 +1183,16 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                 case Inflow:
                     wlyx = utilde(i,j,k,2);
                     wryx = utilde(i,j,k,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case Outflow:
                     wryx = wlyx;
+                    break;
                 case NoSlipWall:
                     wlyx = 0.0;
                     wryx = 0.0;
+                    break;
                 case Interior:
                     break;
             }
@@ -1229,12 +1317,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[0]) {
                 case Inflow:
                     umac(i,j,k) = utilde(i-1,j,k,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     umac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     umac(i,j,k) = min(umacr,0.0);
+                    break;
                 case Interior:
                     break; 
             }
@@ -1244,12 +1335,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[AMREX_SPACEDIM]) {
                 case Inflow:
                     umac(i,j,k) = utilde(i,j,k,0);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     umac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     umac(i,j,k) = max(umacl,0.0);
+                    break;
                 case Interior:
                     break;   
             }
@@ -1297,12 +1391,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[1]) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j-1,k,1);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     vmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     vmac(i,j,k) = min(vmacr,0.0);
+                    break;
                 case Interior:
                     break;     
             }
@@ -1312,17 +1409,22 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[AMREX_SPACEDIM+1]) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j,k,1);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     vmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     vmac(i,j,k) = max(vmacl,0.0);
+                    break;
                 case Interior:
                     break;
             }
         }
     });
+
+    Print() << "physbc, Outflow = " << physbc[2] << ' ' << Outflow << std::endl;
 
     // z-direction
     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
@@ -1345,19 +1447,24 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (wimhyx(i  ,j+1,k  )-wimhyx(i,j,k  ))
             + dt2*fr;
 
+        if (i == 1 && j == 1 && k == 1) {
+            Print() << "wmacl, wmacr = " << wmacl << ' ' << wmacr << std::endl;
+            Print() << "w0mac_cart = " << w0_cart(i,j,k,2) << std::endl;
+        }
+
         if (spherical_local == 1) {
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
-                    wmacr+w0macz(i,j,k) >= 0.0) ||
-                   (fabs(wmacl+wmacr+2*w0macz(i,j,k)) < rel_eps);
+                         wmacr+w0macz(i,j,k) >= 0.0) ||
+                        (fabs(wmacl+wmacr+2*w0macz(i,j,k)) < rel_eps);
             wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0macz(i,j,k) > 0.0 ? wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
-            bool test = (wmacl+w0_cart(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
-                         wmacr+w0_cart(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2*w0_cart(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
-            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
+            bool test = (wmacl+w0_cart(i,j,k,2) <= 0.0 &&
+                         wmacr+w0_cart(i,j,k,2) >= 0.0) ||
+                        (fabs(wmacl+wmacr+2.0*w0_cart(i,j,k,2)) < rel_eps);
+            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,2) > 0.0 ?
                 wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         }
@@ -1367,12 +1474,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[2]) {
                 case Inflow:
                     wmac(i,j,k) = utilde(i,j,k-1,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     wmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     wmac(i,j,k) = min(wmacr,0.0);
+                    break;
                 case Interior:
                     break;
             }
@@ -1382,12 +1492,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             switch (physbc[AMREX_SPACEDIM+2]) {
                 case Inflow:
                     wmac(i,j,k) = utilde(i,j,k,2);
+                    break;
                 case SlipWall:
                 case Symmetry:
                 case NoSlipWall:
                     wmac(i,j,k) = 0.0;
+                    break;
                 case Outflow:
                     wmac(i,j,k) = max(wmacl,0.0);
+                    break;
                 case Interior:
                     break;
             }

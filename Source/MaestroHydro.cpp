@@ -744,7 +744,6 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
     // edge_restriction
     AverageDownFaces(umac);
-
 }
 
 void
