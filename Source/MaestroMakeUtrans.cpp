@@ -50,28 +50,28 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         MultiFab u_mf, v_mf, w_mf;
 
         if (ppm_type == 0) {
-           u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
-           v_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+            u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+            v_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
 
-           MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
-           MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
+            MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
+            MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
 
 #if (AMREX_SPACEDIM == 3)
-           w_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
-           MultiFab::Copy(w_mf, utilde[lev], 2, 0, 1, utilde[lev].nGrow());
+            w_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+            MultiFab::Copy(w_mf, utilde[lev], 2, 0, 1, utilde[lev].nGrow());
 #endif
 
         } else if (ppm_type == 1 || ppm_type == 2) {
 
-           u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
-           v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+            u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+            v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
 
-           MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
-           MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
+            MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
+            MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
 
 #if (AMREX_SPACEDIM == 3)
-           w_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
-           MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
+            w_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+            MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
 #endif
         }
 
@@ -586,7 +586,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         // fill periodic ghost cells
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int d=0; d<AMREX_SPACEDIM; ++d) {
-                    utrans[lev][d].FillBoundary(geom[lev].periodicity());
+                utrans[lev][d].FillBoundary(geom[lev].periodicity());
             }
         }
 

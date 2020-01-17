@@ -121,17 +121,6 @@ public:
                         const RealVector& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
-    /// Create `utrans`, the transverse velocity
-    ///
-    /// @param utilde           perturbed velocity
-    /// @param ufull            full velocity
-    /// @param utrans           transverse velocity
-    /// @param w0mac            MAC base-state velocity
-    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
-                     const amrex::Vector<amrex::MultiFab>& ufull,
-                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
-                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
-
     /// Calculate `rhoX` flux
     ///
     /// Takes the predicted edges states of the scalars
@@ -934,6 +923,17 @@ public:
 
     ////////////
     // MaestroMakeUtrans.cpp functions
+
+    /// Create `utrans`, the transverse velocity
+    ///
+    /// @param utilde           perturbed velocity
+    /// @param ufull            full velocity
+    /// @param utrans           transverse velocity
+    /// @param w0mac            MAC base-state velocity
+    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
+                     const amrex::Vector<amrex::MultiFab>& ufull,
+                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
+                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
 
     // end MaestroMakeUtrans.cpp functions
     ////////////
