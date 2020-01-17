@@ -1,6 +1,6 @@
 
 #include <Maestro.H>
-#include <MaestroHydro_F.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -83,7 +83,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         simhzx.setVal(0.);
         simhzy.setVal(0.);
 #endif
-        const MultiFab& force_mf = force[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #if (AMREX_SPACEDIM == 2)
