@@ -1,35 +1,45 @@
-language: python
-
-python:
-  - "3.7-dev"
-
-before_install:
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
-#  - pwd
-#  - cd ~/; git clone https://github.com/amrex-codes/amrex
-#  - cd ~/; git clone https://github.com/amrex-codes/regression_testing
-
-
-addons:
-   apt:
-      packages:
-      - g++
-      - gfortran
-      - libgmp-dev
-      - libmpfr-dev
-      - pandoc
-      - doxygen
-
-install:
-  - pip install -r requirements.txt
-
-before_script:
-  - export AMREX_HOME=~/amrex
-
-script:
-
-# after_success:
-  - ./deploy_docs.sh
+matrix:
+  include:
+    - language: python
+      python:
+        - "3.7-dev"
+      before_install:
+        - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+      addons:
+        apt:
+          packages:
+          - g++
+          - gfortran
+          - libgmp-dev
+          - libmpfr-dev
+          - pandoc
+          - doxygen
+      install:
+        - pip install -r requirements.txt
+      before_script:
+        - export AMREX_HOME=~/amrex
+      script:
+        - ./deploy_docs.sh
+    
+    - language: cpp
+      compiler:
+        - clang
+      before_install:
+        - cd ~/; git clone https://github.com/amrex-codes/amrex
+        - cd ~/; git clone https://github.com/starkiller-astro/Microphysics.git
+      addons:
+        apt:
+          packages:
+          - g++
+          - gfortran
+          - libgmp-dev
+          - libmpfr-dev
+      before_script:
+        - export AMREX_HOME=~/amrex
+        - export MICROPHYSICS_HOME=~/Microphysics
+      script:
+        - cd Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3
+        - cd Exec/science/flame; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=2
 
 # deploy:
 #   provider: pages
