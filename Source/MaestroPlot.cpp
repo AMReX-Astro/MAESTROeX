@@ -1639,7 +1639,8 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
             {
-                Real uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
+                Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
+                Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
 
                 if (i == ilo && 
                     (physbc[0] == Inflow || 
@@ -1650,7 +1651,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                           4.0*u(i-1,j,k,1)) / hx;
                     uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
 
-                } else if (i == ihi &&
+                } else if (i == ihi+1 &&
                         (physbc[AMREX_SPACEDIM] == Inflow || 
                         physbc[AMREX_SPACEDIM] == SlipWall || 
                         physbc[AMREX_SPACEDIM] == NoSlipWall))
@@ -1669,7 +1670,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                     uy = (u(i,j+1,k,0) + 3.0*u(i,j,k,0) - 
                          4.0*u(i,j-1,k,0)) / hy;
 
-                } else if (j == jhi && 
+                } else if (j == jhi+1 && 
                            (physbc[AMREX_SPACEDIM+1] == Inflow || 
                             physbc[AMREX_SPACEDIM+1] == SlipWall || 
                             physbc[AMREX_SPACEDIM+1] == NoSlipWall))
