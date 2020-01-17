@@ -571,7 +571,7 @@ subroutine velpred_interface_3d(lo, hi, idir, domlo, domhi, &
                     ur(i,j,k,1:3) = ZERO
                  case (Outflow)
                     ur(i,j,k,1) = min(ur(i,j,k,1),ZERO)
-                    ul(i,j,k,1:3) = ul(i,j,k,1:3)
+                    ul(i,j,k,1:3) = ur(i,j,k,1:3)
                  case (Interior)
                  case  default
 #ifndef AMREX_USE_CUDA
