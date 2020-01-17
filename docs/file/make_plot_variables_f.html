@@ -334,12 +334,14 @@
 
 <dl class="subroutine">
 <dt id="f/plot_variables_module/make_vorticity">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>vel</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -358,12 +360,14 @@
 
 <dl class="subroutine">
 <dt id="f/plot_variables_module/make_vorticity_2d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity_2d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity_2d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity_2d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>vel</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -382,12 +386,14 @@
 
 <dl class="subroutine">
 <dt id="f/plot_variables_module/make_vorticity_3d">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity_3d" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">plot_variables_module/</code><code class="sig-name descname">make_vorticity_3d</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">domlo</em>, <em class="sig-param">domhi</em>, <em class="sig-param">vel</em>, <em class="sig-param">v_lo</em>, <em class="sig-param">v_hi</em>, <em class="sig-param">dx</em>, <em class="sig-param">vort</em>, <em class="sig-param">d_lo</em>, <em class="sig-param">d_hi</em>, <em class="sig-param">bc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/plot_variables_module/make_vorticity_3d" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domlo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>domhi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>vel</strong> (v_hi(1)-(v_lo(1))+1,v_hi(2)-(v_lo(2))+1,v_hi(3)-(v_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>v_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
