@@ -323,6 +323,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                 case Outflow:
                     umac(i,j,k) = max(umacl,0.0);
                 case Interior:
+                    break;
             }
         }
     });
