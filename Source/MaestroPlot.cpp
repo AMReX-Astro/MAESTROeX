@@ -1639,7 +1639,6 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
             {
-                Real vx = 0.5 * (u(i+1,j,k,1) - u(i-1,j,k,1)) / hx;
                 Real uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
 
                 if (i == ilo && 
@@ -1713,7 +1712,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 if (fix_lo_x && i == ilo) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                } else if (fix_hi_x && i == ihi) {
+                } else if (fix_hi_x && i == ihi+1) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                 }
@@ -1721,7 +1720,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 if (fix_lo_y && j == jlo) {
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
                     wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                } else if (fix_hi_y && j == jhi) {
+                } else if (fix_hi_y && j == jhi+1) {
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
                     wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
                 }
@@ -1731,7 +1730,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                     vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
                 }
 
-                if (fix_hi_z && k == khi) {
+                if (fix_hi_z && k == khi+1) {
                     uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
                     vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
                 }
@@ -1744,23 +1743,16 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                     wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
                 }
 
-                if (fix_hi_x && fix_lo_y && i == ihi && j == jlo) {
+                if (fix_hi_x && fix_lo_y && i == ihi+1 && j == jlo) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
                     wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
                 }
 
-                if (fix_lo_x && fix_hi_y && i == ilo && j == jhi) {
+                if (fix_lo_x && fix_hi_y && i == ilo && j == jhi+1) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                }
-
-                if (fix_hi_x && fix_hi_y && i == ihi && j == jhi) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
                     wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
                 }
@@ -1772,21 +1764,21 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                     vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
                 }
 
-                if (fix_hi_x && fix_lo_z && i == ihi && k == klo) {
+                if (fix_hi_x && fix_lo_z && i == ihi+1 && k == klo) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
                     vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
                 }
 
-                if (fix_lo_x && fix_hi_z && i == ilo && k == khi) {
+                if (fix_lo_x && fix_hi_z && i == ilo && k == khi+1) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
                     vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
                 }
 
-                if (fix_hi_x && fix_hi_z && i == ihi && k == khi) {
+                if (fix_hi_x && fix_hi_z && i == ihi+1 && k == khi+1) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
@@ -1800,21 +1792,21 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                     vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
                 }
 
-                if (fix_hi_y && fix_lo_z && j == jhi && k == klo) {
+                if (fix_hi_y && fix_lo_z && j == jhi+1 && k == klo) {
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
                     wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
                     uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
                     vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
                 }
 
-                if (fix_lo_y && fix_hi_z && j == jlo && k == khi) {
+                if (fix_lo_y && fix_hi_z && j == jlo && k == khi+1) {
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
                     wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
                     uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
                     vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
                 }
 
-                if (fix_hi_y && fix_hi_z && j == jhi && k == khi) {
+                if (fix_hi_y && fix_hi_z && j == jhi+1 && k == khi+1) {
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
                     wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
                     uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
@@ -1833,7 +1825,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_hi_x && fix_lo_y && fix_lo_z &&
-                    i == ihi && j == jlo && k == klo) {
+                    i == ihi+1 && j == jlo && k == klo) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
@@ -1843,7 +1835,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_lo_x && fix_hi_y && fix_lo_z &&
-                    i == ilo && j == jhi && k == klo) {
+                    i == ilo && j == jhi+1 && k == klo) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
@@ -1853,7 +1845,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_hi_x && fix_hi_y && fix_lo_z &&
-                    i == ihi && j == jhi && k == klo) {
+                    i == ihi+1 && j == jhi+1 && k == klo) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
@@ -1863,7 +1855,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_lo_x && fix_lo_y && fix_hi_z &&
-                    i == ilo && j == jlo && k == khi) {
+                    i == ilo && j == jlo && k == khi+1) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
@@ -1873,7 +1865,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_hi_x && fix_lo_y && fix_hi_z &&
-                    i == ihi && j == jlo && k == khi) {
+                    i == ihi+1 && j == jlo && k == khi+1) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
@@ -1883,7 +1875,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_lo_x && fix_hi_y && fix_hi_z &&
-                    i == ilo && j == jhi && k == khi) {
+                    i == ilo && j == jhi+1 && k == khi+1) {
                     vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
@@ -1893,7 +1885,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                 }
 
                 if (fix_hi_x && fix_hi_y && fix_hi_z &&
-                    i == ihi && j == jhi && k == khi) {
+                    i == ihi+1 && j == jhi+1 && k == khi+1) {
                     vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
                     wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
                     uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
