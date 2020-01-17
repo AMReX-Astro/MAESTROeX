@@ -1424,8 +1424,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         }
     });
 
-    Print() << "physbc, Outflow = " << physbc[2] << ' ' << Outflow << std::endl;
-
     // z-direction
     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
     {
