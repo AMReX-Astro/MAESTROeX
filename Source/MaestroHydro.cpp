@@ -383,6 +383,8 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
         const MultiFab& vtrans_mf  = utrans[lev][1];
               MultiFab& vmac_mf    = umac[lev][1];
 
+        // Ipu and Imu are always the u velocity component
+        // Ipv and Imv are always the v velocity component
         MultiFab Ipu, Imu, Ipv, Imv;
         Ipu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Imu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
@@ -481,6 +483,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                        AMREX_SPACEDIM,0);
             } else {
 
+                // put u on x and y edges, stored in Ipu and Imu
                 PPM_2d(obx, utilde_mf.array(mfi), 
                        u_mf.array(mfi), v_mf.array(mfi), 
                        Ipu.array(mfi), Imu.array(mfi), 
@@ -506,6 +509,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                       AMREX_SPACEDIM,0);
             } else {
 
+                // put v on x and y edges, stored in Ipv and Imv
                 PPM_2d(obx, utilde_mf.array(mfi), 
                        u_mf.array(mfi), v_mf.array(mfi), 
                        Ipv.array(mfi), Imv.array(mfi), 
@@ -609,6 +613,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
             } else {
 
+                // put u on x, y, and z edges, stored in Ipu and Imu
                 PPM_3d(obx, utilde_mf.array(mfi), 
                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
                        Ipu.array(mfi), Imu.array(mfi), 
@@ -634,6 +639,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                        AMREX_SPACEDIM,0);
 
             } else {
+                // put v on x, y, and z edges, stored in Ipv and Imv
                 PPM_3d(obx, utilde_mf.array(mfi), 
                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
                        Ipv.array(mfi), Imv.array(mfi), 
@@ -661,7 +667,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                       AMREX_SPACEDIM,0);
 
             } else {
-
+                // put w on x, y, and z edges, stored in Ipw and Imw
                 PPM_3d(obx, utilde_mf.array(mfi), 
                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
                        Ipw.array(mfi), Imw.array(mfi), 
