@@ -165,10 +165,10 @@ Maestro::VelPredInterface(const MFIter& mfi,
             ury(i,j,k,1) = utilde(i,j,k,1) - (0.5+(dt2/hy)*minu)*Imv(i,j,k,1);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             // extrapolate both components of velocity to left face
-            uly(i,j,k,0) = Ipu(i,j-1,k,0);
+            uly(i,j,k,0) = Ipu(i,j-1,k,1);
             uly(i,j,k,1) = Ipv(i,j-1,k,1);
             // extrapolate both components of velocity to right face
-            ury(i,j,k,0) = Imu(i,j,k,0);
+            ury(i,j,k,0) = Imu(i,j,k,1);
             ury(i,j,k,1) = Imv(i,j,k,1);
         }
 
