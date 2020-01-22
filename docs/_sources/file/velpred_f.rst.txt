@@ -1,8 +1,0 @@
-velpred.F90
-===========
-
-velpred\_module
----------------
-
-.. f:automodule:: velpred_module
-
