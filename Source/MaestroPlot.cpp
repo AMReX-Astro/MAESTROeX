@@ -1611,6 +1611,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
+            const Box& domainBox = geom[lev].Domain();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -1621,6 +1622,8 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
             // functions
             make_vorticity(ARLIM_3D(tileBox.loVect()),
                            ARLIM_3D(tileBox.hiVect()),
+                           ARLIM_3D(domainBox.loVect()),
+                           ARLIM_3D(domainBox.hiVect()),
                            BL_TO_FORTRAN_3D(vel_mf[mfi]), ZFILL(dx),
                            BL_TO_FORTRAN_3D(vorticity_mf[mfi]), phys_bc.dataPtr());
         }

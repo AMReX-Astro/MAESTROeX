@@ -535,10 +535,10 @@ Maestro::VelPredInterface(const MFIter& mfi,
             ury(i,j,k,1) = utilde(i,j,k,1) - (0.5+(dt2/hy)*minu)*Imv(i,j,k,1);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             // extrapolate both components of velocity to left face
-            uly(i,j,k,0) = Ipu(i,j-1,k,0);
+            uly(i,j,k,0) = Ipu(i,j-1,k,1);
             uly(i,j,k,1) = Ipv(i,j-1,k,1);
             // extrapolate both components of velocity to right face
-            ury(i,j,k,0) = Imu(i,j,k,0);
+            ury(i,j,k,0) = Imu(i,j,k,1);
             ury(i,j,k,1) = Imv(i,j,k,1);
         }
 
@@ -1069,8 +1069,8 @@ Maestro::VelPredInterface(const MFIter& mfi,
     AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
     {
         if (ppm_type_local == 0) {
-            Real maxu = (0.5 - dt2*max(0.0,ufull(i,j,k-1,2))/hz);
-            Real minu = (0.5 + dt2*min(0.0,ufull(i,j,k  ,2))/hz);
+            Real maxu = 0.5 - dt2*max(0.0,ufull(i,j,k-1,2))/hz;
+            Real minu = 0.5 + dt2*min(0.0,ufull(i,j,k  ,2))/hz;
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                 // extrapolate all components of velocity to left face
@@ -1286,7 +1286,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, 
     {
         // extrapolate to faces
-        Real ulzy = ulz(i,j,k,0) - (dt6/hy)*(vtrans(i,j+1,k-0)+vtrans(i,j,k-1)) 
+        Real ulzy = ulz(i,j,k,0) - (dt6/hy)*(vtrans(i,j+1,k-1)+vtrans(i,j,k-1)) 
             * (uimhy(i,j+1,k-1,0)-uimhy(i,j,k-1,0));
         Real urzy = urz(i,j,k,0) - (dt6/hy)*(vtrans(i,j+1,k  )+vtrans(i,j,k  )) 
             * (uimhy(i,j+1,k  ,0)-uimhy(i,j,k  ,0));
@@ -1671,7 +1671,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (umacl+w0macx(i,j,k) <= 0.0 &&
                          umacr+w0macx(i,j,k) >= 0.0) ||
-                        (fabs(umacl+umacr+2*w0macx(i,j,k)) < rel_eps);
+                        (fabs(umacl+umacr+2.0*w0macx(i,j,k)) < rel_eps);
             umac(i,j,k) = 0.5*(umacl+umacr)+w0macx(i,j,k) > 0.0 ? umacl : umacr;
             umac(i,j,k) = test ? 0.0 : umac(i,j,k);
         } else {
@@ -1745,7 +1745,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (vmacl+w0macy(i,j,k) <= 0.0 &&
                          vmacr+w0macy(i,j,k) >= 0.0) ||
-                        (fabs(vmacl+vmacr+2*w0macy(i,j,k)) < rel_eps);
+                        (fabs(vmacl+vmacr+2.0*w0macy(i,j,k)) < rel_eps);
             vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0macy(i,j,k) > 0.0 ? vmacl : vmacr;
             vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
         } else {
@@ -1819,15 +1819,15 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
                          wmacr+w0macz(i,j,k) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2*w0macz(i,j,k)) < rel_eps);
+                        (fabs(wmacl+wmacr+2.0*w0macz(i,j,k)) < rel_eps);
             wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0macz(i,j,k) > 0.0 ? wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
-            bool test = (wmacl+w0_cart(i,j,k,2) <= 0.0 &&
-                         wmacr+w0_cart(i,j,k,2) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2.0*w0_cart(i,j,k,2)) < rel_eps);
-            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,2) > 0.0 ?
+            bool test = (wmacl+w0_cart(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
+                         wmacr+w0_cart(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
+                        (fabs(wmacl+wmacr+2.0*w0_cart(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
                 wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         }

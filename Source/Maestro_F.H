@@ -652,6 +652,7 @@ extern "C"
                         amrex::Real* ad_excess, const int* a_lo, const int* a_hi);
 
     void make_vorticity(const int* lo, const int* hi,
+                        const int* domlo, const int* domhi,
                         const amrex::Real* vel, const int* v_lo, const int* v_hi,
                         const amrex::Real* dx,
                         amrex::Real* vorticity, const int* d_lo, const int* d_hi,
