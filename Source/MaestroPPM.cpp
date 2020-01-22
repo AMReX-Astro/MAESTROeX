@@ -8,15 +8,15 @@ using namespace amrex;
 
 void
 Maestro::PPM_2d (const Box& bx, 
-                 Array4<Real> const s,
-                 Array4<Real> const u,
-                 Array4<Real> const v,
+                 Array4<const Real> const s,
+                 Array4<const Real> const u,
+                 Array4<const Real> const v,
                  Array4<Real> const Ip,
                  Array4<Real> const Im,
                  const Box& domainBox,
                  const Vector<BCRec>& bcs,
                  const Real* dx,
-                 bool is_umac, int comp, int bccomp)
+                 const bool is_umac, const int comp, const int bccomp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PPM_2d()",PPM_2d);
@@ -1267,16 +1267,16 @@ Maestro::PPM_2d (const Box& bx,
 
 void
 Maestro::PPM_3d (const Box& bx, 
-                 Array4<Real> const s,
-                 Array4<Real> const u,
-                 Array4<Real> const v,
-                 Array4<Real> const w,
+                 Array4<const Real> const s,
+                 Array4<const Real> const u,
+                 Array4<const Real> const v,
+                 Array4<const Real> const w,
                  Array4<Real> const Ip,
                  Array4<Real> const Im,
                  const Box& domainBox,
                  const Vector<BCRec>& bcs,
                  const Real* dx,
-                 bool is_umac, int comp, int bccomp)
+                 const bool is_umac, const int comp, const int bccomp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PPM_3d()",PPM_3d);

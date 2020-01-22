@@ -51,7 +51,7 @@ Maestro::Slopex(const Box& bx,
             Real slim = min(fabs(dpls), fabs(dmin));
             slim = dpls*dmin > 0.0 ? slim : 0.0;
             Real sflag = copysign(1.0,del);
-            slx(i,j,k,n)= sflag*min(slim,fabs(del));
+            slx(i,j,k,n) = sflag*min(slim,fabs(del));
 
             if (bclo_p[n] == EXT_DIR  || bclo_p[n] == HOEXTRAP) {
                 if (i == ilo-1) {
@@ -64,7 +64,7 @@ Maestro::Slopex(const Box& bx,
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
-                    slx(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slx(i,j,k,n) = sflag*min(slim,fabs(del));
                 }
             }
 
@@ -79,7 +79,7 @@ Maestro::Slopex(const Box& bx,
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
-                    slx(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slx(i,j,k,n) = sflag*min(slim,fabs(del));
                 }
             }
         });
@@ -129,7 +129,7 @@ Maestro::Slopex(const Box& bx,
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? dlim : 0.0;
                     Real sflag = copysign(1.0,del);
-                    slx(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slx(i,j,k,n) = sflag*min(slim,fabs(del));
                 } else if (i == ilo+1) {
                     // Recalculate the slope at lo(1)+1 using the revised dxl
                     Real del = -16.0/15.0*s(i-2,j,k,n) + 0.5*s(i-1,j,k,n) + 
@@ -157,7 +157,7 @@ Maestro::Slopex(const Box& bx,
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? dlim : 0.0;
                     Real sflag = copysign(1.0,del);
-                    slx(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slx(i,j,k,n) = sflag*min(slim,fabs(del));
                 } else if (i == ihi-1) {
                     // Recalculate the slope at hi(1)-1 using the revised dxr
                     Real del = -( -16.0/15.0*s(i+2,j,k,n) + 0.5*s(i+1,j,k,n) +  
@@ -401,7 +401,7 @@ Maestro::Slopez(const Box& bx,
             Real slim = min(fabs(dpls),fabs(dmin));
             slim = dpls*dmin > 0.0 ? slim : 0.0;
             Real sflag = copysign(1.0,del);
-            slz(i,j,k,n)= sflag*min(slim,fabs(del));
+            slz(i,j,k,n) = sflag*min(slim,fabs(del));
 
             if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
                 if (k == klo-1) {
@@ -414,7 +414,7 @@ Maestro::Slopez(const Box& bx,
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
-                    slz(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slz(i,j,k,n) = sflag*min(slim,fabs(del));
                 }
             }
 
@@ -429,7 +429,7 @@ Maestro::Slopez(const Box& bx,
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin > 0.0 ? slim : 0.0;
                     sflag = copysign(1.0,del);
-                    slz(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slz(i,j,k,n) = sflag*min(slim,fabs(del));
                 }
             }
         });
@@ -452,7 +452,7 @@ Maestro::Slopez(const Box& bx,
             dcen = 0.5*(s(i,j,k+2,n)-s(i,j,k,n));
             dmin = 2.0*(s(i,j,k+1,n)-s(i,j,k,n));
             dpls = 2.0*(s(i,j,k+2,n)-s(i,j,k+1,n));
-            dlim  = min(fabs(dmin),fabs(dpls));
+            dlim = min(fabs(dmin),fabs(dpls));
             dlim = dpls*dmin>0.0 ? dlim : 0.0;
             dflag = copysign(1.0,dcen);
             Real dzr = dflag*min(dlim,fabs(dcen));
@@ -461,7 +461,7 @@ Maestro::Slopez(const Box& bx,
             dcen = 0.5*(s(i,j,k+1,n)-s(i,j,k-1,n));
             dmin = 2.0*(s(i,j,k  ,n)-s(i,j,k-1,n));
             dpls = 2.0*(s(i,j,k+1,n)-s(i,j,k  ,n));
-            dlim  = min(fabs(dmin),fabs(dpls));
+            dlim = min(fabs(dmin),fabs(dpls));
             dlim = dpls*dmin>0.0 ? dlim : 0.0;
             dflag = copysign(1.0,dcen);
 
@@ -479,7 +479,7 @@ Maestro::Slopez(const Box& bx,
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? slim : 0.0;
                     Real sflag = copysign(1.0,del);
-                    slz(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slz(i,j,k,n) = sflag*min(slim,fabs(del));
 
                 } else if (k == klo+1) {
                     // Recalculate the slope at lo(2)+1 using the revised dzl
@@ -507,7 +507,7 @@ Maestro::Slopez(const Box& bx,
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? slim : 0.0;
                     Real sflag = copysign(1.0,del);
-                    slz(i,j,k,n)= sflag*min(slim,fabs(del));
+                    slz(i,j,k,n) = sflag*min(slim,fabs(del));
 
                 } else if (k == khi-1) {
                     // Recalculate the slope at lo(3)+1 using the revised dzr

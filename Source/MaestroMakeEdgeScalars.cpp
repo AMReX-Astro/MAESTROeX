@@ -375,10 +375,9 @@ void Maestro::MakeDivU(const Box& bx,
 
     AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
     {
-        divu(i,j,k) = 
-            umac(i+1,j,k) - umac(i,j,k) +
-            vmac(i,j+1,k) - vmac(i,j,k) +
-            wmac(i,j,k+1) - wmac(i,j,k);
+        divu(i,j,k) = umac(i+1,j,k) - umac(i,j,k) +
+                      vmac(i,j+1,k) - vmac(i,j,k) +
+                      wmac(i,j,k+1) - wmac(i,j,k);
         divu(i,j,k) /= dx_local;
     });
 }
@@ -887,7 +886,6 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             slyx : sryx;
         simhyx(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ?
             simhyx(i,j,k) : 0.5 * (slyx + sryx);
-
     });
 
     // simhyz
@@ -964,7 +962,6 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             slyz : sryz;
         simhyz(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ?
             simhyz(i,j,k) : 0.5 * (slyz + sryz);
-
     });
 
     // simhzx
@@ -1044,7 +1041,6 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             slzx : srzx;
         simhzx(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps) ?
             simhzx(i,j,k) : 0.5 * (slzx + srzx);
-
     });
 
     // simhzy
@@ -1121,7 +1117,6 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             slzy : srzy;
         simhzy(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps) ?
             simhzy(i,j,k) : 0.5 * (slzy + srzy);
-
     });
 }
 
@@ -1269,7 +1264,6 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
                 sedgex(i,j,k,comp) = 0.0;
             } 
         } 
-
     });
 
     // y-direction
@@ -1357,7 +1351,6 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
                 sedgey(i,j,k,comp) = 0.0;
             } 
         } 
-
     });
 
     // z-direction
@@ -1445,9 +1438,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
                 sedgez(i,j,k,comp) = 0.0;
             } 
         } 
-
     });
-
 }
 
 #endif
