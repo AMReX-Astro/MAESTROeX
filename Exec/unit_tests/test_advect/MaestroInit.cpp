@@ -104,6 +104,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	S_cc_old          [lev].define(ba, dm,              1,    0);
 	S_cc_new          [lev].define(ba, dm,              1,    0);
 	gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
+    w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    2);
 	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
 
@@ -113,6 +114,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	S_cc_old          [lev].setVal(0.);
 	S_cc_new          [lev].setVal(0.);
 	gpi               [lev].setVal(0.);
+    w0_cart           [lev].setVal(0.);
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
 
