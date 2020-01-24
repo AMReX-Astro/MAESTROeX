@@ -299,12 +299,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     {
         // get references to the MultiFabs at level lev
         MultiFab& solverrhs_mf = solverrhs[lev];
-        const MultiFab& macrhs_mf = macrhs[lev];
-        const MultiFab& uedge_mf = umac[lev][0];
-        const MultiFab& vedge_mf = umac[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wedge_mf = umac[lev][2];
-#endif
 
         // loop over boxes
 #ifdef _OPENMP
@@ -314,24 +308,32 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-#pragma gpu box(tileBox)
-            mac_solver_rhs(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
-                           BL_TO_FORTRAN_ANYD(solverrhs_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(macrhs_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+            GpuArray<int,AMREX_SPACEDIM> dx;
+            for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                dx[n] = geom[lev].CellSize()[n];
+            }
+
+            const Array4<Real> solverrhs_arr = solverrhs[lev].array(mfi);
+            const Array4<const Real> macrhs_arr = macrhs[lev].array(mfi);
+            const Array4<const Real> uedge = umac[lev][0].array(mfi);
+            const Array4<const Real> vedge = umac[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+            const Array4<const Real> wedge = umac[lev][2].array(mfi);
 #endif
-                           AMREX_REAL_ANYD(dx));
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                // Compute newrhs = oldrhs - div(Uedge)
+                solverrhs_arr(i,j,k) = macrhs_arr(i,j,k) 
+                    - ( (uedge(i+1,j,k)-uedge(i,j,k))/dx[0]
+                    + (vedge(i,j+1,k)-vedge(i,j,k))/dx[1] 
+#if (AMREX_SPACEDIM == 3)
+                    + (wedge(i,j,k+1)-wedge(i,j,k))/dx[2]
+#endif
+                    );
+            });
         }
     }
-
 }
 
 // Average bcoefs at faces using inverse of rho

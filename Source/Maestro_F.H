@@ -912,16 +912,6 @@ extern "C"
 
     //////////////////////
     // in mac_solver.F90
-    void mac_solver_rhs(const int* lo, const int* hi, const int lev,
-			amrex::Real* newrhs, const int* nrhs_lo, const int* nrhs_hi,
-			const amrex::Real* oldrhs, const int* orhs_lo, const int* orhs_hi,
-                        const amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                        const amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-			const amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
-			const amrex::Real* dx);
-
     void mult_beta0(const int* lo, const int* hi, const int lev, 
                     const int idir,
                     amrex::Real* uedge, const int* u_lo, const int* u_hi,
