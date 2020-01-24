@@ -33,20 +33,32 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     }
 
-    RealVector gradw0( (max_radial_level+1)*nr_fine );
+    RealVector gradw0( (max_radial_level+1)*nr_fine , 0.0);
     gradw0.shrink_to_fit();
 
-    if (use_exact_base_state || average_base_state) {
-        std::fill(gradw0.begin(), gradw0.end(), 0.);
-    } else {
-	for (int i=0; i<gradw0.size(); ++i) {
-	    gradw0[i] = (w0[i+1] - w0[i])/dr_fine;
-	}
+    Real* AMREX_RESTRICT p_gradw0 = gradw0.dataPtr();
+    Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
+    const Real dr0 = dr_fine;
+
+    if ( !(use_exact_base_state || average_base_state) ) {
+	AMREX_PARALLEL_FOR_1D (gradw0.size(), i,
+        {	
+	    p_gradw0[i] = (p_w0[i+1] - p_w0[i])/dr0;
+	});
     }
+    
+    // // DEBUG
+    // Gpu::synchronize(); // copies data from GPU to CPU
+    // Print() << "DEBUG: " << p_gradw0[10] <<" "<< w0[11] <<" "<< w0[10] <<" "<< dr0 << std::endl;
 
     Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);
     Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
     Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
+
+    // Reset vel_force
+    for (int lev=0; lev<=finest_level; ++lev) {
+	vel_force[lev].setVal(0.);
+    }
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
