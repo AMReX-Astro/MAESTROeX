@@ -79,7 +79,10 @@ Maestro::Evolve ()
 			istep = 1;
 
 			// reset the density
-			InitFromScratch(t_old);
+			for (int lev = 0; lev <= finest_level; ++lev) {
+				MakeNewLevelFromScratch (lev, t_old, grids[lev],
+                                       dmap[lev]);
+			}
 
 			// reset tagging array to include buffer zones
 			TagArray();

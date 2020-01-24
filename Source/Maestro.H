@@ -1431,7 +1431,7 @@ public:
                   amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const amrex::Vector<amrex::MultiFab>& force);
-
+                  
 #if (AMREX_SPACEDIM == 2)
     void VelPredInterface(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
