@@ -234,13 +234,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& xedge_mf = edge[lev][0];
-        MultiFab& yedge_mf = edge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& zedge_mf = edge[lev][2];
-#endif
-
         // Must get cell-centered MultiFab boxes for MIter
         MultiFab& sold_mf = sold[lev];
 
@@ -341,11 +334,7 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
-
-            GpuArray<int,AMREX_SPACEDIM> dx;
-            for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                dx[n] = geom[lev].CellSize()[n];
-            }
+            const Real * AMREX_RESTRICT dx = geom[lev].CellSize();
 
             const Array4<Real> solverrhs_arr = solverrhs[lev].array(mfi);
             const Array4<const Real> macrhs_arr = macrhs[lev].array(mfi);
