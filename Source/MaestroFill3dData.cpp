@@ -42,7 +42,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 }
 
 void
-Maestro::Put1dArrayOnCart (int level,
+Maestro::Put1dArrayOnCart (int lev,
                            const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -54,8 +54,20 @@ Maestro::Put1dArrayOnCart (int level,
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
 
     // get references to the MultiFabs at level lev
-    MultiFab& s0_cart_mf = s0_cart[level];
-    MultiFab& cc_to_r = cell_cc_to_r[level];
+    MultiFab& s0_cart_mf = s0_cart[lev];
+    // MultiFab& cc_to_r = cell_cc_to_r[lev];
+    GpuArray<Real,AMREX_SPACEDIM> dx;
+    GpuArray<Real,AMREX_SPACEDIM> center;
+    GpuArray<Real,AMREX_SPACEDIM> prob_lo;
+
+    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+        dx[n] = geom[lev].CellSize()[n];
+        center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
+        prob_lo[n] = geom[lev].ProbLo(n);
+    }
+
+    Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -65,30 +77,392 @@ Maestro::Put1dArrayOnCart (int level,
 
     	// Get the index space of the valid region
     	const Box& tileBox = mfi.tilebox();
-    	const Real* dx = geom[level].CellSize();
+
+        int max_lev = max_radial_level;
+        int nr_fine_loc = nr_fine;
+
+        const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
+        const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
 
     	// call fortran subroutine
     	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
     	// lo/hi coordinates (including ghost cells), and/or the # of components
     	// We will also pass "validBox", which specifies the "valid" region.
     	if (spherical == 0) {
-#pragma gpu box(tileBox)
-    	    put_1d_array_on_cart(AMREX_INT_ANYD(tileBox.loVect()),
-                     AMREX_INT_ANYD(tileBox.hiVect()),level,
-    				 BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
-    				 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
+                int r = AMREX_SPACEDIM == 2 ? j : k;
+
+                s0_cart_arr(i,j,k,outcomp) = is_input_edge_centered == 1 ? 
+                    0.5 * (s0_p[lev+r*(max_lev+1)] + s0_p[lev+(r+1)*(max_lev+1)]) : 
+                    s0_p[lev+r*(max_lev+1)];
+            });
+
     	} else {
-#pragma gpu box(tileBox)
-    	    put_1d_array_on_cart_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                          AMREX_INT_ANYD(tileBox.hiVect()),
-    				      BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
-    				      s0.dataPtr(), AMREX_REAL_ANYD(dx),
-    				      is_input_edge_centered, is_output_a_vector,
-    				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-    				      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+
+            const Array4<const Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
+
+            if (use_exact_base_state) {
+                if (is_input_edge_centered) {
+                    // we implemented three different ideas for computing s0_cart,
+                    // where s0 is edge-centered.
+                    // 1.  Piecewise constant
+                    // 2.  Piecewise linear
+                    // 3.  Quadratic
+                    if (w0_interp_type == 1) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = cc_to_r(i,j,k);
+
+                            Real rfac = (radius - r_edge_loc_p[(index+1)*(max_lev+1)]) 
+                                / (r_cc_loc_p[(index+1)*(max_lev+1)] 
+                                   - r_cc_loc_p[index*(max_lev+1)]);
+
+                            Real s0_cart_val = rfac > 0.5 ? 
+                                s0_p[(index+1)*(max_lev+1)] : s0_p[index*(max_lev+1)];
+                            
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (w0_interp_type == 2) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = cc_to_r(i,j,k);
+
+                            Real rfac = (radius - r_edge_loc_p[(index+1)*(max_lev+1)]) 
+                                / (r_cc_loc_p[(index+1)*(max_lev+1)] 
+                                   - r_cc_loc_p[index*(max_lev+1)]);
+
+                            Real s0_cart_val;
+                            if (index < nr_fine_loc) {
+                                s0_cart_val = rfac * s0_p[(index+1)*(max_lev+1)] 
+                                    + (1.0-rfac) * s0_p[index*(max_lev+1)];
+                            } else {
+                                s0_cart_val = s0_p[index*(max_lev+1)];
+                            }
+
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (w0_interp_type == 3) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = cc_to_r(i,j,k) + 1;
+
+                            if (index <= 0) {
+                                index = 0;
+                            } else if (index >= nr_fine_loc-1) {
+                                index = nr_fine_loc - 2;
+                            } else if (radius-r_edge_loc_p[index*(max_lev+1)] 
+                                       < r_edge_loc_p[(index+1)*(max_lev+1)]) {
+                                index--;
+                            }
+
+                            Real s0_cart_val = QuadInterp(radius, 
+                                r_edge_loc_p[index*(max_lev+1)],
+                                r_edge_loc_p[(index+1)*(max_lev+1)], 
+                                r_edge_loc_p[(index+2)*(max_lev+1)], 
+                                s0_p[index*(max_lev+1)],
+                                s0_p[(index+1)*(max_lev+1)],
+                                s0_p[(index+2)*(max_lev+1)]);
+
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+                    } else {
+                        Abort("Error: w0_interp_type not defined");
+                    }
+                } else { // is_input_edge_centered = 0
+                    // we directly inject the spherical values into each cell center
+                    // because s0 is also bin-centered.
+
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = cc_to_r(i,j,k);
+
+                        Real s0_cart_val = s0_p[index*(max_lev+1)];
+                        
+                        if (is_output_a_vector) {
+                            s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                            s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                            s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                        } else {
+                            s0_cart_arr(i,j,k,0) = s0_cart_val;
+                        }
+                    });
+                } // is_input_edge_centered
+
+            } else { // use_exact_base_state = 0
+
+                const Real dr = dr_fine;
+
+                if (is_input_edge_centered) {
+                    // we implemented three different ideas for computing s0_cart,
+                    // where s0 is edge-centered.
+                    // 1.  Piecewise constant
+                    // 2.  Piecewise linear
+                    // 3.  Quadratic
+
+                    if (w0_interp_type == 1) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            Real rfac = (radius - Real(index) * dr) / dr;
+
+                            Real s0_cart_val = rfac > 0.5 ? 
+                                s0_p[(index+1)*(max_lev+1)] : s0_p[index*(max_lev+1)];
+                            
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (w0_interp_type == 2) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            Real rfac = (radius - Real(index) * dr) / dr;
+
+                            Real s0_cart_val;
+                            if (index < nr_fine_loc) {
+                                s0_cart_val = rfac * s0_p[(index+1)*(max_lev+1)] + (1.0-rfac) * s0_p[index*(max_lev+1)];
+                            } else {
+                                s0_cart_val = s0_p[nr_fine_loc*(max_lev+1)];
+                            }
+
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (w0_interp_type == 3) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            if (index <= 0) {
+                                index = 0;
+                            } else if (index >= nr_fine_loc-1) {
+                                index = nr_fine_loc - 2;
+                            } else if (radius-r_edge_loc_p[index*(max_lev+1)] 
+                                       < r_edge_loc_p[(index+1)*(max_lev+1)]) {
+                                index--;
+                            }
+
+                            Real s0_cart_val = QuadInterp(radius, 
+                                r_edge_loc_p[index*(max_lev+1)],
+                                r_edge_loc_p[(index+1)*(max_lev+1)], 
+                                r_edge_loc_p[(index+2)*(max_lev+1)], 
+                                s0_p[index*(max_lev+1)],
+                                s0_p[(index+1)*(max_lev+1)],
+                                s0_p[(index+2)*(max_lev+1)]);
+
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+                    } else {
+                        Abort("Error: w0_interp_type not defined");
+                    }
+                } else { // is_input_edge_centered = 0
+                    // we currently have three different ideas for computing s0_cart,
+                    // where s0 is bin-centered.
+                    // 1.  Piecewise constant
+                    // 2.  Piecewise linear
+                    // 3.  Quadratic
+
+                    if (s0_interp_type == 1) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            Real s0_cart_val = s0_p[index*(max_lev+1)];
+                            
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (s0_interp_type == 2) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            Real s0_cart_val;
+                            
+                            if (radius >= r_cc_loc_p[index*(max_lev+1)]) {
+                                if (index >= nr_fine_loc-1) {
+                                    s0_cart_val = s0_p[(nr_fine_loc-1)*(max_lev+1)];
+                                } else {
+                                    s0_cart_val = s0_p[(index+1)*(max_lev+1)] 
+                                        * (radius-r_cc_loc_p[index*(max_lev+1)])/dr 
+                                        + s0_p[index*(max_lev+1)] 
+                                        * (r_cc_loc_p[(index+1)*(max_lev+1)]-radius)/dr;
+                                }
+                            } else {
+                                if (index == 0) {
+                                    s0_cart_val = s0_p[index*(max_lev+1)];
+                                } else if (index > nr_fine_loc-1) {
+                                    s0_cart_val = s0_p[(nr_fine_loc-1)*(max_lev+1)];
+                                } else {
+                                    s0_cart_val = s0_p[index*(max_lev+1)] 
+                                        * (radius-r_cc_loc_p[(index-1)*(max_lev+1)])/dr 
+                                        + s0_p[(index-1)*(max_lev+1)] 
+                                        * (r_cc_loc_p[index*(max_lev+1)]-radius)/dr;
+                                }
+                            }
+                            
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+
+                    } else if (s0_interp_type == 3) {
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                            Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                            Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                            Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                            Real radius = sqrt(x*x + y*y + z*z);
+                            int index = int(radius / dr);
+
+                            if (index == 0) {
+                                index = 1;
+                            } else if (index >= nr_fine_loc-1) {
+                                index = nr_fine_loc-2;
+                            }
+
+                            Real s0_cart_val = QuadInterp(radius, 
+                                r_edge_loc_p[(index-1)*(max_lev+1)],
+                                r_edge_loc_p[index*(max_lev+1)],
+                                r_edge_loc_p[(index+1)*(max_lev+1)], 
+                                s0_p[(index-1)*(max_lev+1)],
+                                s0_p[index*(max_lev+1)],
+                                s0_p[(index+1)*(max_lev+1)]);
+                            
+                            if (is_output_a_vector) {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
+                                s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
+                                s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
+                            } else {
+                                s0_cart_arr(i,j,k,0) = s0_cart_val;
+                            }
+                        });
+                    } // s0_interp_type
+                } // is_input_edge_centere
+            } // use_exact_base_state
     	}
     }
+}
 
+AMREX_GPU_DEVICE 
+Real
+Maestro::QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
+                    const Real y0, const Real y1, const Real y2) 
+{
+    Real y = y0 + (y1-y0)/(x1-x0)*(x-x0) 
+         + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1);
+
+    if (y > max(y0, max(y1, y2))) y = max(y0, max(y1, y2));
+    if (y < min(y0, min(y1, y2))) y = min(y0, min(y1, y2));
+
+    return y;
 }
 
 

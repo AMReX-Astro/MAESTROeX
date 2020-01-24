@@ -321,12 +321,6 @@ extern "C"
 
     //////////////////////
     // in fill_3d_data.F90
-    void put_1d_array_on_cart(const int* lo, const int* hi, const int lev,
-                              amrex::Real* s0_cart,
-                              const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
-                              const amrex::Real* s0, const int is_input_edge_centered,
-                              const int is_output_a_vector);
-
     void put_1d_array_on_cart_sphr(const int* lo, const int* hi,
 				   amrex::Real* s0_cart,
 				   const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
