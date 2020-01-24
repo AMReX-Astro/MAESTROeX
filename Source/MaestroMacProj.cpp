@@ -233,13 +233,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& xedge_mf = edge[lev][0];
-        MultiFab& yedge_mf = edge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& zedge_mf = edge[lev][2];
-#endif
-
         // Must get cell-centered MultiFab boxes for MIter
         MultiFab& sold_mf = sold[lev];
 
@@ -256,28 +249,64 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
-            // call fortran subroutine
-#pragma gpu(xbx)
-            mult_beta0(AMREX_INT_ANYD(xbx.loVect()),
-                       AMREX_INT_ANYD(xbx.hiVect()),lev,1,
-                       BL_TO_FORTRAN_ANYD(xedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
-#pragma gpu(ybx)
-            mult_beta0(AMREX_INT_ANYD(ybx.loVect()),
-                       AMREX_INT_ANYD(ybx.hiVect()),lev,2,
-                       BL_TO_FORTRAN_ANYD(yedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
+            const Array4<Real> uedge = edge[lev][0].array(mfi);
+            const Array4<Real> vedge = edge[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> wedge = edge[lev][2].array(mfi);
+#endif  
+            const Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
+            const Real * AMREX_RESTRICT beta0_edge_p = beta0_edge.dataPtr();
+
+            int max_lev_loc = max_radial_level;
+
+            if (mult_or_div == 1) {
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    int r = j;
+#else 
+                    int r = k;
+#endif
+                    uedge(i,j,k) *= beta0_p[lev+r*(max_lev_loc+1)];
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    vedge(i,j,k) *= beta0_edge_p[lev+j*(max_lev_loc+1)];
+#else 
+                    vedge(i,j,k) *= beta0_p[lev+k*(max_lev_loc+1)];
+#endif
+                });
 
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu(zbx)
-            mult_beta0(AMREX_INT_ANYD(zbx.loVect()),
-                       AMREX_INT_ANYD(zbx.hiVect()),lev,3,
-                       BL_TO_FORTRAN_ANYD(zedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) *= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                });
 #endif
+            } else {
+
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    int r = j;
+#else 
+                    int r = k;
+#endif
+                    uedge(i,j,k) /= beta0_p[lev+r*(max_lev_loc+1)];
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    vedge(i,j,k) /= beta0_edge_p[lev+j*(max_lev_loc+1)];
+#else 
+                    vedge(i,j,k) /= beta0_p[lev+k*(max_lev_loc+1)];
+#endif
+                });
+
+#if (AMREX_SPACEDIM == 3)
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) /= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                });
+#endif
+            }
         }
     }
 }
