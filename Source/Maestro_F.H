@@ -909,21 +909,7 @@ extern "C"
     void finalize_meth_params();
 
     //////////////////////
-
-    //////////////////////
-    // in mac_solver.F90
-    void mult_beta0(const int* lo, const int* hi, const int lev, 
-                    const int idir,
-                    amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                    const amrex::Real* beta0_edge,
-                    const amrex::Real* beta0, const int mult_or_div);
-
-    void mac_bcoef_face(const int* lo, const int* hi,
-            const int lev, const int idir,
-			amrex::Real* xface, const int* x_lo, const int* x_hi,
-			const amrex::Real* rhocc, const int* r_lo, const int* r_hi);
-    //////////////////////
-
+    
     //////////////////////
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);

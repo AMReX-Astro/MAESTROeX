@@ -144,7 +144,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         }
     }
 
-
     if (finest_level == 0) {
         // fill periodic ghost cells
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -162,7 +161,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         // fill level n ghost cells using interpolation from level n-1 data
         FillPatchUedge(umac);
     }
-
 }
 
 // Set up implicit solve using MLABecLaplacian class
@@ -317,7 +315,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                 });
 #endif
             }
-
         }
     }
 }
@@ -382,13 +379,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& xbcoef_mf = facebcoef[lev][0];
-        MultiFab& ybcoef_mf = facebcoef[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& zbcoef_mf = facebcoef[lev][2];
-#endif
-
         // Must get cell-centered MultiFab boxes for MIter
         const MultiFab& rhocc_mf = rhocc[lev];
 
@@ -405,29 +395,26 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #if (AMREX_SPACEDIM == 3)
             const Box& zbx = amrex::growHi(tileBox, 2, 1);
 #endif
-            // call fortran subroutine
-            // x-direction
-#pragma gpu box(xbx)
-            mac_bcoef_face(AMREX_INT_ANYD(xbx.loVect()),AMREX_INT_ANYD(xbx.hiVect()),
-                           lev, 1,
-                           BL_TO_FORTRAN_ANYD(xbcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
 
-            // y-direction
-#pragma gpu box(ybx)
-            mac_bcoef_face(AMREX_INT_ANYD(ybx.loVect()),AMREX_INT_ANYD(ybx.hiVect()),
-                           lev, 2,
-                           BL_TO_FORTRAN_ANYD(ybcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+            const Array4<Real> xbcoef = facebcoef[lev][0].array(mfi);
+            const Array4<Real> ybcoef = facebcoef[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-            // z-direction
-#pragma gpu box(zbx)
-            mac_bcoef_face(AMREX_INT_ANYD(zbx.loVect()),AMREX_INT_ANYD(zbx.hiVect()),
-                           lev, 3,
-                           BL_TO_FORTRAN_ANYD(zbcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+            const Array4<Real> zbcoef = facebcoef[lev][2].array(mfi);
 #endif
+            const Array4<const Real> rhocc_arr = rhocc[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                xbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i-1,j,k));
+            });
+
+            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ybcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j-1,k));
+            });
+#if (AMREX_SPACEDIM == 3)
+            AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                zbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j,k-1));
+            });
+#endif
         }
     }
 }
