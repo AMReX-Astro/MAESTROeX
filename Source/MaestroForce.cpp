@@ -78,6 +78,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         const MultiFab& grav_mf = grav_cart[lev];
         const MultiFab& rho0_mf = rho0_cart[lev];
 
+	// Get grid spacing
+	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -87,8 +90,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
-
+            
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
