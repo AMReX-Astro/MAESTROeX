@@ -54,6 +54,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[lev];
+
     GpuArray<Real,AMREX_SPACEDIM> dx;
     GpuArray<Real,AMREX_SPACEDIM> center;
     GpuArray<Real,AMREX_SPACEDIM> prob_lo;
@@ -70,6 +71,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
     const int max_lev = max_radial_level;
     const int nr_fine_loc = nr_fine;
+    const int w0_interp_type_loc = w0_interp_type;
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -121,12 +123,12 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         Real s0_cart_val;
 
-                        if (w0_interp_type == 1) {
+                        if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
                                 s0_p[(index+1)*(max_lev+1)] : s0_p[index*(max_lev+1)];
 
-                        } else if (w0_interp_type == 2) {
+                        } else if (w0_interp_type_loc == 2) {
                             
                             if (index < nr_fine_loc) {
                                 s0_cart_val = rfac * s0_p[(index+1)*(max_lev+1)] 
@@ -135,7 +137,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 s0_cart_val = s0_p[index*(max_lev+1)];
                             }
 
-                        } else if (w0_interp_type == 3) {
+                        } else if (w0_interp_type_loc == 3) {
                             if (index <= 0) {
                                 index = 0;
                             } else if (index >= nr_fine_loc-1) {
@@ -211,12 +213,12 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real rfac = (radius - Real(index) * dr) / dr;
                         Real s0_cart_val;
 
-                        if (w0_interp_type == 1) {
+                        if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
                                 s0_p[(index+1)*(max_lev+1)] : s0_p[index*(max_lev+1)];
 
-                        } else if (w0_interp_type == 2) {
+                        } else if (w0_interp_type_loc == 2) {
                             
                             if (index < nr_fine_loc) {
                                 s0_cart_val = rfac * s0_p[(index+1)*(max_lev+1)] + (1.0-rfac) * s0_p[index*(max_lev+1)];
@@ -224,7 +226,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 s0_cart_val = s0_p[nr_fine_loc*(max_lev+1)];
                             }
 
-                        } else if (w0_interp_type == 3) {
+                        } else if (w0_interp_type_loc == 3) {
                             
                             if (index <= 0) {
                                 index = 0;
@@ -252,7 +254,11 @@ Maestro::Put1dArrayOnCart (int lev,
                             s0_cart_arr(i,j,k,0) = s0_cart_val;
                         }
                     });
+
                 } else { // is_input_edge_centered = 0
+
+                    const int s0_interp_type_loc = s0_interp_type;
+
                     // we currently have three different ideas for computing s0_cart,
                     // where s0 is bin-centered.
                     // 1.  Piecewise constant
@@ -269,11 +275,11 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         Real s0_cart_val;
 
-                        if (s0_interp_type == 1) {
+                        if (s0_interp_type_loc == 1) {
 
                             s0_cart_val = s0_p[index*(max_lev+1)];
 
-                        } else if (s0_interp_type == 2) {
+                        } else if (s0_interp_type_loc == 2) {
 
                             if (radius >= r_cc_loc_p[index*(max_lev+1)]) {
                                 if (index >= nr_fine_loc-1) {
@@ -296,7 +302,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                         * (r_cc_loc_p[index*(max_lev+1)]-radius)/dr;
                                 }
                             }
-                        } else if (s0_interp_type == 3) {
+                        } else if (s0_interp_type_loc == 3) {
                             if (index == 0) {
                                 index = 1;
                             } else if (index >= nr_fine_loc-1) {
@@ -350,7 +356,6 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
     BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
 
     const int max_lev = max_radial_level;
-
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -458,6 +463,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
     const int nr_fine_loc = nr_fine;
     const int max_lev = max_radial_level;
+    const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real dr = dr_fine;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
@@ -535,8 +541,6 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
             const Array4<Real> w0macz = w0mac[lev][2].array(mfi);
             const Array4<const Real> w0_cart_arr = w0_cart[lev].array(mfi);
 
-            // const Real* dx = geom[lev].CellSize();
-
             if (w0mac_interp_type == 1) {
 
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
@@ -562,7 +566,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     int index = int(radius / dr);
                     Real w0_cart_val;
 
-                    if (w0mac_interp_type == 2) {
+                    if (w0mac_interp_type_loc == 2) {
 
                         Real rfac = (radius - Real(index)*dr) / dr;
 
@@ -601,7 +605,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     int index = int(radius / dr);
                     Real w0_cart_val;
 
-                    if (w0mac_interp_type == 2) {
+                    if (w0mac_interp_type_loc == 2) {
 
                         Real rfac = (radius - Real(index)*dr) / dr;
 
@@ -640,7 +644,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     int index = int(radius / dr);
                     Real w0_cart_val;
 
-                    if (w0mac_interp_type == 2) {
+                    if (w0mac_interp_type_loc == 2) {
 
                         Real rfac = (radius - Real(index)*dr) / dr;
                         
@@ -1189,7 +1193,6 @@ Maestro::MakeNormal ()
 
             // get references to the MultiFabs at level lev
             MultiFab& normal_mf = normal[lev];
-            // const Real* dx = geom[lev].CellSize();
 
             // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
     #ifdef _OPENMP
@@ -1211,12 +1214,6 @@ Maestro::MakeNormal ()
                     normal_arr(i,j,k,1) = y * inv_radius;
                     normal_arr(i,j,k,2) = z * inv_radius;
                 });
-
-    // #pragma gpu box(tileBox)
-    //             make_normal(AMREX_INT_ANYD(tileBox.loVect()),
-    //                         AMREX_INT_ANYD(tileBox.hiVect()),
-    //                         BL_TO_FORTRAN_ANYD(normal_mf[mfi]), 
-    //                         AMREX_REAL_ANYD(dx));
             }
         }
     }
