@@ -330,21 +330,9 @@ extern "C"
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void make_s0mac_sphr_irreg(const int* lo, const int* hi, const int idir,
-			       const amrex::Real* s0,
-			       amrex::Real* s0mac, const int* x_lo, const int* x_hi,
-			       amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
-			       const amrex::Real* dx,
-			       const amrex::Real* r_cc_loc);
-
     void make_normal(const int* lo, const int* hi,
 			       amrex::Real* normal, const int* n_lo, const int* n_hi,
 		     const amrex::Real* dx);
-
-    void put_data_on_faces(const int* lo, const int* hi, const int idir,
-			   const amrex::Real* scc, const int* cc_lo, const int* cc_hi,
-			   amrex::Real* face, const int* x_lo, const int* x_hi,
-			   const int harmonic_avg);
     //////////////////////
 
     //////////////////////

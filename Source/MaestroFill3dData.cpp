@@ -732,20 +732,17 @@ Maestro::MakeS0mac (const RealVector& s0,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& s0macx_mf = s0mac[lev][0];
-        MultiFab& s0macy_mf = s0mac[lev][1];
-        MultiFab& s0macz_mf = s0mac[lev][2];
         MultiFab& s0cart_mf = s0_cart[lev];
     
-        // GpuArray<Real,AMREX_SPACEDIM> dx;
-        // GpuArray<Real,AMREX_SPACEDIM> center;
-        // GpuArray<Real,AMREX_SPACEDIM> prob_lo;
+        GpuArray<Real,AMREX_SPACEDIM> dx;
+        GpuArray<Real,AMREX_SPACEDIM> center;
+        GpuArray<Real,AMREX_SPACEDIM> prob_lo;
 
-        // for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-        //     dx[n] = geom[lev].CellSize(n);
-        //     center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-        //     prob_lo[n] = geom[lev].ProbLo(n);
-        // }
+        for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+            dx[n] = geom[lev].CellSize(n);
+            center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
+            prob_lo[n] = geom[lev].ProbLo(n);
+        }
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -764,39 +761,218 @@ Maestro::MakeS0mac (const RealVector& s0,
             const Array4<const Real> s0_cart_arr = s0_cart[lev].array(mfi);
 
             if (use_exact_base_state) {
-                const Real* dx = geom[lev].CellSize();
-#pragma gpu box(xbx)
-                make_s0mac_sphr_irreg(AMREX_INT_ANYD(xbx.loVect()), 
-                            AMREX_INT_ANYD(xbx.hiVect()),1,
-                            s0.dataPtr(),
-                            BL_TO_FORTRAN_ANYD(s0macx_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
-                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
-#pragma gpu box(ybx)
-                make_s0mac_sphr_irreg(AMREX_INT_ANYD(ybx.loVect()), 
-                            AMREX_INT_ANYD(ybx.hiVect()),2,
-                            s0.dataPtr(),
-                            BL_TO_FORTRAN_ANYD(s0macy_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
-                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
-#pragma gpu box(zbx)
-                make_s0mac_sphr_irreg(AMREX_INT_ANYD(zbx.loVect()), 
-                            AMREX_INT_ANYD(zbx.hiVect()),3,
-                            s0.dataPtr(),
-                            BL_TO_FORTRAN_ANYD(s0macz_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(s0cart_mf[mfi]),
-                            AMREX_REAL_ANYD(dx), r_cc_loc.dataPtr());
-            } else {
-    
-                GpuArray<Real,AMREX_SPACEDIM> dx;
-                GpuArray<Real,AMREX_SPACEDIM> center;
-                GpuArray<Real,AMREX_SPACEDIM> prob_lo;
+                // we currently have three different ideas for computing s0mac
+                // 1.  Interpolate s0 to cell centers, then average to edges
+                // 2.  Interpolate s0 to edges directly using linear interpolation
+                // 3.  Interpolate s0 to edges directly using quadratic interpolation
+                // 4.  Interpolate s0 to nodes, then average to edges
 
-                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                    dx[n] = geom[lev].CellSize(n);
-                    center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-                    prob_lo[n] = geom[lev].ProbLo(n);
+                if (s0mac_interp_type == 1) {
+
+                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                        s0macx(i,j,k) = 0.5 * (s0_cart_arr(i-1,j,k) + s0_cart_arr(i,j,k));
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                        s0macy(i,j,k) = 0.5 * (s0_cart_arr(i,j-1,k) + s0_cart_arr(i,j,k));
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                        s0macz(i,j,k) = 0.5 * (s0_cart_arr(i,j,k-1) + s0_cart_arr(i,j,k));
+                    });
+
+                } else if (s0mac_interp_type == 2) {
+
+                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                        Real x = prob_lo[0] + Real(i) * dx[0] - center[0];
+                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[0]*dx[0]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        if (radius >= r_cc_loc_p[index*(max_lev+1)]) {
+                            Real dri = r_cc_loc_p[(index+1)*(max_lev+1)] 
+                                - r_cc_loc_p[index*(max_lev+1)];
+                            if (index >= nr_fine_loc-1) {
+                                s0macx(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macx(i,j,k) = s0_p[(index+1)*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[index*(max_lev+1)])/dri
+                                    + s0_p[index*(max_lev+1)]
+                                    * (r_cc_loc_p[(index+1)*(max_lev+1)]-radius)/dri;
+                            }
+                        } else {
+                            Real dri = r_cc_loc_p[index*(max_lev+1)] 
+                                - r_cc_loc_p[(index-1)*(max_lev+1)];
+                            if (index == 0) {
+                                s0macx(i,j,k) = s0_p[index*(max_lev+1)];
+                            } else if (index > nr_fine_loc-1) {
+                                s0macx(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macx(i,j,k) = s0_p[index*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[(index-1)*(max_lev+1)])/dri
+                                    + s0_p[(index-1)*(max_lev+1)]
+                                    * (r_cc_loc_p[index*(max_lev+1)]-radius)/dri;
+                            }
+                        }
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                        Real y = prob_lo[1] + Real(j) * dx[1] - center[1];
+                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[1]*dx[1]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        if (radius >= r_cc_loc_p[index*(max_lev+1)]) {
+                            Real dri = r_cc_loc_p[(index+1)*(max_lev+1)] 
+                                - r_cc_loc_p[index*(max_lev+1)];
+                            if (index >= nr_fine_loc-1) {
+                                s0macy(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macy(i,j,k) = s0_p[(index+1)*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[index*(max_lev+1)])/dri
+                                    + s0_p[index*(max_lev+1)]
+                                    * (r_cc_loc_p[(index+1)*(max_lev+1)]-radius)/dri;
+                            }
+                        } else {
+                            Real dri = r_cc_loc_p[index*(max_lev+1)] 
+                                - r_cc_loc_p[(index-1)*(max_lev+1)];
+                            if (index == 0) {
+                                s0macy(i,j,k) = s0_p[index*(max_lev+1)];
+                            } else if (index > nr_fine_loc-1) {
+                                s0macy(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macy(i,j,k) = s0_p[index*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[(index-1)*(max_lev+1)])/dri
+                                    + s0_p[(index-1)*(max_lev+1)]
+                                    * (r_cc_loc_p[index*(max_lev+1)]-radius)/dri;
+                            }
+                        }
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                        Real z = prob_lo[2] + Real(k) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[2]*dx[2]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        if (radius >= r_cc_loc_p[index*(max_lev+1)]) {
+                            Real dri = r_cc_loc_p[(index+1)*(max_lev+1)] 
+                                - r_cc_loc_p[index*(max_lev+1)];
+                            if (index >= nr_fine_loc-1) {
+                                s0macz(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macz(i,j,k) = s0_p[(index+1)*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[index*(max_lev+1)])/dri
+                                    + s0_p[index*(max_lev+1)]
+                                    * (r_cc_loc_p[(index+1)*(max_lev+1)]-radius)/dri;
+                            }
+                        } else {
+                            Real dri = r_cc_loc_p[index*(max_lev+1)] 
+                                - r_cc_loc_p[(index-1)*(max_lev+1)];
+                            if (index == 0) {
+                                s0macz(i,j,k) = s0_p[index*(max_lev+1)];
+                            } else if (index > nr_fine_loc-1) {
+                                s0macz(i,j,k) = s0_p[(nr_fine-1)*(max_lev+1)];
+                            } else {
+                                s0macz(i,j,k) = s0_p[index*(max_lev+1)] 
+                                    * (radius-r_cc_loc_p[(index-1)*(max_lev+1)])/dri
+                                    + s0_p[(index-1)*(max_lev+1)]
+                                    * (r_cc_loc_p[index*(max_lev+1)]-radius)/dri;
+                            }
+                        }
+                    });
+
+                } else if (s0mac_interp_type == 3) {
+
+                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                        Real x = prob_lo[0] + Real(i) * dx[0] - center[0];
+                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[0]*dx[0]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        // index refers to the center point in the quadratic stencil.
+                        // we need to modify this if we're too close to the edge
+                        if (index == 0) {
+                            index = 1;
+                        } else if (index >= nr_fine_loc-1) {
+                            index = nr_fine_loc-2;
+                        }
+
+                        s0macx(i,j,k) = QuadInterp(radius, 
+                                            r_cc_loc_p[(index-1)*(max_lev+1)],
+                                            r_cc_loc_p[index*(max_lev+1)], 
+                                            r_cc_loc_p[(index+1)*(max_lev+1)], 
+                                            s0_p[(index-1)*(max_lev+1)],
+                                            s0_p[index*(max_lev+1)],
+                                            s0_p[(index+1)*(max_lev+1)]);
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                        Real y = prob_lo[1] + Real(j) * dx[1] - center[1];
+                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[1]*dx[1]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        // index refers to the center point in the quadratic stencil.
+                        // we need to modify this if we're too close to the edge
+                        if (index == 0) {
+                            index = 1;
+                        } else if (index >= nr_fine_loc-1) {
+                            index = nr_fine_loc-2;
+                        }
+
+                        s0macy(i,j,k) = QuadInterp(radius, 
+                                            r_cc_loc_p[(index-1)*(max_lev+1)],
+                                            r_cc_loc_p[index*(max_lev+1)], 
+                                            r_cc_loc_p[(index+1)*(max_lev+1)], 
+                                            s0_p[(index-1)*(max_lev+1)],
+                                            s0_p[index*(max_lev+1)],
+                                            s0_p[(index+1)*(max_lev+1)]);
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center[0];
+                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
+                        Real z = prob_lo[2] + Real(k) * dx[2] - center[2];
+
+                        Real radius = sqrt(x*x + y*y + z*z);
+                        int index = round(radius*radius / (dx[2]*dx[2]) - 0.375);
+                        // closest radial index to edge-centered point
+
+                        // index refers to the center point in the quadratic stencil.
+                        // we need to modify this if we're too close to the edge
+                        if (index == 0) {
+                            index = 1;
+                        } else if (index >= nr_fine_loc-1) {
+                            index = nr_fine_loc-2;
+                        }
+
+                        s0macz(i,j,k) = QuadInterp(radius, 
+                                            r_cc_loc_p[(index-1)*(max_lev+1)],
+                                            r_cc_loc_p[index*(max_lev+1)], 
+                                            r_cc_loc_p[(index+1)*(max_lev+1)], 
+                                            s0_p[(index-1)*(max_lev+1)],
+                                            s0_p[index*(max_lev+1)],
+                                            s0_p[(index+1)*(max_lev+1)]);
+                    });
                 }
+
+            } else { // use_exact_base_state = 0
 
                 if (s0mac_interp_type == 1) {
 
@@ -1050,18 +1226,12 @@ Maestro::MakeNormal ()
 void
 Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                         Vector<std::array< MultiFab, AMREX_SPACEDIM > >& face,
-                        int harmonic_avg) {
+                        const int harmonic_avg) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PutDataOnFaces()",PutDataOnFaces);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& facex_mf = face[lev][0];
-        MultiFab& facey_mf = face[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& facez_mf = face[lev][2];
-#endif
+        
         // need one cell-centered MF for the MFIter
         const MultiFab& scc_mf = s_cc[lev];
 
@@ -1078,38 +1248,63 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
             const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // x-direction
-#pragma gpu box(xbx)
-            put_data_on_faces(AMREX_INT_ANYD(xbx.loVect()), 
-                              AMREX_INT_ANYD(xbx.hiVect()),1,
-                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
-                              BL_TO_FORTRAN_ANYD(facex_mf[mfi]),
-                              harmonic_avg);
-            // y-direction
-#pragma gpu box(ybx)
-            put_data_on_faces(AMREX_INT_ANYD(ybx.loVect()), 
-                              AMREX_INT_ANYD(ybx.hiVect()),2,
-                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
-                              BL_TO_FORTRAN_ANYD(facey_mf[mfi]),
-                              harmonic_avg);
-            // z-direction
+            const Array4<const Real> scc = s_cc[lev].array(mfi);
+            const Array4<Real> facex = face[lev][0].array(mfi);
+            const Array4<Real> facey = face[lev][1].array(mfi);
+            const Array4<Real> facez = face[lev][2].array(mfi);
+
+            if (harmonic_avg) {
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    Real denom = scc(i,j,k) + scc(i-1,j,k);
+                    Real prod  = scc(i,j,k) * scc(i-1,j,k);
+
+                    if (denom != 0.0) {
+                        facex(i,j,k) = 2.0 * prod / denom;
+                    } else {
+                        facex(i,j,k) = 0.5 * denom;
+                    }
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    Real denom = scc(i,j,k) + scc(i,j-1,k);
+                    Real prod  = scc(i,j,k) * scc(i,j-1,k);
+
+                    if (denom != 0.0) {
+                        facey(i,j,k) = 2.0 * prod / denom;
+                    } else {
+                        facey(i,j,k) = 0.5 * denom;
+                    }
+                });
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(zbx)
-            put_data_on_faces(AMREX_INT_ANYD(zbx.loVect()), 
-                              AMREX_INT_ANYD(zbx.hiVect()),3,
-                              BL_TO_FORTRAN_ANYD(scc_mf[mfi]),
-                              BL_TO_FORTRAN_ANYD(facez_mf[mfi]),
-                              harmonic_avg);
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    Real denom = scc(i,j,k) + scc(i,j,k-1);
+                    Real prod  = scc(i,j,k) * scc(i-1,j,k);
+
+                    if (denom != 0.0) {
+                        facez(i,j,k) = 2.0 * prod / denom;
+                    } else {
+                        facez(i,j,k) = 0.5 * denom;
+                    }
+                });
 #endif
+            } else {
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    facex(i,j,k) = 0.5 * (scc(i,j,k) + scc(i-1,j,k));
+                });
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    facey(i,j,k) = 0.5 * (scc(i,j,k) + scc(i,j-1,k));
+                });
+#if (AMREX_SPACEDIM == 3)
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    facez(i,j,k) = 0.5 * (scc(i,j,k) + scc(i,j,k-1));
+                });
+#endif
+            }
         }
     }
 
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
-
 }
 
 
