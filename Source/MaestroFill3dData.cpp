@@ -68,6 +68,10 @@ Maestro::Put1dArrayOnCart (int lev,
 
     Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+    const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
+
+    const int max_lev = max_radial_level;
+    const int nr_fine_loc = nr_fine;
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -78,11 +82,7 @@ Maestro::Put1dArrayOnCart (int lev,
     	// Get the index space of the valid region
     	const Box& tileBox = mfi.tilebox();
 
-        int max_lev = max_radial_level;
-        int nr_fine_loc = nr_fine;
-
         const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
-        const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
 
     	// call fortran subroutine
     	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -467,20 +467,24 @@ Maestro::QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 
 
 void
-Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
                 const Real& mult)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
 
+    const int max_lev = max_radial_level;
+
+    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& uedge_mf = uedge[lev][0];
-        MultiFab& vedge_mf = uedge[lev][1];
+        MultiFab& uedge_mf = u_edge[lev][0];
+        MultiFab& vedge_mf = u_edge[lev][1];
 #if (AMREX_SPACEDIM == 3)
-        MultiFab& wedge_mf = uedge[lev][2];
+        MultiFab& wedge_mf = u_edge[lev][2];
         const MultiFab& w0macx_mf = w0mac[lev][0];
         const MultiFab& w0macy_mf = w0mac[lev][1];
         const MultiFab& w0macz_mf = w0mac[lev][2];
@@ -494,6 +498,12 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 #pragma omp parallel
 #endif
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+
+            const Array4<Real> uedge = u_edge[lev][0].array(mfi);
+            const Array4<Real> vedge = u_edge[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> wedge = u_edge[lev][2].array(mfi);
+#endif
             
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -502,26 +512,17 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
 
 #if (AMREX_SPACEDIM == 2)
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    vedge(i,j,k) += mult * w0_p[lev+j*(max_lev+1)];
+                });
 #else
                 const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
-#endif
 
-#if (AMREX_SPACEDIM == 2)
-#pragma gpu box(ybx)
-                addw0(AMREX_INT_ANYD(ybx.loVect()), 
-                      AMREX_INT_ANYD(ybx.hiVect()), 
-                      lev,
-                      BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
-                      w0.dataPtr(),mult);
-#else 
-#pragma gpu box(zbx)
-                addw0(AMREX_INT_ANYD(zbx.loVect()), 
-                      AMREX_INT_ANYD(zbx.hiVect()), 
-                      lev,
-                      BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
-                      w0.dataPtr(),mult);
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) += mult * w0_p[lev+k*(max_lev+1)];
+                });
 #endif
-
             } else {
 
 #if (AMREX_SPACEDIM == 3)
@@ -560,18 +561,18 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
         // fill periodic ghost cells
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int d=0; d<AMREX_SPACEDIM; ++d) {
-                uedge[lev][d].FillBoundary(geom[lev].periodicity());
+                u_edge[lev][d].FillBoundary(geom[lev].periodicity());
             }
         }
 
         // fill ghost cells behind physical boundaries
-        FillUmacGhost(uedge);
+        FillUmacGhost(u_edge);
     } else {
         // edge_restriction
-        AverageDownFaces(uedge);
+        AverageDownFaces(u_edge);
 
         // fill all ghost cells for edge-based velocity field
-        FillPatchUedge(uedge);
+        FillPatchUedge(u_edge);
     }
 }
 
