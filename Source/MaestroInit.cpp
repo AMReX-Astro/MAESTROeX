@@ -480,6 +480,8 @@ void Maestro::InitProj ()
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
+    } else {
+        std::fill(Sbar.begin(), Sbar.end(), 0.);
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
