@@ -63,7 +63,11 @@ contains
                       radius = sqrt(x**2 + y**2 + z**2)
                       index = cc_to_r(i,j,k)
 
-                      rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
+                      if (index .lt. nr_fine) then 
+                        rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
+                      else 
+                        rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index) - r_cc_loc(0,index-1))
+                      endif
 
                       if (rfac .gt. 0.5d0) then
                          s0_cart_val = s0(0,index+1)
@@ -93,7 +97,11 @@ contains
                       radius = sqrt(x**2 + y**2 + z**2)
                       index  = cc_to_r(i,j,k)
 
-                      rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
+                      if (index .lt. nr_fine-1) then 
+                        rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index+1) - r_cc_loc(0,index))
+                      else 
+                        rfac = (radius - r_edge_loc(0,index+1)) / (r_cc_loc(0,index) - r_cc_loc(0,index-1))
+                      endif
 
                       if (index .lt. nr_fine) then
                          s0_cart_val = rfac * s0(0,index+1) + (ONE-rfac) * s0(0,index)

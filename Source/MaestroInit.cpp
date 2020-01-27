@@ -42,8 +42,7 @@ Maestro::Init ()
             WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
         }
-    }
-    else {
+    } else {
         Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
         const int model_file_length = model_file.length();
@@ -76,8 +75,8 @@ Maestro::Init ()
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
 #ifdef SDC
-	    intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
-	    intra[lev].setVal(0.);
+            intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
+            intra[lev].setVal(0.);
 #endif
         }
 
@@ -481,6 +480,8 @@ void Maestro::InitProj ()
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
         Average(S_cc_old,Sbar,0);
+    } else {
+        std::fill(Sbar.begin(), Sbar.end(), 0.);
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
