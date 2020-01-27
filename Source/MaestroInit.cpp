@@ -75,8 +75,8 @@ Maestro::Init ()
             }
             pi[lev].define(convert(grids[lev],nodal_flag), dmap[lev], 1, 0); // nodal
 #ifdef SDC
-	    intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
-	    intra[lev].setVal(0.);
+            intra[lev].define(grids[lev], dmap[lev], Nscal, 0); // for sdc
+            intra[lev].setVal(0.);
 #endif
         }
 
