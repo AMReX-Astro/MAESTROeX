@@ -221,11 +221,6 @@ extern "C"
 
     //////////////////////
     // in compute_grad_phi.F90
-    void compute_grad_phi(const int* lo, const int* hi,
-                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
-                                amrex::Real* gphi, const int* g_lo, const int* g_hi,
-                          const amrex::Real* dx);
-
     void compute_grad_phi_rad(const amrex::Real* phi,
 			      amrex::Real* gphi_rad);
     //////////////////////

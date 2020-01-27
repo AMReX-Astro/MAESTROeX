@@ -568,11 +568,16 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                              Vector<MultiFab>& gphi)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
+    BL_PROFILE_VAR("Maestro::ComputeGradPhi()", ComputeGradPhi);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        const MultiFab& phi_mf = phi[lev];
         MultiFab& gphi_mf = gphi[lev];
+
+        GpuArray<Real,AMREX_SPACEDIM> dx;
+        for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+            dx[n] = geom[lev].CellSize(n);
+        }
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -580,21 +585,40 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 
             // Get the index space of the tile's valid region
             const Box& tilebox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "tileox", which specifies the tile's "valid" region.
-#pragma gpu box(tilebox)
-            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()),
-                             AMREX_INT_ANYD(tilebox.hiVect()),
-                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
-                             AMREX_REAL_ANYD(dx));
+            const Array4<const Real> phi_arr = phi[lev].array(mfi);
+            const Array4<Real> gphi_arr = gphi[lev].array(mfi);
+
+#if (AMREX_SPACEDIM == 2)
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                gphi_arr(i,j,k,0) = 0.5*(phi_arr(i+1,j,k) 
+                    + phi_arr(i+1,j+1,k) 
+                    - phi_arr(i  ,j,k) - phi_arr(i  ,j+1,k) ) / dx[0];
+                gphi_arr(i,j,k,1) = 0.5*(phi_arr(i,j+1,k) 
+                    + phi_arr(i+1,j+1,k) 
+                    - phi_arr(i,j  ,k) - phi_arr(i+1,j  ,k) ) / dx[1];
+            });
+#else
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+             gphi_arr(i,j,k,0) = 0.25*(
+                   phi_arr(i+1,j,k  ) + phi_arr(i+1,j+1,k  ) 
+                  +phi_arr(i+1,j,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i  ,j,k  ) - phi_arr(i  ,j+1,k  ) 
+                  -phi_arr(i  ,j,k+1) - phi_arr(i  ,j+1,k+1) ) /dx[0];
+             gphi_arr(i,j,k,1) = 0.25*(
+                   phi_arr(i,j+1,k  ) + phi_arr(i+1,j+1,k  ) 
+                  +phi_arr(i,j+1,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i,j  ,k  ) - phi_arr(i+1,j  ,k  ) 
+                  -phi_arr(i,j  ,k+1) - phi_arr(i+1,j  ,k+1) ) /dx[1];
+             gphi_arr(i,j,k,2) = 0.25*(
+                   phi_arr(i,j  ,k+1) + phi_arr(i+1,j  ,k+1) 
+                  +phi_arr(i,j+1,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i,j  ,k  ) - phi_arr(i+1,j  ,k  ) 
+                  -phi_arr(i,j+1,k  ) - phi_arr(i+1,j+1,k  ) ) /dx[2];
+            });
+#endif
         }
     }
-
 }
 
 
