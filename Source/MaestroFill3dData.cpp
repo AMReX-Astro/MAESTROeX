@@ -480,16 +480,6 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& uedge_mf = u_edge[lev][0];
-        MultiFab& vedge_mf = u_edge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& wedge_mf = u_edge[lev][2];
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
-        const MultiFab& w0macz_mf = w0mac[lev][2];
-#endif
-
         // need one cell-centered MF for the MFIter
         MultiFab& sold_mf = sold[lev];
 
@@ -530,25 +520,22 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Box& xbx = mfi.nodaltilebox(0); 
                 const Box& ybx = mfi.nodaltilebox(1); 
                 const Box& zbx = mfi.nodaltilebox(2); 
-                
-#pragma gpu box(xbx)
-                addw0_sphr(AMREX_INT_ANYD(xbx.loVect()), 
-                           AMREX_INT_ANYD(xbx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                           mult);
-#pragma gpu box(ybx)
-                addw0_sphr(AMREX_INT_ANYD(ybx.loVect()), 
-                           AMREX_INT_ANYD(ybx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                           mult);
-#pragma gpu box(zbx)
-                addw0_sphr(AMREX_INT_ANYD(zbx.loVect()), 
-                           AMREX_INT_ANYD(zbx.hiVect()),
-                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                           mult);
+
+                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    uedge(i,j,k) += mult * w0macx(i,j,k);
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    vedge(i,j,k) += mult * w0macy(i,j,k);
+                });
+
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) += mult * w0macz(i,j,k);
+                });
 #else
                 Abort("Addw0: Spherical is not valid for DIM < 3");
 #endif

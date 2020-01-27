@@ -330,15 +330,6 @@ extern "C"
 				   const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
 				   const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void addw0(const int* lo, const int* hi, const int lev, 
-               amrex::Real* uedge, const int* u_lo, const int* u_hi,
-               amrex::Real* w0, const amrex::Real mult);
-
-    void addw0_sphr(const int* lo, const int* hi,
-		    amrex::Real* umac, const int* u_lo, const int* u_hi,
-		    const amrex::Real* w0mac, const int* x_lo, const int* x_hi,
-		    const amrex::Real mult);
-
     void make_w0mac_sphr(const int* lo, const int* hi, const int idir,
 			 const amrex::Real* w0,
 			 amrex::Real* w0macx, const int* x_lo, const int* x_hi,

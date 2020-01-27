@@ -438,64 +438,6 @@ contains
 
   end subroutine quad_interp
 
-  subroutine addw0(lo, hi, lev, &
-       uedge, u_lo, u_hi, &
-       w0, mult) bind(C, name="addw0")
-
-    integer,   value, intent(in   ) :: lev
-    integer         , intent(in   ) :: lo(3), hi(3)
-    integer         , intent(in   ) :: u_lo(3), u_hi(3)
-    double precision, intent(inout) :: uedge(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    double precision, intent(in   ) :: w0(0:max_radial_level,0:nr_fine)
-    double precision, value, intent(in   ) :: mult
-
-    ! local
-    integer i,j,k,r
-
-    !$gpu
-
-    do k = lo(3),hi(3)
-        do j = lo(2),hi(2)
-            do i = lo(1),hi(1)
-#if (AMREX_SPACEDIM == 2)
-                r = j
-#else 
-                r = k 
-#endif
-                uedge(i,j,k) = uedge(i,j,k) + mult * w0(lev,r)
-            end do
-        end do
-    end do
-
-  end subroutine addw0
-
-  subroutine addw0_sphr(lo, hi, &
-       umac, u_lo, u_hi, &
-       w0mac, x_lo, x_hi, &
-       mult) bind(C, name="addw0_sphr")
-
-    integer         , intent(in   ) :: lo(3), hi(3)
-    integer         , intent(in   ) :: u_lo(3), u_hi(3)
-    double precision, intent(inout) :: umac(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3))
-    integer         , intent(in   ) :: x_lo(3), x_hi(3)
-    double precision, intent(in   ) :: w0mac(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
-    double precision, value, intent(in) :: mult
-
-    ! local variables
-    integer :: i,j,k
-
-    !$gpu
-
-    do k = lo(3),hi(3)
-       do j = lo(2),hi(2)
-          do i = lo(1),hi(1)
-             umac(i,j,k) = umac(i,j,k) + mult * w0mac(i,j,k)
-          end do
-       end do
-    end do
-
-  end subroutine addw0_sphr
-
   subroutine make_w0mac_sphr(lo, hi, idir, w0, &
        w0mac, x_lo, x_hi, &
        w0_cart, w0_lo, w0_hi, nc_w0, &
