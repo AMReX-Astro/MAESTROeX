@@ -628,10 +628,12 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
 
+    const bool use_alt_energy_fix_loc = use_alt_energy_fix;
+
     for (int lev=0; lev<=finest_level; ++lev) {
-        const MultiFab& pi_mf = pi[lev];
+        
         MultiFab& snew_mf = snew[lev];
-        const MultiFab& beta0_cart_mf = beta0_cart[lev];
+        
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -639,18 +641,25 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 
             // Get the index space of the tile's valid region
             const Box& tileBox = mfi.tilebox();
-            FArrayBox& snew_fab = snew_mf[mfi];
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "tilebox", which specifies the "tile's valid" region.
-#pragma gpu box(tileBox)
-            make_pi_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                       BL_TO_FORTRAN_ANYD(pi_mf[mfi]),
-                       snew_fab.dataPtr(Pi), AMREX_INT_ANYD(snew_fab.loVect()), AMREX_INT_ANYD(snew_fab.hiVect()),
-                       BL_TO_FORTRAN_ANYD(beta0_cart_mf[mfi]));
+            const Array4<const Real> pi_arr = pi[lev].array(mfi);
+            const Array4<Real> pi_cc = snew[lev].array(mfi, Pi);
+            const Array4<const Real> beta0_cart_arr = beta0_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                pi_cc(i,j,k) = 0.25 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
+                    + pi_arr(i,j+1,k) + pi_arr(i+1,j+1,k));
+#else
+                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
+                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1) 
+                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1) 
+                    + pi_arr(i,j+1,k+1) + pi_arr(i+1,j+1,k+1));
+#endif
+                if (use_alt_energy_fix_loc) {
+                    pi_cc(i,j,k) = pi_cc(i,j,k)*beta0_cart_arr(i,j,k);
+                }
+            });
         }
     }
-
 }
