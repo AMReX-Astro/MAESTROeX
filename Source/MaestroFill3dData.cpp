@@ -117,9 +117,16 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real radius = sqrt(x*x + y*y + z*z);
                         int index = cc_to_r(i,j,k);
 
-                        Real rfac = (radius - r_edge_loc_p[(index+1)*(max_lev+1)]) 
+                        Real rfac;
+                        if (index < nr_fine) {
+                            rfac = (radius - r_edge_loc_p[(index+1)*(max_lev+1)]) 
                             / (r_cc_loc_p[(index+1)*(max_lev+1)] 
                                 - r_cc_loc_p[index*(max_lev+1)]);
+                        } else {
+                            rfac = (radius - r_edge_loc_p[(index+1)*(max_lev+1)]) 
+                            / (r_cc_loc_p[index*(max_lev+1)] 
+                                - r_cc_loc_p[(index-1)*(max_lev+1)]);
+                        }
 
                         Real s0_cart_val;
 
