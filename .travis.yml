@@ -1,3 +1,5 @@
+dist: bionic
+
 matrix:
   include:
     - name: "deploy docs"
@@ -44,11 +46,13 @@ matrix:
           - gfortran
           - libgmp-dev
           - libmpfr-dev
+          - python3
       before_script:
         - export AMREX_HOME=~/amrex
         - export MICROPHYSICS_HOME=~/Microphysics
       script:
         - cd $TRAVIS_BUILD_DIR/Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3 DEBUG=TRUE 2>&1 | tee clang_analysis.txt
+        - python3 $TRAVIS_BUILD_DIR/Util/scripts/clang_static_analysis.py clang_analysis.txt
 # deploy:
 #   provider: pages
 #   skip-cleanup: true
