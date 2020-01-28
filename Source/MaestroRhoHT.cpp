@@ -186,7 +186,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,

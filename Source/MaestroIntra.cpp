@@ -32,7 +32,6 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
 
             // Get the index space of the valid region
             const Box& gtbx = mfi.growntilebox(1);
-            const Real* dx = geom[lev].CellSize();
 	    
             // call fortran subroutine
 #pragma gpu box(gtbx)
