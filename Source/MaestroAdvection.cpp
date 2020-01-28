@@ -5,6 +5,18 @@
 
 using namespace amrex;
 
+const int predict_rhoh             = 0;
+const int predict_rhohprime        = 1;
+const int predict_h                = 2;
+const int predict_T_then_rhohprime = 3;
+const int predict_T_then_h         = 4;
+const int predict_hprime           = 5;
+const int predict_Tprime_then_h    = 6;
+
+const int predict_rhoprime_and_X   = 1;
+const int predict_rhoX             = 2;
+const int predict_rho_and_X        = 3;
+
 // compute unprojected mac velocities
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
@@ -103,6 +115,9 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     // Make sure to pass in comp+1 for fortran indexing
     const int startcomp = start_comp + 1;
     const int endcomp = startcomp + num_comp - 1;
+    const int rho_comp = Rho;
+    const int spec_comp = FirstSpec;
+    const int nspec = NumSpec;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -122,9 +137,9 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         const MultiFab& wmac_mf  = umac[lev][2];
 
     	// if spherical == 1
-    	const MultiFab& w0macx_mf = w0mac[lev][0];
-    	const MultiFab& w0macy_mf = w0mac[lev][1];
-    	const MultiFab& w0macz_mf = w0mac[lev][2];
+    	// const MultiFab& w0macx_mf = w0mac[lev][0];
+    	// const MultiFab& w0macy_mf = w0mac[lev][1];
+    	// const MultiFab& w0macz_mf = w0mac[lev][2];
     	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
     	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
     	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
@@ -153,116 +168,332 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             const Box& zbx = amrex::growHi(tileBox,2, 1);
             // const Box& zbx = mfi.nodaltilebox(2);
 #endif
+            const int max_lev = max_radial_level;
+
+            const Array4<Real> sedgex = sedge[lev][0].array(mfi);
+            const Array4<Real> sfluxx = sflux[lev][0].array(mfi);
+            const Array4<Real> etarhoflux_arr = etarhoflux[lev].array(mfi);
+            const Array4<const Real> umacx = umac[lev][0].array(mfi);
+            const Array4<Real> sedgey = sedge[lev][1].array(mfi);
+            const Array4<Real> sfluxy = sflux[lev][1].array(mfi);
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> sedgez = sedge[lev][2].array(mfi);
+            const Array4<Real> sfluxz = sflux[lev][2].array(mfi);
+            const Array4<const Real> wmac = umac[lev][2].array(mfi);
+#endif
+
+            Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+            const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
+            const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
+            const Real * AMREX_RESTRICT rho0_edge_old_p = r0_edge_old.dataPtr();
+            const Real * AMREX_RESTRICT rho0_edge_new_p = r0_edge_new.dataPtr();
+            const Real * AMREX_RESTRICT rho0_predicted_edge_p = r0_predicted_edge.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-                // x-direction
-#pragma gpu box(xbx)
-                make_rhoX_flux_2d(AMREX_INT_ANYD(xbx.loVect()),
-                    AMREX_INT_ANYD(xbx.hiVect()), lev, 1,
-                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
-                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
-                    r0_predicted_edge.dataPtr(),
-                    w0.dataPtr(),
-                    startcomp, endcomp);
 
-                // y-direction
-#pragma gpu box(ybx)
-                make_rhoX_flux_2d(AMREX_INT_ANYD(ybx.loVect()),
-                    AMREX_INT_ANYD(ybx.hiVect()), lev, 2,
-                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                    r0_old.dataPtr(), r0_edge_old.dataPtr(),
-                    r0_new.dataPtr(), r0_edge_new.dataPtr(),
-                    r0_predicted_edge.dataPtr(),
-                    w0.dataPtr(),
-                    startcomp, endcomp);
+            // x-direction
+            AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                int comp = n+start_comp;
+
+                // reset density flux
+                if (n == 0) {
+                    sfluxx(i,j,k,0) = 0.0;
+                }
+
+                Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
+
+                if (species_pred_type == predict_rhoprime_and_X) {
+                    // edge states are rho' and X.  To make the (rho X) flux,
+                    // we need the edge state of rho0
+                    sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                        (rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
+
+                } else if (species_pred_type == predict_rhoX) {
+                    // edge states are (rho X)
+                    sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
+
+                } else if (species_pred_type == predict_rho_and_X) {
+                    // edge states are rho and X
+                    sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                        sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
+                }
+
+                // compute the density fluxes by summing the species fluxes
+                sfluxx(i,j,k,0) += sfluxx(i,j,k,comp);
+            });
+
+            // y-direction
+            AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+                int comp = n+start_comp;
+
+                // reset density flux
+                if (n == 0) {
+                    sfluxy(i,j,k,0) = 0.0;
+                }
+
+                Real rho0_edge = 0.5*(rho0_edge_old_p[lev+j*(max_lev+1)]+rho0_edge_new_p[lev+j*(max_lev+1)]);
+
+                if (species_pred_type == predict_rhoprime_and_X) {
+                    //   ! edge states are rho' and X.  To make the (rho X) flux,
+                    //   ! we need the edge state of rho0
+                    sfluxy(i,j,k,comp) = 
+                        vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
+
+                } else if (species_pred_type == predict_rhoX) {
+                    // ! edge states are (rho X)
+                    sfluxy(i,j,k,comp) = 
+                        vmac(i,j,k)*sedgey(i,j,k,comp);
+
+                } else if (species_pred_type == predict_rho_and_X) {
+                    // ! edge state are rho and X
+                    sfluxy(i,j,k,comp) = 
+                        vmac(i,j,k)*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
+                }
+
+                if (evolve_base_state && !use_exact_base_state) {
+                    if (comp >= spec_comp && comp <= spec_comp+nspec-1) {
+                        etarhoflux_arr(i,j,k) += sfluxy(i,j,k,comp);
+                    }
+
+                    if (comp==spec_comp+nspec-1) {
+                        etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge_p[lev+j*(max_lev+1)];
+                    }
+                }  // evolve_base_state
+
+                // compute the density fluxes by summing the species fluxes
+                sfluxy(i,j,k,0) += sfluxy(i,j,k,comp);
+            });
 
 #elif (AMREX_SPACEDIM == 3)
 
-    	    // call fortran subroutine
-    	    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-    	    // lo/hi coordinates (including ghost cells), and/or the # of components
-    	    // We will also pass "validBox", which specifies the "valid" region.
     	    if (spherical == 0) {
                 // x-direction
-#pragma gpu box(xbx)
-                make_rhoX_flux_3d(AMREX_INT_ANYD(xbx.loVect()),
-                                AMREX_INT_ANYD(xbx.hiVect()),
-                                lev, 1,
-                                BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
-                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
-                                r0_predicted_edge.dataPtr(),
-                                w0.dataPtr(),
-                                startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxx(i,j,k,0) = 0.0;
+                    }
+
+                    Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                            (rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // edge states are (rho X)
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // edge states are rho and X
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                            sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
+                    }
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxx(i,j,k,0) += sfluxx(i,j,k,comp);
+                });
+
                 // y-direction
-#pragma gpu box(ybx)
-                make_rhoX_flux_3d(AMREX_INT_ANYD(ybx.loVect()),
-                                AMREX_INT_ANYD(ybx.hiVect()),
-                                lev, 2,
-                                BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
-                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
-                                r0_predicted_edge.dataPtr(),
-                                w0.dataPtr(),
-                                startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxy(i,j,k,0) = 0.0;
+                    }
+
+                    Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)* 
+                            (rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // edge states are (rho X)
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)*sedgey(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // edge states are rho and X
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)* 
+                            sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
+                    }
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxy(i,j,k,0) += sfluxy(i,j,k,comp);
+                });
+
                 // z-direction
-#pragma gpu box(zbx)
-                make_rhoX_flux_3d(AMREX_INT_ANYD(zbx.loVect()),
-                                AMREX_INT_ANYD(zbx.hiVect()),
-                                lev, 3,
-                                BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(etarhoflux_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                r0_old.dataPtr(), r0_edge_old.dataPtr(),
-                                r0_new.dataPtr(), r0_edge_new.dataPtr(),
-                                r0_predicted_edge.dataPtr(),
-                                w0.dataPtr(),
-                                startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxz(i,j,k,0) = 0.0;
+                    }
+
+                    Real rho0_edge = 0.5*(rho0_edge_old_p[lev+k*(max_lev+1)]+rho0_edge_new_p[lev+k*(max_lev+1)]);
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        //   ! edge states are rho' and X.  To make the (rho X) flux,
+                        //   ! we need the edge state of rho0
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*(rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // ! edge states are (rho X)
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*sedgez(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // ! edge state are rho and X
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp);
+                    }
+
+                    if (evolve_base_state && !use_exact_base_state) {
+                        if (comp >= spec_comp && comp <= spec_comp+nspec-1) {
+                            etarhoflux_arr(i,j,k) += sfluxz(i,j,k,comp);
+                        }
+
+                        if (comp == spec_comp+nspec-1) {
+                            etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge_p[lev+k*(max_lev+1)];
+                        }
+                    }  // evolve_base_state
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxz(i,j,k,0) += sfluxz(i,j,k,comp);
+                });
     	    } else {
+
+                const Array4<const Real> rho0_edgex = rho0mac_edgex.array(mfi);
+                const Array4<const Real> rho0_edgey = rho0mac_edgey.array(mfi);
+                const Array4<const Real> rho0_edgez = rho0mac_edgez.array(mfi);
+
                 // x-direction
-#pragma gpu box(xbx)
-    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
-                                    AMREX_INT_ANYD(xbx.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
-                                    startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxx(i,j,k,0) = 0.0;
+                    }
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                            (rho0_edgex(i,j,k)+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // edge states are (rho X)
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // edge states are rho and X
+                        sfluxx(i,j,k,comp) = umacx(i,j,k)* 
+                            sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
+                    }
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxx(i,j,k,0) += sfluxx(i,j,k,comp);
+                });
+
                 // y-direction
-#pragma gpu box(ybx)
-    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
-                                    AMREX_INT_ANYD(ybx.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
-                                    startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxy(i,j,k,0) = 0.0;
+                    }
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)* 
+                            (rho0_edgey(i,j,k)+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // edge states are (rho X)
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)*sedgey(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // edge states are rho and X
+                        sfluxy(i,j,k,comp) = vmac(i,j,k)* 
+                            sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
+                    }
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxy(i,j,k,0) += sfluxy(i,j,k,comp);
+                });
+
                 // z-direction
-#pragma gpu box(zbx)
-    		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
-                                    AMREX_INT_ANYD(zbx.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
-                                    startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
+                    int comp = n+start_comp;
+
+                    // reset density flux
+                    if (n == 0) {
+                        sfluxz(i,j,k,0) = 0.0;
+                    }
+
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        //   ! edge states are rho' and X.  To make the (rho X) flux,
+                        //   ! we need the edge state of rho0
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*(rho0_edgez(i,j,k)+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // ! edge states are (rho X)
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*sedgez(i,j,k,comp);
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // ! edge state are rho and X
+                        sfluxz(i,j,k,comp) = 
+                            wmac(i,j,k)*sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp);
+                    }
+
+                    // compute the density fluxes by summing the species fluxes
+                    sfluxz(i,j,k,0) += sfluxz(i,j,k,comp);
+                });
+
+// #pragma gpu box(xbx)
+//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
+//                                     AMREX_INT_ANYD(xbx.hiVect()),
+//                                     BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
+//                                     startcomp, endcomp);
+//                 // y-direction
+// #pragma gpu box(ybx)
+//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
+//                                     AMREX_INT_ANYD(ybx.hiVect()),
+//                                     BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
+//                                     startcomp, endcomp);
+//                 // z-direction
+// #pragma gpu box(zbx)
+//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
+//                                     AMREX_INT_ANYD(zbx.hiVect()),
+//                                     BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
+//                                     BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
+//                                     startcomp, endcomp);
 
 	    } // end spherical
 #endif
@@ -532,6 +763,64 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 }
                 else
                 {
+                    // const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                    // const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                    // const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+
+                    // const bool have_h = enthalpy_pred_type == predict_h ||
+                    //     enthalpy_pred_type == predict_T_then_h || 
+                    //     enthalpy_pred_type == predict_Tprime_then_h;
+
+                    // const bool have_hprime = enthalpy_pred_type == predict_hprime;
+
+                    // const bool have_rhoh = enthalpy_pred_type == predict_rhoh;
+
+                //     AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                //     int comp = n+start_comp;
+
+                //     if (have_h) {
+                //         // enthalpy edge state is h
+                //         if (species_pred_type == predict_rhoprime_and_X) {
+                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
+                //                                 (rho0_edge(i,j,k) + sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+
+                //         } else if (species_pred_type == predict_rho_and_X || 
+                //             species_pred_type == predict_rhoX) {
+                //             // density edge state is rho
+
+                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
+                //                 sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
+                //         }
+
+                //     } else if (have_hprime) {
+
+                //         // enthalpy edge state is h'
+                //         if (species_pred_type == predict_rhoprime_and_X) {
+                //             // density edge state is rho'
+
+                //             // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
+                //             // computed from (rho h)_0 / rho_0
+                //             // sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
+                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
+                //                             (sedge(i,j,k,rho_comp)+rho0_edge(i,j,k)) * (sedge(i,j,k,rhoh_comp)+h0_edge(i,j,k))
+                //         }
+
+                //     } else if (have_rhoh) {
+
+                //         sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
+
+                //     } else {
+                //         // enthalpy edge state is (rho h)'
+
+                //         // Average (rho h) onto edges by averaging rho and h
+                //         // separately onto edges.
+                //         //  (rho h)_edge = (rho h)' + (rho_0 * h_0)
+                //         // where h_0 is computed from (rho h)_0 / rho_0
+
+                //         sflux(i,j,k,rhoh_comp) = &
+                //             umac(i,j,k)*(rho0_edge(i,j,k)*h0_edge(i,j,k)+sedge(i,j,k,rhoh_comp))
+                //     }
+                // });
                     // x-direction
 #pragma gpu box(xbx)
                     make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
@@ -693,7 +982,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     startcomp, endcomp);
             } else {
                 Abort("Invalid scalar in UpdateScal().");
-            } // end if
+            } // }
         } // end MFIter loop
     } // end loop over levels
 
