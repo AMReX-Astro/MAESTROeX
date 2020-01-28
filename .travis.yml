@@ -21,12 +21,21 @@ matrix:
       script:
         - ./deploy_docs.sh
     
-    - language: cpp
+    - name: "clang static analysis"
+      if: type = pull_request OR type = api
+      language: cpp
       compiler:
         - clang
       before_install:
         - cd ~/; git clone https://github.com/amrex-codes/amrex
+        - cd ~/amrex; git checkout development
+        - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\|\.H\)" -exec bash -c 'echo "#endif" >> "{}"' \;
+        - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\|\.H\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
         - cd ~/; git clone https://github.com/starkiller-astro/Microphysics.git
+        - cd ~/Microphysics; git checkout development
+        - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\|\.H\)" -exec bash -c 'echo "#endif" >> "{}"' \;
+        - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\|\.H\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
+        - cd $TRAVIS_BUILD_DIR
       addons:
         apt:
           packages:
@@ -38,7 +47,7 @@ matrix:
         - export AMREX_HOME=~/amrex
         - export MICROPHYSICS_HOME=~/Microphysics
       script:
-        - cd $TRAVIS_BUILD_DIR/Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3
+        - cd $TRAVIS_BUILD_DIR/Exec/science/wdconvect; scan-build -enable-checker security.FloatLoopCounter -enable-checker security.insecureAPI.UncheckedReturn make -j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3 DEBUG=TRUE
 # deploy:
 #   provider: pages
 #   skip-cleanup: true
