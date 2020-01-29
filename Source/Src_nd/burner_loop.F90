@@ -586,7 +586,7 @@ contains
        rho_Hnuc,h_lo,h_hi, scal,s_lo,s_hi) bind(C,name="instantaneous_reaction_rates")
 
     use network, only: aion, nspec_evolve
-    use actual_rhs_module, only: actual_rhs
+    use actual_rhs_module, only: actual_rhs, unevolved_rhs
     use amrex_constants_module   , only: ZERO
     use burn_type_module, only: burn_t, burn_to_eos, eos_to_burn, net_ienuc, neqs
     use eos_type_module
@@ -609,6 +609,7 @@ contains
     type (burn_t)    :: state
     type (eos_t)     :: eos_state
     double precision :: ydot(neqs)
+    double precision :: ydot_unevolved(nspec-nspec_evolve)
 
     !$gpu
 
@@ -660,7 +661,16 @@ contains
                 
                 rho_omegadot(i,j,k,1:nspec_evolve) = state % rho * aion(1:nspec_evolve) * &
                      ydot(1:nspec_evolve)
-                rho_omegadot(i,j,k,nspec_evolve+1:nspec) = ZERO
+
+                if (nspec_evolve < nspec) then
+                    call unevolved_rhs(ydot, ydot_unevolved)
+
+                    ! add in the "unevolved" reacting terms -- here we convert from dY/dt to dX/dt
+                    do n = 1, nspec-nspec_evolve
+                       rho_omegadot(i,j,k,nspec_evolve+n) = state % rho * aion(nspec_evolve+n) * ydot_unevolved(n)
+                    end do
+                end if
+
                 rho_Hnuc(i,j,k) = state % rho * ydot(net_ienuc)
              else
                 rho_omegadot(i,j,k,1:nspec) = ZERO
