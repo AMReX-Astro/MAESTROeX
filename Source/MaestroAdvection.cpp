@@ -121,25 +121,15 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-// get references to the MultiFabs at level lev
+        // get references to the MultiFabs at level lev
         const MultiFab& scal_mf  = state[lev];
-        MultiFab& sedgex_mf      = sedge[lev][0];
-        MultiFab& sfluxx_mf      = sflux[lev][0];
-        MultiFab& etarhoflux_mf  = etarhoflux[lev];
-        const MultiFab& umac_mf  = umac[lev][0];
-        MultiFab& sedgey_mf      = sedge[lev][1];
-        MultiFab& sfluxy_mf      = sflux[lev][1];
-        const MultiFab& vmac_mf  = umac[lev][1];
-
+   
 #if (AMREX_SPACEDIM == 3)
         MultiFab& sedgez_mf      = sedge[lev][2];
         MultiFab& sfluxz_mf      = sflux[lev][2];
         const MultiFab& wmac_mf  = umac[lev][2];
 
     	// if spherical == 1
-    	// const MultiFab& w0macx_mf = w0mac[lev][0];
-    	// const MultiFab& w0macy_mf = w0mac[lev][1];
-    	// const MultiFab& w0macz_mf = w0mac[lev][2];
     	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
     	rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
     	rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
@@ -259,7 +249,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     if (comp==spec_comp+nspec-1) {
                         etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge_p[lev+j*(max_lev+1)];
                     }
-                }  // evolve_base_state
+                } 
 
                 // compute the density fluxes by summing the species fluxes
                 sfluxy(i,j,k,0) += sfluxy(i,j,k,comp);
@@ -366,7 +356,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         if (comp == spec_comp+nspec-1) {
                             etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge_p[lev+k*(max_lev+1)];
                         }
-                    }  // evolve_base_state
+                    } 
 
                     // compute the density fluxes by summing the species fluxes
                     sfluxz(i,j,k,0) += sfluxz(i,j,k,comp);
@@ -379,7 +369,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                 // x-direction
                 AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
-                    int comp = n+start_comp;
+                    int comp = n + start_comp;
 
                     // reset density flux
                     if (n == 0) {
@@ -407,8 +397,8 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 });
 
                 // y-direction
-                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
-                    int comp = n+start_comp;
+                AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+                    int comp = n + start_comp;
 
                     // reset density flux
                     if (n == 0) {
@@ -437,7 +427,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                 // z-direction
                 AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
-                    int comp = n+start_comp;
+                    int comp = n + start_comp;
 
                     // reset density flux
                     if (n == 0) {
@@ -445,8 +435,8 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     }
 
                     if (species_pred_type == predict_rhoprime_and_X) {
-                        //   ! edge states are rho' and X.  To make the (rho X) flux,
-                        //   ! we need the edge state of rho0
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*(rho0_edgez(i,j,k)+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp);
 
@@ -464,42 +454,11 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     // compute the density fluxes by summing the species fluxes
                     sfluxz(i,j,k,0) += sfluxz(i,j,k,comp);
                 });
-
-// #pragma gpu box(xbx)
-//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
-//                                     AMREX_INT_ANYD(xbx.hiVect()),
-//                                     BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
-//                                     startcomp, endcomp);
-//                 // y-direction
-// #pragma gpu box(ybx)
-//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
-//                                     AMREX_INT_ANYD(ybx.hiVect()),
-//                                     BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
-//                                     startcomp, endcomp);
-//                 // z-direction
-// #pragma gpu box(zbx)
-//     		    make_rhoX_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
-//                                     AMREX_INT_ANYD(zbx.hiVect()),
-//                                     BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-//                                     BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-//                                     BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
-//                                     startcomp, endcomp);
-
-	    } // end spherical
+            } // end spherical
 #endif
-	} // end MFIter loop
+        } // end MFIter loop
 
-	// increment or decrement the flux registers by area and time-weighted fluxes
+        // increment or decrement the flux registers by area and time-weighted fluxes
         // Note that the fluxes need to be scaled by dt and area
         // In this example we are solving s_t = -div(+F)
         // The fluxes contain, e.g., F_{i+1/2,j} = (s*u)_{i+1/2,j}
@@ -523,7 +482,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,start_comp,start_comp,num_comp, -1.0*dt*area[i]);
-		    // also include density flux
+                    // also include density flux
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,Rho,Rho,1, -1.0*dt*area[i]);
                 }
             }
@@ -532,7 +491,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev)
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,start_comp,start_comp,num_comp, 1.0*dt*area[i]);
-		    // also include density flux
+                    // also include density flux
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,Rho,Rho,1, 1.0*dt*area[i]);
                 }
             }
@@ -541,7 +500,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     		// need edge_restrict for etarhoflux
     	    }
         }
-
     } // end loop over levels
 
     // average down fluxes
