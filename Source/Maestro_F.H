@@ -946,17 +946,6 @@ extern "C"
 
     //////////////////////
     // in update_scal.F90
-    void update_rhoX(const int* lo, const int* hi,
-                     const amrex::Real* sold, const int* so_lo, const int* so_hi,
-                     amrex::Real* snew, const int* sn_lo, const int* sn_hi,
-                     const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
-                     const amrex::Real* sfluxy, const int* y_lo, const int* y_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
-#endif
-                     const amrex::Real* force,  const int* f_lo, const int* f_hi,
-                     const amrex::Real* dx, const amrex::Real dt,
-                     const int startcomp, const int endcomp);
 
     void update_rhoh(const int* lo, const int* hi,
                      const amrex::Real* sold, const int* so_lo, const int* so_hi,

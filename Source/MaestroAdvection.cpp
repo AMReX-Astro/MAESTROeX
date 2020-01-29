@@ -5,18 +5,6 @@
 
 using namespace amrex;
 
-const int predict_rhoh             = 0;
-const int predict_rhohprime        = 1;
-const int predict_h                = 2;
-const int predict_T_then_rhohprime = 3;
-const int predict_T_then_h         = 4;
-const int predict_hprime           = 5;
-const int predict_Tprime_then_h    = 6;
-
-const int predict_rhoprime_and_X   = 1;
-const int predict_rhoX             = 2;
-const int predict_rho_and_X        = 3;
-
 // compute unprojected mac velocities
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
@@ -40,16 +28,16 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 	Vector<MultiFab> ufull(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
 		ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-                // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
-                ufull[lev].setVal(0.);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        ufull[lev].setVal(0.);
 	}
 
 	// create ufull = uold + w0
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(ufull[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
-        }
-        // fill ufull ghost cells
-        FillPatch(t_old, ufull, ufull, ufull, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Copy(ufull[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
+    }
+    // fill ufull ghost cells
+    FillPatch(t_old, ufull, ufull, ufull, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 	for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
 	}
@@ -102,11 +90,13 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     const Vector<MultiFab>& p0_cart)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::UpdateScal()",UpdateScal);
+    BL_PROFILE_VAR("Maestro::UpdateScal()", UpdateScal);
 
-    // Make sure to pass in comp+1 for fortran indexing
-    const int startcomp = start_comp + 1;
-    const int endcomp = startcomp + num_comp;
+    const int rho_comp = Rho;
+    const int rhoh_comp = RhoH;
+    const int spec_comp = FirstSpec;
+    const int nspec = NumSpec;
+    const Real dt_loc = dt;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -121,6 +111,9 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     	const MultiFab& p0cart_mf = p0_cart[lev];
         const MultiFab& force_mf = force[lev];
 
+        const auto dx = geom[lev].CellSizeArray();
+        const Real* d_x = geom[lev].CellSize();
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -129,18 +122,42 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
-            if (start_comp == RhoH)
-            {   // Enthalpy update
+            const Array4<const Real> sold_arr = stateold[lev].array(mfi);
+            const Array4<Real> snew_arr = statenew[lev].array(mfi);
+            const Array4<const Real> sfluxx = sflux[lev][0].array(mfi);
+            const Array4<const Real> sfluxy = sflux[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<const Real> sfluxz = sflux[lev][2].array(mfi);
+#endif
+            const Array4<const Real> force_arr = force[lev].array(mfi);
+            
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
+            if (start_comp == RhoH) {   
+                // Enthalpy update
 
+                const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real divterm = ((sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx[0]
+                        + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx[1]
+#if (AMREX_SPACEDIM == 3)
+                        + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx[2]
+#endif
+                        );
+             
+                    snew_arr(i,j,k,rhoh_comp) = sold_arr(i,j,k,rhoh_comp) 
+                        + dt_loc * (-divterm + force_arr(i,j,k,rhoh_comp));
+
+                    if (do_eos_h_above_cutoff && snew_arr(i,j,k,rho_comp) <= base_cutoff_density) {
+                        // need Microphysics C++
+                    }
+                });
+
+                // this just does the EoS stuff now
+                if (do_eos_h_above_cutoff) {
 #pragma gpu box(tileBox)
-                update_rhoh(AMREX_INT_ANYD(tileBox.loVect()), 
+                    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()), 
                         AMREX_INT_ANYD(tileBox.hiVect()),
                         BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
@@ -151,28 +168,67 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #endif
                         BL_TO_FORTRAN_ANYD(force_mf[mfi]),
                         BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                        AMREX_REAL_ANYD(dx), dt,
+                        AMREX_REAL_ANYD(d_x), dt,
                         NumSpec);
+                }
 
-            } else if (start_comp == FirstSpec) {   // RhoX update
+            } else if (start_comp == FirstSpec) {   
+                // RhoX update
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                update_rhoX(AMREX_INT_ANYD(tileBox.loVect()),
-                    AMREX_INT_ANYD(tileBox.hiVect()),
-                    BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                    BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
-                    BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                    AMREX_REAL_ANYD(dx), dt,
-                    startcomp, endcomp);
+                AMREX_PARALLEL_FOR_4D(tileBox, NumSpec, i, j, k, n, {
+                    int comp = spec_comp + n;
+
+                    Real divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx[0];
+                    divterm += (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx[1];
+    #if (AMREX_SPACEDIM == 3)
+                    divterm += (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx[2];
+    #endif
+                    snew_arr(i,j,k,comp) = sold_arr(i,j,k,comp) + dt_loc * (-divterm + force_arr(i,j,k,comp));
+                });
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    // update density
+                    snew_arr(i,j,k,rho_comp) = sold_arr(i,j,k,rho_comp);
+
+                    bool has_negative_species = false;
+
+                    // define the update to rho as the sum of the updates to (rho X)_i
+                    for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
+                        snew_arr(i,j,k,rho_comp) += snew_arr(i,j,k,comp)-sold_arr(i,j,k,comp);
+                        if (snew_arr(i,j,k,comp) < 0.0) 
+                            has_negative_species = true;
+                    }
+
+                    // enforce a density floor
+                    if (snew_arr(i,j,k,rho_comp) < 0.5*base_cutoff_density) {
+                        for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
+                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_density/snew_arr(i,j,k,rho_comp);
+                        }
+                        snew_arr(i,j,k,rho_comp) = 0.5*base_cutoff_density;
+                    }
+
+                    // do not allow the species to leave here negative.
+                    if (has_negative_species) {
+                        for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
+                            if (snew_arr(i,j,k,comp) < 0.0) {
+                                Real delta = -snew_arr(i,j,k,comp);
+                                Real sumX = 0.0;
+                                for (int comp2=start_comp; comp2<start_comp+nspec; ++comp2) {
+                                    if (comp2 != comp && snew_arr(i,j,k,comp2) >= 0.0) {
+                                        sumX += snew_arr(i,j,k,comp2);
+                                    }
+                                }
+                                for (int comp2 = start_comp; comp2 < start_comp+nspec; ++comp2) {
+                                    if (comp2 != comp && snew_arr(i,j,k,comp2) >= 0.0) {
+                                        Real frac = snew_arr(i,j,k,comp2) / sumX;
+                                        snew_arr(i,j,k,comp2) -= frac * delta;
+                                    }
+                                }
+                                snew_arr(i,j,k,comp) = 0.0;
+                            }
+                        }
+                    }
+                });
             } else {
                 Abort("Invalid scalar in UpdateScal().");
             } // }

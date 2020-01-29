@@ -468,22 +468,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
         // get references to the MultiFabs at level lev
         const MultiFab& scal_mf   = state[lev];
-        MultiFab& sedgex_mf = sedge[lev][0];
-        MultiFab& sfluxx_mf = sflux[lev][0];
-        const MultiFab& umac_mf   = umac[lev][0];
-        MultiFab& sedgey_mf = sedge[lev][1];
-        MultiFab& sfluxy_mf = sflux[lev][1];
-        const MultiFab& vmac_mf   = umac[lev][1];
 
 #if (AMREX_SPACEDIM == 3)
-        MultiFab& sedgez_mf = sedge[lev][2];
-        MultiFab& sfluxz_mf = sflux[lev][2];
-        const MultiFab& wmac_mf   = umac[lev][2];
-
-        // if spherical == 1
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
-        const MultiFab& w0macz_mf = w0mac[lev][2];
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
         MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
         MultiFab rhoh0mac_edgex, rhoh0mac_edgey, rhoh0mac_edgez;
@@ -533,7 +519,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
             const Box& xbx = mfi.nodaltilebox(0);
             const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
@@ -559,9 +544,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             const Real * AMREX_RESTRICT rho0_edge_new_p = r0_edge_new.dataPtr();
             const Real * AMREX_RESTRICT rhoh0_edge_old_p = rh0_edge_old.dataPtr();
             const Real * AMREX_RESTRICT rhoh0_edge_new_p = rh0_edge_new.dataPtr();
-#if (AMREX_SPACEDIM == 3)
-            const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-#endif
 
 #if (AMREX_SPACEDIM == 2)
             AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
@@ -962,5 +944,4 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
-
 }
