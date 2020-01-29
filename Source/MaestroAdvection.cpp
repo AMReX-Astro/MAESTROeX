@@ -97,6 +97,8 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
     const Real dt_loc = dt;
+    const Real base_cutoff_dens_loc = base_cutoff_density;
+    const bool do_eos_h_above_cutoff_loc = do_eos_h_above_cutoff;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -147,7 +149,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     snew_arr(i,j,k,rhoh_comp) = sold_arr(i,j,k,rhoh_comp) 
                         + dt_loc * (-divterm + force_arr(i,j,k,rhoh_comp));
 
-                    if (do_eos_h_above_cutoff && snew_arr(i,j,k,rho_comp) <= base_cutoff_density) {
+                    if (do_eos_h_above_cutoff_loc && snew_arr(i,j,k,rho_comp) <= base_cutoff_dens_loc) {
                         // need Microphysics C++
                     }
                 });
@@ -199,11 +201,11 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     }
 
                     // enforce a density floor
-                    if (snew_arr(i,j,k,rho_comp) < 0.5*base_cutoff_density) {
+                    if (snew_arr(i,j,k,rho_comp) < 0.5*base_cutoff_dens_loc) {
                         for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
-                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_density/snew_arr(i,j,k,rho_comp);
+                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_dens_loc/snew_arr(i,j,k,rho_comp);
                         }
-                        snew_arr(i,j,k,rho_comp) = 0.5*base_cutoff_density;
+                        snew_arr(i,j,k,rho_comp) = 0.5*base_cutoff_dens_loc;
                     }
 
                     // do not allow the species to leave here negative.
@@ -273,28 +275,11 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // 2) Add forcing term to new Utilde
 
     const Real dt_loc = dt;
+    const bool do_sponge_loc = do_sponge;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& uold_mf = uold[lev];
-        MultiFab& unew_mf = unew[lev];
-        const MultiFab& umac_mf   = umac[lev][0];
-        const MultiFab& uedgex_mf = uedge[lev][0];
-        const MultiFab& vmac_mf   = umac[lev][1];
-        const MultiFab& uedgey_mf = uedge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wmac_mf   = umac[lev][2];
-        const MultiFab& uedgez_mf = uedge[lev][2];
-
-        // if spherical == 1
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
-        const MultiFab& w0macz_mf = w0mac[lev][2];
-#endif
         const MultiFab& force_mf = force[lev];
-        const MultiFab& sponge_mf = sponge[lev];
-        const MultiFab& w0_mf = w0_cart[lev];
 
         const auto dx = geom[lev].CellSizeArray();
 
@@ -306,7 +291,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* d_x = geom[lev].CellSize();
 
             const Array4<const Real> uold_arr = uold[lev].array(mfi);
             const Array4<Real> unew_arr = unew[lev].array(mfi);
@@ -375,7 +359,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         (uedgez(i,j,k+1,n) - uedgez(i,j,k,n))/dx[2];
 #endif
                         // Add the sponge
-                        if (do_sponge) unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
+                        if (do_sponge_loc) unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
                     }                    
                 });
             } else {
@@ -438,7 +422,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                     unew_arr(i,j,k,2) -= dt_loc * w0_gradwr;
 
                     // Add the sponge
-                    if (do_sponge) {
+                    if (do_sponge_loc) {
                         for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                             unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
                         }
@@ -456,5 +440,4 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // fill ghost cells
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-
 }

@@ -3,17 +3,17 @@
 
 using namespace amrex;
 
-const int predict_rhoh             = 0;
-const int predict_rhohprime        = 1;
-const int predict_h                = 2;
-const int predict_T_then_rhohprime = 3;
-const int predict_T_then_h         = 4;
-const int predict_hprime           = 5;
-const int predict_Tprime_then_h    = 6;
+const int pred_rhoh             = 0;
+const int pred_rhohprime        = 1;
+const int pred_h                = 2;
+const int pred_T_then_rhohprime = 3;
+const int pred_T_then_h         = 4;
+const int pred_hprime           = 5;
+const int pred_Tprime_then_h    = 6;
 
-const int predict_rhoprime_and_X   = 1;
-const int predict_rhoX             = 2;
-const int predict_rho_and_X        = 3;
+const int pred_rhoprime_and_X   = 1;
+const int pred_rhoX             = 2;
+const int pred_rho_and_X        = 3;
 
 void
 Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
@@ -41,6 +41,10 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
     const int max_lev = max_radial_level;
+    const int species_pred_type_loc = species_pred_type;
+    const bool use_exact_base_state_loc = use_exact_base_state;
+    const bool evolve_base_state_loc = evolve_base_state;
+
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -110,17 +114,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                 Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
 
-                if (species_pred_type == predict_rhoprime_and_X) {
+                if (species_pred_type == pred_rhoprime_and_X) {
                     // edge states are rho' and X.  To make the (rho X) flux,
                     // we need the edge state of rho0
                     sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                         (rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
 
-                } else if (species_pred_type == predict_rhoX) {
+                } else if (species_pred_type_loc == pred_rhoX) {
                     // edge states are (rho X)
                     sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
 
-                } else if (species_pred_type == predict_rho_and_X) {
+                } else if (species_pred_type_loc == pred_rho_and_X) {
                     // edge states are rho and X
                     sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                         sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
@@ -141,24 +145,24 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                 Real rho0_edge = 0.5*(rho0_edge_old_p[lev+j*(max_lev+1)]+rho0_edge_new_p[lev+j*(max_lev+1)]);
 
-                if (species_pred_type == predict_rhoprime_and_X) {
+                if (species_pred_type_loc == pred_rhoprime_and_X) {
                     //   ! edge states are rho' and X.  To make the (rho X) flux,
                     //   ! we need the edge state of rho0
                     sfluxy(i,j,k,comp) = 
                         vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
 
-                } else if (species_pred_type == predict_rhoX) {
+                } else if (species_pred_type_loc == pred_rhoX) {
                     // ! edge states are (rho X)
                     sfluxy(i,j,k,comp) = 
                         vmac(i,j,k)*sedgey(i,j,k,comp);
 
-                } else if (species_pred_type == predict_rho_and_X) {
+                } else if (species_pred_type_loc == pred_rho_and_X) {
                     // ! edge state are rho and X
                     sfluxy(i,j,k,comp) = 
                         vmac(i,j,k)*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
                 }
 
-                if (evolve_base_state && !use_exact_base_state) {
+                if (evolve_base_state_loc && !use_exact_base_state_loc) {
                     if (comp >= spec_comp && comp <= spec_comp+nspec-1) {
                         etarhoflux_arr(i,j,k) += sfluxy(i,j,k,comp);
                     }
@@ -186,17 +190,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                     Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
                         // we need the edge state of rho0
                         sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                             (rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // edge states are (rho X)
                         sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // edge states are rho and X
                         sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                             sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
@@ -217,17 +221,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                     Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
                         // we need the edge state of rho0
                         sfluxy(i,j,k,comp) = vmac(i,j,k)* 
                             (rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // edge states are (rho X)
                         sfluxy(i,j,k,comp) = vmac(i,j,k)*sedgey(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // edge states are rho and X
                         sfluxy(i,j,k,comp) = vmac(i,j,k)* 
                             sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
@@ -248,24 +252,24 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                     Real rho0_edge = 0.5*(rho0_edge_old_p[lev+k*(max_lev+1)]+rho0_edge_new_p[lev+k*(max_lev+1)]);
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         //   ! edge states are rho' and X.  To make the (rho X) flux,
                         //   ! we need the edge state of rho0
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*(rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // ! edge states are (rho X)
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*sedgez(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // ! edge state are rho and X
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp);
                     }
 
-                    if (evolve_base_state && !use_exact_base_state) {
+                    if (evolve_base_state_loc && !use_exact_base_state_loc) {
                         if (comp >= spec_comp && comp <= spec_comp+nspec-1) {
                             etarhoflux_arr(i,j,k) += sfluxz(i,j,k,comp);
                         }
@@ -293,17 +297,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxx(i,j,k,0) = 0.0;
                     }
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
                         // we need the edge state of rho0
                         sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                             (rho0_edgex(i,j,k)+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // edge states are (rho X)
                         sfluxx(i,j,k,comp) = umacx(i,j,k)*sedgex(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // edge states are rho and X
                         sfluxx(i,j,k,comp) = umacx(i,j,k)* 
                             sedgex(i,j,k,rho_comp)*sedgex(i,j,k,comp);
@@ -322,17 +326,17 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxy(i,j,k,0) = 0.0;
                     }
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
                         // we need the edge state of rho0
                         sfluxy(i,j,k,comp) = vmac(i,j,k)* 
                             (rho0_edgey(i,j,k)+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // edge states are (rho X)
                         sfluxy(i,j,k,comp) = vmac(i,j,k)*sedgey(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // edge states are rho and X
                         sfluxy(i,j,k,comp) = vmac(i,j,k)* 
                             sedgey(i,j,k,rho_comp)*sedgey(i,j,k,comp);
@@ -351,18 +355,18 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxz(i,j,k,0) = 0.0;
                     }
 
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
                         // we need the edge state of rho0
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*(rho0_edgez(i,j,k)+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rhoX) {
                         // ! edge states are (rho X)
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*sedgez(i,j,k,comp);
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == pred_rho_and_X) {
                         // ! edge state are rho and X
                         sfluxz(i,j,k,comp) = 
                             wmac(i,j,k)*sedgez(i,j,k,rho_comp)*sedgez(i,j,k,comp);
@@ -452,17 +456,19 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
 
-    const bool have_h = enthalpy_pred_type == predict_h ||
-                        enthalpy_pred_type == predict_T_then_h || 
-                        enthalpy_pred_type == predict_Tprime_then_h;
-    const bool have_hprime = enthalpy_pred_type == predict_hprime;
-    const bool have_rhoh = enthalpy_pred_type == predict_rhoh;
+    const bool have_h = enthalpy_pred_type == pred_h ||
+                        enthalpy_pred_type == pred_T_then_h || 
+                        enthalpy_pred_type == pred_Tprime_then_h;
+    const bool have_hprime = enthalpy_pred_type == pred_hprime;
+    const bool have_rhoh = enthalpy_pred_type == pred_rhoh;
 
     const int rho_comp = Rho;
     const int rhoh_comp = RhoH;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
     const int max_lev = max_radial_level;
+    const int species_pred_type_loc = species_pred_type;
+    const int enthalpy_pred_type_loc = enthalpy_pred_type;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -550,15 +556,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 // create x-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // density edge state is rho'
                         Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
 
                         sfluxx(i,j,k,rhoh_comp) = 
                            umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
 
-                    } else if (species_pred_type == predict_rho_and_X ||
-                               species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rho_and_X ||
+                               species_pred_type_loc == pred_rhoX) {
                         // density edge state is rho
                         sfluxx(i,j,k,rhoh_comp) = 
                             umacx(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp);
@@ -566,8 +572,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 } else if (have_rhoh) {
                     sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k)*sedgex(i,j,k,rhoh_comp);
 
-                } else if (enthalpy_pred_type == predict_rhohprime || 
-                    enthalpy_pred_type == predict_T_then_rhohprime) {
+                } else if (enthalpy_pred_type_loc == pred_rhohprime || 
+                    enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                     //   ! enthalpy edge state is (rho h)'
                     Real rhoh0_edge = 0.5*(rhoh0_old_p[lev+j*(max_lev+1)]+rhoh0_new_p[lev+j*(max_lev+1)]);
 
@@ -579,15 +585,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 // create y-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // density edge state is rho'
                         Real rho0_edge = 0.5*(rho0_edge_old_p[lev+j*(max_lev+1)]+rho0_edge_new_p[lev+j*(max_lev+1)]);
 
                         sfluxy(i,j,k,rhoh_comp) = 
                             vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp);
 
-                    } else if (species_pred_type == predict_rho_and_X || 
-                               species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == pred_rho_and_X || 
+                               species_pred_type_loc == pred_rhoX) {
                         // density edge state is rho
                         sfluxy(i,j,k,rhoh_comp) = 
                             vmac(i,j,k)*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp);
@@ -595,8 +601,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 } else if (have_rhoh) {
                     sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp);
 
-                } else if (enthalpy_pred_type == predict_rhohprime || 
-                    enthalpy_pred_type == predict_T_then_rhohprime) {
+                } else if (enthalpy_pred_type_loc == pred_rhohprime || 
+                    enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                     // enthalpy edge state is (rho h)'
                     Real rhoh0_edge = 0.5*(rhoh0_edge_old_p[lev+j*(max_lev+1)]+rhoh0_edge_new_p[lev+j*(max_lev+1)]);
                     
@@ -612,15 +618,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // create x-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
-                        if (species_pred_type == predict_rhoprime_and_X) {
+                        if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
                             Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
 
                             sfluxx(i,j,k,rhoh_comp) = 
                             umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
 
-                        } else if (species_pred_type == predict_rho_and_X ||
-                                species_pred_type == predict_rhoX) {
+                        } else if (species_pred_type_loc == pred_rho_and_X ||
+                                species_pred_type_loc == pred_rhoX) {
                             // density edge state is rho
                             sfluxx(i,j,k,rhoh_comp) = 
                                 umacx(i,j,k)*sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp);
@@ -628,8 +634,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (have_rhoh) {
                         sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k)*sedgex(i,j,k,rhoh_comp);
 
-                    } else if (enthalpy_pred_type == predict_rhohprime || 
-                        enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == pred_rhohprime || 
+                        enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         //   ! enthalpy edge state is (rho h)'
                         Real rhoh0_edge = 0.5*(rhoh0_old_p[lev+k*(max_lev+1)]+rhoh0_new_p[lev+k*(max_lev+1)]);
 
@@ -641,15 +647,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // create y-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
-                        if (species_pred_type == predict_rhoprime_and_X) {
+                        if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
                             Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
 
                             sfluxy(i,j,k,rhoh_comp) = 
                             vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp);
 
-                        } else if (species_pred_type == predict_rho_and_X ||
-                                species_pred_type == predict_rhoX) {
+                        } else if (species_pred_type_loc == pred_rho_and_X ||
+                                species_pred_type_loc == pred_rhoX) {
                             // density edge state is rho
                             sfluxy(i,j,k,rhoh_comp) = 
                                 vmac(i,j,k)*sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp);
@@ -657,8 +663,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (have_rhoh) {
                         sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp);
 
-                    } else if (enthalpy_pred_type == predict_rhohprime ||
-                        enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == pred_rhohprime ||
+                        enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         //   ! enthalpy edge state is (rho h)'
                         Real rhoh0_edge = 0.5*(rhoh0_old_p[lev+k*(max_lev+1)]+rhoh0_new_p[lev+k*(max_lev+1)]);
 
@@ -670,15 +676,15 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // create z-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
-                        if (species_pred_type == predict_rhoprime_and_X) {
+                        if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
                             Real rho0_edge = 0.5*(rho0_edge_old_p[lev+k*(max_lev+1)]+rho0_edge_new_p[lev+k*(max_lev+1)]);
 
                             sfluxz(i,j,k,rhoh_comp) = 
                                 wmac(i,j,k)*(rho0_edge+sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp);
 
-                        } else if (species_pred_type == predict_rho_and_X || 
-                                species_pred_type == predict_rhoX) {
+                        } else if (species_pred_type_loc == pred_rho_and_X || 
+                                species_pred_type_loc == pred_rhoX) {
                             // density edge state is rho
                             sfluxz(i,j,k,rhoh_comp) = 
                                 wmac(i,j,k)*sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp);
@@ -686,8 +692,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (have_rhoh) {
                         sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*sedgez(i,j,k,rhoh_comp);
 
-                    } else if (enthalpy_pred_type == predict_rhohprime || 
-                        enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == pred_rhohprime || 
+                        enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         // enthalpy edge state is (rho h)'
                         Real rhoh0_edge = 0.5*(rhoh0_edge_old_p[lev+k*(max_lev+1)]+rhoh0_edge_new_p[lev+k*(max_lev+1)]);
                         
@@ -775,20 +781,20 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
                         if (have_h) {
                             // enthalpy edge state is h
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
                                 sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k) * 
                                     (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
 
-                            } else if (species_pred_type == predict_rho_and_X || 
-                                species_pred_type == predict_rhoX) {
+                            } else if (species_pred_type_loc == pred_rho_and_X || 
+                                species_pred_type_loc == pred_rhoX) {
                                 // density edge state is rho
                                 sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k) * 
                                     sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp);
                             }
                         } else if (have_hprime) {
                             // enthalpy edge state is h'
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
 
                                 // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
@@ -819,20 +825,20 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
                         if (have_h) {
                             // enthalpy edge state is h
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
                                 sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * 
                                     (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp);
 
-                            } else if (species_pred_type == predict_rho_and_X || 
-                                species_pred_type == predict_rhoX) {
+                            } else if (species_pred_type_loc == pred_rho_and_X || 
+                                species_pred_type_loc == pred_rhoX) {
                                 // density edge state is rho
                                 sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * 
                                     sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp);
                             }
                         } else if (have_hprime) {
                             // enthalpy edge state is h'
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
 
                                 // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
@@ -861,20 +867,20 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
                         if (have_h) {
                             // enthalpy edge state is h
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
                                 sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * 
                                     (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp);
 
-                            } else if (species_pred_type == predict_rho_and_X || 
-                                species_pred_type == predict_rhoX) {
+                            } else if (species_pred_type_loc == pred_rho_and_X || 
+                                species_pred_type_loc == pred_rhoX) {
                                 // density edge state is rho
                                 sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * 
                                     sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp);
                             }
                         } else if (have_hprime) {
                             // enthalpy edge state is h'
-                            if (species_pred_type == predict_rhoprime_and_X) {
+                            if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // density edge state is rho'
 
                                 // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
