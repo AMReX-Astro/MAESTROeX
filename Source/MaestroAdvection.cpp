@@ -792,6 +792,10 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 });
             } else {
 
+                const Array4<const Real> rho0_edgex = rho0mac_edgex.array(mfi);
+                const Array4<const Real> rho0_edgey = rho0mac_edgey.array(mfi);
+                const Array4<const Real> rho0_edgez = rho0mac_edgez.array(mfi);
+
                 if (use_exact_base_state) {
                     // x-direction
 #pragma gpu box(xbx)
@@ -827,84 +831,137 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
                     // const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                    
+                    const Array4<const Real> h0_edgex = h0mac_edgex.array(mfi);
+                    const Array4<const Real> h0_edgey = h0mac_edgey.array(mfi);
+                    const Array4<const Real> h0_edgez = h0mac_edgez.array(mfi);
 
-                //     AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
-                //     int comp = n+start_comp;
+                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
 
-                //     if (have_h) {
-                //         // enthalpy edge state is h
-                //         if (species_pred_type == predict_rhoprime_and_X) {
-                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
-                //                                 (rho0_edge(i,j,k) + sedge(i,j,k,rho_comp))*sedge(i,j,k,rhoh_comp)
+                        if (have_h) {
+                            // enthalpy edge state is h
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
+                                sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k) * 
+                                    (rho0_edgex(i,j,k) + sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
 
-                //         } else if (species_pred_type == predict_rho_and_X || 
-                //             species_pred_type == predict_rhoX) {
-                //             // density edge state is rho
+                            } else if (species_pred_type == predict_rho_and_X || 
+                                species_pred_type == predict_rhoX) {
+                                // density edge state is rho
+                                sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k) * 
+                                    sedgex(i,j,k,rho_comp)*sedgex(i,j,k,rhoh_comp);
+                            }
+                        } else if (have_hprime) {
+                            // enthalpy edge state is h'
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
 
-                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
-                //                 sedge(i,j,k,rho_comp)*sedge(i,j,k,rhoh_comp)
-                //         }
+                                // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
+                                // computed from (rho h)_0 / rho_0
+                                // sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
+                                sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k) * 
+                                    (sedgex(i,j,k,rho_comp)+rho0_edgex(i,j,k)) * (sedgex(i,j,k,rhoh_comp)+h0_edgex(i,j,k));
+                            }
 
-                //     } else if (have_hprime) {
+                        } else if (have_rhoh) {
 
-                //         // enthalpy edge state is h'
-                //         if (species_pred_type == predict_rhoprime_and_X) {
-                //             // density edge state is rho'
+                            sfluxx(i,j,k,rhoh_comp) = umacx(i,j,k)*sedgex(i,j,k,rhoh_comp);
 
-                //             // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
-                //             // computed from (rho h)_0 / rho_0
-                //             // sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
-                //             sflux(i,j,k,rhoh_comp) = umac(i,j,k) * 
-                //                             (sedge(i,j,k,rho_comp)+rho0_edge(i,j,k)) * (sedge(i,j,k,rhoh_comp)+h0_edge(i,j,k))
-                //         }
+                        } else {
+                            // enthalpy edge state is (rho h)'
 
-                //     } else if (have_rhoh) {
+                            // Average (rho h) onto edges by averaging rho and h
+                            // separately onto edges.
+                            //  (rho h)_edge = (rho h)' + (rho_0 * h_0)
+                            // where h_0 is computed from (rho h)_0 / rho_0
 
-                //         sflux(i,j,k,rhoh_comp) = umac(i,j,k)*sedge(i,j,k,rhoh_comp)
+                            sfluxx(i,j,k,rhoh_comp) = 
+                                umacx(i,j,k)*(rho0_edgex(i,j,k)*h0_edgex(i,j,k)+sedgex(i,j,k,rhoh_comp));
+                        }
+                    });
 
-                //     } else {
-                //         // enthalpy edge state is (rho h)'
+                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
 
-                //         // Average (rho h) onto edges by averaging rho and h
-                //         // separately onto edges.
-                //         //  (rho h)_edge = (rho h)' + (rho_0 * h_0)
-                //         // where h_0 is computed from (rho h)_0 / rho_0
+                        if (have_h) {
+                            // enthalpy edge state is h
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
+                                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * 
+                                    (rho0_edgey(i,j,k) + sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp);
 
-                //         sflux(i,j,k,rhoh_comp) = &
-                //             umac(i,j,k)*(rho0_edge(i,j,k)*h0_edge(i,j,k)+sedge(i,j,k,rhoh_comp))
-                //     }
-                // });
-                    // x-direction
-#pragma gpu box(xbx)
-                    make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(xbx.loVect()),
-                                           AMREX_INT_ANYD(xbx.hiVect()),
-                                           BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]), sfluxx_mf.nComp(),
-                                           BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
-                                           BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                           BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]),
-                                           BL_TO_FORTRAN_ANYD(h0mac_edgex[mfi]));
-                   // y-direction
-#pragma gpu box(ybx)
-                   make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(ybx.loVect()),
-                                          AMREX_INT_ANYD(ybx.hiVect()),
-                                          BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]), sfluxy_mf.nComp(),
-                                          BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
-                                          BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                          BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                          BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]),
-                                          BL_TO_FORTRAN_ANYD(h0mac_edgey[mfi]));
-                  // z-direction
-#pragma gpu box(zbx)
-                  make_rhoh_flux_3d_sphr(AMREX_INT_ANYD(zbx.loVect()),
-                                         AMREX_INT_ANYD(zbx.hiVect()),
-                                         BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]), sfluxz_mf.nComp(),
-                                         BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
-                                         BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                         BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                         BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]),
-                                         BL_TO_FORTRAN_ANYD(h0mac_edgez[mfi]));
+                            } else if (species_pred_type == predict_rho_and_X || 
+                                species_pred_type == predict_rhoX) {
+                                // density edge state is rho
+                                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * 
+                                    sedgey(i,j,k,rho_comp)*sedgey(i,j,k,rhoh_comp);
+                            }
+                        } else if (have_hprime) {
+                            // enthalpy edge state is h'
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
+
+                                // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
+                                // computed from (rho h)_0 / rho_0
+                                // sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
+                                sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k) * 
+                                    (sedgey(i,j,k,rho_comp)+rho0_edgey(i,j,k)) * (sedgey(i,j,k,rhoh_comp)+h0_edgey(i,j,k));
+                            }
+                        } else if (have_rhoh) {
+
+                            sfluxy(i,j,k,rhoh_comp) = vmac(i,j,k)*sedgey(i,j,k,rhoh_comp);
+
+                        } else {
+                            // enthalpy edge state is (rho h)'
+
+                            // Average (rho h) onto edges by averaging rho and h
+                            // separately onto edges.
+                            //  (rho h)_edge = (rho h)' + (rho_0 * h_0)
+                            // where h_0 is computed from (rho h)_0 / rho_0
+                            sfluxy(i,j,k,rhoh_comp) = 
+                                vmac(i,j,k)*(rho0_edgey(i,j,k)*h0_edgey(i,j,k)+sedgey(i,j,k,rhoh_comp));
+                        }
+                    });
+
+                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+
+                        if (have_h) {
+                            // enthalpy edge state is h
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
+                                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * 
+                                    (rho0_edgez(i,j,k) + sedgez(i,j,k,rho_comp))*sedgez(i,j,k,rhoh_comp);
+
+                            } else if (species_pred_type == predict_rho_and_X || 
+                                species_pred_type == predict_rhoX) {
+                                // density edge state is rho
+                                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * 
+                                    sedgez(i,j,k,rho_comp)*sedgez(i,j,k,rhoh_comp);
+                            }
+                        } else if (have_hprime) {
+                            // enthalpy edge state is h'
+                            if (species_pred_type == predict_rhoprime_and_X) {
+                                // density edge state is rho'
+
+                                // (rho h)_edge = (h' + h_0) * (rho' + rho_0) where h0 is
+                                // computed from (rho h)_0 / rho_0
+                                // sfluxx = (umac(i,j,k)+w0macx(i,j,k)) * (rho h)_edge
+                                sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k) * 
+                                    (sedgez(i,j,k,rho_comp)+rho0_edgez(i,j,k)) * (sedgez(i,j,k,rhoh_comp)+h0_edgez(i,j,k));
+                            }
+                        } else if (have_rhoh) {
+
+                            sfluxz(i,j,k,rhoh_comp) = wmac(i,j,k)*sedgez(i,j,k,rhoh_comp);
+
+                        } else {
+                            // enthalpy edge state is (rho h)'
+
+                            // Average (rho h) onto edges by averaging rho and h
+                            // separately onto edges.
+                            //  (rho h)_edge = (rho h)' + (rho_0 * h_0)
+                            // where h_0 is computed from (rho h)_0 / rho_0
+                            sfluxz(i,j,k,rhoh_comp) = 
+                                wmac(i,j,k)*(rho0_edgez(i,j,k)*h0_edgez(i,j,k)+sedgez(i,j,k,rhoh_comp));
+                        }
+                    });
                 }
             }
 #endif
