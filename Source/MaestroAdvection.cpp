@@ -132,10 +132,8 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #endif
             const Array4<const Real> force_arr = force[lev].array(mfi);
             
-
             if (start_comp == RhoH) {   
                 // Enthalpy update
-
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -183,7 +181,8 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     #if (AMREX_SPACEDIM == 3)
                     divterm += (sfluxz(i,j,k+1,comp) - sfluxz(i,j,k,comp))/dx[2];
     #endif
-                    snew_arr(i,j,k,comp) = sold_arr(i,j,k,comp) + dt_loc * (-divterm + force_arr(i,j,k,comp));
+                    snew_arr(i,j,k,comp) = sold_arr(i,j,k,comp) 
+                        + dt_loc * (-divterm + force_arr(i,j,k,comp));
                 });
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -270,6 +269,11 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
 
+    // 1) Subtract (Utilde dot grad) Utilde term from old Utilde
+    // 2) Add forcing term to new Utilde
+
+    const Real dt_loc = dt;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
@@ -292,6 +296,8 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         const MultiFab& sponge_mf = sponge[lev];
         const MultiFab& w0_mf = w0_cart[lev];
 
+        const auto dx = geom[lev].CellSizeArray();
+
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -300,49 +306,100 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
+            const Real* d_x = geom[lev].CellSize();
 
-	    if (spherical == 0) {
-#pragma gpu box(tileBox)
-		update_velocity(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
-				 BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+            const Array4<const Real> uold_arr = uold[lev].array(mfi);
+            const Array4<Real> unew_arr = unew[lev].array(mfi);
+            const Array4<const Real> umacx = umac[lev][0].array(mfi);
+            const Array4<const Real> uedgex = uedge[lev][0].array(mfi);
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+            const Array4<const Real> uedgey = uedge[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-				 BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+            const Array4<const Real> wmac = umac[lev][2].array(mfi);
+            const Array4<const Real> uedgez = uedge[lev][2].array(mfi);
 #endif
-				 BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
+            const Array4<const Real> force_arr = force[lev].array(mfi);
+            const Array4<const Real> sponge_arr = sponge[lev].array(mfi);
+            const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+
+            if (spherical == 0) {
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    // create cell-centered Utilde
+                    Real ubar = 0.5*(umacx(i,j,k) + umacx(i+1,j,k));
+                    Real vbar = 0.5*(vmac(i,j,k) + vmac(i,j+1,k));
 #if (AMREX_SPACEDIM == 3)
-				 BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
+                    Real wbar = 0.5*(wmac(i,j,k) + wmac(i,j,k+1));
 #endif
-				 BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-				 BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-				 AMREX_REAL_ANYD(dx), dt);
-	    } else {
+
+                    // create (Utilde dot grad) Utilde
+                    Real ugradu = (ubar*(uedgex(i+1,j,k,0) - uedgex(i,j,k,0))/dx[0] 
+                        + vbar*(uedgey(i,j+1,k,0) - uedgey(i,j,k,0))/dx[1]
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(tileBox)
-		update_velocity_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-				      BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-				      BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-				      AMREX_REAL_ANYD(dx), dt);
+                        + wbar*(uedgez(i,j,k+1,0) - uedgez(i,j,k,0))/dx[2]
+#endif
+                        );
+
+                    Real ugradv = (ubar*(uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx[0] 
+                        + vbar*(uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx[1]
+#if (AMREX_SPACEDIM == 3)
+                        + wbar*(uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx[2]
+#endif
+                        );
+
+#if (AMREX_SPACEDIM == 3)
+                    Real ugradw = ubar*(uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx[0]
+                        + vbar*(uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx[1]
+                        + wbar*(uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx[2];
+#endif
+
+                    // update with (Utilde dot grad) Utilde and force
+                    unew_arr(i,j,k,0) = uold_arr(i,j,k,0) - dt_loc * ugradu + dt_loc * force_arr(i,j,k,0);
+                    unew_arr(i,j,k,1) = uold_arr(i,j,k,1) - dt_loc * ugradv + dt_loc * force_arr(i,j,k,1);
+#if (AMREX_SPACEDIM == 3)
+                    unew_arr(i,j,k,2) = uold_arr(i,j,k,2) - dt_loc * ugradw + dt_loc * force_arr(i,j,k,2);
+#endif
+
+                    // subtract (w0 dot grad) Utilde term
+#if (AMREX_SPACEDIM == 2)
+                    Real w0bar = 0.5*(w0_arr(i,j,k,AMREX_SPACEDIM-1) + w0_arr(i,j+1,k,AMREX_SPACEDIM-1));
+#else 
+                    Real w0bar = 0.5*(w0_arr(i,j,k,AMREX_SPACEDIM-1) + w0_arr(i,j,k+1,AMREX_SPACEDIM-1));
+#endif
+
+                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                        unew_arr(i,j,k,n) -= dt_loc * w0bar * 
+#if (AMREX_SPACEDIM == 2)
+                        (uedgey(i,j+1,k,n) - uedgey(i,j,k,n))/dx[1];
 #else
-		Abort("UpdateVel: Spherical is not valid for DIM < 3");
+                        (uedgez(i,j,k+1,n) - uedgez(i,j,k,n))/dx[2];
 #endif
-	    }
+                        // Add the sponge
+                        if (do_sponge) unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
+                    }                    
+                });
+            } else {
+#if (AMREX_SPACEDIM == 3)
+#pragma gpu box(tileBox)
+            update_velocity_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(force_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                        AMREX_REAL_ANYD(d_x), dt);
+#else
+            Abort("UpdateVel: Spherical is not valid for DIM < 3");
+#endif
+            }
         } // end MFIter loop
     } // end loop over levels
 

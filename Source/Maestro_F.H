@@ -963,24 +963,6 @@ extern "C"
 
     //////////////////////
     // in update_velocity.F90
-    void update_velocity(const int* lo, const int* hi, const int lev,
-			 const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
-			       amrex::Real* unew, const int* un_lo, const int* un_hi,
-			 const amrex::Real* umac, const int* u_lo, const int* u_hi,
-			 const amrex::Real* vmac, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-			 const amrex::Real* wmac, const int* w_lo, const int* w_hi,
-#endif
-			 const amrex::Real* uedgex, const int* x_lo, const int* x_hi,
-			 const amrex::Real* uedgey, const int* y_lo, const int* y_hi,
-#if (AMREX_SPACEDIM == 3)
-			 const amrex::Real* uedgez, const int* z_lo, const int* z_hi,
-#endif
-			 const amrex::Real* force, const int* f_lo, const int* f_hi,
-			 const amrex::Real* sponge, const int* s_lo, const int* s_hi,
-			 const amrex::Real* w0, const int* w0_lo, const int* w0_hi, 
-             const amrex::Real* dx, const amrex::Real dt);
-
     void update_velocity_sphr(const int* lo, const int* hi,
 			      const amrex::Real* uold, const int* uo_lo, const int* uo_hi,
                               amrex::Real* unew, const int* un_lo, const int* un_hi,
