@@ -380,22 +380,70 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                 });
             } else {
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(tileBox)
-            update_velocity_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                        BL_TO_FORTRAN_ANYD(uold_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(unew_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(uedgex_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(uedgey_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(uedgez_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                        AMREX_REAL_ANYD(d_x), dt);
+                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    // create cell-centered Utilde
+                    Real ubar = 0.5*(umacx(i,j,k) + umacx(i+1,j,k));
+                    Real vbar = 0.5*(vmac(i,j,k) + vmac(i,j+1,k));
+                    Real wbar = 0.5*(wmac(i,j,k) + wmac(i,j,k+1));
+
+                    // create (Utilde dot grad) Utilde
+                    Real ugradu = ubar*(uedgex(i+1,j,k,0) - uedgex(i,j,k,0))/dx[0] + 
+                        vbar*(uedgey(i,j+1,k,0) - uedgey(i,j,k,0))/dx[1] + 
+                        wbar*(uedgez(i,j,k+1,0) - uedgez(i,j,k,0))/dx[2];
+
+                    Real ugradv = ubar*(uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx[0] +
+                        vbar*(uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx[1] + 
+                        wbar*(uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx[2];
+
+                    Real ugradw = ubar*(uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx[0] + 
+                        vbar*(uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx[1] + 
+                        wbar*(uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx[2];
+
+                    // update with (Utilde dot grad) Utilde and force
+                    unew_arr(i,j,k,0) = uold_arr(i,j,k,0) - dt_loc * ugradu + dt_loc * force_arr(i,j,k,0);
+                    unew_arr(i,j,k,1) = uold_arr(i,j,k,1) - dt_loc * ugradv + dt_loc * force_arr(i,j,k,1);
+                    unew_arr(i,j,k,2) = uold_arr(i,j,k,2) - dt_loc * ugradw + dt_loc * force_arr(i,j,k,2);
+
+                    // Subtract (w0 dot grad) Utilde term from new Utilde
+                    Real gradux = (uedgex(i+1,j,k,0) - uedgex(i,j,k,0))/dx[0];
+                    Real gradvx = (uedgex(i+1,j,k,1) - uedgex(i,j,k,1))/dx[0];
+                    Real gradwx = (uedgex(i+1,j,k,2) - uedgex(i,j,k,2))/dx[0];
+
+                    Real graduy = (uedgey(i,j+1,k,0) - uedgey(i,j,k,0))/dx[1];
+                    Real gradvy = (uedgey(i,j+1,k,1) - uedgey(i,j,k,1))/dx[1];
+                    Real gradwy = (uedgey(i,j+1,k,2) - uedgey(i,j,k,2))/dx[1];
+
+                    Real graduz = (uedgez(i,j,k+1,0) - uedgez(i,j,k,0))/dx[2];
+                    Real gradvz = (uedgez(i,j,k+1,1) - uedgez(i,j,k,1))/dx[2];
+                    Real gradwz = (uedgez(i,j,k+1,2) - uedgez(i,j,k,2))/dx[2];
+
+                    Real w0_gradur = gradux * 0.5*(w0macx(i,j,k)+w0macx(i+1,j,k)) 
+                        + graduy * 0.5*(w0macy(i,j,k)+w0macy(i,j+1,k)) 
+                        + graduz * 0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
+
+                    Real w0_gradvr = gradvx * 0.5*(w0macx(i,j,k)+w0macx(i+1,j,k)) 
+                        + gradvy * 0.5*(w0macy(i,j,k)+w0macy(i,j+1,k)) 
+                        + gradvz * 0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
+
+                    Real w0_gradwr = gradwx * 0.5*(w0macx(i,j,k)+w0macx(i+1,j,k)) 
+                        + gradwy * 0.5*(w0macy(i,j,k)+w0macy(i,j+1,k)) 
+                        + gradwz * 0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
+
+                    unew_arr(i,j,k,0) -= dt_loc * w0_gradur;
+                    unew_arr(i,j,k,1) -= dt_loc * w0_gradvr;
+                    unew_arr(i,j,k,2) -= dt_loc * w0_gradwr;
+
+                    // Add the sponge
+                    if (do_sponge) {
+                        for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                            unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
+                        }
+                    }
+                });
 #else
             Abort("UpdateVel: Spherical is not valid for DIM < 3");
 #endif
