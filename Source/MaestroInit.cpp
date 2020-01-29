@@ -42,8 +42,7 @@ Maestro::Init ()
             WriteSmallPlotFile(plotInitData,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
 
         }
-    }
-    else {
+    } else {
         Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
         const int model_file_length = model_file.length();
