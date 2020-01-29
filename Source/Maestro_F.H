@@ -508,29 +508,6 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in make_flux.F90
-
-
-#if (AMREX_SPACEDIM == 3)
-
-   void make_rhoh_flux_3d_sphr(const int* lo, const int* hi,
-				amrex::Real* sflux, const int* fx_lo, const int* fx_hi, const int nc_fx,
-				const amrex::Real* sedge, const int* x_lo, const int* x_hi, const int nc_x,
-				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-				const amrex::Real* w0mac, const int* wx_lo, const int* wx_hi,
-				const amrex::Real* rho0_edge, const int* rx_lo, const int* rx_hi,
-				const amrex::Real* h0_edge,   const int* hx_lo, const int* hx_hi);
-
-   void make_rhoh_flux_3d_sphr_irreg(const int* lo, const int* hi,
-				amrex::Real* sflux, const int* fx_lo, const int* fx_hi, const int nc_fx,
-				const amrex::Real* sedge, const int* x_lo, const int* x_hi, const int nc_x,
-				const amrex::Real* umac,   const int* u_lo, const int* u_hi,
-				const amrex::Real* w0mac, const int* wx_lo, const int* wx_hi,
-				const amrex::Real* rhoh0_edge, const int* hx_lo, const int* hx_hi);
-#endif
-    //////////////////////
-
-    //////////////////////
     // in make_gamma.F90
     void make_gamma(const int* lo, const int* hi, 
                           amrex::Real* gamma, const int* g_lo, const int* g_hi,
