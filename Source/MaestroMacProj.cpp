@@ -333,11 +333,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
 
-            GpuArray<int,AMREX_SPACEDIM> dx;
-            for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                dx[n] = geom[lev].CellSize()[n];
-            }
-
+            const auto dx = geom[lev].CellSizeArray();
+            
             const Array4<Real> solverrhs_arr = solverrhs[lev].array(mfi);
             const Array4<const Real> macrhs_arr = macrhs[lev].array(mfi);
             const Array4<const Real> uedge = umac[lev][0].array(mfi);
