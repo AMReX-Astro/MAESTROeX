@@ -95,11 +95,11 @@ Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                        1,0);
             } else {
 
-                PPM_2d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ip.array(mfi), Im.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ip.array(mfi), Im.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 
 // #pragma gpu box(obx)
 //                 ppm_2d(AMREX_INT_ANYD(obx.loVect()),
@@ -145,7 +145,7 @@ Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,1);
             } else {
-                // PPM_2d(obx, utilde_mf.array(mfi), 
+                // PPM(obx, utilde_mf.array(mfi), 
                 //        u_mf.array(mfi), v_mf.array(mfi), 
                 //        Ip.array(mfi), Im.array(mfi), 
                 //        domainBox, bcs_u, dx, 
@@ -192,11 +192,11 @@ Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,0);
             } else {
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ip.array(mfi), Im.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ip.array(mfi), Im.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 // #pragma gpu box(obx)
 //                 ppm_3d(AMREX_INT_ANYD(obx.loVect()),
 //                        AMREX_INT_ANYD(obx.hiVect()),
@@ -241,7 +241,7 @@ Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,1);
             } else {
-                // PPM_3d(obx, utilde_mf.array(mfi), 
+                // PPM(obx, utilde_mf.array(mfi), 
                 //        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
                 //        Ip.array(mfi), Im.array(mfi), 
                 //        domainBox, bcs_u, dx, 
@@ -290,7 +290,7 @@ Maestro::MakeUtrans (Vector<MultiFab>& utilde,
                        domainBox, bcs_u,  
                        1,2);
             } else {
-                // PPM_3d(obx, utilde_mf.array(mfi), 
+                // PPM(obx, utilde_mf.array(mfi), 
                 //        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
                 //        Ip.array(mfi), Im.array(mfi), 
                 //        domainBox, bcs_u, dx, 
@@ -478,19 +478,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
             } else {
 
                 // put u on x and y edges, stored in Ipu and Imu
-                PPM_2d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ipu.array(mfi), Imu.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 
                 if (ppm_trace_forces == 1) {
 
-                    PPM_2d(obx, force_mf.array(mfi), 
-                           u_mf.array(mfi), v_mf.array(mfi), 
-                           Ipfx.array(mfi), Imfx.array(mfi), 
-                           domainBox, bcs_u, dx, 
-                           false, 0, 0);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
                 }
             }
 
@@ -504,19 +504,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
             } else {
 
                 // put v on x and y edges, stored in Ipv and Imv
-                PPM_2d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ipv.array(mfi), Imv.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
 
                 if (ppm_trace_forces == 1) {
 
-                    PPM_2d(obx, force_mf.array(mfi), 
-                           u_mf.array(mfi), v_mf.array(mfi), 
-                           Ipv.array(mfi), Imv.array(mfi), 
-                           domainBox, bcs_u, dx, 
-                           false, 1, 1);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipv.array(mfi), Imv.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 1, 1);
               }
             }
 
@@ -599,18 +599,18 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
             } else {
 
                 // put u on x, y, and z edges, stored in Ipu and Imu
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipu.array(mfi), Imu.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 
                 if (ppm_trace_forces == 1) {
-                    PPM_3d(obx, force_mf.array(mfi), 
-                            u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                            Ipfx.array(mfi), Imfx.array(mfi), 
-                            domainBox, bcs_u, dx, 
-                            false, 0, 0);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
                 }
             }
 
@@ -625,19 +625,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
             } else {
                 // put v on x, y, and z edges, stored in Ipv and Imv
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipv.array(mfi), Imv.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
 
               if (ppm_trace_forces == 1) {
 
-                PPM_3d(obx, force_mf.array(mfi), 
-                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                        Ipfy.array(mfi), Imfy.array(mfi), 
-                        domainBox, bcs_u, dx, 
-                        false, 1, 1);
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfy.array(mfi), Imfy.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
               }
             }
 
@@ -653,19 +653,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
             } else {
                 // put w on x, y, and z edges, stored in Ipw and Imw
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipw.array(mfi), Imw.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 2, 2);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipw.array(mfi), Imw.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
 
               if (ppm_trace_forces == 1) {
 
-                PPM_3d(obx, force_mf.array(mfi), 
-                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                        Ipfz.array(mfi), Imfz.array(mfi), 
-                        domainBox, bcs_u, dx, 
-                        false, 2, 2);
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfz.array(mfi), Imfz.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
               }
             }
             
@@ -869,19 +869,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 } else {
 
-                    PPM_2d(obx, scal_arr, 
-                           umac_arr, vmac_arr, 
-                           Ip.array(mfi), Im.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                    PPM(obx, scal_arr, 
+                        umac_arr, vmac_arr, 
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_2d(obx, force[lev].array(mfi), 
-                           umac_arr, vmac_arr, 
-                           Ipf.array(mfi), Imf.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, 
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
                     }
                 }
 
@@ -980,19 +980,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 } else {
 
-                    PPM_3d(obx, state[lev].array(mfi), 
-                           umac_arr, vmac_arr, wmac_arr,
-                           Ip.array(mfi), Im.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                    PPM(obx, state[lev].array(mfi), 
+                        umac_arr, vmac_arr, wmac_arr,
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_3d(obx, force[lev].array(mfi), 
-                           umac_arr, vmac_arr, wmac_arr,
-                           Ipf.array(mfi), Imf.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, wmac_arr,
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
                     }
                 }
             }

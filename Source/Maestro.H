@@ -1096,30 +1096,19 @@ public:
 
     ////////////
     // MaestroPPM.cpp functions
-#if (AMREX_SPACEDIM == 2)
-    void PPM_2d(const amrex::Box& bx, 
-                amrex::Array4<const amrex::Real> const scal,
-                amrex::Array4<const amrex::Real> const u,
-                amrex::Array4<const amrex::Real> const v,
-                amrex::Array4<amrex::Real> const Ip,
-                amrex::Array4<amrex::Real> const Im,
-                const amrex::Box& domainBox,
-                const amrex::Vector<amrex::BCRec>& bcs,
-                const amrex::Real* dx,
-                const bool is_umac, const int comp, const int bccomp);
-#else
-    void PPM_3d(const amrex::Box& bx, 
-                amrex::Array4<const amrex::Real> const scal,
-                amrex::Array4<const amrex::Real> const u,
-                amrex::Array4<const amrex::Real> const v,
-                amrex::Array4<const amrex::Real> const w,
-                amrex::Array4<amrex::Real> const Ip,
-                amrex::Array4<amrex::Real> const Im,
-                const amrex::Box& domainBox,
-                const amrex::Vector<amrex::BCRec>& bcs,
-                const amrex::Real* dx,
-                const bool is_umac, const int comp, const int bccomp);
+    void PPM(const amrex::Box& bx, 
+             amrex::Array4<const amrex::Real> const scal,
+             amrex::Array4<const amrex::Real> const u,
+             amrex::Array4<const amrex::Real> const v,
+#if (AMREX_SPACEDIM == 3)
+             amrex::Array4<const amrex::Real> const w,
 #endif
+             amrex::Array4<amrex::Real> const Ip,
+             amrex::Array4<amrex::Real> const Im,
+             const amrex::Box& domainBox,
+             const amrex::Vector<amrex::BCRec>& bcs,
+             const amrex::Real* dx,
+             const bool is_umac, const int comp, const int bccomp);
     ////////////
 
     ////////////
