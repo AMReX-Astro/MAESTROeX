@@ -55,14 +55,12 @@ Maestro::Put1dArrayOnCart (int lev,
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[lev];
 
-    GpuArray<Real,AMREX_SPACEDIM> dx;
+    const auto dx = geom[lev].CellSizeArray();
+    const auto prob_lo = geom[lev].ProbLoArray();
     GpuArray<Real,AMREX_SPACEDIM> center;
-    GpuArray<Real,AMREX_SPACEDIM> prob_lo;
 
     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-        dx[n] = geom[lev].CellSize(n);
         center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-        prob_lo[n] = geom[lev].ProbLo(n);
     }
 
     Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
@@ -478,14 +476,12 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
-        GpuArray<Real,AMREX_SPACEDIM> dx;
+        const auto dx = geom[lev].CellSizeArray();
+        const auto prob_lo = geom[lev].ProbLoArray();
         GpuArray<Real,AMREX_SPACEDIM> center;
-        GpuArray<Real,AMREX_SPACEDIM> prob_lo;
 
         for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-            dx[n] = geom[lev].CellSize(n);
             center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-            prob_lo[n] = geom[lev].ProbLo(n);
         }
 
         // get references to the MultiFabs at level lev
@@ -745,14 +741,12 @@ Maestro::MakeS0mac (const RealVector& s0,
         // get references to the MultiFabs at level lev
         MultiFab& s0cart_mf = s0_cart[lev];
     
-        GpuArray<Real,AMREX_SPACEDIM> dx;
+        const auto dx = geom[lev].CellSizeArray();
+        const auto prob_lo = geom[lev].ProbLoArray();
         GpuArray<Real,AMREX_SPACEDIM> center;
-        GpuArray<Real,AMREX_SPACEDIM> prob_lo;
 
         for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-            dx[n] = geom[lev].CellSize(n);
             center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-            prob_lo[n] = geom[lev].ProbLo(n);
         }
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -1188,14 +1182,12 @@ Maestro::MakeNormal ()
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
-            GpuArray<Real,AMREX_SPACEDIM> dx;
+            const auto dx = geom[lev].CellSizeArray();
+            const auto prob_lo = geom[lev].ProbLoArray();
             GpuArray<Real,AMREX_SPACEDIM> center;
-            GpuArray<Real,AMREX_SPACEDIM> prob_lo;
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                dx[n] = geom[lev].CellSize(n);
                 center[n] = 0.5 * (geom[lev].ProbLo(n) + geom[lev].ProbHi(n));
-                prob_lo[n] = geom[lev].ProbLo(n);
             }
 
             // get references to the MultiFabs at level lev
