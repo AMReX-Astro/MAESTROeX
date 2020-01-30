@@ -394,7 +394,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     // loop over appropriate x-faces
@@ -560,7 +560,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
 
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     // x-direction
@@ -986,9 +986,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     // Create transverse terms, s_{\i-\half\e_x}^{x|y}, etc.
     ////////////////////////////////////////////////////////
 
-    Real dt2 = 0.5 * dt;
     Real dt3 = dt / 3.0;
-    Real dt4 = 0.25 * dt;
     Real dt6 = dt / 6.0;
 
     Real hx = dx[0];
@@ -1002,7 +1000,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     int klo = domainBox.loVect()[2];
     int khi = domainBox.hiVect()[2];
 
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     // simhxy
@@ -1528,7 +1526,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     const Box& ybx = mfi.nodaltilebox(1);
     const Box& zbx = mfi.nodaltilebox(2);
 
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     // x-direction

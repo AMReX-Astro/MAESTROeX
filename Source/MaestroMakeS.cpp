@@ -439,7 +439,6 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            const Real* dx = geom[lev].CellSize();
 #pragma gpu box(tileBox)
             make_rhcc_for_macproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                         BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),

@@ -2133,7 +2133,6 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
