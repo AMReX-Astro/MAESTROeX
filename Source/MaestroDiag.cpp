@@ -84,7 +84,7 @@ Maestro::DiagFile (const int step,
     int ncenter=0;
     Vector<Real> coord_Tmax(AMREX_SPACEDIM,0.0);
     Vector<Real> vel_Tmax(AMREX_SPACEDIM,0.0);
-    Real Rloc_Tmax, vr_Tmax;
+    Real Rloc_Tmax = 0.0, vr_Tmax = 0.0;
 
     // diag_vel.out
     Real U_max=0.0, Mach_max=0.0;
@@ -95,7 +95,7 @@ Maestro::DiagFile (const int step,
     Real enuc_max=0.0;
     Vector<Real> coord_enucmax(AMREX_SPACEDIM,0.0);
     Vector<Real> vel_enucmax(AMREX_SPACEDIM,0.0);
-    Real Rloc_enucmax, vr_enucmax;
+    Real Rloc_enucmax = 0.0, vr_enucmax = 0.0;
     Real nuc_ener=0.0;
 
 

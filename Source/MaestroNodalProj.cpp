@@ -238,7 +238,7 @@ Maestro::NodalProj (int proj_type,
     mlmg.setCGVerbose(cg_verbose);
 
     Real abs_tol = -1.;     // disable absolute tolerance
-    Real rel_tol;
+    Real rel_tol = 1.e-3;
 
     // logic for choosing multigrid tolerance
     // parameters are defined in Maestro.cpp
@@ -281,7 +281,7 @@ Maestro::NodalProj (int proj_type,
 
     // solve for phi
     Print() << "Calling nodal solver" << std::endl;
-    Real mlmg_err = mlmg.solve(amrex::GetVecOfPtrs(phi),
+    mlmg.solve(amrex::GetVecOfPtrs(phi),
                                amrex::GetVecOfConstPtrs(rhstotal),
                                rel_tol, abs_tol);
     Print() << "Done calling nodal solver" << std::endl;
