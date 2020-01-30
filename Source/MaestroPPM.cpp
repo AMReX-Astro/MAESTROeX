@@ -23,7 +23,7 @@ Maestro::PPM_2d (const Box& bx,
 
     // constant used in Colella 2008
     static const Real C = 1.25;
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     const int n = comp;
@@ -1283,7 +1283,7 @@ Maestro::PPM_3d (const Box& bx,
 
     // constant used in Colella 2008
     static const Real C = 1.25;
-    Real rel_eps;
+    Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
 
     const int n = comp;

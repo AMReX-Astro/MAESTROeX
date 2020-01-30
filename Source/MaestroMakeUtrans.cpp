@@ -19,7 +19,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Box& domainBox = geom[lev].Domain();
         const Real* dx = geom[lev].CellSize();
 
-        Real rel_eps;
+        Real rel_eps = 0.0;
         get_rel_eps(&rel_eps);
 
         const Real dt2 = 0.5 * dt;
