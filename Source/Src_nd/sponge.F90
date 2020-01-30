@@ -138,6 +138,22 @@ contains
     double precision :: prob_lo_r,r_top
     integer :: r
 
+    if (.not. allocated(r_sp)) then
+        allocate(r_sp)
+    endif
+    if (.not. allocated(r_md)) then
+        allocate(r_md)
+    endif
+    if (.not. allocated(r_tp)) then
+        allocate(r_tp)
+    endif
+    if (.not. allocated(r_sp_outer)) then
+        allocate(r_sp_outer)
+    endif
+    if (.not. allocated(r_tp_outer)) then
+        allocate(r_tp_outer)
+    endif
+
     if (spherical .eq. 1) then
        prob_lo_r = 0.d0
     else

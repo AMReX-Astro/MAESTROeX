@@ -76,7 +76,7 @@ Maestro::WriteCheckPoint (int step) {
         HeaderFile << t_new << "\n";
 
         // write out rel_eps
-        Real rel_eps;
+        Real rel_eps = 0.0;
         get_rel_eps(&rel_eps);
         HeaderFile << rel_eps << "\n";
 
