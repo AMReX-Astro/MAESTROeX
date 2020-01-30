@@ -659,4 +659,28 @@ contains
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  subroutine get_numdisjointchunks(nchunks) bind(C, name="get_numdisjointchunks")
+
+    integer, intent(inout) :: nchunks(0:finest_radial_level)
+
+    nchunks(0:finest_radial_level) = numdisjointchunks(0:finest_radial_level)
+
+  end subroutine get_numdisjointchunks
+
+  subroutine get_r_end_coord(coord) bind(C, name="get_r_end_coord")
+
+    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+
+    integer :: i, lev
+
+    coord(0:finest_radial_level,0:nr_fine) = 0
+
+    do lev = 0, finest_radial_level
+        do i = 0, numdisjointchunks(lev)
+            coord(lev, i) = r_end_coord(lev, i)
+        end do
+    end do
+
+  end subroutine get_r_end_coord
+
 end module base_state_geometry_module

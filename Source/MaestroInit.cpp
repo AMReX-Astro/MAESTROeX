@@ -90,6 +90,7 @@ Maestro::Init ()
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
 
     compute_cutoff_coords(rho0_old.dataPtr());
 
@@ -254,6 +255,7 @@ Maestro::InitData ()
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);

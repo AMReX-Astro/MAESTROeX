@@ -85,6 +85,9 @@ extern "C"
 
     void destroy_base_state_geometry();
 
+    void get_numdisjointchunks(int* nchunks);
+    void get_r_end_coord(int* coord);
+
     //////////////////////
 
     //////////////////////

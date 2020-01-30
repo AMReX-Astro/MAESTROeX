@@ -76,6 +76,7 @@ Maestro::Regrid ()
 	TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
 
     if (spherical == 1) {
         MakeNormal();

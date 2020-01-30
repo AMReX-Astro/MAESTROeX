@@ -90,24 +90,24 @@ contains
     logical :: top_edge
 
     ! Sum etarho
-#if (AMREX_SPACEDIM == 2)
-    k = lo(3)
-    do j=lo(2),hi(2)
-       do i=lo(1),hi(1)
-          etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
-       end do
-    end do
+! #if (AMREX_SPACEDIM == 2)
+!     k = lo(3)
+!     do j=lo(2),hi(2)
+!        do i=lo(1),hi(1)
+!           etarhosum(j,lev) = etarhosum(j,lev) + etarhoflux(i,j,k)
+!        end do
+!     end do
 
-#elif (AMREX_SPACEDIM == 3)
-    do k=lo(3),hi(3)
-       do j=lo(2),hi(2)
-          do i=lo(1),hi(1)
-             etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
-          end do
-       end do
-    end do
+! #elif (AMREX_SPACEDIM == 3)
+!     do k=lo(3),hi(3)
+!        do j=lo(2),hi(2)
+!           do i=lo(1),hi(1)
+!              etarhosum(k,lev) = etarhosum(k,lev) + etarhoflux(i,j,k)
+!           end do
+!        end do
+!     end do
 
-#endif
+! #endif
 
 
     ! we only add the contribution at the top edge if we are at the top of the domain

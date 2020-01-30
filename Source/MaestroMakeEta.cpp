@@ -20,6 +20,12 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // this stores how many cells there are laterally at each level
     RealVector ncell(max_radial_level+1);
 
+    const int max_lev = max_radial_level;
+    get_r_end_coord(r_end_coord.dataPtr());
+
+    Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
+    const int* AMREX_RESTRICT r_end_coord_p = r_end_coord.dataPtr();
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space of the domain
@@ -36,19 +42,39 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         // get references to the MultiFabs at level lev
         const MultiFab& sold_mf = sold[lev];
         const MultiFab& etarhoflux_mf = etarho_flux[lev];
+        
+        const int nchunks = numdisjointchunks[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
-            const Box& validbox = mfi.validbox();
+            const Box& tilebox = mfi.tilebox();
+            const Box& nbx = mfi.nodaltilebox(AMREX_SPACEDIM-1);
+
+            const Array4<const Real> etarhoflux = etarho_flux[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                int r = AMREX_SPACEDIM == 2 ? j : k;
+                etarhosum_p[lev+r*(max_lev+1)] += etarhoflux(i,j,k);
+            });
+
+            // This has large errors so going to leave it commented out for now
+            // AMREX_PARALLEL_FOR_3D(nbx, i, j, k, {
+            //     int r = AMREX_SPACEDIM == 2 ? j : k;
+            //     for (int n=0; n<nchunks; n++) {
+            //         if (r-1 == r_end_coord_p[n+lev*(nr_fine+1)]) {
+            //             etarhosum_p[lev+r*(max_lev+1)] += etarhoflux(i,j,k);
+            //         }
+            //     }
+            // });
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells)
             // We will also pass "bx", which specifies the "valid" tile region.
             sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                       ARLIM_3D(validbox.loVect()), ARLIM_3D(validbox.hiVect()),
+                       ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
                        BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
                        etarhosum.dataPtr());
         }
@@ -58,7 +84,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 
     make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(),
                        etarhosum.dataPtr(), ncell.dataPtr());
-
 }
 
 
@@ -147,18 +172,16 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // zero at the center (since e_r is not defined there)
     etarho_edge[0] = 0.0;
     if (spherical == 1) {
-
-	double dr1, dr2;
-	for (int r=1; r<nr_fine; ++r) {
-	    dr1 = r_cc_loc[r] - r_edge_loc[r];
-	    dr2 = r_edge_loc[r] - r_cc_loc[r-1];
-	    etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
-	}
-
+        double dr1, dr2;
+        for (int r=1; r<nr_fine; ++r) {
+            dr1 = r_cc_loc[r] - r_edge_loc[r];
+            dr2 = r_edge_loc[r] - r_cc_loc[r-1];
+            etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
+        }
     } else {
-	for (int r=1; r<nr_fine; ++r) {
-	    etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
-	}
+        for (int r=1; r<nr_fine; ++r) {
+            etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
+        }
     }
     // probably should do some better extrapolation here eventually
     etarho_edge[nr_fine] = etarho_cell[nr_fine-1];
