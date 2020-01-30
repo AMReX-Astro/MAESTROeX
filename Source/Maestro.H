@@ -1299,7 +1299,7 @@ public:
                 const amrex::Vector<amrex::BCRec>& bcs,
                 int ncomp,
                 int bc_start_comp);
-
+#if (AMREX_SPACEDIM == 3)
     void Slopez(const amrex::Box& bx, 
                 amrex::Array4<amrex::Real> const scal,
                 amrex::Array4<amrex::Real> const slz,
@@ -1307,6 +1307,7 @@ public:
                 const amrex::Vector<amrex::BCRec>& bcs,
                 int ncomp,
                 int bc_start_comp);
+#endif
     ////////////
 
     ////////////
