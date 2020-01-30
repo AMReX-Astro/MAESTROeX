@@ -28,59 +28,53 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& vel_mf = vel[lev];
-        MultiFab& magvel_mf = magvel[lev];
-        const MultiFab& w0_mf = w0_cart[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        if (spherical == 0) {
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_magvel(AMREX_INT_ANYD(tileBox.loVect()),
-                            AMREX_INT_ANYD(tileBox.hiVect()),
-                            BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-                            BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
-            }
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
-        } else {
+            if (spherical == 0) {
+                const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
-#ifdef _OPENMP
-#pragma omp parallel
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    Real vertical_vel = vel_arr(i,j,k,1) 
+                        + 0.5*(w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
+
+                    magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) 
+                        + vertical_vel*vertical_vel);
+#elif (AMREX_SPACEDIM == 3)
+                    Real vertical_vel = vel_arr(i,j,k,2) 
+                        + 0.5*(w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
+
+                    magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) 
+                        + vel_arr(i,j,k,1)*vel_arr(i,j,k,1)  
+                        + vertical_vel*vertical_vel);
 #endif
-            for ( MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+                });
+            } else {
+                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real velx = vel_arr(i,j,k,0) 
+                        + 0.5*(w0macx(i,j,k) + w0macx(i+1,j,k));
+                    Real vely = vel_arr(i,j,k,1) 
+                        + 0.5*(w0macy(i,j,k) + w0macy(i,j+1,k));
+                    Real velz = vel_arr(i,j,k,2) 
+                        + 0.5*(w0macz(i,j,k) + w0macz(i,j,k+1));
 
-                MultiFab& w0macx_mf = w0mac[lev][0];
-                MultiFab& w0macy_mf = w0mac[lev][1];
-                MultiFab& w0macz_mf = w0mac[lev][2];
-
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_magvel_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                 AMREX_INT_ANYD(tileBox.hiVect()),
-                                 BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                 BL_TO_FORTRAN_ANYD(magvel_mf[mfi]));
+                    magvel_arr(i,j,k) = sqrt(velx*velx 
+                        + vely*vely + velz*velz);
+                });
             }
         }
     }
