@@ -102,10 +102,10 @@ contains
                 r = k
 #endif
                 if (r .le. -1) then
-                    ! do not modify force since dw0/dr=0
-                    else if (r .gt. domhi(AMREX_SPACEDIM)) then
-                    ! do not modify force since dw0/dr=0
-                    else
+                   ! do not modify force since dw0/dr=0
+                else if (r .gt. domhi(AMREX_SPACEDIM)) then
+                   ! do not modify force since dw0/dr=0
+                else
 #if (AMREX_SPACEDIM == 2)
                     vel_force(i,j,k,2) = vel_force(i,j,k,2) &
                             - (vedge(i,j+1,k)+vedge(i,j,k))*(w0_cart(i,j+1,k,AMREX_SPACEDIM)-w0_cart(i,j,k,AMREX_SPACEDIM)) / (2.d0*dx(2))

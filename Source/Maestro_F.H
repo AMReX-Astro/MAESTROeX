@@ -84,6 +84,9 @@ extern "C"
 			 const int* finest_radial_level_in);
 
     void destroy_base_state_geometry();
+    
+    void get_base_cutoff_density (const amrex::Real* base_cutoff_density_in);
+    void get_buoyancy_cutoff_factor (const amrex::Real* buoyancy_cutoff_factor_in);
 
     //////////////////////
 

@@ -87,53 +87,136 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 #endif
         for ( MFIter mfi(vel_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
+	    // Get Array4 inputs
+	    const Array4<const Real> gpi = gpi_mf.array(mfi);
+	    const Array4<const Real> rho = rho_mf.array(mfi);
+	    const Array4<const Real> uedge = uedge_mf.array(mfi);
+	    const Array4<const Real> vedge = vedge_mf.array(mfi);
+#if (AMREX_SPACEDIM == 3)
+	    const Array4<const Real> wedge = wedge_mf.array(mfi);
+#endif
+	    const Array4<const Real> w0_in = w0_mf.array(mfi);
+	    const Array4<const Real> gradw0 = gradw0_mf.array(mfi);
+	    const Array4<const Real> normal = normal_mf.array(mfi);
+	    const Array4<const Real> w0force = w0force_mf.array(mfi);
+	    const Array4<const Real> grav = grav_mf.array(mfi);
+	    const Array4<const Real> rho0 = rho0_mf.array(mfi);
+	    
+	    // output
+	    const Array4<Real> vel_force = vel_force_mf.array(mfi);
+
+	    // constants in Fortran
+	    Real base_cutoff_density, buoyancy_cutoff_factor;
+	    get_base_cutoff_density(&base_cutoff_density);
+	    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
+	    const Real do_add_utilde_force_in = do_add_utilde_force;
+	    
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
+
+	    // y-direction in 2D, z-direction in 3D
+	    const int domhi = domainBox.hiVect()[AMREX_SPACEDIM-1];
             
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
-#pragma gpu box(tileBox)
-                make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
-			       AMREX_INT_ANYD(tileBox.hiVect()),
-			       BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
-			       BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
-			       BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-			       BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+
+#if (AMREX_SPACEDIM == 2)
+		
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {
+		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
+		    
+		    //cutoff the buoyancy term if we are outside of the star
+		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+			rhopert = 0.0;
+		    }
+
+		    // note: if use_alt_energy_fix = T, then gphi is already
+		    // weighted by beta0
+		    vel_force(i,j,k,0) = -gpi(i,j,k,0) / rho(i,j,k);
+
+		    vel_force(i,j,k,1) = (rhopert * grav(i,j,k,1) - gpi(i,j,k,1)) / rho(i,j,k) -
+			w0force(i,j,k,1);
+
+		    if (do_add_utilde_force_in == 1) {
+			if (j <= -1) {
+			    // do not modify force since dw0/dr=0
+			} else if (j >= domhi) {
+			    // do not modify force since dw0/dr=0
+			} else {
+			    vel_force(i,j,k,1) = vel_force(i,j,k,1)
+				- (vedge(i,j+1,k)+vedge(i,j,k))*(w0_in(i,j+1,k,1) - w0_in(i,j,k,1))/(2.0*dx[1]);
+			}
+		    }
+		});
+    
+#elif (AMREX_SPACEDIM == 3)
+		
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {
+		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
+		    
+		    // cutoff the buoyancy term if we are outside of the star
+		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+			rhopert = 0.0;
+		    }
+
+		    // note: if use_alt_energy_fix = T, then gphi is already
+		    // weighted by beta0
+		    vel_force(i,j,k,0) = -gpi(i,j,k,0) / rho(i,j,k);
+		    vel_force(i,j,k,1) = -gpi(i,j,k,1) / rho(i,j,k);
+
+		    vel_force(i,j,k,2) = (rhopert * grav(i,j,k,2) - gpi(i,j,k,2)) / rho(i,j,k) -
+			w0force(i,j,k,2);
+
+		    if (do_add_utilde_force_in == 1) {
+			if (k <= -1) {
+			    // do not modify force since dw0/dr=0
+			} else if (k >= domhi) {
+			    // do not modify force since dw0/dr=0
+			} else {
+			    vel_force(i,j,k,2) = vel_force(i,j,k,2) 
+				- (wedge(i,j,k+1)+wedge(i,j,k))*(w0_in(i,j,k+1,2)-w0_in(i,j,k,2)) / (2.0*dx[2]);
+			}
+		    }
+		});
 #endif
-			       BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-			       BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
-			       AMREX_REAL_ANYD(dx),
-			       AMREX_INT_ANYD(domainBox.hiVect()),
-			       do_add_utilde_force);
+		
             } else {
-#if (AMREX_SPACEDIM == 3)        
-#pragma gpu box(tileBox)
-                make_vel_force_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                    AMREX_INT_ANYD(tileBox.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
-                                    BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
-                                    BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(gradw0_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
-                                    AMREX_REAL_ANYD(dx),
-                                    AMREX_INT_ANYD(domainBox.hiVect()),
-                                    do_add_utilde_force);
+#if (AMREX_SPACEDIM == 3)
+		
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {
+		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
+
+		    // cutoff the buoyancy term if we are outside of the star
+		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+			rhopert = 0.0;
+		    }
+
+		    // note: if use_alt_energy_fix = T, then gphi is already
+		    // weighted by beta0
+		    for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
+			vel_force(i,j,k,dim) = (rhopert*grav(i,j,k,dim) - gpi(i,j,k,dim))/rho(i,j,k)
+			    - w0force(i,j,k,dim);
+		    }
+
+		    
+		    if (do_add_utilde_force == 1) {
+			Real Ut_dot_er = 0.5*(uedge(i,j,k)+uedge(i+1,j  ,k  ))*normal(i,j,k,0) + 
+			                 0.5*(vedge(i,j,k)+vedge(i  ,j+1,k  ))*normal(i,j,k,1) + 
+			                 0.5*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal(i,j,k,2);
+			
+			for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
+			    vel_force(i,j,k,dim) = vel_force(i,j,k,dim) - 
+				Ut_dot_er*gradw0(i,j,k)*normal(i,j,k,dim);
+			}
+		    }
+		});
 #endif
             }
 

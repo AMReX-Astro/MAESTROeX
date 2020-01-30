@@ -12,7 +12,7 @@ module base_state_geometry_module
   use amrex_fort_module, only: amrex_spacedim
   use meth_params_module, only: spherical, octant, anelastic_cutoff_density, base_cutoff_density, &
        burning_cutoff_density_lo, burning_cutoff_density_hi, prob_lo, prob_hi, &
-       use_exact_base_state
+       use_exact_base_state, buoyancy_cutoff_factor
 
   implicit none
 
@@ -657,6 +657,32 @@ contains
 
   end subroutine destroy_base_state_geometry
 
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_base_cutoff_density(base_cutoff_density_in) bind(C,name="get_base_cutoff_density")
+    ! Binds to C function ``get_base_cutoff_density``
+
+    double precision, intent(inout) :: base_cutoff_density_in
+
+    base_cutoff_density_in = base_cutoff_density
+
+  end subroutine get_base_cutoff_density
+  
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_buoyancy_cutoff_factor(buoyancy_cutoff_in) bind(C,name="get_buoyancy_cutoff_factor")
+    ! Binds to C function ``get_buoyancy_cutoff_factor``
+
+    double precision, intent(inout) :: buoyancy_cutoff_in
+
+    buoyancy_cutoff_in = buoyancy_cutoff_factor
+
+  end subroutine get_buoyancy_cutoff_factor
+  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 end module base_state_geometry_module
