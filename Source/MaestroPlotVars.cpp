@@ -96,32 +96,38 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& vel_mf = vel[lev];
-        MultiFab& radvel_mf = rad_vel[lev];
-        MultiFab& circvel_mf = circ_vel[lev];
-        const MultiFab& w0rcart_mf = w0rcart[lev];
-        const MultiFab& normal_mf = normal[lev];
-
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_velrc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                       BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(w0rcart_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(radvel_mf[mfi]),
-                       BL_TO_FORTRAN_ANYD(circvel_mf[mfi]));
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<Real> radvel_arr = rad_vel[lev].array(mfi);
+            const Array4<Real> circvel_arr = circ_vel[lev].array(mfi);
+            const Array4<const Real> w0rcart_arr = w0rcart[lev].array(mfi);
+            const Array4<const Real> normal_arr = normal[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                circvel_arr(i,j,k) = 0.0;
+                radvel_arr(i,j,k) = 0.0;
+
+                for (int n=0; n<AMREX_SPACEDIM; ++n) {
+                    radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal_arr(i,j,k,n);
+                }
+
+                for (int n=0; n<AMREX_SPACEDIM; ++n) {
+                    Real v = vel_arr(i,j,k,n) - radvel_arr(i,j,k)*normal_arr(i,j,k,n);
+                    circvel_arr(i,j,k) += v*v;
+                }
+
+                circvel_arr(i,j,k) = sqrt(circvel_arr(i,j,k));
+
+                // add base state vel to get full radial velocity
+                radvel_arr(i,j,k) += w0rcart_arr(i,j,k);
+            });
         }
     }
 
@@ -365,62 +371,40 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& divw0_mf = divw0[lev];
-        const MultiFab& w0_mf = w0_cart[lev];
-
-        if (spherical == 0) {
-
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(divw0_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-                const Real* dx = geom[lev].CellSize();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const auto dx = geom[lev].CellSizeArray();
+            const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_divw0(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),
-                           BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-                           AMREX_REAL_ANYD(dx),
-                           BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
-            }
+            if (spherical == 0) {
 
-        } else {
+                const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
-            const MultiFab& w0macx_mf = w0mac[lev][0];
-            const MultiFab& w0macy_mf = w0mac[lev][1];
-            const MultiFab& w0macz_mf = w0mac[lev][2];
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    divw0_arr(i,j,k) = (w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1)) / dx[1];
+#else
+                    divw0_arr(i,j,k) = (w0_arr(i,j,k+1,2) - w0_arr(i,j,k,2)) / dx[2];
+#endif                    
+                });
 
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for ( MFIter mfi(divw0_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            } else {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-                const Real* dx = geom[lev].CellSize();
+                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_divw0_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                AMREX_REAL_ANYD(dx),
-                                BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    divw0_arr(i,j,k) = (w0macx(i+1,j,k) - w0macx(i,j,k)) / dx[0]
+                    + (w0macy(i,j+1,k) - w0macy(i,j,k)) / dx[1]
+                    + (w0macz(i,j,k+1) - w0macz(i,j,k)) / dx[2];    
+                });
             }
         }
     }
@@ -440,33 +424,28 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& vel_mf = vel[lev];
-        const MultiFab& state_mf = state[lev];
-        MultiFab& pidivu_mf = pidivu[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(pidivu_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(pidivu[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
+            const auto dx = geom[lev].CellSizeArray();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_pidivu(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                        BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                        AMREX_REAL_ANYD(dx),
-                        BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                        BL_TO_FORTRAN_ANYD(pidivu_mf[mfi]));
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<const Real> pi_cc = state[lev].array(mfi, Pi);
+            const Array4<Real> pidivu_arr = pidivu[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                pidivu_arr(i,j,k) = pi_cc(i,j,k) * 0.5 * (vel_arr(i+1,j,k,0) - vel_arr(i-1,j,k,0)) / dx[0];
+                pidivu_arr(i,j,k) += pi_cc(i,j,k) * 0.5 * (vel_arr(i,j+1,k,1) - vel_arr(i,j-1,k,1)) / dx[1];
+#if (AMREX_SPACEDIM == 3)
+                pidivu_arr(i,j,k) += pi_cc(i,j,k) * 0.5 * (vel_arr(i,j,k+1,2) - vel_arr(i,j,k-1,2)) / dx[2];
+#endif
+            });
         }
-
     }
 
     // average down and fill ghost cells
