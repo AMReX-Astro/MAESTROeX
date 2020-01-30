@@ -473,19 +473,6 @@ extern "C"
 		    const int* lo,  const int* hi,
 		    const amrex::Real* etarhoflux, const int* x_lo, const int* x_hi,
                     amrex::Real* etarhosum);
-
-    void construct_eta_cart(const int* lo, const int* hi,
-			    const amrex::Real* rho_old, const int* ro_lo, const int* ro_hi,
-			    const amrex::Real* rho_new, const int* rn_lo, const int* rn_hi,
-			    const amrex::Real* umac,    const int* u_lo,  const int* u_hi,
-			    const amrex::Real* vmac,    const int* v_lo,  const int* v_hi,
-			    const amrex::Real* wmac,    const int* w_lo,  const int* w_hi,
-			    const amrex::Real* w0macx,  const int* x_lo,  const int* x_hi,
-			    const amrex::Real* w0macy,  const int* y_lo,  const int* y_hi,
-			    const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi,
-			    const amrex::Real* normal,  const int* n_lo,  const int* n_hi,
-			    amrex::Real* eta_cart, const int* e_lo,  const int* e_hi,
-			    const amrex::Real* rho0_nph_cart, const int* rp_lo, const int* rp_hi);
     //////////////////////
 
     //////////////////////

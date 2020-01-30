@@ -94,16 +94,6 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 
         // get references to the MultiFabs at level lev
         const MultiFab& scalold_mf = scal_old[lev];
-        const MultiFab& scalnew_mf = scal_new[lev];
-        const MultiFab& umac_mf   = umac[lev][0];
-        const MultiFab& vmac_mf   = umac[lev][1];
-        const MultiFab& wmac_mf   = umac[lev][2];
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
-        const MultiFab& w0macz_mf = w0mac[lev][2];
-        const MultiFab& normal_mf = normal[lev];
-        MultiFab& etacart_mf = eta_cart[lev];
-        const MultiFab& rho0_nph_cart_mf = rho0_nph_cart[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -114,26 +104,32 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
             // Get the index space of the valid region
             const Box& tilebox = mfi.tilebox();
 
-#pragma gpu box(tilebox)
-            construct_eta_cart( AMREX_INT_ANYD(tilebox.loVect()), AMREX_INT_ANYD(tilebox.hiVect()),
-                                scalold_mf[mfi].dataPtr(Rho),
-                                AMREX_INT_ANYD(scalold_mf[mfi].loVect()), 
-                                AMREX_INT_ANYD(scalold_mf[mfi].hiVect()),
-                                scalnew_mf[mfi].dataPtr(Rho),
-                                AMREX_INT_ANYD(scalnew_mf[mfi].loVect()), 
-                                AMREX_INT_ANYD(scalnew_mf[mfi].hiVect()),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(etacart_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(rho0_nph_cart_mf[mfi]));
+            const Array4<const Real> rho_old = scal_old[lev].array(mfi, Rho);
+            const Array4<const Real> rho_new = scal_new[lev].array(mfi, Rho);
+            const Array4<const Real> umacx = umac[lev][0].array(mfi);
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+            const Array4<const Real> wmac = umac[lev][2].array(mfi);
+            const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+            const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+            const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+            const Array4<const Real> normal_arr = normal[lev].array(mfi);
+            const Array4<Real> etacart_arr = eta_cart[lev].array(mfi);
+            const Array4<const Real> rho0_nph_arr = rho0_nph_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                Real U_dot_er = 0.5*(umacx(i,j,k) + umacx(i+1,j,k) 
+                    + w0macx(i,j,k) + w0macx(i+1,j,k)) * normal_arr(i,j,k,0) + 
+                    0.5*(vmac(i,j,k) + vmac(i,j+1,k) 
+                    + w0macy(i,j,k) + w0macy(i,j+1,k)) * normal_arr(i,j,k,1) + 
+                    0.5*(wmac(i,j,k) + wmac(i,j,k+1) 
+                    + w0macz(i,j,k) + w0macz(i,j,k+1)) * normal_arr(i,j,k,2);
+
+                // construct time-centered [ rho' (U dot e_r) ]
+                etacart_arr(i,j,k) = (0.5*(rho_old(i,j,k) + rho_new(i,j,k)) - 
+                    rho0_nph_arr(i,j,k)) * U_dot_er;
+            });
         }         // end MFIter loop
     }     // end loop over levels
-
 #else
     Abort("MakeEtarhoSphr: Spherical is not valid for DIM != 3");
 #endif
