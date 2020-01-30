@@ -22,7 +22,7 @@ void
 Maestro::NodalProj (int proj_type,
                     Vector<MultiFab>& rhcc,
                     int istep_divu_iter,
-		    bool sdc_off)
+                    bool sdc_off)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::NodalProj()",NodalProj);
@@ -573,10 +573,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab& gphi_mf = gphi[lev];
 
-        GpuArray<Real,AMREX_SPACEDIM> dx;
-        for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-            dx[n] = geom[lev].CellSize(n);
-        }
+        const auto dx = geom[lev].CellSizeArray();
 
 #ifdef _OPENMP
 #pragma omp parallel
