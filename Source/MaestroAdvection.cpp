@@ -510,7 +510,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                                                  BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]), sedgex_mf.nComp(),
                                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
                                                  BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                                 BL_TO_FORTRAN_ANYD(rho0mac_edgex[mfi]));
+                                                 BL_TO_FORTRAN_ANYD(rhoh0mac_edgex[mfi]));
                      // y-direction
 #pragma gpu box(ybx)
                      make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(ybx.loVect()),
@@ -519,7 +519,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                                                   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]), sedgey_mf.nComp(),
                                                   BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
                                                   BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                                  BL_TO_FORTRAN_ANYD(rho0mac_edgey[mfi]));
+                                                  BL_TO_FORTRAN_ANYD(rhoh0mac_edgey[mfi]));
                   // z-direction
 #pragma gpu box(zbx)
                   make_rhoh_flux_3d_sphr_irreg(AMREX_INT_ANYD(zbx.loVect()),
@@ -528,7 +528,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                                                BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]), sedgez_mf.nComp(),
                                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
                                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                               BL_TO_FORTRAN_ANYD(rho0mac_edgez[mfi]));
+                                               BL_TO_FORTRAN_ANYD(rhoh0mac_edgez[mfi]));
                 }
                 else
                 {
