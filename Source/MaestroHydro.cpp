@@ -436,12 +436,6 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
         const MultiFab& w0_mf = w0_cart[lev];
 
 #if (AMREX_SPACEDIM == 2)
-
-#ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-#else
-        const int* bc_f = bcs_u[0].data();
-#endif
         MultiFab u_mf, v_mf;
 
         if (ppm_type == 0) {
@@ -555,17 +549,8 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                              domainBox, dx);
         } // end MFIter loop
 
-#ifdef AMREX_USE_CUDA
-        clean_bc(bc_f);
-#endif
-
 #elif (AMREX_SPACEDIM == 3)
 
-#ifdef AMREX_USE_CUDA
-        int* bc_f = prepare_bc(bcs_u[0].data(), 1);
-#else
-        const int* bc_f = bcs_u[0].data();
-#endif
         MultiFab u_mf, v_mf, w_mf;
 
         if (ppm_type == 0) {
@@ -740,10 +725,6 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                             w0_mf.array(mfi),
                             domainBox, dx);
         } // end MFIter loop
-
-#ifdef AMREX_USE_CUDA
-        clean_bc(bc_f);
-#endif
 
 #endif // AMREX_SPACEDIM
     } // end loop over levels
