@@ -121,19 +121,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                        AMREX_SPACEDIM,0);
             } else {
 
-                PPM_2d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ipu.array(mfi), Imu.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 
                 if (ppm_trace_forces == 1) {
 
-                    PPM_2d(obx, force_mf.array(mfi), 
-                           u_mf.array(mfi), v_mf.array(mfi), 
-                           Ipfx.array(mfi), Imfx.array(mfi), 
-                           domainBox, bcs_u, dx, 
-                           false, 0, 0);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
                 }
             }
 
@@ -146,19 +146,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                       AMREX_SPACEDIM,0);
             } else {
 
-                PPM_2d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ipv.array(mfi), Imv.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
 
                 if (ppm_trace_forces == 1) {
 
-                    PPM_2d(obx, force_mf.array(mfi), 
-                           u_mf.array(mfi), v_mf.array(mfi), 
-                           Ipv.array(mfi), Imv.array(mfi), 
-                           domainBox, bcs_u, dx, 
-                           false, 1, 1);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipv.array(mfi), Imv.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 1, 1);
                 }
             }
 
@@ -240,18 +240,18 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
             } else {
 
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipu.array(mfi), Imu.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
 
                 if (ppm_trace_forces == 1) {
-                    PPM_3d(obx, force_mf.array(mfi), 
-                            u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                            Ipfx.array(mfi), Imfx.array(mfi), 
-                            domainBox, bcs_u, dx, 
-                            false, 0, 0);
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
                 }
             }
 
@@ -265,19 +265,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                        AMREX_SPACEDIM,0);
 
             } else {
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipv.array(mfi), Imv.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
 
               if (ppm_trace_forces == 1) {
 
-                PPM_3d(obx, force_mf.array(mfi), 
-                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                        Ipfy.array(mfi), Imfy.array(mfi), 
-                        domainBox, bcs_u, dx, 
-                        false, 1, 1);
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfy.array(mfi), Imfy.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
               }
             }
 
@@ -293,19 +293,19 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
             } else {
 
-                PPM_3d(obx, utilde_mf.array(mfi), 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ipw.array(mfi), Imw.array(mfi), 
-                       domainBox, bcs_u, dx, 
-                       false, 2, 2);
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipw.array(mfi), Imw.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
 
               if (ppm_trace_forces == 1) {
 
-                PPM_3d(obx, force_mf.array(mfi), 
-                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                        Ipfz.array(mfi), Imfz.array(mfi), 
-                        domainBox, bcs_u, dx, 
-                        false, 2, 2);
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfz.array(mfi), Imfz.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
               }
             }
             

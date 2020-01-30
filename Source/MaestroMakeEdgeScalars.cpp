@@ -139,19 +139,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 } else {
 
-                    PPM_2d(obx, scal_arr, 
-                           umac_arr, vmac_arr, 
-                           Ip.array(mfi), Im.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                    PPM(obx, scal_arr, 
+                        umac_arr, vmac_arr, 
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_2d(obx, force[lev].array(mfi), 
-                           umac_arr, vmac_arr, 
-                           Ipf.array(mfi), Imf.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, 
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
                     }
                 }
 
@@ -250,19 +250,19 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
                 } else {
 
-                    PPM_3d(obx, state[lev].array(mfi), 
-                           umac_arr, vmac_arr, wmac_arr,
-                           Ip.array(mfi), Im.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                    PPM(obx, state[lev].array(mfi), 
+                        umac_arr, vmac_arr, wmac_arr,
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
 
                     if (ppm_trace_forces == 1) {
 
-                        PPM_3d(obx, force[lev].array(mfi), 
-                           umac_arr, vmac_arr, wmac_arr,
-                           Ipf.array(mfi), Imf.array(mfi), 
-                           domainBox, bcs, dx, 
-                           true, scomp, bccomp);
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, wmac_arr,
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
                     }
                 }
             }

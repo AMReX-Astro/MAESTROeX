@@ -19,7 +19,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Box& domainBox = geom[lev].Domain();
         const Real* dx = geom[lev].CellSize();
 
-        Real rel_eps;
+        Real rel_eps = 0.0;
         get_rel_eps(&rel_eps);
 
         const Real dt2 = 0.5 * dt;
@@ -117,11 +117,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        1,0);
             } else {
 
-                PPM_2d(obx, utilde_arr, 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ip_arr, Im_arr, 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_arr, 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ip_arr, Im_arr, 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
            }
 
             // create utrans
@@ -204,11 +204,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,1);
             } else {
-                PPM_2d(obx, utilde_arr, 
-                       u_mf.array(mfi), v_mf.array(mfi), 
-                       Ip_arr, Im_arr, 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_arr, 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ip_arr, Im_arr, 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
            }
 
            // create vtrans
@@ -296,11 +296,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,0);
             } else {
-                PPM_3d(obx, utilde_arr, 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ip_arr, Im_arr, 
-                       domainBox, bcs_u, dx, 
-                       false, 0, 0);
+                PPM(obx, utilde_arr, 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ip_arr, Im_arr, 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
             }
 
             // create utrans
@@ -393,11 +393,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        domainBox, bcs_u, 
                        1,1);
             } else {
-                PPM_3d(obx, utilde_arr, 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ip_arr, Im_arr, 
-                       domainBox, bcs_u, dx, 
-                       false, 1, 1);
+                PPM(obx, utilde_arr, 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ip_arr, Im_arr, 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
             }
 
             // create vtrans
@@ -491,11 +491,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                        domainBox, bcs_u,  
                        1,2);
             } else {
-                PPM_3d(obx, utilde_arr, 
-                       u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                       Ip_arr, Im_arr, 
-                       domainBox, bcs_u, dx, 
-                       false, 2, 2);
+                PPM(obx, utilde_arr, 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ip_arr, Im_arr, 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
             }
 
             // create wtrans
