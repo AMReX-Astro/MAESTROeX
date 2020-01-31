@@ -1,34 +1,33 @@
 #include <Maestro.H>
-// #include <MaestroHydro_F.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
 void Maestro::MakeEdgeState1d(RealVector& s, RealVector& sedge, 
-                              RealVector& w0, RealVector& force)
+                              RealVector& w0, RealVector& force_1d)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1d()",MakeEdgeState1d);
 
     get_numdisjointchunks(numdisjointchunks.dataPtr());
 
-    Real * AMREX_RESTRICT s_p = s.dataPtr();
-    Real * AMREX_RESTRICT sedge_p = sedge.dataPtr();
-    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    Real * AMREX_RESTRICT force_p = force.dataPtr();
+    
 
     if (spherical) {
-        MakeEdgeState1dSphr(s_p, sedge_p, w0_p, force_p);
+        MakeEdgeState1dSphr(s, sedge, w0, force_1d);
     } else {
-        MakeEdgeState1dPlanar(s_p, sedge_p, w0_p, force_p);
+        // MakeEdgeState1dPlanar(s_p, sedge_p, w0_p, force_p);
     }
-
 }
 
-void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge, 
-                                  Real* w0, Real* force)
+void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec, 
+                              RealVector& w0, RealVector& force_1d)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()",MakeEdgeState1dSphr);
+
+    Real rel_eps = 0.0;
+    get_rel_eps(&rel_eps);
 
     const Real dth = 0.5 * dt;
     const Real C = 1.25;
@@ -38,21 +37,32 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
     const int fromm = 3;
     const Real dr = dr_fine;
 
-    GpuArray<Real, nr_fine+1> sedegel;
-    GpuArray<Real, nr_fine+1> sedeger;
+    const int nr = nr_fine;
+
+    RealVector sedgel_vec(nr_fine+1);
+    RealVector sedger_vec(nr_fine+1);
 
     // copy valid data into array with ghost cells
-    GpuArray<Real,nr_fine+2*3> s_ghost;
-    for (auto i = 0; i < s.size(); ++i) {
-        s_ghost[i+3] = s[i];
+    RealVector s_ghost_vec(nr_fine+2*3);
+    for (int i = 0; i < s_vec.size(); ++i) {
+        s_ghost_vec[i+3] = s_vec[i];
     }
 
-    for (auto i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         // symmetry boundary condition at center 
-        s_ghost[2-i] = s[i];
+        s_ghost_vec[2-i] = s_vec[i];
         // first-order extrapolation at top of star
-        s_ghost[3+nr_fine+i] = s[nr_fine-1];
+        s_ghost_vec[3+nr_fine+i] = s_vec[nr_fine-1];
     }
+
+    Real * AMREX_RESTRICT sedgel = sedgel_vec.dataPtr();
+    Real * AMREX_RESTRICT sedger = sedger_vec.dataPtr();
+    Real * AMREX_RESTRICT s_ghost = s_ghost_vec.dataPtr();
+
+    Real * AMREX_RESTRICT s = s_vec.dataPtr();
+    Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+    Real * AMREX_RESTRICT force_p = force_1d.dataPtr();
 
     if (ppm_type == 0) {
 
@@ -69,20 +79,20 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
                 // index of ghost array offset by 3
                 int g = r + 3;
 
-                Real del = 0.5 * (s_ghost[g+1] - s_ghost[g-1])
-                Real dpls = 2.0*(s_ghost[g+1] - s_ghost[g])
-                Real dmin = 2.0*(s_ghost[g] - s_ghost[g-1])
-                Real slim = min(fabs(dpls), fabs(dmin))
-                Real slim = dpls*dmin > 0.0 ? slim : 0.0;
-                Real sflag = copysign(1.0,del)
-                slope = sflag*min(slim,fabs(del))
+                Real del = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
+                Real dpls = 2.0*(s_ghost[g+1] - s_ghost[g]);
+                Real dmin = 2.0*(s_ghost[g] - s_ghost[g-1]);
+                Real slim = min(fabs(dpls), fabs(dmin));
+                slim = dpls*dmin > 0.0 ? slim : 0.0;
+                Real sflag = copysign(1.0,del);
+                slope = sflag*min(slim,fabs(del));
             } else if (slope_order == 4) {
                 for (int i = 0; i < 3; ++i) {
                     int g = r + 3 - 1 + i;
                     // do standard limiting to compute temporary slopes
                     dsscr[i][cen] = 0.5*(s_ghost[g+1]-s_ghost[g-1]);
-                    dpls = 2.0*(s_ghost[g+1]-s_ghost[g]);
-                    dmin = 2.0*(s_ghost[g]-s_ghost[g-1]);
+                    Real dpls = 2.0*(s_ghost[g+1]-s_ghost[g]);
+                    Real dmin = 2.0*(s_ghost[g]-s_ghost[g-1]);
                     dsscr[i][lim]= min(fabs(dmin),fabs(dpls));
                     dsscr[i][lim] = dpls*dmin > 0.0 ? dsscr[i][lim] : 0.0;
                     dsscr[i][flag] = copysign(1.0,dsscr[i][cen]);
@@ -95,10 +105,10 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             }
 
             // compute sedgel and sedger
-            Real u = 0.5*(w0[r]+w0[r+1]);
+            Real u = 0.5*(w0_p[r]+w0_p[r+1]);
             Real ubardth = dth*u/dr;  // NOTE: ubardth=0 for use_exact_base_state case
-            sedgel[r+1 ]= s[r] + (0.5-ubardth)*slope + dth*force[r];
-            sedger[r  ] = s[r] - (0.5+ubardth)*slope + dth*force[r];
+            sedgel[r+1 ]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
+            sedger[r  ] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
         });
 
     } else if (ppm_type == 1) {
@@ -112,17 +122,17 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             // right side
             int g = r + 3; 
             // compute van Leer slopes
-            Real del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1])
-            Real dmin = 2.0  * (s_ghost[g] - s_ghost[g-1])
-            Real dpls = 2.0  * (s_ghost[g+1] - s_ghost[g])
+            Real del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
+            Real dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
+            Real dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
             Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // left side 
             g = r + 3 - 1;
             // compute van Leer slopes
-            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1])
-            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1])
-            dpls = 2.0  * (s_ghost[g+1] - s_ghost[g])
+            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
+            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
+            dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
             Real dsscrl = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sm
@@ -141,10 +151,10 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             // right side
             g = r + 3 + 1; 
             // compute van Leer slopes
-            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1])
-            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1])
-            Real dpls = 2.0  * (s_ghost[g+1] - s_ghost[g])
-            Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
+            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
+            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
+            dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
+            dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sp
             g = r + 3 + 1;
@@ -165,17 +175,17 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             }
 
             // compute Ip and Im
-            Real sigmap = fabs(w0[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real sigmap = fabs(w0_p[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s[r] - 3.0*(sm+sp);
             
-            Real Ip = w0[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
+            Real Ip = w0_p[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
 
-            Real Im = w0[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
+            Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // ! compute sedgel and sedger
-            sedgel[r+1] = Ip + dth*force[r];
-            sedger[r] = Im + dth*force[r];
+            sedgel[r+1] = Ip + dth*force_p[r];
+            sedger[r] = Im + dth*force_p[r];
         });
     } else if (ppm_type == 2) {
 
@@ -203,6 +213,8 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
                 }
             }
 
+            int g = r + 3;
+
             // use Colella 2008 limiters
             // This is a new version of the algorithm
             // to eliminate sensitivity to roundoff.
@@ -211,8 +223,6 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             bool bigp = fabs(alphap) > 2.0*fabs(alpham);
             bool bigm = fabs(alpham) > 2.0*fabs(alphap);
             bool extremum = false;
-
-            int g = r + 3;
 
             if (alpham*alphap >= 0.0) {
                 extremum = true;
@@ -236,7 +246,7 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
                     dachkm = dabarm;
                     dachkp = dabarp;
                 }
-                extremum = (dachkm*dachkp <= 0.0)
+                extremum = (dachkm*dachkp <= 0.0);
             }
 
             if (extremum) {
@@ -280,17 +290,17 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
             Real sp = s_ghost[g] + alphap;
 
             // compute Ip and Im
-            Real sigmap = fabs(w0[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real sigmap = fabs(w0_p[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s[r] - 3.0*(sm+sp);
             
-            Real Ip = w0[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
+            Real Ip = w0_p[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
 
-            Real Im = w0[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
+            Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // ! compute sedgel and sedger
-            sedgel[r+1] = Ip + dth*force[r];
-            sedger[r] = Im + dth*force[r];
+            sedgel[r+1] = Ip + dth*force_p[r];
+            sedger[r] = Im + dth*force_p[r];
         });
     }
 
@@ -307,8 +317,8 @@ void Maestro::MakeEdgeState1dSphr(Real* s, Real* sedge,
         }
 
         // solve Riemann problem to get final edge state
-        sedge[r]= w0(0,r) > 0.0 ? sedgel[r],sedger[r];
-        sedge[r] = fabs(w0[r])<rel_eps ? 0.5*(sedger[r]+sedgel[r]) : sedge[r];
+        sedge[r]= w0_p[r] > 0.0 ? sedgel[r] : sedger[r];
+        sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[r]+sedgel[r]) : sedge[r];
     });
 
 }
