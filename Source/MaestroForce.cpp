@@ -450,16 +450,38 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         const MultiFab& grav_mf = grav_cart[lev];
         const MultiFab& rho0_mf = rho0_cart[lev];
 
+	// Get grid spacing
+	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+	
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
         for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
+	    // inputs
+	    const Array4<const Real> umac = umac_mf.array(mfi);
+	    const Array4<const Real> vmac = vmac_mf.array(mfi);
+	    const Array4<const Real> p0cart = p0cart_mf.array(mfi);
+	    const Array4<const Real> p0macx = p0macx_mf.array(mfi);
+	    const Array4<const Real> p0macy = p0macy_mf.array(mfi);
+#if (AMREX_SPACEDIM == 3)
+	    const Array4<const Real> wmac = wmac_mf.array(mfi);
+	    const Array4<const Real> p0macz = p0macz_mf.array(mfi);
+#endif
+	    const Array4<const Real> thermal_in = thermal_mf.array(mfi);
+	    const Array4<const Real> psicart = psi_mf.array(mfi);
+	    const Array4<const Real> gravcart = grav_mf.array(mfi);
+	    const Array4<const Real> rho0cart = rho0_mf.array(mfi);
+
+	    // output
+	    const Array4<Real> rhoh_force = scal_force_mf.array(mfi);
+	    
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
+	    
+	    const int domhi = domainBox.hiVect()[AMREX_SPACEDIM-1];
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -468,31 +490,97 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
-#pragma gpu box(tileBox)
-            mkrhohforce(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                lev,
-                                scal_force_mf[mfi].dataPtr(RhoH),
-                                AMREX_INT_ANYD(scal_force_mf[mfi].loVect()),
-                                AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+#if (AMREX_SPACEDIM == 2)
+	    AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
+	    {
+		Real gradp0;
+		
+		if (j < base_cutoff_density_coord(lev)) {
+		    gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
+		} else if (j == domhi) {
+		    // NOTE: this should be zero since p0 is constant up here
+		    gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[1]; 
+		} else {
+		    // NOTE: this should be zero since p0 is constant up here
+		    gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[1];
+		}
+
+		Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
+		rhoh_force(i,j,k) =  veladv * gradp0;
+
+		if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
+		    (is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+		    (is_prediction == 0)) {
+		    
+		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
+		}
+
+		if (add_thermal == 1) {
+		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+		}
+	    });
+	    
+#elif (AMREX_SPACEDIM == 3)
+	    if (spherical == 0) {
+
+		AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
+	        {
+		    Real gradp0;
+		
+		    if (k < base_cutoff_density_coord(lev)) {
+			gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
+		    } else if (k == domhi) {
+			// NOTE: this should be zero since p0 is constant up here
+			gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[2]; 
+		    } else {
+			// NOTE: this should be zero since p0 is constant up here
+			gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[2];
+		    }
+
+		    Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j+1,k));
+		    rhoh_force(i,j,k) =  veladv * gradp0;
+
+		    if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
+			(is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+			(is_prediction == 0)) {
+		    
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
+		    }
+
+		    if (add_thermal == 1) {
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+		    }
+		});
+		
+	    } else {
+		AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
+	        {
+		    Real divup, p0divu;
+		
+		    divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx[0] + 
+			(vmac(i,j+1,k) * p0macy(i,j+1,k) - vmac(i,j,k) * p0macy(i,j,k)) / dx[1] + 
+			(wmac(i,j,k+1) * p0macz(i,j,k+1) - wmac(i,j,k) * p0macz(i,j,k)) / dx[2];
+
+		    p0divu = ( (umac(i+1,j,k) - umac(i,j,k)) / dx[0] + 
+			       (vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] + 
+			       (wmac(i,j,k+1) - wmac(i,j,k)) / dx[2] ) * p0cart(i,j,k);
+
+		    rhoh_force(i,j,k) = divup - p0divu;
+
+		    if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
+			(is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+			(is_prediction == 0)) {
+		    
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
+		    }
+
+		    if (add_thermal == 1) {
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+		    }
+		});
+
+	    }
 #endif
-                                BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0macx_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0macy_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                BL_TO_FORTRAN_ANYD(p0macz_mf[mfi]),
-#endif
-                                BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
-                                AMREX_REAL_ANYD(dx), 
-                                AMREX_INT_ANYD(domainBox.hiVect()),
-                                is_prediction, add_thermal);
         }
     }
 
@@ -547,6 +635,9 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
         const MultiFab& thermal_mf = thermal[lev];
         const MultiFab& psi_mf = psi_cart[lev];
 
+	// Get grid spacing
+	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+	
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -556,7 +647,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
-            const Real* dx = geom[lev].CellSize();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
