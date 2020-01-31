@@ -881,6 +881,16 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakeEdgeState.cpp functions
+    void MakeEdgeState();
+
+    void MakeEdgeStateSphr();
+
+    void MakeEdgeStatePlanar();
+    // end MaestroMakeEdgeState.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeEta.cpp functions
 
     /// Compute `eta_rho` at edge- and cell-centers

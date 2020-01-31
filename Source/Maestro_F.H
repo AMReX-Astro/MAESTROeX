@@ -938,6 +938,8 @@ extern "C"
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
     void regrid_base_state_edge(amrex::Real* state_ec);
+    void get_numdisjointchunks(int* nchunks);
+    void get_r_end_coord(int* coord);
     //////////////////////
 
     //////////////////////
