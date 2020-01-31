@@ -360,10 +360,10 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
 void
 Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
-                       int is_prediction,
+                       const int is_prediction,
                        const Vector<MultiFab>& thermal,
-                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                       int add_thermal,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_cart,
+                       const int add_thermal,
                        const int &which_step)
 
 {
@@ -430,14 +430,19 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
     Put1dArrayOnCart(grav,grav_cart,0,0,bcs_f,0);
 
+    // constants in Fortran
+    const int enthalpy_pred_type_in = enthalpy_pred_type;
+    const int predict_h_const = predict_h;
+    const int predict_rhoh_const = predict_rhoh;
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
-        const MultiFab& umac_mf = umac[lev][0];
-        const MultiFab& vmac_mf = umac[lev][1];
+        const MultiFab& umac_mf = umac_cart[lev][0];
+        const MultiFab& vmac_mf = umac_cart[lev][1];
 #if (AMREX_SPACEDIM == 3)
-        const MultiFab& wmac_mf = umac[lev][2];
+        const MultiFab& wmac_mf = umac_cart[lev][2];
 #endif
         const MultiFab& p0cart_mf = p0_cart[lev];
         const MultiFab& p0macx_mf = p0mac[lev][0];
@@ -450,6 +455,10 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         const MultiFab& grav_mf = grav_cart[lev];
         const MultiFab& rho0_mf = rho0_cart[lev];
 
+	// Get cutoff coord
+	int base_cutoff_density_coord;
+	get_base_cutoff_density_coord(&lev, &base_cutoff_density_coord);
+    
 	// Get grid spacing
 	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
 	
@@ -495,7 +504,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	    {
 		Real gradp0;
 		
-		if (j < base_cutoff_density_coord(lev)) {
+		if (j < base_cutoff_density_coord) {
 		    gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
 		} else if (j == domhi) {
 		    // NOTE: this should be zero since p0 is constant up here
@@ -508,8 +517,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
 		rhoh_force(i,j,k) =  veladv * gradp0;
 
-		if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
-		    (is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+		if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
+		    (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
 		    (is_prediction == 0)) {
 		    
 		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
@@ -527,7 +536,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	        {
 		    Real gradp0;
 		
-		    if (k < base_cutoff_density_coord(lev)) {
+		    if (k < base_cutoff_density_coord) {
 			gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
 		    } else if (k == domhi) {
 			// NOTE: this should be zero since p0 is constant up here
@@ -540,8 +549,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		    Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j+1,k));
 		    rhoh_force(i,j,k) =  veladv * gradp0;
 
-		    if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
-			(is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+		    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
+			(is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
 			(is_prediction == 0)) {
 		    
 			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
@@ -553,22 +562,21 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		});
 		
 	    } else {
+		
 		AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
 	        {
-		    Real divup, p0divu;
-		
-		    divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx[0] + 
+		    Real divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx[0] + 
 			(vmac(i,j+1,k) * p0macy(i,j+1,k) - vmac(i,j,k) * p0macy(i,j,k)) / dx[1] + 
 			(wmac(i,j,k+1) * p0macz(i,j,k+1) - wmac(i,j,k) * p0macz(i,j,k)) / dx[2];
 
-		    p0divu = ( (umac(i+1,j,k) - umac(i,j,k)) / dx[0] + 
+		    Real p0divu = ( (umac(i+1,j,k) - umac(i,j,k)) / dx[0] + 
 			       (vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] + 
 			       (wmac(i,j,k+1) - wmac(i,j,k)) / dx[2] ) * p0cart(i,j,k);
 
 		    rhoh_force(i,j,k) = divup - p0divu;
 
-		    if ((is_prediction == 1 && enthalpy_pred_type == predict_h) ||
-			(is_prediction == 1 && enthalpy_pred_type == predict_rhoh) || 
+		    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
+			(is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
 			(is_prediction == 0)) {
 		    
 			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
@@ -578,7 +586,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
 		    }
 		});
-
+		
 	    }
 #endif
         }
@@ -635,9 +643,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
         const MultiFab& thermal_mf = thermal[lev];
         const MultiFab& psi_mf = psi_cart[lev];
 
-	// Get grid spacing
-	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
-	
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -648,6 +653,9 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
 
+	    // Get grid spacing
+	    const Real* dx = geom[lev].CellSize();
+		
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components

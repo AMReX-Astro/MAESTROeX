@@ -674,6 +674,20 @@ contains
   ! ::: ----------------------------------------------------------------
   ! :::
 
+  subroutine get_base_cutoff_density_coord(lev,base_cutoff_density_coord_in) bind(C,name="get_base_cutoff_density_coord")
+    ! Binds to C function ``get_base_cutoff_density_coord``
+
+    integer,          intent(in   ) :: lev
+    integer,          intent(inout) :: base_cutoff_density_coord_in
+
+    base_cutoff_density_coord_in = base_cutoff_density_coord(lev)
+
+  end subroutine get_base_cutoff_density_coord
+  
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
   subroutine get_buoyancy_cutoff_factor(buoyancy_cutoff_in) bind(C,name="get_buoyancy_cutoff_factor")
     ! Binds to C function ``get_buoyancy_cutoff_factor``
 

@@ -648,10 +648,10 @@ public:
 
     /// Calculate the conserved enthalpy force term
     void MakeRhoHForce (amrex::Vector<amrex::MultiFab>& scal_force,
-                        int is_prediction,
+                        const int is_prediction,
                         const amrex::Vector<amrex::MultiFab>& thermal,
-                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                        int add_thermal,
+                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_cart,
+                        const int add_thermal,
 			const int &which_step);
     
     void MakeTempForce(amrex::Vector<amrex::MultiFab>& temp_force,
