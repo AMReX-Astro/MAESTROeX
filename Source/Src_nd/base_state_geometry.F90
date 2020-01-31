@@ -667,6 +667,21 @@ contains
   end subroutine get_numdisjointchunks
 
 
+  subroutine get_r_start_coord(coord) bind(C, name="get_r_start_coord")
+
+    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+    integer :: i, lev
+
+    coord(0:finest_radial_level,0:nr_fine) = 0
+
+    do lev = 0, finest_radial_level
+        do i = 0, numdisjointchunks(lev)
+            coord(lev, i) = r_start_coord(lev, i)
+        end do
+    end do
+  end subroutine get_r_start_coord
+
+
   subroutine get_r_end_coord(coord) bind(C, name="get_r_end_coord")
 
     integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)

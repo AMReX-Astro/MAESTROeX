@@ -7,11 +7,7 @@ void Maestro::MakeEdgeState1d(RealVector& s, RealVector& sedge,
                               RealVector& w0, RealVector& force_1d)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEdgeState1d()",MakeEdgeState1d);
-
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-
-    
+    BL_PROFILE_VAR("Maestro::MakeEdgeState1d()",MakeEdgeState1d);   
 
     if (spherical) {
         MakeEdgeState1dSphr(s, sedge, w0, force_1d);
@@ -183,7 +179,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
             Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
-            // ! compute sedgel and sedger
+            // // compute sedgel and sedger
             sedgel[r+1] = Ip + dth*force_p[r];
             sedger[r] = Im + dth*force_p[r];
         });
@@ -298,7 +294,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
             Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
-            // ! compute sedgel and sedger
+            // // compute sedgel and sedger
             sedgel[r+1] = Ip + dth*force_p[r];
             sedger[r] = Im + dth*force_p[r];
         });
@@ -323,10 +319,457 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
 }
 
-void Maestro::MakeEdgeState1dPlanar(Real* s, Real* sedge, 
-                                    Real* w0, Real* force)
+void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec, 
+                              RealVector& w0, RealVector& force_1d)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dPlanar()",MakeEdgeState1dPlanar);
+
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+
+    Real rel_eps = 0.0;
+    get_rel_eps(&rel_eps);
+
+    const Real dth = 0.5 * dt;
+    const Real C = 1.25;
+    const int cen = 0;
+    const int lim = 1;
+    const int flag = 2;
+    const int fromm = 3;
+    const Real dr = dr_fine;
+    const Real dtdr = dt / dr;
+
+    RealVector sedgel_vec(nr_fine+1);
+    RealVector sedger_vec(nr_fine+1);
+
+    Real * AMREX_RESTRICT sedgel = sedgel_vec.dataPtr();
+    Real * AMREX_RESTRICT sedger = sedger_vec.dataPtr();
+    // Real * AMREX_RESTRICT s_ghost = s_ghost_vec.dataPtr();
+
+    Real * AMREX_RESTRICT s = s_vec.dataPtr();
+    Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+    Real * AMREX_RESTRICT force_p = force_1d.dataPtr();
+
+    int * AMREX_RESTRICT nr_p = nr.dataPtr();
+
+
+    for (int n = 0; n <= max_radial_level; ++n) {
+        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+
+            int lo = r_start_coord[n+i*max_radial_level];
+            int hi = r_end_coord[n+i*max_radial_level];            
+
+            // error checking to make sure that there is a 2 cell buffer at the top and bottom
+            // of the domain for finer levels in planar geometry.  This can be removed if
+            // blocking_factor is implemented at set > 1.
+            if (ppm_type == 1 || ppm_type == 2) {
+                
+                if (r_start_coord[n+i*max_radial_level] == 2) {
+                    Abort("make_edge_state assumes blocking_factor > 1 at lo boundary");
+                } else if (r_end_coord[n+i*max_radial_level] == nr[n]-3) {
+                    Abort("make_edge_state assumes blocking_factor > 1 at hi boundary");
+                }
+            }
+
+            if (ppm_type == 0) {
+
+                // compute slopes
+
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, i, {
+
+                    Real slope = 0.0;
+                    int r = i + lo;
+
+                    if (slope_order == 0) {
+                        slope = 0.0;
+                    } else if (slope_order == 2) {
+                        if (r == 0) {
+                            // one-sided difference
+                            slope = s(n,r+1)-s(n,r)
+                        } else if (r == nr[n]-1) {
+                            // one-sided difference
+                            slope = s(n,r)-s(n,r-1)
+                        } else {
+                            // do standard limiting on interior cells
+                            Real del = 0.5*(s(n,r+1) - s(n,r-1))
+                            Real dpls = 2.0*(s(n,r+1) - s(n,r  ))
+                            Real dmin = 2.0*(s(n,r  ) - s(n,r-1))
+                            Real slim = min(fabs(dpls), fabs(dmin))
+                            slim = dpls*dmin>0.0 ? slim : 0.0;
+                            Real sflag = copysign(1.0,del)
+                            slope = sflag*min(slim,fabs(del))
+                        }
+
+                    } else if (slope_order == 4) {
+
+                        // do r=lo-1,hi+1
+                        if (r == 0) {
+                            // one-sided difference
+                            dxscr(n,r,fromm) = s(n,r+1)-s(n,r)
+                        } else if (r == nr[n]-1) {
+                            // one-sided difference
+                            dxscr(n,r,fromm) = s(n,r)-s(n,r-1)
+                        } else if (r > 0 && r < nr[n]-1) {
+                            // do standard limiting to compute temporary slopes
+                            dxscr(n,r,cen) = 0.5*(s(n,r+1)-s(n,r-1))
+                            dpls = 2.0*(s(n,r+1)-s(n,r  ))
+                            dmin = 2.0*(s(n,r  )-s(n,r-1))
+                            dxscr(n,r,lim)= min(fabs(dmin),fabs(dpls))
+                            dxscr(n,r,lim) = merge(dxscr(n,r,lim),0.0,dpls*dmin>0.0)
+                            dxscr(n,r,flag) = copysign(1.0,dxscr(n,r,cen))
+                            dxscr(n,r,fromm)= dxscr(n,r,flag) 
+                                    *min(dxscr(n,r,lim),fabs(dxscr(n,r,cen)))
+                        }
+                        // end do
+
+                        // do r=lo,hi
+                        if (r == 0) {
+                            // one-sided difference
+                            slope = s(n,r+1)-s(n,r)
+                        } else if (r == nr[n]-1) {
+                            // one-sided difference
+                            slope = s(n,r)-s(n,r-1)
+                        } else {
+                            // fourth-order limited slopes on interior
+                            Real ds = 4.0/3.0*dxscr(n,r,cen) 
+                                    - (dxscr(n,r+1,fromm) + dxscr(n,r-1,fromm))/6.0
+                            slope = dxscr(n,r,flag)*min(fabs(ds),dxscr(n,r,lim))
+                        }
+                        // end do
+
+                    } // which slope order
+
+                    // compute sedgel and sedger
+                //   do r = lo,hi
+                    Real u = 0.5*(w0(n,r)+w0(n,r+1))
+                    Real ubardth = dth*u/dr[n]
+                    sedgel(n,r+1)= s(n,r) + (0.5-ubardth)*slope + dth * force(n,r)
+                    sedger(n,r  )= s(n,r) - (0.5+ubardth)*slope + dth * force(n,r)
+            //   end do
+                });
+
+            } else if (ppm_type == 1) {
+
+        // interpolate s to radial edges, store these temporary values into sedgel
+
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, i, {
+
+                    int r = i + lo;
+                    
+        // do n=0,finest_radial_level
+        //    do i=1,numdisjointchunks[n]
+
+        //       lo = r_start_coord(n,i)
+        //       hi = r_end_coord(n,i)
+
+              // compute van Leer slopes
+            //   do r=lo-1,hi+1
+                    Real dsvl = 0.0
+                    if (r == 0) {
+                        // one-sided difference
+                        dsvl = s(n,r+1)-s(n,r)
+                    } else if (r == nr[n]-1) {
+                        // one-sided difference
+                        dsvl = s(n,r)-s(n,r-1)
+                    } else if (r > 0 && r < nr[n]-1) {
+                        Real del  = 0.5 * (s(n,r+1) - s(n,r-1))
+                        Real dmin = 2.0  * (s(n,r  ) - s(n,r-1))
+                        Real dpls = 2.0  * (s(n,r+1) - s(n,r  ))
+                        dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                    }
+            //   end do
+
+            //   do r=lo,hi+1
+                    if (r == 0) {
+                        // 2nd order interpolation to boundary face
+                        sedgel(n,r) = s(n,r) - 0.5*dsvl(n,r)
+                    } else if (r == nr[n]) {
+                        // 2nd order interpolation to boundary face
+                        sedgel(n,r) = s(n,r-1) + 0.5*dsvl(n,r)
+                    } else {
+                        // 4th order interpolation of s to radial faces
+                        sedgel(n,r) = 0.5*(s(n,r)+s(n,r-1)) - (dsvl(n,r)-dsvl(n,r-1))/6.0
+                        // make sure sedgel lies in between adjacent cell-centered values
+                        sedgel(n,r) = max(sedgel(n,r),min(s(n,r),s(n,r-1)))
+                        sedgel(n,r) = min(sedgel(n,r),max(s(n,r),s(n,r-1)))
+                    }
+        //       end do
+
+        //    end do // loop over disjointchunks
+        // end do // loop over levels
+
+            //   do r=lo,hi
+
+                    Real sp = sedgel(n,r+1)
+                    Real sm = sedgel(n,r  )
+
+                    // modify using quadratic limiters
+                    if ((sp-s(n,r))*(s(n,r)-sm) <= 0.0) {
+                        sp = s(n,r)
+                        sm = s(n,r)
+                    } else if (fabs(sp-s(n,r)) >= 2.0*fabs(sm-s(n,r))) {
+                        sp = 3.0*s(n,r) - 2.0*sm
+                    } else if (fabs(sm-s(n,r)) >= 2.0*fabs(sp-s(n,r))) {
+                        sm = 3.0*s(n,r) - 2.0*sp
+                    }
+            //   end do
+
+                    // compute Ip and Im
+                    Real sigmap = fabs(w0(n,r+1))*dtdr
+                    Real sigmam = fabs(w0(n,r  ))*dtdr
+                    Real s6 = 6.0*s(n,r) - 3.0*(sm+sp)
+                    Real Ip = 0.0;
+                    Real Im = 0.0;
+                    if (w0(n,r+1) > rel_eps) {
+                        Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6)
+                    } else {
+                        Ip = s(n,r)
+                    }
+                    if (w0(n,r) < -rel_eps) {
+                        Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6)
+                    } else {
+                        Im = s(n,r)
+                    }
+
+                    // compute sedgel and sedger
+                    sedgel(n,r+1) = Ip + dth * force(n,r)
+                    sedger(n,r  ) = Im + dth * force(n,r)
+              
+                });
+
+            } else if (ppm_type == 2) {
+
+        // interpolate s to radial edges, store these temporary values into sedgel
+        // do n=0,finest_radial_level
+        //    do i=1,numdisjointchunks[n]
+
+        //       lo = r_start_coord(n,i)
+        //       hi = r_end_coord(n,i)
+
+        // store centered differences in dsvl
+        //       do r=lo-3,hi+3
+
+                AMREX_PARALLEL_FOR_1D(hi-lo+2, i, {
+                    int r = i + lo;
+
+                    // left side 
+                    Real dsvl = 0.0;
+                    if (r == 0) {
+                        // one-sided difference
+                        dsvl = s(n,r)-s(n,r-1)
+                    } else if (r == nr[n]-1) {
+                        // one-sided difference
+                        dsvl = s(n,r-1)-s(n,r-2)
+                    } else if (r > 0 && r < nr[n]-1) {
+                        // centered difference
+                        dsvl = 0.5 * (s(n,r) - s(n,r-2))
+                    }
+
+                    // right side 
+                    Real dsvr = 0.0;
+                    if (r == 0) {
+                        // one-sided difference
+                        dsvr = s(n,r+1)-s(n,r)
+                    } else if (r == nr[n]-1) {
+                        // one-sided difference
+                        dsvr = s(n,r)-s(n,r-1)
+                    } else if (r > 0 && r < nr[n]-1) {
+                        // centered difference
+                        dsvr = 0.5 * (s(n,r+1) - s(n,r-1))
+                    }
+
+            //   end do
+
+            //   do r=lo-2,hi+3
+                    if (r == 0) {
+                        // 2nd order interpolation to boundary face
+                        sedgel(n,r) = s(n,r) - 0.5*dsvr
+                    } else if (r == nr[n]) {
+                        // 2nd order interpolation to boundary face
+                        sedgel(n,r) = s(n,r-1) + 0.5*dsvr
+                    } else if (r > 0 && r < nr[n]) {
+                        // 4th order interpolation of s to radial faces
+                        sedgel(n,r) = 0.5*(s(n,r)+s(n,r-1)) - (dsvr-dsvl)/6.0
+                        if (r >= 2 && r <= nr[n]-2) {
+                            // limit sedge
+                            if ((sedgel(n,r)-s(n,r-1))*(s(n,r)-sedgel(n,r)) < 0.0) {
+                                Real D2  = 3.0*(s(n,r-1)-2.0*sedgel(n,r)+s(n,r))
+                                Real D2L = s(n,r-2)-2.0*s(n,r-1)+s(n,r)
+                                Real D2R = s(n,r-1)-2.0*s(n,r)+s(n,r+1)
+                                Real sgn = copysign(1.0,D2)
+                                Real D2LIM = sgn*max(min(C*sgn*D2L,C*sgn*D2R,sgn*D2),0.0)
+                                sedgel(n,r) = 0.5*(s(n,r-1)+s(n,r)) - D2LIM/6.0
+                            }
+                        }
+                    }
+        //       end do
+
+        //    end do // loop over disjointchunks
+        // end do // loop over levels
+
+        
+        // do n=0,finest_radial_level
+        //    do i=1,numdisjointchunks[n]
+
+        //       lo = r_start_coord(n,i)
+        //       hi = r_end_coord(n,i)
+
+            //   do r=lo,hi
+
+                // use Colella 2008 limiters
+                // This is a new version of the algorithm
+                // to eliminate sensitivity to roundoff.
+
+                    Real sm = 0.0;
+                    Real sp = 0.0;
+
+                    if (r >= 2 && r <= nr[n]-3) {
+
+                        Real alphap = sedgel(n,r+1)-s(n,r)
+                        Real alpham = sedgel(n,r  )-s(n,r)
+                        bool bigp = fabs(alphap)>2.0*fabs(alpham)
+                        bool bigm = fabs(alpham)>2.0*fabs(alphap)
+                        bool extremum = false
+
+                        if (alpham*alphap >= 0.0) {
+                            extremum = true
+                        } else if (bigp || bigm) {
+                            // Possible extremum. We look at cell centered values and face
+                            // centered values for a change in copysign in the differences adjacent to
+                            // the cell. We use the pair of differences whose minimum magnitude is
+                            // the largest, and thus least susceptible to sensitivity to roundoff.
+                            Real dafacem = sedgel(n,r) - sedgel(n,r-1)
+                            Real dafacep = sedgel(n,r+2) - sedgel(n,r+1)
+                            Real dabarm = s(n,r) - s(n,r-1)
+                            Real dabarp = s(n,r+1) - s(n,r)
+                            Real dafacemin = min(fabs(dafacem),fabs(dafacep))
+                            Real dabarmin= min(fabs(dabarm),fabs(dabarp))
+                            Real dachkm = 0.0;
+                            Real dachkp = 0.0;
+                            if (dafacemin >= dabarmin) {
+                                dachkm = dafacem;
+                                dachkp = dafacep;
+                            } else {
+                                dachkm = dabarm;
+                                dachkp = dabarp;
+                            }
+                            extremum = (dachkm*dachkp <= 0.0);
+                        }
+
+                        if (extremum) {
+                            Real D2  = 6.0*(alpham + alphap)
+                            Real D2L = s(n,r-2)-2.0*s(n,r-1)+s(n,r)
+                            Real D2R = s(n,r)-2.0*s(n,r+1)+s(n,r+2)
+                            Real D2C = s(n,r-1)-2.0*s(n,r)+s(n,r+1)
+                            Real sgn = copysign(1.0,D2)
+                            Real D2LIM = max(min(sgn*D2,C*sgn*D2L,C*sgn*D2R,C*sgn*D2C),0.0)
+                            Real D2ABS = max(fabs(D2),1.e-10)
+                            alpham = alpham*D2LIM/D2ABS
+                            alphap = alphap*D2LIM/D2ABS
+                        } else {
+                            if (bigp) {
+                                Real sgn = copysign(1.0,alpham)
+                                Real amax = -alphap*alphap / (4.0*(alpham + alphap))
+                                Real delam = s(n,r-1) - s(n,r)
+                                if (sgn*amax >= sgn*delam) {
+                                    if (sgn*(delam - alpham)>=1.e-10) {
+                                        alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham))
+                                    } else {
+                                        alphap = -2.0*alpham
+                                    }
+                                }
+                            }
+                            if (bigm) {
+                                Real sgn = copysign(1.0,alphap)
+                                Real amax = -alpham*alpham / (4.0*(alpham + alphap))
+                                Real delap = s(n,r+1) - s(n,r)
+                                if (sgn*amax >= sgn*delap) {
+                                    if (sgn*(delap - alphap)>=1.e-10) {
+                                        alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap))
+                                    } else {
+                                        alpham = -2.0*alphap
+                                    }
+                                }
+                            }
+                        }
+
+                        sm = s(n,r) + alpham
+                        sp = s(n,r) + alphap
+
+                    } else {
+
+                        sp = sedgel(n,r+1)
+                        sm = sedgel(n,r  )
+
+                    } // test (r >= 2 && r <= nr[n]-3)
+
+                    // compute Ip and Im
+                    Real sigmap = fabs(w0(n,r+1))*dtdr
+                    Real sigmam = fabs(w0(n,r  ))*dtdr
+                    Real s6 = 6.0*s(n,r) - 3.0*(sm+sp)
+                    Real Ip = 0.0;
+                    Real Im = 0.0;
+                    if (w0(n,r+1) > rel_eps) {
+                        Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6)
+                    } else {
+                        Ip = s(n,r)
+                    }
+                    if (w0(n,r) < -rel_eps) {
+                        Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6)
+                    } else {
+                        Im = s(n,r)
+                    }
+
+                    // compute sedgel and sedger
+                    sedgel(n,r+1) = Ip + dth * force(n,r)
+                    sedger(n,r  ) = Im + dth * force(n,r)
+
+                }); // loop over r
+
+            }
+
+     // sync up edge states at coarse-fine interface
+
+            // if we are not at the finest level, copy in the sedger and sedgel states
+            // from the next finer level at the c-f interface
+            if (n != finest_radial_level) {
+                sedger(n,r_start_coord(n+1,i)/2) = sedger(n+1,r_start_coord(n+1,i))
+                sedgel(n,(r_end_coord(n+1,i)+1)/2) = sedgel(n+1,r_end_coord(n+1,i)+1)
+            }
+
+            // if we are not at the coarsest level, copy in the sedgel and sedger states
+            // from the next coarser level at the c-f interface
+            if (n != 0) {
+                sedgel(n,lo) = sedgel(n-1,lo/2)
+                sedger(n,hi+1) = sedger(n-1,(hi+1)/2)
+            }
+
+
+     // solve Riemann problem to get final edge state
+
+    //        do r=lo,hi+1
+
+            AMREX_PARALLEL_FOR_1D(hi-lo+2, i, {
+                int r = i + lo;
+
+                if (r == 0) {
+                    // pick interior state at lo domain boundary
+                    sedge(n,r) = sedger(n,r)
+                } else if (r == nr[n]) {
+                    // pick interior state at hi domain boundary
+                    sedge(n,r) = sedgel(n,r)
+                } else {
+                    // upwind
+                    sedge(n,r) = w0(n,r) > 0.0 ? sedgel(n,r) : sedger(n,r)
+                    sedge(n,r) = fabs(w0(n,r)) < rel_eps ? 0.5*(sedger(n,r) + sedgel(n,r)) : sedge(n,r)
+                }
+            });
+        //    end do
+
+        }  // loop over disjointchunks
+    } // loop over levels
     
 }
