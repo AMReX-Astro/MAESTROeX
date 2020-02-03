@@ -900,8 +900,8 @@ public:
     void MakeEdgeState1dSphr(RealVector& s, RealVector& sedge, 
                               RealVector& w0, RealVector& force_1d);
 
-    void MakeEdgeState1dPlanar(amrex::Real* s, amrex::Real* sedge, 
-                                  amrex::Real* w0_p, amrex::Real* force_p);
+    void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
+                               RealVector& w0_p, RealVector& force_p);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
