@@ -1,3 +1,15 @@
+# 20.02
+
+  * Offloaded more routines to GPU: Fill3dData, MakeEdgeScal, VelPred, PPM
+
+  * Various bugfixes
+
+  * Fix vorticity to use correct domain boundaries
+
+  * Add travis clang static analysis
+
+  * Update analysis scripts for Urca fields
+
 # 20.01
 
   * Various initialization and checkpoint-restart fixes
@@ -12,7 +24,7 @@
 
   * Work on the rotating_star problem - models, heating profiles, initialization
 
-  * Renname subdirectories within Exec/ to lower-case to sync with Castro
+  * Rename subdirectories within Exec/ to lower-case to sync with Castro
 
 # 19.12
 
