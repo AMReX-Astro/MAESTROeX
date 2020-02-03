@@ -137,11 +137,11 @@ contains
        if (use_exact_base_state) then
           ! nr_fine = nr_irreg + 1
           do i=0,nr_fine-1
-             r_cc_loc(0,i) = sqrt(0.75d0+2.d0*i)*dx_fine(0)
+             r_cc_loc(0,i) = sqrt(0.75d0+2.d0*dble(i))*dx_fine(0)
           end do
           r_edge_loc(0,0) = 0.d0
           do i=0,nr_fine-1
-             r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(i+0.5d0))*dx_fine(0)
+             r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(dble(i)+0.5d0))*dx_fine(0)
           end do
        else
           do i=0,nr_fine-1
