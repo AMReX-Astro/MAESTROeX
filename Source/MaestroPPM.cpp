@@ -1071,12 +1071,11 @@ Maestro::PPM (const Box& bx,
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
-                        //
+                        
                         // Possible extremum. We look at cell centered values and face
                         // centered values for a change in sign in the differences adjacent to
                         // the cell. We use the pair of differences whose minimum magnitude is
                         // the largest, and thus least susceptible to sensitivity to roundoff.
-                        //
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i,j,k,n) - s(i,j-1,k,n);
@@ -1139,7 +1138,6 @@ Maestro::PPM (const Box& bx,
 
             if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
                 if (j == jhi) {
-
                     // The value in the first cc ghost cell represents the edge value.
                     sp = s(i,j+1,k,n);
                     
@@ -1168,7 +1166,6 @@ Maestro::PPM (const Box& bx,
                     sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)));
 
                 } else if (j == jhi-2) {
-
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgerr = -0.2*s(i,j+3,k,n) 
                             + 0.75*s(i,j+2,k,n) 
@@ -1312,7 +1309,6 @@ Maestro::PPM (const Box& bx,
 
         AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
         {
-
             // Compute van Leer slopes in z-direction.
 
             // sm
@@ -1520,7 +1516,6 @@ Maestro::PPM (const Box& bx,
 
         AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
         {
-
             // -1
             // Interpolate s to z-edges.
             Real sedgel = (7.0/12.0)*(s(i,j,k-2,n)+s(i,j,k-1,n)) 
@@ -1656,7 +1651,6 @@ Maestro::PPM (const Box& bx,
 
             // Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
-
                 if (k == klo) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -1777,7 +1771,6 @@ Maestro::PPM (const Box& bx,
             }
 
             if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-
                 if (k == khi) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -1944,6 +1937,5 @@ Maestro::PPM (const Box& bx,
             }
         });  
     }
-
 #endif
 }
