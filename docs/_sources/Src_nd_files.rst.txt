@@ -38,12 +38,9 @@ Src_nd
    file/make_scal_force_f
    file/make_vel_force_f
    file/make_w0_f
-   file/mkutrans_f
-   file/ppm_f
    file/regrid_f
    file/rhoh_vs_t_f
    file/rotation_f
-   file/slope_f
    file/sponge_f
    file/tagging_f
    file/update_scal_f

@@ -1,8 +1,0 @@
-mkutrans.F90
-============
-
-mkutrans\_module
-----------------
-
-.. f:automodule:: mkutrans_module
-
