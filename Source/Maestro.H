@@ -895,13 +895,13 @@ public:
     ////////////
     // MaestroMakeEdgeState.cpp functions
     void MakeEdgeState1d(RealVector& s, RealVector& sedge, 
-                              RealVector& w0, RealVector& force_1d);
+                         RealVector& force);
 
     void MakeEdgeState1dSphr(RealVector& s, RealVector& sedge, 
-                              RealVector& w0, RealVector& force_1d);
+                             RealVector& force);
 
     void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
-                               RealVector& w0_p, RealVector& force_p);
+                               RealVector& force);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 

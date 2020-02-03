@@ -4,20 +4,20 @@
 using namespace amrex;
 
 void Maestro::MakeEdgeState1d(RealVector& s, RealVector& sedge, 
-                              RealVector& w0, RealVector& force_1d)
+                              RealVector& force)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1d()",MakeEdgeState1d);   
 
     if (spherical) {
-        MakeEdgeState1dSphr(s, sedge, w0, force_1d);
+        MakeEdgeState1dSphr(s, sedge, force);
     } else {
         // MakeEdgeState1dPlanar(s_p, sedge_p, w0_p, force_p);
     }
 }
 
 void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec, 
-                              RealVector& w0, RealVector& force_1d)
+                                  RealVector& force)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()",MakeEdgeState1dSphr);
@@ -39,16 +39,17 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     RealVector sedger_vec(nr_fine+1);
 
     // copy valid data into array with ghost cells
-    RealVector s_ghost_vec(nr_fine+2*3);
+    const int ng = 3; // number of ghost cells
+    RealVector s_ghost_vec(nr_fine+2*ng);
     for (int i = 0; i < s_vec.size(); ++i) {
-        s_ghost_vec[i+3] = s_vec[i];
+        s_ghost_vec[i+ng] = s_vec[i];
     }
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < ng; i++) {
         // symmetry boundary condition at center 
-        s_ghost_vec[2-i] = s_vec[i];
+        s_ghost_vec[ng-1-i] = s_vec[i];
         // first-order extrapolation at top of star
-        s_ghost_vec[3+nr_fine+i] = s_vec[nr_fine-1];
+        s_ghost_vec[ng+nr_fine+i] = s_vec[nr_fine-1];
     }
 
     Real * AMREX_RESTRICT sedgel = sedgel_vec.dataPtr();
@@ -58,7 +59,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     Real * AMREX_RESTRICT s = s_vec.dataPtr();
     Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    Real * AMREX_RESTRICT force_p = force_1d.dataPtr();
+    Real * AMREX_RESTRICT force_p = force.dataPtr();
 
     if (ppm_type == 0) {
 
@@ -73,7 +74,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 slope = 0.0;
             } else if (slope_order == 2) {
                 // index of ghost array offset by 3
-                int g = r + 3;
+                int g = r + ng;
 
                 Real del = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
                 Real dpls = 2.0*(s_ghost[g+1] - s_ghost[g]);
@@ -84,7 +85,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 slope = sflag*min(slim,fabs(del));
             } else if (slope_order == 4) {
                 for (int i = 0; i < 3; ++i) {
-                    int g = r + 3 - 1 + i;
+                    int g = r + ng - 1 + i;
                     // do standard limiting to compute temporary slopes
                     dsscr[i][cen] = 0.5*(s_ghost[g+1]-s_ghost[g-1]);
                     Real dpls = 2.0*(s_ghost[g+1]-s_ghost[g]);
@@ -116,7 +117,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // sm
 
             // right side
-            int g = r + 3; 
+            int g = r + ng; 
             // compute van Leer slopes
             Real del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             Real dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -124,7 +125,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // left side 
-            g = r + 3 - 1;
+            g = r + ng - 1;
             // compute van Leer slopes
             del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -132,7 +133,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real dsscrl = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sm
-            g = r + 3;
+            g = r + ng;
             // 4th order interpolation of s to radial faces
             Real sm = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
             // make sure sedgel lies in between adjacent cell-centered values
@@ -145,7 +146,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             dsscrl = dsscrr;
 
             // right side
-            g = r + 3 + 1; 
+            g = r + ng + 1; 
             // compute van Leer slopes
             del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -153,7 +154,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sp
-            g = r + 3 + 1;
+            // g = r + ng + 1;
             // 4th order interpolation of s to radial faces
             Real sp = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
             // make sure sedgel lies in between adjacent cell-centered values
@@ -192,7 +193,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // interpolate s to radial edges, store these temporary values into sedgel
 
             for (int i = 0; i < 4; i++) {
-                int g = r + 3 - 1 + i;
+                int g = r + ng - 1 + i;
                 int rr = r - 1 + i;
 
                 sedget[r] = (7.0/12.0)*(s_ghost[g-1]+s_ghost[g]) 
@@ -209,7 +210,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 }
             }
 
-            int g = r + 3;
+            int g = r + ng;
 
             // use Colella 2008 limiters
             // This is a new version of the algorithm
@@ -320,7 +321,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 }
 
 void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec, 
-                              RealVector& w0, RealVector& force_1d)
+                                    RealVector& force)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dPlanar()",MakeEdgeState1dPlanar);
@@ -346,7 +347,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     Real * AMREX_RESTRICT s = s_vec.dataPtr();
     Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    Real * AMREX_RESTRICT force_p = force_1d.dataPtr();
+    Real * AMREX_RESTRICT force_p = force.dataPtr();
 
 
     // for (int n = 0; n <= max_radial_level; ++n) {
