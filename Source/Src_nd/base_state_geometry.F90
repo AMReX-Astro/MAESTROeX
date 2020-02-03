@@ -675,8 +675,8 @@ contains
     coord(0:finest_radial_level,0:nr_fine) = 0
 
     do lev = 0, finest_radial_level
-        do i = 0, numdisjointchunks(lev)
-            coord(lev, i) = r_start_coord(lev, i)
+        do i = 1, numdisjointchunks(lev)
+            coord(lev, i-1) = r_start_coord(lev, i)
         end do
     end do
   end subroutine get_r_start_coord
@@ -690,8 +690,8 @@ contains
     coord(0:finest_radial_level,0:nr_fine) = 0
     
     do lev = 0, finest_radial_level
-        do i = 0, numdisjointchunks(lev)
-            coord(lev, i) = r_end_coord(lev, i)
+        do i = 1, numdisjointchunks(lev)
+            coord(lev, i-1) = r_end_coord(lev, i)
         end do
     end do
   end subroutine get_r_end_coord

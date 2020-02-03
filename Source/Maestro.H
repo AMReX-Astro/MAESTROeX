@@ -110,7 +110,7 @@ public:
     ////////////
     // MaestroAdvectBase.cpp functions
     void AdvectBaseDens(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge, RealVector& force);
     void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
 
     void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);

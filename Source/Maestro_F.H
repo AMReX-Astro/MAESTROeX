@@ -19,7 +19,8 @@ extern "C"
 			        amrex::Real* rho0_predicted_edge,
 			  const amrex::Real dt,
 			  const amrex::Real* r_cc_loc,
-			  const amrex::Real* r_edge_loc);
+			  const amrex::Real* r_edge_loc,
+              amrex::Real* force);
 
     void advect_base_enthalpy(const amrex::Real* w0,
 			      const amrex::Real* rho0_old,
