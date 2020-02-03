@@ -108,6 +108,18 @@ public:
     ////////////
 
     ////////////
+    // MaestroAdvectBase.cpp functions
+    void AdvectBaseDens(RealVector& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
+    void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
+
+    void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge);
+    // end MaestroAdvectBase.cpp functions
+    ////////////
+
+    ////////////
     // MaestroAdvection.cpp functions
 
     /// Compute unprojected mac velocities
