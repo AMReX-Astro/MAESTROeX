@@ -34,6 +34,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const Real dr = dr_fine;
 
     const int nr = nr_fine;
+    const int max_lev = max_radial_level+1;
 
     RealVector sedgel_vec(nr_fine+1);
     RealVector sedger_vec(nr_fine+1);
@@ -42,14 +43,14 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int ng = 3; // number of ghost cells
     RealVector s_ghost_vec(nr_fine+2*ng);
     for (int i = 0; i < s_vec.size(); ++i) {
-        s_ghost_vec[i+ng] = s_vec[i];
+        s_ghost_vec[i+ng] = s_vec[max_lev*i];
     }
 
     for (int i = 0; i < ng; i++) {
         // symmetry boundary condition at center 
-        s_ghost_vec[ng-1-i] = s_vec[i];
+        s_ghost_vec[ng-1-i] = s_vec[max_lev*i];
         // first-order extrapolation at top of star
-        s_ghost_vec[ng+nr_fine+i] = s_vec[nr_fine-1];
+        s_ghost_vec[ng+nr_fine+i] = s_vec[max_lev*(nr_fine-1)];
     }
 
     Real * AMREX_RESTRICT sedgel = sedgel_vec.dataPtr();
@@ -110,14 +111,15 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
     } else if (ppm_type == 1) {
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        AMREX_PARALLEL_FOR_1D(nr_fine, i, {
+            int r = max_lev*i;
 
             // interpolate s to radial edges
 
             // sm
 
             // right side
-            int g = r + ng; 
+            int g = i + ng; 
             // compute van Leer slopes
             Real del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             Real dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -125,7 +127,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // left side 
-            g = r + ng - 1;
+            g = i + ng - 1;
             // compute van Leer slopes
             del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -133,7 +135,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real dsscrl = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sm
-            g = r + ng;
+            g = i + ng;
             // 4th order interpolation of s to radial faces
             Real sm = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
             // make sure sedgel lies in between adjacent cell-centered values
@@ -146,7 +148,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             dsscrl = dsscrr;
 
             // right side
-            g = r + ng + 1; 
+            g = i + ng + 1; 
             // compute van Leer slopes
             del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
             dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
@@ -154,7 +156,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sp
-            // g = r + ng + 1;
+            // g = i + ng + 1;
             // 4th order interpolation of s to radial faces
             Real sp = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
             // make sure sedgel lies in between adjacent cell-centered values
