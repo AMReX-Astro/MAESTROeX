@@ -353,6 +353,7 @@ Maestro::Slopey(const Box& bx,
     }
 }
 
+#if (AMREX_SPACEDIM == 3)
 void 
 Maestro::Slopez(const Box& bx, 
                 Array4<Real> const s,
@@ -526,3 +527,4 @@ Maestro::Slopez(const Box& bx,
         });
     }
 }
+#endif
