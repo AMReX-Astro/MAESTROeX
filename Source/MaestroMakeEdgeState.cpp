@@ -31,7 +31,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr = dr_fine;
+    const Real dr = dr_fine * pow(2.0, max_radial_level);
 
     const int nr = nr_fine;
     const int max_lev = max_radial_level+1;
@@ -138,7 +138,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             g = i + ng;
             // 4th order interpolation of s to radial faces
             Real sm = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
-            // make sure sedgel lies in between adjacent cell-centered values
+            // make sure sm lies in between adjacent cell-centered values
             sm = max(sm,min(s_ghost[g],s_ghost[g-1]));
             sm = min(sm,max(s_ghost[g],s_ghost[g-1]));
 
@@ -159,9 +159,9 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // g = i + ng + 1;
             // 4th order interpolation of s to radial faces
             Real sp = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
-            // make sure sedgel lies in between adjacent cell-centered values
-            sp = max(sm,min(s_ghost[g],s_ghost[g-1]));
-            sp = min(sm,max(s_ghost[g],s_ghost[g-1]));
+            // make sure sp lies in between adjacent cell-centered values
+            sp = max(sp,min(s_ghost[g],s_ghost[g-1]));
+            sp = min(sp,max(s_ghost[g],s_ghost[g-1]));
 
             // modify using quadratic limiters
             if ((sp-s[r])*(s[r]-sm) <= 0.0) {
@@ -174,17 +174,17 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             }
 
             // compute Ip and Im
-            Real sigmap = fabs(w0_p[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmap = fabs(w0_p[r+max_lev])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
             Real sigmam = fabs(w0_p[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s[r] - 3.0*(sm+sp);
             
-            Real Ip = w0_p[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
+            Real Ip = w0_p[r+max_lev] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
 
             Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // // compute sedgel and sedger
-            sedgel[r+1] = Ip + dth*force_p[r];
-            sedger[r] = Im + dth*force_p[r];
+            sedgel[i+1] = Ip + dth*force_p[r];
+            sedger[i] = Im + dth*force_p[r];
         });
     } else if (ppm_type == 2) {
 
@@ -303,21 +303,22 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         });
     }
 
-    AMREX_PARALLEL_FOR_1D(nr_fine+1, r, {
+    AMREX_PARALLEL_FOR_1D(nr_fine+1, i, {
+        int r = i * max_lev;
         // Fix center and edge of star by reflecting the extrapolated state.
         // An alternate way would be to compute these values using the entire algorithm,
         // but that would require more ghost cells at several stages.
         // By symmetry arguments, this would make no difference at the center of the star
         // and the accuracy at the edge of the star is not important here
-        if (r == 0) {
-            sedgel[r] = sedge[r];
-        } else if (r == nr_fine) {
-            sedger[r] = sedgel[r];
+        if (i == 0) {
+            sedgel[i] = sedger[i];
+        } else if (i == nr_fine) {
+            sedger[i] = sedgel[i];
         }
 
         // solve Riemann problem to get final edge state
-        sedge[r]= w0_p[r] > 0.0 ? sedgel[r] : sedger[r];
-        sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[r]+sedgel[r]) : sedge[r];
+        sedge[r]= w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
+        sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[i]+sedgel[i]) : sedge[r];
     });
 
 }
