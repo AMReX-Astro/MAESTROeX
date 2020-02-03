@@ -496,131 +496,134 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     sedger[r] = s[p] - (0.5+ubardth)*slope + dth * force_p[p];
                 });
 
-        //     } else if (ppm_type == 1) {
+            } else if (ppm_type == 1) {
 
-        // // interpolate s to radial edges, store these temporary values into sedgel
+        // interpolate s to radial edges, store these temporary values into sedgel
 
-        //         AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
 
-        //             int r = j + lo;
+                    int r = j + lo;
+                    int p = n + max_lev*r;
 
-        //             // calculate sm
+                    int pp = n + max_lev*(r+1);
+                    int pm = n + max_lev*(r-1);
 
-        //             // compute van Leer slopes
-        //             // r - 1
-        //             Real dsvlm = 0.0
-        //             int rm = r - 1;
-        //             if (rm == 0) {
-        //                 // one-sided difference
-        //                 dsvlm = s[n+max_lev*(rm+1)]-s[n+max_lev*rm]
-        //             } else if (rm == nr-1) {
-        //                 // one-sided difference
-        //                 dsvlm = s[n+max_lev*rm]-s[n+max_lev*(rm-1)]
-        //             } else if (r > 0 && r < nr-1) {
-        //                 Real del  = 0.5 * (s[n+max_lev*(rm+1)] - s[n+max_lev*(rm-1)])
-        //                 Real dmin = 2.0  * (s[n+max_lev*rm] - s[n+max_lev*(rm-1)])
-        //                 Real dpls = 2.0  * (s[n+max_lev*(rm+1)] - s[n+max_lev*rm])
-        //                 dsvlm = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
-        //             }
+                    // calculate sm
 
-        //             // r
-        //             Real dsvl = 0.0
-        //             if (r == 0) {
-        //                 // one-sided difference
-        //                 dsvl = s[pp]-s[p]
-        //             } else if (r == nr-1) {
-        //                 // one-sided difference
-        //                 dsvl = s[p]-s[pm]
-        //             } else if (r > 0 && r < nr-1) {
-        //                 Real del  = 0.5 * (s[pp] - s[pm])
-        //                 Real dmin = 2.0  * (s[p] - s[pm])
-        //                 Real dpls = 2.0  * (s[pp] - s[p])
-        //                 dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
-        //             }
+                    // compute van Leer slopes
+                    // r - 1
+                    Real dsvlm = 0.0;
+                    int rm = r - 1;
+                    if (rm == 0) {
+                        // one-sided difference
+                        dsvlm = s[n+max_lev*(rm+1)]-s[n+max_lev*rm];
+                    } else if (rm == nr-1) {
+                        // one-sided difference
+                        dsvlm = s[n+max_lev*rm]-s[n+max_lev*(rm-1)];
+                    } else if (r > 0 && r < nr-1) {
+                        Real del  = 0.5 * (s[n+max_lev*(rm+1)] - s[n+max_lev*(rm-1)]);
+                        Real dmin = 2.0  * (s[n+max_lev*rm] - s[n+max_lev*(rm-1)]);
+                        Real dpls = 2.0  * (s[n+max_lev*(rm+1)] - s[n+max_lev*rm]);
+                        dsvlm = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                    }
 
-        //             Real sm = 0.0;
-        //             if (r == 0) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sm = s[p] - 0.5*dsvl
-        //             } else if (r == nr) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sm = s[pm] + 0.5*dsvl
-        //             } else {
-        //                 // 4th order interpolation of s to radial faces
-        //                 sm = 0.5*(s[p]+s[pm]) - (dsvl-dsvlm)/6.0
-        //                 // make sure sedgel lies in between adjacent cell-centered values
-        //                 sm = max(sm,min(s[p],s[pm]))
-        //                 sm = min(sm,max(s[p],s[pm]))
-        //             }
+                    // r
+                    Real dsvl = 0.0;
+                    if (r == 0) {
+                        // one-sided difference
+                        dsvl = s[pp] - s[p];
+                    } else if (r == nr-1) {
+                        // one-sided difference
+                        dsvl = s[p] - s[pm];
+                    } else if (r > 0 && r < nr-1) {
+                        Real del  = 0.5 * (s[pp] - s[pm]);
+                        Real dmin = 2.0  * (s[p] - s[pm]);
+                        Real dpls = 2.0  * (s[pp] - s[p]);
+                        dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                    }
 
-        //             // calculate sp
-        //             // compute van Leer slopes
-        //             // r + 1 - 1
-        //             dsvlm = dsvl;
+                    Real sm = 0.0;
+                    if (r == 0) {
+                        // 2nd order interpolation to boundary face
+                        sm = s[p] - 0.5*dsvl;
+                    } else if (r == nr) {
+                        // 2nd order interpolation to boundary face
+                        sm = s[pm] + 0.5*dsvl;
+                    } else {
+                        // 4th order interpolation of s to radial faces
+                        sm = 0.5*(s[p]+s[pm]) - (dsvl-dsvlm)/6.0;
+                        // make sure sedgel lies in between adjacent cell-centered values
+                        sm = max(sm,min(s[p],s[pm]));
+                        sm = min(sm,max(s[p],s[pm]));
+                    }
 
-        //             // r + 1
-        //             int rp = r + 1;
-        //             if (rp == 0) {
-        //                 // one-sided difference
-        //                 dsvl = s[n+max_lev*(rp+1)]-s[n+max_lev*rp]
-        //             } else if (rp == nr-1) {
-        //                 // one-sided difference
-        //                 dsvl = s[n+max_lev*rp]-s[n+max_lev*(rp-1)]
-        //             } else if (rp > 0 && rp < nr-1) {
-        //                 Real del  = 0.5 * (s[n+max_lev*(rp+1)] - s[n+max_lev*(rp-1)])
-        //                 Real dmin = 2.0  * (s[n+max_lev*rp] - s[n+max_lev*(rp-1)])
-        //                 Real dpls = 2.0  * (s[n+max_lev*(rp+1)] - s[n+max_lev*rp])
-        //                 dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
-        //             }
+                    // calculate sp
+                    // compute van Leer slopes
+                    // r + 1 - 1
+                    dsvlm = dsvl;
 
-        //             Real sp = 0.0;
-        //             if (rp == 0) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sp = s[n+max_lev*rp] - 0.5*dsvl[n+max_lev*rp]
-        //             } else if (rp == nr) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sp = s[n+max_lev*(rp-1)] + 0.5*dsvl
-        //             } else {
-        //                 // 4th order interpolation of s to radial faces
-        //                 sp = 0.5*(s[n+max_lev*rp]+s[n+max_lev*(rp-1)]) - (dsvl-dsvlm)/6.0
-        //                 // make sure sedgel lies in between adjacent cell-centered values
-        //                 sp = max(sp,min(s[n+max_lev*rp],s[n+max_lev*(rp-1)]))
-        //                 sp = min(sp,max(s[p],s[n+max_lev*(rp-1)]))
-        //             }
+                    // r + 1
+                    int rp = r + 1;
+                    if (rp == 0) {
+                        // one-sided difference
+                        dsvl = s[n+max_lev*(rp+1)]-s[n+max_lev*rp];
+                    } else if (rp == nr-1) {
+                        // one-sided difference
+                        dsvl = s[n+max_lev*rp]-s[n+max_lev*(rp-1)];
+                    } else if (rp > 0 && rp < nr-1) {
+                        Real del  = 0.5 * (s[n+max_lev*(rp+1)] - s[n+max_lev*(rp-1)]);
+                        Real dmin = 2.0  * (s[n+max_lev*rp] - s[n+max_lev*(rp-1)]);
+                        Real dpls = 2.0  * (s[n+max_lev*(rp+1)] - s[n+max_lev*rp]);
+                        dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                    }
 
-        //             // modify using quadratic limiters
-        //             if ((sp-s[p])*(s[p]-sm) <= 0.0) {
-        //                 sp = s[p]
-        //                 sm = s[p]
-        //             } else if (fabs(sp-s[p]) >= 2.0*fabs(sm-s[p])) {
-        //                 sp = 3.0*s[p] - 2.0*sm
-        //             } else if (fabs(sm-s[p]) >= 2.0*fabs(sp-s[p])) {
-        //                 sm = 3.0*s[p] - 2.0*sp
-        //             }
-        //     //   end do
+                    Real sp = 0.0;
+                    if (rp == 0) {
+                        // 2nd order interpolation to boundary face
+                        sp = s[n+max_lev*rp] - 0.5*dsvl;
+                    } else if (rp == nr) {
+                        // 2nd order interpolation to boundary face
+                        sp = s[n+max_lev*(rp-1)] + 0.5*dsvl;
+                    } else {
+                        // 4th order interpolation of s to radial faces
+                        sp = 0.5*(s[n+max_lev*rp]+s[n+max_lev*(rp-1)]) - (dsvl-dsvlm)/6.0;
+                        // make sure sedgel lies in between adjacent cell-centered values
+                        sp = max(sp,min(s[n+max_lev*rp],s[n+max_lev*(rp-1)]));
+                        sp = min(sp,max(s[p],s[n+max_lev*(rp-1)]));
+                    }
 
-        //             // compute Ip and Im
-        //             Real sigmap = fabs(w0_p(n,r+1))*dtdr
-        //             Real sigmam = fabs(w0_p(n,r  ))*dtdr
-        //             Real s6 = 6.0*s[p] - 3.0*(sm+sp)
-        //             Real Ip = 0.0;
-        //             Real Im = 0.0;
-        //             if (w0_p(n,r+1) > rel_eps) {
-        //                 Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6)
-        //             } else {
-        //                 Ip = s[p]
-        //             }
-        //             if (w0_p(n,r) < -rel_eps) {
-        //                 Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6)
-        //             } else {
-        //                 Im = s[p]
-        //             }
+                    // modify using quadratic limiters
+                    if ((sp-s[p])*(s[p]-sm) <= 0.0) {
+                        sp = s[p];
+                        sm = s[p];
+                    } else if (fabs(sp-s[p]) >= 2.0*fabs(sm-s[p])) {
+                        sp = 3.0*s[p] - 2.0*sm;
+                    } else if (fabs(sm-s[p]) >= 2.0*fabs(sp-s[p])) {
+                        sm = 3.0*s[p] - 2.0*sp;
+                    }
+            //   end do
 
-        //             // compute sedgel and sedger
-        //             sedgel[r+1] = Ip + dth * force_p(n,r)
-        //             sedger[r] = Im + dth * force_p(n,r)
-              
-        //         });
+                    // compute Ip and Im
+                    Real sigmap = fabs(w0_p[pp])*dtdr;
+                    Real sigmam = fabs(w0_p[p])*dtdr;
+                    Real s6 = 6.0*s[p] - 3.0*(sm+sp);
+                    Real Ip = 0.0;
+                    Real Im = 0.0;
+                    if (w0_p[pp] > rel_eps) {
+                        Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6);
+                    } else {
+                        Ip = s[p];
+                    }
+                    if (w0_p[p] < -rel_eps) {
+                        Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6);
+                    } else {
+                        Im = s[p];
+                    }
+
+                    // compute sedgel and sedger
+                    sedgel[r+1] = Ip + dth * force_p[p];
+                    sedger[r] = Im + dth * force_p[p];
+                });
 
         //     } else if (ppm_type == 2) {
 
