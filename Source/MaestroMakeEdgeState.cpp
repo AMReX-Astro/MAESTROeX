@@ -191,28 +191,28 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         // this will hold values at r-1, r, r+1 and r+2
         GpuArray<Real,4> sedget;
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        AMREX_PARALLEL_FOR_1D(nr_fine, i, {
+            int r = i * max_lev;
             // interpolate s to radial edges, store these temporary values into sedgel
 
-            for (int i = 0; i < 4; i++) {
-                int g = r + ng - 1 + i;
-                int rr = r - 1 + i;
+            for (int j = 0; j < 4; j++) {
+                int g = i + ng - 1 + j;
 
-                sedget[r] = (7.0/12.0)*(s_ghost[g-1]+s_ghost[g]) 
+                sedget[j] = (7.0/12.0)*(s_ghost[g-1]+s_ghost[g]) 
                         - (1.0/12.0)*(s_ghost[g-2]+s_ghost[g+1]);
 
                 // limit sedge
-                if ((sedget[rr]-s_ghost[g-1])*(s_ghost[g]-sedget[rr]) < 0.0) {
-                    Real D2  = 3.0*(s_ghost[g-1]-2.0*sedgel[r]+s_ghost[g]);
+                if ((sedget[j]-s_ghost[g-1])*(s_ghost[g]-sedget[j]) < 0.0) {
+                    Real D2  = 3.0*(s_ghost[g-1]-2.0*sedget[j]+s_ghost[g]);
                     Real D2L = s_ghost[g-2]-2.0*s_ghost[g-1]+s_ghost[g];
                     Real D2R = s_ghost[g-1]-2.0*s_ghost[g]+s_ghost[g+1];
                     Real sgn = copysign(1.0,D2);
                     Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                    sedget[rr] = 0.5*(s_ghost[g-1]+s_ghost[g]) - D2LIM/6.0;
+                    sedget[j] = 0.5*(s_ghost[g-1]+s_ghost[g]) - D2LIM/6.0;
                 }
             }
 
-            int g = r + ng;
+            int g = i + ng;
 
             // use Colella 2008 limiters
             // This is a new version of the algorithm
