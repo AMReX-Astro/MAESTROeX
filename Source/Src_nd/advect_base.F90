@@ -17,7 +17,7 @@ contains
 
   subroutine advect_base_dens(w0,rho0_old,rho0_new, &
        rho0_predicted_edge,dt, &
-       r_cc_loc, r_edge_loc) bind(C, name="advect_base_dens")
+       r_cc_loc, r_edge_loc, lev) bind(C, name="advect_base_dens")
 
     double precision, intent(in   ) ::                  w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
@@ -26,14 +26,18 @@ contains
     double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
+    integer, value, intent(in) :: lev
 
     call bl_proffortfuncstart("Maestro::advect_base_dens")
 
     if (spherical .eq. 0) then
-       call advect_base_dens_planar(w0,rho0_old,rho0_new,rho0_predicted_edge,dt)
+       call advect_base_dens_planar(w0,rho0_old,rho0_new,rho0_predicted_edge,dt,lev)
+
+       ! NOTE: these won't work with the whole looping over levels, but I've 
+       ! already converted these to C++ anyway in the cpp_advect_base branch
        call restrict_base(rho0_new,1)
        call fill_ghost_base(rho0_new,1)
-    else
+    else if (lev .eq. 0) then
        call advect_base_dens_spherical(w0,rho0_old,rho0_new,rho0_predicted_edge,dt, &
             r_cc_loc,r_edge_loc)
     end if
@@ -45,13 +49,14 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine advect_base_dens_planar(w0,rho0_old,rho0_new, &
-       rho0_predicted_edge,dt)
+       rho0_predicted_edge,dt,lev)
 
     double precision, intent(in   ) ::                  w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) ::            rho0_new(0:max_radial_level,0:nr_fine-1)
     double precision, intent(  out) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
     double precision, value, intent(in   ) ::                  dt
+    integer, value, intent(in) :: lev
 
     ! Local variables
     integer :: r, n, i
@@ -141,7 +146,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine advect_base_enthalpy(w0,rho0_old,rhoh0_old,rhoh0_new,rho0_predicted_edge, &
-       psi,dt,r_cc_loc,r_edge_loc) bind(C, name="advect_base_enthalpy")
+       psi,dt,r_cc_loc,r_edge_loc,lev) bind(C, name="advect_base_enthalpy")
 
     double precision, intent(in   ) ::                  w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
@@ -152,15 +157,16 @@ contains
     double precision, value, intent(in   ) ::                  dt
     double precision, intent(in   ) ::            r_cc_loc(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) ::          r_edge_loc(0:max_radial_level,0:nr_fine  )
+    integer, value, intent(in) :: lev
 
     call bl_proffortfuncstart("Maestro::advect_base_enthalpy")
 
     if (spherical .eq. 0) then
        call advect_base_enthalpy_planar(w0,rho0_old,rhoh0_old,rhoh0_new, &
-            rho0_predicted_edge,psi,dt)
+            rho0_predicted_edge,psi,dt,lev)
        call restrict_base(rhoh0_new,1)
        call fill_ghost_base(rhoh0_new,1)
-    else
+    else if (lev .eq. 0) then
        call advect_base_enthalpy_spherical(w0,rho0_old,rhoh0_old,rhoh0_new, &
             rho0_predicted_edge,psi,dt, &
             r_cc_loc, r_edge_loc)
@@ -173,7 +179,7 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   subroutine advect_base_enthalpy_planar(w0,rho0_old,rhoh0_old,rhoh0_new, &
-       rho0_predicted_edge,psi,dt)
+       rho0_predicted_edge,psi,dt,lev)
 
     double precision, intent(in   ) ::                  w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::            rho0_old(0:max_radial_level,0:nr_fine-1)
@@ -182,6 +188,7 @@ contains
     double precision, intent(in   ) :: rho0_predicted_edge(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::                 psi(0:max_radial_level,0:nr_fine-1)
     double precision, value, intent(in   ) ::                  dt
+    integer, value, intent(in) :: lev
 
     ! Local variables
     integer :: r, i, n

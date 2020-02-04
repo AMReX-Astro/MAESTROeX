@@ -385,9 +385,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
-                         rho0_predicted_edge.dataPtr(), dt,
-                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        for (auto lev = 0; lev <= max_radial_level; ++lev) {
+            advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
+                            rho0_predicted_edge.dataPtr(), dt,
+                            r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), lev);
+        }
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -517,10 +519,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
-                             rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
-                             rho0_predicted_edge.dataPtr(), psi.dataPtr(), dt,
-                             r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        for (auto lev = 0; lev <= max_radial_level; ++lev) {
+            advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
+                                rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
+                                rho0_predicted_edge.dataPtr(), psi.dataPtr(), dt,
+                                r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), lev);
+        }
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -789,9 +793,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
         base_time_start = ParallelDescriptor::second();
 
-        advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
-                         rho0_predicted_edge.dataPtr(), dt,
-                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        for (auto lev = 0; lev <= max_radial_level; ++lev) {
+            advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
+                            rho0_predicted_edge.dataPtr(), dt,
+                            r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), lev);
+        }
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -911,10 +917,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         // base state enthalpy update
-        advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
+        for (auto lev = 0; lev <= max_radial_level; ++lev) {
+            advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
                              rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
                              rho0_predicted_edge.dataPtr(), psi.dataPtr(), dt,
-                             r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+                             r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), lev);
+        }
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
