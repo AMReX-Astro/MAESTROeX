@@ -110,7 +110,7 @@ public:
     ////////////
     // MaestroAdvectBase.cpp functions
     void AdvectBaseDens(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge, RealVector& force);
+    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
     void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
 
     void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
@@ -255,6 +255,8 @@ public:
 		    const amrex::Vector<amrex::MultiFab>& force,
 		    const amrex::Vector<amrex::MultiFab>& sponge,
 		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
+
+    // end MaestroAdvection.cpp functions
     ////////////
 
     ////////////
@@ -273,12 +275,23 @@ public:
     ////////////
 
     ////////////
+    // MaestroBaseStateGeometry.cpp functions
+
+    void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
+    void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
+
+    // end MaestroBaseStateGeometry.cpp functions
+    ////////////
+
+    ////////////
     // MaestroCheckpoint.cpp functions
 
     /// Write a checkpoint at timestep `step`
     void WriteCheckPoint (int step);
     int ReadCheckPoint ();
     void GotoNextLine (std::istream& is);
+
+    // end MaestroCheckpoint.cpp functions
     ////////////
 
     ////////////

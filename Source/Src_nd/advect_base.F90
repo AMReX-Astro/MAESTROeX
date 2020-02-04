@@ -32,8 +32,8 @@ contains
 
     if (spherical .eq. 0) then
        call advect_base_dens_planar(w0,rho0_old,rho0_new,rho0_predicted_edge,dt,force)
-       call restrict_base(rho0_new,1)
-       call fill_ghost_base(rho0_new,1)
+    !    call restrict_base(rho0_new,1)
+    !    call fill_ghost_base(rho0_new,1)
     end if
 
     call bl_proffortfuncstop("Maestro::advect_base_dens")
@@ -70,15 +70,15 @@ contains
 
     ! write(*,*) "r_end_coord = ", r_end_coord
 
-    ! do n=0,max_radial_level
-    !    do i=1,numdisjointchunks(n)
+    do n=0,max_radial_level
+       do i=1,numdisjointchunks(n)
 
-    !     ! write(*,*) "start, end = ", r_start_coord(n,i),r_end_coord(n,i)
-    !       do r=r_start_coord(n,i),r_end_coord(n,i)
-    !          force(n,r) = -rho0_old(n,r) * (w0(n,r+1) - w0(n,r)) / dr(n)
-    !       end do
-    !    end do
-    ! end do
+        ! write(*,*) "start, end = ", r_start_coord(n,i),r_end_coord(n,i)
+          do r=r_start_coord(n,i),r_end_coord(n,i)
+             force(n,r) = -rho0_old(n,r) * (w0(n,r+1) - w0(n,r)) / dr(n)
+          end do
+       end do
+    end do
 
     call make_edge_state_1d(rho0_old,edge,w0,force,dt)
 
