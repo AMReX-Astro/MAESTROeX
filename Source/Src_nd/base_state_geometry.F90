@@ -526,7 +526,7 @@ contains
        do n=finest_radial_level,1,-1
           ! for level n, make the coarse edge underneath equal to the fine edge value
           do i=1,numdisjointchunks(n)
-             do r=r_start_coord(n,1),r_end_coord(n,1)+1,2
+             do r=r_start_coord(n,i),r_end_coord(n,i)+1,2
                 s0(n-1,r/2) = s0(n,r)
              end do
           end do
