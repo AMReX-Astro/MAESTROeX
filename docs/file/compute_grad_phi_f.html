@@ -174,7 +174,6 @@
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_pi_cc_f.html">make_pi_cc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
@@ -272,7 +271,7 @@
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/compute_grad_phi_module/compute_grad_phi" title="f/compute_grad_phi_module/compute_grad_phi"><code class="xref f f-func docutils literal notranslate"><span class="pre">compute_grad_phi()</span></code></a>, <a class="reference internal" href="#f/compute_grad_phi_module/compute_grad_phi_rad" title="f/compute_grad_phi_module/compute_grad_phi_rad"><code class="xref f f-func docutils literal notranslate"><span class="pre">compute_grad_phi_rad()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/compute_grad_phi_module/compute_grad_phi_rad" title="f/compute_grad_phi_module/compute_grad_phi_rad"><code class="xref f f-func docutils literal notranslate"><span class="pre">compute_grad_phi_rad()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -280,26 +279,6 @@
 <li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
 </ul>
 <p class="rubric">Subroutines and functions</p>
-<dl class="subroutine">
-<dt id="f/compute_grad_phi_module/compute_grad_phi">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">compute_grad_phi_module/</code><code class="sig-name descname">compute_grad_phi</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">phi</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em>, <em class="sig-param">gphi</em>, <em class="sig-param">g_lo</em>, <em class="sig-param">g_hi</em>, <em class="sig-param">dx</em><span class="sig-paren">)</span><a class="headerlink" href="#f/compute_grad_phi_module/compute_grad_phi" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>phi</strong> (p_hi(1)-(p_lo(1))+1,p_hi(2)-(p_lo(2))+1,p_hi(3)-(p_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>p_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>gphi</strong> (g_hi(1)-(g_lo(1))+1,g_hi(2)-(g_lo(2))+1,g_hi(3)-(g_lo(3))+1,amrex_spacedim)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>g_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>g_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="subroutine">
 <dt id="f/compute_grad_phi_module/compute_grad_phi_rad">
 <em class="property">subroutine  </em><code class="sig-prename descclassname">compute_grad_phi_module/</code><code class="sig-name descname">compute_grad_phi_rad</code><span class="sig-paren">(</span><em class="sig-param">phi</em>, <em class="sig-param">gphi_rad</em><span class="sig-paren">)</span><a class="headerlink" href="#f/compute_grad_phi_module/compute_grad_phi_rad" title="Permalink to this definition">¶</a></dt>
