@@ -355,7 +355,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT force_p = force.dataPtr();
 
-
     for (int n = 0; n <= max_radial_level; ++n) {
 
         sedgel_vec[n].resize(nr_fine+1);
@@ -498,13 +497,12 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
             } else if (ppm_type == 1) {
 
-        // interpolate s to radial edges, store these temporary values into sedgel
+                // interpolate s to radial edges, store these temporary values into sedgel
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
 
                     int r = j + lo;
                     int p = n + max_lev*r;
-
                     int pp = n + max_lev*(r+1);
                     int pm = n + max_lev*(r-1);
 
@@ -601,7 +599,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     } else if (fabs(sm-s[p]) >= 2.0*fabs(sp-s[p])) {
                         sm = 3.0*s[p] - 2.0*sp;
                     }
-            //   end do
 
                     // compute Ip and Im
                     Real sigmap = fabs(w0_p[pp])*dtdr;
@@ -625,179 +622,185 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     sedger[r] = Im + dth * force_p[p];
                 });
 
-        //     } else if (ppm_type == 2) {
+            } else if (ppm_type == 2) {
 
-        // // interpolate s to radial edges
+                // interpolate s to radial edges
 
-        // // store centered differences in dsvl
-        // //       do r=lo-3,hi+3
+                // need a vector to store intermediate values
+                RealVector sedget_vec(nr_fine+1);
+                Real * AMREX_RESTRICT sedget = sedget_vec.dataPtr();
 
-        //         AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
-        //             int r = j + lo;
+                AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
+                    int r = j + lo;
+                    int p = n + max_lev*r;
 
-        //             // left side 
-        //             Real dsvl = 0.0;
-        //             if (r == 0) {
-        //                 // one-sided difference
-        //                 dsvl = s[p]-s[pm]
-        //             } else if (r == nr-1) {
-        //                 // one-sided difference
-        //                 dsvl = s[pm]-s(n,r-2)
-        //             } else if (r > 0 && r < nr-1) {
-        //                 // centered difference
-        //                 dsvl = 0.5 * (s[p] - s(n,r-2))
-        //             }
+                    int pp = n + max_lev*(r+1);
+                    int pm = n + max_lev*(r-1);
+                    int pmm = n + max_lev*(r-2);
 
-        //             // right side 
-        //             Real dsvr = 0.0;
-        //             if (r == 0) {
-        //                 // one-sided difference
-        //                 dsvr = s[pp]-s[p]
-        //             } else if (r == nr-1) {
-        //                 // one-sided difference
-        //                 dsvr = s[p]-s[pm]
-        //             } else if (r > 0 && r < nr-1) {
-        //                 // centered difference
-        //                 dsvr = 0.5 * (s[pp] - s[pm])
-        //             }
+                    // left side 
+                    Real dsvl = 0.0;
+                    if (r-1 == 0) {
+                        // one-sided difference
+                        dsvl = s[p] - s[pm];
+                    } else if (r-1 == nr-1) {
+                        // one-sided difference
+                        dsvl = s[pm] - s[pmm];
+                    } else if (r-1 > 0 && r-1 < nr-1) {
+                        // centered difference
+                        dsvl = 0.5 * (s[p] - s[pmm]);
+                    }
 
-        //     //   end do
+                    // right side 
+                    Real dsvr = 0.0;
+                    if (r == 0) {
+                        // one-sided difference
+                        dsvr = s[pp] - s[p];
+                    } else if (r == nr-1) {
+                        // one-sided difference
+                        dsvr = s[p] - s[pm];
+                    } else if (r > 0 && r < nr-1) {
+                        // centered difference
+                        dsvr = 0.5 * (s[pp] - s[pm]);
+                    }
 
-        //     //   do r=lo-2,hi+3
-        //             if (r == 0) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sedgel(n,r) = s[p] - 0.5*dsvr
-        //             } else if (r == nr) {
-        //                 // 2nd order interpolation to boundary face
-        //                 sedgel(n,r) = s[pm] + 0.5*dsvr
-        //             } else if (r > 0 && r < nr) {
-        //                 // 4th order interpolation of s to radial faces
-        //                 sedgel(n,r) = 0.5*(s[p]+s[pm]) - (dsvr-dsvl)/6.0
-        //                 if (r >= 2 && r <= nr-2) {
-        //                     // limit sedge
-        //                     if ((sedgel(n,r)-s[pm])*(s[p]-sedgel(n,r)) < 0.0) {
-        //                         Real D2  = 3.0*(s[pm]-2.0*sedgel(n,r)+s[p])
-        //                         Real D2L = s(n,r-2)-2.0*s[pm]+s[p]
-        //                         Real D2R = s[pm]-2.0*s[p]+s[pp]
-        //                         Real sgn = copysign(1.0,D2);
-        //                         Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-        //                         sedgel(n,r) = 0.5*(s[pm]+s[p]) - D2LIM/6.0
-        //                     }
-        //                 }
-        //             }
+                    if (r == 0) {
+                        // 2nd order interpolation to boundary face
+                        sedget[r] = s[p] - 0.5*dsvr;
+                    } else if (r == nr) {
+                        // 2nd order interpolation to boundary face
+                        sedget[r] = s[pm] + 0.5*dsvr;
+                    } else if (r > 0 && r < nr) {
+                        // 4th order interpolation of s to radial faces
+                        sedget[r] = 0.5*(s[p]+s[pm]) - (dsvr-dsvl)/6.0;
+                        if (r >= 2 && r <= nr-2) {
+                            // limit sedge
+                            if ((sedget[r]-s[pm])*(s[p]-sedget[r]) < 0.0) {
+                                Real D2  = 3.0*(s[pm]-2.0*sedget[r]+s[p]);
+                                Real D2L = s[pmm] - 2.0*s[pm] + s[p];
+                                Real D2R = s[pm] - 2.0*s[p] + s[pp];
+                                Real sgn = copysign(1.0,D2);
+                                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
+                                sedget[r] = 0.5*(s[pm]+s[p]) - D2LIM/6.0;
+                            }
+                        }
+                    }
+                });
+
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                    int r = j + lo;
+                    int p = n + max_lev*r;
+
+                    int pp = n + max_lev*(r+1);
+                    int ppp = n + max_lev*(r+2);
+                    int pm = n + max_lev*(r-1);
+                    int pmm = n + max_lev*(r-2);
         
+                    // use Colella 2008 limiters
+                    // This is a new version of the algorithm
+                    // to eliminate sensitivity to roundoff.
+                    Real sm = 0.0;
+                    Real sp = 0.0;
 
-        //     //   do r=lo,hi
+                    if (r >= 2 && r <= nr-3) {
 
-        //         // use Colella 2008 limiters
-        //         // This is a new version of the algorithm
-        //         // to eliminate sensitivity to roundoff.
+                        Real alphap = sedget[r+1] - s[p];
+                        Real alpham = sedget[r] - s[p];
+                        bool bigp = fabs(alphap) > 2.0*fabs(alpham);
+                        bool bigm = fabs(alpham) > 2.0*fabs(alphap);
+                        bool extremum = false;
 
-        //             Real sm = 0.0;
-        //             Real sp = 0.0;
+                        if (alpham*alphap >= 0.0) {
+                            extremum = true;
+                        } else if (bigp || bigm) {
+                            // Possible extremum. We look at cell centered values and face
+                            // centered values for a change in copysign in the differences adjacent to
+                            // the cell. We use the pair of differences whose minimum magnitude is
+                            // the largest, and thus least susceptible to sensitivity to roundoff.
+                            Real dafacem = sedget[r] - sedget[r-1];
+                            Real dafacep = sedget[r+2] - sedget[r+1];
+                            Real dabarm = s[p] - s[pm];
+                            Real dabarp = s[pp] - s[p];
+                            Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                            Real dabarmin= min(fabs(dabarm), fabs(dabarp));
+                            Real dachkm = 0.0;
+                            Real dachkp = 0.0;
+                            if (dafacemin >= dabarmin) {
+                                dachkm = dafacem;
+                                dachkp = dafacep;
+                            } else {
+                                dachkm = dabarm;
+                                dachkp = dabarp;
+                            }
+                            extremum = (dachkm*dachkp <= 0.0);
+                        }
 
-        //             if (r >= 2 && r <= nr-3) {
+                        if (extremum) {
+                            Real D2  = 6.0*(alpham + alphap);
+                            Real D2L = s[pmm] - 2.0*s[pm] + s[p];
+                            Real D2R = s[p] - 2.0*s[pp] + s[ppp];
+                            Real D2C = s[pm] - 2.0*s[p] + s[pp];
+                            Real sgn = copysign(1.0, D2);
+                            Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
+                            Real D2ABS = max(fabs(D2),1.e-10);
+                            alpham = alpham*D2LIM/D2ABS;
+                            alphap = alphap*D2LIM/D2ABS;
+                        } else {
+                            if (bigp) {
+                                Real sgn = copysign(1.0, alpham);
+                                Real amax = -alphap*alphap / (4.0*(alpham + alphap));
+                                Real delam = s[pm] - s[p];
+                                if (sgn*amax >= sgn*delam) {
+                                    if (sgn*(delam - alpham) >= 1.e-10) {
+                                        alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                                    } else {
+                                        alphap = -2.0*alpham;
+                                    }
+                                }
+                            }
+                            if (bigm) {
+                                Real sgn = copysign(1.0, alphap);
+                                Real amax = -alpham*alpham / (4.0*(alpham + alphap));
+                                Real delap = s[pp] - s[p];
+                                if (sgn*amax >= sgn*delap) {
+                                    if (sgn*(delap - alphap) >= 1.e-10) {
+                                        alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                                    } else {
+                                        alpham = -2.0*alphap;
+                                    }
+                                }
+                            }
+                        }
 
-        //                 Real alphap = sedgel(n,r+1)-s[p]
-        //                 Real alpham = sedgel(n,r  )-s[p]
-        //                 bool bigp = fabs(alphap)>2.0*fabs(alpham)
-        //                 bool bigm = fabs(alpham)>2.0*fabs(alphap)
-        //                 bool extremum = false
+                        sm = s[p] + alpham;
+                        sp = s[p] + alphap;
 
-        //                 if (alpham*alphap >= 0.0) {
-        //                     extremum = true
-        //                 } else if (bigp || bigm) {
-        //                     // Possible extremum. We look at cell centered values and face
-        //                     // centered values for a change in copysign in the differences adjacent to
-        //                     // the cell. We use the pair of differences whose minimum magnitude is
-        //                     // the largest, and thus least susceptible to sensitivity to roundoff.
-        //                     Real dafacem = sedgel(n,r) - sedgel(n,r-1)
-        //                     Real dafacep = sedgel(n,r+2) - sedgel(n,r+1)
-        //                     Real dabarm = s[p] - s[pm]
-        //                     Real dabarp = s[pp] - s[p]
-        //                     Real dafacemin = min(fabs(dafacem),fabs(dafacep))
-        //                     Real dabarmin= min(fabs(dabarm),fabs(dabarp))
-        //                     Real dachkm = 0.0;
-        //                     Real dachkp = 0.0;
-        //                     if (dafacemin >= dabarmin) {
-        //                         dachkm = dafacem;
-        //                         dachkp = dafacep;
-        //                     } else {
-        //                         dachkm = dabarm;
-        //                         dachkp = dabarp;
-        //                     }
-        //                     extremum = (dachkm*dachkp <= 0.0);
-        //                 }
+                    } else {
+                        sp = sedget[r+1];
+                        sm = sedget[r];
+                    } // test (r >= 2 && r <= nr-3)
 
-        //                 if (extremum) {
-        //                     Real D2  = 6.0*(alpham + alphap);
-        //                     Real D2L = s(n,r-2)-2.0*s[pm]+s[p]
-        //                     Real D2R = s[p]-2.0*s[pp]+s(n,r+2)
-        //                     Real D2C = s[pm]-2.0*s[p]+s[pp]
-        //                     Real sgn = copysign(1.0,D2);
-        //                     Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-        //                     Real D2ABS = max(fabs(D2),1.e-10);
-        //                     alpham = alpham*D2LIM/D2ABS;
-        //                     alphap = alphap*D2LIM/D2ABS;
-        //                 } else {
-        //                     if (bigp) {
-        //                         Real sgn = copysign(1.0,alpham);
-        //                         Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-        //                         Real delam = s[pm] - s[p]
-        //                         if (sgn*amax >= sgn*delam) {
-        //                             if (sgn*(delam - alpham)>=1.e-10) {
-        //                                 alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
-        //                             } else {
-        //                                 alphap = -2.0*alpham;
-        //                             }
-        //                         }
-        //                     }
-        //                     if (bigm) {
-        //                         Real sgn = copysign(1.0,alphap);
-        //                         Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-        //                         Real delap = s[pp] - s[p]
-        //                         if (sgn*amax >= sgn*delap) {
-        //                             if (sgn*(delap - alphap)>=1.e-10) {
-        //                                 alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
-        //                             } else {
-        //                                 alpham = -2.0*alphap;
-        //                             }
-        //                         }
-        //                     }
-        //                 }
+                    // compute Ip and Im
+                    Real sigmap = fabs(w0_p[pp]) * dtdr;
+                    Real sigmam = fabs(w0_p[p]) * dtdr;
+                    Real s6 = 6.0*s[p] - 3.0*(sm+sp);
+                    Real Ip = 0.0;
+                    Real Im = 0.0;
+                    if (w0_p[r+1] > rel_eps) {
+                        Ip = sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6);
+                    } else {
+                        Ip = s[p];
+                    }
+                    if (w0_p[p] < -rel_eps) {
+                        Im = sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6);
+                    } else {
+                        Im = s[p];
+                    }
 
-        //                 sm = s[p] + alpham
-        //                 sp = s[p] + alphap
-
-        //             } else {
-
-        //                 sp = sedgel(n,r+1)
-        //                 sm = sedgel(n,r  )
-
-        //             } // test (r >= 2 && r <= nr-3)
-
-        //             // compute Ip and Im
-        //             Real sigmap = fabs(w0_p(n,r+1))*dtdr
-        //             Real sigmam = fabs(w0_p(n,r  ))*dtdr
-        //             Real s6 = 6.0*s[p] - 3.0*(sm+sp)
-        //             Real Ip = 0.0;
-        //             Real Im = 0.0;
-        //             if (w0_p(n,r+1) > rel_eps) {
-        //                 Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6)
-        //             } else {
-        //                 Ip = s[p]
-        //             }
-        //             if (w0_p(n,r) < -rel_eps) {
-        //                 Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6)
-        //             } else {
-        //                 Im = s[p]
-        //             }
-
-        //             // compute sedgel and sedger
-        //             sedgel(n,r+1) = Ip + dth * force(n,r)
-        //             sedger(n,r  ) = Im + dth * force(n,r)
-
-        //         }); // loop over r
+                    // compute sedgel and sedger
+                    sedgel[r+1] = Ip + dth * force_p[p];
+                    sedger[r] = Im + dth * force_p[p];
+                }); 
             }
         }
     }
@@ -831,8 +834,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
             }
 
             // solve Riemann problem to get final edge state
-
-            //        do r=lo,hi+1
             AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
                 int r = j + lo;
                 int p = n + max_lev*r;
