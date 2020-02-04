@@ -234,8 +234,8 @@ extern "C"
 
     //////////////////////
     // in debug.F90
-    void print_base_cc(const amrex::Real* base);
-    void print_base_edge(const amrex::Real* base);
+    void print_base_cc(const amrex::Real* base, const int lev);
+    void print_base_edge(const amrex::Real* base, const int lev);
 
     void print_mf(const int* lev, const int* lo, const int* hi,
                   const amrex::Real* mf,
@@ -735,7 +735,8 @@ extern "C"
                  const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,
-                 const amrex::Real* dtold, const int* is_predictor);
+                 const amrex::Real* dtold, const int* is_predictor,
+                 const int lev);
     //////////////////////
 
     //////////////////////

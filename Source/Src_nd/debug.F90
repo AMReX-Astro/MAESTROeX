@@ -10,40 +10,40 @@ module debug_module
 
 contains
 
-  subroutine print_base_cc(base) bind(C, name="print_base_cc")
+  subroutine print_base_cc(base, lev) bind(C, name="print_base_cc")
 
     double precision, intent(in   ) :: base(0:max_radial_level,0:nr_fine-1)
+    integer, value, intent(in) :: lev
 
     integer :: n,i,r
 
     if (parallel_IOProcessor()) then
 
-       do n=0,max_radial_level
-          do i=1,numdisjointchunks(n)
-             do r=r_start_coord(n,i),r_end_coord(n,i)
-                print*,'base lev,r',n,r,base(n,r)
-             end do
-          end do
-       end do
+       n = lev
+        do i=1,numdisjointchunks(n)
+            do r=r_start_coord(n,i),r_end_coord(n,i)
+            print*,'base lev,r',n,r,base(n,r)
+            end do
+        end do
 
     end if
 
   end subroutine print_base_cc
 
-  subroutine print_base_edge(base) bind(C, name="print_base_edge")
+  subroutine print_base_edge(base, lev) bind(C, name="print_base_edge")
 
     double precision, intent(in   ) :: base(0:max_radial_level,0:nr_fine)
+    integer, value, intent(in) :: lev
 
     integer :: n,i,r
 
     if (parallel_IOProcessor()) then
-       do n=0,max_radial_level
-          do i=1,numdisjointchunks(n)
-             do r=r_start_coord(n,i),r_end_coord(n,i)+1
-                print*,'base lev,r',n,r,base(n,r)
-             end do
-          end do
-       end do
+       n = lev
+        do i=1,numdisjointchunks(n)
+            do r=r_start_coord(n,i),r_end_coord(n,i)+1
+            print*,'base lev,r',n,r,base(n,r)
+            end do
+        end do
     end if
 
   end subroutine print_base_edge
