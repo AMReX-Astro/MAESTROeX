@@ -221,11 +221,6 @@ extern "C"
 
     //////////////////////
     // in compute_grad_phi.F90
-    void compute_grad_phi(const int* lo, const int* hi,
-                          const amrex::Real* phi,  const int* p_lo, const int* p_hi,
-                                amrex::Real* gphi, const int* g_lo, const int* g_hi,
-                          const amrex::Real* dx);
-
     void compute_grad_phi_rad(const amrex::Real* phi,
 			      amrex::Real* gphi_rad);
     //////////////////////
@@ -609,14 +604,6 @@ extern "C"
                             amrex::Real* rho_Hext, const int* r_lo, const int* r_hi,
                       const amrex::Real* scal,     const int* s_lo, const int* s_hi, const int* nc_s,
                       const amrex::Real* dx, const amrex::Real* time);
-    //////////////////////
-
-    //////////////////////
-    // in make_pi_cc.F90
-    void make_pi_cc(const int* lo, const int* hi,
-                    const amrex::Real* pi,         const int* p_lo, const int* p_hi,
-                          amrex::Real* pi_cc,      const int* c_lo, const int* c_hi,
-                    const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi);
     //////////////////////
 
     //////////////////////
