@@ -1,4 +1,3 @@
-F90EXE_sources += advect_base.F90
 F90EXE_sources += average.F90
 F90EXE_sources += base_state.F90
 F90EXE_sources += base_state_geometry.F90
@@ -19,7 +18,6 @@ F90EXE_sources += inlet_bc.F90
 F90EXE_sources += make_beta0.F90
 F90EXE_sources += make_flux.F90
 F90EXE_sources += make_eta.F90
-F90EXE_sources += make_edge_state.F90
 F90EXE_sources += make_explicit_thermal.F90
 F90EXE_sources += make_heating.F90
 F90EXE_sources += make_gamma.F90
