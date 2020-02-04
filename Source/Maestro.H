@@ -121,62 +121,6 @@ public:
                         const RealVector& w0_force,
 			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
-    /// Create `utrans`, the transverse velocity
-    ///
-    /// @param utilde           perturbed velocity
-    /// @param ufull            full velocity
-    /// @param utrans           transverse velocity
-    /// @param w0mac            MAC base-state velocity
-    void MakeUtrans (amrex::Vector<amrex::MultiFab>& utilde,
-                     const amrex::Vector<amrex::MultiFab>& ufull,
-                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
-                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
-
-    /// Predict the normal velocities to the interfaces.  We don't care about the
-    /// transverse velocities here.  The prediction is done piecewise linear (for now)
-    ///
-    /// @param utilde           perturbed velocity
-    /// @param ufull            full velocity
-    /// @param utrans           transverse velocity
-    /// @param umac             MAC velocity
-    /// @param w0mac            MAC base-state velocity
-    /// @param force            velocity force
-    void VelPred (amrex::Vector<amrex::MultiFab>& utilde,
-                  const amrex::Vector<amrex::MultiFab>& ufull,
-                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
-                  amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                  const amrex::Vector<amrex::MultiFab>& force);
-
-    /// Calculate scalars on cell edges given cell-centered state
-    /// constructs the edge state of a scalar, using a
-    /// second-order Taylor expansion in space (through `dx/2`) and time
-    /// (though `dt/2`) (if `ppm_type = 0`) or using PPM (for `ppm_type = 1,2`).
-    ///
-    /// We use only MAC-projected edge velocities in this prediction.
-    ///
-    /// We are computing all edge states for each variable.  This is what is
-    /// done for the final updates of the state variables and velocity.  For
-    /// velocity, we should set `is_vel = true`
-    ///
-    /// @param state            cell-centered scalars
-    /// @param sedge            edge state of scalars
-    /// @param umac             MAC velocity
-    /// @param force            velocity force
-    /// @param is_vel           set to true if state is a velocity
-    /// @param bcs              boundary conditions
-    /// @param nbccomp          number of components of `bcs`
-    /// @param start_scomp      index of component of `state` to begin with
-    /// @param start_bccomp     index of component of `bcs` to begin with
-    /// @param num_comp         number of components to perform calculation for
-    /// @param is_conservative  are these conserved quantities?
-    void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                       amrex::Vector<amrex::MultiFab>& force,
-                       int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
-                       int start_scomp, int start_bccomp, int num_comp, int is_conservative);
-
     /// Calculate `rhoX` flux
     ///
     /// Takes the predicted edges states of the scalars
@@ -759,6 +703,36 @@ public:
 
     ////////////
     // MaestroMakeEdgeScal.cpp functions
+
+    /// Calculate scalars on cell edges given cell-centered state
+    /// constructs the edge state of a scalar, using a
+    /// second-order Taylor expansion in space (through `dx/2`) and time
+    /// (though `dt/2`) (if `ppm_type = 0`) or using PPM (for `ppm_type = 1,2`).
+    ///
+    /// We use only MAC-projected edge velocities in this prediction.
+    ///
+    /// We are computing all edge states for each variable.  This is what is
+    /// done for the final updates of the state variables and velocity.  For
+    /// velocity, we should set `is_vel = true`
+    ///
+    /// @param state            cell-centered scalars
+    /// @param sedge            edge state of scalars
+    /// @param umac             MAC velocity
+    /// @param force            velocity force
+    /// @param is_vel           set to true if state is a velocity
+    /// @param bcs              boundary conditions
+    /// @param nbccomp          number of components of `bcs`
+    /// @param start_scomp      index of component of `state` to begin with
+    /// @param start_bccomp     index of component of `bcs` to begin with
+    /// @param num_comp         number of components to perform calculation for
+    /// @param is_conservative  are these conserved quantities?
+    void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
+		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       amrex::Vector<amrex::MultiFab>& force,
+                       int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
+                       int start_scomp, int start_bccomp, int num_comp, int is_conservative);
+                       
 #if (AMREX_SPACEDIM == 2)
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,
@@ -951,6 +925,23 @@ public:
 				 const RealVector& p0,
 				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakeUtrans.cpp functions
+
+    /// Create `utrans`, the transverse velocity
+    ///
+    /// @param utilde           perturbed velocity
+    /// @param ufull            full velocity
+    /// @param utrans           transverse velocity
+    /// @param w0mac            MAC base-state velocity
+    void MakeUtrans (const amrex::Vector<amrex::MultiFab>& utilde,
+                     const amrex::Vector<amrex::MultiFab>& ufull,
+                     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
+                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
+
+    // end MaestroMakeUtrans.cpp functions
     ////////////
 
     ////////////
@@ -1305,7 +1296,7 @@ public:
                 const amrex::Vector<amrex::BCRec>& bcs,
                 int ncomp,
                 int bc_start_comp);
-
+#if (AMREX_SPACEDIM == 3)
     void Slopez(const amrex::Box& bx, 
                 amrex::Array4<amrex::Real> const scal,
                 amrex::Array4<amrex::Real> const slz,
@@ -1313,6 +1304,7 @@ public:
                 const amrex::Vector<amrex::BCRec>& bcs,
                 int ncomp,
                 int bc_start_comp);
+#endif
     ////////////
 
     ////////////
@@ -1418,7 +1410,24 @@ public:
     ////////////////////////
 
     ////////////////////////
-    // MaestroVelPredInterfacevoid.cpp functions
+    // MaestroVelPred.cpp functions
+
+    /// Predict the normal velocities to the interfaces.  We don't care about the
+    /// transverse velocities here.  The prediction is done piecewise linear (for now)
+    ///
+    /// @param utilde           perturbed velocity
+    /// @param ufull            full velocity
+    /// @param utrans           transverse velocity
+    /// @param umac             MAC velocity
+    /// @param w0mac            MAC base-state velocity
+    /// @param force            velocity force
+    void VelPred (amrex::Vector<amrex::MultiFab>& utilde,
+                  const amrex::Vector<amrex::MultiFab>& ufull,
+                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& utrans,
+                  amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                  const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                  const amrex::Vector<amrex::MultiFab>& force);
+                  
 #if (AMREX_SPACEDIM == 2)
     void VelPredInterface(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
