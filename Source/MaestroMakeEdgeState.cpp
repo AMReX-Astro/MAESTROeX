@@ -33,7 +33,6 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int fromm = 3;
     const Real dr = dr_fine * pow(2.0, max_radial_level);
 
-    const int nr = nr_fine;
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
 
@@ -66,7 +65,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     if (ppm_type == 0) {
 
         // this will hold values at r-1, r and r+1
-        GpuArray<GpuArray<Real,4>,3> dsscr;
+        RealVector dsscr_vec(4*3);
+        Real * AMREX_RESTRICT dsscr = dsscr_vec.dataPtr();
 
         AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
@@ -75,7 +75,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             if (slope_order_loc == 0) {
                 slope = 0.0;
             } else if (slope_order_loc == 2) {
-                // index of ghost array offset by 3
+                // index of ghost array offset by ng
                 int g = r + ng;
 
                 Real del = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
@@ -87,27 +87,28 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 slope = sflag*min(slim,fabs(del));
             } else if (slope_order_loc == 4) {
                 for (int i = 0; i < 3; ++i) {
+                    // index of ghost array offset by ng
                     int g = r + ng - 1 + i;
                     // do standard limiting to compute temporary slopes
-                    dsscr[i][cen] = 0.5*(s_ghost[g+1]-s_ghost[g-1]);
+                    dsscr[i*4+cen] = 0.5*(s_ghost[g+1]-s_ghost[g-1]);
                     Real dpls = 2.0*(s_ghost[g+1]-s_ghost[g]);
                     Real dmin = 2.0*(s_ghost[g]-s_ghost[g-1]);
-                    dsscr[i][lim]= min(fabs(dmin),fabs(dpls));
-                    dsscr[i][lim] = dpls*dmin > 0.0 ? dsscr[i][lim] : 0.0;
-                    dsscr[i][flag] = copysign(1.0,dsscr[i][cen]);
-                    dsscr[i][fromm]= dsscr[i][flag]*min(dsscr[i][lim],fabs(dsscr[i][cen]));
+                    dsscr[i*4+lim] = min(fabs(dmin),fabs(dpls));
+                    dsscr[i*4+lim] = dpls*dmin > 0.0 ? dsscr[i*4+lim] : 0.0;
+                    dsscr[i*4+flag] = copysign(1.0,dsscr[i*4+cen]);
+                    dsscr[i*4+fromm] = dsscr[i*4+flag]*min(dsscr[i*4+lim],fabs(dsscr[i*4+cen]));
                 }
 
                 // fourth-order limited slopes
-                Real ds = 4.0/3.0*dsscr[1][cen] - (dsscr[2][fromm]+dsscr[0][fromm]) / 6.0;
-                slope = dsscr[1][flag]*min(fabs(ds),dsscr[1][lim]);
+                Real ds = 4.0/3.0*dsscr[1*4+cen] - (dsscr[2*4+fromm]+dsscr[fromm]) / 6.0;
+                slope = dsscr[1*4+flag]*min(fabs(ds),dsscr[1*4+lim]);
             }
 
             // compute sedgel and sedger
             Real u = 0.5*(w0_p[r]+w0_p[r+1]);
             Real ubardth = dth*u/dr;  // NOTE: ubardth=0 for use_exact_base_state case
-            sedgel[r+1 ]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
-            sedger[r  ] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
+            sedgel[r+1]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
+            sedger[r] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
         });
 
     } else if (ppm_type == 1) {
@@ -190,7 +191,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     } else if (ppm_type == 2) {
 
         // this will hold values at r-1, r, r+1 and r+2
-        GpuArray<Real,4> sedget;
+        RealVector sedget_vec(4);
+        Real * AMREX_RESTRICT sedget = sedget_vec.dataPtr();
 
         AMREX_PARALLEL_FOR_1D(nr_fine, i, {
             int r = i * max_lev;
@@ -386,7 +388,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
             if (ppm_type == 0) {
 
-                GpuArray<Real, 3> dxscr;
+                RealVector dxscr_vec(3);
+                Real * AMREX_RESTRICT dxscr = dxscr_vec.dataPtr();
 
                 // compute slopes
 
