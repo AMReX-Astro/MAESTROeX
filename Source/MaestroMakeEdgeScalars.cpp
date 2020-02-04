@@ -1,8 +1,360 @@
 
 #include <Maestro.H>
-#include <MaestroHydro_F.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
+
+void
+Maestro::MakeEdgeScal (Vector<MultiFab>& state,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                       Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                       Vector<MultiFab>& force,
+                       int is_vel, const Vector<BCRec>& bcs, int nbccomp,
+                       int start_scomp, int start_bccomp, int num_comp, int is_conservative)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEdgeScal()", MakeEdgeScal);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // Get the index space and grid spacing of the domain
+        const Box& domainBox = geom[lev].Domain();
+        const Real* dx = geom[lev].CellSize();
+
+        // get references to the MultiFabs at level lev
+        const MultiFab& scal_mf   = state[lev];
+
+        MultiFab Ip, Im, Ipf, Imf;
+        Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab slx, srx, simhx;
+        slx.define(grids[lev],dmap[lev],1,1);
+        srx.define(grids[lev],dmap[lev],1,1);
+        simhx.define(grids[lev],dmap[lev],1,1);
+
+        MultiFab sly, sry, simhy;
+        sly.define(grids[lev],dmap[lev],1,1);
+        sry.define(grids[lev],dmap[lev],1,1);
+        simhy.define(grids[lev],dmap[lev],1,1);
+
+        slx.setVal(0.);
+        srx.setVal(0.);
+        simhx.setVal(0.);
+        sly.setVal(0.);
+        sry.setVal(0.);
+        simhy.setVal(0.);
+
+#if (AMREX_SPACEDIM == 3)
+
+        MultiFab slopez, divu;
+        slopez.define(grids[lev],dmap[lev],1,1);
+        divu.define(grids[lev],dmap[lev],1,1);
+
+        MultiFab slz, srz, simhz;
+        slz.define(grids[lev],dmap[lev],1,1);
+        srz.define(grids[lev],dmap[lev],1,1);
+        simhz.define(grids[lev],dmap[lev],1,1);
+
+        MultiFab simhxy, simhxz, simhyx, simhyz, simhzx, simhzy;
+        simhxy.define(grids[lev],dmap[lev],1,1);
+        simhxz.define(grids[lev],dmap[lev],1,1);
+        simhyx.define(grids[lev],dmap[lev],1,1);
+        simhyz.define(grids[lev],dmap[lev],1,1);
+        simhzx.define(grids[lev],dmap[lev],1,1);
+        simhzy.define(grids[lev],dmap[lev],1,1);
+
+        slx.setVal(0.);
+        srx.setVal(0.);
+        simhx.setVal(0.);
+        sly.setVal(0.);
+        sry.setVal(0.);
+        simhy.setVal(0.);
+        slz.setVal(0.);
+        srz.setVal(0.);
+        simhz.setVal(0.);
+
+        simhxy.setVal(0.);
+        simhxz.setVal(0.);
+        simhyx.setVal(0.);
+        simhyz.setVal(0.);
+        simhzx.setVal(0.);
+        simhzy.setVal(0.);
+#endif
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#if (AMREX_SPACEDIM == 2)
+
+        Vector<MultiFab> vec_scal_mf(num_comp);
+        for (int comp=0; comp < num_comp; ++comp) {
+            vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
+
+            MultiFab::Copy(vec_scal_mf[comp], scal_mf, start_scomp+comp, 0, 1, scal_mf.nGrow());
+        }
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+
+            // Be careful to pass in comp+1 for fortran indexing
+            for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
+
+                int vcomp = scomp - start_scomp;
+                int bccomp = start_bccomp + scomp - start_scomp;
+
+                Array4<Real> const scal_arr = state[lev].array(mfi);
+
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+
+                Array4<Real> const slx_arr = slx.array(mfi);
+                Array4<Real> const srx_arr = srx.array(mfi);
+                Array4<Real> const sly_arr = sly.array(mfi);
+                Array4<Real> const sry_arr = sry.array(mfi);
+
+                Array4<Real> const simhx_arr = simhx.array(mfi);
+                Array4<Real> const simhy_arr = simhy.array(mfi);
+
+                if (ppm_type == 0) {
+                    // we're going to reuse Ip here as slopex and Im as slopey
+                    // as they have the correct number of ghost zones
+
+                    // x-direction
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
+
+                    // y-direction
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
+
+                } else {
+
+                    PPM(obx, scal_arr, 
+                        umac_arr, vmac_arr, 
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
+
+                    if (ppm_trace_forces == 1) {
+
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, 
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
+                    }
+                }
+
+                // Create s_{\i-\half\e_x}^x, etc.
+
+                MakeEdgeScalPredictor(mfi, slx_arr, srx_arr,
+                                      sly_arr, sry_arr,
+                                      scal_arr, 
+                                      Ip.array(mfi), Im.array(mfi), 
+                                      umac_arr, vmac_arr, 
+                                      simhx_arr, simhy_arr, 
+                                      domainBox, bcs, dx,
+                                      scomp, bccomp, is_vel);
+
+                Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
+                Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
+
+                // Create sedgelx, etc.
+
+                MakeEdgeScalEdges(mfi, slx_arr, srx_arr,
+                                  sly_arr, sry_arr,
+                                  scal_arr, 
+                                  sedgex_arr, sedgey_arr, 
+                                  force[lev].array(mfi),
+                                  umac_arr, vmac_arr, 
+                                  Ipf.array(mfi), Imf.array(mfi),
+                                  simhx_arr, simhy_arr, 
+                                  domainBox, bcs, dx,
+                                  scomp, bccomp, 
+                                  is_vel, is_conservative);
+            } // end loop over components
+        } // end MFIter loop
+
+#elif (AMREX_SPACEDIM == 3)
+
+        Vector<MultiFab> vec_scal_mf(num_comp);
+        for (int comp=0; comp < num_comp; ++comp) {
+            vec_scal_mf[comp].define(grids[lev],dmap[lev],1,scal_mf.nGrow());
+            vec_scal_mf[comp].setVal(0.);
+
+            MultiFab::Copy(vec_scal_mf[comp], scal_mf, start_scomp+comp, 0, 1, scal_mf.nGrow());
+        }
+
+        // Be careful to pass in comp+1 for fortran indexing
+        for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
+
+            int vcomp = scomp - start_scomp;
+            int bccomp = start_bccomp + scomp - start_scomp;
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                const Box& obx = amrex::grow(tileBox, 1);
+                const Box& xbx = mfi.nodaltilebox(0);
+                const Box& ybx = mfi.nodaltilebox(1);
+                const Box& zbx = mfi.nodaltilebox(2);
+                const Box& mxbx = amrex::growLo(obx, 0, -1);
+                const Box& mybx = amrex::growLo(obx, 1, -1);
+                const Box& mzbx = amrex::growLo(obx, 2, -1);
+
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+                Array4<Real> const wmac_arr = umac[lev][2].array(mfi);
+
+                // make divu 
+                if (is_conservative) {
+                    MakeDivU(obx, divu.array(mfi), 
+                             umac_arr, vmac_arr, wmac_arr, dx);
+                }
+                          
+                if (ppm_type == 0) {
+                    // we're going to reuse Ip here as slopex and Im as slopey
+                    // as they have the correct number of ghost zones
+
+                    // x-direction
+                    Slopex(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Ip.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
+
+                    // y-direction
+                    Slopey(obx, vec_scal_mf[vcomp].array(mfi), 
+                           Im.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
+
+                    // z-direction
+                    Slopez(obx, vec_scal_mf[vcomp].array(mfi), 
+                           slopez.array(mfi), 
+                           domainBox, bcs, 
+                           1,bccomp);
+
+                } else {
+
+                    PPM(obx, state[lev].array(mfi), 
+                        umac_arr, vmac_arr, wmac_arr,
+                        Ip.array(mfi), Im.array(mfi), 
+                        domainBox, bcs, dx, 
+                        true, scomp, bccomp);
+
+                    if (ppm_trace_forces == 1) {
+
+                        PPM(obx, force[lev].array(mfi), 
+                            umac_arr, vmac_arr, wmac_arr,
+                            Ipf.array(mfi), Imf.array(mfi), 
+                            domainBox, bcs, dx, 
+                            true, scomp, bccomp);
+                    }
+                }
+            }
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+                Array4<Real> const scal_arr = state[lev].array(mfi);
+
+                Array4<Real> const umac_arr = umac[lev][0].array(mfi);
+                Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
+                Array4<Real> const wmac_arr = umac[lev][2].array(mfi);
+
+                Array4<Real> const slx_arr = slx.array(mfi);
+                Array4<Real> const srx_arr = srx.array(mfi);
+                Array4<Real> const sly_arr = sly.array(mfi);
+                Array4<Real> const sry_arr = sry.array(mfi);
+                Array4<Real> const slz_arr = slz.array(mfi);
+                Array4<Real> const srz_arr = srz.array(mfi);
+
+                Array4<Real> const simhx_arr = simhx.array(mfi);
+                Array4<Real> const simhy_arr = simhy.array(mfi);
+                Array4<Real> const simhz_arr = simhz.array(mfi);
+
+                // Create s_{\i-\half\e_x}^x, etc.
+
+                MakeEdgeScalPredictor(mfi, slx_arr, srx_arr,
+                                      sly_arr, sry_arr,
+                                      slz_arr, srz_arr,
+                                      scal_arr, 
+                                      Ip.array(mfi), Im.array(mfi), 
+                                      slopez.array(mfi),
+                                      umac_arr, vmac_arr, wmac_arr,
+                                      simhx_arr, simhy_arr, simhz_arr,
+                                      domainBox, bcs, dx,
+                                      scomp, bccomp, is_vel);
+
+                Array4<Real> const simhxy_arr = simhxy.array(mfi);
+                Array4<Real> const simhxz_arr = simhxz.array(mfi);
+                Array4<Real> const simhyx_arr = simhyx.array(mfi);
+                Array4<Real> const simhyz_arr = simhyz.array(mfi);
+                Array4<Real> const simhzx_arr = simhzx.array(mfi);
+                Array4<Real> const simhzy_arr = simhzy.array(mfi);
+
+                // Create transverse terms, s_{\i-\half\e_x}^{x|y}, etc.
+
+                MakeEdgeScalTransverse(mfi, slx_arr, srx_arr,
+                                       sly_arr, sry_arr,
+                                       slz_arr, srz_arr,
+                                       scal_arr, divu.array(mfi),
+                                       umac_arr, vmac_arr, wmac_arr,
+                                       simhx_arr, simhy_arr, simhz_arr,
+                                       simhxy_arr, simhxz_arr, simhyx_arr,
+                                       simhyz_arr, simhzx_arr, simhzy_arr,
+                                       domainBox, bcs, dx,
+                                       scomp, bccomp, 
+                                       is_vel, is_conservative);
+
+                Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
+                Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
+                Array4<Real> const sedgez_arr = sedge[lev][2].array(mfi);
+
+                // Create sedgelx, etc.
+
+                MakeEdgeScalEdges(mfi, slx_arr, srx_arr,
+                                  sly_arr, sry_arr,
+                                  slz_arr, srz_arr, scal_arr, 
+                                  sedgex_arr, sedgey_arr, sedgez_arr,
+                                  force[lev].array(mfi),
+                                  umac_arr, vmac_arr, wmac_arr,
+                                  Ipf.array(mfi), Imf.array(mfi),
+                                  simhxy_arr, simhxz_arr, simhyx_arr,
+                                  simhyz_arr, simhzx_arr, simhzy_arr,
+                                  domainBox, bcs, dx,
+                                  scomp, bccomp, 
+                                  is_vel, is_conservative);
+            } // end MFIter loop
+        } // end loop over components
+#endif
+    } // end loop over levels
+
+    // We use edge_restriction for the output velocity if is_vel == 1
+    // we do not use edge_restriction for scalars because instead we will use
+    // reflux on the fluxes in make_flux.
+    if (is_vel == 1) {
+        if (reflux_type == 1 || reflux_type == 2) {
+            AverageDownFaces(sedge);
+        }
+    }
+}
 
 #if (AMREX_SPACEDIM == 2)
 

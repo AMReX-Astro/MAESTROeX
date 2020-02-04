@@ -346,8 +346,13 @@ module make_beta0_module
                    
                 if (r < anelastic_cutoff_density_coord(n)) then
 
-                   drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
-                   drm = r_edge_loc(n,r) - r_edge_loc(n,r-1)
+                   if (r .gt. 0) then 
+                        drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
+                        drm = r_edge_loc(n,r) - r_edge_loc(n,r-1)
+                   else 
+                        drp = r_edge_loc(n,r+1) - r_edge_loc(n,r)
+                        drm = drp
+                   endif 
                    
                    if (r .eq. 0 .or. r .eq. nr(n)-1) then
                       
