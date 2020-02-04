@@ -20,7 +20,6 @@ Src_nd
    file/fill_umac_ghost_f
    file/initdata_f
    file/inlet_bc_f
-   file/mac_solver_f
    file/maestro_init_f
    file/make_S_f
    file/make_beta0_f
