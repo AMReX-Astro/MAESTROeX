@@ -70,19 +70,21 @@ contains
 
     ! write(*,*) "r_end_coord = ", r_end_coord
 
-    do n=0,max_radial_level
-       do i=1,numdisjointchunks(n)
+    ! do n=0,max_radial_level
+    !    do i=1,numdisjointchunks(n)
 
-        ! write(*,*) "start, end = ", r_start_coord(n,i),r_end_coord(n,i)
-          do r=r_start_coord(n,i),r_end_coord(n,i)
-             force(n,r) = -rho0_old(n,r) * (w0(n,r+1) - w0(n,r)) / dr(n)
-          end do
-       end do
-    end do
+    !     ! write(*,*) "start, end = ", r_start_coord(n,i),r_end_coord(n,i)
+    !       do r=r_start_coord(n,i),r_end_coord(n,i)
+    !          force(n,r) = -rho0_old(n,r) * (w0(n,r+1) - w0(n,r)) / dr(n)
+    !       end do
+    !    end do
+    ! end do
 
-    call make_edge_state_1d(rho0_old,edge,w0,force,dt)
+    call make_edge_state_1d(rho0_old,rho0_predicted_edge,w0,force,dt)
 
-    rho0_predicted_edge = edge
+    ! rho0_predicted_edge = edge
+
+    edge =  rho0_predicted_edge
 
     ! update rho_0
     do n=0,max_radial_level

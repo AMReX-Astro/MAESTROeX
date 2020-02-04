@@ -9,18 +9,10 @@ Maestro::AdvectBaseDens(RealVector& rho0_predicted_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseDens()", AdvectBaseDens); 
 
-    RealVector force_vec((max_radial_level+1)*nr_fine);
-
     if (spherical == 0) {
-        // AdvectBaseDensPlanar(rho0_predicted_edge);
-        advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
-                         rho0_predicted_edge.dataPtr(), dt,
-                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr(), force_vec.dataPtr());
-        // 
+        AdvectBaseDensPlanar(rho0_predicted_edge);
         RestrictBase(rho0_new, true);
         FillGhostBase(rho0_new, true);
-        // restrict base 
-        // fill_ghost_base
     } else {
         AdvectBaseDensSphr(rho0_predicted_edge);
     }
@@ -140,13 +132,9 @@ Maestro::AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge)
     BL_PROFILE_VAR("Maestro::AdvectBaseEnthalpy()", AdvectBaseEnthalpy); 
 
     if (spherical == 0) {
-        advect_base_enthalpy(w0.dataPtr(), rho0_old.dataPtr(),
-                             rhoh0_old.dataPtr(), rhoh0_new.dataPtr(),
-                             rhoh0_predicted_edge.dataPtr(), psi.dataPtr(), dt,
-                             r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-        // AdvectBaseEnthalpyPlanar(rhoh0_predicted_edge);
-        // RestrictBase(rhoh0_new, true);
-        // FillGhostBase(rhoh0_new, true);
+        AdvectBaseEnthalpyPlanar(rhoh0_predicted_edge);
+        RestrictBase(rhoh0_new, true);
+        FillGhostBase(rhoh0_new, true);
     } else {
         AdvectBaseEnthalpySphr(rhoh0_predicted_edge);
     }
