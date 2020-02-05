@@ -75,6 +75,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
         }
 
+#if (AMREX_SPACEDIM == 2)
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -85,27 +87,14 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& obx = amrex::grow(tileBox, 1);
             const Box& xbx = mfi.nodaltilebox(0);
             const Box& ybx = mfi.nodaltilebox(1);
-#if (AMREX_SPACEDIM == 3)
-            const Box& zbx = mfi.nodaltilebox(2);
-#endif
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
             Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
             Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
             Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
-#if (AMREX_SPACEDIM == 3)
-            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
-#endif
             Array4<Real> const Im_arr = Im.array(mfi);
             Array4<Real> const Ip_arr = Ip.array(mfi);
             Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
-#if (AMREX_SPACEDIM == 3)
-            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
-            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
-            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
-#endif
-
-#if (AMREX_SPACEDIM == 2)
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -284,8 +273,33 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     vly : vry;
                 vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
             });
-
+        } // end MFIter loop
+        
 #elif (AMREX_SPACEDIM == 3)
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // x-direction
             if (ppm_type == 0) {
@@ -302,7 +316,34 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 0, 0);
             }
+        }
 
+       
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi); 
+            
             // create utrans
             int bclo = phys_bc[0];
             int bchi = phys_bc[AMREX_SPACEDIM];
@@ -383,6 +424,33 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
                 }
             });
+        }
+
+        
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // y-direction
             if (ppm_type == 0) {
@@ -399,10 +467,37 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 1, 1);
             }
+        }
+
+        
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // create vtrans
-            bclo = phys_bc[1];
-            bchi = phys_bc[AMREX_SPACEDIM+1];
+            int bclo = phys_bc[1];
+            int bchi = phys_bc[AMREX_SPACEDIM+1];
 
             AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
             {
@@ -481,6 +576,33 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
                 }
             });
+        }
+
+        
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // z-direction
             if (ppm_type == 0) {
@@ -497,10 +619,37 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 2, 2);
             }
+        }
+
+        
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // create wtrans
-            bclo = phys_bc[2];
-            bchi = phys_bc[AMREX_SPACEDIM+2];
+            int bclo = phys_bc[2];
+            int bchi = phys_bc[AMREX_SPACEDIM+2];
 
             AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
             {
@@ -578,8 +727,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     wtrans_arr(i,j,k) = test ? 0.0 : wtrans_arr(i,j,k);
                 }
             });
-#endif
         } // end MFIter loop
+        
+#endif
+
     } // end loop over levels
 
     if (finest_level == 0) {
