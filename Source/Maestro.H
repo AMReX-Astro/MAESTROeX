@@ -572,8 +572,8 @@ public:
     // MaestroForce.cpp functions
 
     /// Calculate the velocity force term
-    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force_in,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav,
