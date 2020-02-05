@@ -976,7 +976,14 @@ public:
 
     void Makew0SphrIrreg() {};
 
-    void Makew0Sphr() {};
+    void Makew0Sphr(const RealVector& w0_old, RealVector& w0_force, 
+                    const RealVector& Sbar_in, 
+                    const RealVector& p0_minus_peosbar, 
+                    RealVector& delta_chi_w0, const bool is_predictor);
+
+    void Tridiag(const RealVector& a, const RealVector& b, 
+                 const RealVector& c, const RealVector& r, 
+                 RealVector& u, const int n);
 
     // end MaestroMakew0.cpp functions
     ////////////
@@ -1623,6 +1630,8 @@ public:
     static amrex::IntVect nodal_flag_x;
     static amrex::IntVect nodal_flag_y;
     static amrex::IntVect nodal_flag_z;
+
+    static constexpr amrex::Real Gconst = 6.67428e-8;
 
     /// which step?
     int istep;
