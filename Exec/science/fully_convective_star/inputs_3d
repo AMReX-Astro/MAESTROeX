@@ -106,9 +106,8 @@ maestro.small_temp = 1.e2
 maestro.sdc_couple_velocity = false
 
 # ROTATION
-# For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
-maestro.rotational_frequency = 100.0
-maestro.rotation_radius = 2.e8
+maestro.rotational_frequency = 4.e-7
+maestro.rotation_radius = 0.0
 
 &probin
 
