@@ -261,6 +261,15 @@ public:
     ////////////
 
     ////////////
+    // MaestroBaseStateGeometry.cpp functions
+
+    void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
+    void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
+
+    // end MaestroBaseStateGeometry.cpp functions
+    ////////////
+
+    ////////////
     // MaestroCheckpoint.cpp functions
 
     /// Write a checkpoint at timestep `step`
