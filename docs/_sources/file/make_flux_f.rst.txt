@@ -1,8 +1,0 @@
-make_flux.F90
-=============
-
-make\_flux\_module
-------------------
-
-.. f:automodule:: make_flux_module
-

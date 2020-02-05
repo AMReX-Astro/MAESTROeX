@@ -26,7 +26,6 @@ Src_nd
    file/make_edge_state_f
    file/make_eta_f
    file/make_explicit_thermal_f
-   file/make_flux_f
    file/make_gamma_f
    file/make_grav_f
    file/make_heating_f
@@ -42,5 +41,4 @@ Src_nd
    file/sponge_f
    file/tagging_f
    file/update_scal_f
-   file/update_vel_f
    
