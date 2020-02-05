@@ -84,6 +84,10 @@ extern "C"
 			 const int* finest_radial_level_in);
 
     void destroy_base_state_geometry();
+    
+    void get_numdisjointchunks(int* nchunks);
+    void get_r_start_coord(int* coord);
+    void get_r_end_coord(int* coord);
 
     //////////////////////
 
