@@ -151,7 +151,7 @@ Maestro::WritePlotFile (const int step,
 	    BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out   |
 			    std::ofstream::trunc |
 			    std::ofstream::binary);
-	    if( !BaseCCFile.good()) {
+	    if(!BaseCCFile.good()) {
                 amrex::FileOpenFailed(BaseCCFileName);
 	    }
 
@@ -184,7 +184,7 @@ Maestro::WritePlotFile (const int step,
 	    BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out   |
 			    std::ofstream::trunc |
 			    std::ofstream::binary);
-	    if( !BaseFCFile.good()) {
+	    if(!BaseFCFile.good()) {
                 amrex::FileOpenFailed(BaseFCFileName);
 	    }
 
@@ -1602,6 +1602,23 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
         const MultiFab& vel_mf = vel[lev];
         MultiFab& vorticity_mf = vorticity[lev];
 
+        const Real* dx = geom[lev].CellSize();
+        const Box& domainBox = geom[lev].Domain();
+
+        const Real hx = dx[0];
+        const Real hy = dx[1];
+#if (AMREX_SPACEDIM == 3)
+        const Real hz = dx[2];
+#endif
+        const int ilo = domainBox.loVect()[0];
+        const int ihi = domainBox.hiVect()[0];
+        const int jlo = domainBox.loVect()[1];
+        const int jhi = domainBox.hiVect()[1];
+#if (AMREX_SPACEDIM == 3)
+        const int klo = domainBox.loVect()[2];
+        const int khi = domainBox.hiVect()[2];
+#endif
+
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -1610,25 +1627,279 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
-            const Box& domainBox = geom[lev].Domain();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            Array4<const Real> const u = vel[lev].array(mfi);
+            Array4<Real> const vort = vorticity[lev].array(mfi);
+            GpuArray<int,AMREX_SPACEDIM*2> physbc;
+            for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
+                physbc[n] = phys_bc[n];
+            } 
 
-            // NOTE: do not offload to the gpu as make_vorticity_3d contains nested
-            // functions
-            make_vorticity(ARLIM_3D(tileBox.loVect()),
-                           ARLIM_3D(tileBox.hiVect()),
-                           ARLIM_3D(domainBox.loVect()),
-                           ARLIM_3D(domainBox.hiVect()),
-                           BL_TO_FORTRAN_3D(vel_mf[mfi]), ZFILL(dx),
-                           BL_TO_FORTRAN_3D(vorticity_mf[mfi]), phys_bc.dataPtr());
+#if (AMREX_SPACEDIM == 2)
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
+            {
+                Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
+                Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
+
+                if (i == ilo && 
+                    (physbc[0] == Inflow || 
+                     physbc[0] == SlipWall || 
+                     physbc[0] == NoSlipWall)) 
+                {
+                    vx = (u(i+1,j,k,1) + 3.0*u(i,j,k,1) - 
+                          4.0*u(i-1,j,k,1)) / hx;
+                    uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
+
+                } else if (i == ihi+1 &&
+                        (physbc[AMREX_SPACEDIM] == Inflow || 
+                        physbc[AMREX_SPACEDIM] == SlipWall || 
+                        physbc[AMREX_SPACEDIM] == NoSlipWall))
+                {
+                    vx = -(u(i-1,j,k,1) + 3.0*u(i,j,k,1) - 
+                         4.0*u(i+1,j,k,1)) / hx;
+                    uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
+                }
+
+                if (j == jlo &&
+                    (physbc[1] == Inflow || 
+                     physbc[1] == SlipWall || 
+                     physbc[1] == NoSlipWall))
+                {
+                    vx = 0.5 * (u(i+1,j,k,1) - u(i-1,j,k,0)) / hx;
+                    uy = (u(i,j+1,k,0) + 3.0*u(i,j,k,0) - 
+                         4.0*u(i,j-1,k,0)) / hy;
+
+                } else if (j == jhi+1 && 
+                           (physbc[AMREX_SPACEDIM+1] == Inflow || 
+                            physbc[AMREX_SPACEDIM+1] == SlipWall || 
+                            physbc[AMREX_SPACEDIM+1] == NoSlipWall))
+                {
+                    vx = 0.5 * (u(i+1,j,k,1) - u(i-1,j,k,1)) / hx;
+                    uy = -(u(i,j-1,k,0) + 3.0*u(i,j,k,0) - 
+                         4.0*u(i,j+1,k,0)) / hy;
+                }
+
+                vort(i,j,k) = vx - uy;
+
+            });
+
+#else 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
+            {
+                Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
+                Real uz = 0.5*(u(i,j,k+1,0)-u(i,j,k-1,0))/hz;
+                Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
+                Real vz = 0.5*(u(i,j,k+1,1)-u(i,j,k-1,1))/hz;
+                Real wx = 0.5*(u(i+1,j,k,2)-u(i-1,j,k,2))/hx;
+                Real wy = 0.5*(u(i,j+1,k,2)-u(i,j-1,k,2))/hy;
+
+                bool fix_lo_x = (physbc[0] == Inflow || 
+                                 physbc[0] == NoSlipWall);
+                bool fix_hi_x = (physbc[AMREX_SPACEDIM] == Inflow || 
+                                 physbc[AMREX_SPACEDIM] == NoSlipWall);
+
+                bool fix_lo_y = (physbc[1] == Inflow || 
+                                 physbc[1] == NoSlipWall);
+                bool fix_hi_y = (physbc[AMREX_SPACEDIM+1] == Inflow ||
+                                 physbc[AMREX_SPACEDIM+1] == NoSlipWall);
+
+                bool fix_lo_z = (physbc[2] == Inflow || 
+                                 physbc[2] == NoSlipWall);
+                bool fix_hi_z = (physbc[AMREX_SPACEDIM+2] == Inflow ||
+                                 physbc[AMREX_SPACEDIM+2] == NoSlipWall);
+
+                // First do all the faces
+                if (fix_lo_x && i == ilo) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                } else if (fix_hi_x && i == ihi+1) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                }
+
+                if (fix_lo_y && j == jlo) {
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                } else if (fix_hi_y && j == jhi+1) {
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                }
+
+                if (fix_lo_z && k == klo) {
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_z && k == khi+1) {
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                // Next do all the edges
+                if (fix_lo_x && fix_lo_y && i == ilo && j == jlo) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                }
+
+                if (fix_hi_x && fix_lo_y && i == ihi+1 && j == jlo) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                }
+
+                if (fix_lo_x && fix_hi_y && i == ilo && j == jhi+1) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                }
+
+                if (fix_lo_x && fix_lo_z && i == ilo && k == klo) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_lo_z && i == ihi+1 && k == klo) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_x && fix_hi_z && i == ilo && k == khi+1) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_hi_z && i == ihi+1 && k == khi+1) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_y && fix_lo_z && j == jlo && k == klo) {
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_y && fix_lo_z && j == jhi+1 && k == klo) {
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_y && fix_hi_z && j == jlo && k == khi+1) {
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_y && fix_hi_z && j == jhi+1 && k == khi+1) {
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+                
+                // Finally do all the corners
+                if (fix_lo_x && fix_lo_y && fix_lo_z && 
+                    i == ilo && j == jlo && k == klo) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_lo_y && fix_lo_z &&
+                    i == ihi+1 && j == jlo && k == klo) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_x && fix_hi_y && fix_lo_z &&
+                    i == ilo && j == jhi+1 && k == klo) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_hi_y && fix_lo_z &&
+                    i == ihi+1 && j == jhi+1 && k == klo) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
+                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_x && fix_lo_y && fix_hi_z &&
+                    i == ilo && j == jlo && k == khi+1) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_lo_y && fix_hi_z &&
+                    i == ihi+1 && j == jlo && k == khi+1) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
+                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_lo_x && fix_hi_y && fix_hi_z &&
+                    i == ilo && j == jhi+1 && k == khi+1) {
+                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                if (fix_hi_x && fix_hi_y && fix_hi_z &&
+                    i == ihi+1 && j == jhi+1 && k == khi+1) {
+                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
+                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
+                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
+                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
+                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
+                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
+                }
+
+                vort(i,j,k) = sqrt((wy-vz)*(wy-vz)+
+                    (uz-wx)*(uz-wx)+(vx-uy)*(vx-uy));
+            });
+#endif
         }
-
-
     }
 
     // average down and fill ghost cells

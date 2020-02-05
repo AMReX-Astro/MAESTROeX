@@ -144,7 +144,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         }
     }
 
-
     if (finest_level == 0) {
         // fill periodic ghost cells
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -162,7 +161,6 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         // fill level n ghost cells using interpolation from level n-1 data
         FillPatchUedge(umac);
     }
-
 }
 
 // Set up implicit solve using MLABecLaplacian class
@@ -236,13 +234,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& xedge_mf = edge[lev][0];
-        MultiFab& yedge_mf = edge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& zedge_mf = edge[lev][2];
-#endif
-
         // Must get cell-centered MultiFab boxes for MIter
         MultiFab& sold_mf = sold[lev];
 
@@ -259,29 +250,64 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
-            // call fortran subroutine
-#pragma gpu(xbx)
-            mult_beta0(AMREX_INT_ANYD(xbx.loVect()),
-                       AMREX_INT_ANYD(xbx.hiVect()),lev,1,
-                       BL_TO_FORTRAN_ANYD(xedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
-#pragma gpu(ybx)
-            mult_beta0(AMREX_INT_ANYD(ybx.loVect()),
-                       AMREX_INT_ANYD(ybx.hiVect()),lev,2,
-                       BL_TO_FORTRAN_ANYD(yedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
+            const Array4<Real> uedge = edge[lev][0].array(mfi);
+            const Array4<Real> vedge = edge[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> wedge = edge[lev][2].array(mfi);
+#endif  
+            const Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
+            const Real * AMREX_RESTRICT beta0_edge_p = beta0_edge.dataPtr();
+
+            int max_lev_loc = max_radial_level;
+
+            if (mult_or_div == 1) {
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    int r = j;
+#else 
+                    int r = k;
+#endif
+                    uedge(i,j,k) *= beta0_p[lev+r*(max_lev_loc+1)];
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    vedge(i,j,k) *= beta0_edge_p[lev+j*(max_lev_loc+1)];
+#else 
+                    vedge(i,j,k) *= beta0_p[lev+k*(max_lev_loc+1)];
+#endif
+                });
 
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu(zbx)
-            mult_beta0(AMREX_INT_ANYD(zbx.loVect()),
-                       AMREX_INT_ANYD(zbx.hiVect()),lev,3,
-                       BL_TO_FORTRAN_ANYD(zedge_mf[mfi]),
-                       beta0_edge.dataPtr(),
-                       beta0.dataPtr(), mult_or_div);
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) *= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                });
 #endif
+            } else {
 
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    int r = j;
+#else 
+                    int r = k;
+#endif
+                    uedge(i,j,k) /= beta0_p[lev+r*(max_lev_loc+1)];
+                });
+
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    vedge(i,j,k) /= beta0_edge_p[lev+j*(max_lev_loc+1)];
+#else 
+                    vedge(i,j,k) /= beta0_p[lev+k*(max_lev_loc+1)];
+#endif
+                });
+
+#if (AMREX_SPACEDIM == 3)
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    wedge(i,j,k) /= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                });
+#endif
+            }
         }
     }
 }
@@ -299,12 +325,6 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     {
         // get references to the MultiFabs at level lev
         MultiFab& solverrhs_mf = solverrhs[lev];
-        const MultiFab& macrhs_mf = macrhs[lev];
-        const MultiFab& uedge_mf = umac[lev][0];
-        const MultiFab& vedge_mf = umac[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wedge_mf = umac[lev][2];
-#endif
 
         // loop over boxes
 #ifdef _OPENMP
@@ -314,24 +334,29 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-#pragma gpu box(tileBox)
-            mac_solver_rhs(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),lev,
-                           BL_TO_FORTRAN_ANYD(solverrhs_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(macrhs_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+            const auto dx = geom[lev].CellSizeArray();
+
+            const Array4<Real> solverrhs_arr = solverrhs[lev].array(mfi);
+            const Array4<const Real> macrhs_arr = macrhs[lev].array(mfi);
+            const Array4<const Real> uedge = umac[lev][0].array(mfi);
+            const Array4<const Real> vedge = umac[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-                           BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+            const Array4<const Real> wedge = umac[lev][2].array(mfi);
 #endif
-                           AMREX_REAL_ANYD(dx));
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                // Compute newrhs = oldrhs - div(Uedge)
+                solverrhs_arr(i,j,k) = macrhs_arr(i,j,k) 
+                    - ( (uedge(i+1,j,k)-uedge(i,j,k))/dx[0]
+                    + (vedge(i,j+1,k)-vedge(i,j,k))/dx[1] 
+#if (AMREX_SPACEDIM == 3)
+                    + (wedge(i,j,k+1)-wedge(i,j,k))/dx[2]
+#endif
+                    );
+            });
         }
     }
-
 }
 
 // Average bcoefs at faces using inverse of rho
@@ -344,13 +369,6 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& xbcoef_mf = facebcoef[lev][0];
-        MultiFab& ybcoef_mf = facebcoef[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& zbcoef_mf = facebcoef[lev][2];
-#endif
-
         // Must get cell-centered MultiFab boxes for MIter
         const MultiFab& rhocc_mf = rhocc[lev];
 
@@ -367,29 +385,26 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #if (AMREX_SPACEDIM == 3)
             const Box& zbx = amrex::growHi(tileBox, 2, 1);
 #endif
-            // call fortran subroutine
-            // x-direction
-#pragma gpu box(xbx)
-            mac_bcoef_face(AMREX_INT_ANYD(xbx.loVect()),AMREX_INT_ANYD(xbx.hiVect()),
-                           lev, 1,
-                           BL_TO_FORTRAN_ANYD(xbcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
 
-            // y-direction
-#pragma gpu box(ybx)
-            mac_bcoef_face(AMREX_INT_ANYD(ybx.loVect()),AMREX_INT_ANYD(ybx.hiVect()),
-                           lev, 2,
-                           BL_TO_FORTRAN_ANYD(ybcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+            const Array4<Real> xbcoef = facebcoef[lev][0].array(mfi);
+            const Array4<Real> ybcoef = facebcoef[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-            // z-direction
-#pragma gpu box(zbx)
-            mac_bcoef_face(AMREX_INT_ANYD(zbx.loVect()),AMREX_INT_ANYD(zbx.hiVect()),
-                           lev, 3,
-                           BL_TO_FORTRAN_ANYD(zbcoef_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(rhocc_mf[mfi]));
+            const Array4<Real> zbcoef = facebcoef[lev][2].array(mfi);
 #endif
+            const Array4<const Real> rhocc_arr = rhocc[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                xbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i-1,j,k));
+            });
+
+            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ybcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j-1,k));
+            });
+#if (AMREX_SPACEDIM == 3)
+            AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                zbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j,k-1));
+            });
+#endif
         }
     }
 }

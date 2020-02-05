@@ -137,11 +137,11 @@ contains
        if (use_exact_base_state) then
           ! nr_fine = nr_irreg + 1
           do i=0,nr_fine-1
-             r_cc_loc(0,i) = sqrt(0.75d0+2.d0*i)*dx_fine(0)
+             r_cc_loc(0,i) = sqrt(0.75d0+2.d0*dble(i))*dx_fine(0)
           end do
           r_edge_loc(0,0) = 0.d0
           do i=0,nr_fine-1
-             r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(i+0.5d0))*dx_fine(0)
+             r_edge_loc(0,i+1) = sqrt(0.75d0+2.d0*(dble(i)+0.5d0))*dx_fine(0)
           end do
        else
           do i=0,nr_fine-1
@@ -526,7 +526,7 @@ contains
        do n=finest_radial_level,1,-1
           ! for level n, make the coarse edge underneath equal to the fine edge value
           do i=1,numdisjointchunks(n)
-             do r=r_start_coord(n,1),r_end_coord(n,1)+1,2
+             do r=r_start_coord(n,i),r_end_coord(n,i)+1,2
                 s0(n-1,r/2) = s0(n,r)
              end do
           end do
@@ -698,5 +698,42 @@ contains
   end subroutine get_buoyancy_cutoff_factor
   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  subroutine get_numdisjointchunks(nchunks) bind(C, name="get_numdisjointchunks")
+
+    integer, intent(inout) :: nchunks(0:finest_radial_level)
+
+    nchunks(0:finest_radial_level) = numdisjointchunks(0:finest_radial_level)
+  end subroutine get_numdisjointchunks
+
+
+  subroutine get_r_start_coord(coord) bind(C, name="get_r_start_coord")
+
+    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+    integer :: i, lev
+
+    coord(0:finest_radial_level,0:nr_fine) = 0
+
+    do lev = 0, finest_radial_level
+        do i = 1, numdisjointchunks(lev)
+            coord(lev, i-1) = r_start_coord(lev, i)
+        end do
+    end do
+  end subroutine get_r_start_coord
+
+
+  subroutine get_r_end_coord(coord) bind(C, name="get_r_end_coord")
+
+    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+    integer :: i, lev
+
+    coord(0:finest_radial_level,0:nr_fine) = 0
+    
+    do lev = 0, finest_radial_level
+        do i = 1, numdisjointchunks(lev)
+            coord(lev, i-1) = r_end_coord(lev, i)
+        end do
+    end do
+  end subroutine get_r_end_coord
 
 end module base_state_geometry_module
