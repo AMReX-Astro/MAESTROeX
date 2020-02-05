@@ -68,8 +68,8 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         }
     } else {
 
-            // spherical case
-            // compute r_cc_loc, r_edge_loc
+        // spherical case
+        // compute r_cc_loc, r_edge_loc
         if (use_exact_base_state) {
                 //   ! nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
@@ -287,7 +287,6 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
                     }
                 }
             }
-
         }
     }
 
@@ -395,11 +394,9 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
             }
         }
     } else {
-
         numdisjointchunks[0] = 1;
         r_start_coord[0] = 0;
         r_end_coord[0] = nr[0]-1;
-
     }
 }
 
