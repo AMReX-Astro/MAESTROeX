@@ -961,6 +961,28 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakew0.cpp functions
+
+    void Makew0(const RealVector& w0_old, RealVector& w0_force, 
+                const RealVector& Sbar_in, const RealVector& p0_minus_peosbar, 
+                RealVector& delta_chi_w0, const bool is_predictor);
+
+    void Makew0PlanarVarg() {};
+
+    void Makew0Planar(const RealVector& w0_old, RealVector& w0_force, 
+                      const RealVector& Sbar_in, 
+                      const RealVector& p0_minus_peosbar, 
+                      RealVector& delta_chi_w0, const bool is_predictor);
+
+    void Makew0SphrIrreg() {};
+
+    void Makew0Sphr() {};
+
+    // end MaestroMakew0.cpp functions
+    ////////////
+
+
+    ////////////
     // MaestroNodalProj.cpp functions
 
     /// Perform a nodal projection
