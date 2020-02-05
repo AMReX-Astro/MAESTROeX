@@ -30,7 +30,7 @@ contains
                      gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
                      etarho_ec,etarho_cc,delta_chi_w0, &
                      r_cc_loc,r_edge_loc, &
-                     dt,dtold,is_predictor,lev) bind(C, name="make_w0")
+                     dt,dtold,is_predictor) bind(C, name="make_w0")
     ! Binds to C function ``make_w0``
 
     double precision, intent(inout) ::               w0(0:max_radial_level,0:nr_fine  )
@@ -51,7 +51,6 @@ contains
     double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) :: dt,dtold
     integer         , intent(in   ) :: is_predictor
-    integer, value, intent(in) :: lev
 
     integer         :: r,n
     double precision :: max_w0
@@ -69,12 +68,12 @@ contains
                                     gamma1bar_old,gamma1bar_new, &
                                     p0_minus_peosbar, &
                                     etarho_cc,w0_force, &
-                                    dt,dtold,r_cc_loc,r_edge_loc,lev)
+                                    dt,dtold,r_cc_loc,r_edge_loc)
        else
           call make_w0_planar(w0,w0_old,Sbar_in, &
                               p0_old,p0_new,gamma1bar_old,gamma1bar_new, &
                               p0_minus_peosbar,etarho_cc,w0_force, &
-                              dt,dtold,delta_chi_w0,is_predictor,lev)
+                              dt,dtold,delta_chi_w0,is_predictor)
        endif
 
 
@@ -131,7 +130,7 @@ contains
 
   subroutine make_w0_planar(w0,w0_old,Sbar_in,p0_old,p0_new, &
                             gamma1bar_old,gamma1bar_new,p0_minus_peosbar, &
-                            etarho_cc,w0_force,dt,dtold,delta_chi_w0,is_predictor,lev)
+                            etarho_cc,w0_force,dt,dtold,delta_chi_w0,is_predictor)
 
     double precision, intent(  out) ::               w0(0:max_radial_level,0:nr_fine  )
     double precision, intent(in   ) ::           w0_old(0:max_radial_level,0:nr_fine  )
@@ -146,7 +145,6 @@ contains
     double precision, intent(inout) ::     delta_chi_w0(0:max_radial_level,0:nr_fine-1)
     double precision, intent(in   ) :: dt,dtold
     integer         , intent(in   ) :: is_predictor
-    integer, value, intent(in) :: lev
 
     ! Local variables
     integer         :: r, n, i, j, refrat
