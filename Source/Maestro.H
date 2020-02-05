@@ -263,6 +263,19 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
+    void InitBaseStateGeometry(const int max_radial_level_in, 
+                               const int nr_fine_in,
+                               const amrex::Real dr_fine_in,
+                               const int nr_irreg_in);
+#if (AMREX_SPACEDIM == 3)
+    void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
+                              const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
+                              const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
+#endif
+    void ComputeCutoffCoords(RealVector& rho0);
+
+    void InitMultilevel(const int finest_radial_level_in);
+                               
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
@@ -1687,6 +1700,13 @@ public:
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
+    IntVector nr;
+    RealVector dr;
+    IntVector base_cutoff_density_coord;
+    IntVector anelastic_cutoff_density_coord;
+    IntVector burning_cutoff_density_lo_coord;
+    IntVector burning_cutoff_density_hi_coord;
+
 
     // these provide information about the multilevel base state configuration
     IntVector numdisjointchunks;
@@ -1700,6 +1720,12 @@ public:
     amrex::Vector<amrex::Real> diagfile1_data;
     amrex::Vector<amrex::Real> diagfile2_data;
     amrex::Vector<amrex::Real> diagfile3_data;
+
+    // problem information
+    RealVector prob_lo;
+    RealVector prob_hi;
+    RealVector center;
+    RealVector dx_fine;
 
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`
