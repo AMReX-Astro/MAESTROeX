@@ -1207,7 +1207,7 @@ Maestro::MakeNormal ()
                     Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center[1];
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center[2];
 
-                    Real inv_radius = 1.0 / (x*x + y*y + z*z);
+                    Real inv_radius = 1.0 / sqrt(x*x + y*y + z*z);
 
                     normal_arr(i,j,k,0) = x * inv_radius;
                     normal_arr(i,j,k,1) = y * inv_radius;
