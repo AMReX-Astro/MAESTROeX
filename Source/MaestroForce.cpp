@@ -122,9 +122,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
 		    // note: if use_alt_energy_fix = T, then gphi is already
 		    // weighted by beta0
-		    vel_force(i,j,k,AMREX_SPACEDIM-1) = -gpi_arr(i,j,k,AMREX_SPACEDIM-1) / rho_arr(i,j,k);
+		    for (int dim=0; dim<AMREX_SPACEDIM-1; ++dim) {
+			vel_force(i,j,k,dim) = -gpi_arr(i,j,k,dim) / rho_arr(i,j,k);
+		    }
 
-		    vel_force(i,j,k,AMREX_SPACEDIM) = (rhopert * grav(i,j,k,AMREX_SPACEDIM) - gpi_arr(i,j,k,AMREX_SPACEDIM)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM);
+		    vel_force(i,j,k,AMREX_SPACEDIM-1) = (rhopert * grav(i,j,k,AMREX_SPACEDIM-1) - gpi_arr(i,j,k,AMREX_SPACEDIM-1)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM-1);
 
 		    if (do_add_utilde_force_in == 1) {
 			
@@ -168,7 +170,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 		    for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
 			vel_force(i,j,k,dim) = (rhopert*grav(i,j,k,dim) - gpi_arr(i,j,k,dim))/rho_arr(i,j,k) - w0_force(i,j,k,dim);
 		    }
-
 		    
 		    if (do_add_utilde_force == 1) {
 			Real Ut_dot_er = 0.5*(uedge(i,j,k)+uedge(i+1,j  ,k  ))*normal_arr(i,j,k,0) + 
@@ -201,7 +202,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
-                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
                          const Vector<MultiFab>& s0_cart,
@@ -248,20 +249,10 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
         // Get the index space and grid spacing of the domain
         const Box& domainBox = geom[lev].Domain();
-        const Real* dx = geom[lev].CellSize();
+	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
-        const MultiFab& state_mf = state[lev];
-        const MultiFab& umac_mf = umac[lev][0];
-        const MultiFab& vmac_mf = umac[lev][1];
-        const MultiFab& s0_mf = s0_cart[lev];
-        const MultiFab& s0_edge_mf = s0_edge_cart[lev];
-        const MultiFab& w0_mf = w0_cart[lev];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wmac_mf = umac[lev][2];
-        const MultiFab& divu_mf = divu_cart[lev];
-#endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -269,6 +260,21 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #endif
         for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
+	    // Get Array4 inputs
+	    const Array4<const Real> scal = state[lev].array(mfi);
+	    const Array4<const Real> umac = umac_in[lev][0].array(mfi);
+	    const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
+	    const Array4<const Real> s0_arr = s0_cart[lev].array(mfi);
+	    const Array4<const Real> s0_edge_arr = s0_edge_cart[lev].array(mfi);
+	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+	    const Array4<const Real> wmac = umac[lev][2].array(mfi);
+	    const Array4<const Real> divu = divu_cart[lev].array(mfi);
+#endif
+
+	    // output
+	    const Array4<Real> force = scal_force_mf.array(mfi);
+	    
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
@@ -296,21 +302,46 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                 Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
-#pragma gpu box(tileBox)
-                modify_scal_force(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()), lev,
-                                  scal_force_mf[mfi].dataPtr(comp),
-                                  AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-                                  state_mf[mfi].dataPtr(comp),
-                                  AMREX_INT_ANYD(state_mf[mfi].loVect()), AMREX_INT_ANYD(state_mf[mfi].hiVect()),
-                                  BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {
+		    Real divu;
+		    
+		    // umac does not contain w0
+#if (AMREX_SPACEDIM == 2)
+		    divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+			+(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1];
+
+		    // add w0 contribution
+		    divu = divu + (w0_arr(i,j+1,k,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
+#elif (AMREX_SPACEDIM == 3)
+		    divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+			+(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] 
+			+(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
+
+		    // add w0 contribution
+		    divu = divu + (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
-                                  BL_TO_FORTRAN_ANYD(s0_mf[mfi]), 
-                                  BL_TO_FORTRAN_ANYD(s0_edge_mf[mfi]), 
-                                  BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-                                  AMREX_REAL_ANYD(dx), fullform);
+			
+		    if (do_fullform == 1) {
+			force(i,j,k) = force(i,j,k) - scal(i,j,k)*divu;
+		    } else {
+
+#if (AMREX_SPACEDIM == 2)
+			Real divs0u = s0_arr(i,j,k)*(  umac(i+1,j,k) - umac(i,j,k))/dx[0] 
+			    +(vmac(i,j+1,k) * s0_edge_arr(i,j+1,k) - 
+			      vmac(i,j  ,k) * s0_edge_arr(i,j,k) )/ dx[1];
+#elif (AMREX_SPACEDIM == 3)
+			Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0] 
+						      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] ) 
+			    +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) &
+			      - wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
+#endif
+
+			force(i,j,k) -= (scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
+		    }
+		});
+		
             }
         }
     }

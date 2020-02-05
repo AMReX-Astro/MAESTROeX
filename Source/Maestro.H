@@ -582,7 +582,7 @@ public:
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
 			 const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
 			 const amrex::Vector<amrex::MultiFab>& s0_cart,
