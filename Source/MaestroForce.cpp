@@ -5,8 +5,8 @@
 using namespace amrex;
 
 void
-Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
-                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
+Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const Vector<MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav_cell,
@@ -57,27 +57,14 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
 
     // Reset vel_force
     for (int lev=0; lev<=finest_level; ++lev) {
-	vel_force[lev].setVal(0.);
+	vel_force_cart[lev].setVal(0.);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& vel_force_mf = vel_force[lev];
-        const MultiFab& gpi_mf = gpi[lev];
-        const MultiFab& rho_mf = rho[lev];
-        const MultiFab& uedge_mf = uedge[lev][0];
-        const MultiFab& vedge_mf = uedge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wedge_mf = uedge[lev][2];
-#endif
-        const MultiFab& w0_mf = w0_cart[lev];
-        const MultiFab& gradw0_mf = gradw0_cart[lev];
-        const MultiFab& normal_mf = normal[lev];
-        const MultiFab& w0force_mf = w0_force_cart[lev];
-        const MultiFab& grav_mf = grav_cart[lev];
-        const MultiFab& rho0_mf = rho0_cart[lev];
-
+        MultiFab& vel_force_mf = vel_force_cart[lev];
+	
 	// Get grid spacing
 	const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
 
@@ -88,19 +75,19 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
         for ( MFIter mfi(vel_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
 	    // Get Array4 inputs
-	    const Array4<const Real> gpi = gpi_mf.array(mfi);
-	    const Array4<const Real> rho = rho_mf.array(mfi);
-	    const Array4<const Real> uedge = uedge_mf.array(mfi);
-	    const Array4<const Real> vedge = vedge_mf.array(mfi);
+	    const Array4<const Real> gpi_arr = gpi[lev].array(mfi);
+	    const Array4<const Real> rho_arr = rho[lev].array(mfi);
+	    const Array4<const Real> uedge = uedge_in[lev][0].array(mfi);
+	    const Array4<const Real> vedge = uedge_in[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-	    const Array4<const Real> wedge = wedge_mf.array(mfi);
+	    const Array4<const Real> wedge = uedge_in[lev][2].array(mfi);
 #endif
-	    const Array4<const Real> w0_in = w0_mf.array(mfi);
-	    const Array4<const Real> gradw0 = gradw0_mf.array(mfi);
-	    const Array4<const Real> normal = normal_mf.array(mfi);
-	    const Array4<const Real> w0force = w0force_mf.array(mfi);
-	    const Array4<const Real> grav = grav_mf.array(mfi);
-	    const Array4<const Real> rho0 = rho0_mf.array(mfi);
+	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+	    const Array4<const Real> gradw0_arr = gradw0_cart[lev].array(mfi);
+	    const Array4<const Real> normal_arr = normal[lev].array(mfi);
+	    const Array4<const Real> w0_force = w0_force_cart[lev].array(mfi);
+	    const Array4<const Real> grav = grav_cart[lev].array(mfi);
+	    const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
 	    
 	    // output
 	    const Array4<Real> vel_force = vel_force_mf.array(mfi);
@@ -124,96 +111,73 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 0) {
 
-#if (AMREX_SPACEDIM == 2)
-		
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
-		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
+		    Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
 		    
 		    //cutoff the buoyancy term if we are outside of the star
-		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+		    if (rho_arr(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
 			rhopert = 0.0;
 		    }
 
 		    // note: if use_alt_energy_fix = T, then gphi is already
 		    // weighted by beta0
-		    vel_force(i,j,k,0) = -gpi(i,j,k,0) / rho(i,j,k);
+		    vel_force(i,j,k,AMREX_SPACEDIM-1) = -gpi_arr(i,j,k,AMREX_SPACEDIM-1) / rho_arr(i,j,k);
 
-		    vel_force(i,j,k,1) = (rhopert * grav(i,j,k,1) - gpi(i,j,k,1)) / rho(i,j,k) -
-			w0force(i,j,k,1);
+		    vel_force(i,j,k,AMREX_SPACEDIM) = (rhopert * grav(i,j,k,AMREX_SPACEDIM) - gpi_arr(i,j,k,AMREX_SPACEDIM)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM);
 
 		    if (do_add_utilde_force_in == 1) {
+			
+#if (AMREX_SPACEDIM == 2)
 			if (j <= -1) {
 			    // do not modify force since dw0/dr=0
 			} else if (j >= domhi) {
 			    // do not modify force since dw0/dr=0
 			} else {
 			    vel_force(i,j,k,1) = vel_force(i,j,k,1)
-				- (vedge(i,j+1,k)+vedge(i,j,k))*(w0_in(i,j+1,k,1) - w0_in(i,j,k,1))/(2.0*dx[1]);
+				- (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
 			}
-		    }
-		});
-    
-#elif (AMREX_SPACEDIM == 3)
-		
-		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
-                {
-		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
-		    
-		    // cutoff the buoyancy term if we are outside of the star
-		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
-			rhopert = 0.0;
-		    }
-
-		    // note: if use_alt_energy_fix = T, then gphi is already
-		    // weighted by beta0
-		    vel_force(i,j,k,0) = -gpi(i,j,k,0) / rho(i,j,k);
-		    vel_force(i,j,k,1) = -gpi(i,j,k,1) / rho(i,j,k);
-
-		    vel_force(i,j,k,2) = (rhopert * grav(i,j,k,2) - gpi(i,j,k,2)) / rho(i,j,k) -
-			w0force(i,j,k,2);
-
-		    if (do_add_utilde_force_in == 1) {
+#else
+			
 			if (k <= -1) {
 			    // do not modify force since dw0/dr=0
 			} else if (k >= domhi) {
 			    // do not modify force since dw0/dr=0
 			} else {
 			    vel_force(i,j,k,2) = vel_force(i,j,k,2) 
-				- (wedge(i,j,k+1)+wedge(i,j,k))*(w0_in(i,j,k+1,2)-w0_in(i,j,k,2)) / (2.0*dx[2]);
+				- (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
 			}
+#endif
 		    }
 		});
-#endif
 		
-            } else {
+            } else {  // spherical
 #if (AMREX_SPACEDIM == 3)
 		
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
-		    Real rhopert = rho(i,j,k) - rho0(i,j,k);
+		    Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
 
 		    // cutoff the buoyancy term if we are outside of the star
-		    if (rho(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+		    if (rho_arr(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
 			rhopert = 0.0;
 		    }
 
 		    // note: if use_alt_energy_fix = T, then gphi is already
 		    // weighted by beta0
 		    for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
-			vel_force(i,j,k,dim) = (rhopert*grav(i,j,k,dim) - gpi(i,j,k,dim))/rho(i,j,k)
-			    - w0force(i,j,k,dim);
+			vel_force(i,j,k,dim) = (rhopert*grav(i,j,k,dim) - gpi_arr(i,j,k,dim))/rho_arr(i,j,k) - w0_force(i,j,k,dim);
 		    }
 
 		    
 		    if (do_add_utilde_force == 1) {
-			Real Ut_dot_er = 0.5*(uedge(i,j,k)+uedge(i+1,j  ,k  ))*normal(i,j,k,0) + 
-			                 0.5*(vedge(i,j,k)+vedge(i  ,j+1,k  ))*normal(i,j,k,1) + 
-			                 0.5*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal(i,j,k,2);
+			Real Ut_dot_er = 0.5*(uedge(i,j,k)+uedge(i+1,j  ,k  ))*normal_arr(i,j,k,0) + 
+			                 0.5*(vedge(i,j,k)+vedge(i  ,j+1,k  ))*normal_arr(i,j,k,1) + 
+			                 0.5*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal_arr(i,j,k,2);
 			
 			for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
 			    vel_force(i,j,k,dim) = vel_force(i,j,k,dim) - 
-				Ut_dot_er*gradw0(i,j,k)*normal(i,j,k,dim);
+				Ut_dot_er*gradw0_arr(i,j,k)*normal_arr(i,j,k,dim);
 			}
 		    }
 		});
@@ -224,11 +188,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
     }
 
     // average fine data onto coarser cells
-    AverageDown(vel_force,0,AMREX_SPACEDIM);
+    AverageDown(vel_force_cart,0,AMREX_SPACEDIM);
 
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
-    FillPatch(t_old, vel_force, vel_force, vel_force, 0, 0, AMREX_SPACEDIM, 0,
+    FillPatch(t_old, vel_force_cart, vel_force_cart, vel_force_cart, 0, 0, AMREX_SPACEDIM, 0,
               bcs_u, 1);
 
 }
@@ -439,21 +403,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
-        const MultiFab& umac_mf = umac_cart[lev][0];
-        const MultiFab& vmac_mf = umac_cart[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wmac_mf = umac_cart[lev][2];
-#endif
-        const MultiFab& p0cart_mf = p0_cart[lev];
-        const MultiFab& p0macx_mf = p0mac[lev][0];
-        const MultiFab& p0macy_mf = p0mac[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& p0macz_mf = p0mac[lev][2];
-#endif
-        const MultiFab& thermal_mf = thermal[lev];
-        const MultiFab& psi_mf = psi_cart[lev];
-        const MultiFab& grav_mf = grav_cart[lev];
-        const MultiFab& rho0_mf = rho0_cart[lev];
 
 	// Get cutoff coord
 	int base_cutoff_density_coord;
@@ -469,19 +418,19 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
 	    // inputs
-	    const Array4<const Real> umac = umac_mf.array(mfi);
-	    const Array4<const Real> vmac = vmac_mf.array(mfi);
-	    const Array4<const Real> p0cart = p0cart_mf.array(mfi);
-	    const Array4<const Real> p0macx = p0macx_mf.array(mfi);
-	    const Array4<const Real> p0macy = p0macy_mf.array(mfi);
+	    const Array4<const Real> umac = umac_cart[lev][0].array(mfi);
+	    const Array4<const Real> vmac = umac_cart[lev][1].array(mfi);
+	    const Array4<const Real> p0cart = p0_cart[lev].array(mfi);
+	    const Array4<const Real> p0macx = p0mac[lev][0].array(mfi);
+	    const Array4<const Real> p0macy = p0mac[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-	    const Array4<const Real> wmac = wmac_mf.array(mfi);
-	    const Array4<const Real> p0macz = p0macz_mf.array(mfi);
+	    const Array4<const Real> wmac = umac_cart[lev][2].array(mfi);
+	    const Array4<const Real> p0macz = p0mac[lev][2].array(mfi);
 #endif
-	    const Array4<const Real> thermal_in = thermal_mf.array(mfi);
-	    const Array4<const Real> psicart = psi_mf.array(mfi);
-	    const Array4<const Real> gravcart = grav_mf.array(mfi);
-	    const Array4<const Real> rho0cart = rho0_mf.array(mfi);
+	    const Array4<const Real> thermal_arr = thermal[lev].array(mfi);
+	    const Array4<const Real> psicart = psi_cart[lev].array(mfi);
+	    const Array4<const Real> gravcart = grav_cart[lev].array(mfi);
+	    const Array4<const Real> rho0cart = rho0_cart[lev].array(mfi);
 
 	    // output
 	    const Array4<Real> rhoh_force = scal_force_mf.array(mfi);
@@ -525,7 +474,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		}
 
 		if (add_thermal == 1) {
-		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
 		}
 	    });
 	    
@@ -557,7 +506,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		    }
 
 		    if (add_thermal == 1) {
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
 		    }
 		});
 		
@@ -583,7 +532,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 		    }
 
 		    if (add_thermal == 1) {
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_in(i,j,k);
+			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
 		    }
 		});
 		
