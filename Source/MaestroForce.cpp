@@ -268,8 +268,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 	    const Array4<const Real> s0_edge_arr = s0_edge_cart[lev].array(mfi);
 	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-	    const Array4<const Real> wmac = umac[lev][2].array(mfi);
-	    const Array4<const Real> divu = divu_cart[lev].array(mfi);
+	    const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
+	    const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
 #endif
 
 	    // output
@@ -283,21 +283,72 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
             if (spherical == 1) {
+		// lo and hi of domain
+		const int* AMREX_RESTRICT domlo = domainBox.loVect();
+		const int* AMREX_RESTRICT domhi = domainBox.hiVect();
+		
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(tileBox)
-                modify_scal_force_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                       AMREX_INT_ANYD(tileBox.hiVect()),
-                                       AMREX_INT_ANYD(domainBox.loVect()), AMREX_INT_ANYD(domainBox.hiVect()),
-                                       scal_force_mf[mfi].dataPtr(comp),
-                                       AMREX_INT_ANYD(scal_force_mf[mfi].loVect()), AMREX_INT_ANYD(scal_force_mf[mfi].hiVect()),
-                                       state_mf[mfi].dataPtr(comp),
-                                       AMREX_INT_ANYD(state_mf[mfi].loVect()), AMREX_INT_ANYD(state_mf[mfi].hiVect()),
-                                       BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                       BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                       BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                       BL_TO_FORTRAN_ANYD(s0_mf[mfi]),
-                                       AMREX_REAL_ANYD(dx), fullform,
-                                       BL_TO_FORTRAN_ANYD(divu_mf[mfi]));
+			
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {		    
+		    // umac does not contain w0
+		    Real divumac = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+			          +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
+			          +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
+		    
+		    if (fullform == 1) {
+			
+			force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_arr(i,j,k));
+		    } else {
+	
+			Real s0_xlo = 0.0;
+			Real s0_xhi = 0.0;		
+			if (i < domhi[0]) {
+			    s0_xhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i+1,j,k));
+			} else {
+			    s0_xhi = s0_arr(i,j,k);
+			}
+			if (i > domlo[0]) {
+			    s0_xlo = 0.5 * (s0_arr(i,j,k) + s0_arr(i-1,j,k));
+			} else {
+			    s0_xlo = s0_arr(i,j,k);
+			}
+			
+			Real s0_ylo = 0.0;
+			Real s0_yhi = 0.0;
+			if (j < domhi[1]) {
+			    s0_yhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j+1,k));
+			} else {
+			    s0_yhi = s0_arr(i,j,k);
+			}
+			if (j > domlo[1]) {
+			    s0_ylo = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j-1,k));
+			} else {
+			    s0_ylo = s0_arr(i,j,k);
+			}
+
+			Real s0_zlo = 0.0;
+			Real s0_zhi = 0.0;
+			if (k < domhi[2]) {
+			    s0_zhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j,k+1));
+			} else {
+			    s0_zhi = s0_arr(i,j,k);
+			}
+			if (k > domlo[2]) {
+			    s0_zlo = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j,k-1));
+			} else {
+			    s0_zlo = s0_arr(i,j,k);
+			}
+			
+			Real divs0u = (umac(i+1,j,k)*s0_xhi - umac(i,j,k)*s0_xlo)/dx[0] + 
+			    (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
+			    (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
+			    
+			force(i,j,k) = force(i,j,k) - divs0u
+			    - (scal(i,j,k)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
+			    
+		    }
+		});
 #else
                 Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
 #endif
@@ -323,7 +374,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 		    divu = divu + (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
 			
-		    if (do_fullform == 1) {
+		    if (fullform == 1) {
 			force(i,j,k) = force(i,j,k) - scal(i,j,k)*divu;
 		    } else {
 
@@ -334,7 +385,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #elif (AMREX_SPACEDIM == 3)
 			Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0] 
 						      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] ) 
-			    +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) &
+			    +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) 
 			      - wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
