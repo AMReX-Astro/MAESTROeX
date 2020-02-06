@@ -84,7 +84,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 #endif
 	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 	    const Array4<const Real> gradw0_arr = gradw0_cart[lev].array(mfi);
-	    const Array4<const Real> normal_arr = normal[lev].array(mfi);
 	    const Array4<const Real> w0_force = w0_force_cart[lev].array(mfi);
 	    const Array4<const Real> grav = grav_cart[lev].array(mfi);
 	    const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
@@ -96,7 +95,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 	    Real base_cutoff_density, buoyancy_cutoff_factor;
 	    get_base_cutoff_density(&base_cutoff_density);
 	    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
-	    const Real do_add_utilde_force_in = do_add_utilde_force;
 	    
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -128,7 +126,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
 		    vel_force(i,j,k,AMREX_SPACEDIM-1) = (rhopert * grav(i,j,k,AMREX_SPACEDIM-1) - gpi_arr(i,j,k,AMREX_SPACEDIM-1)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM-1);
 
-		    if (do_add_utilde_force_in == 1) {
+		    if (do_add_utilde_force == 1) {
 			
 #if (AMREX_SPACEDIM == 2)
 			if (j <= -1) {
@@ -155,7 +153,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 		
             } else {  // spherical
 #if (AMREX_SPACEDIM == 3)
-		
+		const Array4<const Real> normal_arr = normal[lev].array(mfi);
+	    
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
 		    Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
@@ -223,17 +222,17 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         Put1dArrayOnCart(s0_edge,s0_edge_cart,0,0,bcs_f,0);
     }
 
-    RealVector divu;
+    RealVector divw0;
     Vector<MultiFab> divu_cart(finest_level+1);
 
     if (spherical == 1) {
-        divu.resize(nr_fine);
-        std::fill(divu.begin(), divu.end(), 0.);
+        divw0.resize(nr_fine);
+        std::fill(divw0.begin(), divw0.end(), 0.);
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
                 Real dr = r_edge_loc[r+1] - r_edge_loc[r];
-                divu[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
+                divw0[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
                            - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr * r_cc_loc[r]*r_cc_loc[r]);
             }
         }
@@ -242,9 +241,12 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             divu_cart[lev].setVal(0.);
         }
-        Put1dArrayOnCart(divu,divu_cart,0,0,bcs_u,0);
+        Put1dArrayOnCart(divw0,divu_cart,0,0,bcs_u,0);
     }
 
+    // constant
+    const int do_fullform = fullform;
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
@@ -269,7 +271,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 #if (AMREX_SPACEDIM == 3)
 	    const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
-	    const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
 #endif
 
 	    // output
@@ -288,7 +289,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 		const int* AMREX_RESTRICT domhi = domainBox.hiVect();
 		
 #if (AMREX_SPACEDIM == 3)
-			
+		const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
+		
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {		    
 		    // umac does not contain w0
@@ -296,7 +298,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 			          +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
 			          +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
 		    
-		    if (fullform == 1) {
+		    if (do_fullform == 1) {
 			
 			force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_arr(i,j,k));
 		    } else {
@@ -356,17 +358,15 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
-		    Real divu;
-		    
 		    // umac does not contain w0
 #if (AMREX_SPACEDIM == 2)
-		    divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+		    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
 			+(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1];
 
 		    // add w0 contribution
 		    divu = divu + (w0_arr(i,j+1,k,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #elif (AMREX_SPACEDIM == 3)
-		    divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+		    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
 			+(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] 
 			+(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
 
@@ -374,7 +374,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 		    divu = divu + (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
 			
-		    if (fullform == 1) {
+		    if (do_fullform == 1) {
 			force(i,j,k) = force(i,j,k) - scal(i,j,k)*divu;
 		    } else {
 
