@@ -72,13 +72,10 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Box& xbx = amrex::growHi(tileBox,0, 1);
-            const Box& ybx = amrex::growHi(tileBox,1, 1);
-            // const Box& xbx = mfi.nodaltilebox(0);
-            // const Box& ybx = mfi.nodaltilebox(1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
-            const Box& zbx = amrex::growHi(tileBox,2, 1);
-            // const Box& zbx = mfi.nodaltilebox(2);
+            const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
             const Array4<Real> sedgex = sedge[lev][0].array(mfi);
