@@ -520,10 +520,7 @@ Maestro::PlotFileMF (const int nPlot,
             // we have to use protected_divide here to guard against division by zero
             // in the case that there are zeros rho0
             MultiFab& plot_mf_data_mf = *plot_mf_data[i];
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for ( MFIter mfi(plot_mf_data_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(plot_mf_data_mf); mfi.isValid(); ++mfi ) {
                 plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
             }
 

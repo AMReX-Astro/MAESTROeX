@@ -75,6 +75,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #endif
         }
 
+#if (AMREX_SPACEDIM == 2)
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -84,28 +86,13 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
             const Box& xbx = mfi.nodaltilebox(0);
-            const Box& ybx = mfi.nodaltilebox(1);
-#if (AMREX_SPACEDIM == 3)
-            const Box& zbx = mfi.nodaltilebox(2);
-#endif
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
             Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
             Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
-            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
-#if (AMREX_SPACEDIM == 3)
-            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
-#endif
             Array4<Real> const Im_arr = Im.array(mfi);
             Array4<Real> const Ip_arr = Ip.array(mfi);
             Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
-#if (AMREX_SPACEDIM == 3)
-            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
-            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
-            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
-#endif
-
-#if (AMREX_SPACEDIM == 2)
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -195,12 +182,30 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 utrans_arr(i,j,k) = 0.5*(ulx+urx) > 0.0 ? ulx : urx;
                 utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
             });
+        }
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& ybx = mfi.nodaltilebox(1);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
 
             if (ppm_type == 0) {
-                // we're going to reuse Im here as slopey as it has the
+                // we're going to reuse Ip here as slopey as it has the
                 // correct number of ghost zones
                 Slopey(obx, v_mf.array(mfi), 
-                       Im_arr, 
+                       Ip_arr, 
                        domainBox, bcs_u, 
                        1,1);
             } else {
@@ -211,9 +216,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     false, 1, 1);
            }
 
-           // create vtrans
-            bclo = phys_bc[1];
-            bchi = phys_bc[AMREX_SPACEDIM+1];
+            // create vtrans
+            int bclo = phys_bc[1];
+            int bchi = phys_bc[AMREX_SPACEDIM+1];
 
             AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
             {
@@ -223,9 +228,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Im_arr(i,j-1,k,0);
+                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Im_arr(i,j  ,k,0);
+                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -284,8 +289,27 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     vly : vry;
                 vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
             });
-
+        } // end MFIter loop
+        
 #elif (AMREX_SPACEDIM == 3)
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
 
             // x-direction
             if (ppm_type == 0) {
@@ -302,7 +326,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 0, 0);
             }
-
+            
             // create utrans
             int bclo = phys_bc[0];
             int bchi = phys_bc[AMREX_SPACEDIM];
@@ -383,13 +407,32 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
                 }
             });
+        }
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& ybx = mfi.nodaltilebox(1);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
 
             // y-direction
             if (ppm_type == 0) {
-                // we're going to reuse Im here as slopey as it has the
+                // we're going to reuse Ip here as slopey as it has the
                 // correct number of ghost zones
                 Slopey(obx, v_mf.array(mfi), 
-                       Im_arr, 
+                       Ip_arr, 
                        domainBox, bcs_u, 
                        1,1);
             } else {
@@ -401,8 +444,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             }
 
             // create vtrans
-            bclo = phys_bc[1];
-            bchi = phys_bc[AMREX_SPACEDIM+1];
+            int bclo = phys_bc[1];
+            int bchi = phys_bc[AMREX_SPACEDIM+1];
 
             AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
             {
@@ -412,9 +455,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Im_arr(i,j-1,k,0);
+                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Im_arr(i,j  ,k,0);
+                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -481,13 +524,32 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
                 }
             });
+        }
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& zbx = mfi.nodaltilebox(2);
+
+            Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
+            Array4<const Real> const ufull_arr = ufull[lev].array(mfi);
+            Array4<Real> const wtrans_arr = utrans[lev][2].array(mfi);
+            Array4<Real> const Im_arr = Im.array(mfi);
+            Array4<Real> const Ip_arr = Ip.array(mfi);
+            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
+            Array4<const Real> const w0macz = w0mac[lev][2].array(mfi);
 
             // z-direction
             if (ppm_type == 0) {
-                // we're going to reuse Im here as slopez as it has the
+                // we're going to reuse Ip here as slopez as it has the
                 // correct number of ghost zones
                 Slopez(obx, w_mf.array(mfi), 
-                       Im_arr, 
+                       Ip_arr, 
                        domainBox, bcs_u,  
                        1,2);
             } else {
@@ -499,8 +561,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             }
 
             // create wtrans
-            bclo = phys_bc[2];
-            bchi = phys_bc[AMREX_SPACEDIM+2];
+            int bclo = phys_bc[2];
+            int bchi = phys_bc[AMREX_SPACEDIM+2];
 
             AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
             {
@@ -510,9 +572,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     wlz = utilde_arr(i,j,k-1,2) 
-                        + (0.5-(dt2/hz)*max(0.0,ufull_arr(i,j,k-1,2)))*Im_arr(i,j,k-1,0);
+                        + (0.5-(dt2/hz)*max(0.0,ufull_arr(i,j,k-1,2)))*Ip_arr(i,j,k-1,0);
                     wrz = utilde_arr(i,j,k  ,2) 
-                        - (0.5+(dt2/hz)*min(0.0,ufull_arr(i,j,k  ,2)))*Im_arr(i,j,k  ,0);
+                        - (0.5+(dt2/hz)*min(0.0,ufull_arr(i,j,k  ,2)))*Ip_arr(i,j,k  ,0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
                     wlz = Ip_arr(i,j,k-1,2);
@@ -578,8 +640,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     wtrans_arr(i,j,k) = test ? 0.0 : wtrans_arr(i,j,k);
                 }
             });
-#endif
         } // end MFIter loop
+#endif
     } // end loop over levels
 
     if (finest_level == 0) {
