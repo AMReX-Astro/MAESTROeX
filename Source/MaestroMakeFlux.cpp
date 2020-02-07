@@ -111,7 +111,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
                 Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
 
-                if (species_pred_type == pred_rhoprime_and_X) {
+                if (species_pred_type_loc == pred_rhoprime_and_X) {
                     // edge states are rho' and X.  To make the (rho X) flux,
                     // we need the edge state of rho0
                     sfluxx(i,j,k,comp) = umacx(i,j,k)* 
