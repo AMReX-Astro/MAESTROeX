@@ -3,7 +3,7 @@
 maestro.model_file = "model.hse.cool.coulomb"
 maestro.perturb_model = true
 
-maestro.ppm_type = 1
+maestro.ppm_type = 0
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
@@ -27,9 +27,9 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 amr.n_cell             = 48 48 576
 amr.max_grid_size      = 144
 amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
-amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
-amr.blocking_factor    = 8       # block factor in grid generation
+maestro.regrid_int     = 4       # how often to regrid
+amr.ref_ratio          = 2 2 2 2 # refinement ratio
+amr.blocking_factor    = 4       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
 # TIME STEPPING
@@ -53,21 +53,21 @@ maestro.grav_const = -1.5e10
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
+maestro.use_delta_gamma1_term = false
+
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
 maestro.use_thermal_diffusion = false
-maestro.use_delta_gamma1_term = false
 
 # PLOTFILES
 maestro.plot_base_name  = reacting_bubble_3d_plt    # root name of plot file
-maestro.plot_int   = 1      # number of timesteps between plot files
+maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
-maestro.check_base_name = reacting_bubble_3d_chk
 maestro.chk_int         = -1
 
 # tolerances for the initial projection
@@ -89,14 +89,17 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
+# BURNING parameters
+maestro.do_burning = true
+
 # OMP settings
 system.regtest_reduction = 1
 
 &probin
 
   ! override the default values of the probin namelist values here
-  pert_temp_factor = 1.d0
-  pert_rad_factor = 1.d0
+  pert_temp_factor = 1.e0
+  pert_rad_factor = 1.e0
   do_small_domain = F
 
   !extern
@@ -113,4 +116,3 @@ system.regtest_reduction = 1
   use_eos_coulomb = T
 
 /
-
