@@ -10,202 +10,193 @@ Maestro::MakeGravCell(RealVector& grav_cell,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()",MakeGravCell);
 
-    // if (spherical == 0) {
+    const int max_lev = max_radial_level+1;
 
-    //    if (do_planar_invsq_grav)  {
+    if (!spherical) {
+        if (do_planar_invsq_grav)  {
+            // we are doing a plane-parallel geometry with a 1/r**2
+            // gravitational acceleration.  The mass is assumed to be
+            // at the origin.  The mass in the computational domain
+            // does not contribute to the gravitational acceleration.
+            //   do n=0,finest_radial_level
+            for (auto n = 0; n <= finest_radial_level; ++n) {
+                for (auto r = 0; r < nr[n]; ++r) {
+                    // do r = 0, nr(n)-1
+                    grav_cell[n+max_lev*r] = -Gconst*planar_invsq_mass / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
+                }
+            }
 
-    //       // we are doing a plane-parallel geometry with a 1/r**2
-    //       // gravitational acceleration.  The mass is assumed to be
-    //       // at the origin.  The mass in the computational domain
-    //       // does not contribute to the gravitational acceleration.
-    //     //   do n=0,finest_radial_level
-    //       for (auto n = 0; n <= finest_radial_level; ++n) {
-    //          do r = 0, nr(n)-1
-    //             grav_cell[n+max_lev*r] = -Gconst*planar_invsq_mass / r_cc_loc[n+max_lev*r]**2
-    //          }
-    //       }
+        } else if (do_2d_planar_octant) {
 
-    //    } else if (do_2d_planar_octant == 1) {
+            //   compute gravity as in the spherical case
+            RealVector m((finest_radial_level+1)*nr_fine);
+            //   allocate(m(0:finest_radial_level,0:nr_fine-1))
 
-    //       // compute gravity as in the spherical case
+            const int n = 0;
+            m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]*r_cc_loc[n]*r_cc_loc[n];
+            grav_cell[n] = -Gconst * m[n] / (r_cc_loc[n]*r_cc_loc[n]);
 
-    //       allocate(m(0:finest_radial_level,0:nr_fine-1))
+            // do r=1,nr(n)-1
+            for (auto r = 1; r < nr[n]; ++r) {
 
-    //       n = 0
-    //       m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]**3
-    //       grav_cell[n] = -Gconst * m[n] / r_cc_loc[n]**2
+                // the mass is defined at the cell-centers, so to compute
+                // the mass at the current center, we need to add the
+                // contribution of the upper half of the zone below us and
+                // the lower half of the current zone.
 
-    //       do r=1,nr(n)-1
+                // don't add any contributions from outside the star --
+                // i.e.  rho < base_cutoff_density
+                Real term1 = 0.0;
+                if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
+                    term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
+                        (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) *
+                        (r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
+                        r_edge_loc[n+max_lev*r]*r_cc_loc[n+max_lev*(r-1)] +
+                        r_cc_loc[n+max_lev*(r-1)]*r_cc_loc[n+max_lev*(r-1)]);
+                } 
 
-    //          // the mass is defined at the cell-centers, so to compute
-    //          // the mass at the current center, we need to add the
-    //          // contribution of the upper half of the zone below us and
-    //          // the lower half of the current zone.
+                Real term2 = 0.0;
+                if (rho0[n+max_lev*r] > base_cutoff_density) {
+                    term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
+                        (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]) *
+                        (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r] +
+                        r_cc_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
+                        r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                } 
 
-    //          // don't add any contributions from outside the star --
-    //          // i.e.  rho < base_cutoff_density
-    //          if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
-    //             term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
-    //                  (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) *
-    //                  (r_edge_loc[n+max_lev*r]**2 +
-    //                  r_edge_loc[n+max_lev*r]*r_cc_loc[n+max_lev*(r-1)] +
-    //                  r_cc_loc[n+max_lev*(r-1)]**2)
-    //          } else {
-    //             term1 = 0.0
-    //          }
+                m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2;
 
-    //          if (rho0[n+max_lev*r] > base_cutoff_density) {
-    //             term2 = 4.0/3.0*M_PI*rho0(n,r  )*
-    //                  (r_cc_loc[n+max_lev*r] - r_edge_loc(n,r  )) *
-    //                  (r_cc_loc[n+max_lev*r]**2 +
-    //                  r_cc_loc[n+max_lev*r]*r_edge_loc(n,r  ) +
-    //                  r_edge_loc(n,r  )**2)
-    //          } else {
-    //             term2 = 0.0
-    //          }
+                grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
+            }
 
-    //          m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2
+            for (auto n = 1; n <= finest_radial_level; ++n) {
+        //   do n=1,finest_radial_level
+                for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+            //  do i=1,numdisjointchunks(n)
 
-    //          grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / r_cc_loc[n+max_lev*r]**2
+                    if (r_start_coord[n+max_lev*i] == 0) {
+                        m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]*r_cc_loc[n]*r_cc_loc[n];
+                        grav_cell[n] = -Gconst * m[n] / (r_cc_loc[n]*r_cc_loc[n]);
+                    } else {
+                        int r = r_start_coord[n+max_lev*i];
+                        m[n+max_lev*r] = m[n-1+max_lev*(r/2-1)];
 
-    //       }
+                        // the mass is defined at the cell-centers, so to compute
+                        // the mass at the current center, we need to add the
+                        // contribution of the upper half of the zone below us and
+                        // the lower half of the current zone.
 
-    //       do n=1,finest_radial_level
-    //          do i=1,numdisjointchunks(n)
+                        // don't add any contributions from outside the star --
+                        // i.e.  rho < base_cutoff_density
+                        Real term1 = 0.0;
+                        if (rho0[n-1+max_lev*(r/2-1)] > base_cutoff_density) {
+                            term1 = 4.0/3.0*M_PI*rho0[n-1+max_lev*(r/2-1)] *
+                                (r_edge_loc[n-1+max_lev*r/2] - r_cc_loc[n-1+max_lev*(r/2-1)]) *
+                                (r_edge_loc[n-1+max_lev*r/2]*r_edge_loc[n-1+max_lev*r/2] +
+                                r_edge_loc[n-1+max_lev*r/2]*r_cc_loc[n-1+max_lev*(r/2-1)] +
+                                r_cc_loc[n-1+max_lev*(r/2-1)]*r_cc_loc[n-1+max_lev*(r/2-1)]);
+                        } 
 
-    //             if (r_start_coord[n+max_lev*i] == 0) {
-    //                m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]**3
-    //                grav_cell[n] = -Gconst * m[n] / r_cc_loc[n]**2
-    //             } else {
-    //                r = r_start_coord[n+max_lev*i]
-    //                m[n+max_lev*r] = m(n-1,r/2-1)
+                        Real term2 = 0.0;
+                        if (rho0[n+max_lev*r] > base_cutoff_density) {
+                            term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
+                                (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]) *
+                                (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r] +
+                                r_cc_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
+                                r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                        } 
 
-    //                // the mass is defined at the cell-centers, so to compute
-    //                // the mass at the current center, we need to add the
-    //                // contribution of the upper half of the zone below us and
-    //                // the lower half of the current zone.
+                        m[n+max_lev*r] += term1 + term2;
 
-    //                // don't add any contributions from outside the star --
-    //                // i.e.  rho < base_cutoff_density
-    //                if (rho0(n-1,r/2-1) > base_cutoff_density) {
-    //                   term1 = 4.0/3.0*M_PI*rho0(n-1,r/2-1) *
-    //                        (r_edge_loc(n-1,r/2) - r_cc_loc(n-1,r/2-1)) *
-    //                        (r_edge_loc(n-1,r/2)**2 +
-    //                        r_edge_loc(n-1,r/2)*r_cc_loc(n-1,r/2-1) +
-    //                        r_cc_loc(n-1,r/2-1)**2)
-    //                } else {
-    //                   term1 = 0.0
-    //                }
+                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
 
-    //                if (rho0[n+max_lev*r] > base_cutoff_density) {
-    //                   term2 = 4.0/3.0*M_PI*rho0(n,r  )*
-    //                        (r_cc_loc[n+max_lev*r] - r_edge_loc(n,r  )) *
-    //                        (r_cc_loc[n+max_lev*r]**2 +
-    //                        r_cc_loc[n+max_lev*r]*r_edge_loc(n,r  ) +
-    //                        r_edge_loc(n,r  )**2)
-    //                } else {
-    //                   term2 = 0.0
-    //                }
+                    }
 
-    //                m[n+max_lev*r] = m[n+max_lev*r] + term1 + term2
+                    // do r=r_start_coord[n+max_lev*i]+1,r_end_coord[n+max_lev*i]
+                    for (auto r = r_start_coord[n+max_lev*i]+1;
+                         r <= r_end_coord[n+max_lev*i]; ++r) {
 
-    //                grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / r_cc_loc[n+max_lev*r]**2
+                        // the mass is defined at the cell-centers, so to compute
+                        // the mass at the current center, we need to add the
+                        // contribution of the upper half of the zone below us and
+                        // the lower half of the current zone.
 
-    //             }
+                        // don't add any contributions from outside the star --
+                        // i.e.  rho < base_cutoff_density
+                        Real term1 = 0.0;
+                        if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
+                            term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
+                                (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) *
+                                (r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
+                                r_edge_loc[n+max_lev*r]*r_cc_loc[n+max_lev*(r-1)] +
+                                r_cc_loc[n+max_lev*(r-1)]*r_cc_loc[n+max_lev*(r-1)]);
+                        } 
 
-    //             do r=r_start_coord[n+max_lev*i]+1,r_end_coord[n+max_lev*i]
+                        Real term2 = 0.0;
+                        if (rho0[n+max_lev*r] > base_cutoff_density) {
+                            term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
+                                (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]) *
+                                (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r] +
+                                r_cc_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
+                                r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                        } 
 
-    //                // the mass is defined at the cell-centers, so to compute
-    //                // the mass at the current center, we need to add the
-    //                // contribution of the upper half of the zone below us and
-    //                // the lower half of the current zone.
+                        m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2;
 
-    //                // don't add any contributions from outside the star --
-    //                // i.e.  rho < base_cutoff_density
-    //                if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
-    //                   term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
-    //                        (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) *
-    //                        (r_edge_loc[n+max_lev*r]**2 +
-    //                        r_edge_loc[n+max_lev*r]*r_cc_loc[n+max_lev*(r-1)] +
-    //                        r_cc_loc[n+max_lev*(r-1)]**2)
-    //                } else {
-    //                   term1 = 0.0
-    //                }
+                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
+                    }
+                }
+            }
 
-    //                if (rho0[n+max_lev*r] > base_cutoff_density) {
-    //                   term2 = 4.0/3.0*M_PI*rho0(n,r  )*
-    //                        (r_cc_loc[n+max_lev*r] - r_edge_loc(n,r  )) *
-    //                        (r_cc_loc[n+max_lev*r]**2 +
-    //                        r_cc_loc[n+max_lev*r]*r_edge_loc(n,r  ) +
-    //                        r_edge_loc(n,r  )**2)
-    //                } else {
-    //                   term2 = 0.0
-    //                }
+            //   call restrict_base(grav_cell,1)
+            //   call fill_ghost_base(grav_cell,1)
+            RestrictBase(grav_cell, true);
+            FillGhostBase(grav_cell, true);
+        } else {
+            // constant gravity
+            std::fill(grav_cell.begin(), grav_cell.end(), grav_const);
+        }
+    } else { // spherical = 1
 
-    //                m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2
+        //    allocate(m(0:0,0:nr_fine-1))
+        RealVector m(nr_fine);
 
-    //                grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / r_cc_loc[n+max_lev*r]**2
+        m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
+        grav_cell[0] = -Gconst * m[0] / (r_cc_loc[0]*r_cc_loc[0]);
 
-    //             }
-    //          }
-    //       }
+        // do r=1,nr_fine-1
+        for (auto r = 1; r < nr_fine; ++r) {
 
-    //       call restrict_base(grav_cell,1)
-    //       call fill_ghost_base(grav_cell,1)
+            // the mass is defined at the cell-centers, so to compute
+            // the mass at the current center, we need to add the
+            // contribution of the upper half of the zone below us and
+            // the lower half of the current zone.
 
-    //    } else {
+            // don't add any contributions from outside the star --
+            // i.e.  rho < base_cutoff_density
+            Real term1 = 0.0;
+            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
+                term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
+                    (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) *
+                    (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] +
+                    r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] +
+                    r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)]);
+            } 
 
-    //       // constant gravity
-    //       grav_cell = grav_const
+            Real term2 = 0.0;
+            if (rho0[max_lev*r] > base_cutoff_density) {
+                term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
+                    (r_cc_loc[max_lev*r] - r_edge_loc[max_lev*r]) *
+                    (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r] +
+                    r_cc_loc[max_lev*r]*r_edge_loc[max_lev*r] +
+                    r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+            } 
 
-    //    }
+            m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2;
 
-    // } else  // spherical = 1
-
-    //    allocate(m(0:0,0:nr_fine-1))
-
-    //    m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)**3
-    //    grav_cell(0,0) = -Gconst * m(0,0) / r_cc_loc(0,0)**2
-
-    //    do r=1,nr_fine-1
-
-    //       // the mass is defined at the cell-centers, so to compute
-    //       // the mass at the current center, we need to add the
-    //       // contribution of the upper half of the zone below us and
-    //       // the lower half of the current zone.
-
-    //       // don't add any contributions from outside the star --
-    //       // i.e.  rho < base_cutoff_density
-    //       if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-    //          term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
-    //               (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) *
-    //               (r_edge_loc[max_lev*r]**2 +
-    //                r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] +
-    //                r_cc_loc[max_lev*(r-1)]**2)
-    //       } else {
-    //          term1 = 0.0
-    //       }
-
-    //       if (rho0[max_lev*r] > base_cutoff_density) {
-    //          term2 = 4.0/3.0*M_PI*rho0(0,r  )*
-    //               (r_cc_loc[max_lev*r] - r_edge_loc(0,r  )) *
-    //               (r_cc_loc[max_lev*r]**2 +
-    //                r_cc_loc[max_lev*r]*r_edge_loc(0,r  ) +
-    //                r_edge_loc(0,r  )**2)
-    //       } else {
-    //          term2 = 0.0
-    //       }
-
-    //       m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2
-
-    //       grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / r_cc_loc[max_lev*r]**2
-
-    //    }
-
-    //    deallocate(m)
-
-    // }
-
+            grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r]);
+        }
+    }
 }
 
 void
