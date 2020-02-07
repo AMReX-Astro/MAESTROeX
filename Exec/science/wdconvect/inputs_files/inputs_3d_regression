@@ -4,7 +4,7 @@ maestro.model_file = "kepler_new_6.25e8.hybrid.hse.320"
 maestro.perturb_model = true
 
 maestro.drdxfac = 5
-#maestro.ppm_type = 1
+#maestro.ppm_type = 0
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
