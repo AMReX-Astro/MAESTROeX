@@ -103,10 +103,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 	    // y-direction in 2D, z-direction in 3D
 	    const int domhi = domainBox.hiVect()[AMREX_SPACEDIM-1];
             
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            // offload to GPU
             if (spherical == 0) {
 
 		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
@@ -183,7 +180,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 		});
 #endif
             }
-
+	    
         }
     }
 
@@ -243,9 +240,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         }
         Put1dArrayOnCart(divw0,divu_cart,0,0,bcs_u,0);
     }
-
-    // constant
-    const int do_fullform = fullform;
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -261,17 +255,17 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #pragma omp parallel
 #endif
         for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
+	    
 	    // Get Array4 inputs
 	    const Array4<const Real> scal = state[lev].array(mfi);
 	    const Array4<const Real> umac = umac_in[lev][0].array(mfi);
 	    const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
-	    const Array4<const Real> s0_arr = s0_cart[lev].array(mfi);
-	    const Array4<const Real> s0_edge_arr = s0_edge_cart[lev].array(mfi);
-	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 #if (AMREX_SPACEDIM == 3)
 	    const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
 #endif
+	    const Array4<const Real> s0_arr = s0_cart[lev].array(mfi);
+	    const Array4<const Real> s0_edge_arr = s0_edge_cart[lev].array(mfi);
+	    const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
 	    // output
 	    const Array4<Real> force = scal_force_mf.array(mfi);
@@ -279,10 +273,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            // offload to GPU
             if (spherical == 1) {
 		// lo and hi of domain
 		const int* AMREX_RESTRICT domlo = domainBox.loVect();
@@ -298,9 +289,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 			          +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
 			          +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
 		    
-		    if (do_fullform == 1) {
+		    if (fullform == 1) {
 			
-			force(i,j,k) = force(i,j,k) - scal(i,j,k)*(divumac+divu_arr(i,j,k));
+			force(i,j,k,comp) -= scal(i,j,k,comp)*(divumac+divu_arr(i,j,k));
 		    } else {
 	
 			Real s0_xlo = 0.0;
@@ -346,8 +337,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 			    (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
 			    (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
 			    
-			force(i,j,k) = force(i,j,k) - divs0u
-			    - (scal(i,j,k)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
+			force(i,j,k,comp) = force(i,j,k,comp) - divs0u
+			    - (scal(i,j,k,comp)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
 			    
 		    }
 		});
@@ -374,8 +365,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 		    divu = divu + (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
 			
-		    if (do_fullform == 1) {
-			force(i,j,k) = force(i,j,k) - scal(i,j,k)*divu;
+		    if (fullform == 1) {
+			force(i,j,k,comp) -= scal(i,j,k,comp)*divu;
 		    } else {
 
 #if (AMREX_SPACEDIM == 2)
@@ -385,15 +376,15 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #elif (AMREX_SPACEDIM == 3)
 			Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0] 
 						      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] ) 
-			    +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) 
-			      - wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
+			    +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) - 
+			      wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
-			force(i,j,k) -= (scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
+			force(i,j,k,comp) = force(i,j,k,comp) - (scal(i,j,k,comp)-s0_arr(i,j,k))*divu - divs0u;
 		    }
 		});
 		
-            }
+	    }
         }
     }
 
@@ -480,6 +471,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     const int enthalpy_pred_type_in = enthalpy_pred_type;
     const int predict_h_const = predict_h;
     const int predict_rhoh_const = predict_rhoh;
+    const int rhoh_comp = RhoH;
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -515,7 +507,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	    const Array4<const Real> rho0cart = rho0_cart[lev].array(mfi);
 
 	    // output
-	    const Array4<Real> rhoh_force = scal_force_mf.array(mfi);
+	    const Array4<Real> force = scal_force_mf.array(mfi);
 	    
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -523,50 +515,28 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 	    
 	    const int domhi = domainBox.hiVect()[AMREX_SPACEDIM-1];
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
-#if (AMREX_SPACEDIM == 2)
-	    AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
-	    {
-		Real gradp0;
-		
-		if (j < base_cutoff_density_coord) {
-		    gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
-		} else if (j == domhi) {
-		    // NOTE: this should be zero since p0 is constant up here
-		    gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[1]; 
-		} else {
-		    // NOTE: this should be zero since p0 is constant up here
-		    gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[1];
-		}
-
-		Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
-		rhoh_force(i,j,k) =  veladv * gradp0;
-
-		if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
-		    (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
-		    (is_prediction == 0)) {
-		    
-		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
-		}
-
-		if (add_thermal == 1) {
-		    rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
-		}
-	    });
-	    
-#elif (AMREX_SPACEDIM == 3)
 	    if (spherical == 0) {
 
 		AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
 	        {
 		    Real gradp0;
 		
+#if (AMREX_SPACEDIM == 2)
+		    if (j < base_cutoff_density_coord) {
+			gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
+		    } else if (j == domhi) {
+			// NOTE: this should be zero since p0 is constant up here
+			gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[1]; 
+		    } else {
+			// NOTE: this should be zero since p0 is constant up here
+			gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[1];
+		    }
+
+		    Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
+		    force(i,j,k,rhoh_comp) =  veladv * gradp0;
+#else 
 		    if (k < base_cutoff_density_coord) {
 			gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
 		    } else if (k == domhi) {
@@ -577,23 +547,31 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 			gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[2];
 		    }
 
-		    Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j+1,k));
-		    rhoh_force(i,j,k) =  veladv * gradp0;
-
+		    Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
+		    force(i,j,k,rhoh_comp) =  veladv * gradp0;
+#endif
+		    //
+		    // psi should always be in the force if we are doing the final update
+		    // For prediction, it should not be in the force if we are predicting
+		    // (rho h)', but should be there if we are predicting h or rhoh
+		    //
+		    // If use_exact_base_state or average_base_state is on, psi is instead dpdt term
+		    //
 		    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
 			(is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
 			(is_prediction == 0)) {
 		    
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
+			force(i,j,k,rhoh_comp) += psicart(i,j,k);
 		    }
 
 		    if (add_thermal == 1) {
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
+			force(i,j,k,rhoh_comp) += thermal_arr(i,j,k);
 		    }
 		});
 		
 	    } else {
 		
+#if (AMREX_SPACEDIM == 3)
 		AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
 	        {
 		    Real divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx[0] + 
@@ -604,22 +582,22 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 			       (vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] + 
 			       (wmac(i,j,k+1) - wmac(i,j,k)) / dx[2] ) * p0cart(i,j,k);
 
-		    rhoh_force(i,j,k) = divup - p0divu;
+		    force(i,j,k,rhoh_comp) = divup - p0divu;
 
 		    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
 			(is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
 			(is_prediction == 0)) {
 		    
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + psicart(i,j,k);
+			force(i,j,k,rhoh_comp) += psicart(i,j,k);
 		    }
 
 		    if (add_thermal == 1) {
-			rhoh_force(i,j,k) = rhoh_force(i,j,k) + thermal_arr(i,j,k);
+			force(i,j,k,rhoh_comp) += thermal_arr(i,j,k);
 		    }
 		});
-		
+#endif		
 	    }
-#endif
+	    
         }
     }
 
