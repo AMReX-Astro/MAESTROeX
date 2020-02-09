@@ -92,9 +92,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 	    const Array4<Real> vel_force = vel_force_mf.array(mfi);
 
 	    // constants in Fortran
-	    Real base_cutoff_density; 
+	    Real base_cutoff_density=0.0; 
 	    get_base_cutoff_density(&base_cutoff_density);
-	    Real buoyancy_cutoff_factor;
+	    Real buoyancy_cutoff_factor=0.0;
 	    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 	    
             // Get the index space of the valid region
