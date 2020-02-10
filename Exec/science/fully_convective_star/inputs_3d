@@ -1,6 +1,6 @@
 
 # INITIAL MODEL
-maestro.model_file = "initial_models/initdat.256"
+maestro.model_file = "convective_M_0.30.hse.1024"
 maestro.perturb_model = false
 
 maestro.drdxfac = 2
@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 #amr.n_cell             = 64 64 64
 amr.n_cell = 256 256 256
 amr.max_grid_size      = 64
-amr.max_level          = 2       # maximum level number allowed
+amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 16       # block factor in grid generation
