@@ -4,7 +4,7 @@ module make_heating_module
   use model_parser_module
   use amrex_constants_module
   use base_state_geometry_module, only: nr_fine, dr, nr, max_radial_level, center
-  use meth_params_module, only: nscal, model_file, rho_comp, prob_lo, spherical, &
+  use meth_params_module, only: nscal, model_file, rho_comp, temp_comp, prob_lo, spherical, &
        heating_cutoff_density_lo, heating_cutoff_density_hi
   use probin_module, only: use_analytic_heating
   
@@ -27,7 +27,7 @@ contains
     double precision, intent (in   ) :: dx(3), time
 
     integer :: n, r
-    double precision :: rloc, starting_rad, xloc(3), rho
+    double precision :: rloc, starting_rad, xloc(3), rho, T9
     integer :: i, j, k
 
     if (.not. model_initialized) then 
@@ -64,7 +64,9 @@ contains
                     end if
                 end if
 
-                rho_Hext(i,j,k) = 0.d0
+                T9 = scal(i,j,k,temp_comp)/1.d9
+                rho = scal(i,j,k,rho_comp)
+                rho_Hext(i,j,k) = rho * 2.4e4 * rho / T9**(2.d0/3.d0) * exp(-3.38/T9**(1.d0/3.e0))
                 
             end do
         end do
