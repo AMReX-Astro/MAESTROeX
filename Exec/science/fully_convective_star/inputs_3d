@@ -113,13 +113,6 @@ maestro.rotation_radius = 0.0
 
 &probin
 
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e6
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 1.e7
-  use_analytic_heating = F
 
   !extern
 
@@ -132,6 +125,6 @@ maestro.rotation_radius = 0.0
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  eos_assume_neutral = F
+  eos_assume_neutral = .false.
 
 /
