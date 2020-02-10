@@ -164,9 +164,9 @@ Maestro::Init ()
             for (int i=1; i<=init_divu_iter; ++i) {
                 Print() << "Doing initial divu iteration #" << i << std::endl;
 #ifdef SDC
-		DivuIterSDC(i);
+                DivuIterSDC(i);
 #else
-		DivuIter(i);
+                DivuIter(i);
 #endif
             }
 
@@ -210,7 +210,7 @@ Maestro::Init ()
             Print() << "\nWriting checkpoint 0 after all initialization" << std::endl;
             WriteCheckPoint(0);
         }
-		
+                
         if (sum_interval > 0  || sum_per > 0) {
             int index_dummy = 0;
             Print() << "\nWriting diagnosis file after all initialization" << std::endl;
@@ -680,69 +680,69 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
     
     for (int lev=0; lev<=finest_level; ++lev) {
-	stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-	rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
-	rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
-	rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
-	thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
-	rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
-	Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-	hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-	Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
-	pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
-	delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
-	delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
-	sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
-	
-	// divu_iters do not use density weighting
-	rhohalf[lev].setVal(1.);
-	sdc_source[lev].setVal(0.);
+        stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        rho_Hext          [lev].define(grids[lev], dmap[lev],       1, 0);
+        rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
+        thermal           [lev].define(grids[lev], dmap[lev],       1, 0);
+        rhohalf           [lev].define(grids[lev], dmap[lev],       1, 1);
+        Tcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        hcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        Xkcoeff           [lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff            [lev].define(grids[lev], dmap[lev],       1, 1);
+        delta_gamma1      [lev].define(grids[lev], dmap[lev],       1, 1);
+        delta_gamma1_term [lev].define(grids[lev], dmap[lev],       1, 1);
+        sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
+        
+        // divu_iters do not use density weighting
+        rhohalf[lev].setVal(1.);
+        sdc_source[lev].setVal(0.);
     }
     
     ReactSDC(sold,stemp,rho_Hext,p0_old,0.5*dt,t_old,sdc_source);
     
     if (use_thermal_diffusion) {
-	MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
-	
-	MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
-			    temp_diffusion_formulation);
+        MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+        
+        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+                            temp_diffusion_formulation);
     }
     else {
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    thermal[lev].setVal(0.);
-	}
+        for (int lev=0; lev<=finest_level; ++lev) {
+            thermal[lev].setVal(0.);
+        }
     }
     
     MakeReactionRates(rho_omegadot,rho_Hnuc,sold);
     
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-	      rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
-	if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-	    for(int i=0; i<Sbar.size(); ++i) {
-		Sbar[i] += delta_gamma1_termbar[i];
-	    }
-	} else {
-	    Average(S_cc_old,Sbar,0);
-	    
-	    // compute Sbar = Sbar + delta_gamma1_termbar
-	    if (use_delta_gamma1_term) {
-		for(int i=0; i<Sbar.size(); ++i) {
-		    Sbar[i] += delta_gamma1_termbar[i];
-		}
-	    }
-	    
-	    int is_predictor = 1;
-	    make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-		    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-		    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-		    p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
-		    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-		    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
-	}
+        if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
+            for(int i=0; i<Sbar.size(); ++i) {
+                Sbar[i] += delta_gamma1_termbar[i];
+            }
+        } else {
+            Average(S_cc_old,Sbar,0);
+            
+            // compute Sbar = Sbar + delta_gamma1_termbar
+            if (use_delta_gamma1_term) {
+                for(int i=0; i<Sbar.size(); ++i) {
+                    Sbar[i] += delta_gamma1_termbar[i];
+                }
+            }
+            
+            int is_predictor = 1;
+            make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+                    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+                    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+                    p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
+                    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+                    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+        }
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -757,29 +757,29 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     EstDt();
     
     if (maestro_verbose > 0) {
-	Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
-		<< " gives dt = " << dt << std::endl;
+        Print() << "Call to estdt at end of istep_divu_iter = " << istep_divu_iter
+                << " gives dt = " << dt << std::endl;
     }
     
     dt *= init_shrink;
     if (maestro_verbose > 0) {
-	Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
+        Print() << "Multiplying dt by init_shrink; dt = " << dt << std::endl;
     }
     
     if (dt > dt_hold) {
-	if (maestro_verbose > 0) {
-	    Print() << "Ignoring this new dt since it's larger than the previous dt = "
-		    << dt_hold << std::endl;
-	}
-	dt = std::min(dt_hold,dt);
+        if (maestro_verbose > 0) {
+            Print() << "Ignoring this new dt since it's larger than the previous dt = "
+                    << dt_hold << std::endl;
+        }
+        dt = std::min(dt_hold,dt);
     }
     
     if (fixed_dt != -1.0) {
-	// fixed dt
-	dt = fixed_dt;
-	if (maestro_verbose > 0) {
-	    Print() << "Setting fixed dt = " << dt << std::endl;
-	}
+        // fixed dt
+        dt = fixed_dt;
+        if (maestro_verbose > 0) {
+            Print() << "Setting fixed dt = " << dt << std::endl;
+        }
     }
 }
 

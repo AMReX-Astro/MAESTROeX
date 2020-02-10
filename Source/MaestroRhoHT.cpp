@@ -254,10 +254,10 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			const RealVector& rho0_edge_old,
-			const RealVector& rhoh0_edge_old,
-			const RealVector& rho0_edge_new,
-			const RealVector& rhoh0_edge_new)
+                        const RealVector& rho0_edge_old,
+                        const RealVector& rhoh0_edge_old,
+                        const RealVector& rho0_edge_new,
+                        const RealVector& rhoh0_edge_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::HfromRhoTedge()",HfromRhoTedge);
@@ -271,8 +271,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         rhoh0_cart[lev].define(grids[lev], dmap[lev], 1, 2);
         tempbar_cart[lev].define(grids[lev], dmap[lev], 1, 2);
         rho0_cart[lev].setVal(0.);
-	rhoh0_cart[lev].setVal(0.);
-	tempbar_cart[lev].setVal(0.);
+        rhoh0_cart[lev].setVal(0.);
+        tempbar_cart[lev].setVal(0.);
     }
 
     RealVector rho0_halftime( (max_radial_level+1)*nr_fine );
@@ -281,8 +281,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     rhoh0_halftime.shrink_to_fit();
 
     for (int i = 0; i < (max_radial_level+1)*nr_fine; ++i) {
-	rho0_halftime[i] = 0.5*(rho0_old[i] + rho0_new[i]);
-	rhoh0_halftime[i] = 0.5*(rhoh0_old[i] + rhoh0_new[i]);
+        rho0_halftime[i] = 0.5*(rho0_old[i] + rho0_new[i]);
+        rhoh0_halftime[i] = 0.5*(rhoh0_old[i] + rhoh0_new[i]);
     }
     
     Put1dArrayOnCart(rho0_halftime,rho0_cart,0,0,bcs_s,Rho);
@@ -298,11 +298,11 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     tempbar_edge.shrink_to_fit();
 
     if (spherical == 0) {
-	cell_to_edge(tempbar.dataPtr(), tempbar_edge.dataPtr());
-	for (int i = 0; i < (max_radial_level+1)*(nr_fine+1); ++i) {
-	    rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);
-	    rhoh0_edge[i] = 0.5*(rhoh0_edge_old[i] + rhoh0_edge_new[i]);
-	}
+        cell_to_edge(tempbar.dataPtr(), tempbar_edge.dataPtr());
+        for (int i = 0; i < (max_radial_level+1)*(nr_fine+1); ++i) {
+            rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);
+            rhoh0_edge[i] = 0.5*(rhoh0_edge_old[i] + rhoh0_edge_new[i]);
+        }
     }
     
     Vector<MultiFab> rho0_edge_cart(finest_level+1);
@@ -313,9 +313,9 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         rho0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rhoh0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         tempbar_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	rho0_edge_cart[lev].setVal(0.);
-	rhoh0_edge_cart[lev].setVal(0.);
-	tempbar_edge_cart[lev].setVal(0.);
+        rho0_edge_cart[lev].setVal(0.);
+        rhoh0_edge_cart[lev].setVal(0.);
+        tempbar_edge_cart[lev].setVal(0.);
     }
 
     if (spherical == 0) {
@@ -328,7 +328,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-	const MultiFab& scal_mf = sold[lev];
+        const MultiFab& scal_mf = sold[lev];
         MultiFab& sedgex_mf = sedge[lev][0];
         MultiFab& sedgey_mf = sedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
@@ -361,76 +361,76 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
 
-	    if (spherical == 0) {
+            if (spherical == 0) {
 #pragma gpu box(xbx)
-		makeHfromRhoT_edge(AMREX_INT_ANYD(xbx.loVect()),
-				   AMREX_INT_ANYD(xbx.hiVect()),
+                makeHfromRhoT_edge(AMREX_INT_ANYD(xbx.loVect()),
+                                   AMREX_INT_ANYD(xbx.hiVect()),
                    1,
-				   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                                   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
 
 #pragma gpu box(ybx)
-		makeHfromRhoT_edge(AMREX_INT_ANYD(ybx.loVect()),
-				   AMREX_INT_ANYD(ybx.hiVect()),
+                makeHfromRhoT_edge(AMREX_INT_ANYD(ybx.loVect()),
+                                   AMREX_INT_ANYD(ybx.hiVect()),
                    2,
-				   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                                   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
 
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(zbx)
-		makeHfromRhoT_edge(AMREX_INT_ANYD(zbx.loVect()),
-				   AMREX_INT_ANYD(zbx.hiVect()),
+                makeHfromRhoT_edge(AMREX_INT_ANYD(zbx.loVect()),
+                                   AMREX_INT_ANYD(zbx.hiVect()),
                    3,
-				   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-				   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                                   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
+                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
 #endif
-	    } else {
+            } else {
 #if (AMREX_SPACEDIM == 3)
 #pragma gpu box(xbx)
-		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(xbx.loVect()),
-					AMREX_INT_ANYD(xbx.hiVect()),
+                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(xbx.loVect()),
+                                        AMREX_INT_ANYD(xbx.hiVect()),
                     1,
-					BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                                        BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
 
 #pragma gpu box(ybx)
-		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(ybx.loVect()),
-					AMREX_INT_ANYD(ybx.hiVect()),
+                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(ybx.loVect()),
+                                        AMREX_INT_ANYD(ybx.hiVect()),
                     2,
-					BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                                        BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
 
 #pragma gpu box(zbx)
-		makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(zbx.loVect()),
-					AMREX_INT_ANYD(zbx.hiVect()),
-					3,
-					BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-					BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(zbx.loVect()),
+                                        AMREX_INT_ANYD(zbx.hiVect()),
+                                        3,
+                                        BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
+                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
 #endif
-		
-	    }
-	}
+                
+            }
+        }
 
     }
 }

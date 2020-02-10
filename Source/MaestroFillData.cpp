@@ -36,49 +36,49 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     const Vector<BCRec>& bcs_in, int variable_type)
 {
 
-	Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
+        Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
 
-	if (lev == 0)
-	{
-		Vector<MultiFab*> smf;
-		Vector<Real> stime;
-		GetData(0, time, smf, stime, mf_old, mf_new);
+        if (lev == 0)
+        {
+                Vector<MultiFab*> smf;
+                Vector<Real> stime;
+                GetData(0, time, smf, stime, mf_old, mf_new);
 
         PhysBCFunctMaestro physbc;
 
-		if (variable_type == 1) { // velocity
-			physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(velfill));
-		} else { // scalar
-			physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(scalarfill));
-		}
+                if (variable_type == 1) { // velocity
+                        physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(velfill));
+                } else { // scalar
+                        physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(scalarfill));
+                }
 
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
                              geom[lev], physbc, 0);
-	}
-	else
-	{
-		Vector<MultiFab*> cmf, fmf;
-		Vector<Real> ctime, ftime;
-		GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-		GetData(lev, time, fmf, ftime, mf_old, mf_new);
+        }
+        else
+        {
+                Vector<MultiFab*> cmf, fmf;
+                Vector<Real> ctime, ftime;
+                GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+                GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-		PhysBCFunctMaestro cphysbc;
-		PhysBCFunctMaestro fphysbc;
+                PhysBCFunctMaestro cphysbc;
+                PhysBCFunctMaestro fphysbc;
 
-		if (variable_type == 1) { // velocity
-			cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
-			fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
-		} else { // scalar
-			cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
-			fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
-		}
+                if (variable_type == 1) { // velocity
+                        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
+                        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
+                } else { // scalar
+                        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
+                        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
+                }
 
-		Interpolater* mapper = &cell_cons_interp;
+                Interpolater* mapper = &cell_cons_interp;
         FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
                            srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
                            cphysbc, 0, fphysbc, 0, refRatio(lev-1),
                            mapper, bcs, 0);
-	}
+        }
 }
 
 // fill an entire multifab by interpolating from the coarser level

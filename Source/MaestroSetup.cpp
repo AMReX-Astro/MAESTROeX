@@ -183,10 +183,10 @@ Maestro::Setup ()
     r_end_coord  .shrink_to_fit();
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-			     r_cc_loc.dataPtr(),
-			     r_edge_loc.dataPtr(),
-			     geom[max_level].CellSize(),
-			     &nr_irreg);
+                             r_cc_loc.dataPtr(),
+                             r_edge_loc.dataPtr(),
+                             geom[max_level].CellSize(),
+                             &nr_irreg);
 
     if (use_exact_base_state) average_base_state = 1;
 

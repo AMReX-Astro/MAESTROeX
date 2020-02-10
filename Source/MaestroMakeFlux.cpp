@@ -52,16 +52,16 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         const MultiFab& scal_mf  = state[lev];
    
 #if (AMREX_SPACEDIM == 3)
-    	MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
+        MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
 
-    	if (spherical == 1) {
+        if (spherical == 1) {
             rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
             rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-    	    MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
-    	    MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
-    	    MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
-    	}
+            MultiFab::LinComb(rho0mac_edgex,0.5,r0mac_old[lev][0],0,0.5,r0mac_new[lev][0],0,0,1,1);
+            MultiFab::LinComb(rho0mac_edgey,0.5,r0mac_old[lev][1],0,0.5,r0mac_new[lev][1],0,0,1,1);
+            MultiFab::LinComb(rho0mac_edgez,0.5,r0mac_old[lev][2],0,0.5,r0mac_new[lev][2],0,0,1,1);
+        }
 #endif
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -175,7 +175,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
 #elif (AMREX_SPACEDIM == 3)
 
-    	    if (spherical == 0) {
+            if (spherical == 0) {
                 // x-direction
                 AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
@@ -279,7 +279,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     // compute the density fluxes by summing the species fluxes
                     sfluxz(i,j,k,0) += sfluxz(i,j,k,comp);
                 });
-    	    } else {
+            } else {
 
                 const Array4<const Real> rho0_edgex = rho0mac_edgex.array(mfi);
                 const Array4<const Real> rho0_edgey = rho0mac_edgey.array(mfi);
@@ -386,16 +386,16 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
         if (reflux_type == 2) {
 
-    	    // Get the grid size
-    	    const Real* dx = geom[lev].CellSize();
-    	    // NOTE: areas are different in DIM=2 and DIM=3
+            // Get the grid size
+            const Real* dx = geom[lev].CellSize();
+            // NOTE: areas are different in DIM=2 and DIM=3
 #if (AMREX_SPACEDIM == 3)
-    	    const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
+            const Real area[3] = {dx[1]*dx[2], dx[0]*dx[2], dx[0]*dx[1]};
 #else
-    	    const Real area[2] = {dx[1], dx[0]};
+            const Real area[2] = {dx[1], dx[0]};
 #endif
 
-    	    if (flux_reg_s[lev+1])
+            if (flux_reg_s[lev+1])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)
@@ -404,7 +404,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,Rho,Rho,1, -1.0*dt*area[i]);
                 }
             }
-    	    if (flux_reg_s[lev])
+            if (flux_reg_s[lev])
             {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev)
@@ -414,15 +414,15 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 }
             }
 
-    	    if (spherical == 0) {
-    		// need edge_restrict for etarhoflux
-    	    }
+            if (spherical == 0) {
+                // need edge_restrict for etarhoflux
+            }
         }
     } // end loop over levels
 
     // average down fluxes
     if (reflux_type == 1) {
-    	AverageDownFaces(sflux);
+        AverageDownFaces(sflux);
     }
 
     // Something analogous to edge_restriction is done in UpdateScal()
