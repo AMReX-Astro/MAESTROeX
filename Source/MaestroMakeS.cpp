@@ -53,19 +53,19 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         }
     } else {
         if (use_delta_gamma1_term) {
-	    for (int lev=0; lev<=finest_level; ++lev) {
-	        int index;
-	        const Real* dx = geom[lev].CellSize();
+            for (int lev=0; lev<=finest_level; ++lev) {
+                int index;
+                const Real* dx = geom[lev].CellSize();
 
-		// bottom and top edge cases for planar
-		gradp0[lev*nr_fine] = (p0[lev*nr_fine+1] - p0[lev*nr_fine]) / dx[AMREX_SPACEDIM-1];
-		gradp0[(lev+1)*nr_fine-1] = (p0[(lev+1)*nr_fine-1] - p0[(lev+1)*nr_fine-2]) / dx[AMREX_SPACEDIM-1];
-		
-		for (int r=1; r<nr_fine-1; r++) {
-		    index = lev*nr_fine + r;
-		    gradp0[index] = (p0[index+1] - p0[index-1]) / (2.0*dx[AMREX_SPACEDIM-1]);
-		}
-	    }
+                // bottom and top edge cases for planar
+                gradp0[lev*nr_fine] = (p0[lev*nr_fine+1] - p0[lev*nr_fine]) / dx[AMREX_SPACEDIM-1];
+                gradp0[(lev+1)*nr_fine-1] = (p0[(lev+1)*nr_fine-1] - p0[(lev+1)*nr_fine-2]) / dx[AMREX_SPACEDIM-1];
+                
+                for (int r=1; r<nr_fine-1; r++) {
+                    index = lev*nr_fine + r;
+                    gradp0[index] = (p0[index+1] - p0[index-1]) / (2.0*dx[AMREX_SPACEDIM-1]);
+                }
+            }
         }
 
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -77,7 +77,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (use_delta_gamma1_term) {
         Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
     }
-	
+        
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -163,7 +163,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                           BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-			  BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
+                          BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
                           BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
             }
         }

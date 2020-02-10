@@ -1,7 +1,377 @@
 #include <Maestro.H>
-#include <MaestroHydro_F.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
+
+void
+Maestro::VelPred (Vector<MultiFab>& utilde,
+                  const Vector<MultiFab>& ufull,
+                  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
+                  Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                  const Vector<MultiFab>& force)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::VelPred()",VelPred);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // Get the index space and grid spacing of the domain
+        const Box& domainBox = geom[lev].Domain();
+        const Real* dx = geom[lev].CellSize();
+
+        // get references to the MultiFabs at level lev
+              MultiFab& utilde_mf  = utilde[lev];
+        const MultiFab& ufull_mf   = ufull[lev];
+              MultiFab& umac_mf    = umac[lev][0];
+        const MultiFab& utrans_mf  = utrans[lev][0];
+        const MultiFab& vtrans_mf  = utrans[lev][1];
+              MultiFab& vmac_mf    = umac[lev][1];
+
+        MultiFab Ipu, Imu, Ipv, Imv;
+        Ipu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imu.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imv.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab Ipfx, Imfx, Ipfy, Imfy;
+        Ipfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imfx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Ipfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imfy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab ulx, urx, uimhx, uly, ury, uimhy;
+        ulx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        urx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uimhx.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uly.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        ury.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uimhy.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+#if (AMREX_SPACEDIM == 3)
+        const MultiFab& wtrans_mf  = utrans[lev][2];
+        MultiFab& wmac_mf          = umac[lev][2];
+        const MultiFab& w0macx_mf  = w0mac[lev][0];
+        const MultiFab& w0macy_mf  = w0mac[lev][1];
+        const MultiFab& w0macz_mf  = w0mac[lev][2];
+
+        MultiFab Ipw, Imw;
+        Ipw.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imw.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab Ipfz, Imfz;
+        Ipfz.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        Imfz.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab ulz, urz, uimhz;
+        ulz.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        urz.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+        uimhz.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
+
+        MultiFab uimhyz, uimhzy, vimhxz, vimhzx, wimhxy, wimhyx;
+        uimhyz.define(grids[lev],dmap[lev],1,1);
+        uimhzy.define(grids[lev],dmap[lev],1,1);
+        vimhxz.define(grids[lev],dmap[lev],1,1);
+        vimhzx.define(grids[lev],dmap[lev],1,1);
+        wimhxy.define(grids[lev],dmap[lev],1,1);
+        wimhyx.define(grids[lev],dmap[lev],1,1);
+#endif
+        const MultiFab& force_mf = force[lev];
+        const MultiFab& w0_mf = w0_cart[lev];
+
+#if (AMREX_SPACEDIM == 2)
+
+        MultiFab u_mf, v_mf;
+
+        if (ppm_type == 0) {
+           u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+           v_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+
+           MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
+           MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
+
+        } else if (ppm_type == 1 || ppm_type == 2) {
+
+           u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+           v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+
+           MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
+           MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
+        }
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& mxbx = amrex::growLo(obx,0, -1);
+            const Box& mybx = amrex::growLo(obx,1, -1);
+
+            if (ppm_type == 0) {
+                // we're going to reuse Ip here as slopex as it has the
+                // correct number of ghost zones
+                Slopex(obx, utilde_mf.array(mfi), 
+                       Ipu.array(mfi), 
+                       domainBox, bcs_u, 
+                       AMREX_SPACEDIM,0);
+            } else {
+
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
+
+                if (ppm_trace_forces == 1) {
+
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
+                }
+            }
+
+            if (ppm_type == 0) {
+               // we're going to reuse Im here as slopey as it has the
+               // correct number of ghost zones
+               Slopey(obx, utilde_mf.array(mfi), 
+                      Imv.array(mfi), 
+                      domainBox, bcs_u, 
+                      AMREX_SPACEDIM,0);
+            } else {
+
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), 
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
+
+                if (ppm_trace_forces == 1) {
+
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), 
+                        Ipv.array(mfi), Imv.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 1, 1);
+                }
+            }
+
+            VelPredInterface(mfi,
+                             utilde_mf.array(mfi),
+                             ufull_mf.array(mfi),
+                             utrans_mf.array(mfi),
+                             vtrans_mf.array(mfi),
+                             Imu.array(mfi), Ipu.array(mfi),
+                             Imv.array(mfi), Ipv.array(mfi),
+                             ulx.array(mfi), urx.array(mfi),
+                             uimhx.array(mfi),
+                             uly.array(mfi), ury.array(mfi),
+                             uimhy.array(mfi),
+                             domainBox, dx);
+
+            VelPredVelocities(mfi,
+                             utilde_mf.array(mfi),
+                             utrans_mf.array(mfi),
+                             vtrans_mf.array(mfi),
+                             umac_mf.array(mfi), vmac_mf.array(mfi),
+                             Imfx.array(mfi), Ipfx.array(mfi),
+                             Imfy.array(mfi), Ipfy.array(mfi),
+                             ulx.array(mfi), urx.array(mfi),
+                             uimhx.array(mfi),
+                             uly.array(mfi), ury.array(mfi),
+                             uimhy.array(mfi),
+                             force_mf.array(mfi),
+                             w0_mf.array(mfi),
+                             domainBox, dx);
+        } // end MFIter loop
+
+#elif (AMREX_SPACEDIM == 3)
+
+        MultiFab u_mf, v_mf, w_mf;
+
+        if (ppm_type == 0) {
+           u_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+           v_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+           w_mf.define(grids[lev],dmap[lev],1,utilde[lev].nGrow());
+
+           MultiFab::Copy(u_mf, utilde[lev], 0, 0, 1, utilde[lev].nGrow());
+           MultiFab::Copy(v_mf, utilde[lev], 1, 0, 1, utilde[lev].nGrow());
+           MultiFab::Copy(w_mf, utilde[lev], 2, 0, 1, utilde[lev].nGrow());
+
+        } else if (ppm_type == 1 || ppm_type == 2) {
+
+           u_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+           v_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+           w_mf.define(grids[lev],dmap[lev],1,ufull[lev].nGrow());
+
+           MultiFab::Copy(u_mf, ufull[lev], 0, 0, 1, ufull[lev].nGrow());
+           MultiFab::Copy(v_mf, ufull[lev], 1, 0, 1, ufull[lev].nGrow());
+           MultiFab::Copy(w_mf, ufull[lev], 2, 0, 1, ufull[lev].nGrow());
+        }
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& xbx = mfi.nodaltilebox(0);
+            const Box& ybx = mfi.nodaltilebox(1);
+            const Box& zbx = mfi.nodaltilebox(2);
+            const Box& mxbx = amrex::growLo(obx,0, -1);
+            const Box& mybx = amrex::growLo(obx,1, -1);
+            const Box& mzbx = amrex::growLo(obx,2, -1);
+
+            // x-direction
+            if (ppm_type == 0) {
+                // we're going to reuse Ipu here as slopex as it has the
+                // correct number of ghost zones
+                Slopex(obx, utilde_mf.array(mfi), 
+                       Ipu.array(mfi), 
+                       domainBox, bcs_u, 
+                       AMREX_SPACEDIM,0);
+
+            } else {
+
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipu.array(mfi), Imu.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 0, 0);
+
+                if (ppm_trace_forces == 1) {
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                        Ipfx.array(mfi), Imfx.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 0, 0);
+                }
+            }
+
+            // y-direction
+            if (ppm_type == 0) {
+               // we're going to reuse Imv here as slopey as it has the
+               // correct number of ghost zones
+               Slopey(obx, utilde_mf.array(mfi), 
+                       Imv.array(mfi), 
+                       domainBox, bcs_u, 
+                       AMREX_SPACEDIM,0);
+
+            } else {
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipv.array(mfi), Imv.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
+
+              if (ppm_trace_forces == 1) {
+
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfy.array(mfi), Imfy.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 1, 1);
+              }
+            }
+
+            // z-direction
+            if (ppm_type == 0) {
+               // we're going to reuse Imw here as slopey as it has the
+               // correct number of ghost zones
+
+               Slopez(obx, utilde_mf.array(mfi), 
+                      Imw.array(mfi), 
+                      domainBox, bcs_u, 
+                      AMREX_SPACEDIM,0);
+
+            } else {
+
+                PPM(obx, utilde_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipw.array(mfi), Imw.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
+
+              if (ppm_trace_forces == 1) {
+
+                PPM(obx, force_mf.array(mfi), 
+                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                    Ipfz.array(mfi), Imfz.array(mfi), 
+                    domainBox, bcs_u, dx, 
+                    false, 2, 2);
+              }
+            }
+            
+            VelPredInterface(mfi,
+                             utilde_mf.array(mfi),
+                             ufull_mf.array(mfi),
+                             utrans_mf.array(mfi),
+                             vtrans_mf.array(mfi),
+                             wtrans_mf.array(mfi),
+                             Imu.array(mfi), Ipu.array(mfi),
+                             Imv.array(mfi), Ipv.array(mfi),
+                             Imw.array(mfi), Ipw.array(mfi),
+                             ulx.array(mfi), urx.array(mfi),
+                             uimhx.array(mfi),
+                             uly.array(mfi), ury.array(mfi),
+                             uimhy.array(mfi),
+                             ulz.array(mfi), urz.array(mfi),
+                             uimhz.array(mfi),
+                             domainBox, dx);
+
+            VelPredTransverse(mfi,
+                            utilde_mf.array(mfi),
+                            utrans_mf.array(mfi),
+                            vtrans_mf.array(mfi),
+                            wtrans_mf.array(mfi),
+                            ulx.array(mfi), urx.array(mfi),
+                            uimhx.array(mfi),
+                            uly.array(mfi), ury.array(mfi),
+                            uimhy.array(mfi),
+                            ulz.array(mfi), urz.array(mfi),
+                            uimhz.array(mfi),
+                            uimhyz.array(mfi), uimhzy.array(mfi), 
+                            vimhxz.array(mfi), vimhzx.array(mfi), 
+                            wimhxy.array(mfi), wimhyx.array(mfi), 
+                            domainBox, dx);
+
+            VelPredVelocities(mfi,
+                            utilde_mf.array(mfi),
+                            utrans_mf.array(mfi),
+                            vtrans_mf.array(mfi),
+                            wtrans_mf.array(mfi),
+                            umac_mf.array(mfi), vmac_mf.array(mfi),
+                            wmac_mf.array(mfi),
+                            w0macx_mf.array(mfi), 
+                            w0macy_mf.array(mfi),
+                            w0macz_mf.array(mfi),
+                            Imfx.array(mfi), Ipfx.array(mfi),
+                            Imfy.array(mfi), Ipfy.array(mfi),
+                            Imfz.array(mfi), Ipfz.array(mfi),
+                            ulx.array(mfi), urx.array(mfi),
+                            uly.array(mfi), ury.array(mfi),
+                            ulz.array(mfi), urz.array(mfi),
+                            uimhyz.array(mfi), uimhzy.array(mfi), 
+                            vimhxz.array(mfi), vimhzx.array(mfi), 
+                            wimhxy.array(mfi), wimhyx.array(mfi), 
+                            force_mf.array(mfi),
+                            w0_mf.array(mfi),
+                            domainBox, dx);
+        } // end MFIter loop
+
+#endif // AMREX_SPACEDIM
+    } // end loop over levels
+
+    // edge_restriction
+    AverageDownFaces(umac);
+}
 
 #if (AMREX_SPACEDIM == 2)
 
@@ -46,7 +416,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    static const int ppm_type_local = ppm_type;
+    const int ppm_type_local = ppm_type;
 
     // x-direction
     const int ilo = domainBox.loVect()[0];
@@ -284,7 +654,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    static const int ppm_trace_forces_local = ppm_trace_forces;
+    const int ppm_trace_forces_local = ppm_trace_forces;
 
     // x-direction
     const int ilo = domainBox.loVect()[0];

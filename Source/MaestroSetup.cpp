@@ -61,40 +61,40 @@ Maestro::Setup ()
     const Real* dxFine = geom[max_level].CellSize();
 
     if (spherical == 1) {
-
+#if (AMREX_SPACEDIM == 3)
         // compute max_radial_level
         max_radial_level = 0;
 
         // compute dr_fine
         dr_fine = dxFine[0] / drdxfac;
 
-	// compute nr_irreg
-	int domhi = domainBoxFine.bigEnd(0)+1;
-	if (!octant) {
-	    nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
-	} else {
-	    nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
-	}
+        // compute nr_irreg
+        int domhi = domainBoxFine.bigEnd(0)+1;
+        if (!octant) {
+            nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
+        } else {
+            nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
+        }
 
-        // compute nr_fine
-	if (use_exact_base_state) {
-	    nr_fine = nr_irreg + 1;
-	} else {
-	    double lenx, leny, lenz, max_dist;
-	    if (octant) {
-		lenx = probHi[0] - probLo[0];
-		leny = probHi[1] - probLo[1];
-		lenz = probHi[2] - probLo[2];
-	    }
-	    else {
-		lenx = 0.5*(probHi[0] - probLo[0]);
-		leny = 0.5*(probHi[1] - probLo[1]);
-		lenz = 0.5*(probHi[2] - probLo[2]);
-	    }
-	    max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
-	    nr_fine = int(max_dist / dr_fine) + 1;
-	}
-
+            // compute nr_fine
+        if (use_exact_base_state) {
+            nr_fine = nr_irreg + 1;
+        } else {
+            double lenx, leny, lenz, max_dist;
+            if (octant) {
+            lenx = probHi[0] - probLo[0];
+            leny = probHi[1] - probLo[1];
+            lenz = probHi[2] - probLo[2];
+            }
+            else {
+            lenx = 0.5*(probHi[0] - probLo[0]);
+            leny = 0.5*(probHi[1] - probLo[1]);
+            lenz = 0.5*(probHi[2] - probLo[2]);
+            }
+            max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
+            nr_fine = int(max_dist / dr_fine) + 1;
+        }
+#endif
     }
     else {
         // compute max_radial_level
@@ -131,6 +131,9 @@ Maestro::Setup ()
     r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
     etarho_cc    .resize( (max_radial_level+1)*nr_fine );
     psi          .resize( (max_radial_level+1)*nr_fine );
+    numdisjointchunks.resize( (max_radial_level+1) );
+    r_start_coord.resize( (max_radial_level+1)*nr_fine );
+    r_end_coord  .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -175,12 +178,15 @@ Maestro::Setup ()
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
+    numdisjointchunks.shrink_to_fit();
+    r_start_coord.shrink_to_fit();
+    r_end_coord  .shrink_to_fit();
 
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-			     r_cc_loc.dataPtr(),
-			     r_edge_loc.dataPtr(),
-			     geom[max_level].CellSize(),
-			     &nr_irreg);
+                             r_cc_loc.dataPtr(),
+                             r_edge_loc.dataPtr(),
+                             geom[max_level].CellSize(),
+                             &nr_irreg);
 
     if (use_exact_base_state) average_base_state = 1;
 

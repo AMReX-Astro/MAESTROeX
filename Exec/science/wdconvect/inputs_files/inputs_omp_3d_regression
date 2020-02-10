@@ -1,10 +1,10 @@
 
 # INITIAL MODEL
-maestro.model_file = "kepler_new_6.25e8.hybrid.hse.320"
+maestro.model_file = "kepler_new_6.25e8.hybrid.hse.1280"
 maestro.perturb_model = true
 
 maestro.drdxfac = 5
-#maestro.ppm_type = 1
+maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0    0.0
@@ -25,9 +25,9 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 64 64 64
+amr.n_cell             = 32 32 32
 amr.max_grid_size      = 32
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 2       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
@@ -71,6 +71,12 @@ maestro.use_delta_gamma1_term = false
 maestro.plot_base_name  = wdconvect_omp_plt   # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 10.0e0
+
+maestro.plot_spec = false
+maestro.plot_omegadot = false
+maestro.plot_Hnuc = false
+maestro.plot_gpi = false
+maestro.plot_base_state = false
 
 # CHECKPOINT
 maestro.check_base_name = wdconvect_omp_chk

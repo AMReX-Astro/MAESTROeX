@@ -25,7 +25,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 
     for (int lev=0; lev<=finest_level; ++lev) {
         Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
-        		 is_output_a_vector,bcs,sbccomp);
+                         is_output_a_vector,bcs,sbccomp);
     }
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
@@ -1333,8 +1333,8 @@ Maestro::MakeCCtoRadii ()
             init_base_state_map_sphr(AMREX_INT_ANYD(tilebox.loVect()), 
                      AMREX_INT_ANYD(tilebox.hiVect()), 
                      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
-				     AMREX_REAL_ANYD(dx_fine),
-				     AMREX_REAL_ANYD(dx));
+                                     AMREX_REAL_ANYD(dx_fine),
+                                     AMREX_REAL_ANYD(dx));
         }
     }
 

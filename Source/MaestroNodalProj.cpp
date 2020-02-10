@@ -22,7 +22,7 @@ void
 Maestro::NodalProj (int proj_type,
                     Vector<MultiFab>& rhcc,
                     int istep_divu_iter,
-		    bool sdc_off)
+                    bool sdc_off)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::NodalProj()",NodalProj);
@@ -412,7 +412,7 @@ Maestro::NodalProj (int proj_type,
     FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
     if (proj_type == pressure_iters_comp ||
-	proj_type == regular_timestep_comp) {
+        proj_type == regular_timestep_comp) {
         // average pi from nodes to cell-centers and store in the Pi component of snew
         MakePiCC(beta0_cart);
     }
@@ -568,11 +568,13 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                              Vector<MultiFab>& gphi)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ComputeGradPhi()",ComputeGradPhi);
+    BL_PROFILE_VAR("Maestro::ComputeGradPhi()", ComputeGradPhi);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        const MultiFab& phi_mf = phi[lev];
         MultiFab& gphi_mf = gphi[lev];
+
+        const auto dx = geom[lev].CellSizeArray();
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -580,21 +582,40 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
 
             // Get the index space of the tile's valid region
             const Box& tilebox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "tileox", which specifies the tile's "valid" region.
-#pragma gpu box(tilebox)
-            compute_grad_phi(AMREX_INT_ANYD(tilebox.loVect()),
-                             AMREX_INT_ANYD(tilebox.hiVect()),
-                             BL_TO_FORTRAN_ANYD(phi_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(gphi_mf[mfi]),
-                             AMREX_REAL_ANYD(dx));
+            const Array4<const Real> phi_arr = phi[lev].array(mfi);
+            const Array4<Real> gphi_arr = gphi[lev].array(mfi);
+
+#if (AMREX_SPACEDIM == 2)
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                gphi_arr(i,j,k,0) = 0.5*(phi_arr(i+1,j,k) 
+                    + phi_arr(i+1,j+1,k) 
+                    - phi_arr(i  ,j,k) - phi_arr(i  ,j+1,k) ) / dx[0];
+                gphi_arr(i,j,k,1) = 0.5*(phi_arr(i,j+1,k) 
+                    + phi_arr(i+1,j+1,k) 
+                    - phi_arr(i,j  ,k) - phi_arr(i+1,j  ,k) ) / dx[1];
+            });
+#else
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+             gphi_arr(i,j,k,0) = 0.25*(
+                   phi_arr(i+1,j,k  ) + phi_arr(i+1,j+1,k  ) 
+                  +phi_arr(i+1,j,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i  ,j,k  ) - phi_arr(i  ,j+1,k  ) 
+                  -phi_arr(i  ,j,k+1) - phi_arr(i  ,j+1,k+1) ) /dx[0];
+             gphi_arr(i,j,k,1) = 0.25*(
+                   phi_arr(i,j+1,k  ) + phi_arr(i+1,j+1,k  ) 
+                  +phi_arr(i,j+1,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i,j  ,k  ) - phi_arr(i+1,j  ,k  ) 
+                  -phi_arr(i,j  ,k+1) - phi_arr(i+1,j  ,k+1) ) /dx[1];
+             gphi_arr(i,j,k,2) = 0.25*(
+                   phi_arr(i,j  ,k+1) + phi_arr(i+1,j  ,k+1) 
+                  +phi_arr(i,j+1,k+1) + phi_arr(i+1,j+1,k+1) 
+                  -phi_arr(i,j  ,k  ) - phi_arr(i+1,j  ,k  ) 
+                  -phi_arr(i,j+1,k  ) - phi_arr(i+1,j+1,k  ) ) /dx[2];
+            });
+#endif
         }
     }
-
 }
 
 
@@ -604,10 +625,12 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePiCC()",MakePiCC);
 
+    const bool use_alt_energy_fix_loc = use_alt_energy_fix;
+
     for (int lev=0; lev<=finest_level; ++lev) {
-        const MultiFab& pi_mf = pi[lev];
+        
         MultiFab& snew_mf = snew[lev];
-        const MultiFab& beta0_cart_mf = beta0_cart[lev];
+        
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -615,18 +638,25 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
 
             // Get the index space of the tile's valid region
             const Box& tileBox = mfi.tilebox();
-            FArrayBox& snew_fab = snew_mf[mfi];
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "tilebox", which specifies the "tile's valid" region.
-#pragma gpu box(tileBox)
-            make_pi_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                       BL_TO_FORTRAN_ANYD(pi_mf[mfi]),
-                       snew_fab.dataPtr(Pi), AMREX_INT_ANYD(snew_fab.loVect()), AMREX_INT_ANYD(snew_fab.hiVect()),
-                       BL_TO_FORTRAN_ANYD(beta0_cart_mf[mfi]));
+            const Array4<const Real> pi_arr = pi[lev].array(mfi);
+            const Array4<Real> pi_cc = snew[lev].array(mfi, Pi);
+            const Array4<const Real> beta0_cart_arr = beta0_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                pi_cc(i,j,k) = 0.25 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
+                    + pi_arr(i,j+1,k) + pi_arr(i+1,j+1,k));
+#else
+                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
+                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1) 
+                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1) 
+                    + pi_arr(i,j+1,k+1) + pi_arr(i+1,j+1,k+1));
+#endif
+                if (use_alt_energy_fix_loc) {
+                    pi_cc(i,j,k) = pi_cc(i,j,k)*beta0_cart_arr(i,j,k);
+                }
+            });
         }
     }
-
 }
