@@ -20,6 +20,12 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
+	// constants in Fortran
+	Real base_cutoff_density=0.0; 
+	get_base_cutoff_density(&base_cutoff_density);
+	Real buoyancy_cutoff_factor=0.0;
+	get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -86,12 +92,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             
             // output
             const Array4<Real> vel_force = vel_force_mf.array(mfi);
-
-            // constants in Fortran
-            Real base_cutoff_density=0.0; 
-            get_base_cutoff_density(&base_cutoff_density);
-            Real buoyancy_cutoff_factor=0.0;
-            get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -107,7 +107,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                 {
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
                     
-                    //cutoff the buoyancy term if we are outside of the star
+                    // cutoff the buoyancy term if we are outside of the star
                     if (rho_arr(i,j,k) < (buoyancy_cutoff_factor*base_cutoff_density)) {
                         rhopert = 0.0;
                     }
@@ -143,8 +143,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                         }
 #endif
                     }
-                });
-                
+                });          
             } else {  // spherical
 #if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
@@ -170,14 +169,13 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                                          0.5*(wedge(i,j,k)+wedge(i  ,j,  k+1))*normal_arr(i,j,k,2);
                         
                         for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
-                            vel_force(i,j,k,dim) = vel_force(i,j,k,dim) - 
+                            vel_force(i,j,k,dim) -= 
                                 Ut_dot_er*gradw0_arr(i,j,k)*normal_arr(i,j,k,dim);
                         }
                     }
                 });
 #endif
             }
-            
         }
     }
 
@@ -254,7 +252,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
             
             // Get Array4 inputs
-            const Array4<const Real> scal = state[lev].array(mfi);
+            const Array4<const Real> scal = state[lev].array(mfi,comp);
             const Array4<const Real> umac = umac_in[lev][0].array(mfi);
             const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
@@ -265,18 +263,17 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> force = scal_force_mf.array(mfi);
+            const Array4<Real> force = scal_force_mf.array(mfi,comp);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
             // offload to GPU
             if (spherical == 1) {
+#if (AMREX_SPACEDIM == 3)
                 // lo and hi of domain
                 const int* AMREX_RESTRICT domlo = domainBox.loVect();
                 const int* AMREX_RESTRICT domhi = domainBox.hiVect();
-                
-#if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
                 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
@@ -288,7 +285,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                     
                     if (fullform == 1) {
                         
-                        force(i,j,k,comp) -= scal(i,j,k,comp)*(divumac+divu_arr(i,j,k));
+                        force(i,j,k) -= scal(i,j,k)*(divumac+divu_arr(i,j,k));
                     } else {
         
                         Real s0_xlo = 0.0;
@@ -334,9 +331,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                             (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
                             (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
                             
-                        force(i,j,k,comp) = force(i,j,k,comp) - divs0u
-                            - (scal(i,j,k,comp)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
-                            
+                        force(i,j,k) = force(i,j,k) - divs0u
+                            - (scal(i,j,k)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
                     }
                 });
 #else
@@ -352,18 +348,18 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                         +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1];
 
                     // add w0 contribution
-                    divu = divu + (w0_arr(i,j+1,k,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
+                    divu += (w0_arr(i,j+1,k,AMREX_SPACEDIM-1)- w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #elif (AMREX_SPACEDIM == 3)
                     Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
                         +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] 
                         +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
 
                     // add w0 contribution
-                    divu = divu + (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
+                    divu += (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
                         
                     if (fullform == 1) {
-                        force(i,j,k,comp) -= scal(i,j,k,comp)*divu;
+                        force(i,j,k) -= scal(i,j,k)*divu;
                     } else {
 
 #if (AMREX_SPACEDIM == 2)
@@ -377,10 +373,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                               wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
-                        force(i,j,k,comp) = force(i,j,k,comp) - (scal(i,j,k,comp)-s0_arr(i,j,k))*divu - divs0u;
+                        force(i,j,k) = force(i,j,k) - (scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
                     }
                 });
-                
             }
         }
     }
@@ -504,7 +499,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> rho0cart = rho0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> force = scal_force_mf.array(mfi);
+            const Array4<Real> rhoh_force = scal_force_mf.array(mfi, RhoH);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -514,11 +509,14 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
+
+			// For non-spherical, add wtilde d(p0)/dr
+			// For spherical, we make u grad p = div (u p) - p div (u)
             if (spherical == 0) {
 
                 AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
                 {
-                    Real gradp0;
+                    Real gradp0 = 0.0;
                 
 #if (AMREX_SPACEDIM == 2)
                     if (j < base_cutoff_density_coord) {
@@ -532,7 +530,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     }
 
                     Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
-                    force(i,j,k,rhoh_comp) =  veladv * gradp0;
+                    rhoh_force(i,j,k) = veladv * gradp0;
 #else 
                     if (k < base_cutoff_density_coord) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
@@ -545,7 +543,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     }
 
                     Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
-                    force(i,j,k,rhoh_comp) =  veladv * gradp0;
+                    rhoh_force(i,j,k) = veladv * gradp0;
 #endif
                     //
                     // psi should always be in the force if we are doing the final update
@@ -558,11 +556,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
                         (is_prediction == 0)) {
                     
-                        force(i,j,k,rhoh_comp) += psicart(i,j,k);
+                        rhoh_force(i,j,k) += psicart(i,j,k);
                     }
 
                     if (add_thermal == 1) {
-                        force(i,j,k,rhoh_comp) += thermal_arr(i,j,k);
+                        rhoh_force(i,j,k) += thermal_arr(i,j,k);
                     }
                 });
                 
@@ -579,22 +577,21 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                                (vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] + 
                                (wmac(i,j,k+1) - wmac(i,j,k)) / dx[2] ) * p0cart(i,j,k);
 
-                    force(i,j,k,rhoh_comp) = divup - p0divu;
+                    rhoh_force(i,j,k) = divup - p0divu;
 
                     if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
                         (is_prediction == 0)) {
                     
-                        force(i,j,k,rhoh_comp) += psicart(i,j,k);
+                        rhoh_force(i,j,k) += psicart(i,j,k);
                     }
 
                     if (add_thermal == 1) {
-                        force(i,j,k,rhoh_comp) += thermal_arr(i,j,k);
+                        rhoh_force(i,j,k) += thermal_arr(i,j,k);
                     }
                 });
 #endif          
             }
-            
         }
     }
 
