@@ -46,7 +46,7 @@ Maestro::DensityAdvance (int which_step,
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	rho0_old_cart[lev].setVal(0.);
+        rho0_old_cart[lev].setVal(0.);
     }
 
     Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
@@ -233,15 +233,15 @@ Maestro::DensityAdvance (int which_step,
 // Density advance for SDC using intra(global var)
 void
 Maestro::DensityAdvanceSDC (int which_step,
-			    Vector<MultiFab>& scalold,
-			    Vector<MultiFab>& scalnew,
-			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			    Vector<MultiFab>& scal_force,
-			    Vector<MultiFab>& etarhoflux,
-			    Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			    const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-			    const RealVector& rho0_predicted_edge)
+                            Vector<MultiFab>& scalold,
+                            Vector<MultiFab>& scalnew,
+                            Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                            Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+                            Vector<MultiFab>& scal_force,
+                            Vector<MultiFab>& etarhoflux,
+                            Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                            const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+                            const RealVector& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvanceSDC()",DensityAdvanceSDC);
@@ -268,14 +268,14 @@ Maestro::DensityAdvanceSDC (int which_step,
     // source terms for X and for tracers include reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
         scal_force[lev].setVal(0.);
-	MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
+        MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
     }
     
     if (finest_level == 0) {
-	// fill periodic ghost cells
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    scal_force[lev].FillBoundary(geom[lev].periodicity());
-	}
+        // fill periodic ghost cells
+        for (int lev=0; lev<=finest_level; ++lev) {
+            scal_force[lev].FillBoundary(geom[lev].periodicity());
+        }
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
@@ -453,7 +453,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     // reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
         scal_force[lev].setVal(0.);
-	MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
+        MultiFab::Add(scal_force[lev],intra[lev],FirstSpec,FirstSpec,NumSpec,0);
     }
 
     Vector<MultiFab> p0_new_cart(finest_level+1);

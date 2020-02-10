@@ -12,72 +12,72 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const RealVector& w0_force,
                         const Vector<MultiFab>& w0_force_cart)
 {
-	// timer for profiling
-	BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
+        // timer for profiling
+        BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
 
-	// create a uold with filled ghost cells
-	Vector<MultiFab> utilde(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-		utilde[lev].setVal(0.);
-	}
+        // create a uold with filled ghost cells
+        Vector<MultiFab> utilde(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+                utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+                utilde[lev].setVal(0.);
+        }
 
-	FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+        FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
-	// create a MultiFab to hold uold + w0
-	Vector<MultiFab> ufull(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+        // create a MultiFab to hold uold + w0
+        Vector<MultiFab> ufull(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+                ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
         // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
         ufull[lev].setVal(0.);
-	}
+        }
 
-	// create ufull = uold + w0
+        // create ufull = uold + w0
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(ufull[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
     }
     // fill ufull ghost cells
     FillPatch(t_old, ufull, ufull, ufull, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-	for (int lev=0; lev<=finest_level; ++lev) {
+        for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
-	}
+        }
         
-	// create a face-centered MultiFab to hold utrans
-	Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-		utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+        // create a face-centered MultiFab to hold utrans
+        Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+                utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+                utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 #if (AMREX_SPACEDIM == 3)
-		utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+                utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
-		for (int j=0; j < AMREX_SPACEDIM; j++)
-			utrans[lev][j].setVal(0.);
-	}
+                for (int j=0; j < AMREX_SPACEDIM; j++)
+                        utrans[lev][j].setVal(0.);
+        }
 
-	// create utrans
-	MakeUtrans(utilde,ufull,utrans,w0mac);
+        // create utrans
+        MakeUtrans(utilde,ufull,utrans,w0mac);
 
-	// create a MultiFab to hold the velocity forcing
-	Vector<MultiFab> vel_force(finest_level+1);
-	for (int lev=0; lev<=finest_level; ++lev) {
-		if (ppm_trace_forces == 0) {
-			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-		} else {
-			// tracing needs more ghost cells
-			vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-		}
-		vel_force[lev].setVal(0.);
+        // create a MultiFab to hold the velocity forcing
+        Vector<MultiFab> vel_force(finest_level+1);
+        for (int lev=0; lev<=finest_level; ++lev) {
+                if (ppm_trace_forces == 0) {
+                        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+                } else {
+                        // tracing needs more ghost cells
+                        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+                }
+                vel_force[lev].setVal(0.);
 
-	}
+        }
 
-	int do_add_utilde_force = 1;
-	MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-	             w0_force_cart,do_add_utilde_force);
+        int do_add_utilde_force = 1;
+        MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
+                     w0_force_cart,do_add_utilde_force);
 
-	// add w0 to trans velocities
-	Addw0 (utrans,w0mac,1.);
+        // add w0 to trans velocities
+        Addw0 (utrans,w0mac,1.);
 
-	VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
+        VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
 }
 
 
@@ -110,7 +110,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& sfluxz_mf = sflux[lev][2];
 #endif
-    	const MultiFab& p0cart_mf = p0_cart[lev];
+        const MultiFab& p0cart_mf = p0_cart[lev];
         const MultiFab& force_mf = force[lev];
 
         const auto dx = geom[lev].CellSizeArray();

@@ -15,7 +15,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_Hnuc,
                 const RealVector& p0,
                 const Real dt_in,
-		const Real time_in)
+                const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()",React);
@@ -97,12 +97,12 @@ Maestro::React (const Vector<MultiFab>& s_in,
 // react the state over dt_in and update s_out
 void
 Maestro::ReactSDC (const Vector<MultiFab>& s_in,
-		   Vector<MultiFab>& s_out,
-		   Vector<MultiFab>& rho_Hext,
-		   const RealVector& p0,
-		   const Real dt_in,
-		   const Real time_in,
-		   Vector<MultiFab>& source)
+                   Vector<MultiFab>& s_out,
+                   Vector<MultiFab>& rho_Hext,
+                   const RealVector& p0,
+                   const Real dt_in,
+                   const Real time_in,
+                   Vector<MultiFab>& source)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()",ReactSDC);
@@ -114,14 +114,14 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
         MakeHeating(rho_Hext,s_in);
 
         if (do_burning) {
-	    // add to source for enthalpy
-	    for (int lev=0; lev<=finest_level; ++lev) {
+            // add to source for enthalpy
+            for (int lev=0; lev<=finest_level; ++lev) {
                 MultiFab::Add(source[lev],rho_Hext[lev],0,RhoH,1,0);
-	    }
-	} else {
-	    // if we aren't burning, then we should just copy the old state to the
-	    // new and only update the rhoh component with the heating term
-	    // s_out = s_in + dt_in * rho_Hext
+            }
+        } else {
+            // if we aren't burning, then we should just copy the old state to the
+            // new and only update the rhoh component with the heating term
+            // s_out = s_in + dt_in * rho_Hext
             for (int lev=0; lev<=finest_level; ++lev) {
                 MultiFab::Copy(s_out[lev],s_in[lev],0,0,Nscal,0);
                 MultiFab::Saxpy(s_out[lev],dt_in,rho_Hext[lev],0,RhoH,1,0);
@@ -180,7 +180,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& rho_Hnuc,
                      const RealVector& p0,
                      const Real dt_in,
-		     const Real time_in)
+                     const Real time_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()",Burner);
@@ -261,11 +261,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 #else
 // SDC burner
 void Maestro::Burner(const Vector<MultiFab>& s_in,
-		     Vector<MultiFab>& s_out,
-		     const RealVector& p0,
-		     const Real dt_in,
-		     const Real time_in,
-		     const Vector<MultiFab>& source)
+                     Vector<MultiFab>& s_out,
+                     const RealVector& p0,
+                     const Real dt_in,
+                     const Real time_in,
+                     const Vector<MultiFab>& source)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::BurnerSDC()",BurnerSDC);
@@ -290,15 +290,15 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         const MultiFab&    s_in_mf =    s_in[lev];
               MultiFab&   s_out_mf =   s_out[lev];
         const MultiFab& p0_cart_mf = p0_cart[lev];
-	const MultiFab&  source_mf =  source[lev];
-	
+        const MultiFab&  source_mf =  source[lev];
+        
         // create mask assuming refinement ratio = 2
         int finelev = lev+1;
         if (lev == finest_level) finelev = finest_level;
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in_mf, fba, IntVect(2));
-	
+        
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -312,7 +312,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             int use_mask = !(lev==finest_level);
 
             // call fortran subroutine
-	    
+            
             if (spherical == 1) {
 #pragma gpu box(tileBox)
                 burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), 
@@ -342,8 +342,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 // compute heating terms, rho_omegadot and rho_Hnuc
 void
 Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
-			    Vector<MultiFab>& rho_Hnuc,
-			    const Vector<MultiFab>& scal)
+                            Vector<MultiFab>& rho_Hnuc,
+                            const Vector<MultiFab>& scal)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeReactionRates()",MakeReactionRates);
@@ -355,32 +355,32 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
               MultiFab&     rho_Hnuc_mf = rho_Hnuc[lev];
         const MultiFab&         scal_mf =     scal[lev];
 
-	if (!do_burning) {
+        if (!do_burning) {
             rho_omegadot[lev].setVal(0.);
             rho_Hnuc[lev].setVal(0.);
-	} else {
+        } else {
 
-	    // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+            // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	    for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-		// Get the index space of the valid region
-		const Box& tileBox = mfi.tilebox();
-		
-		// call fortran subroutine
-		// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-		// lo/hi coordinates (including ghost cells), and/or the # of components
-		// We will also pass "validBox", which specifies the "valid" region.
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                
+                // call fortran subroutine
+                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+                // lo/hi coordinates (including ghost cells), and/or the # of components
+                // We will also pass "validBox", which specifies the "valid" region.
 #pragma gpu box(tileBox)
-		instantaneous_reaction_rates(AMREX_INT_ANYD(tileBox.loVect()), 
+                instantaneous_reaction_rates(AMREX_INT_ANYD(tileBox.loVect()), 
                          AMREX_INT_ANYD(tileBox.hiVect()),
-					     BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
-					     BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-					     BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
-	    }
-	}
+                                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
+                                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
+            }
+        }
     }
     
 }
