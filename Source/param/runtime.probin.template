@@ -23,17 +23,9 @@ end module probin_module
 
 module extern_probin_module
 
-  use amrex_fort_module, only : rt => amrex_real
+  use probin_module
 
   implicit none
-
-  private
-
-  @@declarationsB@@
-
-#ifdef AMREX_USE_CUDA
-  @@cudaattributesB@@
-#endif
 
 end module extern_probin_module
 

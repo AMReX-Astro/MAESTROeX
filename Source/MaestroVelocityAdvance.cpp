@@ -7,24 +7,24 @@ using namespace amrex;
 void
 Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                           const RealVector& w0_force,
-			  const Vector<MultiFab>& w0_force_cart,
+                          const Vector<MultiFab>& w0_force_cart,
                           const RealVector& rho0_nph,
                           const RealVector& grav_cell_nph,
-			  const Vector<MultiFab>& sponge)
+                          const Vector<MultiFab>& sponge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelocityAdvance()",VelocityAdvance);
 
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-	if (ppm_trace_forces == 0) {
-	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-	} else {
-	    // tracing needs more ghost cells
-	    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-	}
+        if (ppm_trace_forces == 0) {
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        } else {
+            // tracing needs more ghost cells
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+        }
         // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
         vel_force[lev].setVal(0.);
     }

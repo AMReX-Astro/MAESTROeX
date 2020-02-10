@@ -83,7 +83,7 @@ Maestro::EstDt ()
     Vector<MultiFab> gp0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-	gp0_cart[lev].setVal(0.);
+        gp0_cart[lev].setVal(0.);
     }
     RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
     gp0.shrink_to_fit();
@@ -92,7 +92,7 @@ Maestro::EstDt ()
     // divU constraint
     if (spherical == 1) {
       estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-		 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
       
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
@@ -135,7 +135,7 @@ Maestro::EstDt ()
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-	{
+        {
 
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
@@ -168,20 +168,20 @@ Maestro::EstDt ()
 #if (AMREX_SPACEDIM == 3)
 
 #pragma gpu box(tileBox)
-		estdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
-			   AMREX_MFITER_REDUCE_MAX(&umax_grid),
-			   AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-			   AMREX_REAL_ANYD(dx),
-			   BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
-			   BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
-			   BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
-			   BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-			   BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
+                estdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                           AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                           AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                           AMREX_REAL_ANYD(dx),
+                           BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+                           BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+                           BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+                           BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(dSdt_mf[mfi]),
                BL_TO_FORTRAN_ANYD(w0_mf[mfi]),
-			   BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-			   BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-			   BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-			   BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
+                           BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
+                           BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
 
 #else
                 Abort("EstDt: Spherical is not valid for DIM < 3");
@@ -189,10 +189,10 @@ Maestro::EstDt ()
             }
         }
 
-	dt_lev = std::min(dt_lev,dt_grid);
-	umax_lev = std::max(umax_lev,umax_grid);
+        dt_lev = std::min(dt_lev,dt_grid);
+        umax_lev = std::max(umax_lev,umax_grid);
 
-	} //end openmp
+        } //end openmp
 
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);
@@ -299,8 +299,8 @@ Maestro::FirstDt ()
 
     // divU constraint
     if (use_divu_firstdt && spherical == 1) {
-	estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-		   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
+                   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
     }
 
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
@@ -338,7 +338,7 @@ Maestro::FirstDt ()
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-	{
+        {
 
         Real dt_grid = 1.e99;
         Real umax_grid = 0.;
@@ -374,7 +374,7 @@ Maestro::FirstDt ()
 
 #pragma gpu box(tileBox)
                 firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
-			     AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
                              AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                              AMREX_REAL_ANYD(dx),
                              BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
@@ -388,10 +388,10 @@ Maestro::FirstDt ()
             }
         }
 
-	dt_lev = std::min(dt_lev,dt_grid);
-	umax_lev = std::max(umax_lev,umax_grid);
+        dt_lev = std::min(dt_lev,dt_grid);
+        umax_lev = std::max(umax_lev,umax_grid);
 
-	} //end openmp
+        } //end openmp
 
         // find the smallest dt over all processors
         ParallelDescriptor::ReduceRealMin(dt_lev);

@@ -274,7 +274,7 @@ hg_dense_stencil                    bool            true
 #-----------------------------------------------------------------------------
 
 # Use sponging.
-do_sponge                           bool            false	y
+do_sponge                           bool            false       y
 
 # Parameter for sponge.  Problem dependent.
 sponge_kappa                        Real               10.e0            y
@@ -326,10 +326,10 @@ do_planar_invsq_grav                bool            false       y
 planar_invsq_mass                   Real               0.0      y
 
 # turn on (true) or off (false) basestate evolution
-evolve_base_state                   bool            true	y
+evolve_base_state                   bool            true        y
 
 # turn on (true) or off (false) irregularly-spaced basestate
-use_exact_base_state                bool            false	y
+use_exact_base_state                bool            false       y
 
 # if true, don't call average to reset the base state at all, even during
 # initialization
@@ -345,7 +345,7 @@ do_smallscale                       bool            false       y
 
 # After the advective enthalpy update, recompute the enthalpy if we are
 # below the base cutoff density.
-do_eos_h_above_cutoff               bool            true	y
+do_eos_h_above_cutoff               bool            true        y
 
 # predict\_rhoh = 0; @@
 # predict\_rhohprime = 1; @@
@@ -362,7 +362,7 @@ enthalpy_pred_type                  int            1            y
 # and $X$ separately.  @@
 # {\tt species\_pred\_type} = 2 means predict the full ($\rho X$) itself. @@
 # {\tt species\_pred\_type} = 3 means predict $\rho$ and $X$ separately.
-species_pred_type                   int            1		y
+species_pred_type                   int            1            y
 
 # turns on second order correction to delta gamma1 term
 use_delta_gamma1_term               bool            true        y
@@ -379,7 +379,7 @@ grav_const                          Real               -1.5e10    y
 # 0 = no ppm (piecewise linear slopes instead) @@
 # 1 = 1984 ppm @@
 # 2 = Hybrid Sekora/Colella and McCorquodale/Colella 2009/2010 ppm
-ppm_type                            int            1 	       y
+ppm_type                            int            1           y
 
 # 0 = use ppm instead for multi-d integrator @@
 # 1 = bilinear
@@ -448,10 +448,10 @@ use_thermal_diffusion               bool            false
 # How to compute the explicit thermal diffusion term.  @@
 # 1 = in terms of $T$; @@
 # 2 = in terms of $\rho,p_0,X$.
-temp_diffusion_formulation          int            2	    y
+temp_diffusion_formulation          int            2        y
 
 # In the thermal diffusion solver, 1 = Crank-Nicholson; 2 = Backward Euler.
-thermal_diffusion_type              int            1 	    y
+thermal_diffusion_type              int            1        y
 
 # apply the conductivity limiting---if T, then we set the thermal coefficients
 # all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}
@@ -507,13 +507,13 @@ use_pprime_in_tfromp                 bool            false      y
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-s0_interp_type                      int            3	    y
+s0_interp_type                      int            3        y
 
 # The interpolation for filling a cell-centered multifab from a 1D edge-centered array. @@
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-w0_interp_type                      int            2	    y
+w0_interp_type                      int            2        y
 
 # The interpolation for filling an edge based multifab from a 1D bin-centered array. @@
 # 1 = Interpolate s0 to cell centers (with s0\_interp\_type), then average to edges; @@
@@ -526,7 +526,7 @@ s0mac_interp_type                   int            1        y
 # 2 = Interpolate w0 to edges directly using linear interpolation; @@
 # 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
 # 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
-w0mac_interp_type                   int            1 	      y
+w0mac_interp_type                   int            1          y
 
 #-----------------------------------------------------------------------------
 # category: diagnostics, I/O

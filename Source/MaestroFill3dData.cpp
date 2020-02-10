@@ -25,7 +25,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 
     for (int lev=0; lev<=finest_level; ++lev) {
         Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
-        		 is_output_a_vector,bcs,sbccomp);
+                         is_output_a_vector,bcs,sbccomp);
     }
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
@@ -63,30 +63,30 @@ Maestro::Put1dArrayOnCart (int level,
 #endif
     for ( MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-    	// Get the index space of the valid region
-    	const Box& tileBox = mfi.tilebox();
-    	const Real* dx = geom[level].CellSize();
+        // Get the index space of the valid region
+        const Box& tileBox = mfi.tilebox();
+        const Real* dx = geom[level].CellSize();
 
-    	// call fortran subroutine
-    	// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-    	// lo/hi coordinates (including ghost cells), and/or the # of components
-    	// We will also pass "validBox", which specifies the "valid" region.
-    	if (spherical == 0) {
+        // call fortran subroutine
+        // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+        // lo/hi coordinates (including ghost cells), and/or the # of components
+        // We will also pass "validBox", which specifies the "valid" region.
+        if (spherical == 0) {
 #pragma gpu box(tileBox)
-    	    put_1d_array_on_cart(AMREX_INT_ANYD(tileBox.loVect()),
+            put_1d_array_on_cart(AMREX_INT_ANYD(tileBox.loVect()),
                      AMREX_INT_ANYD(tileBox.hiVect()),level,
-    				 BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
-    				 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
-    	} else {
+                                 BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
+                                 s0.dataPtr(), is_input_edge_centered, is_output_a_vector);
+        } else {
 #pragma gpu box(tileBox)
-    	    put_1d_array_on_cart_sphr(AMREX_INT_ANYD(tileBox.loVect()),
+            put_1d_array_on_cart_sphr(AMREX_INT_ANYD(tileBox.loVect()),
                           AMREX_INT_ANYD(tileBox.hiVect()),
-    				      BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
-    				      s0.dataPtr(), AMREX_REAL_ANYD(dx),
-    				      is_input_edge_centered, is_output_a_vector,
-    				      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-    				      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
-    	}
+                                      BL_TO_FORTRAN_ANYD(s0_cart_mf[mfi]), s0_cart_mf.nComp(),
+                                      s0.dataPtr(), AMREX_REAL_ANYD(dx),
+                                      is_input_edge_centered, is_output_a_vector,
+                                      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+                                      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
+        }
     }
 
 }
@@ -529,8 +529,8 @@ Maestro::MakeCCtoRadii ()
             init_base_state_map_sphr(AMREX_INT_ANYD(tilebox.loVect()), 
                      AMREX_INT_ANYD(tilebox.hiVect()), 
                      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
-				     AMREX_REAL_ANYD(dx_fine),
-				     AMREX_REAL_ANYD(dx));
+                                     AMREX_REAL_ANYD(dx_fine),
+                                     AMREX_REAL_ANYD(dx));
         }
     }
 
