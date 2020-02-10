@@ -27,6 +27,7 @@ CEXE_sources += MaestroMacProj.cpp
 CEXE_sources += MaestroMakeEdgeScalars.cpp
 CEXE_sources += MaestroMakeEdgeState.cpp
 CEXE_sources += MaestroMakeEta.cpp
+CEXE_sources += MaestroMakeFlux.cpp
 CEXE_sources += MaestroMakeS.cpp
 CEXE_sources += MaestroMakeUtrans.cpp
 CEXE_sources += MaestroNodalProj.cpp

@@ -135,8 +135,8 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
 // compute only the h term in thermal
 void
 Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
-				  const Vector<MultiFab>& scal,
-				  const Vector<MultiFab>& hcoeff) {
+                                  const Vector<MultiFab>& scal,
+                                  const Vector<MultiFab>& hcoeff) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeExplicitThermalH()",MakeExplicitThermalH);
 
@@ -490,17 +490,17 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
 // SDC version
 void
 Maestro::ThermalConductSDC (int which_step,
-			    const Vector<MultiFab>& s_old,
-			    Vector<MultiFab>& s_hat,
-			    const Vector<MultiFab>& s_new,
-			    const RealVector& p0old,
-			    const RealVector& p0new,
-			    const Vector<MultiFab>& hcoeff1,
-			    const Vector<MultiFab>& Xkcoeff1,
-			    const Vector<MultiFab>& pcoeff1,
-			    const Vector<MultiFab>& hcoeff2,
-			    const Vector<MultiFab>& Xkcoeff2,
-			    const Vector<MultiFab>& pcoeff2)
+                            const Vector<MultiFab>& s_old,
+                            Vector<MultiFab>& s_hat,
+                            const Vector<MultiFab>& s_new,
+                            const RealVector& p0old,
+                            const RealVector& p0new,
+                            const Vector<MultiFab>& hcoeff1,
+                            const Vector<MultiFab>& Xkcoeff1,
+                            const Vector<MultiFab>& pcoeff1,
+                            const Vector<MultiFab>& hcoeff2,
+                            const Vector<MultiFab>& Xkcoeff2,
+                            const Vector<MultiFab>& pcoeff2)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ThermalConductSDC()",ThermalConductSDC);
@@ -526,12 +526,12 @@ Maestro::ThermalConductSDC (int which_step,
     // compute RHS = (rho h)^hat
     //             = (rho h)^1 + dt . (aofs + intra)
     for (int lev = 0; lev <= finest_level; ++lev) {
-	MultiFab::Copy(solverrhs[lev],s_hat[lev],RhoH,0,1,0);
+        MultiFab::Copy(solverrhs[lev],s_hat[lev],RhoH,0,1,0);
     }
 
     // compute resid = div(hcoeff1 grad h^1) - sum_k div(Xkcoeff1 grad Xk^1) - div(pcoeff1 grad p0_old)
     MakeExplicitThermal(resid,s_old,Dcoeff,hcoeff1,Xkcoeff1,pcoeff1,p0_old,2);
-	
+        
     // RHS = solverrhs + dt/2 * resid1
     for (int lev = 0; lev <= finest_level; ++lev) {
         MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
@@ -539,27 +539,27 @@ Maestro::ThermalConductSDC (int which_step,
 
     // predictor
     if (which_step == 1) {
-	// compute resid = 0 - sum_k div(Xkcoeff1 grad Xk^hat) - div(pcoeff1 grad p0_new)
-	MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff1,pcoeff1,p0_new,2);
-	
+        // compute resid = 0 - sum_k div(Xkcoeff1 grad Xk^hat) - div(pcoeff1 grad p0_new)
+        MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff1,pcoeff1,p0_new,2);
+        
     }
     // corrector
     else if (which_step == 2) {
-	// compute resid = div(hcoeff2 grad h2)
-	MakeExplicitThermalHterm(resid,s_new,hcoeff2);
+        // compute resid = div(hcoeff2 grad h2)
+        MakeExplicitThermalHterm(resid,s_new,hcoeff2);
 
-	// RHS = solverrhs + dt/2 * resid
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Saxpy(solverrhs[lev],-dt/2.0,resid[lev],0,0,1,0);
-	}
-	
-	// compute resid = - sum_k div(Xkcoeff2 grad Xk^hat) - div(pcoeff2 grad p0_new)
-	MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
+        // RHS = solverrhs + dt/2 * resid
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Saxpy(solverrhs[lev],-dt/2.0,resid[lev],0,0,1,0);
+        }
+        
+        // compute resid = - sum_k div(Xkcoeff2 grad Xk^hat) - div(pcoeff2 grad p0_new)
+        MakeExplicitThermal(resid,s_hat,Dcoeff,Dcoeff,Xkcoeff2,pcoeff2,p0_new,2);
     }
 
     // RHS = solverrhs + dt/2 * resid
     for (int lev = 0; lev <= finest_level; ++lev) {
-	MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
+        MultiFab::LinComb(solverrhs[lev],1.0,solverrhs[lev],0,dt/2.0,resid[lev],0,0,1,0);
     }
     
     // LHS coefficients for solver
@@ -581,10 +581,10 @@ Maestro::ThermalConductSDC (int which_step,
 
     // average face-centered Bcoefficients
     if (which_step == 1) {
-	PutDataOnFaces(hcoeff1, face_bcoef, 1);
+        PutDataOnFaces(hcoeff1, face_bcoef, 1);
     }
     else if (which_step == 2) {
-	PutDataOnFaces(hcoeff2, face_bcoef, 1);
+        PutDataOnFaces(hcoeff2, face_bcoef, 1);
     }
 
     // initialize value of phi to h^(2) as a guess
@@ -641,10 +641,10 @@ Maestro::ThermalConductSDC (int which_step,
 
     // set timestep
     if (which_step == 1) {
-	mlabec.setScalars(1.0, -dt/2.0);
+        mlabec.setScalars(1.0, -dt/2.0);
     }
     else if (which_step == 2) {
-	mlabec.setScalars(1.0, -dt);
+        mlabec.setScalars(1.0, -dt);
     }
 
     for (int lev = 0; lev <= finest_level; ++lev) {

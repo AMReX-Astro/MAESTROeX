@@ -82,22 +82,22 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force,
             if (spherical == 0) {
 #pragma gpu box(tileBox)
                 make_vel_force(AMREX_INT_ANYD(tileBox.loVect()),
-			       AMREX_INT_ANYD(tileBox.hiVect()),
-			       BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
-			       BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
-			       BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
+                               AMREX_INT_ANYD(tileBox.hiVect()),
+                               BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(gpi_mf[mfi]),
+                               BL_TO_FORTRAN_N_ANYD(rho_mf[mfi],Rho),
+                               BL_TO_FORTRAN_ANYD(uedge_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(vedge_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			       BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(wedge_mf[mfi]),
 #endif
-			       BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-			       BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-			       BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
-			       AMREX_REAL_ANYD(dx),
-			       AMREX_INT_ANYD(domainBox.hiVect()),
-			       do_add_utilde_force);
+                               BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
+                               BL_TO_FORTRAN_ANYD(w0force_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
+                               BL_TO_FORTRAN_ANYD(grav_mf[mfi]),
+                               AMREX_REAL_ANYD(dx),
+                               AMREX_INT_ANYD(domainBox.hiVect()),
+                               do_add_utilde_force);
             } else {
 #if (AMREX_SPACEDIM == 3)        
 #pragma gpu box(tileBox)
@@ -313,8 +313,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     p0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
         psi_cart[lev].setVal(0.);
         grav_cart[lev].setVal(0.);
-	rho0_cart[lev].setVal(0.);
-	p0_cart[lev].setVal(0.);
+        rho0_cart[lev].setVal(0.);
+        p0_cart[lev].setVal(0.);
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
@@ -416,8 +416,8 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     // if we are doing the prediction, then it only makes sense to be in
     // this routine if the quantity we are predicting is rhoh', h, or rhoh
     if (!(enthalpy_pred_type == predict_T_then_rhohprime ||
-	  enthalpy_pred_type == predict_T_then_h ||
-	  enthalpy_pred_type == predict_Tprime_then_h) ) {
+          enthalpy_pred_type == predict_T_then_h ||
+          enthalpy_pred_type == predict_Tprime_then_h) ) {
         Abort("ERROR: should only call mktempforce when predicting T' or T");
     }
 
@@ -427,7 +427,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         psi_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	p0_cart[lev].setVal(0.);
+        p0_cart[lev].setVal(0.);
         psi_cart[lev].setVal(0.);
     }
 
@@ -443,7 +443,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 #if (AMREX_SPACEDIM == 3)
         const MultiFab& wmac_mf = umac[lev][2];
 #endif
-	const MultiFab& scal_mf = scal[lev];
+        const MultiFab& scal_mf = scal[lev];
         const MultiFab& p0cart_mf = p0_cart[lev];
         const MultiFab& thermal_mf = thermal[lev];
         const MultiFab& psi_mf = psi_cart[lev];
@@ -468,22 +468,22 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             // psi is set to dpdt in advance subroutine
 #pragma gpu box(tileBox)
             mktempforce(AMREX_INT_ANYD(tileBox.loVect()),
-			AMREX_INT_ANYD(tileBox.hiVect()),
-			lev,
-			temp_force_mf[mfi].dataPtr(Temp),
-			AMREX_INT_ANYD(temp_force_mf[mfi].loVect()),
-			AMREX_INT_ANYD(temp_force_mf[mfi].hiVect()),
-			BL_TO_FORTRAN_ANYD(scal_mf[mfi]), 
-			BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-			BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+                        AMREX_INT_ANYD(tileBox.hiVect()),
+                        lev,
+                        temp_force_mf[mfi].dataPtr(Temp),
+                        AMREX_INT_ANYD(temp_force_mf[mfi].loVect()),
+                        AMREX_INT_ANYD(temp_force_mf[mfi].hiVect()),
+                        BL_TO_FORTRAN_ANYD(scal_mf[mfi]), 
+                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
 #if (AMREX_SPACEDIM == 3)
-			BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
 #endif
-			BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-			BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-			BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
-			AMREX_REAL_ANYD(dx), 
-			AMREX_INT_ANYD(domainBox.hiVect()));
+                        BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
+                        AMREX_REAL_ANYD(dx), 
+                        AMREX_INT_ANYD(domainBox.hiVect()));
         }
     }
 

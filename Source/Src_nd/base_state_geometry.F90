@@ -696,5 +696,4 @@ contains
     end do
   end subroutine get_r_end_coord
 
-
 end module base_state_geometry_module
