@@ -604,6 +604,14 @@ sdc_iters                           int            1
 sdc_couple_mac_velocity             bool            false
 
 
+#-----------------------------------------------------------------------------
+# category: GPU
+#-----------------------------------------------------------------------------
+
+# The nodal solve is non-deterministic on the GPU. Should it instead be run 
+# on the CPU to give a deterministic solution?
+deterministic_nodal_solve           bool false
+
 
 #-----------------------------------------------------------------------------
 # category: solver tolerances

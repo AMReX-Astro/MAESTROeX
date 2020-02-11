@@ -144,6 +144,7 @@ pp.query("store_particle_vels", store_particle_vels);
 pp.query("do_heating", do_heating);
 pp.query("sdc_iters", sdc_iters);
 pp.query("sdc_couple_mac_velocity", sdc_couple_mac_velocity);
+pp.query("deterministic_nodal_solve", deterministic_nodal_solve);
 pp.query("eps_init_proj_cart", eps_init_proj_cart);
 pp.query("eps_init_proj_sph", eps_init_proj_sph);
 pp.query("eps_divu_cart", eps_divu_cart);

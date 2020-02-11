@@ -98,6 +98,9 @@ maestro.eps_hg_bottom      = 1.e-4
 # OMP settings
 system.regtest_reduction = 1
 
+# GPU parameters 
+maestro.deterministic_nodal_solve = true
+
 &probin
 
   ! override the default values of the probin namelist values here
