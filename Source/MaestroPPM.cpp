@@ -24,8 +24,7 @@ Maestro::PPM (const Box& bx,
 
     // constant used in Colella 2008
     const Real C = 1.25;
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const int n = comp;
 

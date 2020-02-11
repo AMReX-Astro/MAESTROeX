@@ -22,14 +22,14 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         const Real* dx = geom[lev].CellSize();
 
         // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf   = state[lev];
+        const MultiFab& scal_mf = state[lev];
 
         MultiFab Ip, Im, Ipf, Imf;
         Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Ipf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Imf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-
+	
         MultiFab slx, srx, simhx;
         slx.define(grids[lev],dmap[lev],1,1);
         srx.define(grids[lev],dmap[lev],1,1);
@@ -394,8 +394,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     // loop over appropriate x-faces
     int ilo = domainBox.loVect()[0];
@@ -560,8 +559,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     // x-direction
     int bclo = bcs[bccomp].lo()[0];
@@ -1000,8 +998,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     int klo = domainBox.loVect()[2];
     int khi = domainBox.hiVect()[2];
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     // simhxy
     Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
@@ -1526,8 +1523,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     const Box& ybx = mfi.nodaltilebox(1);
     const Box& zbx = mfi.nodaltilebox(2);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     // x-direction
     int bclo = bcs[bccomp].lo()[0];
