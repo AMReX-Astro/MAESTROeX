@@ -25,9 +25,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                     grav_cell[n+max_lev*r] = -Gconst*planar_invsq_mass / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
                 }
             }
-
         } else if (do_2d_planar_octant) {
-
             //   compute gravity as in the spherical case
             RealVector m((finest_radial_level+1)*nr_fine);
             //   allocate(m(0:finest_radial_level,0:nr_fine-1))
@@ -70,9 +68,9 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             }
 
             for (auto n = 1; n <= finest_radial_level; ++n) {
-        //   do n=1,finest_radial_level
+            //   do n=1,finest_radial_level
                 for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
-            //  do i=1,numdisjointchunks(n)
+                //  do i=1,numdisjointchunks(n)
 
                     if (r_start_coord[n+max_lev*i] == 0) {
                         m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]*r_cc_loc[n]*r_cc_loc[n];
@@ -107,9 +105,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         } 
 
                         m[n+max_lev*r] += term1 + term2;
-
                         grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
-
                     }
 
                     // do r=r_start_coord[n+max_lev*i]+1,r_end_coord[n+max_lev*i]
@@ -223,7 +219,6 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 }
             }
         } else if (do_2d_planar_octant) {
-
             // compute gravity as in spherical geometry
 
             // allocate(m(0:finest_radial_level,0:nr_fine))
@@ -291,6 +286,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // constant gravity
             std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
         }
+        
     } else {
 
        grav_edge[0] = 0.0;

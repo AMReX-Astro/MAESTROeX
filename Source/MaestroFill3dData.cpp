@@ -88,7 +88,6 @@ Maestro::Put1dArrayOnCart (int level,
                                       BL_TO_FORTRAN_ANYD(cc_to_r[mfi]));
         }
     }
-
 }
 
 

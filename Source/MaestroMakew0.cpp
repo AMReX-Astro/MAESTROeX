@@ -78,7 +78,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     const RealVector& gamma1bar_old_in,
                     const RealVector& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,  
-                      RealVector& delta_chi_w0, 
+                    RealVector& delta_chi_w0, 
                     const Real dt_in, const Real dtold_in, 
                     const bool is_predictor) 
 {
@@ -228,6 +228,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             //   do r=r_start_coord[n+max_lev*j],r_end_coord[n+max_lev*j]
             for (auto r = r_start_coord[n + max_lev*j]; 
                  r <= r_end_coord[n + max_lev*j]; ++r) {
+
+                // Print() << "j , r, n = " << j << ' ' << r << ' ' << n <<std::endl;
                 w0_old_cen[n+max_lev*r] = 0.5 * (w0_old[n+max_lev*r] + 
                     w0_old[n+max_lev*(r+1)]);
                 w0_new_cen[n+max_lev*r] = 0.5 * (w0_in[n+max_lev*r] + 
@@ -312,8 +314,8 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     }
 
     // make the edge-centered gravity
-    // TODO: call C++ function here
     // call make_grav_edge(grav_edge,rho0_nph,r_edge_loc)
+    MakeGravEdge(grav_edge, rho0_nph);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
     // this takes the form of a tri-diagonal matrix:
@@ -412,6 +414,6 @@ Maestro::Tridiag(const RealVector& a, const RealVector& b,
     }
 
     for (auto j = n-2; j >= 0; --j) {
-        u[j] = u[j] - gam[j+1]*u[j+1];
+        u[j] -= gam[j+1]*u[j+1];
     }
 }

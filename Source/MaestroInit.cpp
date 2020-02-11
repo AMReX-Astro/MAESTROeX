@@ -592,15 +592,15 @@ void Maestro::DivuIter (int istep_divu_iter)
             }
 
             int is_predictor = 1;
-            make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-                    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-                    p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
-                    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
-            // Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_new, 
-            //        p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-            //        p0_minus_peosbar, dt, dt, is_predictor);
+            // make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+            //         rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+            //         p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+            //         p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
+            //         etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+            //         r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+            Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
+                   p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+                   p0_minus_peosbar, delta_chi_w0, dt, dt, is_predictor);
 
             // put w0 on Cartesian cell-centers
             Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
@@ -743,12 +743,15 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
             }
             
             int is_predictor = 1;
-            make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-                    rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                    p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-                    p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
-                    etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+            // make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
+            //         rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
+            //         p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
+            //         p0_minus_pthermbar.dataPtr(), etarho_ec.dataPtr(),
+            //         etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
+            //         r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
+            Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
+                   p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+                   p0_minus_pthermbar, delta_chi_w0, dt, dt, is_predictor);
         }
     }
 
