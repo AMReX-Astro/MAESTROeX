@@ -85,6 +85,9 @@ extern "C"
 
     void destroy_base_state_geometry();
     
+    void get_base_cutoff_density (const amrex::Real* base_cutoff_density_in);
+    void get_base_cutoff_density_coord (const int* lev, int* base_cutoff_density_coord_in);
+    void get_buoyancy_cutoff_factor (const amrex::Real* buoyancy_cutoff_factor_in);
     void get_numdisjointchunks(int* nchunks);
     void get_r_start_coord(int* coord);
     void get_r_end_coord(int* coord);
@@ -707,50 +710,6 @@ extern "C"
 
     //////////////////////
     // in make_scal_force.F90
-    void modify_scal_force(const int* lo, const int* hi, const int lev,
-                           amrex::Real* force, const int* f_lo, const int* f_hi,
-                           const amrex::Real* scal,  const int* s_lo, const int* s_hi,
-                           const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-                           const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                           const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-#endif
-                           const amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
-                           const amrex::Real* s0_edge_cart, const int* se_lo, const int* se_hi,
-                           const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi,
-                           const amrex::Real* dx, const int do_fullform);
-
-    void modify_scal_force_sphr(const int* lo, const int* hi,
-                                const int* domlo, const int* domhi,
-                                amrex::Real* force, const int* f_lo, const int* f_hi,
-                                const amrex::Real* scal,  const int* s_lo, const int* s_hi,
-                                const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-                                const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
-                                const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-                                const amrex::Real* s0,  const int* s0_lo, const int* s0_hi,
-                                const amrex::Real* dx, const int do_fullform,
-                                const amrex::Real* divu_cart,  const int* d_lo, const int* d_hi);
-
-    void mkrhohforce(const int* lo, const int* hi, const int lev,
-                     amrex::Real* rhoh_force, const int* f_lo, const int* f_hi,
-                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-                     const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-#endif
-                     const amrex::Real* thermal, const int* t_lo, const int* t_hi,
-                     const amrex::Real* grav_cart, const int* g_lo, const int* g_hi,
-                     const amrex::Real* rho0_cart, const int* r_lo, const int* r_hi,
-                     const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
-                     const amrex::Real* p0macx,  const int* x_lo, const int* x_hi,
-                     const amrex::Real* p0macy,  const int* y_lo, const int* y_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* p0macz,  const int* z_lo, const int* z_hi,
-#endif
-                     const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
-                     const amrex::Real* dx, const int* domhi,
-                     const int is_prediction, const int add_thermal);
-    
     void mktempforce(const int* lo, const int* hi, const int lev,
                      amrex::Real* temp_force, const int* f_lo, const int* f_hi,
                      const amrex::Real* scal, const int* s_lo, const int* s_hi,
@@ -763,42 +722,6 @@ extern "C"
                      const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
                      const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
                      const amrex::Real* dx, const int* domhi);
-    //////////////////////
-
-    //////////////////////
-    // in make_vel_force.f90
-    void make_vel_force(const int* lo, const int* hi,
-                        amrex::Real* vel_force, const int* f_lo, const int* f_hi,
-                        const amrex::Real* gpi, const int* g_lo, const int* g_hi,
-                        const amrex::Real* rho, const int* r_lo, const int* r_hi,
-                        const amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                        const amrex::Real* vedge, const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                        const amrex::Real* wedge, const int* w_lo, const int* w_hi,
-#endif
-                        const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int nc_w0,
-                        const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi,
-                        const amrex::Real* rho0_cart, const int* r0_lo, const int* r0_hi,
-                        const amrex::Real* grav_cart, const int* gr_lo, const int* gr_hi,
-                        const amrex::Real* dx, const int* domhi,
-                        const int do_add_utilde_force);
-#if (AMREX_SPACEDIM == 3)
-    void make_vel_force_sphr(const int* lo, const int* hi,
-                             amrex::Real* vel_force, const int* f_lo, const int* f_hi,
-                             const amrex::Real* gpi, const int* g_lo, const int* g_hi,
-                             const amrex::Real* rho, const int* r_lo, const int* r_hi,
-                             const amrex::Real* uedge, const int* u_lo, const int* u_hi,
-                             const amrex::Real* vedge, const int* v_lo, const int* v_hi,
-                             const amrex::Real* wedge, const int* w_lo, const int* w_hi,
-                             const amrex::Real* normal, const int* n_lo, const int* n_hi,
-                             const amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi,
-                             const amrex::Real* gradw0_cart, const int* gw_lo, const int* gw_hi,
-                             const amrex::Real* w0_force_cart, const int* wf_lo, const int* wf_hi,
-                             const amrex::Real* rho0_cart, const int* r0_lo, const int* r0_hi,
-                             const amrex::Real* grav_cart, const int* gr_lo, const int* gr_hi,
-                             const amrex::Real* dx, const int* domhi,
-                             const int do_add_utilde_force);
-#endif
     //////////////////////
 
     //////////////////////

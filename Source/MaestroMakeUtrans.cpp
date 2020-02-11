@@ -35,10 +35,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #if (AMREX_SPACEDIM == 3)
         const int klo = domainBox.loVect()[2];
         const int khi = domainBox.hiVect()[2];
-#endif
 
-        const int ppm_type_local = ppm_type;
         const int spherical_local = spherical;
+#endif
+        const int ppm_type_local = ppm_type;
+        
 
         // get references to the MultiFabs at level lev
         const MultiFab& utilde_mf  = utilde[lev];

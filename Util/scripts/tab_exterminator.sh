@@ -1,3 +1,4 @@
+#!/bin/bash
 for f in $(grep -rIPl "\t" ../../Source)
 do
 	echo "Converting tabs to spaces in $f"

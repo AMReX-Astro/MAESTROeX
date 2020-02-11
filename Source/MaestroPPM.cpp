@@ -549,11 +549,11 @@ Maestro::PPM (const Box& bx,
                 // and third inner cells.
                 if (i == ihi-1 || i == ihi-2) {
 
-                    Real alphap = sedger-s(i,j,k,n);
-                    Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bool bigm = fabs(alpham) > 2.0*fabs(alphap);
-                    bool extremum = false;
+                    alphap = sedger-s(i,j,k,n);
+                    alpham = sedge-s(i,j,k,n);
+                    bigp = fabs(alphap) > 2.0*fabs(alpham);
+                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                    extremum = false;
 
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
@@ -1061,11 +1061,11 @@ Maestro::PPM (const Box& bx,
                 // and third inner cells.
                 if (j == jlo+1 || j == jlo+2) {
 
-                    Real alphap = sedger-s(i,j,k,n);
-                    Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bool bigm = fabs(alpham) > 2.0*fabs(alphap);
-                    bool extremum = false;
+                    alphap = sedger-s(i,j,k,n);
+                    alpham = sedge-s(i,j,k,n);
+                    bigp = fabs(alphap) > 2.0*fabs(alpham);
+                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                    extremum = false;
 
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
@@ -1180,11 +1180,11 @@ Maestro::PPM (const Box& bx,
                 // and third inner cells.
                 if (j == jhi-1 || j == jhi-2) {
 
-                    Real alphap = sedger-s(i,j,k,n);
-                    Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bool bigm = fabs(alpham) > 2.0*fabs(alphap);
-                    bool extremum = false;
+                    alphap = sedger-s(i,j,k,n);
+                    alpham = sedge-s(i,j,k,n);
+                    bigp = fabs(alphap) > 2.0*fabs(alpham);
+                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                    extremum = false;
 
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
@@ -1696,11 +1696,11 @@ Maestro::PPM (const Box& bx,
                 // and third inner cells.
                 if (k == klo+1 || k == klo+2) {
 
-                    Real alphap = sedger-s(i,j,k,n);
-                    Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bool bigm = fabs(alpham) > 2.0*fabs(alphap);
-                    bool extremum = false;
+                    alphap = sedger-s(i,j,k,n);
+                    alpham = sedge-s(i,j,k,n);
+                    bigp = fabs(alphap) > 2.0*fabs(alpham);
+                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                    extremum = false;
 
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
@@ -1816,11 +1816,11 @@ Maestro::PPM (const Box& bx,
                 // and third inner cells.
                 if (k == khi-1 || k == khi-2) {
 
-                    Real alphap = sedger-s(i,j,k,n);
-                    Real alpham = sedge-s(i,j,k,n);
-                    bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bool bigm = fabs(alpham) > 2.0*fabs(alphap);
-                    bool extremum = false;
+                    alphap = sedger-s(i,j,k,n);
+                    alpham = sedge-s(i,j,k,n);
+                    bigp = fabs(alphap) > 2.0*fabs(alpham);
+                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                    extremum = false;
 
                     if (alpham*alphap >= 0.0) {
                         extremum = true;
