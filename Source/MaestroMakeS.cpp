@@ -211,7 +211,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             }
         }
     }
-
 }
 
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -454,5 +453,4 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                                         dt, is_predictor);
         }
     }
-
 }

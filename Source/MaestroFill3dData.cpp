@@ -103,9 +103,9 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        MultiFab& uedge_mf = uedge[lev][0];
         MultiFab& vedge_mf = uedge[lev][1];
 #if (AMREX_SPACEDIM == 3)
+        MultiFab& uedge_mf = uedge[lev][0];
         MultiFab& wedge_mf = uedge[lev][2];
         const MultiFab& w0macx_mf = w0mac[lev][0];
         const MultiFab& w0macy_mf = w0mac[lev][1];
@@ -496,7 +496,6 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 
     // Make sure that the fine edges average down onto the coarse edges (edge_restriction)
     AverageDownFaces(face);
-
 }
 
 
@@ -533,5 +532,4 @@ Maestro::MakeCCtoRadii ()
                                      AMREX_REAL_ANYD(dx));
         }
     }
-
 }

@@ -209,12 +209,6 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
                 const Box& obx = amrex::grow(tileBox, 1);
-                const Box& xbx = mfi.nodaltilebox(0);
-                const Box& ybx = mfi.nodaltilebox(1);
-                const Box& zbx = mfi.nodaltilebox(2);
-                const Box& mxbx = amrex::growLo(obx, 0, -1);
-                const Box& mybx = amrex::growLo(obx, 1, -1);
-                const Box& mzbx = amrex::growLo(obx, 2, -1);
 
                 Array4<Real> const umac_arr = umac[lev][0].array(mfi);
                 Array4<Real> const vmac_arr = umac[lev][1].array(mfi);
@@ -579,7 +573,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         if (is_conservative) {
             sedgelx = slx(i,j,k)
                 - (dt2/hy)*(simhy(i-1,j+1,k)*vmac(i-1,j+1,k) 
-                - simhy(i-1,j,k)*vmac(i-1,j,k));
+                - simhy(i-1,j,k)*vmac(i-1,j,k))
                 - (dt2/hx)*s(i-1,j,k,comp)*(umac(i  ,j,k)-umac(i-1,j,k))
                 + dt2*fl;
             sedgerx = srx(i,j,k)
