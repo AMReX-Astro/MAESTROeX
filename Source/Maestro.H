@@ -1800,8 +1800,6 @@ public:
     amrex::Vector<amrex::Real> diagfile3_data;
 
     // problem information
-    RealVector prob_lo;
-    RealVector prob_hi;
     RealVector center;
     RealVector dx_fine;
 

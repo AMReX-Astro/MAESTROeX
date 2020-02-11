@@ -14,6 +14,9 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
 
     Print() << "Calling InitBaseStateGeometry()" << std::endl;
 
+    const Real* probLo = geom[0].ProbLo();
+    const Real* probHi = geom[0].ProbHi();
+
     max_radial_level = max_radial_level_in;
     finest_radial_level = max_radial_level_in; // FIXME - we want to set this after regridding
     nr_fine = nr_fine_in;
@@ -32,14 +35,14 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
     if (octant) {
         for (auto i = 0; i < 3; ++i) {
             if (!(spherical == 1 && AMREX_SPACEDIM == 3 && 
-                    prob_lo[i] == 0.0 ) ) {
+                    probLo[i] == 0.0 ) ) {
                 Abort("ERROR: octant requires spherical with prob_lo = 0.0");
             }
             center[i] = 0.0;
         }
     } else {
         for (auto i = 0; i < 3; ++i) {
-            center[i] = 0.5*(prob_lo[i] + prob_hi[i]);
+            center[i] = 0.5*(probLo[i] + probHi[i]);
         }
     }
 
@@ -60,10 +63,10 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         // compute r_cc_loc, r_edge_loc
         for (auto n = 0; n <= max_radial_level; ++n) {
             for (auto i = 0; i < nr[n]; ++i) {
-                r_cc_loc[n + (max_radial_level+1)*i] = prob_lo[AMREX_SPACEDIM] + (Real(i)+0.5)*dr[n];
+                r_cc_loc[n + (max_radial_level+1)*i] = probLo[AMREX_SPACEDIM] + (Real(i)+0.5)*dr[n];
             }
             for (auto i = 0; i <= nr[n]; ++i) {
-                r_edge_loc[n + (max_radial_level+1)*i] = prob_lo[AMREX_SPACEDIM] + (Real(i))*dr[n];
+                r_edge_loc[n + (max_radial_level+1)*i] = probLo[AMREX_SPACEDIM] + (Real(i))*dr[n];
             }
         }
     } else {
@@ -107,10 +110,12 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
         const Box& tilebox = mfi.tilebox();
         const Array4<Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
+        const Real* AMREX_RESTRICT probLo = geom[0].ProbLo();
+
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-            Real x = prob_lo[0] + (Real(i)+0.5)*dx_lev[0] - center[0];
-            Real y = prob_lo[1] + (Real(j)+0.5)*dx_lev[1] - center[1];
-            Real z = prob_lo[2] + (Real(k)+0.5)*dx_lev[2] - center[2];
+            Real x = probLo[0] + (Real(i)+0.5)*dx_lev[0] - center[0];
+            Real y = probLo[1] + (Real(j)+0.5)*dx_lev[1] - center[1];
+            Real z = probLo[2] + (Real(k)+0.5)*dx_lev[2] - center[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
             cc_to_r(i,j,k) = round(index);
