@@ -1597,7 +1597,6 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
         // get references to the MultiFabs at level lev
         const MultiFab& vel_mf = vel[lev];
-        MultiFab& vorticity_mf = vorticity[lev];
 
         const Real* dx = geom[lev].CellSize();
         const Box& domainBox = geom[lev].Domain();

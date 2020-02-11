@@ -1553,7 +1553,7 @@ public:
                         amrex::Array4<const amrex::Real> const ury,
                         amrex::Array4<const amrex::Real> const uimhy,
                         amrex::Array4<const amrex::Real> const force,
-                        amrex::Array4<const amrex::Real> const w0_cart,
+                        amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
                         const amrex::Real* dx);
 #else 
@@ -1634,7 +1634,7 @@ public:
                         amrex::Array4<const amrex::Real> const wimhxy,
                         amrex::Array4<const amrex::Real> const wimhyx,
                         amrex::Array4<const amrex::Real> const force,
-                        amrex::Array4<const amrex::Real> const w0_cart,
+                        amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
                         const amrex::Real* dx);
 #endif

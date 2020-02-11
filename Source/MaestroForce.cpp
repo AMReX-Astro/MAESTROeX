@@ -239,7 +239,6 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
-        const Box& domainBox = geom[lev].Domain();
         const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
 
         // get references to the MultiFabs at level lev
@@ -272,6 +271,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             if (spherical == 1) {
 #if (AMREX_SPACEDIM == 3)
                 // lo and hi of domain
+                const Box& domainBox = geom[lev].Domain();
                 const int* AMREX_RESTRICT domlo = domainBox.loVect();
                 const int* AMREX_RESTRICT domhi = domainBox.hiVect();
                 const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
@@ -463,7 +463,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     const int enthalpy_pred_type_in = enthalpy_pred_type;
     const int predict_h_const = predict_h;
     const int predict_rhoh_const = predict_rhoh;
-    const int rhoh_comp = RhoH;
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
