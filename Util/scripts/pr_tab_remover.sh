@@ -18,7 +18,7 @@ cd $TRAVIS_BUILD_DIR/Util/scripts
 ./tab_exterminator.sh
 
 # Now let's go have some fun with the cloned repo
-cd 
+cd $TRAVIS_BUILD_DIR
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
 
