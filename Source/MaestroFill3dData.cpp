@@ -139,7 +139,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 s0_cart_val = rfac * s0_p[(index+1)*(max_lev+1)] 
                                     + (1.0-rfac) * s0_p[index*(max_lev+1)];
                             } else {
-                                s0_cart_val = s0_p[index*(max_lev+1)];
+                                s0_cart_val = s0_p[nr_fine_loc*(max_lev+1)];
                             }
 
                         } else if (w0_interp_type_loc == 3) {
