@@ -15,7 +15,7 @@ ssh-add ../id_maestro_rsa
 echo "Running tab exterminator script"
 
 cd $TRAVIS_BUILD_DIR/Util/scripts
-./tab_exterminator
+./tab_exterminator.sh
 
 # Now let's go have some fun with the cloned repo
 cd 
