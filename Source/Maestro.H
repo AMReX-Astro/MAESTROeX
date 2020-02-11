@@ -1679,6 +1679,9 @@ public:
     amrex::Real dr_fine;
     int nr_irreg;
 
+    // relative error needed for base state computations
+    amrex::Real c_rel_eps;
+
     // these provide information about the multilevel base state configuration
     IntVector numdisjointchunks;
     IntVector r_start_coord;
