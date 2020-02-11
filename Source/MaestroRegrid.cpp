@@ -21,43 +21,43 @@ Maestro::Regrid ()
         finest_radial_level = finest_level;
 
         // look at MAESTRO/Source/varden.f90:750-1060
-	// Regrid psi, etarho_cc, etarho_ec, and w0.
-	// We do not regrid these in spherical since the base state array only
-	// contains 1 level of refinement.
-	// We do not regrid these if evolve_base_state=F since they are
-	// identically zero, set this way in initialize.
+        // Regrid psi, etarho_cc, etarho_ec, and w0.
+        // We do not regrid these in spherical since the base state array only
+        // contains 1 level of refinement.
+        // We do not regrid these if evolve_base_state=F since they are
+        // identically zero, set this way in initialize.
         if (evolve_base_state) {
 
-	    // We must regrid psi, etarho_cc, etarho_ec, and w0
-	    // before we call init_multilevel or else we lose
-	    // track of where the old valid data was
+            // We must regrid psi, etarho_cc, etarho_ec, and w0
+            // before we call init_multilevel or else we lose
+            // track of where the old valid data was
 
             // FIXME: may need if statement for irregularly-spaced base states
 
-	    regrid_base_state_cc(psi.dataPtr());
-	    regrid_base_state_cc(etarho_cc.dataPtr());
-	    regrid_base_state_edge(etarho_ec.dataPtr());
-	    regrid_base_state_edge(w0.dataPtr());
+            regrid_base_state_cc(psi.dataPtr());
+            regrid_base_state_cc(etarho_cc.dataPtr());
+            regrid_base_state_edge(etarho_ec.dataPtr());
+            regrid_base_state_edge(w0.dataPtr());
 
         } else {
-	    // evolve_base_state == F and spherical == 0
+            // evolve_base_state == F and spherical == 0
 
-	    // Here we want to fill in the rho0 array so there is
-	    // valid data in any new grid locations that are created
-	    // during the regrid.
-	    for (int i=0; i<rho0_old.size(); ++i) {
-		rho0_temp[i] = rho0_old[i];
-	    }
+            // Here we want to fill in the rho0 array so there is
+            // valid data in any new grid locations that are created
+            // during the regrid.
+            for (int i=0; i<rho0_old.size(); ++i) {
+                rho0_temp[i] = rho0_old[i];
+            }
 
-	    // We will copy rho0_temp back into the rho0 array after we regrid.
-	    regrid_base_state_cc(rho0_temp.dataPtr());
+            // We will copy rho0_temp back into the rho0 array after we regrid.
+            regrid_base_state_cc(rho0_temp.dataPtr());
 
         }
 
-    	// regardless of evolve_base_state, if new grids were
-    	// created, we need to initialize tempbar_init there, in
-    	// case drive_initial_convection = T
-    	regrid_base_state_cc(tempbar_init.dataPtr());
+        // regardless of evolve_base_state, if new grids were
+        // created, we need to initialize tempbar_init there, in
+        // case drive_initial_convection = T
+        regrid_base_state_cc(tempbar_init.dataPtr());
     } else {
         // Here we want to fill in the rho0 array so there is
         // valid data in any new grid locations that are created
@@ -73,15 +73,15 @@ Maestro::Regrid ()
 
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
     if (spherical == 0) {
-	TagArray();
+        TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
 
     if (spherical == 1) {
         MakeNormal();
-    	if (use_exact_base_state) {
-    	    Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
-    	}
+        if (use_exact_base_state) {
+            Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
+        }
     }
     
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -94,9 +94,9 @@ Maestro::Regrid ()
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
     } else {
-    	for (int i=0; i<rho0_old.size(); ++i) {
-    	    rho0_old[i] = rho0_temp[i];
-    	}
+        for (int i=0; i<rho0_old.size(); ++i) {
+            rho0_old[i] = rho0_temp[i];
+        }
     }
 
     // compute cutoff coordinates
@@ -168,7 +168,7 @@ Maestro::TagArray ()
 
     for (int lev=1; lev<=max_radial_level; ++lev) {
 
-	const MultiFab& state = sold[lev];
+        const MultiFab& state = sold[lev];
 
         {
             Vector<int>  itags;
@@ -201,7 +201,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     // convert temperature to perturbation values
     if (use_tpert_in_tagging) {
-	PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
+        PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
     }
 
     const int clearval = TagBox::CLEAR;

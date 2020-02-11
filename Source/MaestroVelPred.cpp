@@ -8,7 +8,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                   const Vector<MultiFab>& ufull,
                   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-		          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const Vector<MultiFab>& force)
 {
     // timer for profiling
@@ -416,7 +416,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    static const int ppm_type_local = ppm_type;
+    const int ppm_type_local = ppm_type;
 
     // x-direction
     const int ilo = domainBox.loVect()[0];
@@ -654,7 +654,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    static const int ppm_trace_forces_local = ppm_trace_forces;
+    const int ppm_trace_forces_local = ppm_trace_forces;
 
     // x-direction
     const int ilo = domainBox.loVect()[0];

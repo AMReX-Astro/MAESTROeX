@@ -6,8 +6,8 @@ using namespace amrex;
 
 void
 Maestro::PutInPertForm(Vector<MultiFab>& scal,
-		       const RealVector& s0,
-		       int comp, int bccomp,
+                       const RealVector& s0,
+                       int comp, int bccomp,
                        const Vector<BCRec>& bcs,
                        bool flag)
 {
@@ -17,7 +17,7 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
     // place 1d array onto a cartesian grid
     Vector<MultiFab> s0_cart(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	s0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        s0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
     // s0 is not edge centered
@@ -25,13 +25,13 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
     Put1dArrayOnCart(s0,s0_cart,0,0);
 
     if (flag) {
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Subtract(scal[lev],s0_cart[lev],0,comp,1,0);
-	}
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Subtract(scal[lev],s0_cart[lev],0,comp,1,0);
+        }
     } else {
         for (int lev = 0; lev <= finest_level; ++lev) {
-	    MultiFab::Add(scal[lev],s0_cart[lev],0,comp,1,0);
-	}
+            MultiFab::Add(scal[lev],s0_cart[lev],0,comp,1,0);
+        }
     }
 
     AverageDown(scal,comp,1);
@@ -41,9 +41,9 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
 
 void
 Maestro::PutInPertForm(int level,
-		       Vector<MultiFab>& scal,
-		       const RealVector& s0,
-		       int comp, int bccomp,
+                       Vector<MultiFab>& scal,
+                       const RealVector& s0,
+                       int comp, int bccomp,
                        const Vector<BCRec>& bcs,
                        bool flag)
 {
@@ -59,14 +59,14 @@ Maestro::PutInPertForm(int level,
     Put1dArrayOnCart(level,s0,s0_cart,0,0);
 
     if (flag) {
-	MultiFab::Subtract(scal[level],s0_cart[level],0,comp,1,0);
+        MultiFab::Subtract(scal[level],s0_cart[level],0,comp,1,0);
     } else {
-	MultiFab::Add(scal[level],s0_cart[level],0,comp,1,0);
+        MultiFab::Add(scal[level],s0_cart[level],0,comp,1,0);
     }
 
     if (level > 0) {
-	average_down(scal[level],scal[level-1],geom[level],geom[level-1],
-		     comp,1,refRatio(level-1));
+        average_down(scal[level],scal[level-1],geom[level],geom[level-1],
+                     comp,1,refRatio(level-1));
     }
 
     FillPatch(level,t_old,scal[level],scal,scal,comp,comp,1,bccomp,bcs);

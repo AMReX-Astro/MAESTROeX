@@ -68,13 +68,13 @@ Real
 Maestro::getCPUTime()
 {
 
-		int numCores = ParallelDescriptor::NProcs();
+                int numCores = ParallelDescriptor::NProcs();
 #ifdef _OPENMP
-		numCores = numCores*omp_get_max_threads();
+                numCores = numCores*omp_get_max_threads();
 #endif
 
-		Real T = numCores*(ParallelDescriptor::second() - startCPUTime) +
-		         previousCPUTimeUsed;
+                Real T = numCores*(ParallelDescriptor::second() - startCPUTime) +
+                         previousCPUTimeUsed;
 
-		return T;
+                return T;
 }

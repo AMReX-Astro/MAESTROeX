@@ -179,7 +179,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-	HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
+        HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
     }
 
     //////////////////////////////////
@@ -322,14 +322,14 @@ Maestro::EnthalpyAdvance (int which_step,
 // Enthalpy advance for SDC using intra(global var)
 void
 Maestro::EnthalpyAdvanceSDC (int which_step,
-			     Vector<MultiFab>& scalold,
-			     Vector<MultiFab>& scalnew,
-			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
-			     Vector<MultiFab>& scal_force,
-			     Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-			     const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-			     const Vector<MultiFab>& thermal)
+                             Vector<MultiFab>& scalold,
+                             Vector<MultiFab>& scalnew,
+                             Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
+                             Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sflux,
+                             Vector<MultiFab>& scal_force,
+                             Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+                             const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+                             const Vector<MultiFab>& thermal)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
@@ -424,14 +424,14 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     // source terms for X and for tracers include reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
+        MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
     }
     
     if (finest_level == 0) {
-	// fill periodic ghost cells
-	for (int lev=0; lev<=finest_level; ++lev) {
-	    scal_force[lev].FillBoundary(geom[lev].periodicity());
-	}
+        // fill periodic ghost cells
+        for (int lev=0; lev<=finest_level; ++lev) {
+            scal_force[lev].FillBoundary(geom[lev].periodicity());
+        }
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
@@ -508,7 +508,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-	HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
+        HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
     }
 
     //////////////////////////////////
@@ -632,7 +632,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     // reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
-	MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
+        MultiFab::Add(scal_force[lev],intra[lev],RhoH,RhoH,1,0);
     }
 
     //////////////////////////////////
@@ -644,7 +644,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     
     Vector<MultiFab> p0_new_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-	p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
     Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);

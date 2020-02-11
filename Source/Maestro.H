@@ -117,9 +117,9 @@ public:
     /// @param w0_force         base-state-velocity force
     /// @param w0_force_cart    base-state-velocity force on cartesian grid
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                        const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                         const RealVector& w0_force,
-			const amrex::Vector<amrex::MultiFab>& w0_force_cart);
+                        const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     /// Calculate `rhoX` flux
     ///
@@ -158,19 +158,19 @@ public:
     /// @param start_comp       index of component of `state` to begin with
     /// @param num_comp         number of components to perform calculation for
     void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-		       amrex::Vector<amrex::MultiFab>& etarhoflux,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-		       const RealVector& r0_old,
-		       const RealVector& r0_edge_old,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-		       const RealVector& r0_new,
-		       const RealVector& r0_edge_new,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-		       const RealVector& r0_predicted_edge,
-		       int start_comp, int num_comp);
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                       amrex::Vector<amrex::MultiFab>& etarhoflux,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const RealVector& r0_old,
+                       const RealVector& r0_edge_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const RealVector& r0_new,
+                       const RealVector& r0_edge_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const RealVector& r0_predicted_edge,
+                       int start_comp, int num_comp);
 
     /// Calculate `rhoh` flux
     ///
@@ -196,24 +196,24 @@ public:
     /// @param rh0mac_new       new MAC-projected base-state conserved enthalpy
     /// @param h0mac_old, h0mac_new base-state primitive enthalpy
     void MakeRhoHFlux (const amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-		       const RealVector& r0_old,
-		       const RealVector& r0_edge_old,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-		       const RealVector& r0_new,
-		       const RealVector& r0_edge_new,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-		       const RealVector& rh0_old,
-		       const RealVector& rh0_edge_old,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-		       const RealVector& rh0_new,
-		       const RealVector& rh0_edge_new,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
-		       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const RealVector& r0_old,
+                       const RealVector& r0_edge_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const RealVector& r0_new,
+                       const RealVector& r0_edge_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const RealVector& rh0_old,
+                       const RealVector& rh0_edge_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
+                       const RealVector& rh0_new,
+                       const RealVector& rh0_edge_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
 
     /// Given scalar fluxes, update scalars
     ///
@@ -225,11 +225,11 @@ public:
     /// @param num_comp         number of components to perform calculation for
     /// @param p0_cart          base state pressure on cartesian grid
     void UpdateScal (const amrex::Vector<amrex::MultiFab>& stateold,
-		     amrex::Vector<amrex::MultiFab>& statenew,
-		     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-		     const amrex::Vector<amrex::MultiFab>& force,
-		     int start_scomp, int num_comp,
-		     const amrex::Vector<amrex::MultiFab>& p0_cart);
+                     amrex::Vector<amrex::MultiFab>& statenew,
+                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                     const amrex::Vector<amrex::MultiFab>& force,
+                     int start_scomp, int num_comp,
+                     const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Update velocity
     ///
@@ -239,10 +239,10 @@ public:
     /// @param sponge
     /// @param w0mac            base state MAC velocity
     void UpdateVel (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
-		    const amrex::Vector<amrex::MultiFab>& force,
-		    const amrex::Vector<amrex::MultiFab>& sponge,
-		    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
+                    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+                    const amrex::Vector<amrex::MultiFab>& force,
+                    const amrex::Vector<amrex::MultiFab>& sponge,
+                    const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
     ////////////
 
     ////////////
@@ -375,22 +375,22 @@ public:
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                          amrex::Vector<amrex::MultiFab>& scal_force,
-			 amrex::Vector<amrex::MultiFab>& etarhoflux,
+                         amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			 const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-			 const RealVector& rho0_predicted_edge);
+                         const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                         const RealVector& rho0_predicted_edge);
 
     // SDC
     void DensityAdvanceSDC (int which_step,
-			    amrex::Vector<amrex::MultiFab>& scalold,
-			    amrex::Vector<amrex::MultiFab>& scalnew,
-			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-			    amrex::Vector<amrex::MultiFab>& scal_force,
-			    amrex::Vector<amrex::MultiFab>& etarhoflux,
-			    amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			    const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-			    const RealVector& rho0_predicted_edge);
+                            amrex::Vector<amrex::MultiFab>& scalold,
+                            amrex::Vector<amrex::MultiFab>& scalnew,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                            amrex::Vector<amrex::MultiFab>& scal_force,
+                            amrex::Vector<amrex::MultiFab>& etarhoflux,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                            const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                            const RealVector& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -401,12 +401,12 @@ public:
 
     /// Write plotfile to disk
     void DiagFile (const int step,
-		   const amrex::Real dt_in,
-		   const RealVector& rho0_in,
-		   const RealVector& p0_in,
-		   const amrex::Vector<amrex::MultiFab>& u_in,
-		   const amrex::Vector<amrex::MultiFab>& s_in,
-		   int& index);
+                   const amrex::Real dt_in,
+                   const RealVector& rho0_in,
+                   const RealVector& p0_in,
+                   const amrex::Vector<amrex::MultiFab>& u_in,
+                   const amrex::Vector<amrex::MultiFab>& s_in,
+                   int& index);
     // end MaestroDiag.cpp functions
     ////////////
 
@@ -443,7 +443,7 @@ public:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                           amrex::Vector<amrex::MultiFab>& scal_force,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                          const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::MultiFab>& thermal);
 
     // SDC
@@ -454,7 +454,7 @@ public:
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                           amrex::Vector<amrex::MultiFab>& scal_force,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                          const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const amrex::Vector<amrex::MultiFab>& diff);
     ////////////////////////
 
@@ -568,7 +568,7 @@ public:
     /// @param w0mac    MAC base state velocity
     /// @param mult     multiplication factor
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
-		const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
 
     /// MAC-project the base state velocity
@@ -576,15 +576,15 @@ public:
 
     /// MAC-project the base state scalar `s0`
     void MakeS0mac (const RealVector& s0,
-		    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
+                    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     /// Create the unit normal across the grids
     void MakeNormal ();
 
     /// Put the cell-centered data `s_cc` on faces by averaging adjacent cells
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
-			amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
-			int harmonic_avg);
+                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
+                        int harmonic_avg);
 
     void MakeCCtoRadii ();
     // end MaestroFill3dData.cpp functions
@@ -594,31 +594,31 @@ public:
     // MaestroForce.cpp functions
 
     /// Calculate the velocity force term
-    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force_cart,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav,
-		       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+                       const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
-			 const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                         const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
-			 const amrex::Vector<amrex::MultiFab>& s0_cart,
+                         const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
                          int fullform);
 
     /// Calculate the conserved enthalpy force term
     void MakeRhoHForce (amrex::Vector<amrex::MultiFab>& scal_force,
-                        int is_prediction,
+                        const int is_prediction,
                         const amrex::Vector<amrex::MultiFab>& thermal,
-                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                        int add_thermal,
-			const int &which_step);
+                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_cart,
+                        const int add_thermal,
+                        const int &which_step);
     
     void MakeTempForce(amrex::Vector<amrex::MultiFab>& temp_force,
                        const amrex::Vector<amrex::MultiFab>& scal,
@@ -709,7 +709,7 @@ public:
     /// @param facebcoef    face-centered `bcoefs`
     /// @param rhocc        cell-centered density
     void AvgFaceBcoeffsInv(amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM > >& facebcoef,
-			   const amrex::Vector<amrex::MultiFab>& rhocc);
+                           const amrex::Vector<amrex::MultiFab>& rhocc);
 
     /// Set boundaries for `LABecLaplacian` to solve `-div(B grad) phi = RHS`
     void SetMacSolverBCs(amrex::MLABecLaplacian& mlabec);
@@ -743,7 +743,7 @@ public:
     /// @param num_comp         number of components to perform calculation for
     /// @param is_conservative  are these conserved quantities?
     void MakeEdgeScal (amrex::Vector<amrex::MultiFab>& state,
-		       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        amrex::Vector<amrex::MultiFab>& force,
                        int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
@@ -885,15 +885,15 @@ public:
     /// @param etarho_cell  cell-centered \f$\eta_\rho\f$
     /// @param etarho_flux  \f$\eta_\rho\f$ flux
     void MakeEtarho (RealVector& etarho_edge,
-		     RealVector& etarho_cell,
-		     const amrex::Vector<amrex::MultiFab>& etarho_flux);
+                     RealVector& etarho_cell,
+                     const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
-			 const amrex::Vector<amrex::MultiFab>& scal_new,
-			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-			 RealVector& etarho_edge,
-			 RealVector& etarho_cell);
+                         const amrex::Vector<amrex::MultiFab>& scal_new,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                         RealVector& etarho_edge,
+                         RealVector& etarho_cell);
 
     // end MaestroMakeEta.cpp functions
     ////////////
@@ -937,23 +937,23 @@ public:
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-			                 const RealVector& rho0,
+                                         const RealVector& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const RealVector& Sbar,
                              const RealVector& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const RealVector& gamma1bar,
-			                 const RealVector& p0,
+                                         const RealVector& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
-			                 amrex::Vector<amrex::MultiFab>& delta_chi,
+                                         amrex::Vector<amrex::MultiFab>& delta_chi,
                              int is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
-				 const RealVector& rho0,
-				 const RealVector& beta0,
-				 const RealVector& gamma1bar,
-				 const RealVector& p0,
-				 const amrex::Vector<amrex::MultiFab>& delta_p_term);
+                                 const RealVector& rho0,
+                                 const RealVector& beta0,
+                                 const RealVector& gamma1bar,
+                                 const RealVector& p0,
+                                 const amrex::Vector<amrex::MultiFab>& delta_p_term);
     // end MaestroMakeS.cpp functions
     ////////////
 
@@ -1040,7 +1040,7 @@ public:
     void NodalProj (int proj_type,
                     amrex::Vector<amrex::MultiFab>& rhcc,
                     int istep_divu_iter=0,
-		    bool sdc_off=true);
+                    bool sdc_off=true);
 
     /// Fill in `Vproj`
     ///
@@ -1206,12 +1206,12 @@ public:
                 const amrex::Real time_react);
 
     void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
-		   amrex::Vector<amrex::MultiFab>& s_out,
-		   amrex::Vector<amrex::MultiFab>& rho_Hext,
-		   const RealVector& p0,
-		   const amrex::Real dt_react,
-		   const amrex::Real time_react,
-		   amrex::Vector<amrex::MultiFab>& source);
+                   amrex::Vector<amrex::MultiFab>& s_out,
+                   amrex::Vector<amrex::MultiFab>& rho_Hext,
+                   const RealVector& p0,
+                   const amrex::Real dt_react,
+                   const amrex::Real time_react,
+                   amrex::Vector<amrex::MultiFab>& source);
 
 #ifndef SDC
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
@@ -1225,22 +1225,22 @@ public:
 
 #else
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
-		 amrex::Vector<amrex::MultiFab>& s_out,
-		 const RealVector& p0,
-		 const amrex::Real dt_react,
-		 const amrex::Real time_react,
-		 const amrex::Vector<amrex::MultiFab>& source);
+                 amrex::Vector<amrex::MultiFab>& s_out,
+                 const RealVector& p0,
+                 const amrex::Real dt_react,
+                 const amrex::Real time_react,
+                 const amrex::Vector<amrex::MultiFab>& source);
 #endif
     
     // compute heating terms, rho_omegadot and rho_Hnuc
     void MakeReactionRates (amrex::Vector<amrex::MultiFab>& rho_omegadot,
-			    amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-			    const amrex::Vector<amrex::MultiFab>& scal);
+                            amrex::Vector<amrex::MultiFab>& rho_Hnuc,
+                            const amrex::Vector<amrex::MultiFab>& scal);
 
     void MakeIntraCoeffs (const amrex::Vector<amrex::MultiFab>& scal1,
-			  const amrex::Vector<amrex::MultiFab>& scal2,
-			  amrex::Vector<amrex::MultiFab>& cp,
-			  amrex::Vector<amrex::MultiFab>& xi);
+                          const amrex::Vector<amrex::MultiFab>& scal2,
+                          amrex::Vector<amrex::MultiFab>& cp,
+                          amrex::Vector<amrex::MultiFab>& xi);
 
     // compute heating term, rho_Hext
     void MakeHeating (amrex::Vector<amrex::MultiFab>& rho_Hext,
@@ -1318,7 +1318,7 @@ public:
     /// @param peos     pressure calculated from the equation of state
     void PfromRhoH (const amrex::Vector<amrex::MultiFab>& state,
                     const amrex::Vector<amrex::MultiFab>& s_old,
-		    amrex::Vector<amrex::MultiFab>& peos);
+                    amrex::Vector<amrex::MultiFab>& peos);
 
     /// Calculate the Mach number given the density and the enthalpy
     ///
@@ -1345,10 +1345,10 @@ public:
 
     // Calculate the enthalpy at edges given the density and the temperature
     void HfromRhoTedge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-			const RealVector& rho0_edge_old,
-			const RealVector& rhoh0_edge_old,
-			const RealVector& rho0_edge_new,
-			const RealVector& rhoh0_edge_new);
+                        const RealVector& rho0_edge_old,
+                        const RealVector& rhoh0_edge_old,
+                        const RealVector& rho0_edge_new,
+                        const RealVector& rhoh0_edge_new);
     ////////////
 
     ////////////
@@ -1419,24 +1419,24 @@ public:
     /// @param pcoeff   pressure coefficient
     /// @param p0       base state pressure
     void MakeExplicitThermal (amrex::Vector<amrex::MultiFab>& thermal,
-			      const amrex::Vector<amrex::MultiFab>& scal,
-			      const amrex::Vector<amrex::MultiFab>& Tcoeff,
-			      const amrex::Vector<amrex::MultiFab>& hcoeff,
-			      const amrex::Vector<amrex::MultiFab>& Xkcoeff,
-			      const amrex::Vector<amrex::MultiFab>& pcoeff,
-			      const RealVector& p0,
-			      int temp_formulation);
+                              const amrex::Vector<amrex::MultiFab>& scal,
+                              const amrex::Vector<amrex::MultiFab>& Tcoeff,
+                              const amrex::Vector<amrex::MultiFab>& hcoeff,
+                              const amrex::Vector<amrex::MultiFab>& Xkcoeff,
+                              const amrex::Vector<amrex::MultiFab>& pcoeff,
+                              const RealVector& p0,
+                              int temp_formulation);
 
     /// Use `apply()` to construct the form of the conduction term.
     /// `apply()` forms the generic quantity:
     ///
     ///   `(alpha * A - beta * div B grad) phi = RHS`
     void ApplyThermal (amrex::MLABecLaplacian& mlabec,
-		       amrex::Vector<amrex::MultiFab>& thermalout,
-		 const amrex::Vector<amrex::MultiFab>& coeff,
-		       amrex::Vector<amrex::MultiFab>& phi,
-		 const amrex::Vector<amrex::BCRec>& bcs,
-		 int bccomp);
+                       amrex::Vector<amrex::MultiFab>& thermalout,
+                 const amrex::Vector<amrex::MultiFab>& coeff,
+                       amrex::Vector<amrex::MultiFab>& phi,
+                 const amrex::Vector<amrex::BCRec>& bcs,
+                 int bccomp);
 
     /// create the coefficients for `grad{T}`, `grad{h}`, `grad{X_k}`, and `grad{p_0}`
     /// for the thermal diffusion term in the enthalpy equation.
@@ -1449,39 +1449,39 @@ public:
     /// @param Xkcoeff  species coefficients
     /// @param pcoeff   pressure coefficient
     void MakeThermalCoeffs(const amrex::Vector<amrex::MultiFab>& scal,
-			   amrex::Vector<amrex::MultiFab>& Tcoeff,
-			   amrex::Vector<amrex::MultiFab>& hcoeff,
-			   amrex::Vector<amrex::MultiFab>& Xkcoeff,
-			   amrex::Vector<amrex::MultiFab>& pcoeff);
+                           amrex::Vector<amrex::MultiFab>& Tcoeff,
+                           amrex::Vector<amrex::MultiFab>& hcoeff,
+                           amrex::Vector<amrex::MultiFab>& Xkcoeff,
+                           amrex::Vector<amrex::MultiFab>& pcoeff);
 
     /// ThermalConduct implements thermal diffusion in the enthalpy equation.
     /// This is an implicit solve, using the multigrid solver.  This updates
     /// the enthalpy only.
     void ThermalConduct (const amrex::Vector<amrex::MultiFab>& s1,
-			       amrex::Vector<amrex::MultiFab>& s2,
-			 const amrex::Vector<amrex::MultiFab>& hcoeff1,
-			 const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
-			 const amrex::Vector<amrex::MultiFab>& pcoeff1,
-			 const amrex::Vector<amrex::MultiFab>& hcoeff2,
-			 const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
-			 const amrex::Vector<amrex::MultiFab>& pcoeff2);
+                               amrex::Vector<amrex::MultiFab>& s2,
+                         const amrex::Vector<amrex::MultiFab>& hcoeff1,
+                         const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
+                         const amrex::Vector<amrex::MultiFab>& pcoeff1,
+                         const amrex::Vector<amrex::MultiFab>& hcoeff2,
+                         const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
+                         const amrex::Vector<amrex::MultiFab>& pcoeff2);
 
     void ThermalConductSDC(int which_step,
-			   const amrex::Vector<amrex::MultiFab>& s_old,
-			         amrex::Vector<amrex::MultiFab>& s_hat,
-			   const amrex::Vector<amrex::MultiFab>& s_new,
-			   const RealVector& p0old,
-			   const RealVector& p0new,
-			   const amrex::Vector<amrex::MultiFab>& hcoeff1,
-			   const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
-			   const amrex::Vector<amrex::MultiFab>& pcoeff1,
-			   const amrex::Vector<amrex::MultiFab>& hcoeff2,
-			   const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
-			   const amrex::Vector<amrex::MultiFab>& pcoeff2);
+                           const amrex::Vector<amrex::MultiFab>& s_old,
+                                 amrex::Vector<amrex::MultiFab>& s_hat,
+                           const amrex::Vector<amrex::MultiFab>& s_new,
+                           const RealVector& p0old,
+                           const RealVector& p0new,
+                           const amrex::Vector<amrex::MultiFab>& hcoeff1,
+                           const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
+                           const amrex::Vector<amrex::MultiFab>& pcoeff1,
+                           const amrex::Vector<amrex::MultiFab>& hcoeff2,
+                           const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
+                           const amrex::Vector<amrex::MultiFab>& pcoeff2);
 
     void MakeExplicitThermalHterm (amrex::Vector<amrex::MultiFab>& thermal,
-			       const amrex::Vector<amrex::MultiFab>& scal,
-			       const amrex::Vector<amrex::MultiFab>& hcoeff);
+                               const amrex::Vector<amrex::MultiFab>& scal,
+                               const amrex::Vector<amrex::MultiFab>& hcoeff);
     ////////////////////////
 
     ////////////////////////
@@ -1490,12 +1490,12 @@ public:
     /// Advance the velocity
     void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			  const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                          const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const RealVector& w0_force,
-			  const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+                          const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const RealVector& rho0_nph,
                           const RealVector& grav_cell_nph,
-			  const amrex::Vector<amrex::MultiFab>& sponge);
+                          const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
 
     ////////////////////////

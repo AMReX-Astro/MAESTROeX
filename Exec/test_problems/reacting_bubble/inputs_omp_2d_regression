@@ -7,7 +7,7 @@ maestro.ppm_type = 1
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0    0.0
-geometry.prob_hi     =  2.16e8 3.6e8
+geometry.prob_hi     =  1.44e8 3.6e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -24,13 +24,16 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 384 640
-amr.max_grid_size      = 128
-amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
+amr.n_cell             = 64 160
+amr.max_grid_size      = 32
+amr.max_level          = 2       # maximum level number allowed
+maestro.regrid_int     = 4       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 # refinement ratio
-amr.blocking_factor    = 8       # block factor in grid generation
+amr.blocking_factor    = 4       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+# TAGGING
+maestro.use_tpert_in_tagging = true
 
 # TIME STEPPING
 maestro.max_step  = 3
@@ -59,14 +62,15 @@ maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
+maestro.use_thermal_diffusion = false
+
 # PLOTFILES
 maestro.plot_base_name  = reacting_bubble_omp_2d_plt # root name of plot file
 maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
-maestro.check_base_name = reacting_bubble_omp_2d_chk
-maestro.chk_int         = 100
+maestro.chk_int         = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -87,13 +91,17 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-#amrex.fpe_trap_invalid = 1
+# BURNING parameters
+maestro.do_burning = true
+
+# OMP settings
+system.regtest_reduction = 1
 
 &probin
 
   ! override the default values of the probin namelist values here
-  pert_temp_factor = 1.d0
-  pert_rad_factor = 1.d0
+  pert_temp_factor = 1.e0
+  pert_rad_factor = 1.e0
   do_small_domain = F
 
   !extern
@@ -110,4 +118,3 @@ maestro.eps_hg_bottom      = 1.e-4
   use_eos_coulomb = T
 
 /
-
