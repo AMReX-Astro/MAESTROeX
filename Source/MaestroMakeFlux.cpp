@@ -34,9 +34,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoXFlux()", MakeRhoXFlux);
 
-    // Make sure to pass in comp+1 for fortran indexing
-    const int startcomp = start_comp + 1;
-    const int endcomp = startcomp + num_comp - 1;
     const int rho_comp = Rho;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
@@ -71,7 +68,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
         for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
             const Box& xbx = mfi.nodaltilebox(0);
             const Box& ybx = mfi.nodaltilebox(1);
 #if (AMREX_SPACEDIM == 3)
@@ -456,13 +452,13 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
     const bool have_h = enthalpy_pred_type == pred_h ||
                         enthalpy_pred_type == pred_T_then_h || 
                         enthalpy_pred_type == pred_Tprime_then_h;
+#if (AMREX_SPACEDIM == 3)
     const bool have_hprime = enthalpy_pred_type == pred_hprime;
+#endif
     const bool have_rhoh = enthalpy_pred_type == pred_rhoh;
 
     const int rho_comp = Rho;
     const int rhoh_comp = RhoH;
-    const int spec_comp = FirstSpec;
-    const int nspec = NumSpec;
     const int max_lev = max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const int enthalpy_pred_type_loc = enthalpy_pred_type;

@@ -19,8 +19,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Box& domainBox = geom[lev].Domain();
         const Real* dx = geom[lev].CellSize();
 
-        Real rel_eps = 0.0;
-        get_rel_eps(&rel_eps);
+        const Real rel_eps = c_rel_eps;
 
         const Real dt2 = 0.5 * dt;
 
@@ -36,10 +35,11 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #if (AMREX_SPACEDIM == 3)
         const int klo = domainBox.loVect()[2];
         const int khi = domainBox.hiVect()[2];
-#endif
 
-        const int ppm_type_local = ppm_type;
         const int spherical_local = spherical;
+#endif
+        const int ppm_type_local = ppm_type;
+        
 
         // get references to the MultiFabs at level lev
         const MultiFab& utilde_mf  = utilde[lev];

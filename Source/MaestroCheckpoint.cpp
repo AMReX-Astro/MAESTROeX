@@ -76,9 +76,8 @@ Maestro::WriteCheckPoint (int step) {
         HeaderFile << t_new << "\n";
 
         // write out rel_eps
-        Real rel_eps = 0.0;
-        get_rel_eps(&rel_eps);
-        HeaderFile << rel_eps << "\n";
+        get_rel_eps(&c_rel_eps);
+        HeaderFile << c_rel_eps << "\n";
 
         // write the BoxArray at each level
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -217,10 +216,9 @@ Maestro::ReadCheckPoint ()
         GotoNextLine(is);
 
         // read in rel_eps
-        Real rel_eps;
-        is >> rel_eps;
+        is >> c_rel_eps;
         GotoNextLine(is);
-        set_rel_eps(&rel_eps);
+        set_rel_eps(&c_rel_eps);
 
         for (int lev = 0; lev <= finest_level; ++lev) {
 

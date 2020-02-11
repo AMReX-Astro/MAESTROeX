@@ -1,6 +1,6 @@
 
 # INITIAL MODEL
-maestro.model_file = "initial_models/initdat.256"
+maestro.model_file = "convective_M_0.30.hse.1024"
 maestro.perturb_model = false
 
 maestro.drdxfac = 2
@@ -29,7 +29,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 #amr.n_cell             = 64 64 64
 amr.n_cell = 256 256 256
 amr.max_grid_size      = 64
-amr.max_level          = 2       # maximum level number allowed
+amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 16       # block factor in grid generation
@@ -67,6 +67,8 @@ maestro.use_divu_firstdt = true
 
 maestro.use_tfromp = true
 maestro.use_exact_base_state = false
+
+maestro.do_heating = true
 
 # PLOTFILES
 maestro.plot_base_name  = plt_    # root name of plot file
@@ -111,13 +113,6 @@ maestro.rotation_radius = 0.0
 
 &probin
 
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e6
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 1.e7
-  use_analytic_heating = F
 
   !extern
 
@@ -130,6 +125,6 @@ maestro.rotation_radius = 0.0
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  eos_assume_neutral = F
+  eos_assume_neutral = .false.
 
 /

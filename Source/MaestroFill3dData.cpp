@@ -1337,5 +1337,4 @@ Maestro::MakeCCtoRadii ()
                                      AMREX_REAL_ANYD(dx));
         }
     }
-
 }
