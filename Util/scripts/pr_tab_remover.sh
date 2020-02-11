@@ -6,7 +6,7 @@ REPO=`git config remote.origin.url`
 SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
 
 # Add rsa keys to the ssh agent to push to GitHub
-gpg --output ../id_maestro_rsa --batch --passphrase $DECRYPT_GITHUB_AUTH --decrypt id_maestro_rsa.enc
+gpg --output ../id_maestro_rsa --batch --passphrase $DECRYPT_GITHUB_AUTH --decrypt $TRAVIS_BUILD_DIR/id_maestro_rsa.enc
 chmod 600 ../id_maestro_rsa
 eval `ssh-agent -s`
 ssh-add ../id_maestro_rsa
