@@ -420,7 +420,7 @@ Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
     for (int n = max_radial_level; n >= 1; --n) {
         Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
         // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             if (is_cell_centered) {
                 // for level n, make the coarser cells underneath simply the average of the fine
@@ -471,7 +471,7 @@ Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
         const int nr = nr_fine / pow(2,max_radial_level-n);
 
         // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev];

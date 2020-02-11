@@ -716,7 +716,7 @@ contains
 
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
-            coord(lev, i-1) = r_start_coord(lev, i)
+            coord(lev, i) = r_start_coord(lev, i)
         end do
     end do
   end subroutine get_r_start_coord
@@ -731,7 +731,7 @@ contains
     
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
-            coord(lev, i-1) = r_end_coord(lev, i)
+            coord(lev, i) = r_end_coord(lev, i)
         end do
     end do
   end subroutine get_r_end_coord
