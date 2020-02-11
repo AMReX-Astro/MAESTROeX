@@ -25,6 +25,9 @@ Maestro::Makew0(RealVector& w0_in,
     std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     const int max_lev = max_radial_level+1;
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
 
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
@@ -107,8 +110,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
     const int max_lev = max_radial_level+1;
 
     // local variables 
-    RealVector w0_old_cen(max_lev*nr_fine);
-    RealVector w0_new_cen(max_lev*nr_fine);
     RealVector psi_planar(nr_fine);
 
     // Compute w0 on edges at level n
@@ -116,7 +117,11 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
         std::fill(psi_planar.begin(), psi_planar.end(), 0.);
 
-        for (auto j = 0; j < numdisjointchunks[n]; ++j) {
+        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+
+            // Print() << "r_start_coord = " << r_start_coord[n+max_lev*j] << ' ' << r_end_coord[n+max_lev*j] <<std::endl;
+
+            // Print() << "base_cutoff_density_coord[n] = " << base_cutoff_density_coord[n] << std::endl;
 
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
@@ -128,15 +133,15 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
             // compute psi for level n
             //   do r = r_start_coord[n+max_lev*j], r_end_coord[n+max_lev*j]
-            for (auto r = r_start_coord[n + max_lev*j]; 
-                j <= r_end_coord[n + max_lev*j]; ++j) {
+            for (auto r = r_start_coord[n+max_lev*j]; 
+                r <= r_end_coord[n+max_lev*j]; ++r) {
                 if (r < base_cutoff_density_coord[n]) {
-                    psi_planar[r] = etarho_cc[n + max_lev*r] * fabs(grav_const);
+                    psi_planar[r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }
             }
 
-            for (auto r = r_start_coord[n + max_lev*j]+1; 
-                r <= r_end_coord[n + max_lev*j]+1; ++r) {
+            for (auto r = r_start_coord[n+max_lev*j]+1; 
+                r <= r_end_coord[n+max_lev*j]+1; ++r) {
 
                 Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
                     + gamma1bar_new_in[n+max_lev*(r-1)]) *
@@ -144,7 +149,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     p0_new_in[n+max_lev*(r-1)])/4.0;
 
                 if (r < base_cutoff_density_coord[n]) {
-                    if (is_predictor == 1) {
+                    if (is_predictor) {
                         delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor * 
                             p0_minus_peosbar[n+max_lev*(r-1)] / 
                             (gamma1bar_old_in[n+max_lev*(r-1)]*
@@ -158,6 +163,10 @@ Maestro::Makew0Planar(RealVector& w0_in,
                 } else {
                     delta_chi_w0[n+max_lev*(r-1)] = 0.0;
                 }
+
+                // if (gamma1bar_p0_avg == 0) {
+                    // Print() << "gamma1bar_p0_avg = " << gamma1bar_p0_avg << " gamma1bar_old, new = " << gamma1bar_old_in[n+max_lev*(r-1)] << ' ' << gamma1bar_new_in[n+max_lev*(r-1)] <<std::endl;
+                // }
 
                 w0_in[n+max_lev*r] = w0_in[n+max_lev*(r-1)]
                     + Sbar_in[n+max_lev*(r-1)] * dr[n] 
@@ -194,11 +203,14 @@ Maestro::Makew0Planar(RealVector& w0_in,
         }
     }
 
+    // return;
+
+
     // zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= max_radial_level; ++n) {
     //    do n=1,max_radial_level
-        for (auto j = 0; j < numdisjointchunks[n]; ++j) {
-            if (j == numdisjointchunks[n]-1) {
+        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+            if (j == numdisjointchunks[n]) {
             // do r=r_end_coord[n+max_lev*j]+2,nr(n)
                 for (auto r = r_end_coord[n+max_lev*j]+2; 
                      r <= nr[n]; ++r) {
@@ -213,14 +225,13 @@ Maestro::Makew0Planar(RealVector& w0_in,
             }
         }
     }
-
     // call restrict_base(w0,0)
     RestrictBase(w0_in, false);
     // call fill_ghost_base(w0,0)
     FillGhostBase(w0_in, false);
 
     for (auto n = 0; n <= max_radial_level; ++n) {
-        for (auto j = 0; j < numdisjointchunks[n]; ++j) {
+        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
@@ -229,18 +240,17 @@ Maestro::Makew0Planar(RealVector& w0_in,
             for (auto r = r_start_coord[n + max_lev*j]; 
                  r <= r_end_coord[n + max_lev*j]; ++r) {
 
-                // Print() << "j , r, n = " << j << ' ' << r << ' ' << n <<std::endl;
-                w0_old_cen[n+max_lev*r] = 0.5 * (w0_old[n+max_lev*r] + 
+                Real w0_old_cen = 0.5 * (w0_old[n+max_lev*r] + 
                     w0_old[n+max_lev*(r+1)]);
-                w0_new_cen[n+max_lev*r] = 0.5 * (w0_in[n+max_lev*r] + 
+                Real w0_new_cen = 0.5 * (w0_in[n+max_lev*r] + 
                     w0_in[n+max_lev*(r+1)]);
-                Real w0_avg = 0.5 * (dt * w0_old_cen[n+max_lev*r] 
-                    + dtold *  w0_new_cen[n+max_lev*r]) / dt_avg;
+                Real w0_avg = 0.5 * (dt * w0_old_cen 
+                    + dtold *  w0_new_cen) / dt_avg;
                 Real div_avg = 0.5 * (dt *(w0_old[n+max_lev*(r+1)]
                     - w0_old[n+max_lev*r]) + dtold * (w0_in[n+max_lev*(r+1)] 
                     - w0_in[n+max_lev*r])) / dt_avg;
-                w0_force[n+max_lev*r] = (w0_new_cen[n+max_lev*r] 
-                    - w0_old_cen[n+max_lev*r])/dt_avg 
+                w0_force[n+max_lev*r] = (w0_new_cen
+                    - w0_old_cen)/dt_avg 
                     + w0_avg*div_avg/dr[n];
             }
         }
@@ -272,8 +282,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     BL_PROFILE_VAR("Maestro::Makew0Sphr()",Makew0Sphr);
 
     // local variables 
-    RealVector w0_old_cen(nr_fine);
-    RealVector w0_new_cen(nr_fine);
     RealVector gamma1bar_nph(nr_fine);
     RealVector p0_nph(nr_fine);
     RealVector A(nr_fine+1);
@@ -386,11 +394,11 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 
     // do r = 0,nr_fine-1
     for (auto r = 0; r < nr_fine; ++r) {
-        w0_old_cen[r] = 0.5 * (w0_old[r] + w0_old[r+1]);
-        w0_new_cen[r] = 0.5 * (w0_in[r] + w0_in[r+1]);
-        Real w0_avg = 0.5 * (dt_in *  w0_old_cen[r] + dtold_in *  w0_new_cen[r]) / dt_avg;
+        Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
+        Real w0_new_cen = 0.5 * (w0_in[r] + w0_in[r+1]);
+        Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
         Real div_avg = 0.5 * (dt_in * (w0_old[r+1]-w0_old[r]) + dtold_in * (w0_in[r+1]-w0_in[r])) / dt_avg;
-        w0_force[r] = (w0_new_cen[r]-w0_old_cen[r]) / dt_avg + w0_avg * div_avg / dr[0];
+        w0_force[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr[0];
     }
 }
 
