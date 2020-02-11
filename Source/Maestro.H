@@ -1783,6 +1783,9 @@ public:
     IntVector burning_cutoff_density_hi_coord;
 
 
+    // relative error needed for base state computations
+    amrex::Real c_rel_eps;
+
     // these provide information about the multilevel base state configuration
     IntVector numdisjointchunks;
     IntVector r_start_coord;
