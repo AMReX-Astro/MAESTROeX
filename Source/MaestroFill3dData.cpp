@@ -1247,7 +1247,9 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
             const Array4<const Real> scc = s_cc[lev].array(mfi);
             const Array4<Real> facex = face[lev][0].array(mfi);
             const Array4<Real> facey = face[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
             const Array4<Real> facez = face[lev][2].array(mfi);
+#endif
 
             if (harmonic_avg) {
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
