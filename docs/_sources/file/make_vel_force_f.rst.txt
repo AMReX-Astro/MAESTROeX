@@ -1,8 +1,0 @@
-make_vel_force.F90
-==================
-
-make\_vel\_force\_module
-------------------------
-
-.. f:automodule:: make_vel_force_module
-
