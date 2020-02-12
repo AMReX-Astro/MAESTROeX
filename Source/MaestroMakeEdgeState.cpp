@@ -335,6 +335,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
 
     Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
@@ -357,7 +358,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT force_p = force.dataPtr();
 
-    for (int n = 0; n <= max_radial_level; ++n) {
+    for (int n = 0; n <= finest_radial_level; ++n) {
 
         sedgel_vec[n].resize(nr_fine+1);
         sedger_vec[n].resize(nr_fine+1);
@@ -523,9 +524,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         dsvlm = s[n+max_lev*rm] - s[n+max_lev*(rm-1)];
                     } else if (rm > 0 && rm < nr-1) {
                         Real del  = 0.5 * (s[n+max_lev*(rm+1)] - s[n+max_lev*(rm-1)]);
-                        Real dmin = 2.0  * (s[n+max_lev*rm] - s[n+max_lev*(rm-1)]);
-                        Real dpls = 2.0  * (s[n+max_lev*(rm+1)] - s[n+max_lev*rm]);
-                        dsvlm = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                        Real dmin = 2.0 * (s[n+max_lev*rm] - s[n+max_lev*(rm-1)]);
+                        Real dpls = 2.0 * (s[n+max_lev*(rm+1)] - s[n+max_lev*rm]);
+                        dsvlm = dmin*dpls > 0.0 ? 
+                            copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
                     }
 
                     // r
@@ -538,9 +540,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         dsvl = s[p] - s[pm];
                     } else if (r > 0 && r < nr-1) {
                         Real del  = 0.5 * (s[pp] - s[pm]);
-                        Real dmin = 2.0  * (s[p] - s[pm]);
-                        Real dpls = 2.0  * (s[pp] - s[p]);
-                        dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                        Real dmin = 2.0 * (s[p] - s[pm]);
+                        Real dpls = 2.0 * (s[pp] - s[p]);
+                        dsvl = dmin*dpls > 0.0 ? 
+                            copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
                     }
 
                     Real sm = 0.0;
@@ -554,8 +557,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         // 4th order interpolation of s to radial faces
                         sm = 0.5*(s[p]+s[pm]) - (dsvl-dsvlm)/6.0;
                         // make sure sm lies in between adjacent cell-centered values
-                        sm = max(sm,min(s[p],s[pm]));
-                        sm = min(sm,max(s[p],s[pm]));
+                        sm = max(sm, min(s[p], s[pm]));
+                        sm = min(sm, max(s[p], s[pm]));
                     }
 
                     // calculate sp
@@ -574,9 +577,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         dsvl = s[n+max_lev*rp]-s[n+max_lev*(rp-1)];
                     } else if (rp > 0 && rp < nr-1) {
                         Real del  = 0.5 * (s[n+max_lev*(rp+1)] - s[n+max_lev*(rp-1)]);
-                        Real dmin = 2.0  * (s[n+max_lev*rp] - s[n+max_lev*(rp-1)]);
-                        Real dpls = 2.0  * (s[n+max_lev*(rp+1)] - s[n+max_lev*rp]);
-                        dsvl = dmin*dpls > 0.0 ? copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
+                        Real dmin = 2.0 * (s[n+max_lev*rp] - s[n+max_lev*(rp-1)]);
+                        Real dpls = 2.0 * (s[n+max_lev*(rp+1)] - s[n+max_lev*rp]);
+                        dsvl = dmin*dpls > 0.0 ? 
+                            copysign(1.0,del)*min(fabs(del),min(fabs(dmin),fabs(dpls))) : 0.0;
                     }
 
                     Real sp = 0.0;
@@ -809,7 +813,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         }
     }
 
-    for (int n = 0; n <= max_radial_level; ++n) {
+    for (int n = 0; n <= finest_radial_level; ++n) {
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
@@ -819,7 +823,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
             // if we are not at the finest level, copy in the sedger and sedgel states
             // from the next finer level at the c-f interface
-            if (n < max_radial_level) {
+            if (n < finest_radial_level) {
                 sedger_vec[n][r_start_coord[n+1+max_lev*i]/2] = sedger_vec[n+1][r_start_coord[n+1+max_lev*i]];
                 sedgel_vec[n][(r_end_coord[n+1+max_lev*i]+1)/2] = sedgel_vec[n+1][r_end_coord[n+1+max_lev*i]+1];
             }
@@ -833,7 +837,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         }
     }
 
-    for (int n = 0; n <= max_radial_level; ++n) {
+    for (int n = 0; n <= finest_radial_level; ++n) {
 
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr(); 
