@@ -539,12 +539,6 @@ public:
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
 
-    AMREX_GPU_DEVICE amrex::Real QuadInterp(const amrex::Real x, 
-                        const amrex::Real x0, const amrex::Real x1, 
-                        const amrex::Real x2,
-                        const amrex::Real y0, const amrex::Real y1, 
-                        const amrex::Real y2);
-
     /// Add (`mult` times) the MAC-projected base state velocity to the edge-based
     /// velocity `uedge`
     ///
@@ -568,7 +562,7 @@ public:
     /// Put the cell-centered data `s_cc` on faces by averaging adjacent cells
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
-                        const int harmonic_avg);
+                        int harmonic_avg);
 
     void MakeCCtoRadii ();
     // end MaestroFill3dData.cpp functions
