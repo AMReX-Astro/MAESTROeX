@@ -1276,7 +1276,7 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 #if (AMREX_SPACEDIM == 3)
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     Real denom = scc(i,j,k) + scc(i,j,k-1);
-                    Real prod  = scc(i,j,k) * scc(i-1,j,k);
+                    Real prod  = scc(i,j,k) * scc(i,j,k-1);
 
                     if (denom != 0.0) {
                         facez(i,j,k) = 2.0 * prod / denom;
