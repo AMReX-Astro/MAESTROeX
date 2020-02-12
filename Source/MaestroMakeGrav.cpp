@@ -202,8 +202,10 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()",MakeGravEdge);
 
-    RealVector m;
     const int max_lev = max_radial_level+1;
+
+    get_finest_radial_level(&finest_radial_level);
+    get_base_cutoff_density(&base_cutoff_density);
 
     if (!spherical) {
         if (do_planar_invsq_grav)  {
@@ -222,6 +224,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // compute gravity as in spherical geometry
 
             // allocate(m(0:finest_radial_level,0:nr_fine))
+            RealVector m;
             m.resize((finest_radial_level+1)*(nr_fine+1));
             m.shrink_to_fit();
 
