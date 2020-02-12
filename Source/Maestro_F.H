@@ -86,11 +86,12 @@ extern "C"
     void destroy_base_state_geometry();
     
     void get_base_cutoff_density (const amrex::Real* base_cutoff_density_in);
-    void get_base_cutoff_density_coord (const int* lev, int* base_cutoff_density_coord_in);
+    void get_base_cutoff_density_coord (const int lev, int* base_cutoff_density_coord_in);
     void get_buoyancy_cutoff_factor (const amrex::Real* buoyancy_cutoff_factor_in);
     void get_numdisjointchunks(int* nchunks);
     void get_r_start_coord(int* coord);
     void get_r_end_coord(int* coord);
+    void get_finest_radial_level(int* lev);
 
     //////////////////////
 
@@ -736,6 +737,30 @@ extern "C"
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,
                  const amrex::Real* dtold, const int* is_predictor);
+
+    void make_w0_sphr2(amrex::Real* w0, const amrex::Real* w0_old,
+                 const amrex::Real* Sbar_in,
+                 const amrex::Real* rho0_nph,
+                 const amrex::Real* p0_nph,
+                 const amrex::Real* gamma1bar_nph,
+                 const amrex::Real* grav_edge,
+                 const amrex::Real* w0_from_Sbar,
+                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
+                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
+                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
+                 const amrex::Real* dtold);
+
+    void make_w0_sphr1(amrex::Real* w0, const amrex::Real* w0_old,
+                 const amrex::Real* Sbar_in,
+                 const amrex::Real* rho0_nph,
+                 const amrex::Real* p0_nph,
+                 const amrex::Real* gamma1bar_nph,
+                 const amrex::Real* grav_edge,
+                 const amrex::Real* w0_from_Sbar,
+                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
+                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
+                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
+                 const amrex::Real* dtold);
     //////////////////////
 
     //////////////////////

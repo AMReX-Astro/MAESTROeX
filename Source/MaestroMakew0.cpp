@@ -46,12 +46,12 @@ Maestro::Makew0(RealVector& w0_in,
             Makew0SphrIrreg();
         } else {
             Makew0Sphr(w0_in, w0_old, w0_force, Sbar_in, 
-                        rho0_old_in, rho0_new_in,
-                        p0_old_in, p0_new_in, 
-                        gamma1bar_old_in, gamma1bar_new_in, 
-                        p0_minus_peosbar, 
-                        delta_chi_w0, dt_in, dtold_in,
-                        is_predictor);
+                      rho0_old_in, rho0_new_in,
+                      p0_old_in, p0_new_in, 
+                      gamma1bar_old_in, gamma1bar_new_in, 
+                      p0_minus_peosbar, 
+                      delta_chi_w0, dt_in, dtold_in,
+                      is_predictor);
         }
     }
 
@@ -116,6 +116,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
     for (auto n = 0; n <= max_radial_level; ++n) {
 
         std::fill(psi_planar.begin(), psi_planar.end(), 0.);
+        int base_cutoff_density_coord = 0;
+        get_base_cutoff_density_coord(n, &base_cutoff_density_coord);
 
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
 
@@ -135,7 +137,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
             //   do r = r_start_coord[n+max_lev*j], r_end_coord[n+max_lev*j]
             for (auto r = r_start_coord[n+max_lev*j]; 
                 r <= r_end_coord[n+max_lev*j]; ++r) {
-                if (r < base_cutoff_density_coord[n]) {
+                if (r < base_cutoff_density_coord) {
                     psi_planar[r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }
             }
@@ -148,7 +150,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     (p0_old_in[n+max_lev*(r-1)] + 
                     p0_new_in[n+max_lev*(r-1)])/4.0;
 
-                if (r < base_cutoff_density_coord[n]) {
+                if (r < base_cutoff_density_coord) {
                     if (is_predictor) {
                         delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor * 
                             p0_minus_peosbar[n+max_lev*(r-1)] / 
@@ -202,9 +204,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
             }
         }
     }
-
-    // return;
-
 
     // zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= max_radial_level; ++n) {
@@ -293,9 +292,16 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     RealVector rho0_nph(nr_fine);
     RealVector grav_edge(nr_fine+1);
 
+    get_base_cutoff_density(&base_cutoff_density);
+    int base_cutoff_density_coord = 0;
+    get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
+
+    Print() << "dr = " << dr[0] << std::endl;
+
+    const int max_lev = max_radial_level+1;
+
     // create time-centered base-state quantities
     for (auto r = 0; r < nr_fine; ++r) {
-    // do r=0,nr_fine-1
         p0_nph[r] = 0.5*(p0_old_in[r] + p0_new_in[r]);
         rho0_nph[r] = 0.5*(rho0_old_in[r] + rho0_new_in[r]);
         gamma1bar_nph[r] = 0.5*(gamma1bar_old_in[r] + gamma1bar_new_in[r]);
@@ -305,24 +311,25 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
 
-    // w0_from_Sbar = 0.0
-    std::fill(w0_from_Sbar.begin(), w0_from_Sbar.end(), 0.);
+    w0_from_Sbar[0] = 0.0;
 
     for (auto r = 1; r <= nr_fine; ++r) {
 
-        Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_density ? dpdt_factor * p0_minus_peosbar[r-1]/dt : 0.0;
+        Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_density ? 
+            dpdt_factor * p0_minus_peosbar[r-1]/dt : 0.0;
 
-        w0_from_Sbar[r] = w0_from_Sbar[r-1] + dr[0] * Sbar_in[r-1] * r_cc_loc[r-1]*r_cc_loc[r-1] - 
-                dr[0]* volume_discrepancy * r_cc_loc[r-1]*r_cc_loc[r-1] / (gamma1bar_nph[r-1]*p0_nph[r-1]);
+        w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
+            dr[0] * Sbar_in[r-1] * r_cc_loc[r-1]*r_cc_loc[r-1] - 
+            dr[0]* volume_discrepancy * r_cc_loc[r-1]*r_cc_loc[r-1] 
+            / (gamma1bar_nph[r-1]*p0_nph[r-1]);
 
     }
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar[r] = w0_from_Sbar[r] / (r_edge_loc[r]*r_edge_loc[r]);
+        w0_from_Sbar[r] /= (r_edge_loc[r]*r_edge_loc[r]);
     }
 
     // make the edge-centered gravity
-    // call make_grav_edge(grav_edge,rho0_nph,r_edge_loc)
     MakeGravEdge(grav_edge, rho0_nph);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
@@ -338,16 +345,17 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
-    int max_cutoff = min(base_cutoff_density_coord[0], nr_fine-1);
+    int max_cutoff = min(base_cutoff_density_coord, nr_fine-1);
     
     for (auto r = 1; r <= max_cutoff; ++r) {
         A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]);
         A[r] /= dr[0]*dr[0];
 
         B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1])
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]) ) / (dr[0]*dr[0]);
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]) ) 
+                / (dr[0]*dr[0]);
 
-        Real dpdr = (p0_nph[r]-p0_nph[r-1])/dr[0];
+        Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr[0];
 
         B[r] -= 4.0 * dpdr / (r_edge_loc[r]*r_edge_loc[r]*r_edge_loc[r]);
 
@@ -415,13 +423,13 @@ Maestro::Tridiag(const RealVector& a, const RealVector& b,
     u[0] = r[0] / bet;
 
     for (auto j = 1; j < n; j++) {
-        gam[j] = c[j-1]/bet;
-        bet = b[j] - a[j]*gam[j];
+        gam[j] = c[j-1] / bet;
+        bet = b[j] - a[j] * gam[j];
         if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
-        u[j] = (r[j]-a[j]*u[j-1])/bet;
+        u[j] = (r[j] - a[j] * u[j-1]) / bet;
     }
 
     for (auto j = n-2; j >= 0; --j) {
-        u[j] -= gam[j+1]*u[j+1];
+        u[j] -= gam[j+1] * u[j+1];
     }
 }

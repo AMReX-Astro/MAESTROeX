@@ -131,6 +131,8 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     bool found = false;
 
     int which_lev = 0;
+    
+    get_finest_radial_level(&finest_radial_level);
 
     // find the finest level containing the anelastic cutoff density,
     // and set the anelastic cutoff coord for this level
@@ -232,7 +234,6 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // and set the burning cutoff coord for this level
     for (auto n=finest_radial_level; n >= 0; --n) {
         for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
-
             if (!found) {
                 //  do r=r_start_coord(n,i),r_end_coord(n,i)
                 int lo = r_start_coord[n + (max_radial_level+1)*i];
@@ -414,10 +415,11 @@ Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
 
     const int max_lev = max_radial_level + 1;
 
-    for (int n = max_radial_level; n >= 1; --n) {
+    for (int n = finest_radial_level; n >= 1; --n) {
         Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
         // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
@@ -463,10 +465,11 @@ Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
 
     const int max_lev = max_radial_level + 1;
 
-    for (int n = max_radial_level; n >= 1; --n) {
+    for (int n = finest_radial_level; n >= 1; --n) {
         Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
         const int nr = nr_fine / pow(2,max_radial_level-n);
 

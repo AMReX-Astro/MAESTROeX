@@ -470,8 +470,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         MultiFab& scal_force_mf = scal_force[lev];
 
         // Get cutoff coord
-        int base_cutoff_density_coord;
-        get_base_cutoff_density_coord(&lev, &base_cutoff_density_coord);
+        int base_cutoff_density_coord = 0;
+        get_base_cutoff_density_coord(lev, &base_cutoff_density_coord);
     
         // Get grid spacing
         const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
