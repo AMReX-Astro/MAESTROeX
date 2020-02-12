@@ -757,6 +757,7 @@ extern "C"
     void get_numdisjointchunks(int* nchunks);
     void get_r_start_coord(int* coord);
     void get_r_end_coord(int* coord);
+    void get_finest_radial_level(int* lev);
     //////////////////////
 
     //////////////////////

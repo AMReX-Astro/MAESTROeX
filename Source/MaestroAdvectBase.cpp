@@ -47,7 +47,7 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
 
         const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
 
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             int lo = r_start_coord[n + max_lev*i];
             int hi = r_end_coord[n + max_lev*i];
@@ -73,7 +73,7 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
         const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
         const Real dt_loc = dt;
         
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             int lo = r_start_coord[n + max_lev*i];
             int hi = r_end_coord[n + max_lev*i];
@@ -165,7 +165,7 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
 
         const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
 
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             int lo = r_start_coord[n + max_lev*i];
             int hi = r_end_coord[n + max_lev*i];
@@ -193,7 +193,7 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
         const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
         const Real dt_loc = dt;
 
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             int lo = r_start_coord[n + max_lev*i];
             int hi = r_end_coord[n + max_lev*i];

@@ -369,7 +369,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         const Real dr = dr_fine * pow(2.0, max_radial_level-n);
         const Real dtdr = dt / dr;
 
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev]; 
@@ -810,7 +810,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     }
 
     for (int n = 0; n <= max_radial_level; ++n) {
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev]; 
@@ -840,7 +840,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
         const int nr = nr_fine / pow(2, max_radial_level-n);
 
-        for (int i = 0; i < numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev]; 
