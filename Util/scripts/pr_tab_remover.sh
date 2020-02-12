@@ -26,10 +26,17 @@ echo "doing git add/commit/push"
 
 # Commit the "changes", i.e. the new version.
 # The delta will show diffs between new and old versions.
+git add --all
+
+# Exit if there are no docs changes
+if git diff --staged --quiet; then
+   echo "exiting with no docs changes"
+   exit 0
+fi
 
 # Otherwise, commit and push
-git commit -am "Tabs have been converted to spaces by tab_exterminator.sh"
-git push $SSH_REPO $TRAVIS_PULL_REQUEST_BRANCH
+git commit -m "Tabs have been converted to spaces by tab_exterminator.sh"
+git push origin $TRAVIS_PULL_REQUEST_BRANCH
 cd 
 
 # Kill the ssh-agent

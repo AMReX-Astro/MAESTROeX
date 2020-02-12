@@ -216,7 +216,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         int index = int(radius / dr);
 
                         Real rfac = (radius - Real(index) * dr) / dr;
-                        Real s0_cart_val;
+                        Real s0_cart_val = 0.0;
 
                         if (w0_interp_type_loc == 1) {
 
@@ -242,7 +242,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 index--;
                             }
 
-                            Real s0_cart_val = QuadInterp(radius, 
+                            s0_cart_val = QuadInterp(radius, 
                                 r_edge_loc_p[index*max_lev],
                                 r_edge_loc_p[(index+1)*max_lev], 
                                 r_edge_loc_p[(index+2)*max_lev], 
@@ -278,7 +278,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real radius = sqrt(x*x + y*y + z*z);
                         int index = int(radius / dr);
 
-                        Real s0_cart_val;
+                        Real s0_cart_val = 0.0;
 
                         if (s0_interp_type_loc == 1) {
 
@@ -472,7 +472,6 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     const Real dr = dr_fine;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
-    Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
@@ -733,7 +732,6 @@ Maestro::MakeS0mac (const RealVector& s0,
     const int max_lev = max_radial_level+1;
     const Real dr = dr_fine;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
-    Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
 
     for (int lev=0; lev<=finest_level; ++lev) {
