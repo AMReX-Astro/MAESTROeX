@@ -31,7 +31,13 @@ Maestro::Makew0(RealVector& w0_in,
 
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
-            Makew0PlanarVarg();
+            Makew0PlanarVarg(w0_in, w0_old, w0_force, Sbar_in, 
+                         rho0_old_in, rho0_new_in,
+                         p0_old_in, p0_new_in, 
+                         gamma1bar_old_in, gamma1bar_new_in, 
+                         p0_minus_peosbar, 
+                         delta_chi_w0, dt_in, dtold_in,
+                         is_predictor);
         } else {
             Makew0Planar(w0_in, w0_old, w0_force, Sbar_in, 
                          rho0_old_in, rho0_new_in,
@@ -262,6 +268,231 @@ Maestro::Makew0Planar(RealVector& w0_in,
 }
 
 void 
+Maestro::Makew0PlanarVarg(RealVector& w0_in, 
+                        const RealVector& w0_old, 
+                        RealVector& w0_force, 
+                        const RealVector& Sbar_in, 
+                        const RealVector& rho0_old_in,
+                        const RealVector& rho0_new_in,
+                        const RealVector& p0_old_in,
+                        const RealVector& p0_new_in,
+                        const RealVector& gamma1bar_old_in,
+                        const RealVector& gamma1bar_new_in,
+                        const RealVector& p0_minus_peosbar,  
+                        RealVector& delta_chi_w0, 
+                        const Real dt_in, const Real dtold_in, 
+                        const bool is_predictor) 
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
+
+    get_finest_radial_level(&finest_radial_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+
+    int fine_base_density_cutoff_coord = 0;
+    get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
+
+    const int max_lev = max_radial_level+1;
+
+    // The planar 1/r**2 gravity constraint equation is solved
+    // by calling the tridiagonal solver, just like spherical.
+    // This is accomplished by putting all the requisite data
+    // on the finest basestate grid, solving for w0, and then
+    // restricting w0 back down to the coarse grid.
+
+    // 1) allocate the finely-gridded temporary basestate arrays
+    RealVector w0_fine(nr[finest_radial_level]+1);
+    RealVector w0bar_fine(nr[finest_radial_level]+1);
+    RealVector deltaw0_fine(nr[finest_radial_level]+1);
+    RealVector p0_old_fine(nr[finest_radial_level]);
+    RealVector p0_new_fine(nr[finest_radial_level]);
+    RealVector p0_nph_fine(nr[finest_radial_level]);
+    RealVector rho0_old_fine(nr[finest_radial_level]);
+    RealVector rho0_new_fine(nr[finest_radial_level]);
+    RealVector rho0_nph_fine(nr[finest_radial_level]);
+    RealVector gamma1bar_old_fine(nr[finest_radial_level]);
+    RealVector gamma1bar_new_fine(nr[finest_radial_level]);
+    RealVector gamma1bar_nph_fine(nr[finest_radial_level]);
+    RealVector p0_minus_peosbar_fine(nr[finest_radial_level]);
+    RealVector etarho_cc_fine(nr[finest_radial_level]);
+    RealVector Sbar_in_fine(nr[finest_radial_level]);
+    RealVector grav_edge_fine(nr[finest_radial_level]+1);
+
+    // 2) copy the data into the temp, uniformly-gridded basestate arrays.
+    ProlongBasetoUniform(p0_old,p0_old_fine);
+    ProlongBasetoUniform(p0_new,p0_new_fine);
+    ProlongBasetoUniform(rho0_old,rho0_old_fine);
+    ProlongBasetoUniform(rho0_new,rho0_new_fine);
+    ProlongBasetoUniform(gamma1bar_old,gamma1bar_old_fine);
+    ProlongBasetoUniform(gamma1bar_new,gamma1bar_new_fine);
+    ProlongBasetoUniform(p0_minus_peosbar,p0_minus_peosbar_fine);
+    ProlongBasetoUniform(etarho_cc,etarho_cc_fine);
+    ProlongBasetoUniform(Sbar_in,Sbar_in_fine);
+
+    // create time-centered base-state quantities
+    for (auto r = 0; r < nr[finest_radial_level]; ++r) {
+        p0_nph_fine[r] = 0.5*(p0_old_fine[r] + p0_new_fine[r]);
+        rho0_nph_fine[r] = 0.5*(rho0_old_fine[r] + rho0_new_fine[r]);
+        gamma1bar_nph_fine[r] = 0.5*(gamma1bar_old_fine[r] + gamma1bar_new_fine[r]);
+    }
+
+
+    // 3) solve to w0bar -- here we just take into account the Sbar and
+    //    volume discrepancy terms
+    // lower boundary condition
+    w0bar_fine[0] = 0.0;
+
+    // do r=1,nr(finest_radial_level)
+    for (auto r = 1; r <= nr[finest_radial_level]; ++r) {
+        Real gamma1bar_p0_avg = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
+
+        Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? dpdt_factor * p0_minus_peosbar_fine[r-1]/dt : 0.0;
+
+        w0bar_fine[r] =  w0bar_fine[r-1] + 
+            Sbar_in_fine[r-1] * dr[finest_radial_level] 
+            - (volume_discrepancy / gamma1bar_p0_avg ) * dr[finest_radial_level];
+
+    }
+
+    // 4) get the edge-centered gravity on the uniformly-gridded
+    // basestate arrays
+    Abort("make_w0.f90: need to write make_grav_edge_uniform");
+    //    call make_grav_edge_uniform(grav_edge_fine, rho0_nph_fine)
+
+
+    // 5) solve for delta w0
+    std::fill(deltaw0_fine.begin(), deltaw0_fine.end(), 0.);
+
+    // this takes the form of a tri-diagonal matrix:
+    // A_j (dw_0)_{j-3/2} +
+    // B_j (dw_0)_{j-1/2} +
+    // C_j (dw_0)_{j+1/2} = F_j
+
+    RealVector A(nr[finest_radial_level]+1);
+    RealVector B(nr[finest_radial_level]+1);
+    RealVector C(nr[finest_radial_level]+1);
+    RealVector u(nr[finest_radial_level]+1);
+    RealVector F(nr[finest_radial_level]+1);
+
+    std::fill(A.begin(), A.end(), 0.);
+    std::fill(B.begin(), B.end(), 0.);
+    std::fill(C.begin(), C.end(), 0.);
+    std::fill(F.begin(), F.end(), 0.);
+    std::fill(u.begin(), u.end(), 0.);
+
+    for (auto r = 1; r <= fine_base_density_cutoff_coord; ++r) {
+        A[r] = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
+        A[r] /= dr[finest_radial_level]*dr[finest_radial_level];
+
+        Real dpdr = (p0_nph_fine[r]-p0_nph_fine[r-1])/dr[finest_radial_level];
+
+        B[r] = -(gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1] + 
+            gamma1bar_nph_fine[r] * p0_nph_fine[r]) 
+            / (dr[finest_radial_level]*dr[finest_radial_level]);
+        B[r] -= 2.0 * dpdr / (r_edge_loc[finest_radial_level+max_lev*r]);
+
+        C[r] = gamma1bar_nph_fine[r] * p0_nph_fine[r];
+        C[r] /= dr[finest_radial_level]*dr[finest_radial_level];
+
+        F[r] = 2.0 * dpdr * w0bar_fine[r] / 
+            r_edge_loc[finest_radial_level+max_lev*r] -
+            grav_edge_fine[r] * (etarho_cc_fine[r] - etarho_cc_fine[r-1]) / 
+            dr[finest_radial_level];
+    }
+
+    // Lower boundary
+    A[0] = 0.0;
+    B[0] = 1.0;
+    C[0] = 0.0;
+    F[0] = 0.0;
+
+    // Upper boundary
+    A[fine_base_density_cutoff_coord+1] = -1.0;
+    B[fine_base_density_cutoff_coord+1] = 1.0;
+    C[fine_base_density_cutoff_coord+1] = 0.0;
+    F[fine_base_density_cutoff_coord+1] = 0.0;
+
+    // Call the tridiagonal solver
+    Tridiag(A, B, C, F, u, fine_base_density_cutoff_coord+2);
+
+    for (auto r = 1; r <= fine_base_density_cutoff_coord+1; ++r) {
+        deltaw0_fine[r] = u[r];
+    }
+
+    for (auto r = fine_base_density_cutoff_coord+2; r <= nr[finest_radial_level]; ++r) {
+        deltaw0_fine[r] = deltaw0_fine[fine_base_density_cutoff_coord+1];
+    }
+
+    // 6) compute w0 = w0bar + deltaw0
+    for (auto r = 0; r < w0_fine.size(); ++r) {
+        w0_fine[r] = w0bar_fine[r] + deltaw0_fine[r];
+        w0_in[finest_radial_level+max_lev*r] = w0_fine[r];
+    }
+
+    // 7) fill the multilevel w0 array from the uniformly-gridded w0 we
+    // just solved for.  Here, we make the coarse edge underneath equal
+    // to the fine edge value.
+    for (auto n = finest_radial_level; n >= 1; --n) {
+    // do n = finest_radial_level, 1, -1
+        for (auto r = 0; r <= nr[n]; n+=2) {
+        //    do r = 0, nr(n), 2
+            w0_in[n-1+max_lev*r/2] = w0_in[n+max_lev*r];
+        }
+    }
+
+    // 8) zero w0 where there is no corresponding full state array
+    // do n=1,finest_radial_level
+    for (auto n = 1; n <= finest_radial_level; ++n) {
+        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+        //    do j=1,numdisjointchunks(n)
+            if (j == numdisjointchunks[n]) {
+                //  do r=r_end_coord(n,j)+2,nr(n)
+                for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
+                    w0_in[n+max_lev*r] = 0.0;
+                }
+            } else {
+                for (auto r = r_end_coord[n+max_lev*j]+2; r < r_start_coord[n+max_lev*(j+1)]; ++r) {
+                    w0_in[n+max_lev*r] = 0.0;
+                }
+            }
+        }
+    }
+
+    // call restrict_base(w0,0)
+    // call fill_ghost_base(w0,0)
+    RestrictBase(w0_in, false);
+    FillGhostBase(w0_in, false);
+
+    // compute the forcing terms
+    for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+        // do n=0,finest_radial_level
+        //    do j=1,numdisjointchunks(n)
+
+            // Compute the forcing term in the base state velocity
+            // equation, - 1/rho0 grad pi0
+            Real dt_avg = 0.5 * (dt + dtold);
+            //   do r=r_start_coord(n,j),r_end_coord(n,j)
+            for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
+                Real w0_old_cen = 0.5 * (w0_old[n+max_lev*r] + w0_old[n+max_lev*(r+1)]);
+                Real w0_new_cen = 0.5 * (w0_in[n+max_lev*r] + w0_in[n+max_lev*(r+1)]);
+                Real w0_avg = 0.5 * (dt * w0_old_cen + dtold *  w0_new_cen) / dt_avg;
+                Real div_avg = 0.5 * (dt * (w0_old[n+max_lev*(r+1)]-w0_old[n+max_lev*r]) + 
+                    dtold * (w0_in[n+max_lev*(r+1)]-w0_in[n+max_lev*r])) / dt_avg;
+                w0_force[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr[n];
+            }
+        }
+    }
+
+    // call restrict_base(w0_force,1)
+    // call fill_ghost_base(w0_force,1)
+    RestrictBase(w0_force, true);
+    FillGhostBase(w0_force, true);
+}
+
+void 
 Maestro::Makew0Sphr(RealVector& w0_in, 
                     const RealVector& w0_old, 
                     RealVector& w0_force, 
@@ -431,5 +662,50 @@ Maestro::Tridiag(const RealVector& a, const RealVector& b,
 
     for (auto j = n-2; j >= 0; --j) {
         u[j] -= gam[j+1] * u[j+1];
+    }
+}
+
+void
+Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
+                              RealVector& base_fine)
+
+{
+    // the mask array will keep track of whether we've filled in data
+    // in a corresponding radial bin.  .false. indicates that we've
+    // already output there.
+    IntVector imask_fine(nr_fine);
+    std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    // r1 is the factor between the current level grid spacing and the
+    // FINEST level
+    int r1 = 1;
+
+    get_finest_radial_level(&finest_radial_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+
+    const int max_lev = max_radial_level+1;
+
+    for (auto n = finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < numdisjointchunks[n]; ++j) {
+            for (auto r = r_start_coord[n+max_lev*j]; r <= r_end_coord[n+max_lev*j]; ++r) {
+                // sum up mask to see if there are any elements set to true 
+                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
+                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
+                        base_fine[i] = base_ml[n+max_lev*r];
+                        imask_fine[i] = 0;
+                    }
+                }
+            }
+        }
+        // update r1 for the next coarsest level -- assume a jump by
+        // factor of 2
+        r1 *= 2;
+    }
+    
+    // check to make sure that no mask values are still true
+    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
+        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
     }
 }

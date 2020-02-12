@@ -991,7 +991,20 @@ public:
                 RealVector& delta_chi_w0, 
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
 
-    void Makew0PlanarVarg() {};
+    void Makew0PlanarVarg(RealVector& w0_in, 
+                        const RealVector& w0_old, 
+                        RealVector& w0_force, 
+                        const RealVector& Sbar_in, 
+                        const RealVector& rho0_old_in,
+                        const RealVector& rho0_new_in,
+                        const RealVector& p0_old_in,
+                        const RealVector& p0_new_in,
+                        const RealVector& gamma1bar_old_in,
+                        const RealVector& gamma1bar_new_in,
+                        const RealVector& p0_minus_peosbar,
+                        RealVector& delta_chi_w0, 
+                        const amrex::Real dt_in, const amrex::Real dtold_in,  
+                        const bool is_predictor);
 
     void Makew0Planar(RealVector& w0_in, 
                     const RealVector& w0_old, 
@@ -1004,7 +1017,7 @@ public:
                     const RealVector& gamma1bar_old_in,
                     const RealVector& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,
-                      RealVector& delta_chi_w0, 
+                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
                     const bool is_predictor);
 
@@ -1028,6 +1041,8 @@ public:
     void Tridiag(const RealVector& a, const RealVector& b, 
                  const RealVector& c, const RealVector& r, 
                  RealVector& u, const int n);
+
+    void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
     // end MaestroMakew0.cpp functions
     ////////////
