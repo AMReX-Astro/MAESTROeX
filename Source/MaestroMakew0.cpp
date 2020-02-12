@@ -66,10 +66,8 @@ Maestro::Makew0(RealVector& w0_in,
 
     if (maestro_verbose >= 2) {
         for (auto n = 0; n <= finest_radial_level; ++n) {
-        //    do n=0,finest_radial_level
             Real max_w0 = 0.0;
             for (auto r = r_start_coord[n]; r <= r_end_coord[n]+1; ++r) {
-            // do r=r_start_coord(n,1),r_end_coord(n,1)+1
                 max_w0 = max(max_w0, fabs(w0_in[n+max_lev*r]));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / dr[n] << std::endl;
@@ -130,10 +128,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
 
-            // Print() << "r_start_coord = " << r_start_coord[n+max_lev*j] << ' ' << r_end_coord[n+max_lev*j] <<std::endl;
-
-            // Print() << "base_cutoff_density_coord[n] = " << base_cutoff_density_coord[n] << std::endl;
-
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
                 w0_in[0] = 0.0;
@@ -143,7 +137,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
             }
 
             // compute psi for level n
-            //   do r = r_start_coord[n+max_lev*j], r_end_coord[n+max_lev*j]
             for (auto r = r_start_coord[n+max_lev*j]; 
                 r <= r_end_coord[n+max_lev*j]; ++r) {
                 if (r < base_cutoff_density_coord) {
@@ -175,10 +168,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     delta_chi_w0[n+max_lev*(r-1)] = 0.0;
                 }
 
-                // if (gamma1bar_p0_avg == 0) {
-                    // Print() << "gamma1bar_p0_avg = " << gamma1bar_p0_avg << " gamma1bar_old, new = " << gamma1bar_old_in[n+max_lev*(r-1)] << ' ' << gamma1bar_new_in[n+max_lev*(r-1)] <<std::endl;
-                // }
-
                 w0_in[n+max_lev*r] = w0_in[n+max_lev*(r-1)]
                     + Sbar_in[n+max_lev*(r-1)] * dr[n] 
                     - psi_planar[r-1] / gamma1bar_p0_avg * dr[n] 
@@ -191,13 +180,11 @@ Maestro::Makew0Planar(RealVector& w0_in,
                 Real offset = w0_in[n+max_lev*(r_end_coord[n+max_lev*j]+1)]
                     - w0_in[n-1+max_lev*(r_end_coord[n+max_lev*j]+1)/2];
 
-                //  do i=n-1,0,-1
                 for (auto i = n-1; i >= 0; --i) {
 
                     int refrat = pow(2, n-i);
 
                     // Restrict w0 from level n to level i
-                    // do r=r_start_coord[n+max_lev*j],r_end_coord[n+max_lev*j]+1
                     for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
                         if (r % refrat == 0) {
                             w0_in[n+max_lev*r/refrat] = w0_in[n+max_lev*r];
@@ -206,7 +193,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
                     // Offset the w0 on level i above the top of level n
                     for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
-                    // do r=(r_end_coord[n+max_lev*j]+1)/refrat+1,nr(i)
                         w0_in[i+max_lev*r] += offset;
                     }
                 }
@@ -216,16 +202,13 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
     // zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= max_radial_level; ++n) {
-    //    do n=1,max_radial_level
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
             if (j == numdisjointchunks[n]) {
-            // do r=r_end_coord[n+max_lev*j]+2,nr(n)
                 for (auto r = r_end_coord[n+max_lev*j]+2; 
                      r <= nr[n]; ++r) {
                     w0_in[n+max_lev*r] = 0.0;
                 }
             } else {
-                // do r=r_end_coord[n+max_lev*j]+2,r_start_coord(n,j+1)-1
                 for (auto r = r_end_coord[n+max_lev*j]+2; 
                      r <= r_start_coord[n+max_lev*(j+1)]-1; ++r) {
                     w0_in[n+max_lev*r] = 0.0;
@@ -233,9 +216,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             }
         }
     }
-    // call restrict_base(w0,0)
+
     RestrictBase(w0_in, false);
-    // call fill_ghost_base(w0,0)
     FillGhostBase(w0_in, false);
 
     for (auto n = 0; n <= max_radial_level; ++n) {
@@ -244,7 +226,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             Real dt_avg = 0.5 * (dt_in + dtold_in);
-            //   do r=r_start_coord[n+max_lev*j],r_end_coord[n+max_lev*j]
             for (auto r = r_start_coord[n + max_lev*j]; 
                  r <= r_end_coord[n + max_lev*j]; ++r) {
 
@@ -264,8 +245,6 @@ Maestro::Makew0Planar(RealVector& w0_in,
         }
     }
 
-    // call restrict_base(w0_force,1)
-    // call fill_ghost_base(w0_force,1)
     RestrictBase(w0_force, true);
     FillGhostBase(w0_force, true);
 }
@@ -346,7 +325,6 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     // lower boundary condition
     w0bar_fine[0] = 0.0;
 
-    // do r=1,nr(finest_radial_level)
     for (auto r = 1; r <= nr[finest_radial_level]; ++r) {
         Real gamma1bar_p0_avg = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
 
@@ -437,9 +415,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     // just solved for.  Here, we make the coarse edge underneath equal
     // to the fine edge value.
     for (auto n = finest_radial_level; n >= 1; --n) {
-    // do n = finest_radial_level, 1, -1
         for (auto r = 0; r <= nr[n]; n+=2) {
-        //    do r = 0, nr(n), 2
             w0_in[n-1+max_lev*r/2] = w0_in[n+max_lev*r];
         }
     }
@@ -448,9 +424,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     // do n=1,finest_radial_level
     for (auto n = 1; n <= finest_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
-        //    do j=1,numdisjointchunks(n)
             if (j == numdisjointchunks[n]) {
-                //  do r=r_end_coord(n,j)+2,nr(n)
                 for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
                     w0_in[n+max_lev*r] = 0.0;
                 }
@@ -462,21 +436,17 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         }
     }
 
-    // call restrict_base(w0,0)
-    // call fill_ghost_base(w0,0)
     RestrictBase(w0_in, false);
     FillGhostBase(w0_in, false);
 
     // compute the forcing terms
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
-        // do n=0,finest_radial_level
-        //    do j=1,numdisjointchunks(n)
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             Real dt_avg = 0.5 * (dt + dtold);
-            //   do r=r_start_coord(n,j),r_end_coord(n,j)
+
             for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
                 Real w0_old_cen = 0.5 * (w0_old[n+max_lev*r] + w0_old[n+max_lev*(r+1)]);
                 Real w0_new_cen = 0.5 * (w0_in[n+max_lev*r] + w0_in[n+max_lev*(r+1)]);
@@ -488,8 +458,6 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         }
     }
 
-    // call restrict_base(w0_force,1)
-    // call fill_ghost_base(w0_force,1)
     RestrictBase(w0_force, true);
     FillGhostBase(w0_force, true);
 }
@@ -527,8 +495,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     get_base_cutoff_density(&base_cutoff_density);
     int base_cutoff_density_coord = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
-
-    Print() << "dr = " << dr[0] << std::endl;
 
     const int max_lev = max_radial_level+1;
 
@@ -619,12 +585,10 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 
     w0_in[0] = w0_from_Sbar[0];
 
-    // do r=1,max_cutoff+1
     for (auto r = 1; r <= max_cutoff+1; ++r) {
         w0_in[r] = u[r] / (r_edge_loc[r]*r_edge_loc[r]) + w0_from_Sbar[r];
     }
 
-    // do r=max_cutoff+2,nr_fine
     for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
         w0_in[r] = w0_in[max_cutoff+1] * r_edge_loc[max_cutoff+1]*r_edge_loc[max_cutoff+1]/(r_edge_loc[r]*r_edge_loc[r]);
     }
@@ -632,7 +596,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    // do r = 0,nr_fine-1
     for (auto r = 0; r < nr_fine; ++r) {
         Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
         Real w0_new_cen = 0.5 * (w0_in[r] + w0_in[r+1]);
@@ -769,12 +732,10 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
 
     w0_in[0] = w0_from_Sbar[0];
 
-    // do r=1,max_cutoff+1
     for (auto r = 1; r <= max_cutoff+1; ++r) {
         w0_in[r] = u[r] / (r_edge_loc[r]*r_edge_loc[r]) + w0_from_Sbar[r];
     }
 
-    // do r=max_cutoff+2,nr_fine
     for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
         w0_in[r] = w0_in[max_cutoff+1] * r_edge_loc[max_cutoff+1]*r_edge_loc[max_cutoff+1]/(r_edge_loc[r]*r_edge_loc[r]);
     }
@@ -782,7 +743,6 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    // do r = 0,nr_fine-1
     for (auto r = 0; r < nr_fine; ++r) {
         Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
         Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
