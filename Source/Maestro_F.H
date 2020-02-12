@@ -323,6 +323,12 @@ extern "C"
 
     //////////////////////
     // in fill_3d_data.F90
+    void put_1d_array_on_cart(const int* lo, const int* hi, const int lev,
+                              amrex::Real* s0_cart,
+                              const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
+                              const amrex::Real* s0, const int is_input_edge_centered,
+                              const int is_output_a_vector);
+
     void put_1d_array_on_cart_sphr(const int* lo, const int* hi,
                                    amrex::Real* s0_cart,
                                    const int* s0_cart_lo, const int* s0_cart_hi, const int nc_s,
@@ -332,9 +338,50 @@ extern "C"
                                    const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc,
                                    const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
+    void addw0(const int* lo, const int* hi, const int lev, 
+               amrex::Real* uedge, const int* u_lo, const int* u_hi,
+               amrex::Real* w0, const amrex::Real mult);
+
+    void addw0_sphr(const int* lo, const int* hi,
+                    amrex::Real* umac, const int* u_lo, const int* u_hi,
+                    const amrex::Real* w0mac, const int* x_lo, const int* x_hi,
+                    const amrex::Real mult);
+
+    void make_w0mac_sphr(const int* lo, const int* hi, const int idir,
+                         const amrex::Real* w0,
+                         amrex::Real* w0macx, const int* x_lo, const int* x_hi,
+                         amrex::Real* w0_cart, const int* w0_lo, const int* w0_hi, const int nc_w0,
+                         amrex::Real* w0_nodal, const int* wn_lo, const int* wn_hi,
+                         const amrex::Real* dx,
+                         const amrex::Real* r_edge_loc);
+
+    void make_w0mac_nodal(const int* lo, const int* hi,
+                         const amrex::Real* w0,
+                         amrex::Real* w0_nodal, const int* w0_lo, const int* w0_hi, 
+                         const amrex::Real* dx);
+
+    void make_s0mac_sphr(const int* lo, const int* hi, const int idir,
+                         const amrex::Real* s0,
+                         amrex::Real* s0mac, const int* x_lo, const int* x_hi,
+                         amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
+                         const amrex::Real* dx,
+                         const amrex::Real* r_cc_loc);
+
+    void make_s0mac_sphr_irreg(const int* lo, const int* hi, const int idir,
+                               const amrex::Real* s0,
+                               amrex::Real* s0mac, const int* x_lo, const int* x_hi,
+                               amrex::Real* s0_cart, const int* s0_lo, const int* s0_hi,
+                               const amrex::Real* dx,
+                               const amrex::Real* r_cc_loc);
+
     void make_normal(const int* lo, const int* hi,
-                     amrex::Real* normal, const int* n_lo, const int* n_hi,
+                               amrex::Real* normal, const int* n_lo, const int* n_hi,
                      const amrex::Real* dx);
+
+    void put_data_on_faces(const int* lo, const int* hi, const int idir,
+                           const amrex::Real* scc, const int* cc_lo, const int* cc_hi,
+                           amrex::Real* face, const int* x_lo, const int* x_hi,
+                           const int harmonic_avg);
     //////////////////////
 
     //////////////////////
