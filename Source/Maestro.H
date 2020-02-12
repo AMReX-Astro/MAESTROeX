@@ -1003,8 +1003,7 @@ public:
                         const RealVector& gamma1bar_new_in,
                         const RealVector& p0_minus_peosbar,
                         RealVector& delta_chi_w0, 
-                        const amrex::Real dt_in, const amrex::Real dtold_in,  
-                        const bool is_predictor);
+                        const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Planar(RealVector& w0_in, 
                     const RealVector& w0_old, 
@@ -1021,7 +1020,19 @@ public:
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
                     const bool is_predictor);
 
-    void Makew0SphrIrreg() {};
+    void Makew0SphrIrreg(RealVector& w0_in, 
+                    const RealVector& w0_old, 
+                    RealVector& w0_force, 
+                    const RealVector& Sbar_in, 
+                    const RealVector& rho0_old_in,
+                    const RealVector& rho0_new_in,
+                    const RealVector& p0_old_in,
+                    const RealVector& p0_new_in,
+                    const RealVector& gamma1bar_old_in,
+                    const RealVector& gamma1bar_new_in,
+                    const RealVector& p0_minus_peosbar,
+                    RealVector& delta_chi_w0, 
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Sphr(RealVector& w0_in, 
                     const RealVector& w0_old, 
@@ -1035,8 +1046,7 @@ public:
                     const RealVector& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,
                     RealVector& delta_chi_w0, 
-                    const amrex::Real dt_in, const amrex::Real dtold_in, 
-                    const bool is_predictor);
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Tridiag(const RealVector& a, const RealVector& b, 
                  const RealVector& c, const RealVector& r, 

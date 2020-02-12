@@ -36,8 +36,7 @@ Maestro::Makew0(RealVector& w0_in,
                          p0_old_in, p0_new_in, 
                          gamma1bar_old_in, gamma1bar_new_in, 
                          p0_minus_peosbar, 
-                         delta_chi_w0, dt_in, dtold_in,
-                         is_predictor);
+                         delta_chi_w0, dt_in, dtold_in);
         } else {
             Makew0Planar(w0_in, w0_old, w0_force, Sbar_in, 
                          rho0_old_in, rho0_new_in,
@@ -49,15 +48,19 @@ Maestro::Makew0(RealVector& w0_in,
         }
     } else {
         if (use_exact_base_state) {
-            Makew0SphrIrreg();
+            Makew0SphrIrreg(w0_in, w0_old, w0_force, Sbar_in, 
+                            rho0_old_in, rho0_new_in,
+                            p0_old_in, p0_new_in, 
+                            gamma1bar_old_in, gamma1bar_new_in, 
+                            p0_minus_peosbar, 
+                            delta_chi_w0, dt_in, dtold_in);
         } else {
             Makew0Sphr(w0_in, w0_old, w0_force, Sbar_in, 
                       rho0_old_in, rho0_new_in,
                       p0_old_in, p0_new_in, 
                       gamma1bar_old_in, gamma1bar_new_in, 
                       p0_minus_peosbar, 
-                      delta_chi_w0, dt_in, dtold_in,
-                      is_predictor);
+                      delta_chi_w0, dt_in, dtold_in);
         }
     }
 
@@ -280,8 +283,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
                         const RealVector& gamma1bar_new_in,
                         const RealVector& p0_minus_peosbar,  
                         RealVector& delta_chi_w0, 
-                        const Real dt_in, const Real dtold_in, 
-                        const bool is_predictor) 
+                        const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
@@ -505,8 +507,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
                     const RealVector& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,  
                     RealVector& delta_chi_w0, 
-                    const Real dt_in, const Real dtold_in, 
-                    const bool is_predictor) 
+                    const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0Sphr()",Makew0Sphr);
@@ -638,6 +639,157 @@ Maestro::Makew0Sphr(RealVector& w0_in,
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
         Real div_avg = 0.5 * (dt_in * (w0_old[r+1]-w0_old[r]) + dtold_in * (w0_in[r+1]-w0_in[r])) / dt_avg;
         w0_force[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr[0];
+    }
+}
+
+void 
+Maestro::Makew0SphrIrreg(RealVector& w0_in, 
+                        const RealVector& w0_old, 
+                        RealVector& w0_force, 
+                        const RealVector& Sbar_in, 
+                        const RealVector& rho0_old_in,
+                        const RealVector& rho0_new_in,
+                        const RealVector& p0_old_in,
+                        const RealVector& p0_new_in,
+                        const RealVector& gamma1bar_old_in,
+                        const RealVector& gamma1bar_new_in,
+                        const RealVector& p0_minus_peosbar,  
+                        RealVector& delta_chi_w0, 
+                        const Real dt_in, const Real dtold_in) 
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::Makew0SphrIrreg()",Makew0SphrIrreg);
+
+    // local variables 
+    RealVector gamma1bar_nph(nr_fine);
+    RealVector p0_nph(nr_fine);
+    RealVector A(nr_fine+1);
+    RealVector B(nr_fine+1);
+    RealVector C(nr_fine+1);
+    RealVector u(nr_fine+1);
+    RealVector F(nr_fine+1);
+    RealVector w0_from_Sbar(nr_fine+1);
+    RealVector rho0_nph(nr_fine);
+    RealVector grav_edge(nr_fine+1);
+
+    get_base_cutoff_density(&base_cutoff_density);
+    int base_cutoff_density_coord = 0;
+    get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
+
+    const int max_lev = max_radial_level+1;
+
+    // create time-centered base-state quantities
+    for (auto r = 0; r < nr_fine; ++r) {
+        p0_nph[r] = 0.5*(p0_old_in[r] + p0_new_in[r]);
+        rho0_nph[r] = 0.5*(rho0_old_in[r] + rho0_new_in[r]);
+        gamma1bar_nph[r] = 0.5*(gamma1bar_old_in[r] + gamma1bar_new_in[r]);
+    }
+
+    // NOTE: We first solve for the w0 resulting only from Sbar,
+    //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
+    //      (r^2 Sbar).  Then we will solve for the update, delta w0.
+
+    w0_from_Sbar[0] = 0.0;
+
+    for (auto r = 1; r <= nr_fine; ++r) {
+
+        Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_density ? 
+            dpdt_factor * p0_minus_peosbar[r-1]/dt : 0.0;
+
+        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
+        w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
+            dr1 * Sbar_in[r-1] * r_cc_loc[r-1]*r_cc_loc[r-1] - 
+            dr1* volume_discrepancy * r_cc_loc[r-1]*r_cc_loc[r-1] 
+            / (gamma1bar_nph[r-1]*p0_nph[r-1]);
+    }
+
+    for (auto r = 1; r <= nr_fine; ++r) {
+        w0_from_Sbar[r] /= (r_edge_loc[r]*r_edge_loc[r]);
+    }
+
+    // make the edge-centered gravity
+    MakeGravEdge(grav_edge, rho0_nph);
+
+    // NOTE:  now we solve for the remainder, (r^2 * delta w0)
+    // this takes the form of a tri-diagonal matrix:
+    // A_j (r^2 dw_0)_{j-3/2} +
+    // B_j (r^2 dw_0)_{j-1/2} +
+    // C_j (r^2 dw_0)_{j+1/2} = F_j
+    std::fill(A.begin(), A.end(), 0.);
+    std::fill(B.begin(), B.end(), 0.);
+    std::fill(C.begin(), C.end(), 0.);
+    std::fill(F.begin(), F.end(), 0.);
+    std::fill(u.begin(), u.end(), 0.);
+
+    // Note that we are solving for (r^2 delta w0), not just w0.
+
+    int max_cutoff = base_cutoff_density_coord;
+    
+    for (auto r = 1; r <= max_cutoff; ++r) {
+        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
+        Real dr2 = r_edge_loc[max_lev*(r+1)] - r_edge_loc[max_lev*r];
+        Real dr3 = r_cc_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)];
+
+        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]);
+        A[r] /= dr1*dr3;
+
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]*dr1) 
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]*dr2) ) 
+                / dr3;
+
+        Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr3;
+
+        B[r] -= 4.0 * dpdr / (r_edge_loc[r]*r_edge_loc[r]*r_edge_loc[r]);
+
+        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]);
+        C[r] /= dr2*dr3;
+
+        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc[r] - 
+                grav_edge[r] * (r_cc_loc[r]*r_cc_loc[r] * etarho_cc[r] - 
+                r_cc_loc[r-1]*r_cc_loc[r-1] * etarho_cc[r-1]) / 
+                (dr3 * r_edge_loc[r]*r_edge_loc[r]) - 
+                4.0 * M_PI * Gconst * 0.5 * 
+                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec[r];
+    }
+
+    // Lower boundary
+    A[0] = 0.0;
+    B[0] = 1.0;
+    C[0] = 0.0;
+    F[0] = 0.0;
+
+    // Upper boundary
+    A[max_cutoff+1] = -1.0;
+    B[max_cutoff+1] = 1.0;
+    C[max_cutoff+1] = 0.0;
+    F[max_cutoff+1] = 0.0;
+
+    // Call the tridiagonal solver
+    Tridiag(A, B, C, F, u, max_cutoff+2);
+
+    w0_in[0] = w0_from_Sbar[0];
+
+    // do r=1,max_cutoff+1
+    for (auto r = 1; r <= max_cutoff+1; ++r) {
+        w0_in[r] = u[r] / (r_edge_loc[r]*r_edge_loc[r]) + w0_from_Sbar[r];
+    }
+
+    // do r=max_cutoff+2,nr_fine
+    for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
+        w0_in[r] = w0_in[max_cutoff+1] * r_edge_loc[max_cutoff+1]*r_edge_loc[max_cutoff+1]/(r_edge_loc[r]*r_edge_loc[r]);
+    }
+
+    // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
+    Real dt_avg = 0.5 * (dt_in + dtold_in);
+
+    // do r = 0,nr_fine-1
+    for (auto r = 0; r < nr_fine; ++r) {
+        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
+        Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
+        Real w0_new_cen = 0.5 * (w0_in[r] + w0_in[r+1]);
+        Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
+        Real div_avg = 0.5 * (dt_in * (w0_old[r+1]-w0_old[r]) + dtold_in * (w0_in[r+1]-w0_in[r])) / dt_avg;
+        w0_force[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
     }
 }
 
