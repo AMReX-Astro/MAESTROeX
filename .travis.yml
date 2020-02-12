@@ -3,6 +3,7 @@ dist: bionic
 matrix:
   include:
     - name: "deploy docs"
+      if: branch = development
       language: python
       python:
         - "3.7-dev"

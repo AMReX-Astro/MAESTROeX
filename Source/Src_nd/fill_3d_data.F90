@@ -1516,7 +1516,7 @@ contains
                         prod = scc(i,j,k) * scc(i-1,j,k)
                     else if (idir == 2) then 
                         denom = (scc(i,j,k) + scc(i,j-1,k))
-                        prod = scc(i,j,k) * scc(i-1,j,k)
+                        prod = scc(i,j,k) * scc(i,j-1,k)
                     else 
                         denom = (scc(i,j,k) + scc(i,j,k-1))
                         prod = scc(i,j,k) * scc(i,j,k-1)

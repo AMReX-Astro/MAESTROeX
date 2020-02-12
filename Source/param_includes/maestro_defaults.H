@@ -152,6 +152,7 @@ bool        Maestro::store_particle_vels = false;
 bool        Maestro::do_heating = false;
 int         Maestro::sdc_iters = 1;
 bool        Maestro::sdc_couple_mac_velocity = false;
+bool        Maestro::deterministic_nodal_solve = false;
 amrex::Real Maestro::eps_init_proj_cart = 1.e-12;
 amrex::Real Maestro::eps_init_proj_sph = 1.e-10;
 amrex::Real Maestro::eps_divu_cart = 1.e-12;
