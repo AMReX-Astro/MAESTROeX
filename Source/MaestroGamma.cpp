@@ -47,11 +47,11 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
             // We will also pass "validBox", which specifies the "valid" region.
 
 #pragma gpu box(tileBox)
-                make_gamma(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),
-                           BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                           BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
+            make_gamma(AMREX_INT_ANYD(tileBox.loVect()),
+                        AMREX_INT_ANYD(tileBox.hiVect()),
+                        BL_TO_FORTRAN_ANYD(gamma1_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+                        BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
         }
     }
 

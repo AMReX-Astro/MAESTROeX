@@ -597,8 +597,8 @@ public:
     // MaestroForce.cpp functions
 
     /// Calculate the velocity force term
-    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+    void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force_cart,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
                        const RealVector& grav,
@@ -607,7 +607,7 @@ public:
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
                          const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
@@ -617,10 +617,10 @@ public:
 
     /// Calculate the conserved enthalpy force term
     void MakeRhoHForce (amrex::Vector<amrex::MultiFab>& scal_force,
-                        int is_prediction,
+                        const int is_prediction,
                         const amrex::Vector<amrex::MultiFab>& thermal,
-                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                        int add_thermal,
+                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_cart,
+                        const int add_thermal,
                         const int &which_step);
     
     void MakeTempForce(amrex::Vector<amrex::MultiFab>& temp_force,
@@ -1496,7 +1496,7 @@ public:
                         amrex::Array4<const amrex::Real> const ury,
                         amrex::Array4<const amrex::Real> const uimhy,
                         amrex::Array4<const amrex::Real> const force,
-                        amrex::Array4<const amrex::Real> const w0_cart,
+                        amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
                         const amrex::Real* dx);
 #else 
@@ -1577,7 +1577,7 @@ public:
                         amrex::Array4<const amrex::Real> const wimhxy,
                         amrex::Array4<const amrex::Real> const wimhyx,
                         amrex::Array4<const amrex::Real> const force,
-                        amrex::Array4<const amrex::Real> const w0_cart,
+                        amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
                         const amrex::Real* dx);
 #endif
@@ -1716,6 +1716,9 @@ public:
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
+
+    // relative error needed for base state computations
+    amrex::Real c_rel_eps;
 
     // these provide information about the multilevel base state configuration
     IntVector numdisjointchunks;

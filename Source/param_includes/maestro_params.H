@@ -144,6 +144,7 @@ static bool        store_particle_vels;
 static bool        do_heating;
 static int         sdc_iters;
 static bool        sdc_couple_mac_velocity;
+static bool        deterministic_nodal_solve;
 static amrex::Real eps_init_proj_cart;
 static amrex::Real eps_init_proj_sph;
 static amrex::Real eps_divu_cart;

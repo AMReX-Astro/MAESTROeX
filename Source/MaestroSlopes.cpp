@@ -435,7 +435,7 @@ Maestro::Slopez(const Box& bx,
             }
         });
 
-    } else  if (slope_order == 4) {
+    } else if (slope_order == 4) {
         // 4th order
 
         AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
@@ -484,13 +484,10 @@ Maestro::Slopez(const Box& bx,
 
                 } else if (k == klo+1) {
                     // Recalculate the slope at lo(2)+1 using the revised dzl
-                    Real del = -16.0/15.0*s(i,j,k-2,n) +  0.5*s(i,j,k-1,n) +  
-                        2.0/3.0*s(i,j,k,n) - 0.1*s(i,j,k+1,n);
                     dmin = 2.0*(s(i,j,k-1,n)-s(i,j,k-2,n));
                     dpls = 2.0*(s(i,j,k,n)-s(i,j,k-1,n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0,del);
                     dzl = slz(i,j,k-1,n);
                     ds = 4.0/3.0 * dcen - (dzr + dzl) / 6.0;
                     slz(i,j,k,n) = dflag*min(fabs(ds),dlim);
@@ -512,13 +509,10 @@ Maestro::Slopez(const Box& bx,
 
                 } else if (k == khi-1) {
                     // Recalculate the slope at lo(3)+1 using the revised dzr
-                    Real del = -( -16.0/15.0*s(i,j,k+2,n) +  0.5*s(i,j,k+1,n) + 
-                        2.0/3.0*s(i,j,k,n) - 0.1*s(i,j,k-1,n) );
                     dmin = 2.0*(s(i,j,k+1,n)-s(i,j,k,n));
                     dpls = 2.0*(s(i,j,k+2,n)-s(i,j,k+1,n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls*dmin>0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0,del);
                     dzr = slz(i,j,k+1,n);
                     ds = 4.0/3.0 * dcen - (dzl + dzr) / 6.0;
                     slz(i,j,k,n) = dflag*min(fabs(ds),dlim);

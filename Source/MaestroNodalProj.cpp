@@ -220,6 +220,16 @@ Maestro::NodalProj (int proj_type,
         rhcc[lev].mult(-1.0,0,1,1);
     }
 
+#ifdef AMREX_USE_CUDA
+    // compRHS is non-deterministic on the GPU. If this flag is true, run 
+    // on the CPU instead
+    bool launched;
+    if (deterministic_nodal_solve) {
+        launched = !Gpu::notInLaunchRegion();
+        // turn off GPU
+        if (launched) Gpu::setLaunchRegion(false);
+    }
+#endif
     // Assemble the nodal RHS as the sum of the cell-centered RHS averaged to nodes
     // plus div (beta0*Vproj) on nodes
     // so rhstotal = div(beta*Vproj) - beta0*(S-Sbar)
@@ -227,6 +237,12 @@ Maestro::NodalProj (int proj_type,
                     amrex::GetVecOfPtrs(Vproj),
                     {},     // pass in null rhnd
                     amrex::GetVecOfPtrs(rhcc));
+#ifdef AMREX_USE_CUDA
+    if (deterministic_nodal_solve) {
+        // turn GPU back on
+        if (launched) Gpu::setLaunchRegion(true);
+    }
+#endif
 
     // restore rhcc
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -281,9 +297,22 @@ Maestro::NodalProj (int proj_type,
 
     // solve for phi
     Print() << "Calling nodal solver" << std::endl;
+#ifdef AMREX_USE_CUDA
+    if (deterministic_nodal_solve) {
+        launched = !Gpu::notInLaunchRegion();
+        // turn off GPU
+        if (launched) Gpu::setLaunchRegion(false);
+    }
+#endif
     mlmg.solve(amrex::GetVecOfPtrs(phi),
-                               amrex::GetVecOfConstPtrs(rhstotal),
+               amrex::GetVecOfConstPtrs(rhstotal),
                                rel_tol, abs_tol);
+#ifdef AMREX_USE_CUDA
+    if (deterministic_nodal_solve) {
+        // turn GPU back on
+        if (launched) Gpu::setLaunchRegion(true);
+    }
+#endif
     Print() << "Done calling nodal solver" << std::endl;
 
     // convert beta0*Vproj back to Vproj

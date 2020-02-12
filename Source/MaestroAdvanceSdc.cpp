@@ -812,15 +812,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             // wallclock time
-            Real start_total_macproj = ParallelDescriptor::second();
+            Real start_total_macproj_corrector = ParallelDescriptor::second();
 
             // MAC projection
             // includes spherical option in C++ function
             MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
 
             // wallclock time
-            Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
-            ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
+            Real end_total_macproj_corrector = ParallelDescriptor::second() - start_total_macproj_corrector;
+            ParallelDescriptor::ReduceRealMax(end_total_macproj_corrector,ParallelDescriptor::IOProcessorNumber());
 
 
             if (spherical == 1 && evolve_base_state && split_projection) {
@@ -975,13 +975,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
     
         // wallclock time
-        Real start_total_react = ParallelDescriptor::second();
+        Real start_total_react_corrector = ParallelDescriptor::second();
     
         ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
 
         // wallclock time
-        Real end_total_react = ParallelDescriptor::second() - start_total_react;
-        ParallelDescriptor::ReduceRealMax(end_total_react,ParallelDescriptor::IOProcessorNumber());
+        Real end_total_react_corrector = ParallelDescriptor::second() - start_total_react_corrector;
+        ParallelDescriptor::ReduceRealMax(end_total_react_corrector,ParallelDescriptor::IOProcessorNumber());
 
         // extract IR =  [ (snew - sold)/dt - sdc_source ]
         for (int lev=0; lev<=finest_level; ++lev) {

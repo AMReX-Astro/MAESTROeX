@@ -98,6 +98,9 @@ maestro.small_dens = 1.e-10
 # BURNING parameters
 maestro.do_burning = false
 
+# GPU parameters 
+maestro.deterministic_nodal_solve = true
+
 &probin
 
   ! override the default values of the probin namelist values here

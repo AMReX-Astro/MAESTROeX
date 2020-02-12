@@ -27,7 +27,6 @@ F90EXE_sources += make_plot_variables.F90
 F90EXE_sources += make_psi.F90
 F90EXE_sources += make_S.F90
 F90EXE_sources += make_scal_force.F90
-F90EXE_sources += make_vel_force.F90
 F90EXE_sources += make_w0.F90
 F90EXE_sources += regrid.F90
 F90EXE_sources += rhoh_vs_t.F90

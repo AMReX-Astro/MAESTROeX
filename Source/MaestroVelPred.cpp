@@ -107,10 +107,6 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = mfi.nodaltilebox(0);
-            const Box& ybx = mfi.nodaltilebox(1);
-            const Box& mxbx = amrex::growLo(obx,0, -1);
-            const Box& mybx = amrex::growLo(obx,1, -1);
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -222,12 +218,6 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& obx = amrex::grow(tileBox, 1);
-            const Box& xbx = mfi.nodaltilebox(0);
-            const Box& ybx = mfi.nodaltilebox(1);
-            const Box& zbx = mfi.nodaltilebox(2);
-            const Box& mxbx = amrex::growLo(obx,0, -1);
-            const Box& mybx = amrex::growLo(obx,1, -1);
-            const Box& mzbx = amrex::growLo(obx,2, -1);
 
             // x-direction
             if (ppm_type == 0) {
@@ -408,8 +398,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
 
@@ -631,7 +620,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                             Array4<const Real> const ury,
                             Array4<const Real> const uimhy,
                             Array4<const Real> const force,
-                            Array4<const Real> const w0_cart,
+                            Array4<const Real> const w0_cart_in,
                             const Box& domainBox,
                             const Real* dx)
 {
@@ -645,8 +634,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
     const Real dt4 = 0.25 * dt;
@@ -741,10 +729,10 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (uimhx(i+1,j,k,1)-uimhx(i,j,k,1)) + dt2*fr;
 
         // solve Riemann problem using full velocity
-        bool test = (vmacl+w0_cart(i,j,k,AMREX_SPACEDIM-1) <= 0.0 && 
-                     vmacr+w0_cart(i,j,k,AMREX_SPACEDIM-1) >= 0.0) || 
-                    (fabs(vmacl+vmacr+2*w0_cart(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
-        vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0_cart(i,j,k,AMREX_SPACEDIM-1) > 0.0 ? 
+        bool test = (vmacl+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) <= 0.0 && 
+                     vmacr+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) >= 0.0) || 
+                    (fabs(vmacl+vmacr+2*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+        vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) > 0.0 ? 
                       vmacl : vmacr;
         vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
 
@@ -833,8 +821,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Box& mybx = amrex::growLo(obx, 1, -1);
     const Box& mzbx = amrex::growLo(obx,2, -1);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
 
@@ -1200,8 +1187,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     // Create u_{\i-\half\e_y}^{y|z}, etc.
     //////////////////////////////////////
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const Real dt6 = dt / 6.0;
 
@@ -1606,7 +1592,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                             Array4<const Real> const wimhxy,
                             Array4<const Real> const wimhyx,
                             Array4<const Real> const force,
-                            Array4<const Real> const w0_cart,
+                            Array4<const Real> const w0_cart_in,
                             const Box& domainBox,
                             const Real* dx)
 {
@@ -1621,8 +1607,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Box& ybx = mfi.nodaltilebox(1);
     const Box& zbx = mfi.nodaltilebox(2);
 
-    Real rel_eps = 0.0;
-    get_rel_eps(&rel_eps);
+    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
     const Real dt4 = 0.25 * dt;
@@ -1824,10 +1809,10 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
-            bool test = (wmacl+w0_cart(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
-                         wmacr+w0_cart(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2.0*w0_cart(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
-            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
+            bool test = (wmacl+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
+                         wmacr+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
+                        (fabs(wmacl+wmacr+2.0*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+            wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
                 wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         }
