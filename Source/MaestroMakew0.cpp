@@ -133,6 +133,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     const Real dt_loc = dt;
+    const Real grav_const_loc = grav_const;
+    const Real dpdt_factor_loc = dpdt_factor;
 
     // Compute w0 on edges at level n
     for (auto n = 0; n <= max_radial_level; ++n) {
@@ -159,7 +161,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord) {
-                    psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const);
+                    psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
                 }
             });
 
@@ -170,25 +172,25 @@ Maestro::Makew0Planar(RealVector& w0_in,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
 
-                Real gamma1bar_p0_avg = (gamma1bar_old[n+max_lev*(r-1)]
+                Real gamma1bar_p0_avg = (gamma1bar_old_p[n+max_lev*(r-1)]
                     + gamma1bar_new_p[n+max_lev*(r-1)]) *
                     (p0_old_p[n+max_lev*(r-1)] + 
                     p0_new_p[n+max_lev*(r-1)])/4.0;
 
                 if (r < base_cutoff_density_coord) {
                     if (is_predictor) {
-                        delta_chi_w0_p[n+max_lev*(r-1)] = dpdt_factor * 
+                        delta_chi_w0_p[n+max_lev*(r-1)] = dpdt_factor_loc * 
                             p0_minus_peosbar_p[n+max_lev*(r-1)] / 
                             (gamma1bar_old_p[n+max_lev*(r-1)]*
                             p0_old_p[n+max_lev*(r-1)]*dt_loc);
                     } else {
-                        delta_chi_w0_p[n+max_lev*(r-1)] += dpdt_factor *
+                        delta_chi_w0_p[n+max_lev*(r-1)] += dpdt_factor_loc *
                             p0_minus_peosbar_p[n+max_lev*(r-1)] / 
                             (gamma1bar_new_p[n+max_lev*(r-1)]*
                             p0_new_p[n+max_lev*(r-1)]*dt_loc);
                     }
                 } else {
-                    delta_chi_w0[n+max_lev*(r-1)] = 0.0;
+                    delta_chi_w0_p[n+max_lev*(r-1)] = 0.0;
                 }
 
                 w0_p[n+max_lev*r] = w0_p[n+max_lev*(r-1)]
@@ -278,13 +280,11 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     w0_old_p[n+max_lev*(r+1)]);
                 Real w0_new_cen = 0.5 * (w0_p[n+max_lev*r] + 
                     w0_p[n+max_lev*(r+1)]);
-                Real w0_avg = 0.5 * (dt * w0_old_cen 
-                    + dtold *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt *(w0_old_p[n+max_lev*(r+1)]
-                    - w0_old_p[n+max_lev*r]) + dtold * (w0_p[n+max_lev*(r+1)] 
+                Real w0_avg = 0.5 * (dt_in * w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
+                Real div_avg = 0.5 * (dt_in *(w0_old_p[n+max_lev*(r+1)]
+                    - w0_old_p[n+max_lev*r]) + dtold_in * (w0_p[n+max_lev*(r+1)] 
                     - w0_p[n+max_lev*r])) / dt_avg;
-                w0_force_p[n+max_lev*r] = (w0_new_cen
-                    - w0_old_cen)/dt_avg 
+                w0_force_p[n+max_lev*r] = (w0_new_cen - w0_old_cen)/dt_avg 
                     + w0_avg*div_avg/dr_lev;
             });
         }
@@ -323,10 +323,12 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     const int max_lev = max_radial_level+1;
     const int nr_finest = nr[finest_radial_level];
     const Real dr_finest = dr[finest_radial_level];
+    const Real dpdt_factor_loc = dpdt_factor;
 
     Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
+    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.
@@ -402,7 +404,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         Real gamma1bar_p0_avg = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
 
         Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? 
-            dpdt_factor * p0_minus_peosbar_fine[r-1]/dt : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_fine[r-1]/dt : 0.0;
 
         w0bar_fine[r] =  w0bar_fine[r-1] + 
             Sbar_in_fine[r-1] * dr_finest 
@@ -454,13 +456,13 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         B[r] = -(gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1] + 
             gamma1bar_nph_fine[r] * p0_nph_fine[r]) 
             / (dr_finest*dr_finest);
-        B[r] -= 2.0 * dpdr / (r_edge_loc[finest_radial_level+max_lev*r]);
+        B[r] -= 2.0 * dpdr / (r_edge_loc_p[finest_radial_level+max_lev*r]);
 
         C[r] = gamma1bar_nph_fine[r] * p0_nph_fine[r];
         C[r] /= dr_finest*dr_finest;
 
         F[r] = 2.0 * dpdr * w0bar_fine[r] / 
-            r_edge_loc[finest_radial_level+max_lev*r] -
+            r_edge_loc_p[finest_radial_level+max_lev*r] -
             grav_edge_fine[r] * (etarho_cc_fine[r] - etarho_cc_fine[r-1]) / 
             dr_finest;
     });
@@ -513,7 +515,6 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     }
 
     // 8) zero w0 where there is no corresponding full state array
-    // do n=1,finest_radial_level
     for (auto n = 1; n <= finest_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
             if (j == numdisjointchunks[n]) {
@@ -545,7 +546,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
-            const Real dt_avg = 0.5 * (dt + dtold);
+            const Real dt_avg = 0.5 * (dt_in + dtold_in);
             const Real dr_lev = dr[n];
 
             // for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
@@ -555,9 +556,9 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
                 int r = k + lo;
                 Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + w0_old_p[n+max_lev*(r+1)]);
                 Real w0_new_cen = 0.5 * (w0_p[n+max_lev*r] + w0_p[n+max_lev*(r+1)]);
-                Real w0_avg = 0.5 * (dt * w0_old_cen + dtold *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt * (w0_old_p[n+max_lev*(r+1)]-w0_old_p[n+max_lev*r]) + 
-                    dtold * (w0_p[n+max_lev*(r+1)]-w0_p[n+max_lev*r])) / dt_avg;
+                Real w0_avg = 0.5 * (dt_in * w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
+                Real div_avg = 0.5 * (dt_in * (w0_old_p[n+max_lev*(r+1)]-w0_old_p[n+max_lev*r]) + 
+                    dtold_in * (w0_p[n+max_lev*(r+1)]-w0_p[n+max_lev*r])) / dt_avg;
                 w0_force_p[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
             });
         }
@@ -624,12 +625,13 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
-    get_base_cutoff_density(&base_cutoff_density);
+    Real base_cutoff_dens = 0.0;
+    get_base_cutoff_density(&base_cutoff_dens);
     int base_cutoff_density_coord = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
 
-    const int max_lev = max_radial_level+1;
     const Real dr0 = dr[0];
+    const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
     // for (auto r = 0; r < nr_fine; ++r) {
@@ -642,7 +644,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
-
     w0_from_Sbar_vec[0] = 0.0;
 
     // for (auto r = 1; r <= nr_fine; ++r) {
@@ -651,8 +652,8 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
 
-        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_density ? 
-            dpdt_factor * p0_minus_peosbar_p[r-1]/dt : 0.0;
+        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_dens ? 
+            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt : 0.0;
 
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
             dr0 * Sbar_p[r-1] * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] - 
@@ -816,11 +817,13 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
-    get_base_cutoff_density(&base_cutoff_density);
+    Real base_cutoff_dens = 0.0;
+    get_base_cutoff_density(&base_cutoff_dens);
     int base_cutoff_density_coord = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
 
     const int max_lev = max_radial_level+1;
+    const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
     // for (auto r = 0; r < nr_fine; ++r) {
@@ -841,8 +844,8 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
 
-        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_density ? 
-            dpdt_factor * p0_minus_peosbar_p[r-1]/dt : 0.0;
+        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_dens ? 
+            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt : 0.0;
 
         Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
@@ -870,7 +873,6 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     std::fill(u_vec.begin(), u_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
-
     int max_cutoff = base_cutoff_density_coord;
     
     // for (auto r = 1; r <= max_cutoff; ++r) {
