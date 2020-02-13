@@ -10,6 +10,9 @@ ssh-add ../id_maestro_rsa
 
 cd $TRAVIS_BUILD_DIR
 git config remote.origin.url git@github.com:${TRAVIS_PULL_REQUEST_SLUG}.git
+git config --get remote.origin.fetch
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git config --get remote.origin.fetch
 git fetch origin
 git remote -v
 git branch --remote
