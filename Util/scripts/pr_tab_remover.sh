@@ -37,7 +37,7 @@ fi
 # Otherwise, commit and push
 git commit -m "Tabs have been converted to spaces by tab_exterminator.sh"
 echo "pushing to $TRAVIS_PULL_REQUEST_BRANCH"
-git push origin $TRAVIS_PULL_REQUEST_BRANCH
+git push $SSH_REPO $TRAVIS_PULL_REQUEST_BRANCH
 cd 
 
 # Kill the ssh-agent
