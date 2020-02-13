@@ -19,7 +19,8 @@ extern "C"
                                 amrex::Real* rho0_predicted_edge,
                           const amrex::Real dt,
                           const amrex::Real* r_cc_loc,
-                          const amrex::Real* r_edge_loc);
+                          const amrex::Real* r_edge_loc,
+                          const int lev);
 
     void advect_base_enthalpy(const amrex::Real* w0,
                               const amrex::Real* rho0_old,
@@ -29,7 +30,8 @@ extern "C"
                               const amrex::Real* psi,
                               const amrex::Real dt,
                               const amrex::Real* r_cc_loc,
-                              const amrex::Real* r_edge_loc);
+                              const amrex::Real* r_edge_loc,
+                              const int lev);
     //////////////////////
 
     //////////////////////
@@ -436,7 +438,8 @@ extern "C"
                           const amrex::Real* rhoh0,
                           const amrex::Real* p0,
                           const amrex::Real* tempbar,
-                          const amrex::Real* tempbar_init);
+                          const amrex::Real* tempbar_init,
+                          const int lev);
 
     void init_base_state_irreg (const amrex::Real* s0_init,
                                 const amrex::Real* p0_init,
@@ -446,7 +449,8 @@ extern "C"
                                 const amrex::Real* tempbar,
                                 const amrex::Real* tempbar_init,
                                 const amrex::Real* r_cc_loc,
-                                const amrex::Real* r_edge_loc);
+                                const amrex::Real* r_edge_loc,
+                                const int lev);
     //////////////////////
 
     //////////////////////
