@@ -8,10 +8,11 @@ eval `ssh-agent -s`
 ssh-add ../id_maestro_rsa
 #ls ../id_rsa_travis
 
+cd $TRAVIS_BUILD_DIR
 git config remote.origin.url git@github.com:${TRAVIS_PULL_REQUEST_SLUG}.git
 git fetch origin
 git remote -v
-git branch
+git branch --remote
 git checkout --track origin/$TRAVIS_PULL_REQUEST_BRANCH
 
 echo "Running tab exterminator script"
