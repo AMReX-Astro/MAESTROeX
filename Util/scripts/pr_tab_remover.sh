@@ -12,8 +12,8 @@ eval `ssh-agent -s`
 ssh-add ../id_maestro_rsa
 #ls ../id_rsa_travis
 
-git fetch
-git checkout -b $TRAVIS_PULL_REQUEST_BRANCH origin/$TRAVIS_PULL_REQUEST_BRANCH
+git fetch --all
+git checkout -b $TRAVIS_PULL_REQUEST_BRANCH $SSH_REPO/$TRAVIS_PULL_REQUEST_BRANCH
 
 echo "Running tab exterminator script"
 
