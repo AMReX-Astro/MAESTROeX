@@ -9,9 +9,10 @@ ssh-add ../id_maestro_rsa
 #ls ../id_rsa_travis
 
 git config remote.origin.url git@github.com:${TRAVIS_PULL_REQUEST_SLUG}.git
-git fetch --all
+git fetch origin
 git remote -v
-git checkout -b $TRAVIS_PULL_REQUEST_BRANCH origin/$TRAVIS_PULL_REQUEST_BRANCH
+git branch
+git checkout --track origin/$TRAVIS_PULL_REQUEST_BRANCH
 
 echo "Running tab exterminator script"
 
