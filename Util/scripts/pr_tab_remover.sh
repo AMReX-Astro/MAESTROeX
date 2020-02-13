@@ -1,10 +1,6 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-# Save some useful information
-REPO=`git config remote.origin.url`
-SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
-
 # Add rsa keys to the ssh agent to push to GitHub
 gpg --output ../id_maestro_rsa --batch --passphrase $DECRYPT_GITHUB_AUTH --decrypt $TRAVIS_BUILD_DIR/id_maestro_rsa.enc
 chmod 600 ../id_maestro_rsa
@@ -12,8 +8,10 @@ eval `ssh-agent -s`
 ssh-add ../id_maestro_rsa
 #ls ../id_rsa_travis
 
+git config remote.origin.url git@github.com:${TRAVIS_PULL_REQUEST_SLUG}.git
 git fetch --all
-git checkout -b $TRAVIS_PULL_REQUEST_BRANCH $SSH_REPO/$TRAVIS_PULL_REQUEST_BRANCH
+git remote -v
+git checkout -b $TRAVIS_PULL_REQUEST_BRANCH origin/$TRAVIS_PULL_REQUEST_BRANCH
 
 echo "Running tab exterminator script"
 
