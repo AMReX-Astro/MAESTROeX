@@ -12,6 +12,8 @@ eval `ssh-agent -s`
 ssh-add ../id_maestro_rsa
 #ls ../id_rsa_travis
 
+git checkout $TRAVIS_PULL_REQUEST_BRANCH
+
 echo "Running tab exterminator script"
 
 cd $TRAVIS_BUILD_DIR/Util/scripts
@@ -30,14 +32,14 @@ git add --all
 
 # Exit if there are no docs changes
 if git diff --staged --quiet; then
-   echo "exiting with no docs changes"
+   echo "exiting with no tabs exterminated"
    exit 0
 fi
 
 # Otherwise, commit and push
 git commit -m "Tabs have been converted to spaces by tab_exterminator.sh"
 echo "pushing to $TRAVIS_PULL_REQUEST_BRANCH"
-git push $SSH_REPO $TRAVIS_PULL_REQUEST_BRANCH
+git push origin $TRAVIS_PULL_REQUEST_BRANCH
 cd 
 
 # Kill the ssh-agent
