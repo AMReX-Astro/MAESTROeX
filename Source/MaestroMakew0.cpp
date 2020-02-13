@@ -156,8 +156,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             // compute psi for level n
             int lo = r_start_coord[n+max_lev*j]; 
             int hi = r_end_coord[n+max_lev*j];
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                int r = j + lo;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                int r = k + lo;
                 if (r < base_cutoff_density_coord) {
                     psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const);
                 }
@@ -167,8 +167,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             hi = r_end_coord[n+max_lev*j]+1;
             // for (auto r = r_start_coord[n+max_lev*j]+1; 
             //     r <= r_end_coord[n+max_lev*j]+1; ++r) {
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                int r = j + lo;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                int r = k + lo;
 
                 Real gamma1bar_p0_avg = (gamma1bar_old[n+max_lev*(r-1)]
                     + gamma1bar_new_p[n+max_lev*(r-1)]) *
@@ -211,8 +211,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     // for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
                     lo = r_start_coord[n+max_lev*j]; 
                     hi = r_end_coord[n+max_lev*j];
-                    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                        int r = j + lo;
+                    AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                        int r = k + lo;
                         if (r % refrat == 0) {
                             w0_p[n+max_lev*r/refrat] = w0_p[n+max_lev*r];
                         }
@@ -222,8 +222,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     // for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
                     lo = (r_end_coord[n+max_lev*j]+1)/refrat+1; 
                     hi = nr[i];
-                    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                        int r = j + lo;
+                    AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                        int r = k + lo;
                         w0_p[i+max_lev*r] += offset;
                     });
                 }
@@ -239,8 +239,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
                 //      r <= nr[n]; ++r) {
                 const int lo = r_end_coord[n+max_lev*j]+2; 
                 const int hi = nr[n];
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                    int r = j + lo;
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                    int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             } else {
@@ -248,8 +248,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
                 //      r <= r_start_coord[n+max_lev*(j+1)]-1; ++r) {
                 const int lo = r_end_coord[n+max_lev*j]+2; 
                 const int hi = r_start_coord[n+max_lev*(j+1)]-1;
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                    int r = j + lo;
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                    int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             }
@@ -271,8 +271,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             //      r <= r_end_coord[n + max_lev*j]; ++r) {
             const int lo = r_start_coord[n+max_lev*j]; 
             const int hi = r_end_coord[n+max_lev*j];
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                int r = j + lo;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                int r = k + lo;
 
                 Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + 
                     w0_old_p[n+max_lev*(r+1)]);
@@ -321,7 +321,8 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
 
     const int max_lev = max_radial_level+1;
-    const int nr_finest = nr_fine / pow(2,(max_radial_level-finest_radial_level));
+    const int nr_finest = nr[finest_radial_level];
+    const Real dr_finest = dr[finest_radial_level];
 
     Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -392,8 +393,6 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     //    volume discrepancy terms
     // lower boundary condition
     w0bar_fine_vec[0] = 0.0;
-
-    const Real dr_finest = dr[finest_radial_level];
 
     // for (auto r = 1; r <= nr_finest; ++r) {
     int lo = 1; 
@@ -521,16 +520,16 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
                 // for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
                 lo = r_end_coord[n+max_lev*j]+2; 
                 hi = nr[n];
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                    int r = j + lo;
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                    int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             } else {
                 // for (auto r = r_end_coord[n+max_lev*j]+2; r < r_start_coord[n+max_lev*(j+1)]; ++r) {
                 lo = r_end_coord[n+max_lev*j]+2; 
                 hi = r_start_coord[n+max_lev*(j+1)];
-                AMREX_PARALLEL_FOR_1D(hi-lo, j, {
-                    int r = j + lo;
+                AMREX_PARALLEL_FOR_1D(hi-lo, k, {
+                    int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             }
@@ -552,8 +551,8 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
             // for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
             lo = r_start_coord[n+max_lev*j]; 
             hi = r_end_coord[n+max_lev*j];
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-                int r = j + lo;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                int r = k + lo;
                 Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + w0_old_p[n+max_lev*(r+1)]);
                 Real w0_new_cen = 0.5 * (w0_p[n+max_lev*r] + w0_p[n+max_lev*(r+1)]);
                 Real w0_avg = 0.5 * (dt * w0_old_cen + dtold *  w0_new_cen) / dt_avg;

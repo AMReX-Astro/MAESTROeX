@@ -407,7 +407,7 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
 }
 
 void 
-Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
+Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
@@ -420,8 +420,6 @@ Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
-        Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
-        // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             if (is_cell_centered) {
@@ -457,7 +455,7 @@ Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
 }
 
 void 
-Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
+Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
@@ -470,7 +468,6 @@ Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
-        Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
         const int nr = nr_fine / pow(2,max_radial_level-n);
 
         // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
