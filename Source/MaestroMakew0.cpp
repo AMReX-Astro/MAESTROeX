@@ -32,11 +32,11 @@ Maestro::Makew0(RealVector& w0_in,
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
             Makew0PlanarVarg(w0_in, w0_old, w0_force, Sbar_in, 
-                         rho0_old_in, rho0_new_in,
-                         p0_old_in, p0_new_in, 
-                         gamma1bar_old_in, gamma1bar_new_in, 
-                         p0_minus_peosbar, 
-                         delta_chi_w0, dt_in, dtold_in);
+                             rho0_old_in, rho0_new_in,
+                             p0_old_in, p0_new_in, 
+                             gamma1bar_old_in, gamma1bar_new_in, 
+                             p0_minus_peosbar, 
+                             delta_chi_w0, dt_in, dtold_in);
         } else {
             Makew0Planar(w0_in, w0_old, w0_force, Sbar_in, 
                          rho0_old_in, rho0_new_in,
@@ -56,11 +56,11 @@ Maestro::Makew0(RealVector& w0_in,
                             delta_chi_w0, dt_in, dtold_in);
         } else {
             Makew0Sphr(w0_in, w0_old, w0_force, Sbar_in, 
-                      rho0_old_in, rho0_new_in,
-                      p0_old_in, p0_new_in, 
-                      gamma1bar_old_in, gamma1bar_new_in, 
-                      p0_minus_peosbar, 
-                      delta_chi_w0, dt_in, dtold_in);
+                       rho0_old_in, rho0_new_in,
+                       p0_old_in, p0_new_in, 
+                       gamma1bar_old_in, gamma1bar_new_in, 
+                       p0_minus_peosbar, 
+                       delta_chi_w0, dt_in, dtold_in);
         }
     }
 
@@ -78,19 +78,19 @@ Maestro::Makew0(RealVector& w0_in,
 
 void 
 Maestro::Makew0Planar(RealVector& w0_in, 
-                    const RealVector& w0_old, 
-                    RealVector& w0_force, 
-                    const RealVector& Sbar_in, 
-                    const RealVector& rho0_old_in,
-                    const RealVector& rho0_new_in,
-                    const RealVector& p0_old_in,
-                    const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
-                    const RealVector& p0_minus_peosbar,  
-                    RealVector& delta_chi_w0, 
-                    const Real dt_in, const Real dtold_in, 
-                    const bool is_predictor) 
+                      const RealVector& w0_old, 
+                      RealVector& w0_force, 
+                      const RealVector& Sbar_in, 
+                      const RealVector& rho0_old_in,
+                      const RealVector& rho0_new_in,
+                      const RealVector& p0_old_in,
+                      const RealVector& p0_new_in,
+                      const RealVector& gamma1bar_old_in,
+                      const RealVector& gamma1bar_new_in,
+                      const RealVector& p0_minus_peosbar,  
+                      RealVector& delta_chi_w0, 
+                      const Real dt_in, const Real dtold_in, 
+                      const bool is_predictor) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0Planar()",Makew0Planar);
@@ -117,14 +117,31 @@ Maestro::Makew0Planar(RealVector& w0_in,
     const int max_lev = max_radial_level+1;
 
     // local variables 
-    RealVector psi_planar(nr_fine);
+    RealVector psi_planar_vec(nr_fine);
+
+    Real * AMREX_RESTRICT psi_planar = psi_planar_vec.dataPtr();
+    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const  Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
+    Real * AMREX_RESTRICT delta_chi_w0_p = delta_chi_w0.dataPtr();
+    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
+    const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
+    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
+
+    const Real dt_loc = dt;
 
     // Compute w0 on edges at level n
     for (auto n = 0; n <= max_radial_level; ++n) {
 
-        std::fill(psi_planar.begin(), psi_planar.end(), 0.);
+        std::fill(psi_planar_vec.begin(), psi_planar_vec.end(), 0.);
         int base_cutoff_density_coord = 0;
         get_base_cutoff_density_coord(n, &base_cutoff_density_coord);
+
+        const Real dr_lev = dr[n];
 
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
 
@@ -137,42 +154,48 @@ Maestro::Makew0Planar(RealVector& w0_in,
             }
 
             // compute psi for level n
-            for (auto r = r_start_coord[n+max_lev*j]; 
-                r <= r_end_coord[n+max_lev*j]; ++r) {
+            int lo = r_start_coord[n+max_lev*j]; 
+            int hi = r_end_coord[n+max_lev*j];
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
                 if (r < base_cutoff_density_coord) {
-                    psi_planar[r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
+                    psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const);
                 }
-            }
+            });
 
-            for (auto r = r_start_coord[n+max_lev*j]+1; 
-                r <= r_end_coord[n+max_lev*j]+1; ++r) {
+            lo = r_start_coord[n+max_lev*j]+1; 
+            hi = r_end_coord[n+max_lev*j]+1;
+            // for (auto r = r_start_coord[n+max_lev*j]+1; 
+            //     r <= r_end_coord[n+max_lev*j]+1; ++r) {
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
 
-                Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
-                    + gamma1bar_new_in[n+max_lev*(r-1)]) *
-                    (p0_old_in[n+max_lev*(r-1)] + 
-                    p0_new_in[n+max_lev*(r-1)])/4.0;
+                Real gamma1bar_p0_avg = (gamma1bar_old[n+max_lev*(r-1)]
+                    + gamma1bar_new_p[n+max_lev*(r-1)]) *
+                    (p0_old_p[n+max_lev*(r-1)] + 
+                    p0_new_p[n+max_lev*(r-1)])/4.0;
 
                 if (r < base_cutoff_density_coord) {
                     if (is_predictor) {
-                        delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor * 
-                            p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_old_in[n+max_lev*(r-1)]*
-                            p0_old_in[n+max_lev*(r-1)]*dt);
+                        delta_chi_w0_p[n+max_lev*(r-1)] = dpdt_factor * 
+                            p0_minus_peosbar_p[n+max_lev*(r-1)] / 
+                            (gamma1bar_old_p[n+max_lev*(r-1)]*
+                            p0_old_p[n+max_lev*(r-1)]*dt_loc);
                     } else {
-                        delta_chi_w0[n+max_lev*(r-1)] += dpdt_factor *
-                            p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_new_in[n+max_lev*(r-1)]*
-                            p0_new_in[n+max_lev*(r-1)]*dt);
+                        delta_chi_w0_p[n+max_lev*(r-1)] += dpdt_factor *
+                            p0_minus_peosbar_p[n+max_lev*(r-1)] / 
+                            (gamma1bar_new_p[n+max_lev*(r-1)]*
+                            p0_new_p[n+max_lev*(r-1)]*dt_loc);
                     }
                 } else {
                     delta_chi_w0[n+max_lev*(r-1)] = 0.0;
                 }
 
-                w0_in[n+max_lev*r] = w0_in[n+max_lev*(r-1)]
-                    + Sbar_in[n+max_lev*(r-1)] * dr[n] 
-                    - psi_planar[r-1] / gamma1bar_p0_avg * dr[n] 
-                    - delta_chi_w0[n+max_lev*(r-1)] * dr[n];
-            }
+                w0_p[n+max_lev*r] = w0_p[n+max_lev*(r-1)]
+                    + Sbar_p[n+max_lev*(r-1)] * dr_lev
+                    - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
+                    - delta_chi_w0_p[n+max_lev*(r-1)] * dr_lev;
+            });
 
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
@@ -185,16 +208,24 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     int refrat = pow(2, n-i);
 
                     // Restrict w0 from level n to level i
-                    for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
+                    // for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
+                    lo = r_start_coord[n+max_lev*j]; 
+                    hi = r_end_coord[n+max_lev*j];
+                    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                        int r = j + lo;
                         if (r % refrat == 0) {
-                            w0_in[n+max_lev*r/refrat] = w0_in[n+max_lev*r];
+                            w0_p[n+max_lev*r/refrat] = w0_p[n+max_lev*r];
                         }
-                    }
+                    });
 
                     // Offset the w0 on level i above the top of level n
-                    for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
-                        w0_in[i+max_lev*r] += offset;
-                    }
+                    // for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
+                    lo = (r_end_coord[n+max_lev*j]+1)/refrat+1; 
+                    hi = nr[i];
+                    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                        int r = j + lo;
+                        w0_p[i+max_lev*r] += offset;
+                    });
                 }
             }
         }
@@ -204,15 +235,23 @@ Maestro::Makew0Planar(RealVector& w0_in,
     for (auto n = 1; n <= max_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
             if (j == numdisjointchunks[n]) {
-                for (auto r = r_end_coord[n+max_lev*j]+2; 
-                     r <= nr[n]; ++r) {
-                    w0_in[n+max_lev*r] = 0.0;
-                }
+                // for (auto r = r_end_coord[n+max_lev*j]+2; 
+                //      r <= nr[n]; ++r) {
+                const int lo = r_end_coord[n+max_lev*j]+2; 
+                const int hi = nr[n];
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                    int r = j + lo;
+                    w0_p[n+max_lev*r] = 0.0;
+                });
             } else {
-                for (auto r = r_end_coord[n+max_lev*j]+2; 
-                     r <= r_start_coord[n+max_lev*(j+1)]-1; ++r) {
-                    w0_in[n+max_lev*r] = 0.0;
-                }
+                // for (auto r = r_end_coord[n+max_lev*j]+2; 
+                //      r <= r_start_coord[n+max_lev*(j+1)]-1; ++r) {
+                const int lo = r_end_coord[n+max_lev*j]+2; 
+                const int hi = r_start_coord[n+max_lev*(j+1)]-1;
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                    int r = j + lo;
+                    w0_p[n+max_lev*r] = 0.0;
+                });
             }
         }
     }
@@ -225,23 +264,29 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
-            Real dt_avg = 0.5 * (dt_in + dtold_in);
-            for (auto r = r_start_coord[n + max_lev*j]; 
-                 r <= r_end_coord[n + max_lev*j]; ++r) {
+            const Real dt_avg = 0.5 * (dt_in + dtold_in);
+            const Real dr_lev = dr[n];
 
-                Real w0_old_cen = 0.5 * (w0_old[n+max_lev*r] + 
-                    w0_old[n+max_lev*(r+1)]);
-                Real w0_new_cen = 0.5 * (w0_in[n+max_lev*r] + 
-                    w0_in[n+max_lev*(r+1)]);
+            // for (auto r = r_start_coord[n + max_lev*j]; 
+            //      r <= r_end_coord[n + max_lev*j]; ++r) {
+            const int lo = r_start_coord[n+max_lev*j]; 
+            const int hi = r_end_coord[n+max_lev*j];
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
+
+                Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + 
+                    w0_old_p[n+max_lev*(r+1)]);
+                Real w0_new_cen = 0.5 * (w0_p[n+max_lev*r] + 
+                    w0_p[n+max_lev*(r+1)]);
                 Real w0_avg = 0.5 * (dt * w0_old_cen 
                     + dtold *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt *(w0_old[n+max_lev*(r+1)]
-                    - w0_old[n+max_lev*r]) + dtold * (w0_in[n+max_lev*(r+1)] 
-                    - w0_in[n+max_lev*r])) / dt_avg;
-                w0_force[n+max_lev*r] = (w0_new_cen
+                Real div_avg = 0.5 * (dt *(w0_old_p[n+max_lev*(r+1)]
+                    - w0_old_p[n+max_lev*r]) + dtold * (w0_p[n+max_lev*(r+1)] 
+                    - w0_p[n+max_lev*r])) / dt_avg;
+                w0_force_p[n+max_lev*r] = (w0_new_cen
                     - w0_old_cen)/dt_avg 
-                    + w0_avg*div_avg/dr[n];
-            }
+                    + w0_avg*div_avg/dr_lev;
+            });
         }
     }
 
@@ -251,18 +296,18 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
 void 
 Maestro::Makew0PlanarVarg(RealVector& w0_in, 
-                        const RealVector& w0_old, 
-                        RealVector& w0_force, 
-                        const RealVector& Sbar_in, 
-                        const RealVector& rho0_old_in,
-                        const RealVector& rho0_new_in,
-                        const RealVector& p0_old_in,
-                        const RealVector& p0_new_in,
-                        const RealVector& gamma1bar_old_in,
-                        const RealVector& gamma1bar_new_in,
-                        const RealVector& p0_minus_peosbar,  
-                        RealVector& delta_chi_w0, 
-                        const Real dt_in, const Real dtold_in) 
+                          const RealVector& w0_old, 
+                          RealVector& w0_force, 
+                          const RealVector& Sbar_in, 
+                          const RealVector& rho0_old_in,
+                          const RealVector& rho0_new_in,
+                          const RealVector& p0_old_in,
+                          const RealVector& p0_new_in,
+                          const RealVector& gamma1bar_old_in,
+                          const RealVector& gamma1bar_new_in,
+                          const RealVector& p0_minus_peosbar,  
+                          RealVector& delta_chi_w0, 
+                          const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
@@ -276,6 +321,11 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
 
     const int max_lev = max_radial_level+1;
+    const int nr_finest = nr_fine / pow(2,(max_radial_level-finest_radial_level));
+
+    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
+    const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.
@@ -284,57 +334,81 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     // restricting w0 back down to the coarse grid.
 
     // 1) allocate the finely-gridded temporary basestate arrays
-    RealVector w0_fine(nr[finest_radial_level]+1);
-    RealVector w0bar_fine(nr[finest_radial_level]+1);
-    RealVector deltaw0_fine(nr[finest_radial_level]+1);
-    RealVector p0_old_fine(nr[finest_radial_level]);
-    RealVector p0_new_fine(nr[finest_radial_level]);
-    RealVector p0_nph_fine(nr[finest_radial_level]);
-    RealVector rho0_old_fine(nr[finest_radial_level]);
-    RealVector rho0_new_fine(nr[finest_radial_level]);
-    RealVector rho0_nph_fine(nr[finest_radial_level]);
-    RealVector gamma1bar_old_fine(nr[finest_radial_level]);
-    RealVector gamma1bar_new_fine(nr[finest_radial_level]);
-    RealVector gamma1bar_nph_fine(nr[finest_radial_level]);
-    RealVector p0_minus_peosbar_fine(nr[finest_radial_level]);
-    RealVector etarho_cc_fine(nr[finest_radial_level]);
-    RealVector Sbar_in_fine(nr[finest_radial_level]);
-    RealVector grav_edge_fine(nr[finest_radial_level]+1);
+    RealVector w0_fine_vec(nr_finest+1);
+    RealVector w0bar_fine_vec(nr_finest+1);
+    RealVector deltaw0_fine_vec(nr_finest+1);
+    RealVector p0_old_fine_vec(nr_finest);
+    RealVector p0_new_fine_vec(nr_finest);
+    RealVector p0_nph_fine_vec(nr_finest);
+    RealVector rho0_old_fine_vec(nr_finest);
+    RealVector rho0_new_fine_vec(nr_finest);
+    RealVector rho0_nph_fine_vec(nr_finest);
+    RealVector gamma1bar_old_fine_vec(nr_finest);
+    RealVector gamma1bar_new_fine_vec(nr_finest);
+    RealVector gamma1bar_nph_fine_vec(nr_finest);
+    RealVector p0_minus_peosbar_fine_vec(nr_finest);
+    RealVector etarho_cc_fine_vec(nr_finest);
+    RealVector Sbar_in_fine_vec(nr_finest);
+    RealVector grav_edge_fine_vec(nr_finest+1);
 
     // 2) copy the data into the temp, uniformly-gridded basestate arrays.
-    ProlongBasetoUniform(p0_old,p0_old_fine);
-    ProlongBasetoUniform(p0_new,p0_new_fine);
-    ProlongBasetoUniform(rho0_old,rho0_old_fine);
-    ProlongBasetoUniform(rho0_new,rho0_new_fine);
-    ProlongBasetoUniform(gamma1bar_old,gamma1bar_old_fine);
-    ProlongBasetoUniform(gamma1bar_new,gamma1bar_new_fine);
-    ProlongBasetoUniform(p0_minus_peosbar,p0_minus_peosbar_fine);
-    ProlongBasetoUniform(etarho_cc,etarho_cc_fine);
-    ProlongBasetoUniform(Sbar_in,Sbar_in_fine);
+    ProlongBasetoUniform(p0_old,p0_old_fine_vec);
+    ProlongBasetoUniform(p0_new,p0_new_fine_vec);
+    ProlongBasetoUniform(rho0_old,rho0_old_fine_vec);
+    ProlongBasetoUniform(rho0_new,rho0_new_fine_vec);
+    ProlongBasetoUniform(gamma1bar_old,gamma1bar_old_fine_vec);
+    ProlongBasetoUniform(gamma1bar_new,gamma1bar_new_fine_vec);
+    ProlongBasetoUniform(p0_minus_peosbar,p0_minus_peosbar_fine_vec);
+    ProlongBasetoUniform(etarho_cc,etarho_cc_fine_vec);
+    ProlongBasetoUniform(Sbar_in,Sbar_in_fine_vec);
+
+    Real * AMREX_RESTRICT w0_fine = w0_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT w0bar_fine = w0bar_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT deltaw0_fine = deltaw0_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_old_fine = p0_old_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_new_fine = p0_new_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_nph_fine = p0_nph_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT rho0_old_fine = rho0_old_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT rho0_new_fine = rho0_new_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT rho0_nph_fine = rho0_nph_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT gamma1bar_old_fine = gamma1bar_old_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT gamma1bar_new_fine = gamma1bar_new_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT gamma1bar_nph_fine = gamma1bar_nph_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_minus_peosbar_fine = p0_minus_peosbar_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT etarho_cc_fine = etarho_cc_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT Sbar_in_fine = Sbar_in_fine_vec.dataPtr();
+    Real * AMREX_RESTRICT grav_edge_fine = grav_edge_fine_vec.dataPtr();
 
     // create time-centered base-state quantities
-    for (auto r = 0; r < nr[finest_radial_level]; ++r) {
+    // for (auto r = 0; r < nr_finest; ++r) {
+    AMREX_PARALLEL_FOR_1D(nr_finest, r, {
         p0_nph_fine[r] = 0.5*(p0_old_fine[r] + p0_new_fine[r]);
         rho0_nph_fine[r] = 0.5*(rho0_old_fine[r] + rho0_new_fine[r]);
         gamma1bar_nph_fine[r] = 0.5*(gamma1bar_old_fine[r] + gamma1bar_new_fine[r]);
-    }
+    });
 
 
     // 3) solve to w0bar -- here we just take into account the Sbar and
     //    volume discrepancy terms
     // lower boundary condition
-    w0bar_fine[0] = 0.0;
+    w0bar_fine_vec[0] = 0.0;
 
-    for (auto r = 1; r <= nr[finest_radial_level]; ++r) {
+    const Real dr_finest = dr[finest_radial_level];
+
+    // for (auto r = 1; r <= nr_finest; ++r) {
+    int lo = 1; 
+    int hi = nr_finest;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
         Real gamma1bar_p0_avg = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
 
-        Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? dpdt_factor * p0_minus_peosbar_fine[r-1]/dt : 0.0;
+        Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? 
+            dpdt_factor * p0_minus_peosbar_fine[r-1]/dt : 0.0;
 
         w0bar_fine[r] =  w0bar_fine[r-1] + 
-            Sbar_in_fine[r-1] * dr[finest_radial_level] 
-            - (volume_discrepancy / gamma1bar_p0_avg ) * dr[finest_radial_level];
-
-    }
+            Sbar_in_fine[r-1] * dr_finest 
+            - (volume_discrepancy / gamma1bar_p0_avg ) * dr_finest;
+    });
 
     // 4) get the edge-centered gravity on the uniformly-gridded
     // basestate arrays
@@ -343,73 +417,92 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
 
 
     // 5) solve for delta w0
-    std::fill(deltaw0_fine.begin(), deltaw0_fine.end(), 0.);
+    std::fill(deltaw0_fine_vec.begin(), deltaw0_fine_vec.end(), 0.);
 
     // this takes the form of a tri-diagonal matrix:
     // A_j (dw_0)_{j-3/2} +
     // B_j (dw_0)_{j-1/2} +
     // C_j (dw_0)_{j+1/2} = F_j
 
-    RealVector A(nr[finest_radial_level]+1);
-    RealVector B(nr[finest_radial_level]+1);
-    RealVector C(nr[finest_radial_level]+1);
-    RealVector u(nr[finest_radial_level]+1);
-    RealVector F(nr[finest_radial_level]+1);
+    RealVector A_vec(nr_finest+1);
+    RealVector B_vec(nr_finest+1);
+    RealVector C_vec(nr_finest+1);
+    RealVector u_vec(nr_finest+1);
+    RealVector F_vec(nr_finest+1);
 
-    std::fill(A.begin(), A.end(), 0.);
-    std::fill(B.begin(), B.end(), 0.);
-    std::fill(C.begin(), C.end(), 0.);
-    std::fill(F.begin(), F.end(), 0.);
-    std::fill(u.begin(), u.end(), 0.);
+    std::fill(A_vec.begin(), A_vec.end(), 0.);
+    std::fill(B_vec.begin(), B_vec.end(), 0.);
+    std::fill(C_vec.begin(), C_vec.end(), 0.);
+    std::fill(F_vec.begin(), F_vec.end(), 0.);
+    std::fill(u_vec.begin(), u_vec.end(), 0.);
 
-    for (auto r = 1; r <= fine_base_density_cutoff_coord; ++r) {
+    Real * AMREX_RESTRICT A = A_vec.dataPtr();
+    Real * AMREX_RESTRICT B = B_vec.dataPtr();
+    Real * AMREX_RESTRICT C = C_vec.dataPtr();
+    Real * AMREX_RESTRICT F = F_vec.dataPtr();
+    Real * AMREX_RESTRICT u = u_vec.dataPtr();
+
+    // for (auto r = 1; r <= fine_base_density_cutoff_coord; ++r) {
+    lo = 1; 
+    hi = fine_base_density_cutoff_coord;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
         A[r] = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
-        A[r] /= dr[finest_radial_level]*dr[finest_radial_level];
+        A[r] /= dr_finest*dr_finest;
 
-        Real dpdr = (p0_nph_fine[r]-p0_nph_fine[r-1])/dr[finest_radial_level];
+        Real dpdr = (p0_nph_fine[r]-p0_nph_fine[r-1])/dr_finest;
 
         B[r] = -(gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1] + 
             gamma1bar_nph_fine[r] * p0_nph_fine[r]) 
-            / (dr[finest_radial_level]*dr[finest_radial_level]);
+            / (dr_finest*dr_finest);
         B[r] -= 2.0 * dpdr / (r_edge_loc[finest_radial_level+max_lev*r]);
 
         C[r] = gamma1bar_nph_fine[r] * p0_nph_fine[r];
-        C[r] /= dr[finest_radial_level]*dr[finest_radial_level];
+        C[r] /= dr_finest*dr_finest;
 
         F[r] = 2.0 * dpdr * w0bar_fine[r] / 
             r_edge_loc[finest_radial_level+max_lev*r] -
             grav_edge_fine[r] * (etarho_cc_fine[r] - etarho_cc_fine[r-1]) / 
-            dr[finest_radial_level];
-    }
+            dr_finest;
+    });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A_vec[0] = 0.0;
+    B_vec[0] = 1.0;
+    C_vec[0] = 0.0;
+    F_vec[0] = 0.0;
 
     // Upper boundary
-    A[fine_base_density_cutoff_coord+1] = -1.0;
-    B[fine_base_density_cutoff_coord+1] = 1.0;
-    C[fine_base_density_cutoff_coord+1] = 0.0;
-    F[fine_base_density_cutoff_coord+1] = 0.0;
+    A_vec[fine_base_density_cutoff_coord+1] = -1.0;
+    B_vec[fine_base_density_cutoff_coord+1] = 1.0;
+    C_vec[fine_base_density_cutoff_coord+1] = 0.0;
+    F_vec[fine_base_density_cutoff_coord+1] = 0.0;
 
     // Call the tridiagonal solver
-    Tridiag(A, B, C, F, u, fine_base_density_cutoff_coord+2);
+    Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, fine_base_density_cutoff_coord+2);
 
-    for (auto r = 1; r <= fine_base_density_cutoff_coord+1; ++r) {
+    // for (auto r = 1; r <= fine_base_density_cutoff_coord+1; ++r) {
+    lo = 1; 
+    hi = fine_base_density_cutoff_coord+1;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
         deltaw0_fine[r] = u[r];
-    }
+    });
 
-    for (auto r = fine_base_density_cutoff_coord+2; r <= nr[finest_radial_level]; ++r) {
+    // for (auto r = fine_base_density_cutoff_coord+2; r <= nr_finest; ++r) {
+    lo = fine_base_density_cutoff_coord+2; 
+    hi = nr_finest;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
         deltaw0_fine[r] = deltaw0_fine[fine_base_density_cutoff_coord+1];
-    }
+    });
 
     // 6) compute w0 = w0bar + deltaw0
-    for (auto r = 0; r < w0_fine.size(); ++r) {
+    // for (auto r = 0; r < w0_fine.size(); ++r) {
+    AMREX_PARALLEL_FOR_1D(w0_fine_vec.size(), r, {
         w0_fine[r] = w0bar_fine[r] + deltaw0_fine[r];
-        w0_in[finest_radial_level+max_lev*r] = w0_fine[r];
-    }
+        w0_p[finest_radial_level+max_lev*r] = w0_fine[r];
+    });
 
     // 7) fill the multilevel w0 array from the uniformly-gridded w0 we
     // just solved for.  Here, we make the coarse edge underneath equal
@@ -425,13 +518,21 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     for (auto n = 1; n <= finest_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
             if (j == numdisjointchunks[n]) {
-                for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
-                    w0_in[n+max_lev*r] = 0.0;
-                }
+                // for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
+                lo = r_end_coord[n+max_lev*j]+2; 
+                hi = nr[n];
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                    int r = j + lo;
+                    w0_p[n+max_lev*r] = 0.0;
+                });
             } else {
-                for (auto r = r_end_coord[n+max_lev*j]+2; r < r_start_coord[n+max_lev*(j+1)]; ++r) {
-                    w0_in[n+max_lev*r] = 0.0;
-                }
+                // for (auto r = r_end_coord[n+max_lev*j]+2; r < r_start_coord[n+max_lev*(j+1)]; ++r) {
+                lo = r_end_coord[n+max_lev*j]+2; 
+                hi = r_start_coord[n+max_lev*(j+1)];
+                AMREX_PARALLEL_FOR_1D(hi-lo, j, {
+                    int r = j + lo;
+                    w0_p[n+max_lev*r] = 0.0;
+                });
             }
         }
     }
@@ -445,16 +546,21 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
-            Real dt_avg = 0.5 * (dt + dtold);
+            const Real dt_avg = 0.5 * (dt + dtold);
+            const Real dr_lev = dr[n];
 
-            for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
-                Real w0_old_cen = 0.5 * (w0_old[n+max_lev*r] + w0_old[n+max_lev*(r+1)]);
-                Real w0_new_cen = 0.5 * (w0_in[n+max_lev*r] + w0_in[n+max_lev*(r+1)]);
+            // for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
+            lo = r_start_coord[n+max_lev*j]; 
+            hi = r_end_coord[n+max_lev*j];
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
+                Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + w0_old_p[n+max_lev*(r+1)]);
+                Real w0_new_cen = 0.5 * (w0_p[n+max_lev*r] + w0_p[n+max_lev*(r+1)]);
                 Real w0_avg = 0.5 * (dt * w0_old_cen + dtold *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt * (w0_old[n+max_lev*(r+1)]-w0_old[n+max_lev*r]) + 
-                    dtold * (w0_in[n+max_lev*(r+1)]-w0_in[n+max_lev*r])) / dt_avg;
-                w0_force[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr[n];
-            }
+                Real div_avg = 0.5 * (dt * (w0_old_p[n+max_lev*(r+1)]-w0_old_p[n+max_lev*r]) + 
+                    dtold * (w0_p[n+max_lev*(r+1)]-w0_p[n+max_lev*r])) / dt_avg;
+                w0_force_p[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
+            });
         }
     }
 
@@ -481,128 +587,177 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     BL_PROFILE_VAR("Maestro::Makew0Sphr()",Makew0Sphr);
 
     // local variables 
-    RealVector gamma1bar_nph(nr_fine);
-    RealVector p0_nph(nr_fine);
-    RealVector A(nr_fine+1);
-    RealVector B(nr_fine+1);
-    RealVector C(nr_fine+1);
-    RealVector u(nr_fine+1);
-    RealVector F(nr_fine+1);
-    RealVector w0_from_Sbar(nr_fine+1);
-    RealVector rho0_nph(nr_fine);
-    RealVector grav_edge(nr_fine+1);
+    RealVector gamma1bar_nph_vec(nr_fine);
+    RealVector p0_nph_vec(nr_fine);
+    RealVector A_vec(nr_fine+1);
+    RealVector B_vec(nr_fine+1);
+    RealVector C_vec(nr_fine+1);
+    RealVector u_vec(nr_fine+1);
+    RealVector F_vec(nr_fine+1);
+    RealVector w0_from_Sbar_vec(nr_fine+1);
+    RealVector rho0_nph_vec(nr_fine);
+    RealVector grav_edge_vec(nr_fine+1);
+
+    Real * AMREX_RESTRICT gamma1bar_nph = gamma1bar_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_nph = p0_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT A = A_vec.dataPtr();
+    Real * AMREX_RESTRICT B = B_vec.dataPtr();
+    Real * AMREX_RESTRICT C = C_vec.dataPtr();
+    Real * AMREX_RESTRICT u = u_vec.dataPtr();
+    Real * AMREX_RESTRICT F = F_vec.dataPtr();
+    Real * AMREX_RESTRICT w0_from_Sbar = w0_from_Sbar_vec.dataPtr();
+    Real * AMREX_RESTRICT rho0_nph = rho0_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT grav_edge = grav_edge_vec.dataPtr();
+
+    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
+    const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
+    const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
+    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
+    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
+    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     get_base_cutoff_density(&base_cutoff_density);
     int base_cutoff_density_coord = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
 
     const int max_lev = max_radial_level+1;
+    const Real dr0 = dr[0];
 
     // create time-centered base-state quantities
-    for (auto r = 0; r < nr_fine; ++r) {
-        p0_nph[r] = 0.5*(p0_old_in[r] + p0_new_in[r]);
-        rho0_nph[r] = 0.5*(rho0_old_in[r] + rho0_new_in[r]);
-        gamma1bar_nph[r] = 0.5*(gamma1bar_old_in[r] + gamma1bar_new_in[r]);
-    }
+    // for (auto r = 0; r < nr_fine; ++r) {
+    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        p0_nph[r] = 0.5*(p0_old_p[r] + p0_new_p[r]);
+        rho0_nph[r] = 0.5*(rho0_old_p[r] + rho0_new_p[r]);
+        gamma1bar_nph[r] = 0.5*(gamma1bar_old_p[r] + gamma1bar_new_p[r]);
+    });
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
 
-    w0_from_Sbar[0] = 0.0;
+    w0_from_Sbar_vec[0] = 0.0;
 
-    for (auto r = 1; r <= nr_fine; ++r) {
+    // for (auto r = 1; r <= nr_fine; ++r) {
+    int lo = 1; 
+    int hi = nr_fine;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
 
-        Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_density ? 
-            dpdt_factor * p0_minus_peosbar[r-1]/dt : 0.0;
+        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_density ? 
+            dpdt_factor * p0_minus_peosbar_p[r-1]/dt : 0.0;
 
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
-            dr[0] * Sbar_in[r-1] * r_cc_loc[r-1]*r_cc_loc[r-1] - 
-            dr[0]* volume_discrepancy * r_cc_loc[r-1]*r_cc_loc[r-1] 
+            dr0 * Sbar_p[r-1] * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] - 
+            dr0 * volume_discrepancy * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] 
             / (gamma1bar_nph[r-1]*p0_nph[r-1]);
+    });
 
-    }
-
-    for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar[r] /= (r_edge_loc[r]*r_edge_loc[r]);
-    }
+    // for (auto r = 1; r <= nr_fine; ++r) {
+    lo = 1; 
+    hi = nr_fine;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        w0_from_Sbar[r] /= (r_edge_loc_p[r]*r_edge_loc_p[r]);
+    });
 
     // make the edge-centered gravity
-    MakeGravEdge(grav_edge, rho0_nph);
+    MakeGravEdge(grav_edge_vec, rho0_nph_vec);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
     // this takes the form of a tri-diagonal matrix:
     // A_j (r^2 dw_0)_{j-3/2} +
     // B_j (r^2 dw_0)_{j-1/2} +
     // C_j (r^2 dw_0)_{j+1/2} = F_j
-    std::fill(A.begin(), A.end(), 0.);
-    std::fill(B.begin(), B.end(), 0.);
-    std::fill(C.begin(), C.end(), 0.);
-    std::fill(F.begin(), F.end(), 0.);
-    std::fill(u.begin(), u.end(), 0.);
+    std::fill(A_vec.begin(), A_vec.end(), 0.);
+    std::fill(B_vec.begin(), B_vec.end(), 0.);
+    std::fill(C_vec.begin(), C_vec.end(), 0.);
+    std::fill(F_vec.begin(), F_vec.end(), 0.);
+    std::fill(u_vec.begin(), u_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
     int max_cutoff = min(base_cutoff_density_coord, nr_fine-1);
     
-    for (auto r = 1; r <= max_cutoff; ++r) {
-        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]);
-        A[r] /= dr[0]*dr[0];
+    // for (auto r = 1; r <= max_cutoff; ++r) {
+    lo = 1; 
+    hi = max_cutoff;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1]);
+        A[r] /= dr0*dr0;
 
-        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1])
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]) ) 
-                / (dr[0]*dr[0]);
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1])
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]) ) 
+                / (dr0*dr0);
 
-        Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr[0];
+        Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr0;
 
-        B[r] -= 4.0 * dpdr / (r_edge_loc[r]*r_edge_loc[r]*r_edge_loc[r]);
+        B[r] -= 4.0 * dpdr / (r_edge_loc_p[r]*r_edge_loc_p[r]*r_edge_loc_p[r]);
 
-        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]);
-        C[r] /= dr[0]*dr[0];
+        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]);
+        C[r] /= dr0*dr0;
 
-        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc[r] - 
-                grav_edge[r] * (r_cc_loc[r]*r_cc_loc[r] * etarho_cc[r] - 
-                r_cc_loc[r-1]*r_cc_loc[r-1] * etarho_cc[r-1]) / 
-                (dr[0] * r_edge_loc[r]*r_edge_loc[r]) - 
+        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc_p[r] - 
+                grav_edge[r] * (r_cc_loc_p[r]*r_cc_loc_p[r] * etarho_cc_p[r] - 
+                r_cc_loc_p[r-1]*r_cc_loc_p[r-1] * etarho_cc_p[r-1]) / 
+                (dr0 * r_edge_loc_p[r]*r_edge_loc_p[r]) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec[r];
-    }
+                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec_p[r];
+    });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A_vec[0] = 0.0;
+    B_vec[0] = 1.0;
+    C_vec[0] = 0.0;
+    F_vec[0] = 0.0;
 
     // Upper boundary
-    A[max_cutoff+1] = -1.0;
-    B[max_cutoff+1] = 1.0;
-    C[max_cutoff+1] = 0.0;
-    F[max_cutoff+1] = 0.0;
+    A_vec[max_cutoff+1] = -1.0;
+    B_vec[max_cutoff+1] = 1.0;
+    C_vec[max_cutoff+1] = 0.0;
+    F_vec[max_cutoff+1] = 0.0;
 
     // Call the tridiagonal solver
-    Tridiag(A, B, C, F, u, max_cutoff+2);
+    Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, max_cutoff+2);
 
     w0_in[0] = w0_from_Sbar[0];
 
-    for (auto r = 1; r <= max_cutoff+1; ++r) {
-        w0_in[r] = u[r] / (r_edge_loc[r]*r_edge_loc[r]) + w0_from_Sbar[r];
-    }
+    // for (auto r = 1; r <= max_cutoff+1; ++r) {
+    lo = 1; 
+    hi = max_cutoff+1;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        w0_p[r] = u[r] / (r_edge_loc_p[r]*r_edge_loc_p[r]) + w0_from_Sbar[r];
+    });
 
-    for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
-        w0_in[r] = w0_in[max_cutoff+1] * r_edge_loc[max_cutoff+1]*r_edge_loc[max_cutoff+1]/(r_edge_loc[r]*r_edge_loc[r]);
-    }
+    // for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
+    lo = max_cutoff+2; 
+    hi = nr_fine;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        w0_p[r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_cutoff+1]*r_edge_loc_p[max_cutoff+1]/(r_edge_loc_p[r]*r_edge_loc_p[r]);
+    });
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
-    Real dt_avg = 0.5 * (dt_in + dtold_in);
+    const Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    for (auto r = 0; r < nr_fine; ++r) {
-        Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
-        Real w0_new_cen = 0.5 * (w0_in[r] + w0_in[r+1]);
+    // for (auto r = 0; r < nr_fine; ++r) {
+    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        Real w0_old_cen = 0.5 * (w0_old_p[r] + w0_old_p[r+1]);
+        Real w0_new_cen = 0.5 * (w0_p[r] + w0_p[r+1]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-        Real div_avg = 0.5 * (dt_in * (w0_old[r+1]-w0_old[r]) + dtold_in * (w0_in[r+1]-w0_in[r])) / dt_avg;
-        w0_force[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr[0];
-    }
+        Real div_avg = 0.5 * (dt_in * (w0_old_p[r+1]-w0_old_p[r]) + dtold_in * (w0_p[r+1]-w0_p[r])) / dt_avg;
+        w0_force_p[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
+    });
 }
 
 void 
@@ -624,16 +779,43 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     BL_PROFILE_VAR("Maestro::Makew0SphrIrreg()",Makew0SphrIrreg);
 
     // local variables 
-    RealVector gamma1bar_nph(nr_fine);
-    RealVector p0_nph(nr_fine);
-    RealVector A(nr_fine+1);
-    RealVector B(nr_fine+1);
-    RealVector C(nr_fine+1);
-    RealVector u(nr_fine+1);
-    RealVector F(nr_fine+1);
-    RealVector w0_from_Sbar(nr_fine+1);
-    RealVector rho0_nph(nr_fine);
-    RealVector grav_edge(nr_fine+1);
+    RealVector gamma1bar_nph_vec(nr_fine);
+    RealVector p0_nph_vec(nr_fine);
+    RealVector A_vec(nr_fine+1);
+    RealVector B_vec(nr_fine+1);
+    RealVector C_vec(nr_fine+1);
+    RealVector u_vec(nr_fine+1);
+    RealVector F_vec(nr_fine+1);
+    RealVector w0_from_Sbar_vec(nr_fine+1);
+    RealVector rho0_nph_vec(nr_fine);
+    RealVector grav_edge_vec(nr_fine+1);
+
+    Real * AMREX_RESTRICT gamma1bar_nph = gamma1bar_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT p0_nph = p0_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT A = A_vec.dataPtr();
+    Real * AMREX_RESTRICT B = B_vec.dataPtr();
+    Real * AMREX_RESTRICT C = C_vec.dataPtr();
+    Real * AMREX_RESTRICT u = u_vec.dataPtr();
+    Real * AMREX_RESTRICT F = F_vec.dataPtr();
+    Real * AMREX_RESTRICT w0_from_Sbar = w0_from_Sbar_vec.dataPtr();
+    Real * AMREX_RESTRICT rho0_nph = rho0_nph_vec.dataPtr();
+    Real * AMREX_RESTRICT grav_edge = grav_edge_vec.dataPtr();
+
+    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
+    const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
+    const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
+    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
+    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
+    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
+    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     get_base_cutoff_density(&base_cutoff_density);
     int base_cutoff_density_coord = 0;
@@ -642,115 +824,132 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     const int max_lev = max_radial_level+1;
 
     // create time-centered base-state quantities
-    for (auto r = 0; r < nr_fine; ++r) {
-        p0_nph[r] = 0.5*(p0_old_in[r] + p0_new_in[r]);
-        rho0_nph[r] = 0.5*(rho0_old_in[r] + rho0_new_in[r]);
-        gamma1bar_nph[r] = 0.5*(gamma1bar_old_in[r] + gamma1bar_new_in[r]);
-    }
+    // for (auto r = 0; r < nr_fine; ++r) {
+    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        p0_nph[r] = 0.5*(p0_old_p[r] + p0_new_p[r]);
+        rho0_nph[r] = 0.5*(rho0_old_p[r] + rho0_new_p[r]);
+        gamma1bar_nph[r] = 0.5*(gamma1bar_old_p[r] + gamma1bar_new_p[r]);
+    });
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
+    w0_from_Sbar_vec[0] = 0.0;
 
-    w0_from_Sbar[0] = 0.0;
+    // for (auto r = 1; r <= nr_fine; ++r) {
+    int lo = 1; 
+    int hi = nr_fine;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
 
-    for (auto r = 1; r <= nr_fine; ++r) {
+        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_density ? 
+            dpdt_factor * p0_minus_peosbar_p[r-1]/dt : 0.0;
 
-        Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_density ? 
-            dpdt_factor * p0_minus_peosbar[r-1]/dt : 0.0;
-
-        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
+        Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
-            dr1 * Sbar_in[r-1] * r_cc_loc[r-1]*r_cc_loc[r-1] - 
-            dr1* volume_discrepancy * r_cc_loc[r-1]*r_cc_loc[r-1] 
+            dr1 * Sbar_p[r-1] * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] - 
+            dr1* volume_discrepancy * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] 
             / (gamma1bar_nph[r-1]*p0_nph[r-1]);
-    }
+    });
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar[r] /= (r_edge_loc[r]*r_edge_loc[r]);
+        w0_from_Sbar[r] /= (r_edge_loc_p[r]*r_edge_loc_p[r]);
     }
 
     // make the edge-centered gravity
-    MakeGravEdge(grav_edge, rho0_nph);
+    MakeGravEdge(grav_edge_vec, rho0_nph_vec);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
     // this takes the form of a tri-diagonal matrix:
     // A_j (r^2 dw_0)_{j-3/2} +
     // B_j (r^2 dw_0)_{j-1/2} +
     // C_j (r^2 dw_0)_{j+1/2} = F_j
-    std::fill(A.begin(), A.end(), 0.);
-    std::fill(B.begin(), B.end(), 0.);
-    std::fill(C.begin(), C.end(), 0.);
-    std::fill(F.begin(), F.end(), 0.);
-    std::fill(u.begin(), u.end(), 0.);
+    std::fill(A_vec.begin(), A_vec.end(), 0.);
+    std::fill(B_vec.begin(), B_vec.end(), 0.);
+    std::fill(C_vec.begin(), C_vec.end(), 0.);
+    std::fill(F_vec.begin(), F_vec.end(), 0.);
+    std::fill(u_vec.begin(), u_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
     int max_cutoff = base_cutoff_density_coord;
     
-    for (auto r = 1; r <= max_cutoff; ++r) {
-        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
-        Real dr2 = r_edge_loc[max_lev*(r+1)] - r_edge_loc[max_lev*r];
-        Real dr3 = r_cc_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)];
+    // for (auto r = 1; r <= max_cutoff; ++r) {
+    lo = 1; 
+    hi = max_cutoff;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
+        Real dr2 = r_edge_loc_p[max_lev*(r+1)] - r_edge_loc_p[max_lev*r];
+        Real dr3 = r_cc_loc_p[max_lev*r] - r_cc_loc_p[max_lev*(r-1)];
 
-        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]);
+        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1]);
         A[r] /= dr1*dr3;
 
-        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc[r-1]*r_cc_loc[r-1]*dr1) 
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]*dr2) ) 
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1]*dr1) 
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]*dr2) ) 
                 / dr3;
 
         Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr3;
 
-        B[r] -= 4.0 * dpdr / (r_edge_loc[r]*r_edge_loc[r]*r_edge_loc[r]);
+        B[r] -= 4.0 * dpdr / (r_edge_loc_p[r]*r_edge_loc_p[r]*r_edge_loc_p[r]);
 
-        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc[r]*r_cc_loc[r]);
+        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]);
         C[r] /= dr2*dr3;
 
-        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc[r] - 
-                grav_edge[r] * (r_cc_loc[r]*r_cc_loc[r] * etarho_cc[r] - 
-                r_cc_loc[r-1]*r_cc_loc[r-1] * etarho_cc[r-1]) / 
-                (dr3 * r_edge_loc[r]*r_edge_loc[r]) - 
+        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc_p[r] - 
+                grav_edge[r] * (r_cc_loc_p[r]*r_cc_loc_p[r] * etarho_cc_p[r] - 
+                r_cc_loc_p[r-1]*r_cc_loc_p[r-1] * etarho_cc_p[r-1]) / 
+                (dr3 * r_edge_loc_p[r]*r_edge_loc_p[r]) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec[r];
-    }
+                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec_p[r];
+    });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A_vec[0] = 0.0;
+    B_vec[0] = 1.0;
+    C_vec[0] = 0.0;
+    F_vec[0] = 0.0;
 
     // Upper boundary
-    A[max_cutoff+1] = -1.0;
-    B[max_cutoff+1] = 1.0;
-    C[max_cutoff+1] = 0.0;
-    F[max_cutoff+1] = 0.0;
+    A_vec[max_cutoff+1] = -1.0;
+    B_vec[max_cutoff+1] = 1.0;
+    C_vec[max_cutoff+1] = 0.0;
+    F_vec[max_cutoff+1] = 0.0;
 
     // Call the tridiagonal solver
-    Tridiag(A, B, C, F, u, max_cutoff+2);
+    Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, max_cutoff+2);
 
-    w0_in[0] = w0_from_Sbar[0];
+    w0_p[0] = w0_from_Sbar_vec[0];
 
-    for (auto r = 1; r <= max_cutoff+1; ++r) {
-        w0_in[r] = u[r] / (r_edge_loc[r]*r_edge_loc[r]) + w0_from_Sbar[r];
-    }
+    // for (auto r = 1; r <= max_cutoff+1; ++r) {
+    lo = 1; 
+    hi = max_cutoff+1;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        w0_p[r] = u[r] / (r_edge_loc_p[r]*r_edge_loc_p[r]) + w0_from_Sbar[r];
+    });
 
-    for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
-        w0_in[r] = w0_in[max_cutoff+1] * r_edge_loc[max_cutoff+1]*r_edge_loc[max_cutoff+1]/(r_edge_loc[r]*r_edge_loc[r]);
-    }
+    // for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
+    lo = max_cutoff+2; 
+    hi = nr_fine;
+    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+        int r = j + lo;
+        w0_p[r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_cutoff+1]*r_edge_loc_p[max_cutoff+1]/(r_edge_loc_p[r]*r_edge_loc_p[r]);
+    });
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
-    Real dt_avg = 0.5 * (dt_in + dtold_in);
+    const Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    for (auto r = 0; r < nr_fine; ++r) {
-        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
-        Real w0_old_cen = 0.5 * (w0_old[r] + w0_old[r+1]);
-        Real w0_new_cen = 0.5 * (w0_in[r] + w0_in[r+1]);
+    // for (auto r = 0; r < nr_fine; ++r) {
+    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
+        Real w0_old_cen = 0.5 * (w0_old_p[r] + w0_old_p[r+1]);
+        Real w0_new_cen = 0.5 * (w0_p[r] + w0_p[r+1]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-        Real div_avg = 0.5 * (dt_in * (w0_old[r+1]-w0_old[r]) + dtold_in * (w0_in[r+1]-w0_in[r])) / dt_avg;
-        w0_force[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
-    }
+        Real div_avg = 0.5 * (dt_in * (w0_old_p[r+1]-w0_old_p[r]) + dtold_in * (w0_p[r+1]-w0_p[r])) / dt_avg;
+        w0_force_p[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
+    });
 }
 
 void
