@@ -20,11 +20,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
-	// constants in Fortran
-	Real base_cutoff_density=0.0; 
-	get_base_cutoff_density(&base_cutoff_density);
-	Real buoyancy_cutoff_factor=0.0;
-	get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
+        // constants in Fortran
+        Real base_cutoff_density=0.0; 
+        get_base_cutoff_density(&base_cutoff_density);
+        Real buoyancy_cutoff_factor=0.0;
+        get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -509,8 +509,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
 
-			// For non-spherical, add wtilde d(p0)/dr
-			// For spherical, we make u grad p = div (u p) - p div (u)
+                        // For non-spherical, add wtilde d(p0)/dr
+                        // For spherical, we make u grad p = div (u p) - p div (u)
             if (spherical == 0) {
 
                 AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,

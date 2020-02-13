@@ -29,7 +29,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
         Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Ipf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
         Imf.define(grids[lev],dmap[lev],AMREX_SPACEDIM,1);
-	
+        
         MultiFab slx, srx, simhx;
         slx.define(grids[lev],dmap[lev],1,1);
         srx.define(grids[lev],dmap[lev],1,1);

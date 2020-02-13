@@ -889,7 +889,7 @@ public:
                      const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
-			             const amrex::Vector<amrex::MultiFab>& scal_new,
+                                     const amrex::Vector<amrex::MultiFab>& scal_new,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                          RealVector& etarho_edge,
