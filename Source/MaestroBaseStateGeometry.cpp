@@ -74,7 +74,7 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         // spherical case
         // compute r_cc_loc, r_edge_loc
         if (use_exact_base_state) {
-                //   ! nr_fine = nr_irreg + 1
+            // nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
                 r_cc_loc[(max_radial_level+1)*i] = sqrt(0.75+2.0*Real(i))*dx_fine[0];
             }
@@ -111,11 +111,12 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
         const Array4<Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
         const Real* AMREX_RESTRICT probLo = geom[0].ProbLo();
+        const Real* AMREX_RESTRICT center_p = center.dataPtr();
 
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-            Real x = probLo[0] + (Real(i)+0.5)*dx_lev[0] - center[0];
-            Real y = probLo[1] + (Real(j)+0.5)*dx_lev[1] - center[1];
-            Real z = probLo[2] + (Real(k)+0.5)*dx_lev[2] - center[2];
+            Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center_p[0];
+            Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center_p[1];
+            Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center_p[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
             cc_to_r(i,j,k) = round(index);
@@ -142,7 +143,6 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
                 int lo = r_start_coord[n + (max_radial_level+1)*i];
                 int hi = r_end_coord[n + (max_radial_level+1)*i];
                 for (auto r = lo; r <= hi; ++r) {
-                //  do r=r_start_coord(n,i),r_end_coord(n,i)
                     if (rho0[n + (max_radial_level+1)*r] <= anelastic_cutoff_density) {
                         anelastic_cutoff_density_coord[n] = r;
                         which_lev = n;
@@ -162,14 +162,12 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     }
 
     // set the anelastic cutoff coordinate on the finer levels
-    // do n=which_lev+1,finest_radial_level
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
        anelastic_cutoff_density_coord[n] = 2*anelastic_cutoff_density_coord[n-1]+1;
     }
 
     // set the anelastic cutoff coordinate on the coarser levels
     for (auto n = which_lev-1; n >= 0; --n) {
-    // do n=which_lev-1,0,-1
        if (anelastic_cutoff_density_coord[n+1] % 2 == 0) {
           anelastic_cutoff_density_coord[n] = anelastic_cutoff_density_coord[n+1] / 2;
        } else {
@@ -187,7 +185,6 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     for (auto n=finest_radial_level; n >= 0; --n) {
         for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
             if (!found) {
-                //  do r=r_start_coord(n,i),r_end_coord(n,i)
                 int lo = r_start_coord[n + (max_radial_level+1)*i];
                 int hi = r_end_coord[n + (max_radial_level+1)*i];
                 for (auto r = lo; r <= hi; ++r) {
@@ -304,13 +301,11 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     }
 
     // set the burning cutoff coordinate on the finer levels
-    // do n=which_lev+1,finest_radial_level
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
        burning_cutoff_density_hi_coord[n] = 0;
     }
 
     // set the burning cutoff coordinate on the coarser levels
-    // do n=which_lev-1,0,-1
     for (auto n = which_lev-1; n >= 0; --n) {
        if (burning_cutoff_density_hi_coord[n+1]%2 == 0) {
           burning_cutoff_density_hi_coord[n] = 0;
@@ -345,16 +340,14 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
     // to use for allocating r_start_coord and r_end_coord
     int maxchunks = 1;
     for (auto n = 1; n <= finest_radial_level; ++n) {
-    // do n=1,finest_radial_level
 
         // initialize variables
         bool chunk_start = false;
         int nchunks = 0;
 
-        //    ! increment nchunks at beginning of each chunk
-        //    ! (ex. when the tagging index changes from 0 to 1)
+        // increment nchunks at beginning of each chunk
+        // (ex. when the tagging index changes from 0 to 1)
         for (auto r = 0; r < nr[n-1]; ++r) {
-        // do r=0,nr(n-1)-1
             if (tag_array[n-1 + (max_radial_level+1)*r] > 0 && !chunk_start) {
                 chunk_start = true;
                 nchunks++;
@@ -362,7 +355,7 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
                 chunk_start = false;
             }
         }
-       maxchunks = max(nchunks,maxchunks);
+        maxchunks = max(nchunks,maxchunks);
     }
 
     r_start_coord.resize((finest_radial_level+1)*maxchunks);
@@ -377,7 +370,6 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
 
         // for > 1 chunks (multilevel)
         for (auto n = 1; n <= finest_radial_level; ++n) {
-        //    do n=1,finest_radial_level
             // initialize variables
             bool chunk_start = false;
             numdisjointchunks[n] = 0;
@@ -385,7 +377,6 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
             // increment numdisjointchunks at beginning of each chunk
             // (ex. when the tagging index changes from 0 to 1)
             for (auto r = 0; r < nr[n-1]; ++r) {
-            // do r=0,nr(n-1)-1
                 if (tag_array[n-1 + (max_radial_level+1)*r] > 0 && !chunk_start) {
                     chunk_start = true;
                     numdisjointchunks[n] = numdisjointchunks[n] + 1;
@@ -427,28 +418,16 @@ Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
                 const int lo = r_start_coord[n+i*max_lev];
                 const int hi = r_end_coord[n+i*max_lev]-1;
 
-                AMREX_PARALLEL_FOR_1D((hi-lo+1)/2+1, j, {
-                    // int r = j*2 + lo;
-                    // s0_m[r/2] = 0.5 * (s0[r] + s0[r+1]);
-                    int r = n + max_lev*(j*2 + lo);
-                    int p = n + max_lev*(j*2 + lo + 1);
-                    int m = n-1 + max_lev*(j*2 + lo)/2;
-
-                    s0[m] = 0.5 * (s0[r] + s0[p]);
-                });
+                for (auto r = r_start_coord[n+i*max_lev]; 
+                      r < r_end_coord[n+i*max_lev]; r+=2) {
+                    s0[n-1+max_lev*r/2] = 0.5 * (s0[n+max_lev*r] + s0[n+max_lev*(r+1)]);
+                }
             } else {
                 // for level n, make the coarse edge underneath equal to the fine edge value
-                const int lo = r_start_coord[n+i*max_lev];
-                const int hi = r_end_coord[n+i*max_lev]+1;
-
-                AMREX_PARALLEL_FOR_1D((hi-lo+1)/2+1, j, {
-                    // int r = j*2 + lo;
-                    // s0_m[r/2] = s0[r];
-                    int r = n + max_lev*(j*2 + lo);
-                    int m = n-1 + max_lev*(j*2 + lo)/2;
-
-                    s0[m] = s0[r];
-                });
+                for (auto r = r_start_coord[n+i*max_lev]; 
+                      r <= r_end_coord[n+i*max_lev]+1; r+=2) {
+                    s0[n-1+max_lev*r/2] = s0[n+max_lev*r];
+                }
             }
         }
     }
@@ -468,9 +447,6 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
-        const int nr = nr_fine / pow(2,max_radial_level-n);
-
-        // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
@@ -500,7 +476,7 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
                     s0[n+max_lev*(lo-4)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
                 }
 
-                if (hi != nr-1) {
+                if (hi != nr[n]-1) {
                     int r_crse = (hi+1)/2;
                     Real del = 0.5*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*(r_crse-1)]);
                     Real dpls = 2.0*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*r_crse]);
@@ -532,7 +508,7 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
                     s0[n+max_lev*(lo-2)] = s0[n-1+max_lev*((lo-2)/2)];
                 }
 
-                if (hi+1 != nr) {
+                if (hi+1 != nr[n]) {
                     // quadratic interpolation from the three closest points
                     s0[n+max_lev*(hi+2)] = -s0[n+max_lev*hi]/3.0
                         + s0[n+max_lev*(hi+1)] + s0[n-1+max_lev*((hi+3)/2)]/3.0;

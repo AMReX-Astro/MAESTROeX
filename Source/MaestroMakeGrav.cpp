@@ -16,6 +16,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
         if (do_planar_invsq_grav)  {
             Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
             const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+            const Real planar_invsq_mass_loc = planar_invsq_mass;
             // we are doing a plane-parallel geometry with a 1/r**2
             // gravitational acceleration.  The mass is assumed to be
             // at the origin.  The mass in the computational domain
@@ -24,7 +25,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                 // for (auto r = 0; r < nr[n]; ++r) {
                 const int nr_lev = nr[n];
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass / (r_cc_loc_p[n+max_lev*r]*r_cc_loc_p[n+max_lev*r]);
+                    grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc_p[n+max_lev*r]*r_cc_loc_p[n+max_lev*r]);
                 });
             }
         } else if (do_2d_planar_octant) {
@@ -208,6 +209,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
         if (do_planar_invsq_grav)  {
             Real * AMREX_RESTRICT grav_edge_p = grav_edge.dataPtr();
             const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+            const Real planar_invsq_mass_loc = planar_invsq_mass;
             // we are doing a plane-parallel geometry with a 1/r**2
             // gravitational acceleration.  The mass is assumed to be
             // at the origin.  The mass in the computational domain
@@ -217,7 +219,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 // for (auto r = 0; r < nr[n]; ++r) {
                 const int nr_lev = nr[n];
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass / (r_edge_loc_p[n+max_lev*r]*r_edge_loc_p[n+max_lev*r]);
+                    grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc_p[n+max_lev*r]*r_edge_loc_p[n+max_lev*r]);
                 });
             }
         } else if (do_2d_planar_octant) {
