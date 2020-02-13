@@ -140,8 +140,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
     for (auto n = 0; n <= max_radial_level; ++n) {
 
         std::fill(psi_planar_vec.begin(), psi_planar_vec.end(), 0.);
-        int base_cutoff_density_coord = 0;
-        get_base_cutoff_density_coord(n, &base_cutoff_density_coord);
+        int base_cutoff_density_coord_loc = 0;
+        get_base_cutoff_density_coord(n, &base_cutoff_density_coord_loc);
 
         const Real dr_lev = dr[n];
 
@@ -160,7 +160,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
             int hi = r_end_coord[n+max_lev*j];
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
-                if (r < base_cutoff_density_coord) {
+                if (r < base_cutoff_density_coord_loc) {
                     psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
                 }
             });
@@ -177,7 +177,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     (p0_old_p[n+max_lev*(r-1)] + 
                     p0_new_p[n+max_lev*(r-1)])/4.0;
 
-                if (r < base_cutoff_density_coord) {
+                if (r < base_cutoff_density_coord_loc) {
                     if (is_predictor) {
                         delta_chi_w0_p[n+max_lev*(r-1)] = dpdt_factor_loc * 
                             p0_minus_peosbar_p[n+max_lev*(r-1)] / 
@@ -627,8 +627,8 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    int base_cutoff_density_coord = 0;
-    get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
+    int base_cutoff_density_coord_loc = 0;
+    get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
 
     const Real dr0 = dr[0];
     const Real dpdt_factor_loc = dpdt_factor;
@@ -685,7 +685,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
-    int max_cutoff = min(base_cutoff_density_coord, nr_fine-1);
+    int max_cutoff = min(base_cutoff_density_coord_loc, nr_fine-1);
     
     // for (auto r = 1; r <= max_cutoff; ++r) {
     lo = 1; 
@@ -819,8 +819,8 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    int base_cutoff_density_coord = 0;
-    get_base_cutoff_density_coord(0, &base_cutoff_density_coord);
+    int base_cutoff_density_coord_loc = 0;
+    get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
 
     const int max_lev = max_radial_level+1;
     const Real dpdt_factor_loc = dpdt_factor;
@@ -873,7 +873,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     std::fill(u_vec.begin(), u_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
-    int max_cutoff = base_cutoff_density_coord;
+    int max_cutoff = base_cutoff_density_coord_loc;
     
     // for (auto r = 1; r <= max_cutoff; ++r) {
     lo = 1; 

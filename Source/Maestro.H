@@ -1826,7 +1826,6 @@ public:
 
     // problem information
     RealVector center;
-    RealVector dx_fine;
 
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`
