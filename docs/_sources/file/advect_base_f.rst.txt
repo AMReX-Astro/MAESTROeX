@@ -1,8 +1,0 @@
-advect_base.F90
-===============
-
-advect\_base\_module
---------------------
-
-.. f:automodule:: advect_base_module
-
