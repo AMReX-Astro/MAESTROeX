@@ -108,10 +108,7 @@ Maestro::Init ()
     }
 
     // make gravity
-    make_grav_cell(grav_cell_old.dataPtr(),
-                   rho0_old.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav_cell_old, rho0_old);
 
     if (restart_file == "") {
 
@@ -262,15 +259,14 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
-        make_grav_cell(grav_cell_old.dataPtr(),
-                       rho0_old.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        ComputeCutoffCoords(rho0_old);
+        MakeGravCell(grav_cell_old, rho0_old);
     }
     else {
 
         // first compute cutoff coordinates using initial density profile
         compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
@@ -281,12 +277,10 @@ Maestro::InitData ()
             // set rho0 to be the average
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
+            ComputeCutoffCoords(rho0_old);
 
             // compute gravity
-            make_grav_cell(grav_cell_old.dataPtr(),
-                           rho0_old.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+            MakeGravCell(grav_cell_old, rho0_old);
 
             // compute p0 with HSE
             enforce_HSE(rho0_old.dataPtr(),
