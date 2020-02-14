@@ -143,6 +143,9 @@ Maestro::Setup ()
 
     // tagged box array for multilevel (planar)
     tag_array .resize( (max_radial_level+1)*nr_fine );
+    numdisjointchunks.resize(max_radial_level+1);
+    r_end_coord.resize((max_radial_level+1)*(nr_fine+1));
+    r_start_coord.resize((max_radial_level+1)*(nr_fine+1));
 
     // diag file data arrays
     diagfile1_data.resize(diag_buf_size*11);
@@ -175,6 +178,9 @@ Maestro::Setup ()
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     tag_array    .shrink_to_fit();
+    numdisjointchunks.shrink_to_fit();
+    r_end_coord.shrink_to_fit();
+    r_start_coord.shrink_to_fit();
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();

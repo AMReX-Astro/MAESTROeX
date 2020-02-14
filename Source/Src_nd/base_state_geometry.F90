@@ -701,7 +701,7 @@ contains
 
   subroutine get_numdisjointchunks(nchunks) bind(C, name="get_numdisjointchunks")
 
-    integer, intent(inout) :: nchunks(0:finest_radial_level)
+    integer, intent(inout) :: nchunks(0:max_radial_level)
 
     nchunks(0:finest_radial_level) = numdisjointchunks(0:finest_radial_level)
   end subroutine get_numdisjointchunks
@@ -709,14 +709,14 @@ contains
 
   subroutine get_r_start_coord(coord) bind(C, name="get_r_start_coord")
 
-    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+    integer, intent(inout) :: coord(0:max_radial_level,0:nr_fine)
     integer :: i, lev
 
-    coord(0:finest_radial_level,0:nr_fine) = 0
+    coord(0:max_radial_level,0:nr_fine) = 0
 
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
-            coord(lev, i-1) = r_start_coord(lev, i)
+            coord(lev, i) = r_start_coord(lev, i)
         end do
     end do
   end subroutine get_r_start_coord
@@ -724,16 +724,27 @@ contains
 
   subroutine get_r_end_coord(coord) bind(C, name="get_r_end_coord")
 
-    integer, intent(inout) :: coord(0:finest_radial_level,0:nr_fine)
+    integer, intent(inout) :: coord(0:max_radial_level,0:nr_fine)
     integer :: i, lev
 
-    coord(0:finest_radial_level,0:nr_fine) = 0
+    coord(0:max_radial_level,0:nr_fine) = 0
     
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
-            coord(lev, i-1) = r_end_coord(lev, i)
+            coord(lev, i) = r_end_coord(lev, i)
         end do
     end do
   end subroutine get_r_end_coord
+
+
+  subroutine get_finest_radial_level(lev_in) bind(C, name="get_finest_radial_level")
+
+    integer, intent(inout) :: lev_in
+
+    lev_in = finest_radial_level
+
+  end subroutine get_finest_radial_level
+
+
 
 end module base_state_geometry_module

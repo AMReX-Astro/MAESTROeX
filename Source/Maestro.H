@@ -108,6 +108,18 @@ public:
     ////////////
 
     ////////////
+    // MaestroAdvectBase.cpp functions
+    void AdvectBaseDens(RealVector& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
+    void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
+
+    void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge);
+    // end MaestroAdvectBase.cpp functions
+    ////////////
+
+    ////////////
     // MaestroAdvection.cpp functions
 
     /// Compute unprojected mac velocities
@@ -243,6 +255,8 @@ public:
                     const amrex::Vector<amrex::MultiFab>& force,
                     const amrex::Vector<amrex::MultiFab>& sponge,
                     const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
+
+    // end MaestroAdvection.cpp functions
     ////////////
 
     ////////////
@@ -261,12 +275,23 @@ public:
     ////////////
 
     ////////////
+    // MaestroBaseStateGeometry.cpp functions
+
+    void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
+    void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
+
+    // end MaestroBaseStateGeometry.cpp functions
+    ////////////
+
+    ////////////
     // MaestroCheckpoint.cpp functions
 
     /// Write a checkpoint at timestep `step`
     void WriteCheckPoint (int step);
     int ReadCheckPoint ();
     void GotoNextLine (std::istream& is);
+
+    // end MaestroCheckpoint.cpp functions
     ////////////
 
     ////////////
@@ -858,6 +883,19 @@ public:
                             bool is_vel, bool is_conservative);
 #endif
     // end MaestroMakeEdgeScal.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakeEdgeState.cpp functions
+    void MakeEdgeState1d(RealVector& s, RealVector& sedge, 
+                         RealVector& force);
+
+    void MakeEdgeState1dSphr(RealVector& s, RealVector& sedge, 
+                             RealVector& force);
+
+    void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
+                               RealVector& force);
+    // end MaestroMakeEdgeState.cpp functions
     ////////////
 
     ////////////

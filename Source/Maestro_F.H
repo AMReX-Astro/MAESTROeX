@@ -15,11 +15,12 @@ extern "C"
     // in advect_base.F90
     void advect_base_dens(const amrex::Real* w0,
                           const amrex::Real* rho0_old,
-                                amrex::Real* rho0_new,
-                                amrex::Real* rho0_predicted_edge,
+                          amrex::Real* rho0_new,
+                          amrex::Real* rho0_predicted_edge,
                           const amrex::Real dt,
                           const amrex::Real* r_cc_loc,
-                          const amrex::Real* r_edge_loc);
+                          const amrex::Real* r_edge_loc,
+                          amrex::Real* force);
 
     void advect_base_enthalpy(const amrex::Real* w0,
                               const amrex::Real* rho0_old,
@@ -753,6 +754,10 @@ extern "C"
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
     void regrid_base_state_edge(amrex::Real* state_ec);
+    void get_numdisjointchunks(int* nchunks);
+    void get_r_start_coord(int* coord);
+    void get_r_end_coord(int* coord);
+    void get_finest_radial_level(int* lev);
     //////////////////////
 
     //////////////////////
