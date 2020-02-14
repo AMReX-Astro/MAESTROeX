@@ -90,6 +90,11 @@ Maestro::Init ()
         }
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+	
+	if (spherical == 0) {
+	    // reset tagging array to include buffer zones
+	    TagArray();
+	}
     }
 
     // set finest_radial_level in fortran
