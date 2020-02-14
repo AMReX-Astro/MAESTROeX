@@ -92,6 +92,7 @@ Maestro::Init ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
 
     compute_cutoff_coords(rho0_old.dataPtr());
+    ComputeCutoffCoords(rho0_old);
 
     if (spherical == 1) {
         MakeNormal();
@@ -118,21 +119,8 @@ Maestro::Init ()
         MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
         // compute beta0
-        if (use_exact_base_state) {
-            make_beta0_irreg(beta0_old.dataPtr(),
-                             rho0_old.dataPtr(),
-                             p0_old.dataPtr(),
-                             gamma1bar_old.dataPtr(),
-                             grav_cell_old.dataPtr(),
-                             r_cc_loc.dataPtr(),
-                             r_edge_loc.dataPtr());
-        } else {
-            make_beta0(beta0_old.dataPtr(),
-                       rho0_old.dataPtr(),
-                       p0_old.dataPtr(),
-                       gamma1bar_old.dataPtr(),
-                       grav_cell_old.dataPtr());
-        }
+        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
+                  grav_cell_old, use_exact_base_state);        
 
         // set beta0^{-1} = beta0_old
         for (int i=0; i<beta0_old.size(); ++i) {

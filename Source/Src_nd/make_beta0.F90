@@ -33,7 +33,7 @@ module make_beta0_module
     
     allocate(beta0_edge(0:finest_radial_level,0:nr_fine))
 
-    beta0 = 0.d0
+    ! beta0 = 0.d0
 
     if (beta0_type .eq. 1) then
 
@@ -59,6 +59,8 @@ module make_beta0_module
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
        do n=0,finest_radial_level
+
+        ! write(*,*) "anelastic cutoff = ", n, anelastic_cutoff_density_coord(n)
 
           do j=1,numdisjointchunks(n)
 
