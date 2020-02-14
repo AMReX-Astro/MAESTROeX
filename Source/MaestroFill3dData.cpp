@@ -77,12 +77,12 @@ Maestro::Put1dArrayOnCart (int lev,
 #endif
     for ( MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-    	// Get the index space of the valid region
-    	const Box& tileBox = mfi.tilebox();
+        // Get the index space of the valid region
+        const Box& tileBox = mfi.tilebox();
 
         const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
 
-    	if (spherical == 0) {
+        if (spherical == 0) {
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
 
@@ -94,7 +94,7 @@ Maestro::Put1dArrayOnCart (int lev,
                     s0_p[lev+r*max_lev];
             });
 
-    	} else {
+        } else {
 
             const Array4<const Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
@@ -333,7 +333,7 @@ Maestro::Put1dArrayOnCart (int lev,
                     });
                 } // is_input_edge_centered
             } // use_exact_base_state
-    	}
+        }
     }
 }
 
