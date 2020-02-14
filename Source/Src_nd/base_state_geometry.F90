@@ -712,7 +712,7 @@ contains
     integer, intent(inout) :: coord(0:max_radial_level,0:nr_fine)
     integer :: i, lev
 
-    coord(0:finest_radial_level,0:nr_fine) = 0
+    coord(0:max_radial_level,0:nr_fine) = 0
 
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
@@ -727,7 +727,7 @@ contains
     integer, intent(inout) :: coord(0:max_radial_level,0:nr_fine)
     integer :: i, lev
 
-    coord(0:finest_radial_level,0:nr_fine) = 0
+    coord(0:max_radial_level,0:nr_fine) = 0
     
     do lev = 0, finest_radial_level
         do i = 1, numdisjointchunks(lev)
