@@ -422,6 +422,16 @@ public:
     // end MaestroDt.cpp functions
     ////////////////////////
 
+    ////////////
+    // MaestroEnforceHSE.cpp
+
+    void EnforceHSE(const RealVector& rho0, 
+                    RealVector& p0,
+                    const RealVector& grav_cell);
+
+    // end  MaestroEnforceHSE.cpp functions
+    ////////////////////////
+
     ////////////////////////
     // MaestroEnthalpyAdvance.cpp functions
 

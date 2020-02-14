@@ -283,11 +283,7 @@ Maestro::InitData ()
             MakeGravCell(grav_cell_old, rho0_old);
 
             // compute p0 with HSE
-            enforce_HSE(rho0_old.dataPtr(),
-                        p0_old.dataPtr(),
-                        grav_cell_old.dataPtr(),
-                        r_cc_loc.dataPtr(),
-                        r_edge_loc.dataPtr());
+            EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(sold,p0_old,1);
@@ -574,12 +570,6 @@ void Maestro::DivuIter (int istep_divu_iter)
             }
 
             int is_predictor = 1;
-            // make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-            //         rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-            //         p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-            //         p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
-            //         etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-            //         r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
             Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_peosbar, delta_chi_w0, dt, dt, is_predictor);

@@ -107,11 +107,7 @@ Maestro::Regrid ()
     MakeGravCell(grav_cell_old, rho0_old);
 
     // enforce HSE
-    enforce_HSE(rho0_old.dataPtr(),
-                p0_old.dataPtr(),
-                grav_cell_old.dataPtr(),
-                r_cc_loc.dataPtr(),
-                r_edge_loc.dataPtr());
+    EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
     if (use_tfromp) {
         // compute full state T = T(rho,p0,X)
