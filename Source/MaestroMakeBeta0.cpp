@@ -8,7 +8,8 @@ Maestro::MakeBeta0(RealVector& beta,
                    const RealVector& rho0,
                    const RealVector& p0,
                    const RealVector& gamma1bar,
-                   const RealVector& grav_cell) 
+                   const RealVector& grav_cell,
+                   const bool is_irreg) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeBeta0()",MakeBeta0);
@@ -64,53 +65,74 @@ Maestro::MakeBeta0(RealVector& beta,
                     Real nu = 0.0;
 
                     if (r < anelastic_cutoff_density_coord[n]) {
+
+                        Real drp = is_irreg ? 
+                            r_edge_loc[n+max_lev*(r+1)] - r_edge_loc[n+max_lev*r] : dr[n];
+                        Real drm = dr[n];
+                        if (is_irreg) {
+                            if (r > 0) {
+                                drm = r_edge_loc[n+max_lev*r] - r_edge_loc[n+max_lev*(r-1)];
+                            } else {
+                                drm = drp;
+                            }
+                        }
+
                         if (r == 0 || r == nr[n]-1) {
                             // lambda = 0.0;
                             // mu = 0.0;
                             // nu = 0.0;
                         } else {
+                            Real drc = is_irreg ? 
+                                r_cc_loc[n+max_lev*(r+1)] - r_cc_loc[n+max_lev*(r-1)] : drc;
+
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
-                            Real del = 0.5 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*(r-1)])/dr[n];
-                            Real dpls = 2.0 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*r])/dr[n];
-                            Real dmin = 2.0 * (rho0[n+max_lev*r] - rho0[n+max_lev*(r-1)])/dr[n];
+                            Real del = 0.5 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*(r-1)])/drc;
+                            Real dpls = 2.0 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*r])/drp;
+                            Real dmin = 2.0 * (rho0[n+max_lev*r] - rho0[n+max_lev*(r-1)])/drm;
                             Real slim = min(fabs(dpls), fabs(dmin));
                             slim = dpls*dmin > 0.0 ? slim : 0.0;
                             Real sflag  = copysign(1.0, del);
                             lambda = sflag*min(slim, fabs(del));
                             
-                            del = 0.5* (gamma1bar[n+max_lev*(r+1)] - gamma1bar[n+max_lev*(r-1)])/dr[n];
-                            dpls  = 2.0 * (gamma1bar[n+max_lev*(r+1)] - gamma1bar[n+max_lev*r])/dr[n];
-                            dmin  = 2.0 * (gamma1bar[n+max_lev*r] - gamma1bar[n+max_lev*(r-1)])/dr[n];
+                            del = 0.5* (gamma1bar[n+max_lev*(r+1)] - gamma1bar[n+max_lev*(r-1)])/drc;
+                            dpls  = 2.0 * (gamma1bar[n+max_lev*(r+1)] - gamma1bar[n+max_lev*r])/drp;
+                            dmin  = 2.0 * (gamma1bar[n+max_lev*r] - gamma1bar[n+max_lev*(r-1)])/drm;
                             slim  = min(fabs(dpls), fabs(dmin));
                             slim  = dpls*dmin > 0.0 ? slim : 0.0;
                             sflag = copysign(1.0, del);
                             mu = sflag*min(slim, fabs(del));
                             
-                            del = 0.5* (p0[n+max_lev*(r+1)] - p0[n+max_lev*(r-1)])/dr[n];
-                            dpls  = 2.0 * (p0[n+max_lev*(r+1)] - p0[n+max_lev*r])/dr[n];
-                            dmin  = 2.0 * (p0[n+max_lev*r] - p0[n+max_lev*(r-1)])/dr[n];
+                            del = 0.5* (p0[n+max_lev*(r+1)] - p0[n+max_lev*(r-1)])/drc;
+                            dpls  = 2.0 * (p0[n+max_lev*(r+1)] - p0[n+max_lev*r])/drp;
+                            dmin  = 2.0 * (p0[n+max_lev*r] - p0[n+max_lev*(r-1)])/drm;
                             slim  = min(fabs(dpls), fabs(dmin));
                             slim  = dpls*dmin > 0.0 ? slim : 0.0;
                             sflag = copysign(1.0, del);
                             nu = sflag*min(slim, fabs(del));
                         }
 
+                        if (is_irreg) {
+                            // edge-to-cell-center spacings 
+                            drp = 2.0 * (r_edge_loc[n+max_lev*(r+1)] - r_cc_loc[n+max_lev*r]);
+                            drm = 2.0 * (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]);
+                        }
+
                         Real integral = 0.0;
 
                         if (nu == 0.0 || mu == 0.0 ||
                             (nu*gamma1bar[n+max_lev*r] - mu*p0[n+max_lev*r]) == 0.0 ||
-                            ((gamma1bar[n+max_lev*r] + 0.5*mu*dr[n])/
-                            (gamma1bar[n+max_lev*r] - 0.5*mu*dr[n])) <= 0.0 ||
-                            ((p0[n+max_lev*r] + 0.5*nu*dr[n])/
-                            (p0[n+max_lev*r] - 0.5*nu*dr[n])) <= 0.0) {
+                            ((gamma1bar[n+max_lev*r] + 0.5*mu*drp)/
+                            (gamma1bar[n+max_lev*r] - 0.5*mu*drm)) <= 0.0 ||
+                            ((p0[n+max_lev*r] + 0.5*nu*drp)/
+                            (p0[n+max_lev*r] - 0.5*nu*drm)) <= 0.0) {
                             
                             // just do piecewise constant integration
-                            integral = fabs(grav_cell[n+max_lev*r])*rho0[n+max_lev*r]*dr[n] 
+                            integral = fabs(grav_cell[n+max_lev*r])*rho0[n+max_lev*r]*0.5*(drp+drm)
                                 / (p0[n+max_lev*r]*gamma1bar[n+max_lev*r]);
                             
                         } else {
-                            if (use_linear_grav_in_beta0) {
+                            if (use_linear_grav_in_beta0 && !is_irreg) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
                                 Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/dr[n];
@@ -144,10 +166,10 @@ Maestro::MakeBeta0(RealVector& beta,
                                 Real coeff2 = lambda*p0[n+max_lev*r]/nu - rho0[n+max_lev*r];
 
                                 integral = (fabs(grav_cell[n+max_lev*r])/denom)*
-                                    (coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*dr[n])/
-                                                (gamma1bar[n+max_lev*r] - 0.5*mu*dr[n])) -
-                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*dr[n])/
-                                                (p0[n+max_lev*r] - 0.5*nu*dr[n])) );
+                                    (coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*drp)/
+                                                (gamma1bar[n+max_lev*r] - 0.5*mu*drm)) -
+                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*drp)/
+                                                (p0[n+max_lev*r] - 0.5*nu*drm)) );
                             }
                         }
 
@@ -199,14 +221,16 @@ Maestro::MakeBeta0(RealVector& beta,
                             // do r=anelastic_cutoff_density_coord(i),(r_end_coord[n+max_lev*j]+1)/refrat-1
                             for (auto r = anelastic_cutoff_density_coord[i]; 
                                  r <= (r_end_coord[n+max_lev*j]+1)/refrat-1; ++r) {
-                                beta0[i+max_lev*r] = 0.5*(beta0[i+1+max_lev*2*r]+beta0[i+1+max_lev*(2*r+1)]);
+                                beta0[i+max_lev*r] = 0.5*(beta0[i+1+max_lev*2*r] + 
+                                    beta0[i+1+max_lev*(2*r+1)]);
                             }
 
                             // do r=(r_end_coord[n+max_lev*j]+1)/refrat,nr(i)
                             for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat; 
                                  r <= nr[i]; ++r) {
                                 if (rho0[i+max_lev*(r-1)] /= 0.0) {
-                                    beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
+                                    beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
+                                        (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
                                 }
                             }
                         }
