@@ -104,10 +104,7 @@ Maestro::Regrid ()
     ComputeCutoffCoords(rho0_old);
 
     // make gravity
-    make_grav_cell(grav_cell_old.dataPtr(),
-                   rho0_old.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav_cell_old, rho0_old);
 
     // enforce HSE
     enforce_HSE(rho0_old.dataPtr(),

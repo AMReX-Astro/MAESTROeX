@@ -458,11 +458,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // update grav_cell_new
         base_time_start = ParallelDescriptor::second();
-
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        
+        MakeGravCell(grav_cell_new, rho0_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
