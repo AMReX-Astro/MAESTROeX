@@ -308,8 +308,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
         Makew0(w0, w0_old, w0_force, Sbar, rho0_old, rho0_old, 
-                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-                p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+               p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+               p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
@@ -851,7 +851,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // update grav_cell_new, rho0_nph, grav_cell_nph
         base_time_start = ParallelDescriptor::second();
-        
+
         MakeGravCell(grav_cell_new, rho0_new);
 
         for(int i=0; i<rho0_nph.size(); ++i) {

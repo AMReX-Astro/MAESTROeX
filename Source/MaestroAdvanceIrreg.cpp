@@ -288,11 +288,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+               p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
@@ -609,11 +607,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_new, 
+               p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
+               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
@@ -841,11 +837,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
-                gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
+               p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
+               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
