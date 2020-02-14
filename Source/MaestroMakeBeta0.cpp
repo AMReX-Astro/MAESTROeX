@@ -269,7 +269,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                 int hi = r_end_coord[n+max_lev*j];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
-                    beta0[n+max_lev*r] = 1.0;
+                    beta0_p[n+max_lev*r] = 1.0;
                 });
             }
         }
