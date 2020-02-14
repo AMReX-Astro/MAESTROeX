@@ -93,7 +93,7 @@ void Maestro::WriteMF (const Vector<MultiFab>& mf,
     Vector<std::string> varnames;
     varnames.resize(nComp);
     for (int i=0; i<nComp; ++i) {
-        varnames[i] = "X";
+        varnames[i] = "MultiFab_" + std::to_string(i);
     }
 
     // temporary MultiFab to hold plotfile data
