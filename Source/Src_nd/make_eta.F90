@@ -21,7 +21,6 @@ module make_eta_module
        max_radial_level, numdisjointchunks, &
        r_start_coord, r_end_coord, finest_radial_level, &
        restrict_base, fill_ghost_base
-  use fill_3d_data_module, only: put_1d_array_on_cart_sphr
 
   implicit none
 

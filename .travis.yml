@@ -26,7 +26,7 @@ matrix:
         - ./deploy_docs.sh
     
     - name: "clang static analysis"
-      if: type = pull_request OR type = api
+      if: type = pull_request OR type = api OR type = cron
       language: cpp
       compiler:
         - clang
@@ -56,7 +56,7 @@ matrix:
         - python3 $TRAVIS_BUILD_DIR/Util/scripts/clang_static_analysis.py clang_analysis.txt
     
     - name: "tab exterminator"
-      if: type = pull_request OR type = api
+      if: type = pull_request OR type = api OR type = cron
       script:
         - ./Util/scripts/pr_tab_remover.sh
 # deploy:

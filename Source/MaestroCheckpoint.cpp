@@ -73,7 +73,9 @@ Maestro::WriteCheckPoint (int step) {
         HeaderFile << dt << "\n";
 
         // write out t_new
-        HeaderFile << t_new << "\n";
+        // we use t_old here to satisfy t=0 after initialization
+        // note that t_old = t_new when we advance a real time step
+        HeaderFile << t_old << "\n";
 
         // write out rel_eps
         get_rel_eps(&c_rel_eps);
@@ -214,6 +216,7 @@ Maestro::ReadCheckPoint ()
         // read in time
         is >> t_old;
         GotoNextLine(is);
+        t_new = t_old + dt;
 
         // read in rel_eps
         is >> c_rel_eps;

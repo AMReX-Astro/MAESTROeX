@@ -82,9 +82,19 @@ Maestro::Init ()
 
         for (int lev=0; lev<=finest_level; ++lev) {
             w0_cart[lev].setVal(0.);
+            rhcc_for_nodalproj[lev].setVal(0.);
+            pi[lev].setVal(0.);
+            S_cc_new[lev].setVal(0.);
+            unew[lev].setVal(0.);
+            snew[lev].setVal(0.);
         }
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        
+        if (spherical == 0) {
+            // reset tagging array to include buffer zones
+            TagArray();
+        }
     }
 
     // set finest_radial_level in fortran
@@ -555,6 +565,9 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     React(sold,stemp,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,0.5*dt,t_old);
 
+    // WriteMF(sold,"a_sold_2levs");
+    // Abort();
+    
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
