@@ -18,20 +18,16 @@ Maestro::EnforceHSE(const RealVector& rho0,
     get_finest_radial_level(&finest_radial_level);
 
     RealVector grav_edge((finest_radial_level+1)*(nr_fine+1));
-    RealVector p0_old((finest_radial_level+1)*(nr_fine+1));
-
-    // Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
-    // const Real * AMREX_RESTRICT rho0_p = rho0.dataPtr();
+    RealVector p0old((finest_radial_level+1)*(nr_fine+1));
 
     Real offset = 0.0;
 
-    // call make_grav_edge(grav_edge,rho0,r_edge_loc)
     MakeGravEdge(grav_edge, rho0);
 
     // create a copy of the input pressure to help us with initial
     // conditions
     for (auto i = 0; i < p0.size(); ++i) {
-        p0_old[i] = p0[i];
+        p0old[i] = p0[i];
     }
 
     // zero the new pressure so we don't leave a non-zero pressure in
@@ -41,7 +37,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
     // integrate all of level 1 first
     // use the old pressure at r=0 as a reference point
-    p0[0] = p0_old[0];
+    p0[0] = p0old[0];
 
     // now integrate upwards from the bottom later, we will offset the
     // entire pressure so we have effectively integrated from the "top"
@@ -73,7 +69,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                 if (r_start_coord[n+max_lev*i] == 0) {
                     // if we are at the bottom of the domain, use the old
                     // pressure as reference
-                    p0[n] = p0_old[n];
+                    p0[n] = p0old[n];
                 } else if (r_start_coord[n+max_lev*i] <= base_cutoff_density_coord[n]) {
                     // we integrate upwards starting from the nearest coarse
                     // cell at a lower physical height
@@ -156,7 +152,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                 // subtract the offset for all values at and above this point
                 if (r_end_coord[n+max_lev*i] != nr[n]-1) {
                     for (auto l = n-1; l >= 0; --l) {
-                        for (auto r = (r_end_coord[n+max_lev*i]+1)/pow(2, n-l); 
+                        for (int r = (r_end_coord[n+max_lev*i]+1)/pow(2, n-l); 
                              r <= nr[l]-1; ++r) {
                             p0[l+max_lev*r] -= offset;
                         }
@@ -169,7 +165,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     // now compare pressure in the last cell and offset to make sure we
     // are integrating "from the top"
     // we use the coarsest level as the reference point
-    offset = p0[max_lev*(nr[0]-1)] - p0_old[max_lev*(nr[0]-1)];
+    offset = p0[max_lev*(nr[0]-1)] - p0old[max_lev*(nr[0]-1)];
 
     // offset level 0
     for (auto r = 0; r < nr_fine; ++r) {
