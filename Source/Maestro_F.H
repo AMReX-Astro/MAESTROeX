@@ -12,29 +12,6 @@ extern "C"
     void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
 
     //////////////////////
-    // in advect_base.F90
-    void advect_base_dens(const amrex::Real* w0,
-                          const amrex::Real* rho0_old,
-                                amrex::Real* rho0_new,
-                                amrex::Real* rho0_predicted_edge,
-                          const amrex::Real dt,
-                          const amrex::Real* r_cc_loc,
-                          const amrex::Real* r_edge_loc,
-                          const int lev);
-
-    void advect_base_enthalpy(const amrex::Real* w0,
-                              const amrex::Real* rho0_old,
-                              const amrex::Real* rhoh0_old,
-                                    amrex::Real* rhoh0_new,
-                              const amrex::Real* rho0_predicted_edge,
-                              const amrex::Real* psi,
-                              const amrex::Real dt,
-                              const amrex::Real* r_cc_loc,
-                              const amrex::Real* r_edge_loc,
-                              const int lev);
-    //////////////////////
-
-    //////////////////////
     // in average.f90
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi,
@@ -782,6 +759,10 @@ extern "C"
     // in regrid.f90
     void regrid_base_state_cc(amrex::Real* state_cc);
     void regrid_base_state_edge(amrex::Real* state_ec);
+    void get_numdisjointchunks(int* nchunks);
+    void get_r_start_coord(int* coord);
+    void get_r_end_coord(int* coord);
+    void get_finest_radial_level(int* lev);
     //////////////////////
 
     //////////////////////
