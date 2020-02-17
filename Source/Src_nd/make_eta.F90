@@ -69,8 +69,8 @@ contains
     ! These calls shouldn't be needed since the planar algorithm only uses
     ! etarho_cc to make_psi, and then we fill ghost cells in make_psi, but
     ! this is just to be safe in case things change in the future
-    call restrict_base(etarho_ec,1)
-    call fill_ghost_base(etarho_ec,1)
+    call restrict_base(etarho_cc,1)
+    call fill_ghost_base(etarho_cc,1)
 
   end subroutine make_etarho_planar
 
