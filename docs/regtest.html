@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Regression Testing &mdash; MAESTROeX 20.02
+  <title>Regression Testing and Continuous Integration &mdash; MAESTROeX 20.02
  documentation</title>
   
 
@@ -134,7 +134,11 @@
 <li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
 <li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Regression Testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Regression Testing and Continuous Integration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#regression-testing">Regression Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">API</span></p>
 <ul>
@@ -189,7 +193,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Regression Testing</li>
+      <li>Regression Testing and Continuous Integration</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -208,8 +212,10 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="regression-testing">
-<h1>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="regression-testing-and-continuous-integration">
+<h1>Regression Testing and Continuous Integration<a class="headerlink" href="#regression-testing-and-continuous-integration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="regression-testing">
+<h2>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this headline">¶</a></h2>
 <p>Nightly regression tests are run on MAESTROeX using the AMReX
 regression testing framework:
 <a class="reference external" href="https://github.com/amrex-codes/regression_testing/">https://github.com/amrex-codes/regression_testing/</a> .  We use the
@@ -246,6 +252,21 @@ at Stony Brook can be used as a starting point and is found here:</p>
 <blockquote>
 <div><p><a class="reference external" href="https://github.com/amrex-astro/actual_test_files">https://github.com/amrex-astro/actual_test_files</a></p>
 </div></blockquote>
+</div>
+<div class="section" id="continuous-integration">
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this headline">¶</a></h2>
+<p>We use Travis CI to run integration tests on the code and to build and deploy the documentation. The current status of these tests on the development branch can be found here:</p>
+<blockquote>
+<div><img alt="https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development" src="https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development" />
+<dl class="field-list simple">
+<dt class="field-odd">target</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://travis-ci.com/AMReX-Astro/MAESTROeX">https://travis-ci.com/AMReX-Astro/MAESTROeX</a></p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Currently, travis runs the <a class="reference external" href="https://clang-analyzer.llvm.org/">clang static analyzer</a>, which finds potential bugs in the code. It also runs a script to convert any tabs in the code into spaces. Both of these are run on pull requests to the MAESTROeX github repo, and are run weekly on the development branch.</p>
+<p>The travis build settings can be found in the <cite>.travis.yml</cite> file.</p>
+</div>
 </div>
 
 
