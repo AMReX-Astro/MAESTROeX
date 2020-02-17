@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
+Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
@@ -16,45 +16,25 @@ Maestro::RestrictBase(RealVector& s0_vec, bool is_cell_centered)
 
     const int max_lev = max_radial_level + 1;
 
-    for (int n = finest_radial_level; n >= 1; --n) {
-        Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
-        // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
+    for (int n = finest_radial_level; n >= 1; --n) {        
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
-
             if (is_cell_centered) {
                 // for level n, make the coarser cells underneath simply the average of the fine
-                const int lo = r_start_coord[n+i*max_lev];
-                const int hi = r_end_coord[n+i*max_lev]-1;
-
-                AMREX_PARALLEL_FOR_1D((hi-lo)/2+1, j, {
-                    // int r = j*2 + lo;
-                    // s0_m[r/2] = 0.5 * (s0[r] + s0[r+1]);
-                    int r = n + max_lev*(j*2 + lo);
-                    int p = n + max_lev*(j*2 + lo + 1);
-                    int m = n-1 + max_lev*(j*2 + lo)/2;
-
-                    s0[m] = 0.5 * (s0[r] + s0[p]);
-                });
+                for (auto j = r_start_coord[n+i*max_lev]; j < r_end_coord[n+i*max_lev]; j+=2) {
+                    s0[n-1 + max_lev*j/2] = 0.5 * (s0[n + max_lev*j] + s0[n + max_lev*(j+1)]);
+                }
             } else {
                 // for level n, make the coarse edge underneath equal to the fine edge value
-                const int lo = r_start_coord[n+i*max_lev];
-                const int hi = r_end_coord[n+i*max_lev]+1;
-
-                AMREX_PARALLEL_FOR_1D((hi-lo+2)/2+1, j, {
-                    // int r = j*2 + lo;
-                    // s0_m[r/2] = s0[r];
-                    int r = n + max_lev*(j*2 + lo);
-                    int m = n-1 + max_lev*(j*2 + lo)/2;
-
-                    s0[m] = s0[r];
-                });
+                for (auto j = r_start_coord[n+i*max_lev]; j <= r_end_coord[n+i*max_lev]+1; j+=2) {
+                    s0[n-1 + max_lev*j/2] = s0[n + max_lev*j];
+                }
             }
         }
     }
 }
 
 void 
-Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
+Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
@@ -67,14 +47,11 @@ Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
-        Real * AMREX_RESTRICT s0 = s0_vec.dataPtr();
-        const int nr = nr_fine / pow(2,max_radial_level-n);
-
-        // Real * AMREX_RESTRICT s0_m = s0_vec[n-1].dataPtr();
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev];
+            const int nr = nr_fine / pow(2,max_radial_level-n);
 
             if (is_cell_centered) {
 
@@ -121,9 +98,7 @@ Maestro::FillGhostBase(RealVector& s0_vec, bool is_cell_centered)
                     s0[n+max_lev*(hi+3)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
                     s0[n+max_lev*(hi+4)] = s0[n-1+max_lev*r_crse] + 0.25*slope;
                 }
-                    
             } else {
-
                 if (lo != 0) {
                     // quadratic interpolation from the three closest points
                     s0[n+max_lev*(lo-1)] = -s0[n+max_lev*(lo+1)]/3.0
