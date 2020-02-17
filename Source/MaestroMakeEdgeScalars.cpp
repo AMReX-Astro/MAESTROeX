@@ -756,6 +756,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     ///////////////////////////////////////
 
     Real ppm_type_local = ppm_type;
+    const Real dt_loc = dt;
     Real hx = dx[0];
     Real hy = dx[1];
     Real hz = dx[2];
@@ -776,9 +777,9 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     {
         if (ppm_type_local == 0) {
             slx(i,j,k) = scal(i-1,j,k,comp) + 
-                0.5 * (1.0 - dt * umac(i,j,k) / hx) * Ip(i-1,j,k,0);
+                0.5 * (1.0 - dt_loc * umac(i,j,k) / hx) * Ip(i-1,j,k,0);
             srx(i,j,k) = scal(i,j,k,comp) - 
-                0.5 * (1.0 + dt * umac(i,j,k) / hx) * Ip(i,j,k,0);
+                0.5 * (1.0 + dt_loc * umac(i,j,k) / hx) * Ip(i,j,k,0);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             slx(i,j,k) = Ip(i-1,j,k,0);
             srx(i,j,k) = Im(i,j,k,0);
@@ -835,9 +836,9 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     {
         if (ppm_type_local == 0) {
             sly(i,j,k) = scal(i,j-1,k,comp) + 
-                0.5 * (1.0 - dt * vmac(i,j,k) / hy) * Im(i,j-1,k,0);
+                0.5 * (1.0 - dt_loc * vmac(i,j,k) / hy) * Im(i,j-1,k,0);
             sry(i,j,k) = scal(i,j,k,comp) - 
-                0.5 * (1.0 + dt * vmac(i,j,k) / hy) * Im(i,j,k,0);
+                0.5 * (1.0 + dt_loc * vmac(i,j,k) / hy) * Im(i,j,k,0);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             sly(i,j,k) = Ip(i,j-1,k,1);
             sry(i,j,k) = Im(i,j,k,1);
@@ -894,9 +895,9 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     {
         if (ppm_type_local == 0) {
             slz(i,j,k) = scal(i,j,k-1,comp) + 
-                0.5 * (1.0 - dt * wmac(i,j,k) / hz) * slopez(i,j,k-1);
+                0.5 * (1.0 - dt_loc * wmac(i,j,k) / hz) * slopez(i,j,k-1);
             srz(i,j,k) = scal(i,j,k,comp) - 
-                0.5 * (1.0 + dt * wmac(i,j,k) / hz) * slopez(i,j,k);
+                0.5 * (1.0 + dt_loc * wmac(i,j,k) / hz) * slopez(i,j,k);
         } else if (ppm_type_local == 1 || ppm_type_local == 2) {
             slz(i,j,k) = Ip(i,j,k-1,2);
             srz(i,j,k) = Im(i,j,k,2);
