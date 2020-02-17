@@ -174,86 +174,86 @@ contains
     ! write(*,*) "rstartcoord, end = ", r_start_coord(0,1), r_end_coord(0,1)
 
     ! write(*,*) "base_cutoff_coord = ", base_cutoff_density_coord(n)
-    ! w0 = ZERO
+    w0 = ZERO
 
-    ! ! Compute w0 on edges at level n
-    ! do n=0,max_radial_level
+    ! Compute w0 on edges at level n
+    do n=0,max_radial_level
 
-    !    psi_planar = ZERO
+       psi_planar = ZERO
 
-    !    do j=1,numdisjointchunks(n)
+       do j=1,numdisjointchunks(n)
 
-    !       if (n .eq. 0) then
-    !          ! Initialize new w0 at bottom of coarse base array to zero.
-    !          w0(0,0) = ZERO
-    !       else
-    !          ! Obtain the starting value of w0 from the coarser grid
-    !          w0(n,r_start_coord(n,j)) = w0(n-1,r_start_coord(n,j)/2)
-    !       end if
+          if (n .eq. 0) then
+             ! Initialize new w0 at bottom of coarse base array to zero.
+             w0(0,0) = ZERO
+          else
+             ! Obtain the starting value of w0 from the coarser grid
+             w0(n,r_start_coord(n,j)) = w0(n-1,r_start_coord(n,j)/2)
+          end if
 
-    !       ! compute psi for level n
-    !       do r = r_start_coord(n,j), r_end_coord(n,j)
-    !          if (r .lt. base_cutoff_density_coord(n)) then
-    !             psi_planar(r) = etarho_cc(n,r) * abs(grav_const)
-    !          end if
-    !       end do
+          ! compute psi for level n
+          do r = r_start_coord(n,j), r_end_coord(n,j)
+             if (r .lt. base_cutoff_density_coord(n)) then
+                psi_planar(r) = etarho_cc(n,r) * abs(grav_const)
+             end if
+          end do
 
-    !       do r=r_start_coord(n,j)+1,r_end_coord(n,j)+1
+          do r=r_start_coord(n,j)+1,r_end_coord(n,j)+1
 
-    !          gamma1bar_p0_avg = (gamma1bar_old(n,r-1)+gamma1bar_new(n,r-1)) * &
-    !               (p0_old(n,r-1)+p0_new(n,r-1))/4.0d0
+             gamma1bar_p0_avg = (gamma1bar_old(n,r-1)+gamma1bar_new(n,r-1)) * &
+                  (p0_old(n,r-1)+p0_new(n,r-1))/4.0d0
 
-    !         !  write(*,*) "gamma1bar_p0_avg = ", gamma1bar_p0_avg, "gamma1bar_old, new = ",gamma1bar_old(n,r-1), gamma1bar_new(n,r-1)
+            !  write(*,*) "gamma1bar_p0_avg = ", gamma1bar_p0_avg, "gamma1bar_old, new = ",gamma1bar_old(n,r-1), gamma1bar_new(n,r-1)
 
-    !          if (r .lt. base_cutoff_density_coord(n)) then
+             if (r .lt. base_cutoff_density_coord(n)) then
 
-    !             if (is_predictor .eq. 1) then
-    !                delta_chi_w0(n,r-1) = dpdt_factor * &
-    !                     p0_minus_peosbar(n,r-1) / (gamma1bar_old(n,r-1)*p0_old(n,r-1)*dt)
-    !             else
-    !                delta_chi_w0(n,r-1) = delta_chi_w0(n,r-1) + dpdt_factor * &
-    !                     p0_minus_peosbar(n,r-1) / (gamma1bar_new(n,r-1)*p0_new(n,r-1)*dt)
-    !             end if
+                if (is_predictor .eq. 1) then
+                   delta_chi_w0(n,r-1) = dpdt_factor * &
+                        p0_minus_peosbar(n,r-1) / (gamma1bar_old(n,r-1)*p0_old(n,r-1)*dt)
+                else
+                   delta_chi_w0(n,r-1) = delta_chi_w0(n,r-1) + dpdt_factor * &
+                        p0_minus_peosbar(n,r-1) / (gamma1bar_new(n,r-1)*p0_new(n,r-1)*dt)
+                end if
 
-    !          else
-    !             delta_chi_w0(n,r-1) = 0.d0
-    !          end if
+             else
+                delta_chi_w0(n,r-1) = 0.d0
+             end if
 
-    !          w0(n,r) = w0(n,r-1) + Sbar_in(n,r-1) * dr(n) &
-    !               - psi_planar(r-1) / gamma1bar_p0_avg * dr(n) &
-    !               - delta_chi_w0(n,r-1) * dr(n)
+             w0(n,r) = w0(n,r-1) + Sbar_in(n,r-1) * dr(n) &
+                  - psi_planar(r-1) / gamma1bar_p0_avg * dr(n) &
+                  - delta_chi_w0(n,r-1) * dr(n)
 
-    !       end do
+          end do
 
-    !       if (n .gt. 0) then
+          if (n .gt. 0) then
 
-    !          ! Compare the difference between w0 at top of level n to
-    !          ! the corresponding point on level n-1
-    !          offset = w0(n,r_end_coord(n,j)+1) - w0(n-1,(r_end_coord(n,j)+1)/2)
+             ! Compare the difference between w0 at top of level n to
+             ! the corresponding point on level n-1
+             offset = w0(n,r_end_coord(n,j)+1) - w0(n-1,(r_end_coord(n,j)+1)/2)
 
-    !          do i=n-1,0,-1
+             do i=n-1,0,-1
 
-    !             refrat = 2**(n-i)
+                refrat = 2**(n-i)
 
-    !             ! Restrict w0 from level n to level i
-    !             do r=r_start_coord(n,j),r_end_coord(n,j)+1
-    !                if (mod(r,refrat) .eq. 0) then
-    !                   w0(i,r/refrat) = w0(n,r)
-    !                end if
-    !             end do
+                ! Restrict w0 from level n to level i
+                do r=r_start_coord(n,j),r_end_coord(n,j)+1
+                   if (mod(r,refrat) .eq. 0) then
+                      w0(i,r/refrat) = w0(n,r)
+                   end if
+                end do
 
-    !             ! Offset the w0 on level i above the top of level n
-    !             do r=(r_end_coord(n,j)+1)/refrat+1,nr(i)
-    !                w0(i,r) = w0(i,r) + offset
-    !             end do
+                ! Offset the w0 on level i above the top of level n
+                do r=(r_end_coord(n,j)+1)/refrat+1,nr(i)
+                   w0(i,r) = w0(i,r) + offset
+                end do
 
-    !          end do
+             end do
 
-    !       end if
+          end if
 
-    !    end do
+       end do
 
-    ! end do
+    end do
 
     ! zero w0 where there is no corresponding full state array
     do n=1,max_radial_level
