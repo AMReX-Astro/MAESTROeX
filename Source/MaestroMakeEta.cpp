@@ -14,6 +14,8 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
+    const int nrf = nr_fine + 1;
+    const int max_lev = max_radial_level + 1;
     RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 );
     etarhosum.shrink_to_fit();
 
@@ -41,24 +43,141 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
-            const Box& validbox = mfi.validbox();
+            const Box& validbox = mfi.tilebox();
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells)
             // We will also pass "bx", which specifies the "valid" tile region.
-            sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                       ARLIM_3D(validbox.loVect()), ARLIM_3D(validbox.hiVect()),
-                       BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
-                       etarhosum.dataPtr());
+            // sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
+            //            ARLIM_3D(validbox.loVect()), ARLIM_3D(validbox.hiVect()),
+            //            BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
+            //            etarhosum.dataPtr());
+
+            const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
+            Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
+
+#ifdef AMREX_USE_CUDA
+            auto launched = !Gpu::notInLaunchRegion();
+            // turn off GPU
+            if (launched) Gpu::setLaunchRegion(false);
+#endif
+
+#if (AMREX_SPACEDIM == 2)
+            int zlo = validbox.loVect()[2];
+            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+                if (k == zlo) {
+                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                }
+            });
+
+            // we only add the contribution at the top edge if we are at the top of the domain
+            // this prevents double counting
+            auto top_edge = false;
+            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
+                if (validbox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
+                    top_edge = true;
+                }
+            }
+            if (top_edge) {
+                int k = validbox.loVect()[2];
+                int j = validbox.loVect()[1]+1;
+                int lo = validbox.loVect()[0];
+                int hi = validbox.hiVect()[0];
+
+                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, k, {
+                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                });
+            }
+#else 
+            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+                amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+            });
+
+            // we only add the contribution at the top edge if we are at the top of the domain
+            // this prevents double counting
+            auto top_edge = false;
+
+            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
+                if (validbox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
+                    top_edge = true;
+                }
+            }
+            
+            if (top_edge) {
+                int zhi = validbox.hiVect()[2] + 1;
+                const auto& zbx = mfi.nodaltilebox(2);
+                AMREX_HOST_DEVICE_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    if (k == zhi) {
+                        amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+                    }
+                });
+            }
+#endif
+
+#ifdef AMREX_USE_CUDA
+    // turn GPU back on
+    if (launched) Gpu::setLaunchRegion(true);
+#endif
         }
     }
 
     ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
 
-    make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(),
-                       etarhosum.dataPtr(), ncell.dataPtr());
+    // const int max_lev = max_radial_level+1;
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
 
+    std::fill(etarho_edge.begin(), etarho_edge.end(), 0.0);
+    std::fill(etarho_cell.begin(), etarho_cell.end(), 0.0);
+
+    Real * AMREX_RESTRICT etarho_edge_p = etarho_edge.dataPtr();
+    const Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
+    Real * AMREX_RESTRICT etarho_cell_p = etarho_cell.dataPtr();
+
+    for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+            Real ncell_lev = ncell[n];
+            const int lo = r_start_coord[n+max_lev*i];
+            const int hi = r_end_coord[n+max_lev*i]+1;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
+                // note swapped shaping for etarhosum
+                etarho_edge_p[n+max_lev*r] = etarhosum_p[r+(nr_fine+1)*n] / ncell_lev;
+            });
+        }
+    }
+
+    // These calls shouldn't be needed since the planar algorithm doesn't use
+    // these outside of this function, but this is just to be safe in case
+    // things change in the future.
+    RestrictBase(etarho_edge, false);
+    FillGhostBase(etarho_edge, false);
+
+    // make the cell-centered etarho_cc by averaging etarho to centers
+    for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+            Real ncell_lev = ncell[n];
+            const int lo = r_start_coord[n+max_lev*i];
+            const int hi = r_end_coord[n+max_lev*i]+1;
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                int r = j + lo;
+                etarho_cell_p[n+max_lev*r] = 0.5 * (etarho_edge_p[n+max_lev*r] + 
+                    etarho_edge_p[n+max_lev*(r+1)]);
+            });
+        }
+    }
+
+    // These calls shouldn't be needed since the planar algorithm only uses
+    // etarho_cell to make_psi, and then we fill ghost cells in make_psi, but
+    // this is just to be safe in case things change in the future
+    RestrictBase(etarho_cell, true);
+    FillGhostBase(etarho_cell, true);
+
+    // make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(),
+    //                    etarhosum.dataPtr(), ncell.dataPtr());
 }
 
 
