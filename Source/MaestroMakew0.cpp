@@ -165,39 +165,35 @@ Maestro::Makew0Planar(RealVector& w0_in,
                 }
             });
 
-            lo = r_start_coord[n+max_lev*j]+1; 
-            hi = r_end_coord[n+max_lev*j]+1;
-            // for (auto r = r_start_coord[n+max_lev*j]+1; 
-            //     r <= r_end_coord[n+max_lev*j]+1; ++r) {
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
-                int r = k + lo;
+            for (auto r = r_start_coord[n+max_lev*j]+1; 
+                r <= r_end_coord[n+max_lev*j]+1; ++r) {
 
-                Real gamma1bar_p0_avg = (gamma1bar_old_p[n+max_lev*(r-1)]
-                    + gamma1bar_new_p[n+max_lev*(r-1)]) *
-                    (p0_old_p[n+max_lev*(r-1)] + 
-                    p0_new_p[n+max_lev*(r-1)])/4.0;
+                Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
+                    + gamma1bar_new_in[n+max_lev*(r-1)]) *
+                    (p0_old_in[n+max_lev*(r-1)] + 
+                    p0_new_in[n+max_lev*(r-1)])/4.0;
 
                 if (r < base_cutoff_density_coord_loc) {
                     if (is_predictor) {
-                        delta_chi_w0_p[n+max_lev*(r-1)] = dpdt_factor_loc * 
-                            p0_minus_peosbar_p[n+max_lev*(r-1)] / 
-                            (gamma1bar_old_p[n+max_lev*(r-1)]*
-                            p0_old_p[n+max_lev*(r-1)]*dt_loc);
+                        delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor_loc * 
+                            p0_minus_peosbar[n+max_lev*(r-1)] / 
+                            (gamma1bar_old_in[n+max_lev*(r-1)]*
+                            p0_old_in[n+max_lev*(r-1)]*dt_loc);
                     } else {
-                        delta_chi_w0_p[n+max_lev*(r-1)] += dpdt_factor_loc *
-                            p0_minus_peosbar_p[n+max_lev*(r-1)] / 
-                            (gamma1bar_new_p[n+max_lev*(r-1)]*
-                            p0_new_p[n+max_lev*(r-1)]*dt_loc);
+                        delta_chi_w0[n+max_lev*(r-1)] += dpdt_factor_loc *
+                            p0_minus_peosbar[n+max_lev*(r-1)] / 
+                            (gamma1bar_new_in[n+max_lev*(r-1)]*
+                            p0_new_in[n+max_lev*(r-1)]*dt_loc);
                     }
                 } else {
-                    delta_chi_w0_p[n+max_lev*(r-1)] = 0.0;
+                    delta_chi_w0[n+max_lev*(r-1)] = 0.0;
                 }
 
-                w0_p[n+max_lev*r] = w0_p[n+max_lev*(r-1)]
-                    + Sbar_p[n+max_lev*(r-1)] * dr_lev
-                    - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
-                    - delta_chi_w0_p[n+max_lev*(r-1)] * dr_lev;
-            });
+                w0_in[n+max_lev*r] = w0_in[n+max_lev*(r-1)]
+                    + Sbar_in[n+max_lev*(r-1)] * dr_lev
+                    - psi_planar_vec[r-1] / gamma1bar_p0_avg * dr_lev
+                    - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
+            }
 
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
@@ -210,15 +206,11 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     int refrat = pow(2, n-i);
 
                     // Restrict w0 from level n to level i
-                    // for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
-                    lo = r_start_coord[n+max_lev*j]; 
-                    hi = r_end_coord[n+max_lev*j];
-                    AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
-                        int r = k + lo;
+                    for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
                         if (r % refrat == 0) {
-                            w0_p[n+max_lev*r/refrat] = w0_p[n+max_lev*r];
+                            w0_in[n+max_lev*r/refrat] = w0_in[n+max_lev*r];
                         }
-                    });
+                    }
 
                     // Offset the w0 on level i above the top of level n
                     // for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
