@@ -450,7 +450,6 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
 
             const int lo = r_start_coord[n+i*max_lev];
             const int hi = r_end_coord[n+i*max_lev];
-            const int nr = nr_fine / pow(2,max_radial_level-n);
 
             if (is_cell_centered) {
 
