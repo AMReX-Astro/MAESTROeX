@@ -40,19 +40,13 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         const MultiFab& etarhoflux_mf = etarho_flux[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
             const Box& validbox = mfi.tilebox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells)
-            // We will also pass "bx", which specifies the "valid" tile region.
-            // sum_etarho(&lev, ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-            //            ARLIM_3D(validbox.loVect()), ARLIM_3D(validbox.hiVect()),
-            //            BL_TO_FORTRAN_3D(etarhoflux_mf[mfi]),
-            //            etarhosum.dataPtr());
 
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
@@ -145,7 +139,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 // note swapped shaping for etarhosum
-                etarho_edge_p[n+max_lev*r] = etarhosum_p[r+(nr_fine+1)*n] / ncell_lev;
+                etarho_edge_p[n+max_lev*r] = etarhosum_p[r+nrf*n] / ncell_lev;
             });
         }
     }
@@ -175,9 +169,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // this is just to be safe in case things change in the future
     RestrictBase(etarho_cell, true);
     FillGhostBase(etarho_cell, true);
-
-    // make_etarho_planar(etarho_edge.dataPtr(), etarho_cell.dataPtr(),
-    //                    etarhosum.dataPtr(), ncell.dataPtr());
 }
 
 
@@ -192,6 +183,9 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);
 
+    const int max_lev = max_radial_level + 1;
+    const int nrf = nr_fine + 1;
+
     Vector<MultiFab> eta_cart(finest_level+1);
     Vector<MultiFab> rho0_nph_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -199,11 +193,15 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         rho0_nph_cart[lev].define(grids[lev],dmap[lev],1,0);
     }
 
-    RealVector rho0_nph( (max_radial_level+1)*nr_fine );
+    RealVector rho0_nph(max_lev*nr_fine);
 
-    for (int i=0; i<rho0_nph.size(); ++i) {
-        rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-    }
+    const Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr();
+    const Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr();
+    Real * AMREX_RESTRICT rho0_nph_p = rho0_nph.dataPtr();
+
+    AMREX_PARALLEL_FOR_1D(max_lev*nr_fine, i, {
+        rho0_nph_p[i] = 0.5*(rho0_old_p[i]+rho0_new_p[i]);
+    });
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
 
@@ -211,45 +209,39 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scalold_mf = scal_old[lev];
-        const MultiFab& scalnew_mf = scal_new[lev];
-        const MultiFab& umac_mf   = umac[lev][0];
-        const MultiFab& vmac_mf   = umac[lev][1];
-        const MultiFab& wmac_mf   = umac[lev][2];
-        const MultiFab& w0macx_mf = w0mac[lev][0];
-        const MultiFab& w0macy_mf = w0mac[lev][1];
-        const MultiFab& w0macz_mf = w0mac[lev][2];
-        const MultiFab& normal_mf = normal[lev];
-        MultiFab& etacart_mf = eta_cart[lev];
-        const MultiFab& rho0_nph_cart_mf = rho0_nph_cart[lev];
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scalold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_old[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tilebox = mfi.tilebox();
 
-#pragma gpu box(tilebox)
-            construct_eta_cart( AMREX_INT_ANYD(tilebox.loVect()), AMREX_INT_ANYD(tilebox.hiVect()),
-                                scalold_mf[mfi].dataPtr(Rho),
-                                AMREX_INT_ANYD(scalold_mf[mfi].loVect()), 
-                                AMREX_INT_ANYD(scalold_mf[mfi].hiVect()),
-                                scalnew_mf[mfi].dataPtr(Rho),
-                                AMREX_INT_ANYD(scalnew_mf[mfi].loVect()), 
-                                AMREX_INT_ANYD(scalnew_mf[mfi].hiVect()),
-                                BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(etacart_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(rho0_nph_cart_mf[mfi]));
+            const Array4<const Real> rho_old = scal_old[lev].array(mfi);
+            const Array4<const Real> rho_new = scal_new[lev].array(mfi);
+            const Array4<const Real> rho0_nph_cart_arr = rho0_nph_cart[lev].array(mfi);
+            const Array4<const Real> umac_arr = umac[lev][0].array(mfi);
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+            const Array4<const Real> wmac = umac[lev][2].array(mfi);
+            const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+            const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+            const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+            const Array4<const Real> normal_arr = normal[lev].array(mfi);
+            const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                Real U_dot_er = 0.5*(umac_arr(i,j,k) + umac_arr(i+1,j,k) 
+                    + w0macx(i,j,k) + w0macx(i+1,j,k)) * normal_arr(i,j,k,0) + 
+                    0.5*(vmac(i,j,k) + vmac(i,j+1,k) 
+                    + w0macy(i,j,k) + w0macy(i,j+1,k)) * normal_arr(i,j,k,1) + 
+                    0.5*(wmac(i,j,k) + wmac(i,j,k+1) 
+                    + w0macz(i,j,k) + w0macz(i,j,k+1)) * normal_arr(i,j,k,2);
+
+                // construct time-centered [ rho' (U dot e_r) ]
+                eta_cart_arr(i,j,k) = (0.5*(rho_old(i,j,k) + rho_new(i,j,k)) 
+                    - rho0_nph_cart_arr(i,j,k)) * U_dot_er;
+            });
         }         // end MFIter loop
     }     // end loop over levels
 
@@ -264,25 +256,30 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
     Average(eta_cart,etarho_cell,0);
 
+    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    Real * AMREX_RESTRICT etarho_edge_p = etarho_edge.dataPtr();
+    const Real * AMREX_RESTRICT etarho_cell_p = etarho_cell.dataPtr();
+
     // put eta on base state edges
     // note that in spherical the base state has no refinement
     // the 0th value of etarho = 0, since U dot . e_r must be
     // zero at the center (since e_r is not defined there)
-    etarho_edge[0] = 0.0;
-    if (spherical == 1) {
-
-        double dr1, dr2;
-        for (int r=1; r<nr_fine; ++r) {
-            dr1 = r_cc_loc[r] - r_edge_loc[r];
-            dr2 = r_edge_loc[r] - r_cc_loc[r-1];
-            etarho_edge[r] = (dr2*etarho_cell[r] + dr1*etarho_cell[r-1])/(dr1+dr2);
+    const bool sph_loc = spherical;
+    AMREX_PARALLEL_FOR_1D(nrf, r, {
+        if (r == 0) {
+            etarho_edge_p[r] = 0.0;
+        } else if (r == nrf-1) {
+            // probably should do some better extrapolation here eventually
+            etarho_edge_p[r] = etarho_cell[r-1];
+        } else {
+            if (sph_loc) {
+                Real dr1 = r_cc_loc_p[r] - r_edge_loc_p[r];
+                Real dr2 = r_edge_loc_p[r] - r_cc_loc_p[r-1];
+                etarho_edge_p[r] = (dr2*etarho_cell_p[r] + dr1*etarho_cell_p[r-1])/(dr1+dr2);
+            } else {
+                etarho_edge_p[r] = 0.5*(etarho_cell_p[r] + etarho_cell_p[r-1]);
+            }
         }
-
-    } else {
-        for (int r=1; r<nr_fine; ++r) {
-            etarho_edge[r] = 0.5*(etarho_cell[r] + etarho_cell[r-1]);
-        }
-    }
-    // probably should do some better extrapolation here eventually
-    etarho_edge[nr_fine] = etarho_cell[nr_fine-1];
+    });
 }
