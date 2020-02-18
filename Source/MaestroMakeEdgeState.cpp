@@ -345,7 +345,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     const int cen = 0;
     const int lim = 1;
     const int flag = 2;
-    const int fromm = 3;
 
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;

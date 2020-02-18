@@ -1158,5 +1158,4 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "Misc       :" << misc_time << " seconds\n";
         Print() << "Base State :" << base_time << " seconds\n";
     }
-
 }

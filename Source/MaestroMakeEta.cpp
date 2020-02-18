@@ -51,12 +51,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
-#ifdef AMREX_USE_CUDA
-            auto launched = !Gpu::notInLaunchRegion();
-            // turn off GPU
-            if (launched) Gpu::setLaunchRegion(false);
-#endif
-
 #if (AMREX_SPACEDIM == 2)
             int zlo = validbox.loVect()[2];
             AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
@@ -107,11 +101,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                     }
                 });
             }
-#endif
-
-#ifdef AMREX_USE_CUDA
-    // turn GPU back on
-    if (launched) Gpu::setLaunchRegion(true);
 #endif
         }
     }
@@ -206,7 +195,6 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
 
 #if (AMREX_SPACEDIM == 3)
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -271,7 +259,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
             etarho_edge_p[r] = 0.0;
         } else if (r == nrf-1) {
             // probably should do some better extrapolation here eventually
-            etarho_edge_p[r] = etarho_cell[r-1];
+            etarho_edge_p[r] = etarho_cell_p[r-1];
         } else {
             if (sph_loc) {
                 Real dr1 = r_cc_loc_p[r] - r_edge_loc_p[r];
