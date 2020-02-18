@@ -297,6 +297,15 @@ public:
     ////////////
 
     ////////////
+    // MaestroCelltoEdge.cpp functions
+
+    void CelltoEdge(const RealVector& s0_cell_vec, 
+                    RealVector& s0_edge_vec);
+
+    // end MaestroCelltoEdge.cpp functions
+    ////////////
+
+    ////////////
     // MaestroCheckpoint.cpp functions
 
     /// Write a checkpoint at timestep `step`

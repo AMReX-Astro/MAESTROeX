@@ -298,7 +298,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     tempbar_edge.shrink_to_fit();
 
     if (spherical == 0) {
-        cell_to_edge(tempbar.dataPtr(), tempbar_edge.dataPtr());
+        CelltoEdge(tempbar, tempbar_edge);
         for (int i = 0; i < (max_radial_level+1)*(nr_fine+1); ++i) {
             rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);
             rhoh0_edge[i] = 0.5*(rhoh0_edge_old[i] + rhoh0_edge_new[i]);
