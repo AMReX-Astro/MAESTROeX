@@ -15,6 +15,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()",Average);
 
+    const int max_lev = max_radial_level+1;
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
+
     for (int i=0; i<phibar.size(); ++i) {
         phibar[i] = 0.0;
     }
@@ -67,16 +73,29 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // reduction over boxes to get sum
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
 
+        Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
+
         // divide phisum by ncell so it stores "phibar"
-        for (int lev=0; lev<=max_radial_level; ++lev) {
-            divide_phisum_by_ncell(phisum.dataPtr(),ncell.dataPtr(),lev);
+        for (int lev = 0; lev < max_lev; ++lev) {
+            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) { 
+                const int lo = r_start_coord[lev+max_lev*i];
+                const int hi = r_end_coord[lev+max_lev*i];
+                Real ncell_lev = ncell[lev];
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                    int r = j + lo;
+                    // note swapped shaping for etarhosum
+                    phisum_p[lev+max_lev*r] /= ncell_lev;
+                });
+            }
         }
+
+        RestrictBase(phisum, true);
+        FillGhostBase(phisum, true);
 
         // swap pointers so phibar contains the computed average
         std::swap(phisum,phibar);
 
-    }
-    else if (spherical == 1 && use_exact_base_state) {
+    } else if (spherical == 1 && use_exact_base_state) {
         // spherical case with uneven base state spacing
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
@@ -122,8 +141,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // swap pointers so phibar contains the computed average
         std::swap(phisum,phibar);
-    }
-    else {
+    } else {
         // spherical case with even base state spacing
 
         // For spherical, we construct a 1D array at each level, phisum, that has space
@@ -190,6 +208,4 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         average_sphr(phisum.dataPtr(),phibar.dataPtr(),ncell.dataPtr(),radii.dataPtr(),&finest_level);
 
     }
-
-
 }

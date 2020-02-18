@@ -13,6 +13,15 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
+#ifdef AMREX_USE_CUDA
+    bool launched;
+    if (deterministic_nodal_solve) {
+        launched = !Gpu::notInLaunchRegion();
+        // turn off GPU
+        if (launched) Gpu::setLaunchRegion(false);
+    }
+#endif
+
     // Local variables
     const int nrf = nr_fine + 1;
     const int max_lev = max_radial_level + 1;
@@ -158,6 +167,13 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // this is just to be safe in case things change in the future
     RestrictBase(etarho_cell, true);
     FillGhostBase(etarho_cell, true);
+
+#ifdef AMREX_USE_CUDA
+    if (deterministic_nodal_solve) {
+        // turn GPU back on
+        if (launched) Gpu::setLaunchRegion(true);
+    }
+#endif
 }
 
 
