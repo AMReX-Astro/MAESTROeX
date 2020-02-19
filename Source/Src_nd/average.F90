@@ -146,7 +146,7 @@ contains
     ! normalize phisum so it actually stores the average at a radius
     do n=0,finest_level
        do r=0,nr_irreg
-          if (ncell(n,r) .ne. 0.d0) then
+          if (ncell(n,r) .ne. 0) then
              phisum(n,r) = phisum(n,r) / dble(ncell(n,r))
           end if
        end do
@@ -408,12 +408,12 @@ contains
 
     !$OMP PARALLEL DO PRIVATE(r)
     do r=0,nr_irreg
-       radii(lev,r) = sqrt(0.75d0+2.d0*r)*dx(1)
+       radii(lev,r) = sqrt(0.75d0+2.d0*dble(r))*dx(1)
     end do
     !$OMP END PARALLEL DO
 
-    radii(lev,nr_irreg+1) = 1.d99
-    radii(lev,-1) = 0.d0
+   !  radii(lev,nr_irreg+1) = 1.d99
+   !  radii(lev,-1) = 0.d0
 
   end subroutine compute_radii_sphr
 

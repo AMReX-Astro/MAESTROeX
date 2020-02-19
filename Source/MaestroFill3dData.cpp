@@ -340,13 +340,15 @@ Maestro::Put1dArrayOnCart (int lev,
 AMREX_GPU_DEVICE 
 Real
 Maestro::QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
-                    const Real y0, const Real y1, const Real y2) 
+                    const Real y0, const Real y1, const Real y2, bool limit) 
 {
     Real y = y0 + (y1-y0)/(x1-x0)*(x-x0) 
          + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1);
 
-    if (y > max(y0, max(y1, y2))) y = max(y0, max(y1, y2));
-    if (y < min(y0, min(y1, y2))) y = min(y0, min(y1, y2));
+    if (limit) {
+        if (y > max(y0, max(y1, y2))) y = max(y0, max(y1, y2));
+        if (y < min(y0, min(y1, y2))) y = min(y0, min(y1, y2));
+    }
 
     return y;
 }

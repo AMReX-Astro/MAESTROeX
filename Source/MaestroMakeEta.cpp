@@ -55,14 +55,14 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
-            const Box& validbox = mfi.tilebox();
+            const Box& tilebox = mfi.tilebox();
 
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-            int zlo = validbox.loVect()[2];
-            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+            int zlo = tilebox.loVect()[2];
+            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 }
@@ -72,22 +72,22 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             // this prevents double counting
             auto top_edge = false;
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (validbox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
             if (top_edge) {
-                int k = validbox.loVect()[2];
-                int j = validbox.loVect()[1]+1;
-                int lo = validbox.loVect()[0];
-                int hi = validbox.hiVect()[0];
+                int k = tilebox.loVect()[2];
+                int j = tilebox.loVect()[1]+1;
+                int lo = tilebox.loVect()[0];
+                int hi = tilebox.hiVect()[0];
 
                 AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, k, {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 });
             }
 #else 
-            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
             });
 
@@ -96,13 +96,13 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             auto top_edge = false;
 
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (validbox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
             
             if (top_edge) {
-                int zhi = validbox.hiVect()[2] + 1;
+                int zhi = tilebox.hiVect()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
                 AMREX_HOST_DEVICE_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
