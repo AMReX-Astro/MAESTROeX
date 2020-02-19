@@ -32,6 +32,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int flag = 2;
     const int fromm = 3;
     const Real dr = dr_fine * pow(2.0, max_radial_level);
+    const Real dtdr = dt / dr;
 
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
@@ -176,8 +177,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             }
 
             // compute Ip and Im
-            Real sigmap = fabs(w0_p[r+max_lev])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0_p[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real sigmap = fabs(w0_p[r+max_lev])*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p[r])*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s[r] - 3.0*(sm+sp);
             
             Real Ip = w0_p[r+max_lev] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
@@ -292,8 +293,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real sp = s_ghost[g] + alphap;
 
             // compute Ip and Im
-            Real sigmap = fabs(w0_p[r+1])*dt/dr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0_p[r])*dt/dr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real sigmap = fabs(w0_p[r+1])*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p[r])*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s[r] - 3.0*(sm+sp);
             
             Real Ip = w0_p[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s[r];
@@ -306,6 +307,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         });
     }
 
+    const int nr_fine_loc = nr_fine;
+
     AMREX_PARALLEL_FOR_1D(nr_fine+1, i, {
         int r = i * max_lev;
         // Fix center and edge of star by reflecting the extrapolated state.
@@ -315,7 +318,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         // and the accuracy at the edge of the star is not important here
         if (i == 0) {
             sedgel[i] = sedger[i];
-        } else if (i == nr_fine) {
+        } else if (i == nr_fine_loc) {
             sedger[i] = sedgel[i];
         }
 
