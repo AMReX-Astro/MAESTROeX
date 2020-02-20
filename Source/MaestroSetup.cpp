@@ -132,8 +132,8 @@ Maestro::Setup ()
     etarho_cc    .resize( (max_radial_level+1)*nr_fine );
     psi          .resize( (max_radial_level+1)*nr_fine );
     numdisjointchunks.resize( (max_radial_level+1) );
-    r_start_coord.resize( (max_radial_level+1)*nr_fine );
-    r_end_coord  .resize( (max_radial_level+1)*nr_fine );
+    r_start_coord.resize( (max_radial_level+1)*(nr_fine+1));
+    r_end_coord  .resize( (max_radial_level+1)*(nr_fine+1));
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -193,6 +193,7 @@ Maestro::Setup ()
                              r_edge_loc.dataPtr(),
                              geom[max_level].CellSize(),
                              &nr_irreg);
+    InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);
 
     if (use_exact_base_state) average_base_state = 1;
 
@@ -595,7 +596,5 @@ Maestro::BCSetup()
         else {
             Abort("Invalid hi_bc");
         }
-
     } // end loop over directions
-
 }

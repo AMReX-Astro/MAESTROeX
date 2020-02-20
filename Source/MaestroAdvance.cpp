@@ -85,21 +85,21 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     RealVector grav_cell_nph   ( (max_radial_level+1)*nr_fine );
-    RealVector   rho0_nph        ( (max_radial_level+1)*nr_fine );
+    RealVector rho0_nph        ( (max_radial_level+1)*nr_fine );
     RealVector p0_nph          ( (max_radial_level+1)*nr_fine );
     RealVector p0_minus_peosbar( (max_radial_level+1)*nr_fine );
-    RealVector   peosbar         ( (max_radial_level+1)*nr_fine );
-    RealVector   w0_force        ( (max_radial_level+1)*nr_fine );
-    RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
-    RealVector   beta0_nph       ( (max_radial_level+1)*nr_fine );
-    RealVector   gamma1bar_temp1 ( (max_radial_level+1)*nr_fine );
-    RealVector   gamma1bar_temp2 ( (max_radial_level+1)*nr_fine );
-    RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
+    RealVector peosbar         ( (max_radial_level+1)*nr_fine );
+    RealVector w0_force        ( (max_radial_level+1)*nr_fine );
+    RealVector Sbar            ( (max_radial_level+1)*nr_fine );
+    RealVector beta0_nph       ( (max_radial_level+1)*nr_fine );
+    RealVector gamma1bar_temp1 ( (max_radial_level+1)*nr_fine );
+    RealVector gamma1bar_temp2 ( (max_radial_level+1)*nr_fine );
+    RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0    ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    RealVector w0_old             ( (max_radial_level+1)*(nr_fine+1) );
     RealVector rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
     // make sure C++ is as efficient as possible with memory usage
@@ -303,14 +303,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
+        ComputeCutoffCoords(rho0_old);
+
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
-        
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+        Makew0(w0, w0_old, w0_force, Sbar, rho0_old, rho0_old, 
+                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+                p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
@@ -716,14 +715,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
+        ComputeCutoffCoords(rho0_old);
+
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-
-        make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar.dataPtr(),
-                rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-                gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-                r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+        Makew0(w0, w0_old, w0_force, Sbar, rho0_old, rho0_new, 
+                p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
+                p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 

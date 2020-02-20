@@ -35,24 +35,28 @@ contains
 
   end subroutine average
 
-  subroutine divide_phisum_by_ncell(phisum,ncell) bind (C,name="divide_phisum_by_ncell")
+  subroutine divide_phisum_by_ncell(phisum,ncell,lev) bind (C,name="divide_phisum_by_ncell")
     ! compute phibar by normalizing phisum
 
     double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent(in   ) ::  ncell(0:max_radial_level)
+    integer, value, intent(in) :: lev
 
     integer :: n,i,r
 
-    do n=0,max_radial_level
+    n = lev
+    ! do n=0,max_radial_level
        do i=1,numdisjointchunks(n)
           do r=r_start_coord(n,i),r_end_coord(n,i)
              phisum(n,r) = phisum(n,r) / dble(ncell(n))
           end do
        end do
-    end do
+    ! end do
 
-    call restrict_base(phisum,1)
-    call fill_ghost_base(phisum,1)
+    if (n .eq. max_radial_level) then
+        call restrict_base(phisum,1)
+        call fill_ghost_base(phisum,1)
+    endif
 
   end subroutine divide_phisum_by_ncell
 
@@ -89,15 +93,17 @@ contains
 
   end subroutine average_sphr_irreg
 
-  subroutine divide_phisum_by_ncell_irreg(phisum,ncell) &
+  subroutine divide_phisum_by_ncell_irreg(phisum,ncell,lev) &
        bind (C,name="divide_phisum_by_ncell_irreg")
 
     double precision, intent(inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent(in   ) ::  ncell(0:max_radial_level,0:nr_fine-1)
+    integer, value, intent(in) :: lev
 
     integer :: n,r
 
-    do n=0,max_radial_level
+    n = lev
+    ! do n=0,max_radial_level
        do r=0,nr_fine-1
           ! divide only if ncell>0
           if (ncell(n,r) > 0) then
@@ -107,10 +113,12 @@ contains
              phisum(n,r) = phisum(n,r-1)
           end if
        end do
-    end do
+    ! end do
 
-    call restrict_base(phisum,1)
-    call fill_ghost_base(phisum,1)
+    if (n .eq. max_radial_level) then 
+        call restrict_base(phisum,1)
+        call fill_ghost_base(phisum,1)
+    endif
 
   end subroutine divide_phisum_by_ncell_irreg
 

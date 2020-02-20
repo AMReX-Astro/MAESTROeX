@@ -159,9 +159,7 @@ Maestro::WritePlotFile (const int step,
 
             BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
 
-            int nr = nr_fine / pow(2,(max_radial_level-lev));
-
-            for (int i=0; i<nr; ++i) {
+            for (int i=0; i<nr[lev]; ++i) {
                 BaseCCFile << r_cc_loc[lev+(max_radial_level+1)*i] << " "
                            << rho0_in[lev+(max_radial_level+1)*i] << " "
                            << rhoh0_in[lev+(max_radial_level+1)*i] << " "
@@ -174,7 +172,7 @@ Maestro::WritePlotFile (const int step,
     // write out the face-centered base state
     if (ParallelDescriptor::IOProcessor()) {
 
-        for (int lev=0; lev<=max_radial_level; ++lev) {
+        for (int lev = 0; lev <= max_radial_level; ++lev) {
 
             std::ofstream BaseFCFile;
             BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
@@ -192,9 +190,7 @@ Maestro::WritePlotFile (const int step,
 
             BaseFCFile << "r_edge  w0 \n";
 
-            int nr = nr_fine / pow(2,(max_radial_level-lev));
-
-            for (int i=0; i<nr+1; ++i) {
+            for (int i = 0; i <= nr[lev]; ++i) {
                 BaseFCFile << r_edge_loc[lev+(max_radial_level+1)*i] << " "
                            << w0[lev+(max_radial_level+1)*i] << "\n";
             }

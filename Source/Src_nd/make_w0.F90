@@ -171,6 +171,9 @@ contains
     ! end do
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    ! write(*,*) "rstartcoord, end = ", r_start_coord(0,1), r_end_coord(0,1)
+
+    ! write(*,*) "base_cutoff_coord = ", base_cutoff_density_coord(n)
     w0 = ZERO
 
     ! Compute w0 on edges at level n
@@ -199,6 +202,8 @@ contains
 
              gamma1bar_p0_avg = (gamma1bar_old(n,r-1)+gamma1bar_new(n,r-1)) * &
                   (p0_old(n,r-1)+p0_new(n,r-1))/4.0d0
+
+            !  write(*,*) "gamma1bar_p0_avg = ", gamma1bar_p0_avg, "gamma1bar_old, new = ",gamma1bar_old(n,r-1), gamma1bar_new(n,r-1)
 
              if (r .lt. base_cutoff_density_coord(n)) then
 
@@ -250,20 +255,20 @@ contains
 
     end do
 
-       ! zero w0 where there is no corresponding full state array
-       do n=1,max_radial_level
-          do j=1,numdisjointchunks(n)
-             if (j .eq. numdisjointchunks(n)) then
-                do r=r_end_coord(n,j)+2,nr(n)
-                   w0(n,r) = ZERO
-                end do
-             else
-                do r=r_end_coord(n,j)+2,r_start_coord(n,j+1)-1
-                   w0(n,r) = ZERO
-                end do
-             end if
-          end do
-       end do
+    ! zero w0 where there is no corresponding full state array
+    do n=1,max_radial_level
+        do j=1,numdisjointchunks(n)
+            if (j .eq. numdisjointchunks(n)) then
+            do r=r_end_coord(n,j)+2,nr(n)
+                w0(n,r) = ZERO
+            end do
+            else
+            do r=r_end_coord(n,j)+2,r_start_coord(n,j+1)-1
+                w0(n,r) = ZERO
+            end do
+            end if
+        end do
+    end do
 
     call restrict_base(w0,0)
     call fill_ghost_base(w0,0)
@@ -413,7 +418,7 @@ contains
     ! 4) get the edge-centered gravity on the uniformly-gridded
     ! basestate arrays
     call amrex_error("make_w0.f90: need to write make_grav_edge_uniform")
-!    call make_grav_edge_uniform(grav_edge_fine, rho0_nph_fine)
+    !    call make_grav_edge_uniform(grav_edge_fine, rho0_nph_fine)
 
 
     ! 5) solve for delta w0
@@ -533,6 +538,263 @@ contains
     call fill_ghost_base(w0_force,1)
 
   end subroutine make_w0_planar_var_g
+
+  subroutine make_w0_spherical2(w0,w0_old,Sbar_in, &
+    rho0_nph, p0_nph, &
+    gamma1bar_nph, grav_edge, w0_from_Sbar, &
+    etarho_ec,etarho_cc,w0_force, &
+    r_cc_loc,r_edge_loc,dt,dtold)  bind(C, name="make_w0_sphr2")
+
+double precision, intent(  out) ::               w0(0:nr_fine  )
+double precision, intent(in   ) ::           w0_old(0:nr_fine  )
+double precision, intent(in   ) ::          Sbar_in(0:nr_fine-1)
+double precision, intent(in   ) ::         rho0_nph(0:nr_fine-1)
+double precision, intent(in   ) ::           p0_nph(0:nr_fine-1)
+double precision, intent(in   ) ::    gamma1bar_nph(0:nr_fine-1)
+double precision, intent(inout) ::    grav_edge(0:nr_fine)
+double precision, intent(inout) ::    w0_from_Sbar(0:nr_fine)
+double precision, intent(in   ) ::        etarho_ec(0:nr_fine  )
+double precision, intent(in   ) ::        etarho_cc(0:nr_fine-1)
+double precision, intent(  out) ::         w0_force(0:nr_fine-1)
+double precision, intent(in   ) ::         r_cc_loc(0:max_radial_level,0:nr_fine-1)
+double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
+double precision, intent(in   ) :: dt,dtold
+
+! Local variables
+integer                    :: r, max_cutoff
+double precision            :: dpdr, volume_discrepancy, w0_avg, div_avg, dt_avg
+
+double precision ::    w0_old_cen(0:nr_fine-1)
+double precision ::    w0_new_cen(0:nr_fine-1)
+double precision ::             A(0:nr_fine)
+double precision ::             B(0:nr_fine)
+double precision ::             C(0:nr_fine)
+double precision ::             u(0:nr_fine)
+double precision ::             F(0:nr_fine)
+
+! w0_from_Sbar = ZERO
+
+!     do r=1,nr_fine
+
+!        if (rho0_old(r-1) .gt. base_cutoff_density) then
+!           volume_discrepancy = dpdt_factor * p0_minus_peosbar(r-1)/dt
+!        else
+!           volume_discrepancy = ZERO
+!        endif
+
+!        w0_from_Sbar(r) = w0_from_Sbar(r-1) + dr(0) * Sbar_in(r-1) * r_cc_loc(0,r-1)**2 - &
+!             dr(0)* volume_discrepancy * r_cc_loc(0,r-1)**2 / (gamma1bar_nph(r-1)*p0_nph(r-1))
+
+!     end do
+
+!     !$OMP PARALLEL DO PRIVATE(r)
+!     do r=1,nr_fine
+!        w0_from_Sbar(r) = w0_from_Sbar(r) / r_edge_loc(0,r)**2
+!     end do
+!     !$OMP END PARALLEL DO
+
+    ! make the edge-centered gravity
+    ! call make_grav_edge(grav_edge,rho0_nph,r_edge_loc)
+
+! NOTE:  now we solve for the remainder, (r^2 * delta w0)
+! this takes the form of a tri-diagonal matrix:
+! A_j (r^2 dw_0)_{j-3/2} +
+! B_j (r^2 dw_0)_{j-1/2} +
+! C_j (r^2 dw_0)_{j+1/2} = F_j
+
+A   = ZERO
+B   = ZERO
+C   = ZERO
+F   = ZERO
+u   = ZERO
+
+! Note that we are solving for (r^2 delta w0), not just w0.
+
+max_cutoff = min(base_cutoff_density_coord(0), nr_fine-1)
+
+!$OMP PARALLEL DO PRIVATE(r,dpdr)
+do r=1,max_cutoff
+    A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
+    A(r) = A(r) / dr(0)**2
+
+    B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 &
+    +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 ) / dr(0)**2
+
+    dpdr = (p0_nph(r)-p0_nph(r-1))/dr(0)
+
+    B(r) = B(r) - four * dpdr / (r_edge_loc(0,r))**3
+
+    C(r) = gamma1bar_nph(r) * p0_nph(r) / r_cc_loc(0,r)**2
+    C(r) = C(r) / dr(0)**2
+
+    F(r) = four * dpdr * w0_from_Sbar(r) / r_edge_loc(0,r) - &
+    grav_edge(r) * (r_cc_loc(0,r  )**2 * etarho_cc(r  ) - &
+    r_cc_loc(0,r-1)**2 * etarho_cc(r-1)) / &
+    (dr(0) * r_edge_loc(0,r)**2) - &
+    four * M_PI * Gconst * HALF * &
+    (rho0_nph(r) + rho0_nph(r-1)) * etarho_ec(r)
+end do
+!$OMP END PARALLEL DO
+
+! Lower boundary
+A(0) = zero
+B(0) = one
+C(0) = zero
+F(0) = zero
+
+! Upper boundary
+A(max_cutoff+1) = -one
+B(max_cutoff+1) = one
+C(max_cutoff+1) = zero
+F(max_cutoff+1) = zero
+
+! Call the tridiagonal solver
+call tridiag(A, B, C, F, u, max_cutoff+2)
+
+w0(0) = ZERO + w0_from_Sbar(0)
+
+!$OMP PARALLEL DO PRIVATE(r)
+do r=1,max_cutoff+1
+w0(r) = u(r) / r_edge_loc(0,r)**2 + w0_from_Sbar(r)
+end do
+!$OMP END PARALLEL DO
+
+do r=max_cutoff+2,nr_fine
+w0(r) = w0(max_cutoff+1)&
+*r_edge_loc(0,max_cutoff+1)**2/r_edge_loc(0,r)**2
+end do
+
+! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
+dt_avg = HALF * (dt + dtold)
+
+!$OMP PARALLEL DO PRIVATE(r,w0_avg,div_avg)
+do r = 0,nr_fine-1
+w0_old_cen(r) = HALF * (w0_old(r) + w0_old(r+1))
+w0_new_cen(r) = HALF * (w0    (r) + w0    (r+1))
+w0_avg = HALF * (dt *  w0_old_cen(r)           + dtold *  w0_new_cen(r)  ) / dt_avg
+div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
+w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr(0)
+end do
+!$OMP END PARALLEL DO
+
+end subroutine make_w0_spherical2
+
+subroutine make_w0_spherical1(w0,w0_old,Sbar_in, &
+    rho0_nph, p0_nph, &
+    gamma1bar_nph, grav_edge, w0_from_Sbar, &
+    etarho_ec,etarho_cc,w0_force, &
+    r_cc_loc,r_edge_loc,dt,dtold)  bind(C, name="make_w0_sphr1")
+
+double precision, intent(  out) ::               w0(0:nr_fine  )
+double precision, intent(in   ) ::           w0_old(0:nr_fine  )
+double precision, intent(in   ) ::          Sbar_in(0:nr_fine-1)
+double precision, intent(in   ) ::         rho0_nph(0:nr_fine-1)
+double precision, intent(in   ) ::           p0_nph(0:nr_fine-1)
+double precision, intent(in   ) ::    gamma1bar_nph(0:nr_fine-1)
+double precision, intent(inout) ::    grav_edge(0:nr_fine)
+double precision, intent(inout) ::    w0_from_Sbar(0:nr_fine)
+double precision, intent(in   ) ::        etarho_ec(0:nr_fine  )
+double precision, intent(in   ) ::        etarho_cc(0:nr_fine-1)
+double precision, intent(  out) ::         w0_force(0:nr_fine-1)
+double precision, intent(in   ) ::         r_cc_loc(0:max_radial_level,0:nr_fine-1)
+double precision, intent(in   ) ::       r_edge_loc(0:max_radial_level,0:nr_fine  )
+double precision, intent(in   ) :: dt,dtold
+
+! Local variables
+integer                    :: r, max_cutoff
+double precision            :: dpdr, volume_discrepancy, w0_avg, div_avg, dt_avg
+
+double precision ::    w0_old_cen(0:nr_fine-1)
+double precision ::    w0_new_cen(0:nr_fine-1)
+double precision ::             A(0:nr_fine)
+double precision ::             B(0:nr_fine)
+double precision ::             C(0:nr_fine)
+double precision ::             u(0:nr_fine)
+double precision ::             F(0:nr_fine)
+
+
+! NOTE:  now we solve for the remainder, (r^2 * delta w0)
+! this takes the form of a tri-diagonal matrix:
+! A_j (r^2 dw_0)_{j-3/2} +
+! B_j (r^2 dw_0)_{j-1/2} +
+! C_j (r^2 dw_0)_{j+1/2} = F_j
+
+A   = ZERO
+B   = ZERO
+C   = ZERO
+F   = ZERO
+u   = ZERO
+
+! Note that we are solving for (r^2 delta w0), not just w0.
+
+max_cutoff = min(base_cutoff_density_coord(0), nr_fine-1)
+
+!$OMP PARALLEL DO PRIVATE(r,dpdr)
+do r=1,max_cutoff
+    A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2
+    A(r) = A(r) / dr(0)**2
+
+    B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / r_cc_loc(0,r-1)**2 &
+    +gamma1bar_nph(r  ) * p0_nph(r  ) / r_cc_loc(0,r  )**2 ) / dr(0)**2
+
+    dpdr = (p0_nph(r)-p0_nph(r-1))/dr(0)
+
+    B(r) = B(r) - four * dpdr / (r_edge_loc(0,r))**3
+
+    C(r) = gamma1bar_nph(r) * p0_nph(r) / r_cc_loc(0,r)**2
+    C(r) = C(r) / dr(0)**2
+
+    F(r) = four * dpdr * w0_from_Sbar(r) / r_edge_loc(0,r) - &
+    grav_edge(r) * (r_cc_loc(0,r  )**2 * etarho_cc(r  ) - &
+    r_cc_loc(0,r-1)**2 * etarho_cc(r-1)) / &
+    (dr(0) * r_edge_loc(0,r)**2) - &
+    four * M_PI * Gconst * HALF * &
+    (rho0_nph(r) + rho0_nph(r-1)) * etarho_ec(r)
+end do
+!$OMP END PARALLEL DO
+
+! Lower boundary
+A(0) = zero
+B(0) = one
+C(0) = zero
+F(0) = zero
+
+! Upper boundary
+A(max_cutoff+1) = -one
+B(max_cutoff+1) = one
+C(max_cutoff+1) = zero
+F(max_cutoff+1) = zero
+
+! Call the tridiagonal solver
+call tridiag(A, B, C, F, u, max_cutoff+2)
+
+w0(0) = ZERO + w0_from_Sbar(0)
+
+!$OMP PARALLEL DO PRIVATE(r)
+do r=1,max_cutoff+1
+w0(r) = u(r) / r_edge_loc(0,r)**2 + w0_from_Sbar(r)
+end do
+!$OMP END PARALLEL DO
+
+do r=max_cutoff+2,nr_fine
+w0(r) = w0(max_cutoff+1)&
+*r_edge_loc(0,max_cutoff+1)**2/r_edge_loc(0,r)**2
+end do
+
+! Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
+! dt_avg = HALF * (dt + dtold)
+
+! !$OMP PARALLEL DO PRIVATE(r,w0_avg,div_avg)
+! do r = 0,nr_fine-1
+! w0_old_cen(r) = HALF * (w0_old(r) + w0_old(r+1))
+! w0_new_cen(r) = HALF * (w0    (r) + w0    (r+1))
+! w0_avg = HALF * (dt *  w0_old_cen(r)           + dtold *  w0_new_cen(r)  ) / dt_avg
+! div_avg = HALF * (dt * (w0_old(r+1)-w0_old(r)) + dtold * (w0(r+1)-w0(r))) / dt_avg
+! w0_force(r) = (w0_new_cen(r)-w0_old_cen(r)) / dt_avg + w0_avg * div_avg / dr(0)
+! end do
+! !$OMP END PARALLEL DO
+
+end subroutine make_w0_spherical1
 
   subroutine make_w0_spherical(w0,w0_old,Sbar_in, &
                                rho0_old,rho0_new,p0_old,p0_new, &

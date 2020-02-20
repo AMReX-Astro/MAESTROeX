@@ -317,17 +317,6 @@ Maestro::DiagFile (const int step,
             U_max = max(U_max, U_max_level);
             Mach_max = max(Mach_max, Mach_max_level);
 
-#if (AMREX_SPACEDIM == 3)
-            // compute center of the star
-            Vector<Real> center(AMREX_SPACEDIM, 0.0);
-            const Real* probLo = geom[0].ProbLo();
-            const Real* probHi = geom[0].ProbHi();
-
-            for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
-                center[idim] = 0.5*(*(probLo+idim) + *(probHi+idim));
-            }
-#endif
-
             // if T_max_level is the new max, then copy the location as well
             if ( T_max_level > T_max ) {
                 T_max = T_max_level;

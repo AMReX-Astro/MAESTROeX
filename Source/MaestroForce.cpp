@@ -223,9 +223,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
-                Real dr = r_edge_loc[r+1] - r_edge_loc[r];
+                Real dr_loc = r_edge_loc[r+1] - r_edge_loc[r];
                 divw0[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
-                           - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr * r_cc_loc[r]*r_cc_loc[r]);
+                           - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr_loc * r_cc_loc[r]*r_cc_loc[r]);
             }
         }
 
@@ -467,8 +467,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         MultiFab& scal_force_mf = scal_force[lev];
 
         // Get cutoff coord
-        int base_cutoff_density_coord;
-        get_base_cutoff_density_coord(&lev, &base_cutoff_density_coord);
+        int base_cutoff_density_coord_loc = 0;
+        get_base_cutoff_density_coord(lev, &base_cutoff_density_coord_loc);
     
         // Get grid spacing
         const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
@@ -515,7 +515,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real gradp0 = 0.0;
                 
 #if (AMREX_SPACEDIM == 2)
-                    if (j < base_cutoff_density_coord) {
+                    if (j < base_cutoff_density_coord_loc) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
                     } else if (j == domhi) {
                         // NOTE: this should be zero since p0 is constant up here
@@ -528,7 +528,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
                     rhoh_force(i,j,k) = veladv * gradp0;
 #else 
-                    if (k < base_cutoff_density_coord) {
+                    if (k < base_cutoff_density_coord_loc) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
                     } else if (k == domhi) {
                         // NOTE: this should be zero since p0 is constant up here
