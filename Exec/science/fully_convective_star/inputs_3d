@@ -27,7 +27,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 64 64 64
-amr.n_cell = 256 256 256
+amr.n_cell = 128 128 128 256 256 256
 amr.max_grid_size      = 64
 amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid
@@ -54,7 +54,7 @@ maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 
 maestro.anelastic_cutoff_density = 1.e-2
-maestro.base_cutoff_density = 1.e-1
+maestro.base_cutoff_density = 1.e-3
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.e6

@@ -239,7 +239,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
-        const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
 
         // get references to the MultiFabs at level lev
         MultiFab& scal_force_mf = scal_force[lev];
@@ -272,8 +272,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #if (AMREX_SPACEDIM == 3)
                 // lo and hi of domain
                 const Box& domainBox = geom[lev].Domain();
-                const int* AMREX_RESTRICT domlo = domainBox.loVect();
-                const int* AMREX_RESTRICT domhi = domainBox.hiVect();
+                const auto domlo = domainBox.loVect3d();
+                const auto domhi = domainBox.hiVect3d();
                 const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
                 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
@@ -284,10 +284,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                                   +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
                     
                     if (fullform == 1) {
-                        
-                        force(i,j,k) -= scal(i,j,k)*(divumac+divu_arr(i,j,k));
+                        force(i,j,k) -= scal(i,j,k)*(divumac + divu_arr(i,j,k));
                     } else {
-        
                         Real s0_xlo = 0.0;
                         Real s0_xhi = 0.0;              
                         if (i < domhi[0]) {
@@ -332,7 +330,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                             (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
                             
                         force(i,j,k) = force(i,j,k) - divs0u
-                            - (scal(i,j,k)-s0_arr(i,j,k))*(divumac+divu_arr(i,j,k));
+                            - (scal(i,j,k)-s0_arr(i,j,k))*(divumac + divu_arr(i,j,k));
                     }
                 });
 #else
@@ -357,9 +355,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                     // add w0 contribution
                     divu += (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
 #endif
-                        
                     if (fullform == 1) {
-                        force(i,j,k) -= scal(i,j,k)*divu;
+                        force(i,j,k) -= scal(i,j,k) * divu;
                     } else {
 
 #if (AMREX_SPACEDIM == 2)
