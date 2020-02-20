@@ -295,7 +295,7 @@ enforce_HSE in initialize.f90.</p>
 <p class="rubric">Subroutines and functions</p>
 <dl class="subroutine">
 <dt id="f/base_state_module/init_base_state">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_module/</code><code class="sig-name descname">init_base_state</code><span class="sig-paren">(</span><em class="sig-param">s0_init</em>, <em class="sig-param">p0_init</em>, <em class="sig-param">rho0</em>, <em class="sig-param">rhoh0</em>, <em class="sig-param">p0</em>, <em class="sig-param">tempbar</em>, <em class="sig-param">tempbar_init</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_module/init_base_state" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_module/</code><code class="sig-name descname">init_base_state</code><span class="sig-paren">(</span><em class="sig-param">s0_init</em>, <em class="sig-param">p0_init</em>, <em class="sig-param">rho0</em>, <em class="sig-param">rhoh0</em>, <em class="sig-param">p0</em>, <em class="sig-param">tempbar</em>, <em class="sig-param">tempbar_init</em>, <em class="sig-param">lev</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_module/init_base_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -307,6 +307,7 @@ enforce_HSE in initialize.f90.</p>
 <li><p><strong>p0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>tempbar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>tempbar_init</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Call to</dt>
@@ -317,7 +318,7 @@ enforce_HSE in initialize.f90.</p>
 
 <dl class="subroutine">
 <dt id="f/base_state_module/init_base_state_irreg">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_module/</code><code class="sig-name descname">init_base_state_irreg</code><span class="sig-paren">(</span><em class="sig-param">s0_init</em>, <em class="sig-param">p0_init</em>, <em class="sig-param">rho0</em>, <em class="sig-param">rhoh0</em>, <em class="sig-param">p0</em>, <em class="sig-param">tempbar</em>, <em class="sig-param">tempbar_init</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_module/init_base_state_irreg" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_module/</code><code class="sig-name descname">init_base_state_irreg</code><span class="sig-paren">(</span><em class="sig-param">s0_init</em>, <em class="sig-param">p0_init</em>, <em class="sig-param">rho0</em>, <em class="sig-param">rhoh0</em>, <em class="sig-param">p0</em>, <em class="sig-param">tempbar</em>, <em class="sig-param">tempbar_init</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em>, <em class="sig-param">lev</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_module/init_base_state_irreg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state_irreg</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -331,6 +332,7 @@ enforce_HSE in initialize.f90.</p>
 <li><p><strong>tempbar_init</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em> :: edge-to-edge</p></li>
+<li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
 <dt class="field-even">Call to</dt>
