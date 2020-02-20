@@ -1,7 +1,7 @@
 
 # INITIAL MODEL
 maestro.model_file = "convective_M_0.30.hse.1024"
-maestro.perturb_model = false
+maestro.perturb_model = true
 
 maestro.drdxfac = 2
 #maestro.ppm_type = 1
@@ -125,6 +125,8 @@ maestro.rotation_radius = 0.0
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
+  velpert_radius = 1.e9
+  velpert_amplitude = 1.e4
   eos_assume_neutral = .false.
 
 /
