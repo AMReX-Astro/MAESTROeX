@@ -494,11 +494,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
 
             // make time-centered psi
-            // make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
-            //                    gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
-            //                    Sbar.dataPtr(),
-            //                    r_cc_loc.dataPtr(),
-            //                    r_edge_loc.dataPtr());
             MakePsiSphr(psi, w0, gamma1bar_temp2, p0_nph, Sbar);
         }
 
@@ -605,6 +600,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
         base_time_start = ParallelDescriptor::second();
+
+        int max_lev = max_radial_level + 1;
         
         MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
                   grav_cell_new);
