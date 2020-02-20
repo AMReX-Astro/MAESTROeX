@@ -645,7 +645,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
         int r = j + lo;
 
         Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_dens ? 
-            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt_in : 0.0;
 
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
             dr0 * Sbar_p[r-1] * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] - 
