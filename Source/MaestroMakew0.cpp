@@ -640,7 +640,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     w0_from_Sbar_vec[0] = 0.0;
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        // Print() << "r = " << r << " denominator = " << (gamma1bar_nph_vec[r-1]*p0_nph_vec[r-1]) << std::endl;
+        
         Real volume_discrepancy = rho0_old_in[r-1] > base_cutoff_dens ? 
             dpdt_factor_loc * p0_minus_peosbar[r-1]/dt_in : 0.0;
 
@@ -717,6 +717,9 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     C_vec[max_cutoff+1] = 0.0;
     F_vec[max_cutoff+1] = 0.0;
 
+    // need to synchronize gpu values with updated host values
+    Gpu::synchronize();
+    
     // Call the tridiagonal solver
     Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, max_cutoff+2);
 
