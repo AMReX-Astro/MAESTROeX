@@ -46,6 +46,9 @@ Maestro::Setup ()
 
     maestro_conductivity_init();
 
+    // check max level does not exceed hardcoded limit 
+    if (max_level > MAESTRO_MAX_LEVELS) Abort("max_level exceeds MAESTROeX's limit!");
+
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
 
