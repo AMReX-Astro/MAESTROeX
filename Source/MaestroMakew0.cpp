@@ -689,8 +689,8 @@ Maestro::Makew0Sphr(RealVector& w0_in,
         A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)]);
         A[r] /= dr0*dr0;
 
-        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1])
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[max_lev*r]) ) 
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)])
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[max_lev*r]*r_cc_loc_p[max_lev*r]) ) 
                 / (dr0*dr0);
 
         Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr0;
@@ -733,7 +733,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     hi = max_cutoff+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = u[r] / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) + w0_from_Sbar[r];
+        w0_p[max_lev*r] = u[r] / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) + w0_from_Sbar[r];
     });
 
     // for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
@@ -741,7 +741,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     hi = nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_lev*(max_cutoff+1)]*r_edge_loc_p[max_lev*(max_cutoff+1)]/(r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
+        w0_p[max_lev*r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_lev*(max_cutoff+1)]*r_edge_loc_p[max_lev*(max_cutoff+1)]/(r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
     });
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
@@ -824,9 +824,9 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     // create time-centered base-state quantities
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
-        p0_nph[r] = 0.5*(p0_old_p[r] + p0_new_p[r]);
-        rho0_nph[r] = 0.5*(rho0_old_p[r] + rho0_new_p[r]);
-        gamma1bar_nph[r] = 0.5*(gamma1bar_old_p[r] + gamma1bar_new_p[r]);
+        p0_nph[r] = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
+        rho0_nph[r] = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
+        gamma1bar_nph[r] = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
     });
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
@@ -834,24 +834,20 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
     w0_from_Sbar_vec[0] = 0.0;
 
-    // for (auto r = 1; r <= nr_fine; ++r) {
-    int lo = 1; 
-    int hi = nr_fine;
-    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-        int r = j + lo;
+    for (auto r = 1; r <= nr_fine; ++r) {
 
-        Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_dens ? 
-            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt_in : 0.0;
+        Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
+            dpdt_factor_loc * p0_minus_peosbar[max_lev*(r-1)]/dt_in : 0.0;
 
-        Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
-        w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
-            dr1 * Sbar_p[r-1] * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] - 
-            dr1* volume_discrepancy * r_cc_loc_p[r-1]*r_cc_loc_p[r-1] 
+        Real dr1 = r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)];
+        w0_from_Sbar_vec[r] = w0_from_Sbar_vec[r-1] + 
+            dr1 * Sbar_in[max_lev*(r-1)] * r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)] - 
+            dr1* volume_discrepancy * r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)] 
             / (gamma1bar_nph[r-1]*p0_nph[r-1]);
-    });
+    }
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar[r] /= (r_edge_loc_p[r]*r_edge_loc_p[r]);
+        w0_from_Sbar[r] /= (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
     }
 
     // make the edge-centered gravity
@@ -872,34 +868,34 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     int max_cutoff = base_cutoff_density_coord_loc;
     
     // for (auto r = 1; r <= max_cutoff; ++r) {
-    lo = 1; 
-    hi = max_cutoff;
+    int lo = 1; 
+    int hi = max_cutoff;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
         Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
         Real dr2 = r_edge_loc_p[max_lev*(r+1)] - r_edge_loc_p[max_lev*r];
         Real dr3 = r_cc_loc_p[max_lev*r] - r_cc_loc_p[max_lev*(r-1)];
 
-        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1]);
+        A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)]);
         A[r] /= dr1*dr3;
 
-        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1]*dr1) 
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]*dr2) ) 
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)]*dr1) 
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[max_lev*r]*r_cc_loc_p[max_lev*r]*dr2) ) 
                 / dr3;
 
         Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr3;
 
-        B[r] -= 4.0 * dpdr / (r_edge_loc_p[r]*r_edge_loc_p[r]*r_edge_loc_p[r]);
+        B[r] -= 4.0 * dpdr / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
 
-        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[r]);
+        C[r] = gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[max_lev*r]*r_cc_loc_p[max_lev*r]);
         C[r] /= dr2*dr3;
 
-        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc_p[r] - 
-                grav_edge[max_lev*r] * (r_cc_loc_p[r]*r_cc_loc_p[r] * etarho_cc_p[r] - 
-                r_cc_loc_p[r-1]*r_cc_loc_p[r-1] * etarho_cc_p[r-1]) / 
-                (dr3 * r_edge_loc_p[r]*r_edge_loc_p[r]) - 
+        F[r] = 4.0 * dpdr * w0_from_Sbar[r] / r_edge_loc_p[max_lev*r] - 
+                grav_edge[max_lev*r] * (r_cc_loc_p[max_lev*r]*r_cc_loc_p[max_lev*r] * etarho_cc_p[max_lev*r] - 
+                r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)] * etarho_cc_p[max_lev*(r-1)]) / 
+                (dr3 * r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec_p[r];
+                (rho0_nph[max_lev*r] + rho0_nph[max_lev*(r-1)]) * etarho_ec_p[max_lev*r];
     });
 
     // Lower boundary
@@ -927,7 +923,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     hi = max_cutoff+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = u[r] / (r_edge_loc_p[r]*r_edge_loc_p[r]) + w0_from_Sbar[r];
+        w0_p[max_lev*r] = u[r] / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) + w0_from_Sbar[r];
     });
 
     // for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
@@ -935,7 +931,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     hi = nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_cutoff+1]*r_edge_loc_p[max_cutoff+1]/(r_edge_loc_p[r]*r_edge_loc_p[r]);
+        w0_p[max_lev*r] = w0_p[max_lev*(max_cutoff+1)] * r_edge_loc_p[max_lev*(max_cutoff+1)]*r_edge_loc_p[max_lev*(max_cutoff+1)]/(r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
     });
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
@@ -944,11 +940,11 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
-        Real w0_old_cen = 0.5 * (w0_old_p[r] + w0_old_p[r+1]);
-        Real w0_new_cen = 0.5 * (w0_p[r] + w0_p[r+1]);
+        Real w0_old_cen = 0.5 * (w0_old_p[max_lev*r] + w0_old_p[max_lev*(r+1)]);
+        Real w0_new_cen = 0.5 * (w0_p[max_lev*r] + w0_p[max_lev*(r+1)]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-        Real div_avg = 0.5 * (dt_in * (w0_old_p[r+1]-w0_old_p[r]) + dtold_in * (w0_p[r+1]-w0_p[r])) / dt_avg;
-        w0_force_p[r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
+        Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
+        w0_force_p[max_lev*r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
     });
 }
 
