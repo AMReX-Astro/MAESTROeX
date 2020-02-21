@@ -412,8 +412,8 @@ contains
     end do
     !$OMP END PARALLEL DO
 
-   !  radii(lev,nr_irreg+1) = 1.d99
-   !  radii(lev,-1) = 0.d0
+    radii(lev,nr_irreg+1) = 1.d99
+    radii(lev,-1) = 0.d0
 
   end subroutine compute_radii_sphr
 

@@ -21,7 +21,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     get_r_end_coord(r_end_coord.dataPtr());
     get_finest_radial_level(&finest_radial_level);
 
-    for (int i=0; i<phibar.size(); ++i) {
+    for (int i = 0; i < phibar.size(); ++i) {
         phibar[i] = 0.0;
     }
 
@@ -153,14 +153,14 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // For spherical, we construct a 1D array at each level, phisum, that has space
         // allocated for every possible radius that a cell-center at each level can
         // map into.  The radial locations have been precomputed and stored in radii.
-        RealVector phisum((finest_level+1)*(nr_irreg+2),0.0);
+        RealVector phisum((finest_level+1)*(nr_irreg+2), 0.0);
         RealVector radii((finest_level+1)*(nr_irreg+3));
-        IntVector ncell((finest_level+1)*(nr_irreg+2),0);
+        IntVector ncell((finest_level+1)*(nr_irreg+2), 0);
 
         Real * AMREX_RESTRICT radii_p = radii.dataPtr();
         Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
         int * AMREX_RESTRICT ncell_p = ncell.dataPtr();
-        Real * AMREX_RESTRICT center_p = center.dataPtr();
+        const Real * AMREX_RESTRICT center_p = center.dataPtr();
 
         const int fine_lev = finest_level + 1;
         const int nr_irreg_loc = nr_irreg;
@@ -198,14 +198,15 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             const iMultiFab& mask = makeFineMask(phi_mf, fba, IntVect(2));
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-            for ( MFIter mfi(phi_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi ) {
                 // Get the index space of the valid region
-                const Box& tilebox = mfi.tilebox();
+                const Box& tilebox = mfi.validbox();
 
                 const Array4<const int> mask_arr = mask.array(mfi);
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
-                int use_mask = !(lev==fine_lev-1);
+                bool use_mask = !(lev==fine_lev-1);
 
                 AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
@@ -215,7 +216,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     // make sure the cell isn't covered by finer cells
                     bool cell_valid = true;
                     if (use_mask) {
-                        if (mask_arr(i,j,k)) cell_valid = false;
+                        if (mask_arr(i,j,k) == 1) cell_valid = false;
                     }
 
                     if (cell_valid) {
@@ -253,27 +254,21 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         }
 
         IntVector which_lev(nr_fine);
-        IntVector rcoord(fine_lev);
         IntVector max_rcoord(fine_lev);
 
         // compute center point for the finest level
-        phisum[finest_level] =  (11.0/8.0)*phisum[finest_level+fine_lev]
-            - (3.0/8.0)*phisum[finest_level+fine_lev*2];
+        phisum[finest_level] = (11.0/8.0) * phisum[finest_level+fine_lev]
+            - (3.0/8.0) * phisum[finest_level+fine_lev*2];
         ncell[finest_level] = 1;
 
         // choose which level to interpolate from
-        for (auto n = 0; n <= finest_level; ++n) {
-            rcoord[n] = 0;
-        }
-
-        int * AMREX_RESTRICT rcoord_p = rcoord.dataPtr();
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
-
         const int dr0 = dr[0];
 
         AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
-            Real radius = (Real(r)+0.5)*dr0;
+            Real radius = (Real(r) + 0.5) * dr0;
+            Vector<int> rcoord_p(fine_lev, 0);
 
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
@@ -297,8 +292,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             which_lev_p[r] = 0;
 
             int min_all = min(ncell_p[fine_lev*(rcoord_p[0])], 
-                    ncell_p[fine_lev*(rcoord_p[0]+1)], 
-                    ncell_p[fine_lev*(rcoord_p[0]+2)]);
+                ncell_p[fine_lev*(rcoord_p[0]+1)], 
+                ncell_p[fine_lev*(rcoord_p[0]+2)]);
 
             for (auto n = 1; n < fine_lev; ++n) {
                 int min_lev = min(ncell_p[n+fine_lev*(rcoord_p[n])], 
@@ -360,9 +355,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         }
 
         // compute phibar
-        IntVector stencil_coord(fine_lev, 0);
-
-        int * AMREX_RESTRICT stencil_coord_p = stencil_coord.dataPtr();
         int * AMREX_RESTRICT max_rcoord_p = max_rcoord.dataPtr();
         Real * AMREX_RESTRICT phibar_p = phibar.dataPtr();
 
@@ -371,35 +363,34 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
-            Real radius = (Real(r)+0.5)*dr0;
+            Real radius = (Real(r) + 0.5) * dr0;
+            int stencil_coord = 0;
 
             // find the closest coordinate
-            for (auto j = stencil_coord_p[which_lev_p[r]]; j <= max_rcoord_p[which_lev_p[r]]; ++j) {
+            for (auto j = stencil_coord; j <= max_rcoord_p[which_lev_p[r]]; ++j) {
                 if (fabs(radius-radii_p[which_lev_p[r]+fine_lev*(j+1)]) < 
                     fabs(radius-radii_p[which_lev_p[r]+fine_lev*(j+2)])) {
-                    stencil_coord_p[which_lev_p[r]] = j;
+                    stencil_coord = j;
                     break;
                 }
             }
 
             // make sure the interpolation points will be in bounds
             if (which_lev_p[r] != fine_lev-1) {
-                stencil_coord_p[which_lev_p[r]] = max(stencil_coord_p[which_lev_p[r]], 1);
+                stencil_coord = max(stencil_coord, 1);
             }
-            stencil_coord_p[which_lev_p[r]] = min(stencil_coord_p[which_lev_p[r]], 
+            stencil_coord = min(stencil_coord, 
                     max_rcoord_p[which_lev_p[r]]-1);
 
             bool limit = (r > nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2))) ? false : true;
 
             phibar_p[max_lev*r] = QuadInterp(radius, 
-                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]])], 
-                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]]+1)], 
-                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]]+2)], 
-                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]])], 
-                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]]+1)], 
-                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord_p[which_lev_p[r]]+2)], limit);
+                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord)], 
+                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord+1)], 
+                    radii_p[which_lev_p[r]+fine_lev*(stencil_coord+2)], 
+                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord)], 
+                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+1)], 
+                    phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+2)], limit);
         });
-
-        Print() << "phibar = " << phibar[0] << ' ' << phibar[max_lev] << ' ' << phibar[max_lev*2] << std::endl;
     }
 }
