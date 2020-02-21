@@ -396,7 +396,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         Real gamma1bar_p0_avg = gamma1bar_nph_fine[r-1] * p0_nph_fine[r-1];
 
         Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? 
-            dpdt_factor_loc * p0_minus_peosbar_fine[r-1]/dt : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_fine[r-1]/dt_in : 0.0;
 
         w0bar_fine[r] =  w0bar_fine[r-1] + 
             Sbar_in_fine[r-1] * dr_finest 
@@ -471,6 +471,9 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     C_vec[fine_base_density_cutoff_coord+1] = 0.0;
     F_vec[fine_base_density_cutoff_coord+1] = 0.0;
 
+    // need to synchronize gpu values with updated host values
+    Gpu::synchronize();
+    
     // Call the tridiagonal solver
     Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, fine_base_density_cutoff_coord+2);
 
@@ -838,7 +841,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
         int r = j + lo;
 
         Real volume_discrepancy = rho0_old_p[r-1] > base_cutoff_dens ? 
-            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_p[r-1]/dt_in : 0.0;
 
         Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
         w0_from_Sbar[r] = w0_from_Sbar[r-1] + 
@@ -910,7 +913,10 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     B_vec[max_cutoff+1] = 1.0;
     C_vec[max_cutoff+1] = 0.0;
     F_vec[max_cutoff+1] = 0.0;
-
+    
+    // need to synchronize gpu values with updated host values
+    Gpu::synchronize();
+    
     // Call the tridiagonal solver
     Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, max_cutoff+2);
 
