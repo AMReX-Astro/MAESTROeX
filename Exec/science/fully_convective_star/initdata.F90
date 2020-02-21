@@ -51,6 +51,12 @@ contains
     ! abort program
     call amrex_error("Planar initdata not written")
 
+    print *, "in initdata"
+    print *, "velpert_radius = ", velpert_radius
+    print *, "velpert_amplitude = ", velpert_amplitude
+    print *, "perturb_model = ", perturb_model
+
+
   end subroutine initdata
 
   subroutine initdata_sphr(time, lo, hi, &
@@ -118,6 +124,7 @@ contains
     double precision :: normk(3,3,3)
 
 
+
     ! initialize the domain with the base state
     scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
 
@@ -181,8 +188,8 @@ contains
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! set the radial bounds of the perturbation
-    velpert_r_outer = 3.5d8
-    velpert_r_inner = 2.5d8
+    velpert_r_outer = velpert_radius
+    velpert_r_inner = 0.d0
     
     if (perturb_model) then
 
