@@ -689,8 +689,8 @@ Maestro::Makew0Sphr(RealVector& w0_in,
         A[r] = gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)]);
         A[r] /= dr0*dr0;
 
-        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[r-1]*r_cc_loc_p[r-1])
-                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[r]*r_cc_loc_p[max_lev*r]) ) 
+        B[r] = -( gamma1bar_nph[r-1] * p0_nph[r-1] / (r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)])
+                + gamma1bar_nph[r] * p0_nph[r] / (r_cc_loc_p[max_lev*r]*r_cc_loc_p[max_lev*r]) ) 
                 / (dr0*dr0);
 
         Real dpdr = (p0_nph[r] - p0_nph[r-1]) / dr0;
@@ -733,7 +733,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     hi = max_cutoff+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = u[r] / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) + w0_from_Sbar[r];
+        w0_p[max_lev*r] = u[r] / (r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) + w0_from_Sbar[r];
     });
 
     // for (auto r = max_cutoff+2; r <= nr_fine; ++r) {
@@ -741,7 +741,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     hi = nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        w0_p[r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_lev*(max_cutoff+1)]*r_edge_loc_p[max_lev*(max_cutoff+1)]/(r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
+        w0_p[max_lev*r] = w0_p[max_cutoff+1] * r_edge_loc_p[max_lev*(max_cutoff+1)]*r_edge_loc_p[max_lev*(max_cutoff+1)]/(r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]);
     });
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
@@ -894,7 +894,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
                 r_cc_loc_p[max_lev*(r-1)]*r_cc_loc_p[max_lev*(r-1)] * etarho_cc_p[max_lev*(r-1)]) / 
                 (dr3 * r_edge_loc_p[max_lev*r]*r_edge_loc_p[max_lev*r]) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph[r] + rho0_nph[r-1]) * etarho_ec_p[max_lev*r];
+                (rho0_nph[max_lev*r] + rho0_nph[max_lev*(r-1)]) * etarho_ec_p[max_lev*r];
     });
 
     // Lower boundary
@@ -939,7 +939,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         Real dr1 = r_edge_loc_p[max_lev*r] - r_edge_loc_p[max_lev*(r-1)];
-        Real w0_old_cen = 0.5 * (w0_old_p[max_lev*r] + w0_old_p[max_lev*r+1]);
+        Real w0_old_cen = 0.5 * (w0_old_p[max_lev*r] + w0_old_p[max_lev*(r+1)]);
         Real w0_new_cen = 0.5 * (w0_p[max_lev*r] + w0_p[max_lev*(r+1)]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
         Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
