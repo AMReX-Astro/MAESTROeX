@@ -264,11 +264,17 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // choose which level to interpolate from
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
         const int dr0 = dr[0];
+        const int nrf = nr_fine;
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        AMREX_PARALLEL_FOR_1D(nrf, r, {
 
             Real radius = (Real(r) + 0.5) * dr0;
-            Vector<int> rcoord_p(fine_lev, 0);
+            // Vector<int> rcoord_p(fine_lev, 0);
+            int rcoord_p[MAESTRO_MAX_LEVELS];
+
+            for (auto i = 0; i < fine_lev; ++i) {
+                rcoord_p[i] = 0.0;
+            }
 
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
@@ -359,9 +365,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         Real * AMREX_RESTRICT phibar_p = phibar.dataPtr();
 
         const Real drdxfac_loc = drdxfac;
-        const int nrf = nr_fine;
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+        AMREX_PARALLEL_FOR_1D(nrf, r, {
 
             Real radius = (Real(r) + 0.5) * dr0;
             int stencil_coord = 0;
