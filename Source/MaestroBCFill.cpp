@@ -18,19 +18,18 @@ Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
     FillExtBC(scal, bx, domainBox, bcs, comp, false);
 }
 
-
 void
 Maestro::VelFill(const Array4<Real>& vel, 
                  const Box& bx, const Box& domainBox, 
                  const Real* dx, 
-                 const BCRec bcs, const Real * gridlo)
+                 const BCRec bcs, const Real * gridlo, const int comp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelFill()", VelFill);
 
     fab_filcc(bx, vel, 1, domainBox, dx, gridlo, &bcs);
 
-    FillExtBC(vel, bx, domainBox, bcs, 0, true);
+    FillExtBC(vel, bx, domainBox, bcs, comp, true);
 }
 
 void
@@ -57,23 +56,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     const auto lo = bx.loVect3d();
     const auto hi = bx.hiVect3d();
 
-    const Box qbx(q);
-    const auto q_lo = qbx.loVect3d();
-    const auto q_hi = qbx.hiVect3d();
-
-//     const auto is = max(q_lo[0], domlo[0]);
-//     const auto ie = min(q_hi[0], domhi[0]);
-
-//     const auto js = max(q_lo[1], domlo[1]);
-//     const auto je = min(q_hi[1], domhi[1]); 
-
-// #if AMREX_SPACEDIM == 3
-//     const auto ks = max(q_lo[2], domlo[2]);
-//     const auto ke = min(q_hi[2], domhi[2]); 
-// #endif
-
     if (lo[0] < domlo[0]) {
-        auto imin = lo[0];
         auto imax = domlo[0];
 
         if (bcs.lo(0) == BCType::ext_dir) {
@@ -82,7 +65,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (i < imax) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[0,0] - must supply Dirichlet boundary conditions for scalar");
             } 
@@ -91,7 +74,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
     if (hi[0] > domhi[0]) {
         auto imin = domhi[0]+1;
-        auto imax = hi[0];
 
         if (bcs.hi(0) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
@@ -99,7 +81,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (i > imin) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[0,1] - must supply Dirichlet boundary conditions for scalar");
             } 
@@ -107,7 +89,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (lo[1] < domlo[1]) {
-        auto jmin = lo[1];
         auto jmax = domlo[1];
 
         if (bcs.lo(1) == BCType::ext_dir) {
@@ -116,7 +97,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (j < jmax) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[1,0] - must supply Dirichlet boundary conditions for scalar");
             } 
@@ -125,7 +106,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
     if (hi[1] > domhi[1]) {
         auto jmin = domhi[1]+1;
-        auto jmax = hi[1];
 
         if (bcs.hi(1) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
@@ -133,7 +113,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (j > jmin) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[1,1] - must supply Dirichlet boundary conditions for scalar");
             } 
@@ -143,7 +123,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 #if AMREX_SPACEDIM == 3
 
     if (lo[2] < domlo[2]) {
-        auto kmin = lo[2];
         auto kmax = domlo[2];
 
         if (bcs.lo(2) == BCType::ext_dir) {
@@ -152,7 +131,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (k < kmax) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[2,0] - must supply Dirichlet boundary conditions for scalar");
             } 
@@ -161,7 +140,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
     if (hi[2] > domhi[2]) {
         auto kmin = domhi[2]+1;
-        auto kmax = hi[2];
 
         if (bcs.hi(2) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
@@ -169,7 +147,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     if (k > kmin) {
                         q(i,j,k) = 0.0;
                     }
-                })
+                });
             } else {
                 Abort("MaestroBCFill bc[2,1] - must supply Dirichlet boundary conditions for scalar");
             } 
