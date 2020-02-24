@@ -300,6 +300,32 @@ public:
     ////////////
 
     ////////////
+    // MaestroBCFill.cpp functions
+
+    void ScalarFill(const amrex::Array4<amrex::Real>& scal, 
+                    const amrex::Box& bx, 
+                    const amrex::Box& domainBox,
+                    const amrex::Real* dx, 
+                    const amrex::BCRec bcs, 
+                    const amrex::Real* gridlo, const int comp);
+
+    void VelFill(const amrex::Array4<amrex::Real>& vel, 
+                    const amrex::Box& bx, 
+                    const amrex::Box& domainBox,
+                    const amrex::Real* dx, 
+                    const amrex::BCRec bcs, 
+                    const amrex::Real * gridlo);
+
+    void FillExtBC(const amrex::Array4<amrex::Real>& q, 
+                   const amrex::Box& bx, 
+                   const amrex::Box& domainBox, 
+                   const amrex::BCRec bcs, 
+                   const int comp, const bool is_vel=false);
+
+    // end MaestroBCFill.cpp functions
+    ////////////
+
+    ////////////
     // MaestroCheckpoint.cpp functions
 
     /// Write a checkpoint at timestep `step`
