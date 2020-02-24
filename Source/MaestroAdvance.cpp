@@ -600,8 +600,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
         base_time_start = ParallelDescriptor::second();
-
-        int max_lev = max_radial_level + 1;
         
         MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
                   grav_cell_new);

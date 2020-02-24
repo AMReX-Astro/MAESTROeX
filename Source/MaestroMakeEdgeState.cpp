@@ -31,8 +31,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr = dr_fine * pow(2.0, max_radial_level);
-    const Real dtdr = dt / dr;
+    const Real dr_loc = dr_fine * pow(2.0, max_radial_level);
+    const Real dtdr = dt / dr_loc;
 
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
@@ -107,7 +107,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
             // compute sedgel and sedger
             Real u = 0.5*(w0_p[r]+w0_p[r+1]);
-            Real ubardth = dth*u/dr;  // NOTE: ubardth=0 for use_exact_base_state case
+            Real ubardth = dth*u/dr_loc;  // NOTE: ubardth=0 for use_exact_base_state case
             sedgel[r+1]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
             sedger[r] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
         });
@@ -368,9 +368,9 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr();   
 
-        const int nr = nr_fine / pow(2, max_radial_level-n);
-        const Real dr = dr_fine * pow(2.0, max_radial_level-n);
-        const Real dtdr = dt / dr;
+        const int nr_lev = nr_fine / pow(2, max_radial_level-n);
+        const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
+        const Real dtdr = dt / dr_lev;
 
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
@@ -384,7 +384,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                 
                 if (r_start_coord[n+i*max_lev] == 2) {
                     Abort("make_edge_state assumes blocking_factor > 1 at lo boundary");
-                } else if (r_end_coord[n+i*max_lev] == nr-3) {
+                } else if (r_end_coord[n+i*max_lev] == nr_lev-3) {
                     Abort("make_edge_state assumes blocking_factor > 1 at hi boundary");
                 }
             }
@@ -411,7 +411,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         if (r == 0) {
                             // one-sided difference
                             slope = s[pp]-s[p];
-                        } else if (r == nr-1) {
+                        } else if (r == nr_lev-1) {
                             // one-sided difference
                             slope = s[p]-s[pm];
                         } else {
@@ -436,10 +436,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         if (rm == 0) {
                             // one-sided difference
                             dxscrm = s[n+max_lev*(rm+1)] - s[n+max_lev*rm];
-                        } else if (rm == nr-1) {
+                        } else if (rm == nr_lev-1) {
                             // one-sided difference
                             dxscrm = s[n+max_lev*rm] - s[n+max_lev*(rm-1)];
-                        } else if (rm > 0 && rm < nr-1) {
+                        } else if (rm > 0 && rm < nr_lev-1) {
                             // do standard limiting to compute temporary slopes
                             dxscr[cen] = 0.5*(s[n+max_lev*(rm+1)] - s[n+max_lev*(rm-1)]);
                             Real dpls = 2.0*(s[n+max_lev*(rm+1)] - s[n+max_lev*rm]);
@@ -455,10 +455,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         if (rp == 0) {
                             // one-sided difference
                             dxscrp = s[n+max_lev*(rp+1)]-s[n+max_lev*rp];
-                        } else if (rp == nr-1) {
+                        } else if (rp == nr_lev-1) {
                             // one-sided difference
                             dxscrp = s[n+max_lev*rp]-s[n+max_lev*(rp-1)];
-                        } else if (rp > 0 && rp < nr-1) {
+                        } else if (rp > 0 && rp < nr_lev-1) {
                             // do standard limiting to compute temporary slopes
                             dxscr[cen] = 0.5*(s[n+max_lev*(rp+1)] - s[n+max_lev*(rp-1)]);
                             Real dpls = 2.0*(s[n+max_lev*(rp+1)] - s[n+max_lev*rp]);
@@ -468,10 +468,9 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                             dxscr[flag] = copysign(1.0,dxscr[cen]);
                             dxscrp = dxscr[flag] * min(dxscr[lim],fabs(dxscr[cen]));
                         }
-                        // end do
 
                         // now find dxscr for r
-                        if (r > 0 && r < nr-1) {
+                        if (r > 0 && r < nr_lev-1) {
                             // do standard limiting to compute temporary slopes
                             dxscr[cen] = 0.5*(s[n+max_lev*(r+1)] - s[n+max_lev*(r-1)]);
                             Real dpls = 2.0*(s[n+max_lev*(r+1)] - s[n+max_lev*r]);
@@ -484,7 +483,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                         if (r == 0) {
                             // one-sided difference
                             slope = s[pp] - s[p];
-                        } else if (r == nr-1) {
+                        } else if (r == nr_lev-1) {
                             // one-sided difference
                             slope = s[p] - s[pm];
                         } else {
@@ -496,7 +495,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
                     // compute sedgel and sedger
                     Real u = 0.5*(w0_p[p]+w0_p[pp]);
-                    Real ubardth = dth*u/dr;
+                    Real ubardth = dth*u/dr_lev;
                     sedgel[r+1] = s[p] + (0.5-ubardth)*slope + dth * force_p[p];
                     sedger[r] = s[p] - (0.5+ubardth)*slope + dth * force_p[p];
                 });
@@ -521,10 +520,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (rm == 0) {
                         // one-sided difference
                         dsvlm = s[n+max_lev*(rm+1)] - s[n+max_lev*rm];
-                    } else if (rm == nr-1) {
+                    } else if (rm == nr_lev-1) {
                         // one-sided difference
                         dsvlm = s[n+max_lev*rm] - s[n+max_lev*(rm-1)];
-                    } else if (rm > 0 && rm < nr-1) {
+                    } else if (rm > 0 && rm < nr_lev-1) {
                         Real del  = 0.5 * (s[n+max_lev*(rm+1)] - s[n+max_lev*(rm-1)]);
                         Real dmin = 2.0 * (s[n+max_lev*rm] - s[n+max_lev*(rm-1)]);
                         Real dpls = 2.0 * (s[n+max_lev*(rm+1)] - s[n+max_lev*rm]);
@@ -537,10 +536,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (r == 0) {
                         // one-sided difference
                         dsvl = s[pp] - s[p];
-                    } else if (r == nr-1) {
+                    } else if (r == nr_lev-1) {
                         // one-sided difference
                         dsvl = s[p] - s[pm];
-                    } else if (r > 0 && r < nr-1) {
+                    } else if (r > 0 && r < nr_lev-1) {
                         Real del  = 0.5 * (s[pp] - s[pm]);
                         Real dmin = 2.0 * (s[p] - s[pm]);
                         Real dpls = 2.0 * (s[pp] - s[p]);
@@ -552,7 +551,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (r == 0) {
                         // 2nd order interpolation to boundary face
                         sm = s[p] - 0.5*dsvl;
-                    } else if (r == nr) {
+                    } else if (r == nr_lev) {
                         // 2nd order interpolation to boundary face
                         sm = s[pm] + 0.5*dsvl;
                     } else {
@@ -574,10 +573,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (rp == 0) {
                         // one-sided difference
                         dsvl = s[n+max_lev*(rp+1)]-s[n+max_lev*rp];
-                    } else if (rp == nr-1) {
+                    } else if (rp == nr_lev-1) {
                         // one-sided difference
                         dsvl = s[n+max_lev*rp]-s[n+max_lev*(rp-1)];
-                    } else if (rp > 0 && rp < nr-1) {
+                    } else if (rp > 0 && rp < nr_lev-1) {
                         Real del  = 0.5 * (s[n+max_lev*(rp+1)] - s[n+max_lev*(rp-1)]);
                         Real dmin = 2.0 * (s[n+max_lev*rp] - s[n+max_lev*(rp-1)]);
                         Real dpls = 2.0 * (s[n+max_lev*(rp+1)] - s[n+max_lev*rp]);
@@ -589,7 +588,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (rp == 0) {
                         // 2nd order interpolation to boundary face
                         sp = s[n+max_lev*rp] - 0.5*dsvl;
-                    } else if (rp == nr) {
+                    } else if (rp == nr_lev) {
                         // 2nd order interpolation to boundary face
                         sp = s[n+max_lev*(rp-1)] + 0.5*dsvl;
                     } else {
@@ -653,10 +652,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (r-1 == 0) {
                         // one-sided difference
                         dsvl = s[p] - s[pm];
-                    } else if (r-1 == nr-1) {
+                    } else if (r-1 == nr_lev-1) {
                         // one-sided difference
                         dsvl = s[pm] - s[pmm];
-                    } else if (r-1 > 0 && r-1 < nr-1) {
+                    } else if (r-1 > 0 && r-1 < nr_lev-1) {
                         // centered difference
                         dsvl = 0.5 * (s[p] - s[pmm]);
                     }
@@ -666,10 +665,10 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (r == 0) {
                         // one-sided difference
                         dsvr = s[pp] - s[p];
-                    } else if (r == nr-1) {
+                    } else if (r == nr_lev-1) {
                         // one-sided difference
                         dsvr = s[p] - s[pm];
-                    } else if (r > 0 && r < nr-1) {
+                    } else if (r > 0 && r < nr_lev-1) {
                         // centered difference
                         dsvr = 0.5 * (s[pp] - s[pm]);
                     }
@@ -677,13 +676,13 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     if (r == 0) {
                         // 2nd order interpolation to boundary face
                         sedget[r] = s[p] - 0.5*dsvr;
-                    } else if (r == nr) {
+                    } else if (r == nr_lev) {
                         // 2nd order interpolation to boundary face
                         sedget[r] = s[pm] + 0.5*dsvr;
-                    } else if (r > 0 && r < nr) {
+                    } else if (r > 0 && r < nr_lev) {
                         // 4th order interpolation of s to radial faces
                         sedget[r] = 0.5*(s[p]+s[pm]) - (dsvr-dsvl)/6.0;
-                        if (r >= 2 && r <= nr-2) {
+                        if (r >= 2 && r <= nr_lev-2) {
                             // limit sedge
                             if ((sedget[r]-s[pm])*(s[p]-sedget[r]) < 0.0) {
                                 Real D2  = 3.0*(s[pm]-2.0*sedget[r]+s[p]);
@@ -712,7 +711,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     Real sm = 0.0;
                     Real sp = 0.0;
 
-                    if (r >= 2 && r <= nr-3) {
+                    if (r >= 2 && r <= nr_lev-3) {
 
                         Real alphap = sedget[r+1] - s[p];
                         Real alpham = sedget[r] - s[p];
@@ -844,7 +843,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr(); 
 
-        const int nr = nr_fine / pow(2, max_radial_level-n);
+        const int nr_lev = nr_fine / pow(2, max_radial_level-n);
 
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 
@@ -859,7 +858,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                 if (r == 0) {
                     // pick interior state at lo domain boundary
                     sedge[p] = sedger[r];
-                } else if (r == nr) {
+                } else if (r == nr_lev) {
                     // pick interior state at hi domain boundary
                     sedge[p] = sedgel[r];
                 } else {

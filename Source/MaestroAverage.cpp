@@ -272,7 +272,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             // Vector<int> rcoord_p(fine_lev, 0);
             int rcoord_p[MAESTRO_MAX_LEVELS];
 
-            for (auto i = 0; i < fine_lev; ++i) {
+            // initialize
+            for (auto i = 0; i < MAESTRO_MAX_LEVELS; ++i) {
                 rcoord_p[i] = 0.0;
             }
 
