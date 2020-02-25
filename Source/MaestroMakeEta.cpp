@@ -74,7 +74,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                 int hi = validbox.hiVect()[0];
 
                 AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, i, {
-		    int i_loc = i+lo;
+                    int i_loc = i+lo;
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i_loc,j,k));
                 });
             }
