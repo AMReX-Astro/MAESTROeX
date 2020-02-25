@@ -34,16 +34,57 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            const Array4<Real> state = scal[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-#pragma gpu box(tileBox)
-            makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
+            if (use_eos_e_instead_of_h) {
+                // (rho, (h->e)) --> T, p
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                    eos_t eos_state;
+
+                    eos_state.rho = state(i,j,k,Rho);
+                    eos_state.T   = state(i,j,k,Temp);
+                    for (auto n = 0; n < NumSpec; ++n) {
+                        eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
+                    }
+
+                    // e = h - p/rho
+                    eos_state.e = state(i,j,k,RhoH) / state(i,j,k,Rho) - 
+                        p0_arr(i,j,k) / state(i,j,k,Rho);
+
+                    eos(eos_input_re, eos_state);
+
+                    state(i,j,k,Temp) = eos_state.T;
+
+                });
+            } else {
+                // (rho, h) --> T, p
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                    eos_t eos_state;
+
+                    eos_state.rho = state(i,j,k,Rho);
+                    eos_state.T   = state(i,j,k,Temp);
+                    for (auto n = 0; n < NumSpec; ++n) {
+                        eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
+                    }
+
+                    eos_state.h = state(i,j,k,RhoH) / state(i,j,k,Rho);
+
+                    eos(eos_input_rh, eos_state);
+
+                    state(i,j,k,Temp) = eos_state.T;
+
+                });
+
+            }
+
+// #pragma gpu box(tileBox)
+//             makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
+//                                 AMREX_INT_ANYD(tileBox.hiVect()),
+//                                 BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
+//                                 BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
         }
 
     }
