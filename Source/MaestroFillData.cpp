@@ -233,11 +233,6 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in
 
         // get references to the MultiFabs at level lev
         MultiFab& sold_mf = sold[lev];         // need a cell-centered MF for the MFIter
-//         MultiFab& umacx_mf = umac[lev][0];
-//         MultiFab& umacy_mf = umac[lev][1];
-// #if (AMREX_SPACEDIM == 3)
-//         MultiFab& umacz_mf = umac[lev][2];
-// #endif
 
         // DO NOT TILE THIS SUBROUTINE
         // this just filling ghost cells so the fortran logic has to be reworked
@@ -479,16 +474,6 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in
             }
         });
 #endif
-
-//             fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-//                             ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-//                             BL_TO_FORTRAN_3D(umacx_mf[mfi]),
-//                             BL_TO_FORTRAN_3D(umacy_mf[mfi]),
-// #if (AMREX_SPACEDIM == 3)
-//                             BL_TO_FORTRAN_3D(umacz_mf[mfi]),
-// #endif
-//                             phys_bc.dataPtr());
-
         }
     }
 }
@@ -572,28 +557,110 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 #endif
                 for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
                     const int nComp = 1;
-                    const Box& box   = crse_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
+                    const Box& box = crse_src[mfi].box();
+                    IntVect ratio = refRatio(lev-1);
+
+                    const auto lo = box.loVect3d();
+                    const auto hi = box.hiVect3d();
+
+                    const Array4<Real> fine = fine_src.array(mfi);
+                    const Array4<Real> crse = crse_src.array(mfi);
+
                     // For edge-based data, fill fine values with piecewise-constant interp of coarse data.
                     // Operate only on faces that overlap--ie, only fill the fine faces that make up each
                     // coarse face, leave the in-between faces alone.
-                    PC_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &dir,
-                                   BL_TO_FORTRAN_FAB(crse_src[mfi]),
-                                   BL_TO_FORTRAN_FAB(fine_src[mfi]));
+#if (AMREX_SPACEDIM == 2)
+                    int k = 0;
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                int jj = ratio[1]*j;
+                                for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                    int ii = ratio[0]*i;
+                                    for (auto L = 0; L < ratio[1]; ++L) {
+                                        fine(ii,jj+L,k,n) = crse(i,j,k,n);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                int jj = ratio[1]*j;
+                                for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                    int ii = ratio[0]*i;
+                                    for (auto L = 0; L < ratio[0]; ++L) {
+                                        fine(ii+L,jj,k,n) = crse(i,j,k,n);
+                                    }
+                                }
+                            }
+                        }
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[2]; ++P) {
+                                            for (auto L = 0; L < ratio[1]; ++L) {
+                                                fine(ii,jj+L,kk+P,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dir == 1) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[2]; ++P) {
+                                            for (auto L = 0; L < ratio[0]; ++L) {
+                                                fine(ii+L,jj,kk+P,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[1]; ++P) {
+                                            for (auto L = 0; L < ratio[0]; ++L) {
+                                                fine(ii+L,jj+P,kk,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#endif
                 }
                 crse_src.clear();
-                //
+                
                 // Replace pc-interpd fine data with preferred u_mac data at
                 // this level u_mac valid only on surrounding faces of valid
                 // region - this op will not fill grow region.
-                //
                 fine_src.copy(uedge[lev][dir]);
-                //
+                
                 // Interpolate unfilled grow cells using best data from
                 // surrounding faces of valid region, and pc-interpd data
                 // on fine edges overlaying coarse edges.
-                //
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -621,7 +688,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 uedge[lev][dir].copy(uedge_f_save);
             }
 
-        }         // end if
+        } // end if
 
         // fill periodic ghost cells
         for (int d=0; d<AMREX_SPACEDIM; ++d) {
@@ -631,6 +698,5 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
         // fill ghost cells behind physical boundaries
         FillUmacGhost(uedge,lev);
 
-    }     // end loop over levels
-
+    } // end loop over levels
 }
