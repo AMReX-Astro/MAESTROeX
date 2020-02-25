@@ -69,11 +69,11 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             }
             if (top_edge) {
                 int k = validbox.loVect()[2];
-                int j = validbox.loVect()[1]+1;
+                int j = validbox.hiVect()[1]+1;
                 int lo = validbox.loVect()[0];
                 int hi = validbox.hiVect()[0];
 
-                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, k, {
+                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, i, {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 });
             }
