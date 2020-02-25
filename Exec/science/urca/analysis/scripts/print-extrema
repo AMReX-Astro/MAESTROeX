@@ -5,6 +5,7 @@ Use yt to slice a boxlib plotfile supplied through the domain center.
 Donald E. Willcox
 """
 import yt
+from yt.frontends.boxlib.data_structures import AMReXDataset
 import numpy as np
 import argparse
 
@@ -25,7 +26,7 @@ def print_field_stats(ds, field):
     print('max value of {} is {}'.format(field, fmax))
 
 if __name__=="__main__":
-    ds = yt.load(args.infile)
+    ds = AMReXDataset(args.infile)
 
     for f in ds.field_list + ds.derived_field_list:
         print_field_stats(ds, f)
