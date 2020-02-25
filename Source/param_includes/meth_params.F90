@@ -13,7 +13,7 @@
 module meth_params_module
 
   use amrex_fort_module, only : rt => amrex_real
-  use state_sizes_module, only: nscal
+  use state_indices_module, only: nscal
   implicit none
 
   ! variables in the module

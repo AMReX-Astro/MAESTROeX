@@ -5,6 +5,8 @@
 #include <omp.h>
 #endif
 
+#include <state_indices.H>
+
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
@@ -1740,7 +1742,7 @@ public:
     ////////////////
 
     // these are defined in `VariableSetup()`
-    static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
+    // static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
     static int ng_s; //< number of ghost cells for `sold/new` and `uold/new`
 
     // these are defined in `Maestro.cpp`

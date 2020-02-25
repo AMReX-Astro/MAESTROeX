@@ -295,18 +295,18 @@ void Maestro::VariableSetup ()
 
     Print() << "Calling VariableSetup()" << std::endl;
 
-    int cnt = 0;
-    Rho = cnt++;
-    RhoH = cnt++;
+    // int cnt = 0;
+    // Rho = cnt++;
+    // RhoH = cnt++;
 
-    FirstSpec = cnt;
-    get_num_spec(&NumSpec);
-    cnt += NumSpec;
+    // FirstSpec = cnt;
+    // get_num_spec(&NumSpec);
+    // cnt += NumSpec;
 
-    Temp = cnt++;
-    Pi = cnt++;
+    // Temp = cnt++;
+    // Pi = cnt++;
 
-    Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
+    // Nscal = cnt;  // NumSpec + 4 (Rho, RhoH, Temp, Pi)
 
     // set number of ghost cells for sold/new and uold/new
     ng_s = 3;
