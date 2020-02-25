@@ -43,17 +43,17 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
-            const Box& validbox = mfi.tilebox();
+            const Box& validbox = mfi.validbox();
 
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
             int zlo = validbox.loVect()[2];
-            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+            AMREX_PARALLEL_FOR_3D(validbox, i, j, k, {
                 if (k == zlo) {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 }
@@ -68,17 +68,18 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                 }
             }
             if (top_edge) {
-                int k = validbox.loVect()[2];
+                int k = validbox.hiVect()[2];
                 int j = validbox.hiVect()[1]+1;
                 int lo = validbox.loVect()[0];
                 int hi = validbox.hiVect()[0];
 
-                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, i, {
+                AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
+                    int i = n + lo;
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 });
             }
 #else 
-            AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
+            AMREX_PARALLEL_FOR_3D(validbox, i, j, k, {
                 amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
             });
 
@@ -95,7 +96,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             if (top_edge) {
                 int zhi = validbox.hiVect()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
-                AMREX_HOST_DEVICE_PARALLEL_FOR_3D(zbx, i, j, k, {
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
                         amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
                     }
@@ -107,7 +108,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 
     ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
 
-    // const int max_lev = max_radial_level+1;
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());

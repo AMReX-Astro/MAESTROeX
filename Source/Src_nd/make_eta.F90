@@ -40,16 +40,16 @@ contains
     ! Local variables
     integer :: r,i,n
 
-    ! etarho_ec       = ZERO
-    ! etarho_cc       = ZERO
+    etarho_ec       = ZERO
+    etarho_cc       = ZERO
 
-    ! do n=0,finest_radial_level
-    !    do i=1,numdisjointchunks(n)
-    !       do r = r_start_coord(n,i), r_end_coord(n,i)+1
-    !          etarho_ec(n,r) = etarhosum(r,n) / dble(ncell(n))
-    !       end do
-    !    end do
-    ! end do
+    do n=0,finest_radial_level
+       do i=1,numdisjointchunks(n)
+          do r = r_start_coord(n,i), r_end_coord(n,i)+1
+             etarho_ec(n,r) = etarhosum(r,n) / dble(ncell(n))
+          end do
+       end do
+    end do
 
     ! These calls shouldn't be needed since the planar algorithm doesn't use
     ! these outside of this function, but this is just to be safe in case
