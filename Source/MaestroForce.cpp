@@ -449,10 +449,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
     Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
 
-    make_grav_cell(grav.dataPtr(),
-                   rho0.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav, rho0);
 
     Put1dArrayOnCart(grav,grav_cart,0,0,bcs_f,0);
 

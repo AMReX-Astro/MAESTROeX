@@ -303,11 +303,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 1;
-            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                    rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-                    gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, 
+                   rho0_old, p0_old, p0_old, gamma1bar_old, 
+                   gamma1bar_old, p0_minus_peosbar, 
+                   delta_chi_w0_dummy, dt, dtold, is_predictor);
 
             if (spherical == 1) {
                 // put w0 on Cartesian edges
@@ -420,14 +419,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // correct the base state density by "averaging"
         Average(shat, rho0_new, Rho);
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
     }
 
     // update grav_cell_new
     if (evolve_base_state) {
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        MakeGravCell(grav_cell_new, rho0_new);
     }
     else {
         grav_cell_new = grav_cell_old;
@@ -560,6 +557,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // update base state density and pressure
         Average(snew, rho0_new, Rho);
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
         
         if (use_etarho) {
             // compute the new etarho
@@ -570,10 +568,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
         }
 
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        MakeGravCell(grav_cell_new, rho0_new);
 
         enforce_HSE(rho0_new.dataPtr(),
                     p0_new.dataPtr(),
@@ -679,8 +674,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+
+        MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                  grav_cell_new);
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
@@ -777,12 +773,11 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute w0, w0_force, and delta_chi_w0
                     is_predictor = 0;
-                    make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                            rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-                            gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                            etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                            r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-                    
+                    Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, 
+                           rho0_new, p0_old, p0_new, gamma1bar_old, 
+                           gamma1bar_new, p0_minus_peosbar, 
+                           delta_chi_w0_dummy, dt, dtold, is_predictor);
+                                
                     if (spherical == 1) {
                         // put w0 on Cartesian edges
                         MakeW0mac(w0mac);
@@ -856,23 +851,18 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             // correct the base state density by "averaging"
             Average(shat, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
+            ComputeCutoffCoords(rho0_new);
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph
         if (evolve_base_state) {
-            make_grav_cell(grav_cell_new.dataPtr(),
-                           rho0_new.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+            MakeGravCell(grav_cell_new, rho0_new);
             
             for(int i=0; i<beta0_nph.size(); ++i) {
                 rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
             }
             
-            make_grav_cell(grav_cell_nph.dataPtr(),
-                           rho0_nph.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+            MakeGravCell(grav_cell_nph, rho0_nph);
         } else {
             rho0_nph = rho0_old;
             grav_cell_nph = grav_cell_old;
@@ -1006,6 +996,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             // update base state density and pressure
             Average(snew, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
+            ComputeCutoffCoords(rho0_new);
 
             if (use_etarho) {
                 // compute the new etarho
@@ -1016,10 +1007,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 }
             }
 
-            make_grav_cell(grav_cell_new.dataPtr(),
-                           rho0_new.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+            MakeGravCell(grav_cell_new, rho0_new);
             
             enforce_HSE(rho0_new.dataPtr(),
                         p0_new.dataPtr(),
@@ -1132,8 +1120,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             // compute beta0 and gamma1bar
             MakeGamma1bar(snew,gamma1bar_new,p0_new);
-            make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                       gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+
+            MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                      grav_cell_new);
         }
         else {
             // Just pass beta0 and gamma1bar through if not evolving base state
@@ -1177,11 +1166,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                    rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
-                    gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_new, 
+                   rho0_new, p0_new, p0_new, gamma1bar_new, 
+                   gamma1bar_new, p0_minus_peosbar, 
+                   delta_chi_w0_dummy, dt, dtold, is_predictor);
 
             if (spherical == 1) {
                 // put w0 on Cartesian cell-centers

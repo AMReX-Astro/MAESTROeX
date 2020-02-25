@@ -743,6 +743,19 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakeBeta0.cpp functions
+
+    void MakeBeta0(RealVector& beta, 
+                   const RealVector& rho0,
+                   const RealVector& p0,
+                   const RealVector& gamma1bar,
+                   const RealVector& grav_cell,
+                   const bool is_irreg=false);
+
+    // end MaestroMakeBeta0.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeEdgeScal.cpp functions
 
     /// Calculate scalars on cell edges given cell-centered state

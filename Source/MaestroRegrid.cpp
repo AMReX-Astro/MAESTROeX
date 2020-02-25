@@ -101,12 +101,10 @@ Maestro::Regrid ()
 
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
+    ComputeCutoffCoords(rho0_old);
 
     // make gravity
-    make_grav_cell(grav_cell_old.dataPtr(),
-                   rho0_old.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav_cell_old, rho0_old);
 
     // enforce HSE
     enforce_HSE(rho0_old.dataPtr(),
@@ -130,14 +128,8 @@ Maestro::Regrid ()
     MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
     // beta0_old needs to be recomputed
-    if (use_exact_base_state) {
-        make_beta0_irreg(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                         gamma1bar_old.dataPtr(), grav_cell_old.dataPtr(),
-                         r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-    } else {
-        make_beta0(beta0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-                   gamma1bar_old.dataPtr(), grav_cell_old.dataPtr());
-    }
+    MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
+              grav_cell_old, use_exact_base_state);
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
