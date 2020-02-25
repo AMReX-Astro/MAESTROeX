@@ -19,7 +19,6 @@ CEXE_sources += MaestroEnthalpyAdvance.cpp
 CEXE_sources += MaestroEvolve.cpp
 CEXE_sources += MaestroFillData.cpp
 CEXE_sources += MaestroFill3dData.cpp
-CEXE_sources += MaestroFillUmacGhost.cpp
 CEXE_sources += MaestroForce.cpp
 CEXE_sources += MaestroGamma.cpp
 CEXE_sources += MaestroHeating.cpp
