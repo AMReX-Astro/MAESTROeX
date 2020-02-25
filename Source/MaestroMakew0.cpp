@@ -825,7 +825,6 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     w0_from_Sbar_vec[0] = 0.0;
 
     for (auto r = 1; r <= nr_fine; ++r) {
-
         Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
             dpdt_factor_loc * p0_minus_peosbar[max_lev*(r-1)]/dt_in : 0.0;
 
@@ -837,7 +836,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     }
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar[r] /= (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+        w0_from_Sbar_vec[r] /= (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
     }
 
     // make the edge-centered gravity

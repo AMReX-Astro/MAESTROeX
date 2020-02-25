@@ -137,6 +137,9 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     int which_lev = 0;
     
     get_finest_radial_level(&finest_radial_level);
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
 
     // find the finest level containing the anelastic cutoff density,
     // and set the anelastic cutoff coord for this level

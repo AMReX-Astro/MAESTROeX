@@ -102,6 +102,7 @@ Maestro::Init ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
 
     compute_cutoff_coords(rho0_old.dataPtr());
+    ComputeCutoffCoords(rho0_old);
 
     if (spherical == 1) {
         MakeNormal();
@@ -117,10 +118,7 @@ Maestro::Init ()
     }
 
     // make gravity
-    make_grav_cell(grav_cell_old.dataPtr(),
-                   rho0_old.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav_cell_old, rho0_old);
 
     if (restart_file == "") {
 
@@ -128,21 +126,8 @@ Maestro::Init ()
         MakeGamma1bar(sold,gamma1bar_old,p0_old);
 
         // compute beta0
-        if (use_exact_base_state) {
-            make_beta0_irreg(beta0_old.dataPtr(),
-                             rho0_old.dataPtr(),
-                             p0_old.dataPtr(),
-                             gamma1bar_old.dataPtr(),
-                             grav_cell_old.dataPtr(),
-                             r_cc_loc.dataPtr(),
-                             r_edge_loc.dataPtr());
-        } else {
-            make_beta0(beta0_old.dataPtr(),
-                       rho0_old.dataPtr(),
-                       p0_old.dataPtr(),
-                       gamma1bar_old.dataPtr(),
-                       grav_cell_old.dataPtr());
-        }
+        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
+                  grav_cell_old, use_exact_base_state);        
 
         // set beta0^{-1} = beta0_old
         for (int i=0; i<beta0_old.size(); ++i) {
@@ -284,15 +269,14 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
-        make_grav_cell(grav_cell_old.dataPtr(),
-                       rho0_old.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        ComputeCutoffCoords(rho0_old);
+        MakeGravCell(grav_cell_old, rho0_old);
     }
     else {
 
         // first compute cutoff coordinates using initial density profile
         compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
@@ -303,19 +287,13 @@ Maestro::InitData ()
             // set rho0 to be the average
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
+            ComputeCutoffCoords(rho0_old);
 
             // compute gravity
-            make_grav_cell(grav_cell_old.dataPtr(),
-                           rho0_old.dataPtr(),
-                           r_cc_loc.dataPtr(),
-                           r_edge_loc.dataPtr());
+            MakeGravCell(grav_cell_old, rho0_old);
 
             // compute p0 with HSE
-            enforce_HSE(rho0_old.dataPtr(),
-                        p0_old.dataPtr(),
-                        grav_cell_old.dataPtr(),
-                        r_cc_loc.dataPtr(),
-                        r_edge_loc.dataPtr());
+            EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(sold,p0_old,1);
@@ -605,12 +583,6 @@ void Maestro::DivuIter (int istep_divu_iter)
             }
 
             int is_predictor = 1;
-            // make_w0(w0.dataPtr(), w0.dataPtr(), w0_force.dataPtr(),Sbar.dataPtr(),
-            //         rho0_old.dataPtr(), rho0_old.dataPtr(), p0_old.dataPtr(),
-            //         p0_old.dataPtr(), gamma1bar_old.dataPtr(), gamma1bar_old.dataPtr(),
-            //         p0_minus_peosbar.dataPtr(), etarho_ec.dataPtr(),
-            //         etarho_cc.dataPtr(), delta_chi_w0.dataPtr(), r_cc_loc.dataPtr(),
-            //         r_edge_loc.dataPtr(), &dt, &dt, &is_predictor);
             Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_peosbar, delta_chi_w0, dt, dt, is_predictor);

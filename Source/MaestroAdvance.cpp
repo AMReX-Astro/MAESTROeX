@@ -308,8 +308,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
         Makew0(w0, w0_old, w0_force, Sbar, rho0_old, rho0_old, 
-                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-                p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+               p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+               p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
@@ -391,6 +391,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
     }
     else {
         rho0_new = rho0_old;
@@ -448,15 +449,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
+            ComputeCutoffCoords(rho0_new);
         }
 
         // update grav_cell_new
         base_time_start = ParallelDescriptor::second();
 
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        MakeGravCell(grav_cell_new, rho0_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -468,11 +467,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -612,15 +607,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         MakeGamma1bar(snew,gamma1bar_new,p0_new);
 
         base_time_start = ParallelDescriptor::second();
-
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        
+        MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                  grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
-    }
-    else {
+    } else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new = beta0_old;
         gamma1bar_new = gamma1bar_old;
@@ -647,6 +641,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
         compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
     }
 
     if (use_thermal_diffusion) {
@@ -789,6 +784,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -830,24 +826,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
+            ComputeCutoffCoords(rho0_new);
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph
         base_time_start = ParallelDescriptor::second();
 
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        MakeGravCell(grav_cell_new, rho0_new);
 
         for(int i=0; i<rho0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
-
-        make_grav_cell(grav_cell_nph.dataPtr(),
-                       rho0_nph.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        MakeGravCell(grav_cell_nph, rho0_nph);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -859,11 +849,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -994,8 +980,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                  grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
