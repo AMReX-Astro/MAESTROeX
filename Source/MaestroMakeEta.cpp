@@ -81,7 +81,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                 int lo = tilebox.loVect()[0];
                 int hi = tilebox.hiVect()[0];
 
-                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, k, {
+                AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, i, {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 });
             }
