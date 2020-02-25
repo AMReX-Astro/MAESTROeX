@@ -454,7 +454,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // update grav_cell_new
         base_time_start = ParallelDescriptor::second();
-
+        
         MakeGravCell(grav_cell_new, rho0_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;

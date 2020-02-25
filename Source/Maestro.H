@@ -26,6 +26,9 @@ typedef amrex::Vector< amrex::Real > RealVector;
 typedef amrex::Vector< int > IntVector;
 #endif
 
+/// hard code a maximum level limit
+#define MAESTRO_MAX_LEVELS 15
+
 class Maestro
     : public amrex::AmrCore
 {
