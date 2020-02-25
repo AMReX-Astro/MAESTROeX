@@ -570,7 +570,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                     // Operate only on faces that overlap--ie, only fill the fine faces that make up each
                     // coarse face, leave the in-between faces alone.
 #if (AMREX_SPACEDIM == 2)
-                    int k = 0;
+                    int k = lo[2];
                     if (dir == 0) {
                         for (auto n = 0; n < nComp; ++n) {
                             for (auto j = lo[1]; j <= hi[1]; ++j) {
@@ -667,13 +667,105 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
                     const int nComp = 1;
                     const Box& fbox  = fine_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
+                    IntVect ratio = refRatio(lev-1);
+
+                    const auto flo = fbox.loVect3d();
+                    const auto fhi = fbox.hiVect3d();
+
+                    const Array4<Real> fine = fine_src.array(mfi);
+
                     // Do linear in dir, pc transverse to dir, leave alone the fine values
                     // lining up with coarse edges--assume these have been set to hold the
                     // values you want to interpolate to the rest.
-                    EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
-                                BL_TO_FORTRAN_FAB(fine_src[mfi]));
+
+#if (AMREX_SPACEDIM == 2)
+                    int k = lo[2];
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                for (auto i = flo[0]; i<= fhi[0]-ratio[dir]; i+=ratio[0]) {
+                                    Real df = fine(i+ratio[dir],j,k,n) - fine(i,j,k,n);
+                                    for (auto M=1; M < ratio[dir]; ++M) {
+                                        Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(j,flo[1]); P <= min(j+ratio[1]-1, fhi[1]); ++P) {
+                                                fine(i+M,P,k,n) = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = flo[1]; j <= fhi[1]-ratio[dir]; j+=ratio[1]) {
+                                for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j+ratio[dir],k,n) - fine(i,j,k,n);
+                                    for (auto M=1; M < ratio[dir]; ++M) {
+                                        Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                fine(P,j+M,k,n) = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i<= fhi[0]-ratio[dir]; i+=ratio[0]) {
+                                    Real df = fine(i+ratio[dir],j,k,n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(j,flo[1]); P <= min(j+ratio[1]-1, fhi[1]); ++P) {
+                                                for (auto L = max(k, flo[2]); L <= min(k+ratio[2]-1, fhi[2]); ++L) {
+                                                    fine(i+M,P,L,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dir == 1) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]-ratio[dir]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j+ratio[dir],k,n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                for (auto L = max(k, flo[2]); L <= min(k+ratio[2]-1, fhi[2]); ++L) {
+                                                    fine(P,j+M,L,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]-ratio[dir]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j,k+ratio[dir],n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                for (auto L = max(j, flo[1]); L <= min(j+ratio[1]-1, fhi[1]); ++L) {
+                                                    fine(P,L,k+M,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#endif
                 }
 
                 // make a copy of the original fine uedge but with no ghost cells
