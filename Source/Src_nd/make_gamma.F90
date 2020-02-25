@@ -28,7 +28,6 @@ contains
     ! local variables
     integer :: i, j, k
 
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -46,10 +45,8 @@ contains
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
              ! dens, pres, and xmass are inputs
-             call eos(eos_input_rp, eos_state, pt_index)
+             call eos(eos_input_rp, eos_state)
 
              gamma(i,j,k) = eos_state%gam1
 

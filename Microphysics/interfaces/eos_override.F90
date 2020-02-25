@@ -1,5 +1,6 @@
 module eos_override_module
 
+  use amrex_fort_module, only : rt => amrex_real
   implicit none
 
   public eos_override

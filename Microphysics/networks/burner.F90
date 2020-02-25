@@ -4,6 +4,7 @@ module burner_module
   use network
   use eos_module
   use burn_type_module
+  use amrex_error_module
 
 #ifdef SDC
   use integrator_module

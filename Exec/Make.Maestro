@@ -86,6 +86,7 @@ ifdef MICROPHYSICS_HOME
    EOS_PATH := $(MICROPHYSICS_HOME)/EOS/$(strip $(EOS_DIR))
    NETWORK_PATH := $(MICROPHYSICS_HOME)/networks/$(strip $(NETWORK_DIR))
    COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(CONDUCTIVITY_DIR))
+   INTERFACES_PATH := $(MICROPHYSICS_HOME)/interfaces/$(strip $(INTERFACES_DIR))
 endif
 
 ifeq ($(USE_REACT), TRUE)
@@ -125,6 +126,10 @@ endif
 
 ifneq "$(wildcard $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR)) )" ""
    COND_PATH := $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR))
+endif
+
+ifneq "$(wildcard $(INTERFACES_HOME)/$(strip $(INTERFACES_DIR)) )" ""
+   INTERFACES_PATH := $(INTERFACES_HOME)/$(strip $(INTERFACES_DIR))
 endif
 
 # Problems can specify the input file for general_null by setting
@@ -174,6 +179,8 @@ EXTERN_CORE += $(NETWORK_PATH)
 ifdef MICROPHYSICS_HOME
   EXTERN_CORE += $(MICROPHYSICS_HOME)/EOS
   EXTERN_CORE += $(MICROPHYSICS_HOME)/networks
+  EXTERN_CORE += $(MICROPHYSICS_HOME)/interfaces
+  EXTERN_CORE += $(MICROPHYSICS_HOME)/constants
 endif
 
 EXTERN_CORE += $(TOP)/Microphysics/conductivity
@@ -262,7 +269,7 @@ CEXE_headers += $(AMREX_HOME)/Tools/C_scripts/AMReX_buildInfo.H
 INCLUDE_LOCATIONS +=  $(AMREX_HOME)/Tools/C_scripts
 
 
-MNAMES := EOS=$(EOS_PATH) NETWORK=$(NETWORK_PATH)
+MNAMES := EOS=$(EOS_PATH) NETWORK=$(NETWORK_PATH) 
 MNAMES += CONDUCTIVITY=$(COND_PATH)
 
 # we make AMReX_buildInfo.cpp as we make the .o file, so we can delete

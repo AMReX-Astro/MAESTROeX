@@ -435,10 +435,8 @@ contains
              eos_state%T = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
              ! dens, temp, and xmass are inputs
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              spdx    = max(spdx,eos_state%cs)
              ux      = max(ux,abs(u(i,j,k,1)))
@@ -608,7 +606,7 @@ contains
              pt_index(:) = (/i, j, k/)
 
              ! dens, temp, and xmass are inputs
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              spdx    = max(spdx,eos_state%cs)
              spdy    = max(spdy,eos_state%cs)

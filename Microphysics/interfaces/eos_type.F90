@@ -287,7 +287,7 @@ contains
   end subroutine print_state
 
 
-  subroutine eos_get_small_temp(small_temp_out)
+  subroutine eos_get_small_temp(small_temp_out) bind(C, name="eos_get_small_temp")
 
     !$acc routine seq
 
@@ -303,7 +303,7 @@ contains
 
 
 
-  subroutine eos_get_small_dens(small_dens_out)
+  subroutine eos_get_small_dens(small_dens_out) bind(C, name="eos_get_small_dens")
 
     !$acc routine seq
 

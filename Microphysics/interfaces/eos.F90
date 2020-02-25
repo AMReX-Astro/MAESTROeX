@@ -1,23 +1,21 @@
 module eos_module
 
-  use amrex_error_module
-  
+  use amrex_fort_module, only : rt => amrex_real
   implicit none
 
-  public eos_init, eos
+  public eos_init, eos, get_eos_name
 
-  logical, save :: initialized = .false.
+  logical, save :: initialized = .false.  
 
 contains
 
-  ! EOS initialization routine: read in general EOS parameters, then
+  ! EOS initialization routine: read in general EOS parameters, then 
   ! call any specific initialization used by the EOS.
 
   subroutine eos_init(small_temp, small_dens)
 
-    use amrex_fort_module, only: rt => amrex_real
-    use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
-    use amrex_error_module, only: amrex_warning
+    use amrex_error_module
+    use amrex_paralleldescriptor_module, only : amrex_pd_ioprocessor
     use eos_type_module, only: mintemp, mindens, maxtemp, maxdens, &
                                minx, maxx, minye, maxye, mine, maxe, &
                                minp, maxp, mins, maxs, minh, maxh
@@ -47,22 +45,22 @@ contains
     allocate(minh)
     allocate(maxh)
 
-    mintemp = 1.d-200
-    maxtemp = 1.d200
-    mindens = 1.d-200
-    maxdens = 1.d200
-    minx    = 1.d-200
-    maxx    = 1.d0 + 1.d-12
-    minye   = 1.d-200
-    maxye   = 1.d0 + 1.d-12
-    mine    = 1.d-200
-    maxe    = 1.d200
-    minp    = 1.d-200
-    maxp    = 1.d200
-    mins    = 1.d-200
-    maxs    = 1.d200
-    minh    = 1.d-200
-    maxh    = 1.d200
+    mintemp = 1.e-200_rt
+    maxtemp = 1.e200_rt
+    mindens = 1.e-200_rt
+    maxdens = 1.e200_rt
+    minx    = 1.e-200_rt
+    maxx    = 1.e0_rt + 1.e-12_rt
+    minye   = 1.e-200_rt
+    maxye   = 1.e0_rt + 1.e-12_rt
+    mine    = 1.e-200_rt
+    maxe    = 1.e200_rt
+    minp    = 1.e-200_rt
+    maxp    = 1.e200_rt
+    mins    = 1.e-200_rt
+    maxs    = 1.e200_rt
+    minh    = 1.e-200_rt
+    maxh    = 1.e200_rt
 
     ! Set up any specific parameters or initialization steps required by the EOS we are using.
 
@@ -74,13 +72,13 @@ contains
     ! if they are smaller than that.
 
     ! Note that in this routine we use the Fortran-based parallel_IOProcessor()
-    ! command rather than the C++-based version used elsewhere in MAESTROeX; this
+    ! command rather than the C++-based version used elsewhere in Castro; this
     ! ensures compatibility with Fortran-based test programs.
 
     if (present(small_temp)) then
        if (small_temp < mintemp) then
-          if (parallel_IOProcessor()) then
-             call amrex_warning('EOS: small_temp cannot be less than the mintemp allowed by the EOS. Resetting small_temp to mintemp.')
+          if (amrex_pd_ioprocessor()) then
+             print *, 'EOS: small_temp cannot be less than the mintemp allowed by the EOS. Resetting small_temp to mintemp.'
           endif
           small_temp = mintemp
        else
@@ -90,8 +88,8 @@ contains
 
     if (present(small_dens)) then
        if (small_dens < mindens) then
-          if (parallel_IOProcessor()) then
-             call amrex_warning('EOS: small_dens cannot be less than the mindens allowed by the EOS. Resetting small_dens to mindens.')
+          if (amrex_pd_ioprocessor()) then
+             print *, 'EOS: small_dens cannot be less than the mindens allowed by the EOS. Resetting small_dens to mindens.'
           endif
           small_dens = mindens
        else
@@ -108,16 +106,26 @@ contains
   end subroutine eos_init
 
 
+  subroutine eos_finalize()
 
-  subroutine eos(input, state, pt_index)
+    use actual_eos_module, only: actual_eos_finalize
+
+    implicit none
+
+    call actual_eos_finalize()
+
+  end subroutine eos_finalize
+
+
+  subroutine eos(input, state, use_raw_inputs)
 
     !$acc routine seq
 
     use eos_type_module, only: eos_t
-    use eos_composition_module, only : composition, composition_derivatives
+    use eos_composition_module, only : composition
     use actual_eos_module, only: actual_eos
     use eos_override_module, only: eos_override
-#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
+#ifndef AMREX_USE_GPU
     use amrex_error_module, only: amrex_error
 #endif
 
@@ -127,19 +135,29 @@ contains
 
     integer,      intent(in   ) :: input
     type (eos_t), intent(inout) :: state
-    integer,      intent(in   ), optional  :: pt_index(:)
+    logical, optional, intent(in) :: use_raw_inputs
 
-    logical :: has_been_reset
+    logical :: has_been_reset, use_composition_routine
 
     !$gpu
 
-#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
+    ! Local variables
+
+#ifndef AMREX_USE_GPU
     if (.not. initialized) call amrex_error('EOS: not initialized')
 #endif
 
-    ! Get abar, zbar, etc.
+    if (present(use_raw_inputs)) then
+       use_composition_routine = .not. use_raw_inputs
+    else
+       use_composition_routine = .true.
+    end if
 
-    call composition(state)
+    if (use_composition_routine) then
+       ! Get abar, zbar, etc.
+
+       call composition(state)
+    end if
 
     ! Force the inputs to be valid.
 
@@ -160,6 +178,73 @@ contains
 
   end subroutine eos
 
+
+
+#ifdef AMREX_USE_GPU
+  attributes(global) subroutine launch_eos(input, state)
+
+    use eos_type_module, only: eos_t
+
+    implicit none
+
+    integer,      intent(in   ) :: input
+    type (eos_t), intent(inout) :: state
+
+    ! Wrapper kernel for calling the device EOS.
+
+#ifdef AMREX_GPU_PRAGMA_NO_HOST
+    call eos(input, state)
+#else
+    call eos_device(input, state)
+#endif
+
+  end subroutine launch_eos
+#endif
+
+
+
+  subroutine eos_on_host(input, state)
+
+    use eos_type_module, only: eos_t
+
+    implicit none
+
+    integer,      intent(in   ) :: input
+    type (eos_t), intent(inout) :: state
+
+#ifdef AMREX_USE_CUDA
+    integer,      device :: input_device
+    type (eos_t), device :: state_device
+#endif
+
+    ! Evaluate the EOS on a single thread on the GPU.
+    ! If we're in a CPU-only build, fall back to the
+    ! normal EOS call.
+
+#ifdef AMREX_USE_CUDA
+    input_device = input
+    state_device = state
+
+    call launch_eos<<<1,1>>>(input_device, state_device)
+
+    state = state_device
+#else
+    call eos(input, state)
+#endif
+
+  end subroutine eos_on_host
+
+
+
+  function get_eos_name() result(name)
+
+    use actual_eos_module, only: eos_name
+
+    character(len=128) :: name
+
+    name = eos_name
+
+  end function get_eos_name
 
 
   subroutine reset_inputs(input, state, has_been_reset)
@@ -381,9 +466,10 @@ contains
 
 
 
-#if (!(defined(AMREX_USE_CUDA) || defined(AMREX_USE_ACC)))
+#ifndef AMREX_USE_GPU
   subroutine check_inputs(input, state)
 
+    use amrex_error_module
     use network, only: nspec
     use eos_type_module, only: eos_t, print_state, minx, maxx, minye, maxye, &
                                eos_input_rt, eos_input_re, eos_input_rp, eos_input_rh, &
@@ -464,6 +550,7 @@ contains
 
   subroutine check_rho(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, mindens, maxdens, print_state
 
     implicit none
@@ -484,6 +571,7 @@ contains
 
   subroutine check_T(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, mintemp, maxtemp, print_state
 
     implicit none
@@ -504,6 +592,7 @@ contains
 
   subroutine check_e(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, mine, maxe, print_state
 
     implicit none
@@ -524,6 +613,7 @@ contains
 
   subroutine check_h(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, minh, maxh, print_state
 
     implicit none
@@ -544,6 +634,7 @@ contains
 
   subroutine check_s(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, mins, maxs, print_state
 
     implicit none
@@ -564,6 +655,7 @@ contains
 
   subroutine check_p(state)
 
+    use amrex_error_module
     use eos_type_module, only: eos_t, minp, maxp, print_state
 
     implicit none

@@ -13,6 +13,8 @@
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
+#include <network.H>
+#include <eos.H>
 
 #include <PhysBCFunctMaestro.H>
 
