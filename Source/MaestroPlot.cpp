@@ -1569,10 +1569,7 @@ Maestro::MakeGrav (const RealVector& rho0,
     RealVector grav_cell( (max_radial_level+1)*nr_fine );
     grav_cell.shrink_to_fit();
 
-    make_grav_cell(grav_cell.dataPtr(),
-                   rho0.dataPtr(),
-                   r_cc_loc.dataPtr(),
-                   r_edge_loc.dataPtr());
+    MakeGravCell(grav_cell, rho0);
 
     Put1dArrayOnCart(grav_cell,grav,0,0,bcs_f,0);
 

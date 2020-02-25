@@ -293,11 +293,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 1;
-            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                    rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-                    gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+                   p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+                   p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
+                   is_predictor);
 
             Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
@@ -408,16 +407,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
     }
 
     // update grav_cell_new
     if (evolve_base_state) {
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
-    }
-    else {
+        MakeGravCell(grav_cell_new, rho0_new);
+    } else {
         grav_cell_new = grav_cell_old;
     }
 
@@ -427,11 +423,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // set new p0 through HSE
         p0_new = p0_old;
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
         for (int i=0; i<p0_nph.size(); ++i) {
@@ -527,9 +519,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        MakeGamma1bar(snew,gamma1bar_new,p0_new);        
+        MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                  grav_cell_new);
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
@@ -553,6 +545,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
         compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
     }
 
     if (use_thermal_diffusion) {
@@ -622,11 +615,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                    rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-                    gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+                   p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
+                   p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
+                   is_predictor);
 
             Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
             
@@ -709,23 +701,19 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
         compute_cutoff_coords(rho0_new.dataPtr());
+        ComputeCutoffCoords(rho0_new);
     }
 
     // update grav_cell_new, rho0_nph, grav_cell_nph
     if (evolve_base_state) {
-        make_grav_cell(grav_cell_new.dataPtr(),
-                       rho0_new.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        
+        MakeGravCell(grav_cell_new, rho0_new);
 
         for(int i=0; i<beta0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
-
-        make_grav_cell(grav_cell_nph.dataPtr(),
-                       rho0_nph.dataPtr(),
-                       r_cc_loc.dataPtr(),
-                       r_edge_loc.dataPtr());
+        
+        MakeGravCell(grav_cell_nph, rho0_nph);
     } else {
         rho0_nph = rho0_old;
         grav_cell_nph = grav_cell_old;
@@ -737,11 +725,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // set new p0 through HSE
         p0_new = p0_old;
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         for (int i=0; i<p0_nph.size(); ++i) {
             p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
@@ -822,9 +806,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
         //compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
-        make_beta0(beta0_new.dataPtr(), rho0_new.dataPtr(), p0_new.dataPtr(),
-                   gamma1bar_new.dataPtr(), grav_cell_new.dataPtr());
+        MakeGamma1bar(snew,gamma1bar_new,p0_new);        
+        MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
+                  grav_cell_new);
     }
 
     for(int i=0; i<beta0_nph.size(); ++i) {
@@ -870,11 +854,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force_dummy.dataPtr(),Sbar.dataPtr(),
-                    rho0_new.dataPtr(),rho0_new.dataPtr(),p0_new.dataPtr(),p0_new.dataPtr(),
-                    gamma1bar_new.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-                    etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0_dummy.dataPtr(),
-                    r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
+            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
+                    p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
+                    p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
+                    is_predictor);
 
             Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         

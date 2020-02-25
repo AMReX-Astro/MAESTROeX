@@ -467,6 +467,16 @@ public:
     // end MaestroDt.cpp functions
     ////////////////////////
 
+    ////////////
+    // MaestroEnforceHSE.cpp
+
+    void EnforceHSE(const RealVector& rho0, 
+                    RealVector& p0,
+                    const RealVector& grav_cell);
+
+    // end  MaestroEnforceHSE.cpp functions
+    ////////////////////////
+
     ////////////////////////
     // MaestroEnthalpyAdvance.cpp functions
 
@@ -766,6 +776,19 @@ public:
     void SetMacSolverBCs(amrex::MLABecLaplacian& mlabec);
 
     // end MaestroMacProj.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakeBeta0.cpp functions
+
+    void MakeBeta0(RealVector& beta, 
+                   const RealVector& rho0,
+                   const RealVector& p0,
+                   const RealVector& gamma1bar,
+                   const RealVector& grav_cell,
+                   const bool is_irreg=false);
+
+    // end MaestroMakeBeta0.cpp functions
     ////////////
 
     ////////////

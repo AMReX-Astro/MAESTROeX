@@ -16,6 +16,8 @@
 
 module actual_network
 
+  use amrex_fort_module, only: rt => amrex_real
+
   implicit none
 
   integer, parameter :: nspec = @@NSPEC@@
@@ -27,42 +29,52 @@ module actual_network
   character (len=16), save :: aux_names(naux)
   character (len= 5), save :: short_aux_names(naux)
 
-  double precision, allocatable, save   :: aion(:), zion(:)
+  double precision, allocatable, save :: aion(:), aion_inv(:), zion(:)
+
+  !$acc declare create(aion, aion_inv, zion)
 
   integer, parameter :: nrates = 1
   integer, parameter :: num_rate_groups = 1
 
 #ifdef AMREX_USE_CUDA
-  attributes(managed) :: aion
-  attributes(managed) :: zion
+  attributes(managed) :: aion, aion_inv, zion
 #endif
 
 contains
 
   subroutine actual_network_init
 
-    allocate(aion(nspec))
-    allocate(zion(nspec))
-
     @@SPEC_NAMES@@
 
     @@SHORT_SPEC_NAMES@@
 
+    allocate(aion(nspec))
+    allocate(aion_inv(nspec))
+    allocate(zion(nspec))
+
     @@AION@@
+
+    @@AION_INV@@
 
     @@ZION@@
 
     @@AUX_NAMES@@
 
+    @@SHORT_AUX_NAMES@@
+
+    !$acc update device(aion, aion_inv, zion)
+
   end subroutine actual_network_init
+
 
   subroutine actual_network_finalize
 
     implicit none
 
-    ! Nothing to do here.
+    deallocate(aion)
+    deallocate(aion_inv)
+    deallocate(zion)
 
   end subroutine actual_network_finalize
-
 
 end module actual_network
