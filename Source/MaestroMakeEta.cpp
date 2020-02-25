@@ -142,7 +142,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // make the cell-centered etarho_cc by averaging etarho to centers
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
-            Real ncell_lev = ncell[n];
             const int lo = r_start_coord[n+max_lev*i];
             const int hi = r_end_coord[n+max_lev*i]+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
