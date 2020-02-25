@@ -436,11 +436,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // set new p0 through HSE
         p0_new = p0_old;
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
         for (int i=0; i<p0_nph.size(); ++i) {
@@ -570,11 +566,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         MakeGravCell(grav_cell_new, rho0_new);
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
         for (int i=0; i<p0_nph.size(); ++i) {
@@ -873,12 +865,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             
             // set new p0 through HSE
             p0_new = p0_old;
-            
-            enforce_HSE(rho0_new.dataPtr(),
-                        p0_new.dataPtr(),
-                        grav_cell_new.dataPtr(),
-                        r_cc_loc.dataPtr(),
-                        r_edge_loc.dataPtr());
+
+            EnforceHSE(rho0_new, p0_new, grav_cell_new);
             
             for (int i=0; i<p0_nph.size(); ++i) {
                 p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
@@ -1008,12 +996,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             MakeGravCell(grav_cell_new, rho0_new);
-            
-            enforce_HSE(rho0_new.dataPtr(),
-                        p0_new.dataPtr(),
-                        grav_cell_new.dataPtr(),
-                        r_cc_loc.dataPtr(),
-                        r_edge_loc.dataPtr());
+
+            EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
             // compute p0_nph
             for (int i=0; i<p0_nph.size(); ++i) {

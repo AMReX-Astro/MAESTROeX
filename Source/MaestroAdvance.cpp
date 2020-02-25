@@ -454,7 +454,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // update grav_cell_new
         base_time_start = ParallelDescriptor::second();
-        
+
         MakeGravCell(grav_cell_new, rho0_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
@@ -467,11 +467,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
@@ -853,11 +849,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         base_time_start = ParallelDescriptor::second();
 
-        enforce_HSE(rho0_new.dataPtr(),
-                    p0_new.dataPtr(),
-                    grav_cell_new.dataPtr(),
-                    r_cc_loc.dataPtr(),
-                    r_edge_loc.dataPtr());
+        EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
