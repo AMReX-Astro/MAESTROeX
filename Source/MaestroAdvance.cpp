@@ -476,6 +476,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // make psi
         if (spherical == 0) {
             MakePsiPlanar(psi);
+            // make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
         } else {
             // compute p0_nph
             for (int i=0; i<p0_nph.size(); ++i) {
@@ -494,11 +495,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             }
 
             // make time-centered psi
-            // make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
-            //                    gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
-            //                    Sbar.dataPtr(),
-            //                    r_cc_loc.dataPtr(),
-            //                    r_edge_loc.dataPtr());
             MakePsiSphr(psi, w0, gamma1bar_temp2, p0_nph, Sbar);
         }
 
@@ -860,6 +856,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // make psi
         if (spherical == 0) {
             MakePsiPlanar(psi);
+            // make_psi_planar(etarho_cc.dataPtr(),psi.dataPtr());
         } else {
             // compute gamma1bar^{(2)} and store it in gamma1bar_temp2
             MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
@@ -871,11 +868,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
             }
 
-            // make_psi_spherical(psi.dataPtr(),w0.dataPtr(),
-            //                    gamma1bar_temp2.dataPtr(),p0_nph.dataPtr(),
-            //                    Sbar.dataPtr(),
-            //                    r_cc_loc.dataPtr(),
-            //                    r_edge_loc.dataPtr());
             MakePsiSphr(psi, w0, gamma1bar_temp2, p0_nph, Sbar);
 
             base_time += ParallelDescriptor::second() - base_time_start;

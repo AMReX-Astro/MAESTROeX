@@ -368,7 +368,7 @@ contains
     else
        do n=1,nc
           do j=flo(1),fhi(1)-ratio(dir),ratio(1)
-             do i=flo(0),fhi(0)
+             do i=flo(0),fhi(0),ratio(0)
                 df = fine(i,j+ratio(dir),k,n)-fine(i,j,k,n)
                 do M=1,ratio(dir)-1
                    val = fine(i,j,k,n) + df*dble(M)/dble(ratio(dir))
@@ -404,7 +404,7 @@ contains
        do n=1,nc
           do k=flo(2),fhi(2),ratio(2)
              do j=flo(1),fhi(1)-ratio(dir),ratio(1)
-                do i=flo(0),fhi(0)
+                do i=flo(0),fhi(0),ratio(0)
                    df = fine(i,j+ratio(dir),k,n)-fine(i,j,k,n)
                    do M=1,ratio(dir)-1
                       val = fine(i,j,k,n) &
