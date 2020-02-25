@@ -21,7 +21,6 @@ Src_nd
    file/inlet_bc_f
    file/maestro_init_f
    file/make_S_f
-   file/make_beta0_f
    file/make_eta_f
    file/make_explicit_thermal_f
    file/make_gamma_f
@@ -31,7 +30,6 @@ Src_nd
    file/make_plot_variables_f
    file/make_psi_f
    file/make_scal_force_f
-   file/make_w0_f
    file/regrid_f
    file/rhoh_vs_t_f
    file/rotation_f

@@ -161,7 +161,6 @@
 <li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_beta0_f.html">make_beta0.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
@@ -174,7 +173,6 @@
 <li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_w0_f.html">make_w0.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
@@ -295,11 +293,8 @@ does too.</p>
 <dt class="field-even">Use </dt>
 <dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>)</p>
 </dd>
-<dt class="field-odd">Called from</dt>
-<dd class="field-odd"><p><a class="reference internal" href="make_w0_f.html#f/make_w0_module/make_w0_spherical_simple" title="f/make_w0_module/make_w0_spherical_simple"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_spherical_simple()</span></code></a></p>
-</dd>
-<dt class="field-even">Call to</dt>
-<dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
+<dt class="field-odd">Call to</dt>
+<dd class="field-odd"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -321,7 +316,7 @@ The base state uses 0-based indexing, so grav_edge does too.</p>
 <dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>)</p>
 </dd>
 <dt class="field-odd">Called from</dt>
-<dd class="field-odd"><p><a class="reference internal" href="enforce_HSE_f.html#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a>, <a class="reference internal" href="make_w0_f.html#f/make_w0_module/make_w0_spherical" title="f/make_w0_module/make_w0_spherical"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_spherical()</span></code></a>, <a class="reference internal" href="make_w0_f.html#f/make_w0_module/make_w0_sphr_irreg" title="f/make_w0_module/make_w0_sphr_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_w0_sphr_irreg()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="enforce_HSE_f.html#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a></p>
 </dd>
 <dt class="field-even">Call to</dt>
 <dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
