@@ -30,15 +30,6 @@ module network
 
   logical :: network_initialized = .false.
 
-  ! this will be computed here, not in the actual network
-  real(kind=rt), allocatable :: aion_inv(:)
-
-  !$acc declare create(aion_inv)
-
-#ifdef AMREX_USE_CUDA
-  attributes(managed) :: aion_inv
-#endif
-
 contains
 
   subroutine network_init()
@@ -47,8 +38,6 @@ contains
     use amrex_constants_module, only : ONE
 
     implicit none
-
-    allocate(aion_inv(nspec))
 
     ! First, we call the specific network initialization.
     ! This should set the number of species and number of
@@ -67,10 +56,6 @@ contains
     if ( naux .lt. 0 ) then
        call amrex_error("Network cannot have a negative number of auxiliary variables.")
     endif
-
-    aion_inv(:) = ONE/aion(:)
-
-    !$acc update device(aion_inv)
 
     network_initialized = .true.
 

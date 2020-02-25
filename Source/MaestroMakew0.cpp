@@ -121,14 +121,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
     Real * AMREX_RESTRICT psi_planar = psi_planar_vec.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
-    const  Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
-    Real * AMREX_RESTRICT delta_chi_w0_p = delta_chi_w0.dataPtr();
-    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
     Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
-    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
@@ -612,7 +605,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
@@ -805,8 +797,6 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_minus_peosbar_p = p0_minus_peosbar.dataPtr();
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
