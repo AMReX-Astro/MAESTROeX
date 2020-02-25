@@ -996,7 +996,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             MakeGravCell(grav_cell_new, rho0_new);
-
+            
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
             // compute p0_nph
