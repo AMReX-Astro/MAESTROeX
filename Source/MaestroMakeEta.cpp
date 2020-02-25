@@ -52,7 +52,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-            int zlo = validbox.loVect()[2];
+            int zlo = 0;
             AMREX_HOST_DEVICE_PARALLEL_FOR_3D(validbox, i, j, k, {
                 if (k == zlo) {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
@@ -68,13 +68,14 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                 }
             }
             if (top_edge) {
-                int k = validbox.loVect()[2];
+                int k = 0;
                 int j = validbox.hiVect()[1]+1;
                 int lo = validbox.loVect()[0];
                 int hi = validbox.hiVect()[0];
 
                 AMREX_HOST_DEVICE_PARALLEL_FOR_1D(hi-lo+1, i, {
-                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+		    int i_loc = i+lo;
+                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i_loc,j,k));
                 });
             }
 #else 
@@ -142,7 +143,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // make the cell-centered etarho_cc by averaging etarho to centers
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
-            Real ncell_lev = ncell[n];
             const int lo = r_start_coord[n+max_lev*i];
             const int hi = r_end_coord[n+max_lev*i]+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
