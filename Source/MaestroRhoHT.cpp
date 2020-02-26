@@ -9,7 +9,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
                     const RealVector& p0)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::TfromRhoH()",TfromRhoH);
+    BL_PROFILE_VAR("Maestro::TfromRhoH()", TfromRhoH);
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
@@ -86,7 +86,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
                     const bool updateRhoH)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
+    BL_PROFILE_VAR("Maestro::TfromRhoP()", TfromRhoP);
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
@@ -156,7 +156,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
                     Vector<MultiFab>& peos)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PfromRhoH()",PfromRhoH);
+    BL_PROFILE_VAR("Maestro::PfromRhoH()", PfromRhoH);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -207,7 +207,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
                            Vector<MultiFab>& mach)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MachfromRhoH()",MachfromRhoH);
+    BL_PROFILE_VAR("Maestro::MachfromRhoH()", MachfromRhoH);
 
     Vector<MultiFab> p0_cart(finest_level+1);
 
@@ -282,7 +282,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
                      Vector<MultiFab>& cs)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::CsfromRhoH()",CsfromRhoH);
+    BL_PROFILE_VAR("Maestro::CsfromRhoH()", CsfromRhoH);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -337,7 +337,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                         const RealVector& rhoh0_edge_new)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::HfromRhoTedge()",HfromRhoTedge);
+    BL_PROFILE_VAR("Maestro::HfromRhoTedge()", HfromRhoTedge);
 
     Vector<MultiFab> rho0_cart(finest_level+1);
     Vector<MultiFab> rhoh0_cart(finest_level+1);
@@ -401,22 +401,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,1,0,bcs_s,Temp);
     }
 
-
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf = sold[lev];
-        MultiFab& sedgex_mf = sedge[lev][0];
-        MultiFab& sedgey_mf = sedge[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& sedgez_mf = sedge[lev][2];
-#endif
-        const MultiFab& rho0_mf = rho0_cart[lev];
-        const MultiFab& rhoh0_mf = rhoh0_cart[lev];
-        const MultiFab& tempbar_mf = tempbar_cart[lev];
-        const MultiFab& rho0_edge_mf = rho0_edge_cart[lev];
-        const MultiFab& rhoh0_edge_mf = rhoh0_edge_cart[lev];
-        const MultiFab& tempbar_edge_mf = tempbar_edge_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -748,7 +733,6 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     }
                 });
 #endif
-                
             }
         }
     }
