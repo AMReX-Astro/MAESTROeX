@@ -42,6 +42,9 @@ Maestro::Setup ()
 
     maestro_network_init();
 
+    maestro_eos_init();
+    eos_init();
+
     burner_init();
 
     maestro_conductivity_init();
@@ -54,8 +57,7 @@ Maestro::Setup ()
 
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(&Rho,&RhoH,&FirstSpec,&Temp,&Pi,&Nscal,
-                      ZFILL(probLo),ZFILL(probHi));
+    set_method_params(ZFILL(probLo),ZFILL(probHi));
 
     // set up BCRec definitions for BC types
     BCSetup();
@@ -305,14 +307,17 @@ void Maestro::VariableSetup ()
 void
 Maestro::ExternInit ()
 {
-  // initialize the external runtime parameters -- these will
-  // live in the probin
+    // initialize the external runtime parameters -- these will
+    // live in the probin
 
-  if (ParallelDescriptor::IOProcessor()) {
-    std::cout << "reading extern runtime parameters ..." << std::endl;
-  }
+    if (ParallelDescriptor::IOProcessor()) {
+        std::cout << "reading extern runtime parameters ..." << std::endl;
+    }
 
-  maestro_extern_init();
+    maestro_extern_init();
+
+    // grab them from Fortran to C++
+    init_extern_parameters();
 }
 
 // set up BCRec definitions for BC types

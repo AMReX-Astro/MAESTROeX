@@ -174,8 +174,6 @@ def doit(variables_file, odir, defines):
                 count = fields[4]
                 ifdef = fields[5]
 
-                print(f"cpp name, f90 name = {cpp_var}, {F90_var}")
-
                 # we may be fed a pair of the form (SET, DEFINE),
                 # in which case we only add to SET if we define
                 # DEFINE
@@ -194,12 +192,9 @@ def doit(variables_file, odir, defines):
                     indices.append(Index(name, cpp_var, F90_var, default_group=default_group,
                                          iset=current_set, also_adds_to=adds_to,
                                          count=count))
-        print(default_set)
 
     # find the set of set names
     unique_sets = {q.iset for q in indices}
-
-    print(f"unique_sets = {indices}")
 
     # we'll keep track of all the counters across all the sets.  This
     # will be used later to write a module that sets parameters with
@@ -254,7 +249,6 @@ def doit(variables_file, odir, defines):
         # f.write(f"   integer, parameter :: nscal = {nadv}\n")
         for ac in all_counters:
             f.write(f"   {ac.get_f90_set_string()}\n")
-        print(f"counters = {all_counters}")
 
         # we only loop over the default sets for setting indices, not the
         # "adds to", so we don't set the same index twice
