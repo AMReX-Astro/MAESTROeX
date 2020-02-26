@@ -40,9 +40,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         const MultiFab& etarhoflux_mf = etarho_flux[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
         for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
@@ -52,7 +49,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-            int zlo = validbox.loVect()[2];
+            int zlo = 0;
             AMREX_PARALLEL_FOR_3D(validbox, i, j, k, {
                 if (k == zlo) {
                     amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
@@ -68,7 +65,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                 }
             }
             if (top_edge) {
-                int k = validbox.hiVect()[2];
+                int k = 0;
                 int j = validbox.hiVect()[1]+1;
                 int lo = validbox.loVect()[0];
                 int hi = validbox.hiVect()[0];
