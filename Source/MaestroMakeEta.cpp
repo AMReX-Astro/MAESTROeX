@@ -68,7 +68,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             // this prevents double counting
             auto top_edge = false;
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
+                if (validbox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
@@ -93,13 +93,13 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             auto top_edge = false;
 
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
+                if (validbox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
             
             if (top_edge) {
-                int zhi = tilebox.hiVect()[2] + 1;
+                int zhi = validbox.hiVect()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
