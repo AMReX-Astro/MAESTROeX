@@ -20,16 +20,11 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_mf = scal[lev];
-        const MultiFab& p0_mf = p0_cart[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -49,9 +44,8 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
                         eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
                     }
 
-                    // e = h - p/rho
-                    eos_state.e = state(i,j,k,RhoH) / state(i,j,k,Rho) - 
-                        p0_arr(i,j,k) / state(i,j,k,Rho);
+                    // e = (rhoh - p)/rho
+                    eos_state.e = (state(i,j,k,RhoH) - p0_arr(i,j,k)) / state(i,j,k,Rho);
 
                     eos(eos_input_re, eos_state);
 
@@ -77,16 +71,8 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
                     state(i,j,k,Temp) = eos_state.T;
 
                 });
-
             }
-
-// #pragma gpu box(tileBox)
-//             makeTfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
-//                                 AMREX_INT_ANYD(tileBox.hiVect()),
-//                                 BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-//                                 BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
         }
-
     }
 
     // average down and fill ghost cells
@@ -97,7 +83,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
                     const RealVector& p0,
-                    int updateRhoH)
+                    const bool updateRhoH)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoP()",TfromRhoP);
@@ -112,29 +98,44 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_mf = scal[lev];
-        const MultiFab& p0_mf = p0_cart[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Array4<Real> state = scal[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            // (rho, p) --> T
 
-#pragma gpu box(tileBox)
-            makeTfromRhoP(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0_mf[mfi]), updateRhoH);
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                eos_t eos_state;
+
+                eos_state.rho = state(i,j,k,Rho);
+                eos_state.T   = state(i,j,k,Temp);
+
+                if (use_pprime_in_tfromp) {
+                    eos_state.p = p0_arr(i,j,k) + state(i,j,k,Pi);
+                } else {
+                    eos_state.p = p0_arr(i,j,k);
+                }
+
+                for (auto n = 0; n < NumSpec; ++n) {
+                    eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
+                }
+
+                eos(eos_input_rp, eos_state);
+
+                state(i,j,k,Temp) = eos_state.T;
+
+                if (updateRhoH) {
+                    state(i,j,k,RhoH) = eos_state.rho * eos_state.h;
+                }
+            });
         }
     }
 
@@ -143,7 +144,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
 
     // average down and fill ghost cells (Enthalpy)
-    if (updateRhoH == 1) {
+    if (updateRhoH) {
         AverageDown(scal,RhoH,1);
         FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
     }
@@ -159,37 +160,43 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& state_mf = state[lev];
-        const MultiFab& sold_mf = s_old[lev];
-        MultiFab& peos_mf = peos[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(state_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Array4<const Real> state_arr = state[lev].array(mfi);
+            const Array4<const Real> temp_old = s_old[lev].array(mfi, Temp);
+            const Array4<Real> peos_arr = peos[lev].array(mfi);
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            makePfromRhoH(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                          BL_TO_FORTRAN_ANYD(state_mf[mfi]),
-                          sold_mf[mfi].dataPtr(Temp),
-                          AMREX_INT_ANYD(sold_mf[mfi].loVect()), AMREX_INT_ANYD(sold_mf[mfi].hiVect()),
-                          BL_TO_FORTRAN_ANYD(peos_mf[mfi]));
+            // (rho, H) --> T, p
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                eos_t eos_state;
+
+                eos_state.rho = state_arr(i,j,k,Rho);
+                eos_state.T   = temp_old(i,j,k);
+
+                for (auto n = 0; n < NumSpec; ++n) {
+                    eos_state.xn[n] = state_arr(i,j,k,FirstSpec+n) / eos_state.rho;
+                }
+
+                eos_state.h = state_arr(i,j,k,RhoH) / state_arr(i,j,k,Rho);
+
+                eos(eos_input_rh, eos_state);
+
+                peos_arr(i,j,k) = eos_state.p;
+            });
         }
-
     }
 
     // average down and fill ghost cells
-    AverageDown(peos,0,1);
-    FillPatch(t_old,peos,peos,peos,0,0,1,0,bcs_f);
+    AverageDown(peos, 0, 1);
+    FillPatch(t_old, peos, peos, peos, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -212,47 +219,66 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf = scal[lev];
-        const MultiFab& vel_mf = vel[lev];
-        const MultiFab& w0cart_mf = w0cart[lev];
-        MultiFab& mach_mf = mach[lev];
-        const MultiFab& p0_mf = p0_cart[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Array4<const Real> state = scal[lev].array(mfi);
+            const Array4<const Real> u = vel[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<const Real> w0_arr = w0cart[lev].array(mfi);
+            const Array4<Real> mach_arr = mach[lev].array(mfi);
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            makeMachfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
-                                  AMREX_INT_ANYD(tileBox.hiVect()),
-                                  BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(w0cart_mf[mfi]),
-                                  BL_TO_FORTRAN_ANYD(mach_mf[mfi]));
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                // vel is the magnitude of the velocity, including w0
+#if (AMREX_SPACEDIM == 2)
+                Real velocity = sqrt(u(i,j,k,0)*u(i,j,k,0) + 
+                    (u(i,j,k,1) + w0_arr(i,j,k))*(u(i,j,k,1) + w0_arr(i,j,k)));
+#else
+                Real velocity = sqrt(u(i,j,k,0)*u(i,j,k,0) + 
+                    u(i,j,k,1)*u(i,j,k,1) + 
+                    (u(i,j,k,2) + w0_arr(i,j,k))*(u(i,j,k,2) + w0_arr(i,j,k)));
+#endif                
+
+                eos_t eos_state;
+
+                eos_state.rho = state(i,j,k,Rho);
+                eos_state.T   = state(i,j,k,Temp);
+
+                for (auto n = 0; n < NumSpec; ++n) {
+                    eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
+                }
+
+                if (use_eos_e_instead_of_h) {
+                    // e = h - p/rho
+                    eos_state.e = (state(i,j,k,RhoH) - p0_arr(i,j,k)) / state(i,j,k,Rho);
+
+                    eos(eos_input_re, eos_state);
+                } else {
+                    eos_state.h = state(i,j,k,RhoH) / state(i,j,k,Rho);
+
+                    eos(eos_input_rh, eos_state);
+                }
+
+                mach_arr(i,j,k) = velocity / eos_state.cs;
+            });
         }
-
     }
 
     // average down and fill ghost cells
-    AverageDown(mach,0,1);
-    FillPatch(t_old,mach,mach,mach,0,0,1,0,bcs_f);
+    AverageDown(mach, 0, 1);
+    FillPatch(t_old, mach, mach, mach, 0, 0, 1, 0, bcs_f);
 }
 
 void
 Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
                      const RealVector& p0,
-                     const Vector<MultiFab>& p0cart,
+                     const Vector<MultiFab>& p0_cart,
                      Vector<MultiFab>& cs)
 {
     // timer for profiling
@@ -260,37 +286,47 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf = scal[lev];
-        MultiFab& cs_mf = cs[lev];
-
-        const MultiFab& p0cart_mf = p0cart[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
+            const Array4<const Real> state = scal[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<Real> cs_arr = cs[lev].array(mfi);
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            makeCsfromRhoH(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(cs_mf[mfi]));
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                eos_t eos_state;
+
+                eos_state.rho = state(i,j,k,Rho);
+                eos_state.T   = state(i,j,k,Temp);
+
+                for (auto n = 0; n < NumSpec; ++n) {
+                    eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
+                }
+
+                if (use_eos_e_instead_of_h) {
+                    // e = h - p/rho
+                    eos_state.e = (state(i,j,k,RhoH) - p0_arr(i,j,k)) / state(i,j,k,Rho);
+
+                    eos(eos_input_re, eos_state);
+                } else {
+                    eos_state.h = state(i,j,k,RhoH) / state(i,j,k,Rho);
+
+                    eos(eos_input_rh, eos_state);
+                }
+
+                cs_arr(i,j,k) = eos_state.cs;
+            });
         }
     }
 
     // average down and fill ghost cells
-    AverageDown(cs,0,1);
-    FillPatch(t_old,cs,cs,cs,0,0,1,0,bcs_f);
+    AverageDown(cs, 0, 1);
+    FillPatch(t_old, cs, cs, cs, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -386,7 +422,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -395,83 +431,325 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #if (AMREX_SPACEDIM == 3)
             const Box& zbx = amrex::growHi(tileBox,2, 1);
 #endif
+            const Array4<const Real> state = sold[lev].array(mfi);
+            const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
+            const Array4<const Real> rhoh0_arr = rhoh0_cart[lev].array(mfi);
+            const Array4<const Real> tempbar_arr = tempbar_cart[lev].array(mfi);
 
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            const Array4<Real> sedgex = sedge[lev][0].array(mfi);
+            const Array4<Real> sedgey = sedge[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> sedgez = sedge[lev][2].array(mfi);
+#endif
 
             if (spherical == 0) {
-#pragma gpu box(xbx)
-                makeHfromRhoT_edge(AMREX_INT_ANYD(xbx.loVect()),
-                                   AMREX_INT_ANYD(xbx.hiVect()),
-                   1,
-                                   BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                const Array4<const Real> rho0_edge_arr = rho0_edge_cart[lev].array(mfi);
+                const Array4<const Real> rhoh0_edge_arr = rhoh0_edge_cart[lev].array(mfi);
+                const Array4<const Real> tempbar_edge_arr = tempbar_edge_cart[lev].array(mfi);
+                // x-edge
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    eos_t eos_state;
 
-#pragma gpu box(ybx)
-                makeHfromRhoT_edge(AMREX_INT_ANYD(ybx.loVect()),
-                                   AMREX_INT_ANYD(ybx.hiVect()),
-                   2,
-                                   BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp);
+                    } else {
+                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp);
+                    }
+
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        
+                        // interface states are rho' and X
+                        eos_state.rho = sedgex(i,j,k,Rho) + rho0_arr(i,j,k);
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
+                        }
+
+                    } else if (species_pred_type == predict_rhoX) {
+
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgex(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+
+                        // interface states are rho and X
+                        eos_state.rho = sedgex(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgex(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+                        sedgex(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_arr(i,j,k);
+                    }
+                });
+
+                // y-edge
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    eos_t eos_state;
+
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+#if (AMREX_SPACEDIM == 2)
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp);
+#else
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp);
+#endif
+                    } else {
+                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp);
+                    }
+
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // interface states are rho' and X
+#if (AMREX_SPACEDIM == 2)
+                        eos_state.rho = sedgey(i,j,k,Rho) + rho0_edge_arr(i,j,k);
+#else
+                        eos_state.rho = sedgey(i,j,k,Rho) + rho0_arr(i,j,k);
+#endif
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
+                        }
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgey(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // interface states are rho and X
+                        eos_state.rho = sedgey(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgey(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+#if (AMREX_SPACEDIM == 2)
+                        sedgey(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge_arr(i,j,k);
+#else
+                        sedgey(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_arr(i,j,k);
+#endif
+                    }
+                });
 
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(zbx)
-                makeHfromRhoT_edge(AMREX_INT_ANYD(zbx.loVect()),
-                                   AMREX_INT_ANYD(zbx.hiVect()),
-                   3,
-                                   BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rho0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(rhoh0_edge_mf[mfi]),
-                                   BL_TO_FORTRAN_ANYD(tempbar_edge_mf[mfi]));
+                // z-edge
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    eos_t eos_state;
+
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp);
+                    } else {
+                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp);
+                    }
+
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // interface states are rho' and X
+                        eos_state.rho = sedgez(i,j,k,Rho) + rho0_edge_arr(i,j,k);
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
+                        }
+
+                    } else if (species_pred_type == predict_rhoX) {
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgez(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // interface states are rho and X
+                        eos_state.rho = sedgez(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgez(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+                        sedgez(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge_arr(i,j,k);
+                    }
+                });
 #endif
             } else {
 #if (AMREX_SPACEDIM == 3)
-#pragma gpu box(xbx)
-                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(xbx.loVect()),
-                                        AMREX_INT_ANYD(xbx.hiVect()),
-                    1,
-                                        BL_TO_FORTRAN_ANYD(sedgex_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                // x-edge
+                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    eos_t eos_state;
 
-#pragma gpu box(ybx)
-                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(ybx.loVect()),
-                                        AMREX_INT_ANYD(ybx.hiVect()),
-                    2,
-                                        BL_TO_FORTRAN_ANYD(sedgey_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                        Real tempbar_edge = 0.5 * (tempbar_arr(i-1,j,k) + tempbar_arr(i,j,k));
+                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_edge, small_temp);
+                    } else {
+                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp);
+                    }
 
-#pragma gpu box(zbx)
-                makeHfromRhoT_edge_sphr(AMREX_INT_ANYD(zbx.loVect()),
-                                        AMREX_INT_ANYD(zbx.hiVect()),
-                                        3,
-                                        BL_TO_FORTRAN_ANYD(sedgez_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rhoh0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(tempbar_mf[mfi]));
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // interface states are rho' and X
+                        Real rho0_edge = 0.5 * (rho0_arr(i-1,j,k) + rho0_arr(i,j,k));
+                        eos_state.rho = sedgex(i,j,k,Rho) + rho0_edge;
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
+                        }
+                    } else if (species_pred_type == predict_rhoX) {
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgex(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // interface states are rho and X
+                        eos_state.rho = sedgex(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgex(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                        Real rhoh0_edge = 0.5 * (rhoh0_arr(i-1,j,k) + rhoh0_arr(i,j,k));
+                        sedgex(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
+                    }
+                });
+
+                // y-edge
+                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    eos_t eos_state;
+
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                        Real tempbar_edge = 0.5 * (tempbar_arr(i,j-1,k) + tempbar_arr(i,j,k));
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge, small_temp);
+                    } else {
+                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp);
+                    }
+
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // interface states are rho' and X
+                        Real rho0_edge = 0.5 * (rho0_arr(i,j-1,k) + rho0_arr(i,j,k));
+                        eos_state.rho = sedgey(i,j,k,Rho) + rho0_edge;
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
+                        }
+                    } else if (species_pred_type == predict_rhoX) {
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgey(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // interface states are rho and X
+                        eos_state.rho = sedgey(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgey(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                        Real rhoh0_edge = 0.5 * (rhoh0_arr(i,j-1,k) + rhoh0_arr(i,j,k));
+                        sedgey(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
+                    }
+                });
+
+                // z-edge
+                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    eos_t eos_state;
+
+                    // get edge-centered temperature
+                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                        Real tempbar_edge = 0.5 * (tempbar_arr(i,j,k-1) + tempbar_arr(i,j,k));
+                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge, small_temp);
+                    } else {
+                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp);
+                    }
+
+                    // get edge-centered density and species
+                    if (species_pred_type == predict_rhoprime_and_X) {
+                        // interface states are rho' and X
+                        Real rho0_edge = 0.5 * (rho0_arr(i,j,k-1) + rho0_arr(i,j,k));
+                        eos_state.rho = sedgez(i,j,k,Rho) + rho0_edge;
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
+                        }
+                    } else if (species_pred_type == predict_rhoX) {
+                        // interface states are rho and (rho X)
+                        eos_state.rho = sedgez(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+                    } else if (species_pred_type == predict_rho_and_X) {
+                        // interface states are rho and X
+                        eos_state.rho = sedgez(i,j,k,Rho); 
+
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
+                        }
+                    }
+
+                    eos(eos_input_rt, eos_state);
+
+                    if (enthalpy_pred_type == predict_T_then_h ||
+                        enthalpy_pred_type == predict_Tprime_then_h) {
+                        sedgez(i,j,k,RhoH) = eos_state.h;
+                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                        Real rhoh0_edge = 0.5 * (rhoh0_arr(i,j,k-1) + rhoh0_arr(i,j,k));
+                        sedgez(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
+                    }
+                });
 #endif
                 
             }
         }
-
     }
 }

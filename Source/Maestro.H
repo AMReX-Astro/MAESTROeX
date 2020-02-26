@@ -1399,7 +1399,7 @@ public:
     /// @param p0       base state pressure
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
                     const RealVector& p0,
-                    int updateRhoH = 0);
+                    const bool updateRhoH=false);
 
     /// Calculate the pressure given the density and the enthalpy
     ///
