@@ -191,6 +191,7 @@ EXTERN_CORE += $(COND_PATH)
 # tell it where to put them
 NETWORK_HEADERS_DIR = $(MAESTROEX_AUTO_SOURCE_DIR)
 
+include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
 Blocs += $(foreach dir, $(EXTERN_CORE), $(dir))
@@ -227,6 +228,9 @@ INCLUDE_LOCATIONS += $(MAESTROEX_AUTO_SOURCE_DIR)
 
 # runtime parameter support for extern/ routines
 F90EXE_sources += extern.F90
+CEXE_sources += extern_parameters.cpp
+FEXE_headers += extern_parameters_F.H
+CEXE_headers += extern_parameters.H
 
 # these are for finding runtime parameters
 EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
@@ -247,6 +251,8 @@ ifdef USE_CUDA
     DEFINES += -DCUDA
   endif
 endif
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
