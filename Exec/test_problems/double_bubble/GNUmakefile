@@ -23,7 +23,7 @@ CONDUCTIVITY_DIR := constant
 NETWORK_DIR      := general_null
 INTEGRATOR_DIR   := VODE90
 
-GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/simple3.net
+NETWORK_INPUTS := simple3.net
 
 Bpack   := ./Make.package
 Blocs   := .

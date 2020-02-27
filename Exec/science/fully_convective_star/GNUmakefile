@@ -24,7 +24,7 @@ CONDUCTIVITY_DIR := constant
 NETWORK_DIR      := general_null
 INTEGRATOR_DIR   := VODE90
 
-GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/H_He.net
+NETWORK_INPUTS := H_He.net
 
 
 Bpack   := ./Make.package

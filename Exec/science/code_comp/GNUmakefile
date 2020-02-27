@@ -22,7 +22,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := gamma_law_general
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
-GENERAL_NET_INPUTS := simple.net
+NETWORK_INPUTS := simple.net
 INTEGRATOR_DIR   := VODE90
 
 

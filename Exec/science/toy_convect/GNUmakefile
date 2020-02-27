@@ -23,7 +23,7 @@ CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
 INTEGRATOR_DIR   := VODE90
 
-GENERAL_NET_INPUTS := $(MICROPHYSICS_HOME)/networks/$(NETWORK_DIR)/hotcno.net
+NETWORK_INPUTS := hotcno.net
 
 Bpack   := ./Make.package
 Blocs   := .
