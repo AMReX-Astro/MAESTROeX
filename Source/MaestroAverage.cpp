@@ -53,9 +53,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             }
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
             for ( MFIter mfi(phi[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi )
             {
                 // Get the index space of the valid region
