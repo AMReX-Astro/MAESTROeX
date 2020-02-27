@@ -98,7 +98,6 @@ contains
     double precision, allocatable :: p0_cart(:,:,:,:)
 
     type (eos_t) :: eos_state
-    integer :: pt_index(3)
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
