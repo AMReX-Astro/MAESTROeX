@@ -5,8 +5,6 @@
 #include <omp.h>
 #endif
 
-#include <state_indices.H>
-
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
@@ -18,6 +16,8 @@
 #include <network.H>
 #include <eos.H>
 
+#include <state_indices.H>
+#include <ModelParser.H>
 #include <PhysBCFunctMaestro.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
@@ -1778,6 +1778,9 @@ public:
 
     /// number of ghost cells needed for hyperbolic step
     int ng_adv;
+
+    // model file
+    static ModelParser input_model;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new

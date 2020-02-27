@@ -33,12 +33,8 @@ matrix:
       before_install:
         - cd ~/; git clone https://github.com/amrex-codes/amrex
         - cd ~/amrex; git checkout development
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'echo "#endif" >> "{}"' \;
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
         - cd ~/; git clone https://github.com/starkiller-astro/Microphysics.git
         - cd ~/Microphysics; git checkout development
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'echo "#endif" >> "{}"' \;
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
         - cd $TRAVIS_BUILD_DIR
       addons:
         apt:
@@ -59,10 +55,3 @@ matrix:
       if: type = pull_request OR type = api OR type = cron
       script:
         - ./Util/scripts/pr_tab_remover.sh
-# deploy:
-#   provider: pages
-#   skip-cleanup: true
-#   github-token: $GITHUB_TOKEN
-#   keep-history: true
-#   on:
-#     branch: master
