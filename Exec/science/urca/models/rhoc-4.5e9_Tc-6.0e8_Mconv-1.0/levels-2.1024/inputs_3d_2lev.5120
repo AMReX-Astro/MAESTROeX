@@ -31,6 +31,9 @@ maestro.init_iter = 1
 
 maestro.stop_time = 36000.
 
+# how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
+maestro.sum_interval = 1
+
 # PLOTFILES
 maestro.plot_file  = plt     # root name of plot file
 maestro.plot_int   = 1000000 # number of timesteps between plot files
@@ -44,10 +47,6 @@ maestro.check_base_name = chk
 maestro.chk_int         = 50
 
 maestro.cfl       = 0.8    # cfl number for hyperbolic system
-                           # In this test problem, the velocity is
-		           # time-dependent.  We could use 0.9 in
-		           # the 3D test, but need to use 0.7 in 2D
-		           # to satisfy CFL condition.
 
 maestro.init_shrink = 0.1e0
 maestro.max_dt_growth = 1.1e0
@@ -78,9 +77,6 @@ maestro.evolve_base_state = true
 maestro.dpdt_factor = 0.0e0
 
 maestro.use_tfromp = true
-
-# use average down instead of refluxing at C-F interfaces
-# per Andy's recommendation to avoid issues
 
 # trace forces to the interfaces per Mike's recommendation
 maestro.ppm_trace_forces = 1
