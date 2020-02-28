@@ -23,7 +23,7 @@ EOS_DIR          := gamma_law_general
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
 NETWORK_INPUTS := simple.net
-INTEGRATOR_DIR   := VODE90
+INTEGRATOR_DIR   := VODE
 
 
 Bpack   := ./Make.package

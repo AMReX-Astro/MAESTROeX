@@ -20,7 +20,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := gamma_law_general
 CONDUCTIVITY_DIR := constant
 NETWORK_DIR      := general_null
-INTEGRATOR_DIR   := VODE90
+INTEGRATOR_DIR   := VODE
 
 NETWORK_INPUTS := simple.net
 

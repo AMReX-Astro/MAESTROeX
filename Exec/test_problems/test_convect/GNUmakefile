@@ -22,7 +22,7 @@ EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
 NETWORK_INPUTS := ignition.net
-INTEGRATOR_DIR   := VODE90
+INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package
 Blocs   := .
