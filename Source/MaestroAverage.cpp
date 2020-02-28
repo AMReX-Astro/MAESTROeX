@@ -46,9 +46,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
 
-	    // get references to the MultiFabs at level lev
-	    const MultiFab& phi_mf = phi[lev];
-	
+            // get references to the MultiFabs at level lev
+            const MultiFab& phi_mf = phi[lev];
+        
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
             for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
             {
@@ -60,20 +60,20 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                     int r = AMREX_SPACEDIM == 2 ? j : k;
 #if (AMREX_SPACEDIM == 2)
-		    if (k == 0)
+                    if (k == 0)
 #endif
                         amrex::Gpu::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
                 });
             }
         }
-	
+        
         // reduction over boxes to get sum
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
 
-	get_numdisjointchunks(numdisjointchunks.dataPtr());
-	get_r_start_coord(r_start_coord.dataPtr());
-	get_r_end_coord(r_end_coord.dataPtr());
-	get_finest_radial_level(&finest_radial_level);
+        get_numdisjointchunks(numdisjointchunks.dataPtr());
+        get_r_start_coord(r_start_coord.dataPtr());
+        get_r_end_coord(r_end_coord.dataPtr());
+        get_finest_radial_level(&finest_radial_level);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
