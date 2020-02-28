@@ -1,11 +1,9 @@
 #include <ModelParser.H>
-#include <AMReX.H>
 
 using namespace amrex;
 
 string 
 trim(const string& str) {
-
     const char* whitespace = " \t\v\r\n";
     const auto str_begin = str.find_first_not_of(whitespace);
     const auto str_end = str.find_last_not_of(whitespace);
