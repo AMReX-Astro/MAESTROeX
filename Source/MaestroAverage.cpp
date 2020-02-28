@@ -68,7 +68,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        divide_phisum_by_ncell(phisum.dataPtr(),ncell.dataPtr());
+        for (int lev=0; lev<=max_radial_level; ++lev) {
+            divide_phisum_by_ncell(phisum.dataPtr(),ncell.dataPtr(),lev);
+        }
 
         // swap pointers so phibar contains the computed average
         std::swap(phisum,phibar);
@@ -114,7 +116,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        divide_phisum_by_ncell_irreg(phisum.dataPtr(),ncell.dataPtr());
+        for (int lev=0; lev<=max_radial_level; ++lev) {
+            divide_phisum_by_ncell_irreg(phisum.dataPtr(),ncell.dataPtr(),lev);
+        }
 
         // swap pointers so phibar contains the computed average
         std::swap(phisum,phibar);

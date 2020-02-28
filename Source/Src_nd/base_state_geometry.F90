@@ -677,7 +677,7 @@ contains
   subroutine get_base_cutoff_density_coord(lev,base_cutoff_density_coord_in) bind(C,name="get_base_cutoff_density_coord")
     ! Binds to C function ``get_base_cutoff_density_coord``
 
-    integer,          intent(in   ) :: lev
+    integer, value,   intent(in   ) :: lev
     integer,          intent(inout) :: base_cutoff_density_coord_in
 
     base_cutoff_density_coord_in = base_cutoff_density_coord(lev)
@@ -736,15 +736,12 @@ contains
     end do
   end subroutine get_r_end_coord
 
-
   subroutine get_finest_radial_level(lev_in) bind(C, name="get_finest_radial_level")
 
     integer, intent(inout) :: lev_in
-
+    
     lev_in = finest_radial_level
 
   end subroutine get_finest_radial_level
-
-
 
 end module base_state_geometry_module

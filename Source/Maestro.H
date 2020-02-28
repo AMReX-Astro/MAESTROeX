@@ -26,6 +26,9 @@ typedef amrex::Vector< amrex::Real > RealVector;
 typedef amrex::Vector< int > IntVector;
 #endif
 
+/// hard code a maximum level limit
+#define MAESTRO_MAX_LEVELS 15
+
 class Maestro
     : public amrex::AmrCore
 {
@@ -277,6 +280,19 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
+    void InitBaseStateGeometry(const int max_radial_level_in, 
+                               const int nr_fine_in,
+                               const amrex::Real dr_fine_in,
+                               const int nr_irreg_in);
+#if (AMREX_SPACEDIM == 3)
+    void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
+                              const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
+                              const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
+#endif
+    void ComputeCutoffCoords(RealVector& rho0);
+
+    void InitMultilevel(const int finest_radial_level_in);
+                               
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
@@ -423,6 +439,16 @@ public:
     void FirstDt ();
 
     // end MaestroDt.cpp functions
+    ////////////////////////
+
+    ////////////
+    // MaestroEnforceHSE.cpp
+
+    void EnforceHSE(const RealVector& rho0, 
+                    RealVector& p0,
+                    const RealVector& grav_cell);
+
+    // end  MaestroEnforceHSE.cpp functions
     ////////////////////////
 
     ////////////////////////
@@ -727,6 +753,19 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakeBeta0.cpp functions
+
+    void MakeBeta0(RealVector& beta, 
+                   const RealVector& rho0,
+                   const RealVector& p0,
+                   const RealVector& gamma1bar,
+                   const RealVector& grav_cell,
+                   const bool is_irreg=false);
+
+    // end MaestroMakeBeta0.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeEdgeScal.cpp functions
 
     /// Calculate scalars on cell edges given cell-centered state
@@ -911,11 +950,25 @@ public:
                      const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
-                         const amrex::Vector<amrex::MultiFab>& scal_new,
+                                     const amrex::Vector<amrex::MultiFab>& scal_new,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                          RealVector& etarho_edge,
                          RealVector& etarho_cell);
+
+    // end MaestroMakeEta.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakeGrav.cpp functions
+
+    void MakeGravCell(RealVector& grav_cell, 
+                      const RealVector& rho0);
+
+    void MakeGravEdge(RealVector& grav_edge, 
+                      const RealVector& rho0);
+
+    // end MaestroMakeGrav.cpp functions
     ////////////
 
     ////////////
@@ -981,6 +1034,90 @@ public:
 
     // end MaestroMakeUtrans.cpp functions
     ////////////
+
+    ////////////
+    // MaestroMakew0.cpp functions
+
+    void Makew0(RealVector& w0_in, 
+                const RealVector& w0_old, 
+                RealVector& w0_force, 
+                const RealVector& Sbar_in, 
+                const RealVector& rho0_old_in,
+                const RealVector& rho0_new_in,
+                const RealVector& p0_old_in,
+                const RealVector& p0_new_in,
+                const RealVector& gamma1bar_old_in,
+                const RealVector& gamma1bar_new_in,
+                const RealVector& p0_minus_peosbar, 
+                RealVector& delta_chi_w0, 
+                const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
+
+    void Makew0PlanarVarg(RealVector& w0_in, 
+                        const RealVector& w0_old, 
+                        RealVector& w0_force, 
+                        const RealVector& Sbar_in, 
+                        const RealVector& rho0_old_in,
+                        const RealVector& rho0_new_in,
+                        const RealVector& p0_old_in,
+                        const RealVector& p0_new_in,
+                        const RealVector& gamma1bar_old_in,
+                        const RealVector& gamma1bar_new_in,
+                        const RealVector& p0_minus_peosbar,
+                        RealVector& delta_chi_w0, 
+                        const amrex::Real dt_in, const amrex::Real dtold_in);
+
+    void Makew0Planar(RealVector& w0_in, 
+                    const RealVector& w0_old, 
+                    RealVector& w0_force, 
+                    const RealVector& Sbar_in, 
+                    const RealVector& rho0_old_in,
+                    const RealVector& rho0_new_in,
+                    const RealVector& p0_old_in,
+                    const RealVector& p0_new_in,
+                    const RealVector& gamma1bar_old_in,
+                    const RealVector& gamma1bar_new_in,
+                    const RealVector& p0_minus_peosbar,
+                    RealVector& delta_chi_w0, 
+                    const amrex::Real dt_in, const amrex::Real dtold_in,  
+                    const bool is_predictor);
+
+    void Makew0SphrIrreg(RealVector& w0_in, 
+                    const RealVector& w0_old, 
+                    RealVector& w0_force, 
+                    const RealVector& Sbar_in, 
+                    const RealVector& rho0_old_in,
+                    const RealVector& rho0_new_in,
+                    const RealVector& p0_old_in,
+                    const RealVector& p0_new_in,
+                    const RealVector& gamma1bar_old_in,
+                    const RealVector& gamma1bar_new_in,
+                    const RealVector& p0_minus_peosbar,
+                    RealVector& delta_chi_w0, 
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
+
+    void Makew0Sphr(RealVector& w0_in, 
+                    const RealVector& w0_old, 
+                    RealVector& w0_force, 
+                    const RealVector& Sbar_in, 
+                    const RealVector& rho0_old_in,
+                    const RealVector& rho0_new_in,
+                    const RealVector& p0_old_in,
+                    const RealVector& p0_new_in,
+                    const RealVector& gamma1bar_old_in,
+                    const RealVector& gamma1bar_new_in,
+                    const RealVector& p0_minus_peosbar,
+                    RealVector& delta_chi_w0, 
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
+
+    void Tridiag(const RealVector& a, const RealVector& b, 
+                 const RealVector& c, const RealVector& r, 
+                 RealVector& u, const int n);
+
+    void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
+
+    // end MaestroMakew0.cpp functions
+    ////////////
+
 
     ////////////
     // MaestroNodalProj.cpp functions
@@ -1624,6 +1761,8 @@ public:
     static amrex::IntVect nodal_flag_y;
     static amrex::IntVect nodal_flag_z;
 
+    static constexpr amrex::Real Gconst = 6.67428e-8;
+
     /// which step?
     int istep;
     int start_step;
@@ -1722,6 +1861,13 @@ public:
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
+    IntVector nr;
+    RealVector dr;
+    IntVector base_cutoff_density_coord;
+    IntVector anelastic_cutoff_density_coord;
+    IntVector burning_cutoff_density_lo_coord;
+    IntVector burning_cutoff_density_hi_coord;
+
 
     // relative error needed for base state computations
     amrex::Real c_rel_eps;
@@ -1738,6 +1884,9 @@ public:
     amrex::Vector<amrex::Real> diagfile1_data;
     amrex::Vector<amrex::Real> diagfile2_data;
     amrex::Vector<amrex::Real> diagfile3_data;
+
+    // problem information
+    RealVector center;
 
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`

@@ -12,41 +12,19 @@ extern "C"
     void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
 
     //////////////////////
-    // in advect_base.F90
-    void advect_base_dens(const amrex::Real* w0,
-                          const amrex::Real* rho0_old,
-                          amrex::Real* rho0_new,
-                          amrex::Real* rho0_predicted_edge,
-                          const amrex::Real dt,
-                          const amrex::Real* r_cc_loc,
-                          const amrex::Real* r_edge_loc,
-                          amrex::Real* force);
-
-    void advect_base_enthalpy(const amrex::Real* w0,
-                              const amrex::Real* rho0_old,
-                              const amrex::Real* rhoh0_old,
-                                    amrex::Real* rhoh0_new,
-                              const amrex::Real* rho0_predicted_edge,
-                              const amrex::Real* psi,
-                              const amrex::Real dt,
-                              const amrex::Real* r_cc_loc,
-                              const amrex::Real* r_edge_loc);
-    //////////////////////
-
-    //////////////////////
     // in average.f90
     void average(const int* lev, const int* lo, const int* hi,
                  const amrex::Real* phi, const int* p_lo, const int* p_hi,
                  amrex::Real* phisum);
 
-    void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell);
+    void divide_phisum_by_ncell(amrex::Real* phisum, int* ncell, const int lev);
 
     void average_sphr_irreg(const int* lev, const int* lo, const int* hi,
                             const amrex::Real* phi, const int* p_lo, const int* p_hi,
                             amrex::Real* phisum, int* ncell,
                             const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
-    void divide_phisum_by_ncell_irreg(amrex::Real* phisum, int* ncell);
+    void divide_phisum_by_ncell_irreg(amrex::Real* phisum, int* ncell, const int lev);
 
     void average_sphr(amrex::Real* phisum, amrex::Real* phibar,
                       int* ncell, amrex::Real* radii, const int* finest_level);
@@ -87,11 +65,12 @@ extern "C"
     void destroy_base_state_geometry();
     
     void get_base_cutoff_density (const amrex::Real* base_cutoff_density_in);
-    void get_base_cutoff_density_coord (const int* lev, int* base_cutoff_density_coord_in);
+    void get_base_cutoff_density_coord (const int lev, int* base_cutoff_density_coord_in);
     void get_buoyancy_cutoff_factor (const amrex::Real* buoyancy_cutoff_factor_in);
     void get_numdisjointchunks(int* nchunks);
     void get_r_start_coord(int* coord);
     void get_r_end_coord(int* coord);
+    void get_finest_radial_level(int* lev);
 
     //////////////////////
 
@@ -235,8 +214,8 @@ extern "C"
 
     //////////////////////
     // in debug.F90
-    void print_base_cc(const amrex::Real* base);
-    void print_base_edge(const amrex::Real* base);
+    void print_base_cc(const amrex::Real* base, const int lev);
+    void print_base_edge(const amrex::Real* base, const int lev);
 
     void print_mf(const int* lev, const int* lo, const int* hi,
                   const amrex::Real* mf,
@@ -436,7 +415,8 @@ extern "C"
                           const amrex::Real* rhoh0,
                           const amrex::Real* p0,
                           const amrex::Real* tempbar,
-                          const amrex::Real* tempbar_init);
+                          const amrex::Real* tempbar_init,
+                          const int lev);
 
     void init_base_state_irreg (const amrex::Real* s0_init,
                                 const amrex::Real* p0_init,
@@ -446,7 +426,8 @@ extern "C"
                                 const amrex::Real* tempbar,
                                 const amrex::Real* tempbar_init,
                                 const amrex::Real* r_cc_loc,
-                                const amrex::Real* r_edge_loc);
+                                const amrex::Real* r_edge_loc,
+                                const int lev);
     //////////////////////
 
     //////////////////////
@@ -737,6 +718,30 @@ extern "C"
                  const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
                  const amrex::Real* r_edge_loc, const amrex::Real* dt,
                  const amrex::Real* dtold, const int* is_predictor);
+
+    void make_w0_sphr2(amrex::Real* w0, const amrex::Real* w0_old,
+                 const amrex::Real* Sbar_in,
+                 const amrex::Real* rho0_nph,
+                 const amrex::Real* p0_nph,
+                 const amrex::Real* gamma1bar_nph,
+                 const amrex::Real* grav_edge,
+                 const amrex::Real* w0_from_Sbar,
+                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
+                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
+                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
+                 const amrex::Real* dtold);
+
+    void make_w0_sphr1(amrex::Real* w0, const amrex::Real* w0_old,
+                 const amrex::Real* Sbar_in,
+                 const amrex::Real* rho0_nph,
+                 const amrex::Real* p0_nph,
+                 const amrex::Real* gamma1bar_nph,
+                 const amrex::Real* grav_edge,
+                 const amrex::Real* w0_from_Sbar,
+                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
+                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
+                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
+                 const amrex::Real* dtold);
     //////////////////////
 
     //////////////////////
