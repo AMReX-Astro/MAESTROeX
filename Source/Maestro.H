@@ -18,6 +18,7 @@
 
 #include <state_indices.H>
 #include <ModelParser.H>
+#include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
@@ -279,6 +280,18 @@ public:
                   int comp);
 
     // end MaestroAverage.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroBaseState.cpp functions
+
+    void InitBaseState(RealVector& s0_init, RealVector& p0_init, 
+                       RealVector& rho0, RealVector& rhoh0, 
+                       RealVector& p0, RealVector& tempbar, 
+                       RealVector& tempbar_init,
+                       const int lev);
+
+    // end MaestroBaseState.cpp functions
     ////////////
 
     ////////////
@@ -705,6 +718,15 @@ public:
     void InitIter ();
 
     // end MaestroInit.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroInletBC.cpp functions
+
+    /// Calculate the horizontal average of \f$\Gamma_1\f$
+    void SetInletBCs();
+
+    // end InletBC.cpp functions
     ////////////
 
     ////////////
@@ -1780,7 +1802,10 @@ public:
     int ng_adv;
 
     // model file
-    static ModelParser input_model;
+    ModelParser input_model;
+
+    // log file 
+    SimpleLog log_file;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new

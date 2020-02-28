@@ -1,41 +1,34 @@
 #include <ModelParser.H>
+#include <math.h>
 
 using namespace amrex;
 
-string 
-trim(const string& str) {
-    const char* whitespace = " \t\v\r\n";
-    const auto str_begin = str.find_first_not_of(whitespace);
-    const auto str_end = str.find_last_not_of(whitespace);
-    return str_begin == str_end ? "" : str.substr(str_begin, str_end - str_begin - 1);
-}
-
 void 
-ModelParser::ReadFile(const string& model_file_name)
+ModelParser::ReadFile(const std::string& model_file_name)
 {
     // open the model file 
-    ifstream model_file(model_file_name);
+    std::ifstream model_file(model_file_name);
     if (!model_file.is_open()) {
-        Abort("Could not open model file!")
+        Abort("Could not open model file!");
     }
 
     // the first line has the number of points in the model
-    string line;
-    getline(model_file, line);
+    std::string line;
+    std::getline(model_file, line);
     int ipos = line.find('=') + 1;
     npts_model = stoi(line.substr(ipos));
 
     // now read in the number of variables
-    getline(model_file, line);
+    std::getline(model_file, line);
     ipos = line.find('=') + 1;
-    static const int nvars_model_file = stoi(line.substr(ipos));
+    static const int nvars_model_file = std::stoi(line.substr(ipos));
 
     RealVector vars_stored(nvars_model_file);
-    Vector<string> varnames_stored(nvars_model_file);
+    std::vector<std::string> varnames_stored(nvars_model_file);
 
     // now read in the names of the variables
     for (auto i = 0; i < nvars_model_file; ++i) {
-        getline(model_file, line);
+        std::getline(model_file, line);
         ipos = line.find('#') + 1;
         varnames_stored[i] = trim(line.substr(ipos));
     }
@@ -53,8 +46,8 @@ ModelParser::ReadFile(const string& model_file_name)
 
     // start reading in the data 
     for (auto i = 0; i < npts_model; ++i) {
-        getline(model_file, line);
-        istringstream iss(line);
+        std::getline(model_file, line);
+        std::istringstream iss(line);
         iss >> model_r[i];
         for (auto j = 0; j < nvars_model_file; ++j) {
             iss >> vars_stored[j];
@@ -69,7 +62,7 @@ ModelParser::ReadFile(const string& model_file_name)
         bool found_dens = false;
         bool found_temp = false;
         bool found_pres = false;
-        Vector<bool> found_spec(NumSpec);
+        std::vector<bool> found_spec(NumSpec);
         for (auto comp = 0; comp < NumSpec; ++comp) {
             found_spec[comp] = false;
         }
@@ -125,7 +118,7 @@ ModelParser::ReadFile(const string& model_file_name)
                     Print() << "WARNING: " << trim(spec_names_cxx[comp]) << " not provided in inputs file" << std::endl;
                 }
             }
-        }
+        }        
     }
 
     model_initialized = true;
@@ -168,7 +161,7 @@ ModelParser::Interpolate(const Real r, const int ivar,
         interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
         // safety check to make sure interpolate lies within the bounding points
-        if (!interp_top) {
+        if (!interpolate_top) {
             Real minvar = min(model_state[i][ivar], model_state[i-1][ivar]);
             Real maxvar = max(model_state[i][ivar], model_state[i-1][ivar]);
             interpolate = max(interpolate, minvar);

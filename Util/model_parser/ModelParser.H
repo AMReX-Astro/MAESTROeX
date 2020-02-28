@@ -1,13 +1,11 @@
 #ifndef _MODEL_PARSER_H_
 #define _MODEL_PARSER_H_
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
+#include <AMReX_Vector.H>
+#include <AMReX_Print.H>
+#include <MaestroUtil.H>
 #include <state_indices.H>
 #include <network_properties.H>
-#include <AMReX.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -23,28 +21,27 @@ class ModelParser
 {
 public:
 
-    ModelParser() {model_initialized = false};
+    ModelParser() {model_initialized = false;};
 
-    void ReadFile(const string& model_file);
+    void ReadFile(const std::string& model_file);
 
     amrex::Real Interpolate(const amrex::Real r, const int ivar, 
                             bool interpolate_top=false);
 
-    // arrays for storing the model data
-    Vector<RealVector> model_state;
+    // // arrays for storing the model data
+    amrex::Vector<RealVector> model_state;
     RealVector model_r;
 
-    static int npts_model;
+    int npts_model;
 
-    static bool model_initialized;
+    bool model_initialized;
 
-private:
     // integer keys for indexing the model_state array
-    constexpr int idens_model = 0;
-    constexpr int itemp_model = 1;
-    constexpr int ipres_model = 2;
-    constexpr int ispec_model = 3;
-    constexpr int nvars_model = 3 + NumSpec;
-}
+    static constexpr int idens_model = 0;
+    static constexpr int itemp_model = 1;
+    static constexpr int ipres_model = 2;
+    static constexpr int ispec_model = 3;
+    static constexpr int nvars_model = 3 + NumSpec;
+};
 
 #endif
