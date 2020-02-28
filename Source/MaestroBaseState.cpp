@@ -13,6 +13,10 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
+    if (use_exact_base_state && !spherical) {
+        Abort("Irregular base state not valid for planar");
+    }
+
     if (!input_model.model_initialized) {
         // read model file 
         input_model.ReadFile(model_file);
@@ -27,6 +31,17 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     Real model_dr = (input_model.model_r[npts_model-1] - input_model.model_r[0]) / Real(npts_model - 1);
     Real rmax = input_model.model_r[npts_model-1];
 
+    // irregular base state dr 
+    RealVector model_dr_irreg;
+    if (use_exact_base_state) {
+        model_dr_irreg.resize(npts_model);
+
+        model_dr[0] = model_r[0];
+        for (auto i = 1; i < npts_model; ++i) {
+            model_dr[i] = model_r[i] - model_r[i-1];
+        }
+    }
+
     if (ParallelDescriptor::IOProcessor()) {
         if (!spherical) {
             log_file.Log("model file mapping, level: ", n);
@@ -39,8 +54,13 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         log_file.Log(" ");
         log_file.Log("maximum radius (cell-centered) of input model =       ", rmax);
 
-        Real mod_dr = dr[n] > model_dr ? 
-            remainder(model_dr, dr[n]) : remainder(dr[n], model_dr);
+        Real mod_dr = 0.0;
+        if (use_exact_base_state) {
+            mod_dr = r_cc_loc[lev] < model_dr[0] ? remainder(model_dr[0], r_cc_loc[lev]) : remainder(r_cc_loc[lev], model_dr[0]);
+        } else {
+            mod_dr = dr[n] > model_dr ? 
+                remainder(model_dr, dr[n]) : remainder(dr[n], model_dr);
+        }
 
         if (mod_dr > TINY) {
             log_file.Log(" ");
@@ -73,7 +93,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         // here we account for r > rmax of the model.hse array, assuming
         // that the state stays constant beyond rmax
         rloc = min(rloc, rmax);
-
 
         // also, if we've falled below the cutoff density, just keep the
         // model constant
@@ -164,8 +183,16 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
     Real mencl = 0.0;
 
-    if (spherical || do_2d_planar_octant) {
-        mencl = 4.0/3.0 * M_PI * dr[n]*dr[n]*dr[n] * s0_init[n+max_lev*nr_fine*Rho];
+    if (use_exact_base_state) {
+        Real dr_irreg = r_edge_loc[n+max_lev] - r_edge_loc[n]; // edge-to-edge
+
+        if (spherical || do_2d_planar_octant) {
+            mencl = 4.0/3.0 * M_PI * dr_irreg*dr_irreg*dr_irreg * s0_init[n+max_lev*nr_fine*Rho];
+        }
+    } else {
+        if (spherical || do_2d_planar_octant) {
+            mencl = 4.0/3.0 * M_PI * dr[n]*dr[n]*dr[n] * s0_init[n+max_lev*nr_fine*Rho];
+        }
     }
 
     Real max_hse_error = -1.e30;
@@ -178,8 +205,10 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
         if (rloc > base_cutoff_density_loc) {
 
-            Real r_r = starting_rad + Real(r+1) * dr[n];
-            Real r_l = starting_rad + Real(r) * dr[n];
+            Real r_r = starting_rad;
+            r_r += use_exact_base_state ? r_edge_loc[n+max_lev*(r+1)] : Real(r+1) * dr[n];
+            Real r_l = starting_rad
+            r_l += use_exact_base_state ? r_edge_loc[n+max_lev*r] : Real(r) * dr[n];
 
             Real g = 0.0;
 
@@ -195,10 +224,21 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
                     g = -Gconst*planar_invsq_mass / (r_l*r_l);
                 }
             }
+            
+            Real dpdr = 0.0;
+            Real rhog = 0.0;
+            if (use_exact_base_state) {
+                Real dr_irreg = r_cc_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)];
+                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr_irreg;
 
-            Real dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr[n];
-            Real rhog = 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] +  
-                          s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
+                Real rfrac = (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) / dr_irreg; 
+                rhog = ((1.0-rfrac) * s0_init[n+max_lev*(r+nr_fine*Rho)] +  
+                        rfrac * s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
+            } else {
+                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr[n];
+                rhog = 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] +  
+                              s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
+            }
 
             if (print_init_hse_diag) {
                 Print() << "r, dpdr, rhog, err: " << rloc << ", " 

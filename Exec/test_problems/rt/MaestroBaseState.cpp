@@ -149,7 +149,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
     Real max_hse_error = -1.e30;
 
-    // do r=1,nr(n)-1
     for (auto r = 1; r < nr[n]; ++r) {
 
         Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr[n];
@@ -159,8 +158,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
                          s0_init[n+max_lev*(r-1+nr_fine*Rho)])*grav_const;
 
         max_hse_error = max(max_hse_error, fabs(dpdr - rhog)/fabs(dpdr));
-
-        // max_hse_error = max(max_hse_error, abs(dpdr - rhog)/abs(rhog))
     }
 
     Print() << " " << std::endl;
