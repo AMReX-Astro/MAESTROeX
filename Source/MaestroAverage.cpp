@@ -16,14 +16,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     BL_PROFILE_VAR("Maestro::Average()",Average);
 
     const int max_lev = max_radial_level+1;
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
-
-    for (int i = 0; i < phibar.size(); ++i) {
-        phibar[i] = 0.0;
-    }
+    
+    std::fill(phibar.begin(), phibar.end(), 0.0);
 
     if (spherical == 0) {
 
@@ -31,12 +25,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((max_radial_level+1)*nr_fine,0.0);
+        RealVector phisum((max_radial_level+1)*nr_fine, 0.0);
         phisum.shrink_to_fit();
         Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
 
         // this stores how many cells there are laterally at each level
-        Vector<int> ncell(max_radial_level+1);
+        IntVector ncell(max_radial_level+1);
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -52,23 +46,34 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
 
+	    // get references to the MultiFabs at level lev
+	    const MultiFab& phi_mf = phi[lev];
+	
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-            for ( MFIter mfi(phi[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi )
+            for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi )
             {
                 // Get the index space of the valid region
-                const Box& tilebox = mfi.tilebox();
+                const Box& tilebox = mfi.validbox();
 
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
                 AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                     int r = AMREX_SPACEDIM == 2 ? j : k;
-                    amrex::Gpu::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
+#if (AMREX_SPACEDIM == 2)
+		    if (k == 0)
+#endif
+                        amrex::Gpu::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
                 });
             }
         }
-
+	
         // reduction over boxes to get sum
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
+
+	get_numdisjointchunks(numdisjointchunks.dataPtr());
+	get_r_start_coord(r_start_coord.dataPtr());
+	get_r_end_coord(r_end_coord.dataPtr());
+	get_finest_radial_level(&finest_radial_level);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
