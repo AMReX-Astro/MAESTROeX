@@ -224,6 +224,8 @@ Maestro::InitData ()
 
     Print() << "Calling InitData()" << std::endl;
 
+    Print() << "initdata model_File = " << model_file << std::endl;
+
     // read in model file and fill in s0_init and p0_init for all levels
     if (use_exact_base_state) {
         for (auto lev = 0; lev <= max_radial_level; ++lev) {
@@ -235,9 +237,11 @@ Maestro::InitData ()
         std::fill(psi.begin(), psi.end(), 0.);
     } else {
         for (auto lev = 0; lev <= max_radial_level; ++lev) {
-            init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-                            rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
-                            tempbar_init.dataPtr(), lev);
+            InitBaseState(s0_init, p0_init, rho0_old, rhoh0_old, 
+                          p0_old, tempbar, tempbar_init, lev);
+            // init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
+            //                 rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
+            //                 tempbar_init.dataPtr(), lev);
         }
     }
 

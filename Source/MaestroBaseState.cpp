@@ -19,7 +19,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     }
 
     const int npts_model = input_model.npts_model;
-    const int TINY = 1.e-10;
+    const Real TINY = 1.e-10;
     const int max_lev = max_radial_level + 1;
     const int n = lev;
 
@@ -143,7 +143,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
                 rhoh_above_cutoff = s0_init[n+max_lev*(r+nr_fine*RhoH)];
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     spec_above_cutoff[comp] = 
-                        s0_init[n+max_lev*(r+nr_fine*FirstSpec+comp)];
+                        s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))];
                 }
                 temp_above_cutoff = s0_init[n+max_lev*(r+nr_fine*Temp)];
                 p_above_cutoff = p0_init[n+max_lev*r];
@@ -152,12 +152,12 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < max_lev*nr_fine; ++i) {
-        rho0[i] = s0_init[i+max_lev*nr_fine*Rho];
-        rhoh0[i] = s0_init[i+max_lev*nr_fine*RhoH];
-        tempbar[i] = s0_init[i+max_lev*nr_fine*Temp];
-        tempbar_init[i] = s0_init[i+max_lev*nr_fine*Temp];
-        p0[i] = p0_init[i];
+    for (auto i = 0; i < nr_fine; ++i) {
+        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
+        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
+        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
     }
 
     // check whether we are in HSE

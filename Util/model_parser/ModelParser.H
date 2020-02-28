@@ -23,7 +23,7 @@ public:
 
     ModelParser() {model_initialized = false;};
 
-    void ReadFile(const std::string& model_file);
+    void ReadFile(const std::string model_file);
 
     amrex::Real Interpolate(const amrex::Real r, const int ivar, 
                             bool interpolate_top=false);

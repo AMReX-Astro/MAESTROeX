@@ -4,10 +4,12 @@
 using namespace amrex;
 
 void 
-ModelParser::ReadFile(const std::string& model_file_name)
+ModelParser::ReadFile(const std::string model_file_name)
 {
     // open the model file 
     std::ifstream model_file(model_file_name);
+    Print() << "model file = " << model_file_name << std::endl;
+
     if (!model_file.is_open()) {
         Abort("Could not open model file!");
     }
