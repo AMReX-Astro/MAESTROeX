@@ -73,7 +73,14 @@ extern "C"
     void get_finest_radial_level(int* lev);
 
     //////////////////////
+    
+    //////////////////////
+    // in inlet_bc.F90
 
+    void get_inlet_bcs (amrex::Real* params);
+
+    //////////////////////
+    
     //////////////////////
     // in bc_fill_nd.F90
 
