@@ -1,3 +1,11 @@
 {% extends "!layout.html" %}
   {% block footer %} {{ super() }}
 {% endblock %}
+
+
+{% block sidebartitle %}
+{{ super() }}
+    <div class="branch">
+        Branch: <a href="{{ pagename+file_suffix | replace('dev/', '') }}">master</a> | <a href="dev/{{ pagename+file_suffix | replace('dev/', '') }}">development</a>
+    </div>
+{% endblock %}
