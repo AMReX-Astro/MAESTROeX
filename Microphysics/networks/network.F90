@@ -3,11 +3,6 @@
 !
 ! nspec      -- the number of species
 !
-! aion       -- atomic number
-! zion       -- proton number
-!
-! aion_inv   -- 1/aion
-!
 ! spec_names -- the name of the isotope
 ! short_spec_names -- the abbreviated name of the isotope
 !
