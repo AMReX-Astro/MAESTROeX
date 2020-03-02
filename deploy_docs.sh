@@ -47,7 +47,7 @@ cd ..
 # Clean out existing contents. If it's the master branch, then 
 # move dev docs to a temporary directory then move back again after 
 # everything is deleted
-if ["$TRAVIS_BRANCH" == "$MASTER_BRANCH"]; then
+if [ "$TRAVIS_BRANCH" -eq "$MASTER_BRANCH" ]; then
     mkdir tmp
     mv -r out/docs/dev tmp || true
     rm -rf out/docs/**/* || exit 0
@@ -66,7 +66,7 @@ make html
 cd ../
 
 mkdir -p out/docs/
-if ["$TRAVIS_BRANCH" == "$MASTER_BRANCH"]; then
+if [ "$TRAVIS_BRANCH" -eq "$MASTER_BRANCH" ]; then
     mv sphinx_docs/build/html/* out/docs
 else 
     mkdir -p out/docs/dev/
