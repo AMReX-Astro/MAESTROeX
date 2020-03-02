@@ -3,7 +3,7 @@ dist: bionic
 matrix:
   include:
     - name: "deploy docs"
-      if: branch = development
+      if: branch = development OR branch = master
       language: python
       python:
         - "3.7-dev"
@@ -33,12 +33,8 @@ matrix:
       before_install:
         - cd ~/; git clone https://github.com/amrex-codes/amrex
         - cd ~/amrex; git checkout development
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'echo "#endif" >> "{}"' \;
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
         - cd ~/; git clone https://github.com/starkiller-astro/Microphysics.git
         - cd ~/Microphysics; git checkout development
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'echo "#endif" >> "{}"' \;
-        # - find . -type f -regex ".*\(\.f90\|\.F90\|\.cpp\)" -exec bash -c 'sed -i "1s/^/#ifndef __clang_analyzer__\n/" {}' \;
         - cd $TRAVIS_BUILD_DIR
       addons:
         apt:
