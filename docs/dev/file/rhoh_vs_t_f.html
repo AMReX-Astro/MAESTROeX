@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>rhoh_vs_t.F90 &mdash; MAESTROeX 20.03
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rotation.F90" href="rotation_f.html" />
+    <link rel="prev" title="regrid.F90" href="regrid_f.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="../index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="../_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.03
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="file/rhoh_vs_t_f.html">master</a> | <a href="dev/file/rhoh_vs_t_f.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cell_to_edge_f.html">cell_to_edge.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compute_grad_phi_f.html">compute_grad_phi.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="diag_f.html">diag.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fill_umac_ghost_f.html">fill_umac_ghost.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">rhoh_vs_t.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f/rhoh_vs_t_module">rhoh_vs_t_module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../filelist.html">File list</a> &raquo;</li>
+        
+          <li><a href="../Src_nd_files.html">Src_nd</a> &raquo;</li>
+        
+      <li>rhoh_vs_t.F90</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/file/rhoh_vs_t_f.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rhoh-vs-t-f90">
+<h1>rhoh_vs_t.F90<a class="headerlink" href="#rhoh-vs-t-f90" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="f/rhoh_vs_t_module">
+<span id="rhoh-vs-t-module"></span><h2>rhoh_vs_t_module<a class="headerlink" href="#f/rhoh_vs_t_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Quick access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#f/rhoh_vs_t_module/predict_h" title="f/rhoh_vs_t_module/predict_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_h</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_hprime" title="f/rhoh_vs_t_module/predict_hprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_hprime</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_rho_and_x" title="f/rhoh_vs_t_module/predict_rho_and_x"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rho_and_x</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_rhoh" title="f/rhoh_vs_t_module/predict_rhoh"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhoh</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_rhohprime" title="f/rhoh_vs_t_module/predict_rhohprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhohprime</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_rhoprime_and_x" title="f/rhoh_vs_t_module/predict_rhoprime_and_x"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhoprime_and_x</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_rhox" title="f/rhoh_vs_t_module/predict_rhox"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_rhox</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_t_then_h" title="f/rhoh_vs_t_module/predict_t_then_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_t_then_h</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_t_then_rhohprime" title="f/rhoh_vs_t_module/predict_t_then_rhohprime"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_t_then_rhohprime</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/predict_tprime_then_h" title="f/rhoh_vs_t_module/predict_tprime_then_h"><code class="xref f f-var docutils literal notranslate"><span class="pre">predict_tprime_then_h</span></code></a></p>
+</dd>
+<dt class="field-even">Routines</dt>
+<dd class="field-even"><p><a class="reference internal" href="#f/rhoh_vs_t_module/makecsfromrhoh" title="f/rhoh_vs_t_module/makecsfromrhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">makecsfromrhoh()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/makehfromrhot_edge" title="f/rhoh_vs_t_module/makehfromrhot_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">makehfromrhot_edge()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/makehfromrhot_edge_sphr" title="f/rhoh_vs_t_module/makehfromrhot_edge_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">makehfromrhot_edge_sphr()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/makemachfromrhoh" title="f/rhoh_vs_t_module/makemachfromrhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">makemachfromrhoh()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/makepfromrhoh" title="f/rhoh_vs_t_module/makepfromrhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">makepfromrhoh()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/maketfromrhoh" title="f/rhoh_vs_t_module/maketfromrhoh"><code class="xref f f-func docutils literal notranslate"><span class="pre">maketfromrhoh()</span></code></a>, <a class="reference internal" href="#f/rhoh_vs_t_module/maketfromrhop" title="f/rhoh_vs_t_module/maketfromrhop"><code class="xref f f-func docutils literal notranslate"><span class="pre">maketfromrhop()</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Required modules</p>
+<ul class="simple">
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code></p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code></p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">nspec()</span></code>)</p></li>
+<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rhoh_comp" title="f/meth_params_module/rhoh_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rhoh_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/temp_comp" title="f/meth_params_module/temp_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">temp_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/pi_comp" title="f/meth_params_module/pi_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">pi_comp()</span></code></a>, <code class="xref f f-func docutils literal notranslate"><span class="pre">nscal()</span></code>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/use_eos_e_instead_of_h" title="f/meth_params_module/use_eos_e_instead_of_h"><code class="xref f f-func docutils literal notranslate"><span class="pre">use_eos_e_instead_of_h()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/use_pprime_in_tfromp" title="f/meth_params_module/use_pprime_in_tfromp"><code class="xref f f-func docutils literal notranslate"><span class="pre">use_pprime_in_tfromp()</span></code></a>)</p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
+</ul>
+<p class="rubric">Variables</p>
+<ul>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_h">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=2</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_hprime">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_hprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=5</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_hprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_rho_and_x">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_rho_and_x</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=3</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_rho_and_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_rhoh">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_rhoh</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=0</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_rhoh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_rhohprime">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_rhohprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=1</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_rhohprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_rhoprime_and_x">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_rhoprime_and_x</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=1</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_rhoprime_and_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_rhox">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_rhox</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=2</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_rhox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_t_then_h">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_t_then_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=4</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_t_then_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_t_then_rhohprime">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_t_then_rhohprime</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=3</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_t_then_rhohprime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/rhoh_vs_t_module/predict_tprime_then_h">
+<code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">predict_tprime_then_h</code><em> [</em><em>integer</em><em>,</em><em>private/parameter/optional/default=6</em><em>]</em><a class="headerlink" href="#f/rhoh_vs_t_module/predict_tprime_then_h" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+</ul>
+<p class="rubric">Subroutines and functions</p>
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/maketfromrhoh">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">maketfromrhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">state</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/maketfromrhoh" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>state</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_cart</strong> (p0_hi(1)-(p0_lo(1))+1,p0_hi(2)-(p0_lo(2))+1,p0_hi(3)-(p0_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/maketfromrhop">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">maketfromrhop</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">state</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em>, <em class="sig-param">updaterhoh</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/maketfromrhop" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>state</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_cart</strong> (p0_hi(1)-(p0_lo(1))+1,p0_hi(2)-(p0_lo(2))+1,p0_hi(3)-(p0_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>updaterhoh</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/makepfromrhoh">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">makepfromrhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">state</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">temp_old</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">peos</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/makepfromrhoh" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>state</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>temp_old</strong> (t_hi(1)-(t_lo(1))+1,t_hi(2)-(t_lo(2))+1,t_hi(3)-(t_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>peos</strong> (p_hi(1)-(p_lo(1))+1,p_hi(2)-(p_lo(2))+1,p_hi(3)-(p_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>p_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/makemachfromrhoh">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">makemachfromrhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">state</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">u</em>, <em class="sig-param">u_lo</em>, <em class="sig-param">u_hi</em>, <em class="sig-param">p0_cart</em>, <em class="sig-param">p0_lo</em>, <em class="sig-param">p0_hi</em>, <em class="sig-param">w0cart</em>, <em class="sig-param">w_lo</em>, <em class="sig-param">w_hi</em>, <em class="sig-param">mach</em>, <em class="sig-param">m_lo</em>, <em class="sig-param">m_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/makemachfromrhoh" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>state</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u</strong> (u_hi(1)-(u_lo(1))+1,u_hi(2)-(u_lo(2))+1,u_hi(3)-(u_lo(3))+1,3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>u_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_cart</strong> (p0_hi(1)-(p0_lo(1))+1,p0_hi(2)-(p0_lo(2))+1,p0_hi(3)-(p0_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w0cart</strong> (w_hi(1)-(w_lo(1))+1,w_hi(2)-(w_lo(2))+1,w_hi(3)-(w_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>w_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>mach</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>m_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/makecsfromrhoh">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">makecsfromrhoh</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">state</em>, <em class="sig-param">s_lo</em>, <em class="sig-param">s_hi</em>, <em class="sig-param">p0cart</em>, <em class="sig-param">p_lo</em>, <em class="sig-param">p_hi</em>, <em class="sig-param">cs</em>, <em class="sig-param">c_lo</em>, <em class="sig-param">c_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/makecsfromrhoh" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>state</strong> (s_hi(1)-(s_lo(1))+1,s_hi(2)-(s_lo(2))+1,s_hi(3)-(s_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>s_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p0cart</strong> (p_hi(1)-(p_lo(1))+1,p_hi(2)-(p_lo(2))+1,p_hi(3)-(p_lo(3))+1,1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>cs</strong> (c_hi(1)-(c_lo(1))+1,c_hi(2)-(c_lo(2))+1,c_hi(3)-(c_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>c_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>c_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module" title="f/fill_3d_data_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">fill_3d_data_module</span></code></a> (<a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module/put_1d_array_on_cart_sphr" title="f/fill_3d_data_module/put_1d_array_on_cart_sphr"><code class="xref f f-func docutils literal notranslate"><span class="pre">put_1d_array_on_cart_sphr()</span></code></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/makehfromrhot_edge">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">makehfromrhot_edge</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">idir</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">rho0_cart</em>, <em class="sig-param">r_lo</em>, <em class="sig-param">r_hi</em>, <em class="sig-param">rhoh0_cart</em>, <em class="sig-param">rh_lo</em>, <em class="sig-param">rh_hi</em>, <em class="sig-param">temp0_cart</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em>, <em class="sig-param">rho0_edge_cart</em>, <em class="sig-param">re_lo</em>, <em class="sig-param">re_hi</em>, <em class="sig-param">rhoh0_edge_cart</em>, <em class="sig-param">rhe_lo</em>, <em class="sig-param">rhe_hi</em>, <em class="sig-param">temp0_edge_cart</em>, <em class="sig-param">te_lo</em>, <em class="sig-param">te_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/makehfromrhot_edge" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_cart</strong> (r_hi(1)-(r_lo(1))+1,r_hi(2)-(r_lo(2))+1,r_hi(3)-(r_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhoh0_cart</strong> (rh_hi(1)-(rh_lo(1))+1,rh_hi(2)-(rh_lo(2))+1,rh_hi(3)-(rh_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rh_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rh_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>temp0_cart</strong> (t_hi(1)-(t_lo(1))+1,t_hi(2)-(t_lo(2))+1,t_hi(3)-(t_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_edge_cart</strong> (re_hi(1)-(re_lo(1))+1,re_hi(2)-(re_lo(2))+1,re_hi(3)-(re_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>re_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>re_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhoh0_edge_cart</strong> (rhe_hi(1)-(rhe_lo(1))+1,rhe_hi(2)-(rhe_lo(2))+1,rhe_hi(3)-(rhe_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhe_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhe_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>temp0_edge_cart</strong> (te_hi(1)-(te_lo(1))+1,te_hi(2)-(te_lo(2))+1,te_hi(3)-(te_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>te_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>te_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/species_pred_type" title="f/meth_params_module/species_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">species_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/enthalpy_pred_type" title="f/meth_params_module/enthalpy_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">enthalpy_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_temp" title="f/meth_params_module/small_temp"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_temp()</span></code></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/rhoh_vs_t_module/makehfromrhot_edge_sphr">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">rhoh_vs_t_module/</code><code class="sig-name descname">makehfromrhot_edge_sphr</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">idir</em>, <em class="sig-param">sedge</em>, <em class="sig-param">x_lo</em>, <em class="sig-param">x_hi</em>, <em class="sig-param">rho0_cart</em>, <em class="sig-param">r_lo</em>, <em class="sig-param">r_hi</em>, <em class="sig-param">rhoh0_cart</em>, <em class="sig-param">rh_lo</em>, <em class="sig-param">rh_hi</em>, <em class="sig-param">temp0_cart</em>, <em class="sig-param">t_lo</em>, <em class="sig-param">t_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/rhoh_vs_t_module/makehfromrhot_edge_sphr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>idir</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
+<li><p><strong>sedge</strong> (x_hi(1)-(x_lo(1))+1,x_hi(2)-(x_lo(2))+1,x_hi(3)-(x_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>x_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>x_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rho0_cart</strong> (r_hi(1)-(r_lo(1))+1,r_hi(2)-(r_lo(2))+1,r_hi(3)-(r_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rhoh0_cart</strong> (rh_hi(1)-(rh_lo(1))+1,rh_hi(2)-(rh_lo(2))+1,rh_hi(3)-(rh_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rh_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>rh_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>temp0_cart</strong> (t_hi(1)-(t_lo(1))+1,t_hi(2)-(t_lo(2))+1,t_hi(3)-(t_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>t_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/species_pred_type" title="f/meth_params_module/species_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">species_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/enthalpy_pred_type" title="f/meth_params_module/enthalpy_pred_type"><code class="xref f f-func docutils literal notranslate"><span class="pre">enthalpy_pred_type()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_temp" title="f/meth_params_module/small_temp"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_temp()</span></code></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rotation_f.html" class="btn btn-neutral float-right" title="rotation.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="regrid_f.html" class="btn btn-neutral float-left" title="regrid.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2019, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

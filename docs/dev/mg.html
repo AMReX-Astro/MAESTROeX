@@ -1,0 +1,870 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Multigrid &mdash; MAESTROeX 20.03
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Rotation in MAESTROeX" href="rotation.html" />
+    <link rel="prev" title="Godunov Interface States" href="Godunov.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.03
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="mg.html">master</a> | <a href="dev/mg.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Multigrid</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#amrex-multigrid-philosophy">AMReX Multigrid Philosophy</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-structures">Data Structures</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mg-tower">mg_tower</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bndry-reg">bndry_reg</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#stencils">Stencils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#smoothers">Smoothers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cycling">Cycling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bottom-solvers">Bottom Solvers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#special-bottom-solver">Special Bottom Solver</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flowchart">Flowchart</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cell-centered-mg">Cell-Centered MG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nodal-mg">Nodal MG</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#maestroexs-multigrid-use">MAESTROeX’s Multigrid Use</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convergence-criteria">Convergence Criteria</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#multigrid-solver-tolerances">Multigrid Solver Tolerances</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#general-remarks">General Remarks</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Multigrid</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mg.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="multigrid">
+<span id="sec-mg"></span><h1>Multigrid<a class="headerlink" href="#multigrid" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="amrex-multigrid-philosophy">
+<h2>AMReX Multigrid Philosophy<a class="headerlink" href="#amrex-multigrid-philosophy" title="Permalink to this headline">¶</a></h2>
+<p>Here we describe some of the general ideas behind the AMReX multigrid (MG).</p>
+<p>We solve MG on an AMR hierarchy, which means in places we will encounter
+C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
+at C-F interfaces to ensure the correct solution to the Poisson equation
+across these interfaces. There is no correction step needed in this
+case (this differs from <a class="bibtex reference internal" href="zreferences.html#ricker-2008" id="id1">[Ricker08]</a>).</p>
+<p>The MG solver always works with jumps of <span class="math notranslate nohighlight">\(2\times\)</span> between levels. In
+some codes (but not MAESTROeX) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
+levels. AMReX uses a mini_cycle in these cases, effectively
+inserting a multigrid level between the two AMR levels and doing a mini
+V-cycle.</p>
+<p>The MG solvers are located in amrex/Src/LinearSolvers/F_MG/.
+There are two MG solvers, for cell-centered and nodal data.
+Generally, the routines specific to the cell-centered solver will have
+cc in their name, and those specific to the nodal solver will have
+nd in their name.</p>
+<p>Support for <span class="math notranslate nohighlight">\(\Delta x \ne \Delta y \ne \Delta z\)</span></p>
+<div class="section" id="data-structures">
+<h3>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="mg-tower">
+<h4>mg_tower<a class="headerlink" href="#mg-tower" title="Permalink to this headline">¶</a></h4>
+<p>The mg_tower is a special Fortran derived type that carries all the
+information required for a AMReX multigrid solve.</p>
+<p>The following parameters are specified when building the mg_tower:</p>
+<ul class="simple">
+<li><p>smoother: the type of smoother to use. Choices are listed
+in mg_tower.f90. Common options are
+MG_SMOOTHER_GS_RB for red-black Gauss-Seidel and
+MG_SMOOTHER_JACOBI for Jacobi.</p></li>
+<li><p>nu1: The number of smoothings at each level on the way down
+the V-cycle.</p></li>
+<li><p>nu2: The number of smoothings at each level on the way up
+the V-cycle.</p></li>
+<li><p>nub: The number of smoothing before and after the bottom solver.</p></li>
+<li><p>gamma:</p></li>
+<li><p>cycle_type: The type of multigrid to do, V-cycles (
+MG_VCycle), W-cycles (MG_WCycle), full multigrid (
+MG_FCycle).</p></li>
+<li><p>omega:</p></li>
+<li><p>bottom_solver: the type of bottom solver to use. See the next
+section.</p></li>
+<li><p>bottom_max_iter: the maximum number of iterations for the
+bottom solver</p></li>
+<li><p>bottom_solver_eps: the tolerance used by the bottom
+solver. In MAESTROeX, this is set via mg_eps_module.</p></li>
+<li><p>max_iter: the maximum number of multigrid cycles.</p></li>
+<li><p>max_bottom_nlevel: additional coarsening if you use
+bottom_solver type 4 (see below)</p></li>
+<li><p>min_width: minimum size of grid at coarsest multigrid level</p></li>
+<li><p>rel_solver_eps: the relative tolerance of the solver (in
+MAESTROeX, this is set via mg_eps_module.</p></li>
+<li><p>abs_solver_eps: the absolute tolerance of the solver (in
+MAESTROeX, this is set via mg_eps_module.</p></li>
+<li><p>verbose: the verbosity of the multigrid solver. In MAESTROeX,
+this is set via the mg_verbose runtime parameter. Higher
+numbers give more verbosity.</p></li>
+<li><p>cg_verbose: the verbosity of the bottom solver. In MAESTROeX,
+this is set via the cg_verbose runtime parameter. Higher
+numbers give more verbosity.</p></li>
+</ul>
+<p>In addition to these parameters, the mg_tower carries a number of
+multifabs that carry the solution and stencil for the multigrid
+solve.</p>
+<ul>
+<li><p>ss: The stencil itself—for each zone, this gives the
+coefficients of the terms in the Laplacian, with the convention that
+the ‘0’ term is located in the current cell and the other terms are
+the <span class="math notranslate nohighlight">\(\pm 1\)</span> off the current cell in each direction.</p></li>
+<li><p>cc: scratch space (?)</p></li>
+<li><p>ff: The source (righthand side) of the elliptic equation
+we are solving.</p></li>
+<li><p>dd: The residual/defect, <span class="math notranslate nohighlight">\(f - L\phi\)</span></p></li>
+<li><p>uu: The solution variable (<span class="math notranslate nohighlight">\(\phi\)</span> when on the finest level)</p></li>
+<li><p>mm: For cell-centered, mm takes a direction and
+tells you whether we are at a Dirichlet or Neumann boundary, or if
+we are skewed in that direction.</p>
+<p>For nodal, mm simply tells us whether a point is Dirichlet
+or Neumann. There is no skew in nodal.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="bndry-reg">
+<h4>bndry_reg<a class="headerlink" href="#bndry-reg" title="Permalink to this headline">¶</a></h4>
+<p>There are two types of bndry_reg objects, each of which is a set of
+dim multifabs. The first, which is built with the
+bndry_reg_build call, is defined on all cells immediately outside
+of each grid. Each multifab within the bndry_reg contains all the
+fabs on both the low and high faces for a given direction. In the
+context of multigrid, we fill the bndry_reg with coarse data before
+interpolating the data to the correct locations to be used in the
+multigrid stencil. The second type of bndry_reg object is defined on
+the coarse cells immediately outside each fine grid, and is defined
+with the bndry_reg_rr_build call, is defined on all cells
+immediately outside. For this latter type, the option is available
+to include only cells not covered by a different fine grid, but this
+is left as an option because it requires additional calculations of
+box intersections.</p>
+<p>In multigrid, we use the latter type of bndry_reg to calculate the
+residual at coarse cells adjacent to fine grids that is used as the
+right hand side in the relaxation step at the coarse level on the way
+down the V-cycle (or other). The first type of bndry_regis used to
+hold boundary conditions for the fine grids that are interpolated from
+the coarse grid solution; this is filled on the way back up the
+V-cycle.</p>
+<p>To compute the residual in a coarse cell adjacent to a fine grid, we
+first compute the pure coarse residual, then subtract the contribution
+from the coarse face underlying the coarse-fine interface, and add the
+contribution of the fine faces at the coarse-fine interface.
+The bndry_reg holds the cell-centered contribution from the
+difference of these edge fluxes and is added to the coarse residual
+multifab.</p>
+</div>
+</div>
+<div class="section" id="stencils">
+<h3>Stencils<a class="headerlink" href="#stencils" title="Permalink to this headline">¶</a></h3>
+<p>There are several different stencil types that we can use for
+the discretization. For cell-centered, these are:</p>
+<ul class="simple">
+<li><p>CC_CROSS_STENCIL: this is the standard cross-stencil—5 points
+in 2-d and 7 points in 3-d. For cell-centered MG, this is the default, and
+is usually the best choice.</p></li>
+<li><p>HO_CROSS_STENCIL: this is a cross-stencil that uses 9 points
+in 2-d and 11-points in 3-d. For instance, it will use <span class="math notranslate nohighlight">\((i,j)\)</span>;
+<span class="math notranslate nohighlight">\((i\pm1,j)\)</span>; <span class="math notranslate nohighlight">\((i\pm2,j)\)</span>; <span class="math notranslate nohighlight">\((i,j\pm1)\)</span>; <span class="math notranslate nohighlight">\((i,j\pm2)\)</span>. This is
+higher-order accurate that CC_CROSS_STENCIL.</p></li>
+<li><p>HO_DENSE_STENCIL: this is a dense-stencil—it uses all the
+points (including corners) in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>, resulting in a 9-point stencil
+in 2-d and 27-point stencil in 3-d.</p></li>
+</ul>
+<p>For the nodal solver, the choices are:</p>
+<ul class="simple">
+<li><p>ND_CROSS_STENCIL: this is the standard cross-stencil.</p></li>
+<li><p>ND_DENSE_STENCIL: this is a dense stencil, using
+all the points in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>. The
+derivation of this stencil is based on finite-element ideas, defining
+basis functions on the nodes. This is developed in 2-d in
+<a class="bibtex reference internal" href="zreferences.html#almgrenbellszymczak-1996" id="id2">[ABS96]</a>.</p></li>
+<li><p>ND_VATER_STENCIL: this is an alternate dense stencil derived
+using a similar finite-element idea as above, but a different control
+volume.</p></li>
+</ul>
+<p>For the cell-centered solve, the coefficients for the stencil are computed
+once, at the beginning of the solve. For the nodal solver, the coefficients
+are hard-coded into the smoothers.</p>
+</div>
+<div class="section" id="smoothers">
+<h3>Smoothers<a class="headerlink" href="#smoothers" title="Permalink to this headline">¶</a></h3>
+<p>The following smoothers are available (but not necessarily for both the
+cell-centered and nodal solvers):</p>
+<ul class="simple">
+<li><p>MG_SMOOTHER_GS_RB: a red-black Gauss-Seidel smoother</p></li>
+<li><p>MG_SMOOTHER_JACOBI: a Jacobi smoother (not implemented for
+the dense nodal stencil)</p></li>
+<li><p>MG_SMOOTHER_MINION_CROSS</p></li>
+<li><p>MG_SMOOTHER_MINION_FULL</p></li>
+<li><p>MG_SMOOTHER_EFF_RB</p></li>
+</ul>
+</div>
+<div class="section" id="cycling">
+<h3>Cycling<a class="headerlink" href="#cycling" title="Permalink to this headline">¶</a></h3>
+<p>The default cycling is a V-cycle, but W-cycles and full multigrid are
+supported as well.</p>
+</div>
+<div class="section" id="bottom-solvers">
+<h3>Bottom Solvers<a class="headerlink" href="#bottom-solvers" title="Permalink to this headline">¶</a></h3>
+<p>The multigrid cycling coarsens the grids as part of the solve. When
+the coarsest grid is reached, the individual boxes that comprise that
+level are coarsened as much as then can, down to <span class="math notranslate nohighlight">\(2^3\)</span> zones. Depending
+on the distribution of sizes of the grids, it may not be possible for
+everything to reach this minimum size. At this point, the bottom
+solver is invoked. Most of these will solve the linear system
+on this collection of grids directly. There is one special bottom
+solver that will define a new box encompassing all of the coarsened
+grids and then put the data on fewer boxes and processors and further
+coarsen the problem, again until we get as close to <span class="math notranslate nohighlight">\(2^3\)</span> as possible.
+At that point, one of the other bottom solvers will be called upon
+to solve the problem.</p>
+<p>There are several bottom solvers available in AMReX. For MAESTROeX.
+These are set through the mg_bottom_solver (MAC/cell-centered)
+and hg_bottom_solver (nodal) runtime parameters.
+The allowed values are:</p>
+<ul class="simple">
+<li><p>mg_bottom_solver / hg_bottom_solver = 0: smoothing only.</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 1: biconjugate
+gradient stabilized—this is the default.</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 2: conjugate
+gradient method</p></li>
+<li><p>mg_bottom_solver / hg_bottom_solver = 4: a special
+bottom solver that extends the range of the multigrid coarsening
+by aggregrating coarse grids on the original mesh together and
+further coarsening.</p></li>
+</ul>
+<p>You should use the special bottom solver (4) whenever possible, even
+if it means changing your gridding strategy (as discussed below) to
+make it more efficient.</p>
+<div class="section" id="special-bottom-solver">
+<h4>Special Bottom Solver<a class="headerlink" href="#special-bottom-solver" title="Permalink to this headline">¶</a></h4>
+<p>The special solver takes the data from the coarsest level of the
+original multigrid V-cycle and copies it onto a new grid structure with
+the same number of total cells in each direction, but with a fewer
+number of larger grids. A new V-cycle begins from this point, so we
+are essentially coarsening this “new” problem. Now, the coarsest
+level of the multigrid V-cycle in the “new” problem has fewer cells
+and fewer grids as compared to the original coarsest level.</p>
+<p>To enable this solver, set hg_bottom_solver = 4 (for the nodal
+projections) and/or mg_bottom_solver = 4 (for the
+cell-centered projections) in your inputs file.</p>
+<p>To understand how this bottom solver works, the first thing you need
+to know is what the grid structure of the coarsest level of your
+multigrid V-cycle looks like. Next, figure out the size of the box you
+would need if you wanted it to fit all the data on the coarsest level.
+Finally, figure out what the largest integer <span class="math notranslate nohighlight">\(n\)</span> is so that you can evenly
+divide the length of this box by <span class="math notranslate nohighlight">\(2^n\)</span> in every coordinate direction.
+If <span class="math notranslate nohighlight">\(n &lt; 2\)</span>, the program will abort since the grid structure is not
+suitable for this bottom solver.</p>
+<p>The code will set up a “new” problem, using the data at the
+coarsest level of the original problem as the initial data. The grid
+structure for this new problem has the same number of cells as the
+coarsest level of the original problem, but the data is copied onto a
+grid structure where each grid has <span class="math notranslate nohighlight">\(2^n\)</span> cells on each side. The new
+V-cycle continues down to the new coarsest level, in which each grid
+has 2 cells on each side. If you wish to impose a limit on the
+maximum value that <span class="math notranslate nohighlight">\(n\)</span> can have, you can do so by setting
+max_mg_bottom_nlevs equal to that value.</p>
+<p>Some grid examples help make this clear:</p>
+<ul class="simple">
+<li><p><strong>Example 1:</strong> A 3D problem with <span class="math notranslate nohighlight">\(384^3\)</span> cells divided into <span class="math notranslate nohighlight">\(32^3\)</span>
+grids, i.e., there is a <span class="math notranslate nohighlight">\(12\times 12\times 12\)</span> block of <span class="math notranslate nohighlight">\(32^3\)</span> grids.
+The coarsest level of the multigrid V-cycle contains <span class="math notranslate nohighlight">\(12\times
+12\times 12\)</span> grids that have <span class="math notranslate nohighlight">\(2^3\)</span> cells, so the entire problem domain
+has <span class="math notranslate nohighlight">\(24^3\)</span> cells. We see that <span class="math notranslate nohighlight">\(n=3\)</span>, and create a new problem domain
+with a <span class="math notranslate nohighlight">\(3\times 3\times 3\)</span> block of <span class="math notranslate nohighlight">\(8^3\)</span> grids. The coarsest level
+of the multigrid V-cycle for the “new” problem will be a <span class="math notranslate nohighlight">\(3\times
+3\times 3\)</span> block of <span class="math notranslate nohighlight">\(2^3\)</span> grids.</p></li>
+<li><p><strong>Example 2:</strong> A 2D problem with <span class="math notranslate nohighlight">\(96\times 384\)</span> cells divided into
+<span class="math notranslate nohighlight">\(48^2\)</span> grids, i.e., there is a <span class="math notranslate nohighlight">\(2\times 8\)</span> block of <span class="math notranslate nohighlight">\(48^2\)</span> grids. The
+coarsest level of the multigrid V-cycle contains <span class="math notranslate nohighlight">\(2\times 8\)</span> grids
+that have <span class="math notranslate nohighlight">\(3^2\)</span> cells, so the entire problem domain has <span class="math notranslate nohighlight">\(6\times 24\)</span>
+cells. We see that <span class="math notranslate nohighlight">\(n=0\)</span>, so the program aborts since this grid
+structure is not appropriate for the fancy bottom solver.</p></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="section" id="flowchart">
+<h2>Flowchart<a class="headerlink" href="#flowchart" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX multigrid solves always involve the full AMR hierarchy.</p>
+<div class="section" id="cell-centered-mg">
+<h3>Cell-Centered MG<a class="headerlink" href="#cell-centered-mg" title="Permalink to this headline">¶</a></h3>
+<p>The flowchart below shows the structure of a cell-centered multigrid
+solve using pure V-cycles.</p>
+<ul class="simple">
+<li><p>stencil_fill_cc_all_mglevels / stencil_fill_cc:
+Compute all of the stencil coefficients
+for the Laplacian operator at all cells. At the C-F interfaces, the
+stencil coefficients are modified to know this.</p></li>
+<li><p>ml_cc: The main driver for the cell-centered multigrid.
+Among other things, this computes the norm that will be used
+for convergence testing.</p></li>
+<li><p>mg_tower_v_cycle (recursive):</p>
+<ul>
+<li><p><em>recursively descend V-cycle</em></p>
+<ul>
+<li><p>: Smooth the
+problem at the current MG level using the desired smoother.</p></li>
+<li><p>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</p></li>
+<li><p>: Restrict
+the defect to the coarser level by conservative averaging.</p></li>
+</ul>
+</li>
+<li><p>mg_tower_bottom_solve: Solve the coarsened problem
+using the chosen bottom solver.</p></li>
+<li><p><em>ascend V-cycle</em></p>
+<ul>
+<li><p>: Take the solution at level <span class="math notranslate nohighlight">\(n-1\)</span> and use it to
+correct the solution at level <span class="math notranslate nohighlight">\(n\)</span> by representing the data on the finer grid. This uses
+linear reconstruction for jumps by <span class="math notranslate nohighlight">\(2\times\)</span> and piecewise-constant otherwise.</p></li>
+<li><p>:</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>compute_defect: This is called multiple times, checking for
+convergence at each level.</p></li>
+</ul>
+</div>
+<div class="section" id="nodal-mg">
+<h3>Nodal MG<a class="headerlink" href="#nodal-mg" title="Permalink to this headline">¶</a></h3>
+<p>The flowchart below shows the structure of a cell-centered multigrid
+solve using pure V-cycles.</p>
+<ul class="simple">
+<li><p>stencil_fill_cc_all_mglevels / stencil_fill_cc:
+For the nodal solver, this applies the weights to the
+coefficients.</p></li>
+<li><p>ml_nd: The main driver for the nodal multigrid.</p></li>
+<li><p>mg_tower_v_cycle (recursive):</p>
+<ul>
+<li><p><em>recursively descend V-cycle</em></p>
+<ul>
+<li><p>: Smooth the
+problem at the current MG level using the desired smoother.</p></li>
+<li><p>compute_defect: Construct <span class="math notranslate nohighlight">\(f - L\phi\)</span>.</p></li>
+<li><p>: Restrict
+the defect to the coarser level by simply taking the fine value that
+lies at the same place as the coarse data.</p></li>
+</ul>
+</li>
+<li><p>mg_tower_bottom_solve: Solve the coarsened problem
+using the chosen bottom solver.</p></li>
+<li><p><em>ascend V-cycle</em></p>
+<ul>
+<li><p>: For nodal data, the fine grid
+will have some points at exactly the same place as the coarse data—these are
+simply copied to the fine grid. The remain data is interpolated.</p></li>
+<li><p>:</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>compute_defect: This is called multiple times, checking for
+convergence at each level.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="maestroexs-multigrid-use">
+<h2>MAESTROeX’s Multigrid Use<a class="headerlink" href="#maestroexs-multigrid-use" title="Permalink to this headline">¶</a></h2>
+<p>MAESTROeX uses multigrid to enforce the velocity constraint through
+projections at the half-time (the MAC projection) and end of the time
+step (the HG projection). Two multigrid solvers are provided by
+AMReX—one for cell-centered data and one for node-centered (nodal)
+data. Both of these are used in MAESTROeX.</p>
+<p>The MAC projection operates on the advective velocities predicted at
+the cell-interfaces at the half-time. The edge-centered velocities
+are shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. If we consider purely
+incompressible flow, the projection appears as:</p>
+<div class="math notranslate nohighlight" id="equation-mg-0">
+<span class="eqno">(288)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation">¶</a></span>\[D G \phi = D U\]</div>
+<p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
+In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
+<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>. The remaining quantities are discretized as:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
+<div class="math notranslate nohighlight" id="equation-mg-1">
+<span class="eqno">(289)<a class="headerlink" href="#equation-mg-1" title="Permalink to this equation">¶</a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
+               \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
+</li>
+<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
+<a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(DG\phi\)</span> is cell-centered, also shown in <a class="reference internal" href="#fig-mg-mac"><span class="std std-numref">Fig. 27</span></a>,
+computed from <span class="math notranslate nohighlight">\(G\phi\)</span> using the same differencing as <span class="math notranslate nohighlight">\(DU\)</span>.</p></li>
+</ul>
+<div class="figure align-default" id="fig-mg-mac">
+<a class="reference internal image-reference" href="_images/MAC_mg2.png"><img alt="Data centerings for the MAC projection" src="_images/MAC_mg2.png" style="width: 80%;" /></a>
+</div>
+<p>The HG projection projects the cell-centered velocities at the end of
+the timestep. Here, <span class="math notranslate nohighlight">\(\phi\)</span> is node-centered. <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 28</span></a>
+shows the locations of the various quantities involved in the HG
+projection. Again considering simple incompressible flow, we now
+solve:</p>
+<div class="math notranslate nohighlight" id="equation-mg-2">
+<span class="eqno">(290)<a class="headerlink" href="#equation-mg-2" title="Permalink to this equation">¶</a></span>\[L \phi = D U\]</div>
+<p>where <span class="math notranslate nohighlight">\(L\)</span> is a discretization of the Laplacian operator. In this
+sense, the HG projection is an <em>approximate projection</em>, that is,
+<span class="math notranslate nohighlight">\(L \neq DG\)</span> (in discretized form). The various operations have the
+following centerings:</p>
+<ul>
+<li><p><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
+<div class="math notranslate nohighlight" id="equation-mg-3">
+<span class="eqno">(291)<a class="headerlink" href="#equation-mg-3" title="Permalink to this equation">¶</a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
+                             \frac{1}{2} (u_{i-1,j} + u_{i-1,j-1})}{\Delta x} +
+                       \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
+                             \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>
+</li>
+<li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is cell-centered, as shown in <a class="reference internal" href="#fig-mg-hg"><span class="std std-numref">Fig. 28</span></a>.</p></li>
+<li><p><span class="math notranslate nohighlight">\(L\phi\)</span> is node-centered. This is a direct discretization of
+the Laplacian operator. By default, MAESTROeX uses a dense stencil
+(9-points in 2-d, 27-points in 3-d). Alternately, a <em>cross</em>
+stencil can be used (by setting hg_dense_stencil = F). This
+uses 5-points in 2-d, 7-points in 3-d.</p>
+<div class="figure align-default" id="fig-mg-hg">
+<a class="reference internal image-reference" href="mgfigpath/HG_mg2"><img alt="Data centerings for the HG projection" src="mgfigpath/HG_mg2" style="width: 80%;" /></a>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="convergence-criteria">
+<h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Permalink to this headline">¶</a></h2>
+<p>All MAESTROeX multigrid solves consist of pure V-cycles.</p>
+<div class="section" id="multigrid-solver-tolerances">
+<span id="sec-mgtol"></span><h3>Multigrid Solver Tolerances<a class="headerlink" href="#multigrid-solver-tolerances" title="Permalink to this headline">¶</a></h3>
+<p>Beginning at the start of execution, there are several places where
+either cell-centered multigrid or node-centered multigrid solves are
+performed. The outline below lists the solves one encounters, in order,
+from the start of execution. The values of the tolerances lists here
+are defined in the mg_eps module. To set problem-specific values
+of these tolerances, place a local copy of mg_eps.f90 in your
+problem directory.</p>
+<p>In the initialization, multigrid comes in during the initial projection
+and the “divu” iterations.</p>
+<ul>
+<li><p><em>initial projection</em> (initial_proj called from varden)</p>
+<p>The initial projection creates a first approximation to the velocity
+field by forcing the initial velocity field set by initveldata
+to satisfy the elliptic constraint equation. Since the initial
+velocity may be zero, there is no guarantee that a well-defined
+timestep can be computed at this point, so the source term, <span class="math notranslate nohighlight">\(S\)</span>,
+used here only involves thermal diffusion and any external heating
+term, <span class="math notranslate nohighlight">\(\Hext\)</span>—no reactions are included (see paper III, §3.3).</p>
+<p>The initial projection can be disabled with the do_initial_projection
+runtime parameter.</p>
+<p>The tolerances, eps_init_proj_cart and eps_init_proj_sph
+(for Cartesian and spherical respectively) are set in mg_eps.f90
+and have the default values of:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 38%" />
+<col style="width: 38%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Cartesian:</p></td>
+<td><p>eps_init_proj_cart</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>spherical:</p></td>
+<td><p>eps_init_proj_sph</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><em>“divu” iterations</em> (<code class="docutils literal notranslate"><span class="pre">divu_iter</span></code> called from <code class="docutils literal notranslate"><span class="pre">varden</span></code>)</p>
+<p>The “divu” iterations projects the velocity field from the initial
+projection to satisfy the full constraint (including reactions).
+This is an iterative process since the reactions depend on the
+timestep and the timestep depends on the velocity field (see
+paper III, §3.3). The number of iterations to take is set through
+the init_divu_iter runtime parameter.</p>
+<p>The overall tolerance, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{divu}\)</span> depends on the iteration, <span class="math notranslate nohighlight">\(i\)</span>.
+We start with a loose tolerance and progressively get tighter. The
+tolerances (set in divu_iter) are, for Cartesian:</p>
+<div class="math notranslate nohighlight" id="equation-mg-4">
+<span class="eqno">(292)<a class="headerlink" href="#equation-mg-4" title="Permalink to this equation">¶</a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt                     {divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                         &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                           &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1  \\[2mm]
+                  \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
+                           &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter}   \\
+                                \end{array}
+                 \right .\end{split}\]</div>
+<p>and for spherical:</p>
+<div class="math notranslate nohighlight" id="equation-mg-5">
+<span class="eqno">(293)<a class="headerlink" href="#equation-mg-5" title="Permalink to this equation">¶</a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
+                    \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &amp;
+                          \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
+                   \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} - 1 \, \\[2mm]
+                   \mathtt{eps\_divu\_sph}  &amp;
+                          \quad \mathrm{for}~ i = \mathtt{init\_divu\_iter} \, )\\
+                 \end{array}
+                 \right .\end{split}\]</div>
+<p>The various parameters are set in mg_eps.f90 and have the default values of:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 51%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>eps_divu_cart</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>eps_divu_sph</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>divu_iter_factor</p></td>
+<td><p>= 100</p></td>
+</tr>
+<tr class="row-even"><td><p>divu_level_factor</p></td>
+<td><p>= 10</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<p>In the main algorithm, mulitgrid solves come in during the two MAC projections,
+two (optional) thermal diffusion solves, and the final velocity projection.</p>
+<ul>
+<li><p><em>MAC projection</em></p>
+<p>The MAC projection forces the edge-centered, half-time advective
+velocities to obey the elliptic constraint. This is done both in
+the predictor and corrector portions of the main algorithm.</p>
+<p>There are two tolerances here. The norm of the residual is required
+to be reduced by a relative tolerance of</p>
+<div class="math notranslate nohighlight" id="equation-mg-6">
+<span class="eqno">(294)<a class="headerlink" href="#equation-mg-6" title="Permalink to this equation">¶</a></span>\[\epsilon =
+ \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
+ \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .\]</div>
+<p>A separate tolerance is used for the bottom solver,
+<span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = \mathtt{eps\_mac\_bottom}\)</span>. These
+parameters are set in mg_eps.f90 and have the default values:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 53%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>eps_mac</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>eps_mac_max</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-8}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>mac_level_factor</p></td>
+<td><p>= 10</p></td>
+</tr>
+<tr class="row-even"><td><p>eps_mac_bottom</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-3}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><em>thermal diffusion</em></p>
+<p>This uses the same mac_multigrid routine as the MAC
+projection, so it uses the same tolerances. The only difference is
+that the absolute tolerance is based on the norm of <span class="math notranslate nohighlight">\(h\)</span> now, instead
+of <span class="math notranslate nohighlight">\(U^\mathrm{ADV}\)</span>.</p>
+</li>
+<li><p><em>velocity projection</em></p>
+<dl class="simple">
+<dt>The final velocity projection uses a tolerance of :math:<a href="#id3"><span class="problematic" id="id4">`</span></a>epsilon = min {</dt><dd><p>mathtt{eps_hg_max}, mathtt{eps_hg} cdot mathtt{hg_level_factor}^{(mathtt{nlevs} - 1)} }`. This tolerance</p>
+</dd>
+</dl>
+<p>is set in hgproject using the parameter values specified in mg_eps.f90. A separate
+tolerance is used for the bottom
+solver, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = \mathtt{eps\_hg\_bottom}\)</span>.</p>
+<p>The default parameter values are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 46%" />
+<col style="width: 54%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>eps_hg</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-12}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p>eps_hg_max</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-10}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p>hg_level_factor</p></td>
+<td><p>= 10</p></td>
+</tr>
+<tr class="row-even"><td><p>eps_hg_bottom</p></td>
+<td><p>= <span class="math notranslate nohighlight">\(10^{-4}\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="general-remarks">
+<h2>General Remarks<a class="headerlink" href="#general-remarks" title="Permalink to this headline">¶</a></h2>
+<p>If MAESTRO has trouble converging in the multigrid solves, try
+setting the verbosity mg_verbose or cg_verbose to
+higher values to get more information about the solve.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rotation.html" class="btn btn-neutral float-right" title="Rotation in MAESTROeX" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Godunov.html" class="btn btn-neutral float-left" title="Godunov Interface States" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2019, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

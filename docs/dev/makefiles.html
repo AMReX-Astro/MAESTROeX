@@ -1,0 +1,585 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MAESTROeX Build System &mdash; MAESTROeX 20.03
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Managing Jobs" href="managingjobs.html" />
+    <link rel="prev" title="Analysis" href="analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.03
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="makefiles.html">master</a> | <a href="dev/makefiles.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MAESTROeX Build System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build-process-overview">Build Process Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#finding-source-files">Finding Source Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files-created-at-compile-time">Files Created at Compile-time</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#maestroex-problem-options">MAESTROex Problem Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#problem-specific-files">Problem-specific Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#defining-eos-network-and-conductivity-routines">Defining EOS, Network, and Conductivity Routines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core-maestroex-modules">Core MAESTROeX modules</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#special-targets">Special Targets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#print"><code class="docutils literal notranslate"><span class="pre">print-*</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#file-locations"><code class="docutils literal notranslate"><span class="pre">file_locations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clean-and-realclean"><code class="docutils literal notranslate"><span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">realclean</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#special-debugging-modes">Special Debugging Modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#extending-the-build-system">Extending the Build System</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-compiler">Adding a Compiler</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parallel-mpi-builds">Parallel (MPI) Builds</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>MAESTROeX Build System</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/makefiles.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="maestroex-build-system">
+<span id="ch-make"></span><h1>MAESTROeX Build System<a class="headerlink" href="#maestroex-build-system" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="build-process-overview">
+<h2>Build Process Overview<a class="headerlink" href="#build-process-overview" title="Permalink to this headline">¶</a></h2>
+<p>The MAESTROeX build system uses features of GNU make (version 3.81 or
+later), which is typically the default on systems. The MAESTROeX
+executable is built in the problem’s directory (one of the directories
+under <code class="docutils literal notranslate"><span class="pre">SCIENCE/</span></code>, <code class="docutils literal notranslate"><span class="pre">TEST_PROBLEMS/</span></code>, or <code class="docutils literal notranslate"><span class="pre">UNIT_TESTS/</span></code>). This
+directory will contain a makefile, <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code>, that includes all the
+necessary information to build the executable.</p>
+<p>We use the build system in AMReX in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/GNUmake</span></code>.  A set of
+MAESTROeX-specific macros are defined in <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Exec/Make.Maestro</span></code>.</p>
+<p>MAESTROeX gets the location of the AMReX library through the
+<code class="docutils literal notranslate"><span class="pre">AMREX_HOME</span></code> variable. This should be set as an environment
+variable in your shell start-up files (e.g. <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or
+<code class="docutils literal notranslate"><span class="pre">.cshrc</span></code>).</p>
+<p>The AMReX build system separates the compiler-specific information
+from the machine-specific information—this allows for reuse of the
+compiler information. The only machine-specific parts of the build
+system are for the MPI library locations, contained in
+<code class="docutils literal notranslate"><span class="pre">amrex/Tools/GNUmake/sites/</span></code>.  The compiler flags for the various
+compilers are listed in the files in
+<code class="docutils literal notranslate"><span class="pre">amrex/Tools/GNUmake/comps/</span></code>. The compiler is set via the <code class="docutils literal notranslate"><span class="pre">COMP</span></code>
+variable in the problem’s GNUmakefile.</p>
+<p>There are several options in addition to the compiler that affect the
+build process: <code class="docutils literal notranslate"><span class="pre">USE_MPI</span></code>, <code class="docutils literal notranslate"><span class="pre">USE_OMP</span></code>, <code class="docutils literal notranslate"><span class="pre">USE_CUDA</span></code> for the parallelism,
+and <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> and <code class="docutils literal notranslate"><span class="pre">TEST</span></code> for diagnostic information.. Together,
+these choices along with the compiler name are reflected in the name
+of the executable.</p>
+<p>When the <code class="docutils literal notranslate"><span class="pre">make</span></code> command is run, the object and module files are
+written into sub-directories under <code class="docutils literal notranslate"><span class="pre">tmp_build_dir/</span></code>. Separating each build into
+a separate sub-directory under the problem directory allows for
+multiple builds of MAESTROeX to exist side-by-side in the problem
+directory.</p>
+<div class="section" id="finding-source-files">
+<h3>Finding Source Files<a class="headerlink" href="#finding-source-files" title="Permalink to this headline">¶</a></h3>
+<p>The MAESTROeX executable is built from source distributed across a
+number of directories. In each of these directories containing source
+files, there is a <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> file. This file has a number of
+lines of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CEXE_sources</span> <span class="o">+=</span> <span class="n">file</span><span class="o">.</span><span class="n">cpp</span>
+<span class="n">F90EXE_sources</span> <span class="o">+=</span> <span class="n">file</span><span class="o">.</span><span class="n">F90</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">file.cpp</span></code> is a C++ source file and <code class="docutils literal notranslate"><span class="pre">file.F90</span></code> is a Fortran
+source file that should be built when this directory is added to the
+list of build directories.</p>
+<p>The AMReX build system relies on the <code class="docutils literal notranslate"><span class="pre">vpath</span></code> functionality of
+make. In a makefile, the <code class="docutils literal notranslate"><span class="pre">vpath</span></code> variable holds search path used to
+locate source files. When a particular file is needed, the directories
+listed in <code class="docutils literal notranslate"><span class="pre">vpath</span></code> are searched until the file is found. The first
+instance of a file is used. We exploit this feature by always putting
+the build directory first in <code class="docutils literal notranslate"><span class="pre">vpath</span></code>.  This means that if a source
+file is placed in the build directory, that copy will override any
+other version in the source path.</p>
+</div>
+<div class="section" id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h3>
+<p>There is no need to explicitly define the dependencies between the
+source files for Fortran modules. Scripts in
+AMReX are run at the start of the build
+process and parse all the source files and make an explicit list of
+the dependency pairs.</p>
+</div>
+<div class="section" id="files-created-at-compile-time">
+<h3>Files Created at Compile-time<a class="headerlink" href="#files-created-at-compile-time" title="Permalink to this headline">¶</a></h3>
+<p>Several files are created at build-time:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">extern.F90</span></code>:</p>
+<p>This is the module that controls runtime parameters. This is
+created by the script <code class="docutils literal notranslate"><span class="pre">write_probin.py</span></code> in
+<code class="docutils literal notranslate"><span class="pre">amrex/Tools/F_scripts/</span></code>. The makefile logic for creating it is
+in <code class="docutils literal notranslate"><span class="pre">Make.Maestro</span></code>. At compile time, the problem, main MAESTROeX/,
+and any microphysics directories (set from the <code class="docutils literal notranslate"><span class="pre">EOS_DIR</span></code>,
+<code class="docutils literal notranslate"><span class="pre">CONDUCTIVITY_DIR</span></code>, and <code class="docutils literal notranslate"><span class="pre">NETWORK_DIR</span></code> parameters in the <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> are
+searched for <code class="docutils literal notranslate"><span class="pre">_parameter</span></code> files. These files are parsed and the
+<code class="docutils literal notranslate"><span class="pre">extern.F90</span></code> file is output containing the runtime parameters, their
+default values, and the logic for reading and interpreting the
+inputs file.</p>
+</li>
+<li><p>AMReX_buildInfo.cpp:</p>
+<p>This file contains basic information about the build
+environment (compiler used, build machine, build directory, compiler
+flags, etc.). This is created by the script <code class="docutils literal notranslate"><span class="pre">makebuildinfo_C.py</span></code>
+in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/C_scripts/</span></code> from
+<code class="docutils literal notranslate"><span class="pre">Make.Maestro</span></code> by passing in a number of makefile variables. This is
+rewritten every time the code is compiled. The primary use of this
+module is writing out the <code class="docutils literal notranslate"><span class="pre">job_info</span></code> file in the plotfiles.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">actual_network.F90</span></code>:</p>
+<p>This is generated at compile time <em>only</em> for the
+<code class="docutils literal notranslate"><span class="pre">general_null</span></code> network. The <code class="docutils literal notranslate"><span class="pre">general_null</span></code> network allows the
+user to define a list of non-reacting species builds the
+<code class="docutils literal notranslate"><span class="pre">actual_network.F90</span></code> based on this list. The makefile logic for building
+this is in the <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> in
+<code class="docutils literal notranslate"><span class="pre">Microphysics/networks/general_null</span></code>. The script <code class="docutils literal notranslate"><span class="pre">write_network.py</span></code>
+in that directory does the actual parsing of the species file and
+outputs the <code class="docutils literal notranslate"><span class="pre">actual_network.f90</span></code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="maestroex-problem-options">
+<h2>MAESTROex Problem Options<a class="headerlink" href="#maestroex-problem-options" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="problem-specific-files">
+<span id="sec-make-otherfiles"></span><h3>Problem-specific Files<a class="headerlink" href="#problem-specific-files" title="Permalink to this headline">¶</a></h3>
+<p>If a problem has a unique file that is needed as part of the build,
+then that file should be added to a <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> file in the
+problem’s directory.</p>
+<p>Note that this is not necessary if you place a custom version of
+a source file in the problem’s directory. Since that file is already
+listed in the <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> in its original location, the build
+system will know that it needs to be built. Since the <code class="docutils literal notranslate"><span class="pre">vpath</span></code>
+variable puts the problem’s directory at the start of the search
+path, the version of the file in the problem’s directory will be
+found first.</p>
+</div>
+<div class="section" id="defining-eos-network-and-conductivity-routines">
+<h3>Defining EOS, Network, and Conductivity Routines<a class="headerlink" href="#defining-eos-network-and-conductivity-routines" title="Permalink to this headline">¶</a></h3>
+<p>Each MAESTROeX problem needs to define an equation of state, a
+reaction network, and a routine to compute the conductivities (for
+thermal diffusion). This is true even if the problem is not doing
+reactions of thermal diffusion. These definitions are specified
+in the problem’s <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code>.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">EOS_DIR</span></code>:</p>
+<p>This variable points to the directory (by default, relative to
+<code class="docutils literal notranslate"><span class="pre">Microphysics/EOS/</span></code>) of the equation of state used for the build.
+Choices that work with MAESTROeX are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">helmholtz</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gamma_law_general</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">multigamma</span></code></p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONDUCTIVITY_DIR</span></code>:</p>
+<p>This variable points to the conductivity routine used for the build
+(by default, relative to <code class="docutils literal notranslate"><span class="pre">Microphysics/conductivity/</span></code>). Choices
+that work with MAESTROeX are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">constant</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">stellar</span></code></p></li>
+</ul>
+<p>If diffusion is not being used for the problem, this should be set
+to constant.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NETWORK_DIR</span></code>:</p>
+<p>This variable points to the reaction network used for the build (by
+default, relative to <code class="docutils literal notranslate"><span class="pre">Microphysics/networks/</span></code>). Several options
+are present in <code class="docutils literal notranslate"><span class="pre">Microphysics/networks/</span></code>. A network is required even
+if you are not doing reactions, since the network defines the
+species that are advected and interpreted by the equation of state.</p>
+<p>A special choice, <code class="docutils literal notranslate"><span class="pre">Microphysics/networks/general_null</span></code> is a general
+network that simply defines the properties of one or more species.
+This requires an inputs file, specified by
+<code class="docutils literal notranslate"><span class="pre">GENERAL_NET_INPUTS</span></code>. This inputs file is read at compile-time and
+used to build the <code class="docutils literal notranslate"><span class="pre">actual_network.F90</span></code> file that is compiled into the
+source.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="core-maestroex-modules">
+<h3>Core MAESTROeX modules<a class="headerlink" href="#core-maestroex-modules" title="Permalink to this headline">¶</a></h3>
+<p>Several modules are included in all MAESTROeX builds by default.
+In addition to the AMReX sources, we also include</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MAESTROeX/constants</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MAESTROeX/Source</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Util/model_parser</span></code></p></li>
+</ul>
+<p>The microphysics used may bring in its own dependencies.</p>
+<p>For each of these included directories, <code class="docutils literal notranslate"><span class="pre">Make.Maestro</span></code> adds the
+list of source files defined in their <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> to the list
+of files to be compiled. It also adds each of these directories to
+the <code class="docutils literal notranslate"><span class="pre">vpath</span></code> as a directory for the build process to search in for
+source files.</p>
+</div>
+</div>
+<div class="section" id="special-targets">
+<h2>Special Targets<a class="headerlink" href="#special-targets" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="print">
+<h3><code class="docutils literal notranslate"><span class="pre">print-*</span></code><a class="headerlink" href="#print" title="Permalink to this headline">¶</a></h3>
+<p>To see the contents of any variable in the build system, you can build
+the special target <code class="docutils literal notranslate"><span class="pre">print-varname</span></code>, where <code class="docutils literal notranslate"><span class="pre">varname</span></code> is the name of
+the variable. For example, to see what the network directory is, you would
+do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="nb">print</span><span class="o">-</span><span class="n">NETWORK_DIR</span>
+</pre></div>
+</div>
+<p>This functionality is useful for debugging the makefiles.</p>
+</div>
+<div class="section" id="file-locations">
+<h3><code class="docutils literal notranslate"><span class="pre">file_locations</span></code><a class="headerlink" href="#file-locations" title="Permalink to this headline">¶</a></h3>
+<p>Source files are found by searching through the make
+<code class="docutils literal notranslate"><span class="pre">vpath</span></code>. The first instance of the file found in the <code class="docutils literal notranslate"><span class="pre">vpath</span></code>
+is used in the build. To see which files are used and their locations,
+do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">file_locations</span>
+</pre></div>
+</div>
+<p>This will also show any files that aren’t found. Some are expected
+(e.g., <code class="docutils literal notranslate"><span class="pre">extern.F90</span></code> is created at compile time), but other files
+that are not found could indicate an incomplete <code class="docutils literal notranslate"><span class="pre">vpath</span></code>.</p>
+</div>
+<div class="section" id="clean-and-realclean">
+<h3><code class="docutils literal notranslate"><span class="pre">clean</span></code> and <code class="docutils literal notranslate"><span class="pre">realclean</span></code><a class="headerlink" href="#clean-and-realclean" title="Permalink to this headline">¶</a></h3>
+<p>Typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> deletes the object and module files for the
+current build (i.e., the current choice of <code class="docutils literal notranslate"><span class="pre">USE_MPI</span></code>, <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>,
+<code class="docutils literal notranslate"><span class="pre">COMP</span></code>, and <code class="docutils literal notranslate"><span class="pre">USE_OMP</span></code>). This also removes any of the compile-time
+generated source files. Any other builds are left unchanged.</p>
+<p>Typing <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">realclean</span></code> deletes the object and module files for
+all builds—i.e., the entire <code class="docutils literal notranslate"><span class="pre">tmp_build_dir/</span></code> is removed.</p>
+</div>
+</div>
+<div class="section" id="special-debugging-modes">
+<span id="ch-makefiles-special"></span><h2>Special Debugging Modes<a class="headerlink" href="#special-debugging-modes" title="Permalink to this headline">¶</a></h2>
+<p>AMReX has several options that produce executables that can help
+track down memory issues, uninitialized variables, NaNs, etc.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> :</p>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">DEBUG=TRUE</span></code> on the <code class="docutils literal notranslate"><span class="pre">make</span></code> commandline or in the
+<code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> generates an executable with debugging information
+included in the executable (e.g., to be interpreted by the
+debugger, gdb). This will usually add -g to the compile line and
+also lower the optimization. For gfortran it will add several
+options to catch uninitialize variables, bounds errors, etc.
+The resulting executable will have <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> in its name.</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TEST</span> <span class="pre">=</span> <span class="pre">TRUE</span></code></p>
+<p>Setting <code class="docutils literal notranslate"><span class="pre">TEST=TRUE</span></code> on the <code class="docutils literal notranslate"><span class="pre">make</span></code> commandline or in the
+<code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> will enable routines in AMReX to initialize MultiFabs
+and arrays with signalliing NaNs. This
+behavior is the same as <code class="docutils literal notranslate"><span class="pre">DEBUG=TRUE</span></code>, but <code class="docutils literal notranslate"><span class="pre">TEST</span></code> uses the same
+compiler optimizations as a normal build.</p>
+<p>This can be useful with compiler flags that trap floating point
+exceptions (FPEs), but checks on floating point exceptions can also
+be enabled through runtime parameters passed to AMReX’s
+backtrace functionlity:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">amrex.fpe_trap_invalid</span></code>: enabling FPE trapping for
+invalid operations (e.g. <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">*</span> <span class="pre">inf</span></code>, <code class="docutils literal notranslate"><span class="pre">sqrt(-1)</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">amrex.fpe_trap_zero</span></code>: enable FPE trapping for
+divide-by-zero</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">amrex.fpe_trap_overflow</span></code>: enable FPE trapping for
+overflow</p></li>
+</ul>
+</li>
+<li><p>backtracing</p>
+<p>When exception trapping is enabled (either via AMReX or the
+compiler), the code will abort, and the backtrace information will
+be output to a file <code class="docutils literal notranslate"><span class="pre">Backtrace.N</span></code>, where N is the
+processor number. AMReX will also initialize multifabs with
+signaliing NaNs to help uncover any floating point issues.</p>
+<p>This is also useful to diagnose deadlocks in parallel regions.
+If the code is hanging, doing “control-C” will be intercepted
+and the code will generate a backtrace which will identify
+where in the code there was a deadlock.</p>
+<p>Behind the scenes, AMReX implements this capability via the
+Linux/Unix <code class="docutils literal notranslate"><span class="pre">feenableexcept</span></code> function (this is in
+<code class="docutils literal notranslate"><span class="pre">backtrace_c.cpp</span></code> in AMReX).</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">FSANITIZER</span></code></p>
+<p>For gfortran, gcc, g++, setting <code class="docutils literal notranslate"><span class="pre">FSANITIZER=TRUE</span></code>
+in <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> will enable the
+address sanitizer support built into GCC. This is enabled through
+integration with <a class="reference external" href="https://github.com/google/sanitizers">https://github.com/google/sanitizers</a> in GCC.</p>
+<p>Note: you will need to have the libraries libasan and
+libubsan installed on your machine to use this functionality.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="extending-the-build-system">
+<h2>Extending the Build System<a class="headerlink" href="#extending-the-build-system" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adding-a-compiler">
+<h3>Adding a Compiler<a class="headerlink" href="#adding-a-compiler" title="Permalink to this headline">¶</a></h3>
+<p>Properties for different compilers are already defined in
+<code class="docutils literal notranslate"><span class="pre">${AMREX_HOME}/Tools/GNUmake</span></code>. Each compiler is given its
+own file in the <code class="docutils literal notranslate"><span class="pre">comps/</span></code> sub-directory.  These
+compiler files define the compiler flags for both optimized and debug
+compiling.</p>
+</div>
+<div class="section" id="parallel-mpi-builds">
+<h3>Parallel (MPI) Builds<a class="headerlink" href="#parallel-mpi-builds" title="Permalink to this headline">¶</a></h3>
+<p>When building with MPI, the build system needs to know about the
+location of the MPI libraries. If your local MPI has the <code class="docutils literal notranslate"><span class="pre">mpif90</span></code>
+and <code class="docutils literal notranslate"><span class="pre">mpicxx</span></code> wrappers installed and working, then MAESTROeX will
+attempt to use these. Otherwise, you will need to add a site to the
+<code class="docutils literal notranslate"><span class="pre">sites/</span></code> sub-directory in the AMReX build system specifying the
+details of your environment.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="managingjobs.html" class="btn btn-neutral float-right" title="Managing Jobs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="analysis.html" class="btn btn-neutral float-left" title="Analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2019, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>
