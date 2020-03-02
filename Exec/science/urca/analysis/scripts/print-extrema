@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+"""
+Use yt to slice a boxlib plotfile supplied through the domain center.
+
+Donald E. Willcox
+"""
+import yt
+from yt.frontends.boxlib.data_structures import AMReXDataset
+import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('infile', type=str, help='Name of input plotfile.')
+args = parser.parse_args()
+
+def calculate_field_extrema(ds, field):
+    region = ds.all_data()
+    fmin, fmax = region.quantities.extrema(field)
+    return fmin, fmax
+    
+def print_field_stats(ds, field):
+    print('------------')
+    print(field)
+    fmin, fmax = calculate_field_extrema(ds, field)
+    print('min value of {} is {}'.format(field, fmin))
+    print('max value of {} is {}'.format(field, fmax))
+
+if __name__=="__main__":
+    ds = AMReXDataset(args.infile)
+
+    for f in ds.field_list + ds.derived_field_list:
+        print_field_stats(ds, f)

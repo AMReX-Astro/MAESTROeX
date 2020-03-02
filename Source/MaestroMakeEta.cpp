@@ -43,44 +43,45 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
-            const Box& validbox = mfi.validbox();
+            const Box& tilebox = mfi.tilebox();
 
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-            int zlo = validbox.loVect()[2];
-            AMREX_PARALLEL_FOR_3D(validbox, i, j, k, {
+            int zlo = 0;
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
-                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 }
             });
-
+            
             // we only add the contribution at the top edge if we are at the top of the domain
             // this prevents double counting
             auto top_edge = false;
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (validbox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
+
             if (top_edge) {
-                int k = validbox.hiVect()[2];
-                int j = validbox.hiVect()[1]+1;
-                int lo = validbox.loVect()[0];
-                int hi = validbox.hiVect()[0];
+                const int k = 0;
+                const int j = tilebox.hiVect()[1]+1;
+                const int lo = tilebox.loVect()[0];
+                const int hi = tilebox.hiVect()[0];
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
                     int i = n + lo;
-                    amrex::Gpu::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 });
             }
 #else 
-            AMREX_PARALLEL_FOR_3D(validbox, i, j, k, {
-                amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                amrex::HostDevice::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
             });
 
             // we only add the contribution at the top edge if we are at the top of the domain
@@ -88,17 +89,17 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             auto top_edge = false;
 
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (validbox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
             
             if (top_edge) {
-                int zhi = validbox.hiVect()[2] + 1;
+                int zhi = tilebox.hiVect()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
-                        amrex::Gpu::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+                        amrex::HostDevice::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
                     }
                 });
             }
