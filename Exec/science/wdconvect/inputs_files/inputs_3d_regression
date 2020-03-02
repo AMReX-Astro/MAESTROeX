@@ -68,6 +68,8 @@ maestro.use_tfromp = true
 
 maestro.use_delta_gamma1_term = false
 
+maestro.do_burning = true
+
 # PLOTFILES
 maestro.plot_base_name  = wdconvect_plt   # root name of plot file
 maestro.plot_int   = 1      # number of timesteps between plot files
@@ -98,6 +100,9 @@ maestro.eps_hg_bottom      = 1.e-4
 
 # OMP settings
 system.regtest_reduction = 1
+
+# GPU parameters 
+maestro.deterministic_nodal_solve = true
 
 &probin
 
