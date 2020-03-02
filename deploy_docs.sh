@@ -8,7 +8,7 @@ DEV_BRANCH="development"
 TARGET_BRANCH="gh-pages"
 
 # Pull requests and commits to other branches shouldn't try to deploy
-if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$MASTER_BRANCH" -o "$TRAVIS_BRANCH" != "$DEV_BRANCH" ]; then
+if [ "$TRAVIS_PULL_REQUEST" != "false" || ("$TRAVIS_BRANCH" != "$MASTER_BRANCH" && "$TRAVIS_BRANCH" != "$DEV_BRANCH") ]; then
     echo "Skipping deploy on $TRAVIS_BRANCH. We only deploy docs automatically from development."
     exit 0
 fi
