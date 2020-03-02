@@ -6,6 +6,6 @@
 {% block sidebartitle %}
 {{ super() }}
     <div class="branch">
-        Branch: <a href="{{ pagename+file_suffix | replace('dev/', '') }}">master</a> | <a href="dev/{{ pagename+file_suffix | replace('dev/', '') }}">development</a>
+        Branch: <a href="{{ pagename|replace('dev/', '') }}{{file_suffix}}">master</a> | <a href="dev/{{ pagename|replace('dev/', '') }}{{file_suffix}}">development</a>
     </div>
 {% endblock %}
