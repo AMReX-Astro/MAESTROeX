@@ -58,17 +58,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                     amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
                 }
             });
-
-            // const auto lo = amrex::lbound(tilebox);
-            // const auto hi = amrex::ubound(tilebox);
-            // auto k = 0;//tilebox.hiVect()[2];
-            // for (auto j = lo.y; j <= hi.y; ++j) {
-            //     AMREX_PRAGMA_SIMD
-            //     for (auto i = lo.x; i <= hi.x; ++i) {
-            //         amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
-            //     }
-            // }
-
+            
             // we only add the contribution at the top edge if we are at the top of the domain
             // this prevents double counting
             auto top_edge = false;
@@ -77,11 +67,12 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
                     top_edge = true;
                 }
             }
+
             if (top_edge) {
-                int k = tilebox.hiVect()[2];
-                int j = tilebox.hiVect()[1]+1;
-                int lo = tilebox.loVect()[0];
-                int hi = tilebox.hiVect()[0];
+                const int k = 0;
+                const int j = tilebox.hiVect()[1]+1;
+                const int lo = tilebox.loVect()[0];
+                const int hi = tilebox.hiVect()[0];
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
                     int i = n + lo;
