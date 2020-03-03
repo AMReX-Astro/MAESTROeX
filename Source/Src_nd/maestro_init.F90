@@ -7,7 +7,6 @@ module maestro_init_module
   use model_parser_module
   use meth_params_module, only: rho_comp, rhoh_comp, spec_comp, temp_comp, pi_comp, &
        nscal, small_dens, small_temp, prob_lo, prob_hi, rel_eps
-  use eos_module, only: eos_init
   use runtime_init_module
   implicit none
 
@@ -26,6 +25,51 @@ contains
     call burner_loop_init()
 
   end subroutine maestro_network_init
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine maestro_eos_init() bind(C, name="maestro_eos_init")
+    ! Binds to C function ``maestro_eos_init``
+    
+    use eos_module, only: eos_init
+
+    integer :: ioproc
+
+    !---------------------------------------------------------------------
+    ! other initializations
+    !---------------------------------------------------------------------
+
+    ! This is a routine which links to the C++ ParallelDescriptor class
+
+    call bl_pd_is_ioproc(ioproc)
+
+    !---------------------------------------------------------------------
+    ! safety checks
+    !---------------------------------------------------------------------
+
+    if (small_dens <= 0.d0) then
+        if (ioproc == 1) then
+           call amrex_warning("Warning:: small_dens has not been set, defaulting to 1.d-200.")
+        endif
+        small_dens = 1.d-200
+     endif
+ 
+     if (small_temp <= 0.d0) then
+        if (ioproc == 1) then
+           call amrex_warning("Warning:: small_temp has not been set, defaulting to 1.d-200.")
+        endif
+        small_temp = 1.d-200
+     endif
+ 
+     ! Note that the EOS may modify our choices because of its
+     ! internal limitations, so the small_dens and small_temp
+     ! may be modified coming back out of this routine.
+ 
+     call eos_init(small_dens=small_dens, small_temp=small_temp)
+
+  end subroutine maestro_eos_init
 
   ! :::
   ! ::: ----------------------------------------------------------------
@@ -115,67 +159,18 @@ contains
   ! ::: ----------------------------------------------------------------
   ! :::
 
-  subroutine set_method_params(Density,Enthalpy,FirstSpec,Temperature, &
-       Pressure,Nscalars,prob_lo_in,prob_hi_in) &
+  subroutine set_method_params(prob_lo_in,prob_hi_in) &
        bind(C, name="set_method_params")
     ! Binds to C function ``set_method_params``
 
-    integer         , intent(in) :: Density, Enthalpy, FirstSpec, Temperature
-    integer         , intent(in) :: Pressure, Nscalars
     double precision, intent(in) :: prob_lo_in(3), prob_hi_in(3)
-
-    integer :: ioproc
-
-    !---------------------------------------------------------------------
-    ! conserved state components
-    !---------------------------------------------------------------------
 
     if (parallel_IOProcessor()) then
        print*,'Calling set_method_params()'
     end if
 
-    rho_comp  = Density+1
-    rhoh_comp = Enthalpy+1
-    spec_comp = FirstSpec+1
-    temp_comp = Temperature+1
-    pi_comp   = Pressure+1
-
-    ! nscal = Nscalars
-
     prob_lo(1:3) = prob_lo_in(1:3)
-    prob_hi(1:3) = prob_hi_in(1:3)
-
-    !---------------------------------------------------------------------
-    ! other initializations
-    !---------------------------------------------------------------------
-
-    ! This is a routine which links to the C++ ParallelDescriptor class
-
-    call bl_pd_is_ioproc(ioproc)
-
-    !---------------------------------------------------------------------
-    ! safety checks
-    !---------------------------------------------------------------------
-
-    if (small_dens <= 0.d0) then
-       if (ioproc == 1) then
-          call amrex_warning("Warning:: small_dens has not been set, defaulting to 1.d-200.")
-       endif
-       small_dens = 1.d-200
-    endif
-
-    if (small_temp <= 0.d0) then
-       if (ioproc == 1) then
-          call amrex_warning("Warning:: small_temp has not been set, defaulting to 1.d-200.")
-       endif
-       small_temp = 1.d-200
-    endif
-
-    ! Note that the EOS may modify our choices because of its
-    ! internal limitations, so the small_dens and small_temp
-    ! may be modified coming back out of this routine.
-
-    call eos_init(small_temp, small_dens)
+    prob_hi(1:3) = prob_hi_in(1:3)    
 
   end subroutine set_method_params
 
