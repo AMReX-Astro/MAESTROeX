@@ -12,25 +12,25 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const RealVector& w0_force,
                         const Vector<MultiFab>& w0_force_cart)
 {
-        // timer for profiling
-        BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
 
-        // create a uold with filled ghost cells
-        Vector<MultiFab> utilde(finest_level+1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-                utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-                utilde[lev].setVal(0.);
-        }
+    // create a uold with filled ghost cells
+    Vector<MultiFab> utilde(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+            utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+            utilde[lev].setVal(0.);
+    }
 
-        FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+    FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
-        // create a MultiFab to hold uold + w0
-        Vector<MultiFab> ufull(finest_level+1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-                ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
-        ufull[lev].setVal(0.);
-        }
+    // create a MultiFab to hold uold + w0
+    Vector<MultiFab> ufull(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+            ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+    // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+    ufull[lev].setVal(0.);
+    }
 
         // create ufull = uold + w0
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -38,46 +38,46 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
     // fill ufull ghost cells
     FillPatch(t_old, ufull, ufull, ufull, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
-        }
-        
-        // create a face-centered MultiFab to hold utrans
-        Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-                utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-                utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+        MultiFab::Add(ufull[lev],utilde[lev],0,0,AMREX_SPACEDIM,ng_adv);
+    }
+    
+    // create a face-centered MultiFab to hold utrans
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+            utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+            utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 #if (AMREX_SPACEDIM == 3)
-                utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+            utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
-                for (int j=0; j < AMREX_SPACEDIM; j++)
-                        utrans[lev][j].setVal(0.);
-        }
+            for (int j=0; j < AMREX_SPACEDIM; j++)
+                    utrans[lev][j].setVal(0.);
+    }
 
-        // create utrans
-        MakeUtrans(utilde,ufull,utrans,w0mac);
+    // create utrans
+    MakeUtrans(utilde,ufull,utrans,w0mac);
 
-        // create a MultiFab to hold the velocity forcing
-        Vector<MultiFab> vel_force(finest_level+1);
-        for (int lev=0; lev<=finest_level; ++lev) {
-                if (ppm_trace_forces == 0) {
-                        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-                } else {
-                        // tracing needs more ghost cells
-                        vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-                }
-                vel_force[lev].setVal(0.);
+    // create a MultiFab to hold the velocity forcing
+    Vector<MultiFab> vel_force(finest_level+1);
+    for (int lev=0; lev<=finest_level; ++lev) {
+            if (ppm_trace_forces == 0) {
+                    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+            } else {
+                    // tracing needs more ghost cells
+                    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+            }
+            vel_force[lev].setVal(0.);
 
-        }
+    }
 
-        int do_add_utilde_force = 1;
-        MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-                     w0_force_cart,do_add_utilde_force);
+    int do_add_utilde_force = 1;
+    MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
+                    w0_force_cart,do_add_utilde_force);
 
-        // add w0 to trans velocities
-        Addw0 (utrans,w0mac,1.);
+    // add w0 to trans velocities
+    Addw0 (utrans,w0mac,1.);
 
-        VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
+    VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
 }
 
 
@@ -139,38 +139,31 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    Real divterm = ((sfluxx(i+1,j,k,rhoh_comp) - sfluxx(i,j,k,rhoh_comp))/dx[0]
-                        + (sfluxy(i,j+1,k,rhoh_comp) - sfluxy(i,j,k,rhoh_comp))/dx[1]
+                    Real divterm = ((sfluxx(i+1,j,k,RhoH) - sfluxx(i,j,k,RhoH))/dx[0]
+                        + (sfluxy(i,j+1,k,RhoH) - sfluxy(i,j,k,RhoH))/dx[1]
 #if (AMREX_SPACEDIM == 3)
-                        + (sfluxz(i,j,k+1,rhoh_comp) - sfluxz(i,j,k,rhoh_comp))/dx[2]
+                        + (sfluxz(i,j,k+1,RhoH) - sfluxz(i,j,k,RhoH))/dx[2]
 #endif
                         );
              
-                    snew_arr(i,j,k,rhoh_comp) = sold_arr(i,j,k,rhoh_comp) 
-                        + dt_loc * (-divterm + force_arr(i,j,k,rhoh_comp));
+                    snew_arr(i,j,k,RhoH) = sold_arr(i,j,k,RhoH) 
+                        + dt_loc * (-divterm + force_arr(i,j,k,RhoH));
 
-                    if (do_eos_h_above_cutoff_loc && snew_arr(i,j,k,rho_comp) <= base_cutoff_dens_loc) {
-                        // need Microphysics C++
+                    if (do_eos_h_above_cutoff_loc && snew_arr(i,j,k,Rho) <= base_cutoff_dens_loc) {
+                        eos_t eos_state;
+
+                        eos_state.rho = snew_arr(i,j,k,Rho);
+                        eos_state.T = sold_arr(i,j,k,Temp);
+                        eos_state.p = p0_arr(i,j,k);
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = snew_arr(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+
+                        eos(eos_input_rp, eos_state);
+
+                        snew_arr(i,j,k,RhoH) = snew_arr(i,j,k,Rho) * eos_state.h;
                     }
                 });
-
-                // this just does the EoS stuff now
-                if (do_eos_h_above_cutoff) {
-#pragma gpu box(tileBox)
-                    update_rhoh(AMREX_INT_ANYD(tileBox.loVect()), 
-                        AMREX_INT_ANYD(tileBox.hiVect()),
-                        BL_TO_FORTRAN_ANYD(scalold_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(scalnew_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(sfluxx_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(sfluxy_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_ANYD(sfluxz_mf[mfi]),
-#endif
-                        BL_TO_FORTRAN_ANYD(force_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                        AMREX_REAL_ANYD(d_x), dt,
-                        NumSpec);
-                }
 
             } else if (start_comp == FirstSpec) {   
                 // RhoX update

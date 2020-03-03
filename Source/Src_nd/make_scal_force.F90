@@ -91,7 +91,6 @@ contains
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%rho   = scal(i,j,k,rho_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
-             
              ! dens, temp, xmass inputs
              call eos(eos_input_rt, eos_state)
              
@@ -119,7 +118,6 @@ contains
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
-                
                 ! dens, temp, xmass inputs
                 call eos(eos_input_rt, eos_state)
                 
@@ -138,7 +136,7 @@ contains
                 eos_state%T     = scal(i,j,k,temp_comp)
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
-                
+                                
                 ! dens, temp, xmass inputs
                 call eos(eos_input_rt, eos_state)
                 
