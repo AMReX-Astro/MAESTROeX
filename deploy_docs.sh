@@ -60,6 +60,12 @@ fi
 # Pull from SOURCE_BRANCH again
 git pull || true
 
+# if on the dev branch, use the dev_layout.html template to get the 
+# links correct
+if [ "$TRAVIS_BRANCH" = "$DEV_BRANCH" ]; then
+    mv sphinx_docs/source/_templates/dev_layout.html sphinx_docs/source/_templates/layout.html 
+fi
+
 # Build the Sphinx documentation
 cd sphinx_docs
 make html
