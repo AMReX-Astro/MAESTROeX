@@ -3,12 +3,27 @@ MAESTROEX_HOME ?= /path/to/MAESTROEX
 
 TOP := $(MAESTROEX_HOME)
 
-# default microphysics locations
-EOS_HOME     ?= $(TOP)/Microphysics/EOS
-NETWORK_HOME ?= $(TOP)/Microphysics/networks
-COND_HOME    ?= $(TOP)/Microphysics/conductivity
+# Microphysics is a git submodule of MAESTROeX. By default
+# we assume it is in the external/ directory.
+# The user may override this with their own installation
+# of Microphysics as long as they set the environment variable
+# MICROPHYSICS_HOME.
 
-INTEGRATOR_DIR ?= VODE90
+MICROPHYSICS_HOME ?= $(TOP)/external/Microphysics
+
+# Check to make sure that Microphysics actually exists,
+# using an arbitrary file that must exist to check.
+# Throw an error if we don't have Microphysics.
+ifeq ("$(wildcard $(MICROPHYSICS_HOME)/Make.Microphysics)","")
+  $(error Microphysics has not been downloaded. Please run "git submodule update --init" from the top level of the code)
+endif
+
+# default microphysics locations
+EOS_HOME     ?= $(MICROPHYSICS_HOME)/EOS
+NETWORK_HOME ?= $(MICROPHYSICS_HOME)/networks
+CONDUCTIVITY_HOME    ?= $(MICROPHYSICS_HOME)/conductivity
+
+INTEGRATOR_DIR ?= VODE
 
 EBASE := Maestro
 
@@ -82,114 +97,12 @@ VPATH_LOCATIONS   += $(Blocs)
 # microphysics
 #------------------------------------------------------------------------------
 
-ifdef MICROPHYSICS_HOME
-   EOS_PATH := $(MICROPHYSICS_HOME)/EOS/$(strip $(EOS_DIR))
-   NETWORK_PATH := $(MICROPHYSICS_HOME)/networks/$(strip $(NETWORK_DIR))
-   COND_PATH := $(MICROPHYSICS_HOME)/conductivity/$(strip $(CONDUCTIVITY_DIR))
-   INTERFACES_PATH := $(MICROPHYSICS_HOME)/interfaces/$(strip $(INTERFACES_DIR))
-endif
-
-ifeq ($(USE_REACT), TRUE)
-  DEFINES += -DREACTIONS
-  # we need the compositional derivatives for SDC
-  DEFINES += -DEXTRA_THERMO
-endif
-
-ifeq ($(USE_REACT_SPARSE_JACOBIAN), TRUE)
-  DEFINES += -DREACT_SPARSE_JACOBIAN
-
-  # The following is sometimes useful to turn on for debugging sparse J indices
-  # (if a get/set/scale is called with (row, col) not in the sparse J, stop)
-  # Otherwise, set/scale do nothing, and get returns 0.
-  ifeq ($(USE_SPARSE_STOP_ON_OOB), TRUE)
-    DEFINES += -DSPARSE_STOP_ON_OOB
-  endif
-endif
-
-# Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
-ifeq ($(USE_SDC), TRUE)
-  DEFINES += -DSDC -DSIMPLIFIED_SDC -DPRIM_SPECIES_HAVE_SOURCES
-  DEFINES += -DSDC_EVOLVE_ENTHALPY
-  USE_SIMPLIFIED_SDC = TRUE
-endif
-
-# if the EOS / network / conductivity name exists in
-# MAESTROEX/Microphysics, then use that version
-
-ifneq "$(wildcard $(EOS_HOME)/$(strip $(EOS_DIR)) )" ""
-   EOS_PATH := $(EOS_HOME)/$(strip $(EOS_DIR))
-endif
-
-ifneq "$(wildcard $(NETWORK_HOME)/$(strip $(NETWORK_DIR)) )" ""
-   NETWORK_PATH := $(NETWORK_HOME)/$(strip $(NETWORK_DIR))
-endif
-
-ifneq "$(wildcard $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR)) )" ""
-   COND_PATH := $(COND_HOME)/$(strip $(CONDUCTIVITY_DIR))
-endif
-
-ifneq "$(wildcard $(INTERFACES_HOME)/$(strip $(INTERFACES_DIR)) )" ""
-   INTERFACES_PATH := $(INTERFACES_HOME)/$(strip $(INTERFACES_DIR))
-endif
-
-# Problems can specify the input file for general_null by setting
-# GENERAL_NET_INPUTS directly (full path) or just specifying the name
-# of the inputs file as NETWORK_INPUTS and let us sort it out
-ifndef GENERAL_NET_INPUTS
-   ifneq "$(wildcard $(NETWORK_INPUTS))" ""
-      GENERAL_NET_INPUTS := $(NETWORK_INPUTS)
-   else
-      GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/general_null/$(NETWORK_INPUTS)
-   endif
-endif
-
-# Specify that we want to write the general_null network
-# files to our temporary build directory (this has no
-# effect for other networks).
+# Specify that we want to write any automatically generated network
+# file (including the general_null network) to our temporary build
+# directory
 NETWORK_OUTPUT_PATH = $(MAESTROEX_AUTO_SOURCE_DIR)
 
-EXTERN_CORE += $(EOS_HOME)
-EXTERN_CORE += $(EOS_PATH)
-
-# the helmholtz EOS has an include file -- also add a target to link
-# the table into the problem directory.
-ifeq ($(findstring helmholtz, $(EOS_DIR)), helmholtz)
-   all: table
-endif
-
-table:
-	@if [ ! -f helm_table.dat ]; then echo Linking helm_table.dat; ln -s $(EOS_PATH)/helm_table.dat .;  fi
-
-# some networks have .dat files that need to be linked
-NET_DAT_FILES = $(wildcard $(NETWORK_PATH)/*.dat)
-ifneq ($(NET_DAT_FILES),)
-   all: net_dat
-endif
-
-net_dat:
-	$(foreach dat,$(NET_DAT_FILES),$(shell ln -s $(dat) .))
-
-EXTERN_CORE += $(NETWORK_HOME)
-EXTERN_CORE += $(NETWORK_PATH)
-
-# Note that this should be located after the include of the EOS and
-# Network includes since it has actions that depend on variables set
-# there.
-
-ifdef MICROPHYSICS_HOME
-  EXTERN_CORE += $(MICROPHYSICS_HOME)/EOS
-  EXTERN_CORE += $(MICROPHYSICS_HOME)/networks
-  EXTERN_CORE += $(MICROPHYSICS_HOME)/interfaces
-  EXTERN_CORE += $(MICROPHYSICS_HOME)/constants
-endif
-
-EXTERN_CORE += $(TOP)/Microphysics/conductivity
-EXTERN_CORE += $(COND_HOME)
-EXTERN_CORE += $(COND_PATH)
-
-# for the automatically generated network_properties stuff, we should
-# tell it where to put them
-NETWORK_HEADERS_DIR = $(MAESTROEX_AUTO_SOURCE_DIR)
+USE_CONDUCTIVITY := TRUE
 
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
@@ -275,8 +188,8 @@ CEXE_headers += $(AMREX_HOME)/Tools/C_scripts/AMReX_buildInfo.H
 INCLUDE_LOCATIONS +=  $(AMREX_HOME)/Tools/C_scripts
 
 
-MNAMES := EOS=$(EOS_PATH) NETWORK=$(NETWORK_PATH) 
-MNAMES += CONDUCTIVITY=$(COND_PATH)
+MNAMES := EOS=$(EOS_PATH) NETWORK=$(NETWORK_PATH)
+MNAMES += CONDUCTIVITY=$(CONDUCTIVITY_PATH)
 
 # we make AMReX_buildInfo.cpp as we make the .o file, so we can delete
 # it immediately.  this way if the build is interrupted, we are
@@ -323,7 +236,7 @@ endif
 endif
 
 clean::
-	$(SILENT) $(RM) extern.F90 extern.f90
+	$(SILENT) $(RM) extern.F90 extern.f90 extern_parameters.cpp extern_parameters_F.H extern_parameters.H
 	$(SILENT) $(RM) AMReX_buildInfo.cpp
 	$(SILENT) $(RM) $(MAESTROEX_AUTO_SOURCE_DIR)/*.H $(MAESTROEX_AUTO_SOURCE_DIR)/*.[fF]90
 

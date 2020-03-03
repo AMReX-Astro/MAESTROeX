@@ -27,9 +27,9 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 64 64 64
-amr.n_cell = 256 256 256
+amr.n_cell = 128 128 128 256 256 256
 amr.max_grid_size      = 64
-amr.max_level          = 1       # maximum level number allowed
+amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 16       # block factor in grid generation
@@ -53,8 +53,8 @@ maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
 
-maestro.anelastic_cutoff_density = 1.e-2
-maestro.base_cutoff_density = 1.e-3
+maestro.anelastic_cutoff_density = 0.1
+maestro.base_cutoff_density = 0.05
 
 maestro.do_sponge = 0
 maestro.sponge_center_density = 3.e6
@@ -95,7 +95,7 @@ maestro.eps_mac_max        = 1.e-8
 maestro.mac_level_factor   = 10.
 maestro.eps_mac_bottom     = 1.e-3
 # tolerances for the nodal projection
-maestro.eps_hg             = 2.e-10
+maestro.eps_hg             = 5.e-10
 maestro.eps_hg_max         = 1.e-9
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4

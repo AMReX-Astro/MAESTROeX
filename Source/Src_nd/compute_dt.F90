@@ -406,7 +406,6 @@ contains
     double precision :: eps,dt_divu,dt_sound,gradp0,denom,rho_min
     integer          :: i,j,k
 
-    integer :: pt_index(3)
     type(eos_t) :: eos_state
 
     !$gpu
@@ -575,7 +574,6 @@ contains
     double precision :: gp_dot_u,eps,dt_divu,dt_sound,denom,rho_min
     integer          :: i,j,k,r
 
-    integer pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -602,8 +600,6 @@ contains
              eos_state%rho   = scal(i,j,k,rho_comp)
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-             pt_index(:) = (/i, j, k/)
 
              ! dens, temp, and xmass are inputs
              call eos(eos_input_rt, eos_state)
