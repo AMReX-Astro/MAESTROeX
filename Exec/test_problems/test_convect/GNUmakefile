@@ -21,8 +21,8 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := general_null
-GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/ignition.net
-INTEGRATOR_DIR   := VODE90
+NETWORK_INPUTS := ignition.net
+INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package
 Blocs   := .

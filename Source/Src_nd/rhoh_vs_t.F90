@@ -37,7 +37,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -58,9 +57,7 @@ contains
                 eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
                      p0_cart(i,j,k) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_re, eos_state, pt_index)
+                call eos(eos_input_re, eos_state)
 
                 state(i,j,k,temp_comp) = eos_state%T
 
@@ -82,9 +79,7 @@ contains
 
                 eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_rh, eos_state, pt_index)
+                call eos(eos_input_rh, eos_state)
 
                 state(i,j,k,temp_comp) = eos_state%T
 
@@ -109,7 +104,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -130,9 +124,7 @@ contains
 
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rp, eos_state, pt_index)
+             call eos(eos_input_rp, eos_state)
 
              state(i,j,k,temp_comp) = eos_state%T
 
@@ -164,7 +156,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -180,9 +171,7 @@ contains
 
              eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rh, eos_state, pt_index)
+             call eos(eos_input_rh, eos_state)
 
              peos(i,j,k) = eos_state%p
 
@@ -209,7 +198,6 @@ contains
     double precision, intent (inout) :: mach(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     double precision :: vel
     type (eos_t) :: eos_state
 
@@ -241,9 +229,7 @@ contains
                 eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
                      p0_cart(i,j,k) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_re, eos_state, pt_index)
+                call eos(eos_input_re, eos_state)
 
                 mach(i,j,k) = vel / eos_state%cs
 
@@ -274,9 +260,7 @@ contains
 
                 eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_rh, eos_state, pt_index)
+                call eos(eos_input_rh, eos_state)
 
                 mach(i,j,k) = vel / eos_state%cs
 
@@ -305,7 +289,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -326,9 +309,7 @@ contains
                 eos_state%e = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp) - &
                      p0cart(i,j,k,1) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_re, eos_state, pt_index)
+                call eos(eos_input_re, eos_state)
 
                 cs(i,j,k) = eos_state%cs
 
@@ -349,9 +330,7 @@ contains
 
                 eos_state%h = state(i,j,k,rhoh_comp) / state(i,j,k,rho_comp)
 
-                pt_index(:) = (/i, j, k/)
-
-                call eos(eos_input_rh, eos_state, pt_index)
+                call eos(eos_input_rh, eos_state)
 
                 cs(i,j,k) = eos_state%cs
 
@@ -394,7 +373,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -436,9 +414,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -491,9 +467,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -544,9 +518,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -598,9 +570,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -642,7 +612,6 @@ contains
     integer :: i, j, k
     double precision :: rho0_edge, rhoh0_edge, temp0_edge
     
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -687,9 +656,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -743,9 +710,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then
@@ -800,9 +765,7 @@ contains
 
                     endif
 
-                    pt_index(:) = (/i, j, k/)
-
-                    call eos(eos_input_rt, eos_state, pt_index)
+                    call eos(eos_input_rt, eos_state)
                     
                     if (enthalpy_pred_type .eq. predict_T_then_h .or. &
                         enthalpy_pred_type .eq. predict_Tprime_then_h) then

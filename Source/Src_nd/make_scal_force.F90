@@ -57,7 +57,6 @@ contains
     integer          :: i,j,k
     
     type (eos_t) :: eos_state
-    integer :: pt_index(3)
 
     ! spherical only variables
     double precision :: p0_lox,p0_hix,p0_loy,p0_hiy,p0_loz,p0_hiz
@@ -93,10 +92,8 @@ contains
              eos_state%rho   = scal(i,j,k,rho_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
              
-             pt_index(:) = (/i, j, k/)
-
              ! dens, temp, xmass inputs
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
              
              dhdp = ONE / scal(i,j,k,rho_comp) + ( scal(i,j,k,rho_comp) * eos_state%dedr - &
                                                    eos_state%p / scal(i,j,k,rho_comp) ) &
@@ -123,10 +120,8 @@ contains
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
                 
-                pt_index(:) = (/i, j, k/)
-                
                 ! dens, temp, xmass inputs
-                call eos(eos_input_rt, eos_state, pt_index)
+                call eos(eos_input_rt, eos_state)
                 
                 dhdp = ONE / scal(i,j,k,rho_comp) + ( scal(i,j,k,rho_comp) * eos_state%dedr - &
                      eos_state%p / scal(i,j,k,rho_comp) ) / ( scal(i,j,k,rho_comp) * eos_state%dpdr )
@@ -144,10 +139,8 @@ contains
                 eos_state%rho   = scal(i,j,k,rho_comp)
                 eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1) / scal(i,j,k,rho_comp)
                 
-                pt_index(:) = (/i, j, k/)
-                
                 ! dens, temp, xmass inputs
-                call eos(eos_input_rt, eos_state, pt_index)
+                call eos(eos_input_rt, eos_state)
                 
                 dhdp = ONE / scal(i,j,k,rho_comp) + ( scal(i,j,k,rho_comp) * eos_state%dedr - &
                                                       eos_state%p / scal(i,j,k,rho_comp) ) &
