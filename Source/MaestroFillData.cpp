@@ -679,7 +679,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                     // values you want to interpolate to the rest.
 
 #if (AMREX_SPACEDIM == 2)
-                    int k = lo[2];
+                    int k = flo[2];
                     if (dir == 0) {
                         for (auto n = 0; n < nComp; ++n) {
                             for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
