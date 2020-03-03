@@ -59,7 +59,6 @@ contains
     double precision, intent (in) :: gamma1bar_cart (g1_lo(1):g1_hi(1),g1_lo(2):g1_hi(2),g1_lo(3):g1_hi(3))
 
     integer i,j,k,r
-    integer pt_index(3)
     type(eos_t) :: eos_state
     type(eos_xderivs_t) :: eos_xderivs
 
@@ -77,10 +76,8 @@ contains
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
              ! dens, temp, and xmass are inputs
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              call composition_derivatives(eos_state, eos_xderivs)
 
@@ -173,7 +170,6 @@ contains
     double precision, intent (in   ) :: normal(no_lo(1):no_hi(1),no_lo(2):no_hi(2),no_lo(3):no_hi(3),3)
 
     integer i,j,k,r
-    integer pt_index(3)
     type(eos_t) :: eos_state
     type(eos_xderivs_t) :: eos_xderivs
     integer comp
@@ -190,10 +186,8 @@ contains
              eos_state%T     = scal(i,j,k,temp_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
              ! dens, temp, and xmass are inputs
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              call composition_derivatives(eos_state, eos_xderivs)
 

@@ -52,7 +52,6 @@ contains
     integer          :: i, j, k
     double precision :: divterm
 
-    integer :: pt_index(3)
     type(eos_t) :: eos_state
 
     !$gpu
@@ -86,10 +85,8 @@ contains
                    eos_state%p   = p0_new_cart(i,j,k)
                    eos_state%xn  = snew(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-                   pt_index(:) = (/i, j, k/)
-
                    ! (rho,P) --> T,h
-                   call eos(eos_input_rp, eos_state, pt_index)
+                   call eos(eos_input_rp, eos_state)
 
                    snew(i,j,k,rhoh_comp) = snew(i,j,k,rho_comp) * eos_state%h
 
