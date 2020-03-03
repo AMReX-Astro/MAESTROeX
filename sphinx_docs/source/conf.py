@@ -78,7 +78,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'MAESTROeX'
-copyright = '2018-2019, MAESTROeX development tem'
+copyright = '2018-2020, MAESTROeX development tem'
 author = 'MAESTROeX development team'
 
 html_logo = "maestroex_logo.png"
