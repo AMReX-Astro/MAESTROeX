@@ -231,7 +231,7 @@ endif
 endif
 
 clean::
-	$(SILENT) $(RM) extern.F90 extern.f90
+	$(SILENT) $(RM) extern.F90 extern.f90 extern_parameters.cpp extern_parameters_F.H extern_parameters.H
 	$(SILENT) $(RM) AMReX_buildInfo.cpp
 	$(SILENT) $(RM) $(MAESTROEX_AUTO_SOURCE_DIR)/*.H $(MAESTROEX_AUTO_SOURCE_DIR)/*.[fF]90
 
