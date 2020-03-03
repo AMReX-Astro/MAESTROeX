@@ -20,10 +20,8 @@ Src_nd
    file/initdata_f
    file/inlet_bc_f
    file/maestro_init_f
-   file/make_S_f
    file/make_eta_f
    file/make_explicit_thermal_f
-   file/make_gamma_f
    file/make_grav_f
    file/make_heating_f
    file/make_intra_coeffs_f
@@ -31,9 +29,7 @@ Src_nd
    file/make_psi_f
    file/make_scal_force_f
    file/regrid_f
-   file/rhoh_vs_t_f
    file/rotation_f
    file/sponge_f
    file/tagging_f
-   file/update_scal_f
    

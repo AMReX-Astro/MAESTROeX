@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="make_S.F90" href="make_S_f.html" />
+    <link rel="next" title="make_eta.F90" href="make_eta_f.html" />
     <link rel="prev" title="inlet_bc.F90" href="inlet_bc_f.html" /> 
 </head>
 
@@ -168,10 +168,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#f/maestro_init_module">maestro_init_module</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
@@ -179,11 +177,9 @@
 <li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
@@ -269,7 +265,7 @@
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
 <dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/maestro_init_module/get_num_spec" title="f/maestro_init_module/get_num_spec"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_num_spec()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_rel_eps" title="f/maestro_init_module/get_rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_rel_eps()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_spec_az" title="f/maestro_init_module/get_spec_az"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_spec_az()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_spec_names" title="f/maestro_init_module/get_spec_names"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_spec_names()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_conductivity_init" title="f/maestro_init_module/maestro_conductivity_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_conductivity_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_extern_init" title="f/maestro_init_module/maestro_extern_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_extern_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_network_init" title="f/maestro_init_module/maestro_network_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_network_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/set_method_params" title="f/maestro_init_module/set_method_params"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_method_params()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/set_rel_eps" title="f/maestro_init_module/set_rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_rel_eps()</span></code></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#f/maestro_init_module/get_num_spec" title="f/maestro_init_module/get_num_spec"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_num_spec()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_rel_eps" title="f/maestro_init_module/get_rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_rel_eps()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_spec_az" title="f/maestro_init_module/get_spec_az"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_spec_az()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/get_spec_names" title="f/maestro_init_module/get_spec_names"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_spec_names()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_conductivity_init" title="f/maestro_init_module/maestro_conductivity_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_conductivity_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_eos_init" title="f/maestro_init_module/maestro_eos_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_eos_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_extern_init" title="f/maestro_init_module/maestro_extern_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_extern_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/maestro_network_init" title="f/maestro_init_module/maestro_network_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">maestro_network_init()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/set_method_params" title="f/maestro_init_module/set_method_params"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_method_params()</span></code></a>, <a class="reference internal" href="#f/maestro_init_module/set_rel_eps" title="f/maestro_init_module/set_rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_rel_eps()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
@@ -279,8 +275,7 @@
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_paralleldescriptor_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code> =&gt; <code class="xref f f-func docutils literal notranslate"><span class="pre">parallel_ioprocessor()</span></code>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_fort_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_spacedim()</span></code>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">model_parser_module</span></code></p></li>
-<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rhoh_comp" title="f/meth_params_module/rhoh_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rhoh_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/temp_comp" title="f/meth_params_module/temp_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">temp_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/pi_comp" title="f/meth_params_module/pi_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">pi_comp()</span></code></a>, <code class="xref f f-func docutils literal notranslate"><span class="pre">nscal()</span></code>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_dens" title="f/meth_params_module/small_dens"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_dens()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_temp" title="f/meth_params_module/small_temp"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_temp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/prob_lo" title="f/meth_params_module/prob_lo"><code class="xref f f-func docutils literal notranslate"><span class="pre">prob_lo()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/prob_hi" title="f/meth_params_module/prob_hi"><code class="xref f f-func docutils literal notranslate"><span class="pre">prob_hi()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rel_eps" title="f/meth_params_module/rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">rel_eps()</span></code></a>)</p></li>
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">eos_init()</span></code>)</p></li>
+<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">rhoh_comp()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">temp_comp()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">pi_comp()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">nscal()</span></code>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_dens" title="f/meth_params_module/small_dens"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_dens()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/small_temp" title="f/meth_params_module/small_temp"><code class="xref f f-func docutils literal notranslate"><span class="pre">small_temp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/prob_lo" title="f/meth_params_module/prob_lo"><code class="xref f f-func docutils literal notranslate"><span class="pre">prob_lo()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/prob_hi" title="f/meth_params_module/prob_hi"><code class="xref f f-func docutils literal notranslate"><span class="pre">prob_hi()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/rel_eps" title="f/meth_params_module/rel_eps"><code class="xref f f-func docutils literal notranslate"><span class="pre">rel_eps()</span></code></a>)</p></li>
 <li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">runtime_init_module</span></code></p></li>
 </ul>
 <p class="rubric">Subroutines and functions</p>
@@ -294,6 +289,17 @@
 </dd>
 <dt class="field-even">Call to</dt>
 <dd class="field-even"><p><a class="reference internal" href="burner_loop_f.html#f/burner_loop_module/burner_loop_init" title="f/burner_loop_module/burner_loop_init"><code class="xref f f-func docutils literal notranslate"><span class="pre">burner_loop_init()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/maestro_init_module/maestro_eos_init">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">maestro_init_module/</code><code class="sig-name descname">maestro_eos_init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#f/maestro_init_module/maestro_eos_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">maestro_eos_init</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Use </dt>
+<dd class="field-odd"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">eos_init()</span></code>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -372,17 +378,11 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
 
 <dl class="subroutine">
 <dt id="f/maestro_init_module/set_method_params">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">maestro_init_module/</code><code class="sig-name descname">set_method_params</code><span class="sig-paren">(</span><em class="sig-param">density</em>, <em class="sig-param">enthalpy</em>, <em class="sig-param">firstspec</em>, <em class="sig-param">temperature</em>, <em class="sig-param">pressure</em>, <em class="sig-param">nscalars</em>, <em class="sig-param">prob_lo_in</em>, <em class="sig-param">prob_hi_in</em><span class="sig-paren">)</span><a class="headerlink" href="#f/maestro_init_module/set_method_params" title="Permalink to this definition">¶</a></dt>
+<em class="property">subroutine  </em><code class="sig-prename descclassname">maestro_init_module/</code><code class="sig-name descname">set_method_params</code><span class="sig-paren">(</span><em class="sig-param">prob_lo_in</em>, <em class="sig-param">prob_hi_in</em><span class="sig-paren">)</span><a class="headerlink" href="#f/maestro_init_module/set_method_params" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">set_method_params</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>density</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>enthalpy</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>firstspec</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>temperature</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>pressure</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>nscalars</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>prob_lo_in</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>prob_hi_in</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
@@ -423,7 +423,7 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="make_S_f.html" class="btn btn-neutral float-right" title="make_S.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="make_eta_f.html" class="btn btn-neutral float-right" title="make_eta.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="inlet_bc_f.html" class="btn btn-neutral float-left" title="inlet_bc.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
