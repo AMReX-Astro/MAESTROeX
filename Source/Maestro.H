@@ -5,6 +5,8 @@
 #include <omp.h>
 #endif
 
+#include <state_indices.H>
+
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
@@ -13,6 +15,8 @@
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
+#include <network.H>
+#include <eos.H>
 
 #include <PhysBCFunctMaestro.H>
 
@@ -1395,7 +1399,7 @@ public:
     /// @param p0       base state pressure
     void TfromRhoP (amrex::Vector<amrex::MultiFab>& scal,
                     const RealVector& p0,
-                    int updateRhoH = 0);
+                    const bool updateRhoH=false);
 
     /// Calculate the pressure given the density and the enthalpy
     ///
@@ -1738,7 +1742,6 @@ public:
     ////////////////
 
     // these are defined in `VariableSetup()`
-    static int Rho, RhoH, FirstSpec, NumSpec, Temp, Pi, Nscal;
     static int ng_s; //< number of ghost cells for `sold/new` and `uold/new`
 
     // these are defined in `Maestro.cpp`
