@@ -5,6 +5,8 @@
 #include <omp.h>
 #endif
 
+#include <state_indices.H>
+
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>

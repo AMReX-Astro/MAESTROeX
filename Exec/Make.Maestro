@@ -105,6 +105,8 @@ NETWORK_OUTPUT_PATH = $(MAESTROEX_AUTO_SOURCE_DIR)
 
 USE_CONDUCTIVITY := TRUE
 
+USE_CXX_EOS := TRUE
+
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
