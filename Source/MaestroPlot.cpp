@@ -1498,57 +1498,170 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
                        Vector<MultiFab>& ad_excess)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeAdExcess()",MakeAdExcess);
+    BL_PROFILE_VAR("Maestro::MakeAdExcess()", MakeAdExcess);
+
+    const auto base_cutoff_density_loc = base_cutoff_density;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const MultiFab& state_mf = state[lev];
-        MultiFab& ad_excess_mf = ad_excess[lev];
+        // const MultiFab& state_mf = state[lev];
+        // MultiFab& ad_excess_mf = ad_excess[lev];
+        MultiFab pres_mf(grids[lev], dmap[lev], 1, 0);
+        MultiFab nabla_ad_mf(grids[lev], dmap[lev], 1, 0);
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-        if (spherical == 0) {
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(state_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_ad_excess(AMREX_INT_ANYD(tileBox.loVect()),
-                               AMREX_INT_ANYD(tileBox.hiVect()),
-                               BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                               BL_TO_FORTRAN_ANYD(ad_excess_mf[mfi]));
-            }
-
-        } else {
-
-            const MultiFab& normal_mf = normal[lev];
-
-#ifdef _OPENMP
-#pragma omp parallel
+            const Array4<const Real> state_arr = state[lev].array(mfi);
+            const Array4<Real> ad_excess_arr = ad_excess[lev].array(mfi);
+            const Array4<Real> pres = pres_mf.array(mfi);
+            const Array4<Real> nabla_ad = nabla_ad_mf.array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<const Real> normal_arr = normal[lev].array(mfi);
 #endif
-            for ( MFIter mfi(state_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                eos_t eos_state;
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_ad_excess_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                    AMREX_INT_ANYD(tileBox.hiVect()),
-                                    BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                                    BL_TO_FORTRAN_ANYD(normal_mf[mfi]),
-                                    BL_TO_FORTRAN_ANYD(ad_excess_mf[mfi]));
+                eos_state.rho   = state_arr(i,j,k,Rho);
+                eos_state.T     = state_arr(i,j,k,Temp);
+                for (auto comp = 0; comp < NumSpec; ++comp) {
+                    eos_state.xn[comp] = state_arr(i,j,k,FirstSpec+comp)/eos_state.rho;
+                }
+
+                eos(eos_input_rt, eos_state);
+
+                pres(i,j,k) = eos_state.p;
+                // Print() << "pres = " << pres(i,j,k) << std::endl;
+
+                Real chi_rho = eos_state.rho * eos_state.dpdr / eos_state.p;
+                Real chi_t = eos_state.T * eos_state.dpdT / eos_state.p;
+                nabla_ad(i,j,k) = (eos_state.gam1 - chi_rho) / (chi_t * eos_state.gam1);
+            });
+
+            const auto lo = tileBox.loVect3d();
+            const auto hi = tileBox.hiVect3d();
+
+            if (spherical == 0) {
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real nabla = 0.0;
+
+                    if (state_arr(i,j,k,Rho) > base_cutoff_density_loc) {
+                        Real dtemp = 0.0;
+                        Real dp = 0.0;
+#if (AMREX_SPACEDIM == 2)
+                        // forward difference
+                        if (j == lo[1]) {
+                            dtemp = state_arr(i,j+1,k,Temp) - state_arr(i,j,k,Temp);
+                            dp = pres(i,j+1,k) - pres(i,j,k);
+                        // backward difference
+                        } else if (j == hi[1]) {
+                            dtemp = state_arr(i,j,k,Temp) - state_arr(i,j-1,k,Temp);
+                            dp = pres(i,j,k) - pres(i,j-1,k);
+                        // centered difference
+                        } else {
+                            dtemp = state_arr(i,j+1,k,Temp) - state_arr(i,j-1,k,Temp);
+                            dp = pres(i,j+1,k) - pres(i,j-1,k);
+                        }
+#else 
+                        // forward difference
+                        if (k == lo[2]) {
+                            dtemp = state_arr(i,j,k+1,Temp) - state_arr(i,j,k,Temp);
+                            dp = pres(i,j,k+1) - pres(i,j,k);
+                        // backward difference
+                        } else if (k == hi[2]) {
+                            dtemp = state_arr(i,j,k,Temp) - state_arr(i,j,k-1,Temp);
+                            dp = pres(i,j,k) - pres(i,j,k-1);
+                        // centered difference
+                        } else {
+                            dtemp = state_arr(i,j,k+1,Temp) - state_arr(i,j,k-1,Temp);
+                            dp = pres(i,j,k+1) - pres(i,j,k-1);
+                        }
+#endif
+                        // prevent Inf
+                        if (dp * state_arr(i,j,k,Temp) == 0.0) {
+                            nabla = std::numeric_limits<Real>::min();
+                        } else {
+                            nabla = pres(i,j,k) * dtemp / (dp * state_arr(i,j,k,Temp));
+                        }
+                    }
+
+                    ad_excess_arr(i,j,k) = nabla - nabla_ad(i,j,k);
+                });
+            } else {
+#if (AMREX_SPACEDIM == 3)
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real nabla = 0.0;
+
+                    if (state_arr(i,j,k,Rho) > base_cutoff_density_loc) {
+                        // compute gradient
+                        RealVector dtemp(AMREX_SPACEDIM);
+                        RealVector dp(AMREX_SPACEDIM);
+                        // forward difference
+                        if (i == lo[0]) {
+                            dtemp[0] = state_arr(i+1,j,k,Temp) - state_arr(i,j,k,Temp);
+                            dp[0] = pres(i+1,j,k) - pres(i,j,k);
+                        // backward difference
+                        } else if (i == hi[0]) {
+                            dtemp[0] = state_arr(i,j,k,Temp) - state_arr(i-1,j,k,Temp);
+                            dp[0] = pres(i,j,k) - pres(i-1,j,k);
+                        // centered difference
+                        } else {
+                            dtemp[0] = state_arr(i+1,j,k,Temp) - state_arr(i-1,j,k,Temp);
+                            dp[0] = pres(i+1,j,k) - pres(i-1,j,k);
+                        }
+                        // forward difference
+                        if (j == lo[1]) {
+                            dtemp[1] = state_arr(i,j+1,k,Temp) - state_arr(i,j,k,Temp);
+                            dp[1] = pres(i,j+1,k) - pres(i,j,k);
+                        // backward difference
+                        } else if (j == hi[1]) {
+                            dtemp[1] = state_arr(i,j,k,Temp) - state_arr(i,j-1,k,Temp);
+                            dp[1] = pres(i,j,k) - pres(i,j-1,k);
+                        // centered difference
+                        } else {
+                            dtemp[1] = state_arr(i,j+1,k,Temp) - state_arr(i,j-1,k,Temp);
+                            dp[1] = pres(i,j+1,k) - pres(i,j-1,k);
+                        }
+                        // forward difference
+                        if (k == lo[2]) {
+                            dtemp[2] = state_arr(i,j,k+1,Temp) - state_arr(i,j,k,Temp);
+                            dp[2] = pres(i,j,k+1) - pres(i,j,k);
+                        // backward difference
+                        } else if (k == hi[2]) {
+                            dtemp[2] = state_arr(i,j,k,Temp) - state_arr(i,j,k-1,Temp);
+                            dp[2] = pres(i,j,k) - pres(i,j,k-1);
+                        // centered difference
+                        } else {
+                            dtemp[2] = state_arr(i,j,k+1,Temp) - state_arr(i,j,k-1,Temp);
+                            dp[2] = pres(i,j,k+1) - pres(i,j,k-1);
+                        }
+
+                        Real dp_dot = 0.0;
+                        Real dtemp_dot = 0.0;
+                        for (auto c = 0; c < AMREX_SPACEDIM; ++c) {
+                            dp_dot += dp[c] * normal_arr(i,j,k,c);
+                            dtemp_dot += dtemp[c] * normal_arr(i,j,k,c);
+                        }
+
+                        // prevent Inf
+                        if (dp_dot * state_arr(i,j,k,Temp) == 0.0) {
+                            nabla = std::numeric_limits<Real>::min();
+                        } else {
+                            nabla = pres(i,j,k) * dtemp_dot / (dp_dot * state_arr(i,j,k,Temp));
+                        }
+                    }
+
+                    ad_excess_arr(i,j,k) = nabla - nabla_ad(i,j,k);
+                });
+#endif
             }
         }
     }
@@ -1564,7 +1677,7 @@ Maestro::MakeGrav (const RealVector& rho0,
                    Vector<MultiFab>& grav)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeGrav()",MakeGrav);
+    BL_PROFILE_VAR("Maestro::MakeGrav()", MakeGrav);
 
     RealVector grav_cell( (max_radial_level+1)*nr_fine );
     grav_cell.shrink_to_fit();
