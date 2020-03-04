@@ -16,7 +16,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // Local variables
     const int nrf = nr_fine + 1;
     const int max_lev = max_radial_level + 1;
-    RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0 );
+    RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0);
     etarhosum.shrink_to_fit();
 
     // this stores how many cells there are laterally at each level
@@ -39,9 +39,14 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         const MultiFab& sold_mf = sold[lev];
         const MultiFab& etarhoflux_mf = etarho_flux[lev];
 
+        ParmParse pp("amrex");
+        pp.query("regtest_reduction", system::regtest_reduction);
+
+        Print() << "regtest = " << system::regtest_reduction << std::endl;
+
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel if (!system::regtest_reduction)
 #endif
         for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
@@ -55,7 +60,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             int zlo = tilebox.loVect3d()[2];
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
-                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*j]), etarhoflux_arr(i,j,k));
                 }
             });
             
@@ -70,18 +75,19 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 
             if (top_edge) {
                 const int k = 0;
-                const int j = tilebox.hiVect3d()[1]+1;
-                const int lo = tilebox.loVect3d()[0];
-                const int hi = tilebox.hiVect3d()[0];
+                const auto ybx = amrex::growHi(tilebox, 1, 1);
+                const int j = ybx.hiVect3d()[1];
+                const int lo = ybx.loVect3d()[0];
+                const int hi = ybx.hiVect3d()[0];
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
                     int i = n + lo;
-                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*j]), etarhoflux_arr(i,j,k));
                 });
             }
 #else 
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-                amrex::HostDevice::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+                amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*k]), etarhoflux_arr(i,j,k));
             });
 
             // we only add the contribution at the top edge if we are at the top of the domain
@@ -95,11 +101,11 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             }
             
             if (top_edge) {
-                int zhi = tilebox.hiVect3d()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
+                int zhi = zbx.hiVect3d()[2];
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
-                        amrex::HostDevice::Atomic::Add(&(etarhosum_p[k+nrf*lev]), etarhoflux_arr(i,j,k));
+                        amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*k]), etarhoflux_arr(i,j,k));
                     }
                 });
             }
@@ -128,8 +134,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             const int hi = r_end_coord[n+max_lev*i]+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                // note swapped shaping for etarhosum
-                etarho_edge_p[n+max_lev*r] = etarhosum_p[r+nrf*n] / ncell_lev;
+                etarho_edge_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
             });
         }
     }
