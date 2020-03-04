@@ -39,11 +39,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
         const MultiFab& sold_mf = sold[lev];
         const MultiFab& etarhoflux_mf = etarho_flux[lev];
 
-        ParmParse pp("amrex");
-        pp.query("regtest_reduction", system::regtest_reduction);
-
-        Print() << "regtest = " << system::regtest_reduction << std::endl;
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel if (!system::regtest_reduction)
@@ -75,7 +70,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
 
             if (top_edge) {
                 const int k = 0;
-                const auto ybx = amrex::growHi(tilebox, 1, 1);
+                const auto ybx = mfi.nodaltilebox(1);
                 const int j = ybx.hiVect3d()[1];
                 const int lo = ybx.loVect3d()[0];
                 const int hi = ybx.hiVect3d()[0];
@@ -101,7 +96,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             }
             
             if (top_edge) {
-                const auto& zbx = mfi.nodaltilebox(2);
+                const auto zbx = mfi.nodaltilebox(2);
                 int zhi = zbx.hiVect3d()[2];
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
