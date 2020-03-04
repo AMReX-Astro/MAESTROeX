@@ -5,9 +5,9 @@
 #  descriptive-name     C++-name   Fortran-name  also-adds-to    count   if-def
 
 # the variable state
-@set: scalars nscal
+@set: scalars Nscal Nscal
    density                Rho       rho_comp     None             1                None
-   enthalpy               Rhoh      rhoh_comp    None             1                None
-   species                FirstSpec spec_comp    None           (nspec, nspec)     None
+   enthalpy               RhoH      rhoh_comp    None             1                None
    temperature            Temp      temp_comp    None             1                None
    pi                     Pi        pi_comp      None             1                None
+   species                FirstSpec spec_comp    None           (nspec, NumSpec)     None
