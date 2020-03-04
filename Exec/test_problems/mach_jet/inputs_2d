@@ -96,7 +96,7 @@ maestro.small_dens = 1.e-10
 maestro.do_burning = false
 
 # OMP settings
-system.regtest_reduction = 1
+amrex.regtest_reduction = 1
 
 &probin
 

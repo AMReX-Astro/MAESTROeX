@@ -53,11 +53,11 @@ contains
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           do i = lo(1), hi(1)
-             if (((lev .eq. 0) .and. (state(i,j,k,rho_comp) .ge. tag_density_1)) .or. &
-	     	 ((lev .eq. 1) .and. (state(i,j,k,rho_comp) .ge. tag_density_2)) .or. &
-		 ((lev .eq. 2) .and. (state(i,j,k,rho_comp) .ge. tag_density_3))) then
+              if (((lev .eq. 0) .and. (state(i,j,k,rho_comp) .ge. tag_density_1)) .or. &
+                  ((lev .eq. 1) .and. (state(i,j,k,rho_comp) .ge. tag_density_2)) .or. &
+                  ((lev .eq. 2) .and. (state(i,j,k,rho_comp) .ge. tag_density_3))) then
                 tag(i,j,k) = set
-	     end if	     
+              end if
           enddo
        enddo
     enddo

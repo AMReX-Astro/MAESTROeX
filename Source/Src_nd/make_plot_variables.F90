@@ -24,7 +24,6 @@ contains
     double precision, intent(inout) :: ad_excess(a_lo(1):a_hi(1),a_lo(2):a_hi(2),a_lo(3):a_hi(3))
 
     integer :: i, j, k
-    integer :: pt_index(3)
     double precision :: pres(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
     double precision :: nabla_ad(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
     double precision :: chi_rho, chi_t, dt, dp, nabla
@@ -41,9 +40,7 @@ contains
              eos_state%T     = state(i,j,k,temp_comp)
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              pres(i,j,k) = eos_state%p
 
@@ -123,7 +120,6 @@ contains
     double precision, intent(inout) :: ad_excess(a_lo(1):a_hi(1),a_lo(2):a_hi(2),a_lo(3):a_hi(3))
 
     integer :: i, j, k, c
-    integer :: pt_index(3)
     double precision :: pres(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
     double precision :: nabla_ad(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3))
     double precision :: chi_rho, chi_t, dp(4), dt(4), nabla
@@ -140,9 +136,7 @@ contains
              eos_state%T     = state(i,j,k,temp_comp)
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              pres(i,j,k) = eos_state%p
 
@@ -916,7 +910,6 @@ contains
 
     ! Local variables
     integer :: i, j, k
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -935,9 +928,7 @@ contains
 
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rp, eos_state, pt_index)
+             call eos(eos_input_rp, eos_state)
 
              deltagamma(i,j,k) = eos_state%gam1 - gamma1bar_cart(i,j,k,1)
           enddo
@@ -959,7 +950,6 @@ contains
 
     ! Local variables
     integer :: i, j, k, r
-    integer :: pt_index(3)
     type (eos_t) :: eos_state
 
     !$gpu
@@ -977,9 +967,7 @@ contains
              eos_state%T     = state(i,j,k,temp_comp)
              eos_state%xn(:) = state(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index(:) = (/i, j, k/)
-
-             call eos(eos_input_rt, eos_state, pt_index)
+             call eos(eos_input_rt, eos_state)
 
              entropy(i,j,k) = eos_state%s
           enddo

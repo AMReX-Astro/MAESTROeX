@@ -21,7 +21,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR      := ignition_chamulak
-INTEGRATOR_DIR   := VODE90
+INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package
 Blocs   := .
