@@ -36,9 +36,9 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     if (use_exact_base_state) {
         model_dr_irreg.resize(npts_model);
 
-        model_dr[0] = model_r[0];
+        model_dr_irreg[0] = input_model.model_r[0];
         for (auto i = 1; i < npts_model; ++i) {
-            model_dr[i] = model_r[i] - model_r[i-1];
+            model_dr_irreg[i] = input_model.model_r[i] - input_model.model_r[i-1];
         }
     }
 
@@ -56,7 +56,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
         Real mod_dr = 0.0;
         if (use_exact_base_state) {
-            mod_dr = r_cc_loc[lev] < model_dr[0] ? remainder(model_dr[0], r_cc_loc[lev]) : remainder(r_cc_loc[lev], model_dr[0]);
+            mod_dr = r_cc_loc[lev] < model_dr_irreg[0] ? remainder(model_dr_irreg[0], r_cc_loc[lev]) : remainder(r_cc_loc[lev], model_dr_irreg[0]);
         } else {
             mod_dr = dr[n] > model_dr ? 
                 remainder(model_dr, dr[n]) : remainder(dr[n], model_dr);
@@ -101,7 +101,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
             s0_init[n+max_lev*(r+nr_fine*Rho)] = rho_above_cutoff;
             s0_init[n+max_lev*(r+nr_fine*RhoH)] = rhoh_above_cutoff;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init[n+max_lev*(r+nr_fine*FirstSpec+comp)] = spec_above_cutoff[comp];
+                s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = spec_above_cutoff[comp];
             }
             p0_init[n+max_lev*r] = p_above_cutoff;
             s0_init[n+max_lev*(r+nr_fine*Temp)] = temp_above_cutoff;
@@ -116,14 +116,17 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
             Real sumX = 0.0;
             // do comp = 1, NumSpec
+            // Print() << "NumSpec = " << NumSpec << std::endl;
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 xn_ambient[comp] = max(0.0, min(1.0, 
-                        input_model.Interpolate(rloc, input_model.ispec_model+comp)));
+                    input_model.Interpolate(rloc, input_model.ispec_model+comp)));
                 sumX += xn_ambient[comp];
             }
 
+            // Print() << "sumX = " << sumX << std::endl;
+
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                xn_ambient[comp] /= sumX;
+                if (sumX > 0.0) xn_ambient[comp] /= sumX;
             }
 
             eos_t eos_state;
@@ -142,7 +145,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
             s0_init[n+max_lev*(r+nr_fine*Rho)] = d_ambient;
             s0_init[n+max_lev*(r+nr_fine*RhoH)] = d_ambient * eos_state.h;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init[n+max_lev*(r+nr_fine*FirstSpec+comp)] = 
+                s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
                     d_ambient * xn_ambient[comp];
             }
             p0_init[n+max_lev*r] = eos_state.p; // p_ambient !
@@ -207,7 +210,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
             Real r_r = starting_rad;
             r_r += use_exact_base_state ? r_edge_loc[n+max_lev*(r+1)] : Real(r+1) * dr[n];
-            Real r_l = starting_rad
+            Real r_l = starting_rad;
             r_l += use_exact_base_state ? r_edge_loc[n+max_lev*r] : Real(r) * dr[n];
 
             Real g = 0.0;
