@@ -16,7 +16,7 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR := general_null
-GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/H_core.net
+NETWORK_INPUTS := H_core.net
 
 Bpack   := ./Make.package
 Blocs   := .

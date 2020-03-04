@@ -75,7 +75,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gradp0,gradp0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(gradp0,gradp0_cart, 0, 0, bcs_f, 0);
     }
         
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -89,89 +89,145 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(psi_in,psi_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
+        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(psi_in, psi_cart, 0, 0, bcs_f, 0);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // Declare local storage now. This should be done outside the MFIter loop,
-        // and then we will resize the Fabs in each MFIter loop iteration. Then,
-        // we apply an Elixir to ensure that their memory is saved until it is no
-        // longer needed (only relevant for the asynchronous case, usually on GPUs).
-
-        // get references to the MultiFabs at level lev
-        MultiFab& S_cc_mf = S_cc[lev];
-        MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
-        MultiFab& delta_gamma1_mf = delta_gamma1[lev];
-        const MultiFab& scal_mf = scal[lev];
-        const MultiFab& u_mf = u[lev];
-        const MultiFab& rho_odot_mf = rho_omegadot[lev];
-        const MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
-        const MultiFab& rho_Hext_mf = rho_Hext[lev];
-        const MultiFab& thermal_mf = thermal[lev];
-        const MultiFab& normal_mf = normal[lev];
-
-        const MultiFab& p0_mf = p0_cart[lev];
-        const MultiFab& gradp0_mf = gradp0_cart[lev];
-        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            const Array4<Real> S_cc_arr = S_cc[lev].array(mfi);
+            const Array4<Real> delta_gamma1_term_arr = delta_gamma1_term[lev].array(mfi);
+            const Array4<Real> delta_gamma1_arr = delta_gamma1[lev].array(mfi);
+            const Array4<const Real> scal_arr = scal[lev].array(mfi);
+            const Array4<const Real> rho_odot_arr = rho_omegadot[lev].array(mfi);
+            const Array4<const Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
+            const Array4<const Real> thermal_arr = thermal[lev].array(mfi);
+            const Array4<const Real> u_arr = u[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<const Real> gradp0_arr = gradp0_cart[lev].array(mfi);
+            const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
             if (spherical == 1) {
+#if (AMREX_SPACEDIM == 3)
+                const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
-#pragma gpu box(tileBox)
-                make_S_cc_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                               BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(rho_odot_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                               BL_TO_FORTRAN_ANYD(normal_mf[mfi]));
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    eos_t eos_state;
 
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    for (auto n = 0; n < NumSpec; ++n) {
+                        eos_state.xn[n] = scal_arr(i,j,k,FirstSpec+n) / eos_state.rho;
+                    }
+
+                    // dens, temp, and xmass are inputs
+                    eos(eos_input_rt, eos_state);
+
+                    eos_xderivs_t eos_xderivs = composition_derivatives(eos_state);
+
+                    Real sigma = eos_state.dpdT / 
+                        (eos_state.rho * eos_state.cp * eos_state.dpdr);
+
+                    Real xi_term = 0.0;
+                    Real pres_term = 0.0;
+
+                    if (use_omegadot_terms_in_S) {
+                        for (auto comp = 0; comp < NumSpec; ++comp) {
+                            xi_term -= eos_xderivs.dhdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
+
+                            pres_term += eos_xderivs.dpdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
+                        }
+                    }
+
+                    S_cc_arr(i,j,k) = (sigma / eos_state.rho) * 
+                        (rho_Hext_arr(i,j,k) + rho_Hnuc_arr(i,j,k) + thermal_arr(i,j,k)) 
+                        + sigma * xi_term 
+                        + pres_term / (eos_state.rho * eos_state.dpdr);
+
+                    if (use_delta_gamma1_term) {
+                        delta_gamma1_arr(i,j,k) = eos_state.gam1 - gamma1bar_arr(i,j,k);
+
+                        Real U_dot_er = 0.0;
+                        for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                            U_dot_er += u_arr(i,j,k,n) * normal_arr(i,j,k,n);
+                        }
+
+                        delta_gamma1_term_arr(i,j,k) = (eos_state.gam1 - gamma1bar_arr(i,j,k)) * 
+                            u_arr(i,j,k,AMREX_SPACEDIM-1)* 
+                            gradp0_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
+                            gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
+                    } else {
+                        delta_gamma1_term_arr(i,j,k) = 0.0;
+                        delta_gamma1_arr(i,j,k) = 0.0;
+                    }
+                });
+#endif
             } else {
-#pragma gpu box(tileBox)
-                make_S_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                          lev,
-                          BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(u_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(rho_odot_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(gradp0_mf[mfi]),
-                          BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    eos_t eos_state;
+
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    for (auto n = 0; n < NumSpec; ++n) {
+                        eos_state.xn[n] = scal_arr(i,j,k,FirstSpec+n) / eos_state.rho;
+                    }
+
+                    // dens, temp, and xmass are inputs
+                    eos(eos_input_rt, eos_state);
+
+                    eos_xderivs_t eos_xderivs = composition_derivatives(eos_state);
+
+                    Real sigma = eos_state.dpdT / 
+                        (eos_state.rho * eos_state.cp * eos_state.dpdr);
+
+                    Real xi_term = 0.0;
+                    Real pres_term = 0.0;
+
+                    if (use_omegadot_terms_in_S) {
+                        for (auto comp = 0; comp < NumSpec; ++comp) {
+                            xi_term -= eos_xderivs.dhdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
+
+                            pres_term += eos_xderivs.dpdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
+                        }
+                    }
+
+                    S_cc_arr(i,j,k) = (sigma / eos_state.rho) * 
+                        ( rho_Hext_arr(i,j,k) + rho_Hnuc_arr(i,j,k) + thermal_arr(i,j,k) ) 
+                        + sigma * xi_term 
+                        + pres_term / (eos_state.rho * eos_state.dpdr);
+                        
+                    int r = AMREX_SPACEDIM == 2 ? j : k;
+
+                    if (use_delta_gamma1_term && r < anelastic_cutoff_density_coord[lev]) {
+                        delta_gamma1_arr(i,j,k) = eos_state.gam1 - gamma1bar_arr(i,j,k);
+
+                        delta_gamma1_term_arr(i,j,k) = (eos_state.gam1 - gamma1bar_arr(i,j,k)) * 
+                            u_arr(i,j,k,AMREX_SPACEDIM-1)* 
+                            gradp0_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
+                            gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
+                    } else {
+                        delta_gamma1_term_arr(i,j,k) = 0.0;
+                        delta_gamma1_arr(i,j,k) = 0.0;
+                    }
+                });
             }
         }
     }
 
     // average fine data onto coarser cells
-    AverageDown(S_cc,0,1);
-    AverageDown(delta_gamma1_term,0,1);
+    AverageDown(S_cc, 0, 1);
+    AverageDown(delta_gamma1_term, 0, 1);
 
     if (use_delta_gamma1_term) {
 
@@ -180,34 +236,26 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
-            // get references to the MultiFabs at level lev
-            MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
-            const MultiFab& delta_gamma1_mf = delta_gamma1[lev];
-
-            const MultiFab& p0_mf = p0_cart[lev];
-            const MultiFab& psi_mf = psi_cart[lev];
-            const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
-
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(delta_gamma1_term_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(delta_gamma1_term[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                create_correction_delta_gamma1_term(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                                    BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                                                    BL_TO_FORTRAN_ANYD(delta_gamma1_mf[mfi]),
-                                                    BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                                                    BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
-                                                    BL_TO_FORTRAN_ANYD(p0_mf[mfi]));
+                const Array4<Real> delta_gamma1_term_arr = delta_gamma1_term[lev].array(mfi);
+                const Array4<const Real> delta_gamma1_arr = delta_gamma1[lev].array(mfi);
+                const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
+                const Array4<const Real> psi_arr = psi_cart[lev].array(mfi);
+                const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    delta_gamma1_term_arr(i,j,k) += delta_gamma1_arr(i,j,k) * 
+                        psi_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
+                        gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
+                });
             }
         }
     }
@@ -222,7 +270,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<MultiFab>& delta_gamma1_term)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeRHCCforNodalProj()",MakeRHCCforNodalProj);
+    BL_PROFILE_VAR("Maestro::MakeRHCCforNodalProj()", MakeRHCCforNodalProj);
 
     Vector<MultiFab> Sbar_cart(finest_level+1);
     Vector<MultiFab> beta0_cart(finest_level+1);
@@ -234,46 +282,36 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
         beta0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(Sbar, Sbar_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
-        // get references to the MultiFabs at level lev
-        MultiFab& rhcc_mf = rhcc[lev];
-        const MultiFab& S_cc_mf = S_cc[lev];
-        const MultiFab& Sbar_mf = Sbar_cart[lev];
-        const MultiFab& beta0_mf = beta0_cart[lev];
-
-        const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_rhcc_for_nodalproj(AMREX_INT_ANYD(tileBox.loVect()),
-                                            AMREX_INT_ANYD(tileBox.hiVect()),
-                                            BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(Sbar_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
-                                            BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]));
+            const Array4<Real> rhcc_arr = rhcc[lev].array(mfi);
+            const Array4<const Real> S_cc_arr = S_cc[lev].array(mfi);
+            const Array4<const Real> Sbar_arr = Sbar_cart[lev].array(mfi);
+            const Array4<const Real> beta0_arr = beta0_cart[lev].array(mfi);
+            const Array4<const Real> delta_gamma1_term_arr = delta_gamma1_term[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                rhcc_arr(i,j,k) = beta0_arr(i,j,k) * (S_cc_arr(i,j,k) - Sbar_arr(i,j,k) + delta_gamma1_term_arr(i,j,k));
+            });
         }
     }
 
     // averge down and fill ghost cells using first-order extrapolation
-    AverageDown(rhcc,0,1);
+    AverageDown(rhcc, 0, 1);
     FillPatch(t_old, rhcc, rhcc, rhcc, 0, 0, 1, 0, bcs_f);
 }
 
@@ -312,53 +350,49 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         rho0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(gamma1bar, gamma1bar_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+
+    const Real dt_loc = dt;
+    const Real dpdt_factor_loc = dpdt_factor;
+    const Real base_cutoff_density_loc = base_cutoff_density;
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        // get references to the MultiFabs at level lev
-        const MultiFab& delta_p_mf = delta_p_term[lev];
-        MultiFab& correction_cc_mf = correction_cc[lev];
-
-        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
-        const MultiFab& p0_mf = p0_cart[lev];
-        const MultiFab& beta0_mf = beta0_cart[lev];
-        const MultiFab& rho0_mf = rho0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(correction_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(correction_cc[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            create_correction_cc(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                        BL_TO_FORTRAN_ANYD(correction_cc_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]), dt);
+            const Array4<Real> correction_arr = correction_cc[lev].array(mfi);
+            const Array4<const Real> delta_p_arr = delta_p_term[lev].array(mfi);
+            const Array4<const Real> beta0_arr = beta0_cart[lev].array(mfi);
+            const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                Real correction_factor = rho0_arr(i,j,k) > base_cutoff_density_loc ? 
+                    beta0_arr(i,j,k) * dpdt_factor_loc / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k)) / dt_loc : 0.0;
+
+                correction_arr(i,j,k) = correction_factor * delta_p_arr(i,j,k);
+            });
         }
     }
 
     // average down and fill ghost cells using first-order extrapolation
-    AverageDown(correction_cc,0,1);
+    AverageDown(correction_cc, 0, 1);
     FillPatch(t_old, correction_cc, correction_cc, correction_cc, 0, 0, 1, 0, bcs_f);
 
     // add correction term
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Add(rhcc[lev],correction_cc[lev],0,0,1,1);
+        MultiFab::Add(rhcc[lev], correction_cc[lev], 0, 0, 1, 1);
     }
 }
 
@@ -377,7 +411,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              int is_predictor)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()",MakeRHCCforMacProj);
+    BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()", MakeRHCCforMacProj);
 
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> Sbar_cart(finest_level+1);
@@ -400,57 +434,63 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         rho0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(Sbar,Sbar_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(beta0,beta0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(Sbar, Sbar_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
 
     if (dpdt_factor > 0.0) {
-        Put1dArrayOnCart(gamma1bar,gamma1bar_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
-        Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
+        Put1dArrayOnCart(gamma1bar, gamma1bar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
     }
+
+    const Real base_cutoff_density_loc = base_cutoff_density;
+    const Real dt_loc = dt;
+    const Real dpdt_factor_loc = dpdt_factor;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // fill rhcc
-        // get references to the MultiFabs at level lev
-        MultiFab& rhcc_mf = rhcc[lev];
-        const MultiFab& S_cc_mf = S_cc[lev];
-        const MultiFab& delta_gamma1_term_mf = delta_gamma1_term[lev];
-        const MultiFab& delta_p_mf = delta_p_term[lev];
-        MultiFab& delta_chi_mf = delta_chi[lev];
-
-        const MultiFab& Sbar_mf = Sbar_cart[lev];
-        const MultiFab& beta0_mf = beta0_cart[lev];
-        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
-        const MultiFab& p0_mf = p0_cart[lev];
-        const MultiFab& rho0_mf = rho0_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(S_cc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(S_cc[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_rhcc_for_macproj(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                                        BL_TO_FORTRAN_ANYD(rhcc_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(S_cc_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(Sbar_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(beta0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(rho0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(delta_gamma1_term_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(delta_p_mf[mfi]),
-                                        BL_TO_FORTRAN_ANYD(delta_chi_mf[mfi]),
-                                        dt, is_predictor);
+            const Array4<Real> rhcc_arr = rhcc[lev].array(mfi);
+            const Array4<const Real> S_cc_arr = S_cc[lev].array(mfi);
+            const Array4<const Real> Sbar_arr = Sbar_cart[lev].array(mfi);
+            const Array4<const Real> beta0_arr = beta0_cart[lev].array(mfi);
+            const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
+            const Array4<const Real> delta_gamma1_arr = delta_gamma1_term[lev].array(mfi);
+            const Array4<const Real> delta_p_arr = delta_p_term[lev].array(mfi);
+            const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<Real> delta_chi_arr = delta_chi[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                rhcc_arr(i,j,k) = beta0_arr(i,j,k) * (S_cc_arr(i,j,k) - 
+                    Sbar_arr(i,j,k) + delta_gamma1_arr(i,j,k));
+            });
+
+            if (dpdt_factor > 0.0) {
+                if (is_predictor) {
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        delta_chi_arr(i,j,k) = 0.0;
+                    });
+                } 
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    if (rho0_arr(i,j,k) > base_cutoff_density_loc) {
+                        delta_chi_arr(i,j,k) += dpdt_factor_loc * delta_p_arr(i,j,k) / 
+                            (dt_loc*gamma1bar_arr(i,j,k)*p0_arr(i,j,k));
+                        rhcc_arr(i,j,k) += beta0_arr(i,j,k) * delta_chi_arr(i,j,k);
+                    }
+                });
+            } 
         }
     }
 }

@@ -1,3 +1,17 @@
+# 20.03
+
+  * Offloaded more routines to GPU: MakeUtrans, MacProj, NodalProj, Makew0, MakeBeta0, AdvectBase, EnforceHSE
+
+  * Fixed non-deterministic OMP+MPI behavior
+
+  * Update regression tests to cover wider range of MPI + OMP + multilevel
+
+  * Merged all parameters into a single module
+
+  * Add test problem: fully_convective_star
+
+  * Various bug fixes
+
 # 20.02
 
   * Offloaded more routines to GPU: Fill3dData, MakeEdgeScal, VelPred, PPM
