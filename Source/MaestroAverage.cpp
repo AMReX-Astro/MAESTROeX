@@ -54,7 +54,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel if (!system::regtest_reduction)
 #endif
             for ( MFIter mfi(phi[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi )
             {
@@ -198,10 +198,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             const iMultiFab& mask = makeFineMask(phi_mf, fba, IntVect(2));
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-
-            for ( MFIter mfi(phi_mf); mfi.isValid(); ++mfi ) {
+#ifdef _OPENMP
+#pragma omp parallel if (!system::regtest_reduction)
+#endif
+            for ( MFIter mfi(phi_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
                 // Get the index space of the valid region
-                const Box& tilebox = mfi.validbox();
+                const Box& tilebox = mfi.tilebox();
 
                 const Array4<const int> mask_arr = mask.array(mfi);
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
