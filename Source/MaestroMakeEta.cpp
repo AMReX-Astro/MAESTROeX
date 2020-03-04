@@ -52,7 +52,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
-            int zlo = 0;
+            int zlo = tilebox.loVect3d()[2];
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
                     amrex::HostDevice::Atomic::Add(&(etarhosum_p[j+nrf*lev]), etarhoflux_arr(i,j,k));
@@ -63,16 +63,16 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             // this prevents double counting
             auto top_edge = false;
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect()[1] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect3d()[1] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
 
             if (top_edge) {
                 const int k = 0;
-                const int j = tilebox.hiVect()[1]+1;
-                const int lo = tilebox.loVect()[0];
-                const int hi = tilebox.hiVect()[0];
+                const int j = tilebox.hiVect3d()[1]+1;
+                const int lo = tilebox.loVect3d()[0];
+                const int hi = tilebox.hiVect3d()[0];
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
                     int i = n + lo;
@@ -89,13 +89,13 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             auto top_edge = false;
 
             for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect()[2] == r_end_coord[lev+max_lev*i]) {
+                if (tilebox.hiVect3d()[2] == r_end_coord[lev+max_lev*i]) {
                     top_edge = true;
                 }
             }
             
             if (top_edge) {
-                int zhi = tilebox.hiVect()[2] + 1;
+                int zhi = tilebox.hiVect3d()[2] + 1;
                 const auto& zbx = mfi.nodaltilebox(2);
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
