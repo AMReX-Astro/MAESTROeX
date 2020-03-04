@@ -65,7 +65,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 #if (AMREX_SPACEDIM == 2)
                     if (k == 0)
 #endif
-                        amrex::Gpu::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
+                        amrex::HostDevice::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
                 });
             }
         }
@@ -240,8 +240,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                             }
                         }
 
-                        amrex::Gpu::Atomic::Add(&(phisum_p[lev+fine_lev*(index+1)]), phi_arr(i,j,k));
-                        amrex::Gpu::Atomic::Add(&(ncell_p[lev+fine_lev*(index+1)]), 1);
+                        amrex::HostDevice::Atomic::Add(&(phisum_p[lev+fine_lev*(index+1)]), phi_arr(i,j,k));
+                        amrex::HostDevice::Atomic::Add(&(ncell_p[lev+fine_lev*(index+1)]), 1);
                     }
                 });
             }
