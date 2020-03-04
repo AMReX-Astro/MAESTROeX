@@ -94,7 +94,12 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
         Put1dArrayOnCart(psi_in, psi_cart, 0, 0, bcs_f, 0);
     }
 
+    const auto use_omegadot_terms_in_S_loc = use_omegadot_terms_in_S;
+    const auto use_delta_gamma1_term_loc = use_delta_gamma1_term;
+
     for (int lev=0; lev<=finest_level; ++lev) {
+
+        const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -142,7 +147,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     Real xi_term = 0.0;
                     Real pres_term = 0.0;
 
-                    if (use_omegadot_terms_in_S) {
+                    if (use_omegadot_terms_in_S_loc) {
                         for (auto comp = 0; comp < NumSpec; ++comp) {
                             xi_term -= eos_xderivs.dhdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
 
@@ -155,7 +160,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                         + sigma * xi_term 
                         + pres_term / (eos_state.rho * eos_state.dpdr);
 
-                    if (use_delta_gamma1_term) {
+                    if (use_delta_gamma1_term_loc) {
                         delta_gamma1_arr(i,j,k) = eos_state.gam1 - gamma1bar_arr(i,j,k);
 
                         Real U_dot_er = 0.0;
@@ -194,7 +199,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     Real xi_term = 0.0;
                     Real pres_term = 0.0;
 
-                    if (use_omegadot_terms_in_S) {
+                    if (use_omegadot_terms_in_S_loc) {
                         for (auto comp = 0; comp < NumSpec; ++comp) {
                             xi_term -= eos_xderivs.dhdX[comp] * rho_odot_arr(i,j,k,comp) / eos_state.rho;
 
@@ -209,7 +214,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                         
                     int r = AMREX_SPACEDIM == 2 ? j : k;
 
-                    if (use_delta_gamma1_term && r < anelastic_cutoff_density_coord[lev]) {
+                    if (use_delta_gamma1_term_loc && r < anelastic_cutoff_density_coord_lev) {
                         delta_gamma1_arr(i,j,k) = eos_state.gam1 - gamma1bar_arr(i,j,k);
 
                         delta_gamma1_term_arr(i,j,k) = (eos_state.gam1 - gamma1bar_arr(i,j,k)) * 

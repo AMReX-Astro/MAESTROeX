@@ -19,6 +19,8 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
     }
     Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
+    const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
+
     for (int lev=0; lev<=finest_level; ++lev) {
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -32,7 +34,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
             const Array4<Real> state = scal[lev].array(mfi);
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-            if (use_eos_e_instead_of_h) {
+            if (use_eos_e_instead_of_h_loc) {
                 // (rho, (h->e)) --> T, p
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
 
@@ -96,6 +98,8 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     }
     Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
+    const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -118,7 +122,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
                 eos_state.rho = state(i,j,k,Rho);
                 eos_state.T   = state(i,j,k,Temp);
 
-                if (use_pprime_in_tfromp) {
+                if (use_pprime_in_tfromp_loc) {
                     eos_state.p = p0_arr(i,j,k) + state(i,j,k,Pi);
                 } else {
                     eos_state.p = p0_arr(i,j,k);
@@ -217,6 +221,8 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
     }
     Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
 
+    const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -254,7 +260,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
                     eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
                 }
 
-                if (use_eos_e_instead_of_h) {
+                if (use_eos_e_instead_of_h_loc) {
                     // e = h - p/rho
                     eos_state.e = (state(i,j,k,RhoH) - p0_arr(i,j,k)) / state(i,j,k,Rho);
 
@@ -284,6 +290,8 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::CsfromRhoH()", CsfromRhoH);
 
+    const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -308,7 +316,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
                     eos_state.xn[n] = state(i,j,k,FirstSpec+n) / eos_state.rho;
                 }
 
-                if (use_eos_e_instead_of_h) {
+                if (use_eos_e_instead_of_h_loc) {
                     // e = h - p/rho
                     eos_state.e = (state(i,j,k,RhoH) - p0_arr(i,j,k)) / state(i,j,k,Rho);
 
@@ -401,6 +409,17 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,1,0,bcs_s,Temp);
     }
 
+    // make a lot of local copies
+    const auto enthalpy_pred_type_loc = enthalpy_pred_type;
+    const auto species_pred_type_loc = species_pred_type;
+    const auto predict_Tprime_then_h_loc = predict_Tprime_then_h;
+    const auto predict_rhoprime_and_X_loc = predict_rhoprime_and_X;
+    const auto predict_rhoX_loc = predict_rhoX;
+    const auto predict_rho_and_X_loc = predict_rho_and_X;
+    const auto predict_T_then_h_loc = predict_T_then_h;
+    const auto predict_T_then_rhohprime_loc = predict_T_then_rhohprime;
+    const auto small_temp_loc = small_temp;
+
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -436,14 +455,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
-                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp);
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
+                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp_loc);
                     } else {
-                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         
                         // interface states are rho' and X
                         eos_state.rho = sedgex(i,j,k,Rho) + rho0_arr(i,j,k);
@@ -452,7 +471,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
                         }
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
 
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgex(i,j,k,Rho); 
@@ -461,7 +480,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
 
                         // interface states are rho and X
                         eos_state.rho = sedgex(i,j,k,Rho); 
@@ -473,10 +492,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgex(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {
                         sedgex(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_arr(i,j,k);
                     }
                 });
@@ -486,18 +505,18 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
 #if (AMREX_SPACEDIM == 2)
-                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp);
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp_loc);
 #else
-                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp);
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp_loc);
 #endif
                     } else {
-                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         // interface states are rho' and X
 #if (AMREX_SPACEDIM == 2)
                         eos_state.rho = sedgey(i,j,k,Rho) + rho0_edge_arr(i,j,k);
@@ -508,7 +527,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
                         }
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgey(i,j,k,Rho); 
 
@@ -516,7 +535,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgey(i,j,k,Rho); 
 
@@ -527,10 +546,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgey(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {
 #if (AMREX_SPACEDIM == 2)
                         sedgey(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge_arr(i,j,k);
 #else
@@ -545,14 +564,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
-                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp);
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
+                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge_arr(i,j,k), small_temp_loc);
                     } else {
-                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         // interface states are rho' and X
                         eos_state.rho = sedgez(i,j,k,Rho) + rho0_edge_arr(i,j,k);
 
@@ -560,7 +579,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
                         }
 
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgez(i,j,k,Rho); 
 
@@ -568,7 +587,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                             eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
 
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgez(i,j,k,Rho); 
 
@@ -579,10 +598,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgez(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {
                         sedgez(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge_arr(i,j,k);
                     }
                 });
@@ -594,15 +613,15 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         Real tempbar_edge = 0.5 * (tempbar_arr(i-1,j,k) + tempbar_arr(i,j,k));
-                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_edge, small_temp);
+                        eos_state.T = max(sedgex(i,j,k,Temp) + tempbar_edge, small_temp_loc);
                     } else {
-                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgex(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         // interface states are rho' and X
                         Real rho0_edge = 0.5 * (rho0_arr(i-1,j,k) + rho0_arr(i,j,k));
                         eos_state.rho = sedgex(i,j,k,Rho) + rho0_edge;
@@ -610,14 +629,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n);
                         }
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgex(i,j,k,Rho); 
 
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgex(i,j,k,Rho); 
 
@@ -628,10 +647,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgex(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {    
                         Real rhoh0_edge = 0.5 * (rhoh0_arr(i-1,j,k) + rhoh0_arr(i,j,k));
                         sedgex(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
                     }
@@ -642,15 +661,15 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         Real tempbar_edge = 0.5 * (tempbar_arr(i,j-1,k) + tempbar_arr(i,j,k));
-                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge, small_temp);
+                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_edge, small_temp_loc);
                     } else {
-                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgey(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         // interface states are rho' and X
                         Real rho0_edge = 0.5 * (rho0_arr(i,j-1,k) + rho0_arr(i,j,k));
                         eos_state.rho = sedgey(i,j,k,Rho) + rho0_edge;
@@ -658,14 +677,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n);
                         }
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgey(i,j,k,Rho); 
 
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgey(i,j,k,Rho); 
 
@@ -676,10 +695,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgey(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {    
                         Real rhoh0_edge = 0.5 * (rhoh0_arr(i,j-1,k) + rhoh0_arr(i,j,k));
                         sedgey(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
                     }
@@ -690,15 +709,15 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                     eos_t eos_state;
 
                     // get edge-centered temperature
-                    if (enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         Real tempbar_edge = 0.5 * (tempbar_arr(i,j,k-1) + tempbar_arr(i,j,k));
-                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge, small_temp);
+                        eos_state.T = max(sedgez(i,j,k,Temp) + tempbar_edge, small_temp_loc);
                     } else {
-                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp);
+                        eos_state.T = max(sedgez(i,j,k,Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
-                    if (species_pred_type == predict_rhoprime_and_X) {
+                    if (species_pred_type_loc == predict_rhoprime_and_X_loc) {
                         // interface states are rho' and X
                         Real rho0_edge = 0.5 * (rho0_arr(i,j,k-1) + rho0_arr(i,j,k));
                         eos_state.rho = sedgez(i,j,k,Rho) + rho0_edge;
@@ -706,14 +725,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n);
                         }
-                    } else if (species_pred_type == predict_rhoX) {
+                    } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgez(i,j,k,Rho); 
 
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i,j,k,FirstSpec+n) / eos_state.rho;
                         }
-                    } else if (species_pred_type == predict_rho_and_X) {
+                    } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgez(i,j,k,Rho); 
 
@@ -724,10 +743,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 
                     eos(eos_input_rt, eos_state);
 
-                    if (enthalpy_pred_type == predict_T_then_h ||
-                        enthalpy_pred_type == predict_Tprime_then_h) {
+                    if (enthalpy_pred_type_loc == predict_T_then_h_loc ||
+                        enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
                         sedgez(i,j,k,RhoH) = eos_state.h;
-                    } else if (enthalpy_pred_type == predict_T_then_rhohprime) {    
+                    } else if (enthalpy_pred_type_loc == predict_T_then_rhohprime_loc) {    
                         Real rhoh0_edge = 0.5 * (rhoh0_arr(i,j,k-1) + rhoh0_arr(i,j,k));
                         sedgez(i,j,k,RhoH) = eos_state.rho * eos_state.h - rhoh0_edge;
                     }
