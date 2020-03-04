@@ -25,10 +25,9 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
+    const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
 
-        // get references to the MultiFabs at level lev
-        MultiFab& gamma1_mf = gamma1[lev];
+    for (int lev=0; lev<=finest_level; ++lev) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -48,7 +47,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 
                 eos_state.rho = scal_arr(i,j,k,Rho);
 
-                if (use_pprime_in_tfromp) {
+                if (use_pprime_in_tfromp_loc) {
                     eos_state.p = p0_arr(i,j,k) + scal_arr(i,j,k,Pi);
                 } else {
                     eos_state.p = p0_arr(i,j,k);
