@@ -1504,9 +1504,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        // const MultiFab& state_mf = state[lev];
-        // MultiFab& ad_excess_mf = ad_excess[lev];
+        // create MultiFabs to hold pressure and gradient
         MultiFab pres_mf(grids[lev], dmap[lev], 1, 0);
         MultiFab nabla_ad_mf(grids[lev], dmap[lev], 1, 0);
 
@@ -2018,42 +2016,51 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
                          Vector<MultiFab>& deltagamma)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeDeltaGamma()",MakeDeltaGamma);
+    BL_PROFILE_VAR("Maestro::MakeDeltaGamma()", MakeDeltaGamma);
+
+    const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& state_mf = state[lev];
-        MultiFab& deltagamma_mf = deltagamma[lev];
-
-        const MultiFab& p0cart_mf = p0_cart[lev];
-        const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(state_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_deltagamma(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                            BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                            BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]), BL_TO_FORTRAN_ANYD(gamma1barcart_mf[mfi]),
-                            BL_TO_FORTRAN_ANYD(deltagamma_mf[mfi]));
+            const Array4<const Real> state_arr = state[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
+            const Array4<Real> deltagamma_arr = deltagamma[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                eos_t eos_state;
+
+                eos_state.rho   = state_arr(i,j,k,Rho);
+                eos_state.T     = state_arr(i,j,k,Temp);
+                if (use_pprime_in_tfromp) {
+                    eos_state.p     = p0_arr(i,j,k) + state_arr(i,j,k,Pi);
+                } else {
+                    eos_state.p     = p0_arr(i,j,k);
+                }
+
+                for (auto comp = 0; comp < NumSpec; ++comp) {
+                    eos_state.xn[comp] = state_arr(i,j,k,FirstSpec+comp)/eos_state.rho;
+                }
+
+                eos(eos_input_rp, eos_state);
+
+                deltagamma_arr(i,j,k) = eos_state.gam1 - gamma1bar_arr(i,j,k);
+            });
         }
     }
 
     // average down and fill ghost cells
-    AverageDown(deltagamma,0,1);
-    FillPatch(t_old,deltagamma,deltagamma,deltagamma,0,0,1,0,bcs_f);
+    AverageDown(deltagamma, 0, 1);
+    FillPatch(t_old, deltagamma, deltagamma, deltagamma, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -2065,30 +2072,32 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& state_mf = state[lev];
-        MultiFab& entropy_mf = entropy[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(state_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_entropy(AMREX_INT_ANYD(tileBox.loVect()),
-                         AMREX_INT_ANYD(tileBox.hiVect()),lev,
-                         BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                         BL_TO_FORTRAN_ANYD(entropy_mf[mfi]));
-        }
+            const Array4<const Real> state_arr = state[lev].array(mfi);
+            const Array4<Real> entropy_arr = entropy[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j ,k, {
+                eos_t eos_state;
+
+                eos_state.rho = state_arr(i,j,k,Rho);
+                eos_state.T = state_arr(i,j,k,Temp);
+                for (auto comp = 0; comp < NumSpec; ++comp) {
+                    eos_state.xn[comp] = state_arr(i,j,k,FirstSpec+comp) / state_arr(i,j,k,Rho);
+                }
+
+                eos(eos_input_rt, eos_state);
+
+                entropy_arr(i,j,k) = eos_state.s;
+            });
+        }
     }
 
     // average down and fill ghost cells
@@ -2101,13 +2110,9 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
                     Vector<MultiFab>& divw0)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeDivw0()",MakeDivw0);
+    BL_PROFILE_VAR("Maestro::MakeDivw0()", MakeDivw0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& divw0_mf = divw0[lev];
-        const MultiFab& w0_mf = w0_cart[lev];
 
         if (spherical == 0) {
 
@@ -2115,52 +2120,46 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(divw0_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
-                const Real* dx = geom[lev].CellSize();
+                const auto dx = geom[lev].CellSizeArray();
+                
+                const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+                const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_divw0(AMREX_INT_ANYD(tileBox.loVect()),
-                           AMREX_INT_ANYD(tileBox.hiVect()),
-                           BL_TO_FORTRAN_ANYD(w0_mf[mfi]), w0_mf.nComp(),
-                           AMREX_REAL_ANYD(dx),
-                           BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+#if (AMREX_SPACEDIM == 2)
+                    divw0_arr(i,j,k) = (w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1)) / dx[1];
+#else
+                    divw0_arr(i,j,k) = (w0_arr(i,j,k+1,2) - w0_arr(i,j,k,2)) / dx[2];
+#endif
+                });
             }
 
         } else {
-
-            const MultiFab& w0macx_mf = w0mac[lev][0];
-            const MultiFab& w0macy_mf = w0mac[lev][1];
-            const MultiFab& w0macz_mf = w0mac[lev][2];
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(divw0_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
                 const Real* dx = geom[lev].CellSize();
+                
+                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+                const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                make_divw0_sphr(AMREX_INT_ANYD(tileBox.loVect()),
-                                AMREX_INT_ANYD(tileBox.hiVect()),
-                                BL_TO_FORTRAN_ANYD(w0macx_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macy_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(w0macz_mf[mfi]),
-                                AMREX_REAL_ANYD(dx),
-                                BL_TO_FORTRAN_ANYD(divw0_mf[mfi]));
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    divw0_arr(i,j,k) = (w0macx(i+1,j,k) - w0macx(i,j,k)) / dx[0] + 
+                        (w0macy(i,j+1,k) - w0macy(i,j,k)) / dx[1] + 
+                        (w0macz(i,j,k+1) - w0macz(i,j,k)) / dx[2];
+                });
             }
         }
     }
@@ -2180,38 +2179,34 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& vel_mf = vel[lev];
-        const MultiFab& state_mf = state[lev];
-        MultiFab& pidivu_mf = pidivu[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(pidivu_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
+        for ( MFIter mfi(pidivu[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            const Real* dx = geom[lev].CellSize();
+            const auto dx = geom[lev].CellSizeArray();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_pidivu(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                        BL_TO_FORTRAN_ANYD(vel_mf[mfi]),
-                        AMREX_REAL_ANYD(dx),
-                        BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                        BL_TO_FORTRAN_ANYD(pidivu_mf[mfi]));
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<const Real> pi_cc = state[lev].array(mfi, Pi);
+            const Array4<Real> pidivu_arr = pidivu[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                pidivu_arr(i,j,k) = pi_cc(i,j,k) * 0.5 * (
+                    (vel_arr(i+1,j,k,0) - vel_arr(i-1,j,k,0))/dx[0]
+                  + (vel_arr(i,j+1,k,1) - vel_arr(i,j-1,k,1))/dx[1]
+#if (AMREX_SPACEDIM == 3)
+                  + (vel_arr(i,j,k+1,2) - vel_arr(i,j,k-1,2))/dx[2]
+#endif
+                    );
+            });
         }
-
     }
 
     // average down and fill ghost cells
-    AverageDown(pidivu,0,1);
-    FillPatch(t_old,pidivu,pidivu,pidivu,0,0,1,0,bcs_f);
+    AverageDown(pidivu, 0, 1);
+    FillPatch(t_old, pidivu, pidivu, pidivu, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -2219,37 +2214,34 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
                    Vector<MultiFab>& abar)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeAbar()",MakeAbar);
+    BL_PROFILE_VAR("Maestro::MakeAbar()", MakeAbar);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& state_mf = state[lev];
-        MultiFab& abar_mf = abar[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(abar_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
+        for ( MFIter mfi(abar[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-            make_abar(AMREX_INT_ANYD(tileBox.loVect()),
-                      AMREX_INT_ANYD(tileBox.hiVect()),
-                      BL_TO_FORTRAN_ANYD(state_mf[mfi]), state_mf.nComp(),
-                      BL_TO_FORTRAN_ANYD(abar_mf[mfi]));
-        }
+            const Array4<const Real> state_arr = state[lev].array(mfi);
+            const Array4<Real> abar_arr = abar[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                Real denominator = 0.0;
+
+                for (auto comp = 0; comp < NumSpec; ++comp) {
+                    denominator += state_arr(i,j,k,FirstSpec+comp) / aion[comp];
+                }
+
+                abar_arr(i,j,k) = state_arr(i,j,k,Rho) / denominator;
+            });
+        }
     }
 
     // average down and fill ghost cells
-    AverageDown(abar,0,1);
-    FillPatch(t_old,abar,abar,abar,0,0,1,0,bcs_f);
+    AverageDown(abar, 0, 1);
+    FillPatch(t_old, abar, abar, abar, 0, 0, 1, 0, bcs_f);
 }
