@@ -2,7 +2,7 @@ module burner_loop_module
 
   use amrex_error_module
   use burner_module
-  use burn_type_module, only: burn_t, copy_burn_t
+  use burn_type_module, only: burn_t
   use network, only: nspec, network_species_index
   use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
        pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
@@ -43,6 +43,10 @@ contains
        tempbar_init_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
+
+    use burn_type_module, only : copy_burn_t
+
+    implicit none
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer, value  , intent (in   ) :: lev
@@ -197,6 +201,10 @@ contains
        tempbar_init_cart, t_lo, t_hi, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
+
+    use burn_type_module, only : copy_burn_t
+
+    implicit none
 
     integer         , intent (in   ) :: lo(3), hi(3)
     integer         , intent (in   ) :: i_lo(3), i_hi(3)

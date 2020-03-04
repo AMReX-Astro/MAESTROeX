@@ -384,6 +384,7 @@ extern "C"
     // in maestro_init.f90
 
     void maestro_network_init();
+    void maestro_eos_init();
     void maestro_extern_init();
     void maestro_conductivity_init();
     void get_num_spec(int* nspec);
@@ -391,13 +392,7 @@ extern "C"
     void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
 
     // set fortran-specific parameters in meth_params.F90
-    void set_method_params (const int* Density,
-                            const int* Enthalpy,
-                            const int* FirstSpec,
-                            const int* Temperature,
-                            const int* Pressure,
-                            const int* Nscalars,
-                            const amrex::Real* prob_lo_in,
+    void set_method_params (const amrex::Real* prob_lo_in,
                             const amrex::Real* prob_hi_in);
 
     void set_rel_eps (const amrex::Real* rel_eps_in);

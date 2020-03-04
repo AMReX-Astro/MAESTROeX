@@ -113,7 +113,6 @@ contains
     double precision, pointer :: p0_cart(:,:,:,:)
 
     type (eos_t) :: eos_state
-    integer :: pt_index(3)
 
     double precision :: rand, velpert_r_inner, velpert_r_outer
 
@@ -194,9 +193,7 @@ contains
              eos_state%rho   = scal(i,j,k,rho_comp)
              eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
 
-             pt_index = (/ i, j, k /)
-
-             call eos(eos_input_rp, eos_state, pt_index)
+             call eos(eos_input_rp, eos_state)
 
              scal(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
              scal(i,j,k,temp_comp) = eos_state%T

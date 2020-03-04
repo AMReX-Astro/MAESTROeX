@@ -17,8 +17,8 @@ MICROPHYSICS_HOME ?= ../../../../Microphysics
 EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := constant
 NETWORK_DIR := general_null
-NETWORK_FILE := triple_alpha_plus_o.net
-GENERAL_NET_INPUTS := $(MAESTROEX_HOME)/Microphysics/networks/$(NETWORK_DIR)/$(NETWORK_FILE)
+NETWORK_INPUTS := triple_alpha_plus_o.net
+
 
 Bpack   := ./Make.package
 Blocs   := .

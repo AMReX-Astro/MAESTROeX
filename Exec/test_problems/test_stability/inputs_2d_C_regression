@@ -92,6 +92,12 @@ maestro.use_divu_firstdt = false
 
 maestro.grav_const = -5.e4
 
+# OMP settings
+amrex.regtest_reduction = 1
+
+# GPU parameters 
+maestro.deterministic_nodal_solve = true
+
 
 &probin
 
