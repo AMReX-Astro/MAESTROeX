@@ -241,7 +241,9 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in
             const Box& tilebox = mfi.tilebox();
             const auto xbx = mfi.grownnodaltilebox(0, 1);
             const auto ybx = mfi.grownnodaltilebox(1, 1);
+#if (AMREX_SPACEDIM == 3)
             const auto zbx = mfi.grownnodaltilebox(2, 1);
+#endif
 
             const Array4<Real> umac = umac_in[lev][0].array(mfi);
             const Array4<Real> vmac = umac_in[lev][1].array(mfi);
