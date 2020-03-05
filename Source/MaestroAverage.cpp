@@ -56,7 +56,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             for ( MFIter mfi(phi[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi )
             {
                 // Get the index space of the valid region
-                const Box& tilebox = mfi.validbox();
+                const Box& tilebox = mfi.tilebox();
 
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
