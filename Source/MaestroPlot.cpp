@@ -1596,13 +1596,17 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
                 });
             } else {
 #if (AMREX_SPACEDIM == 3)
+                RealVector dtemp_vec(AMREX_SPACEDIM, 0.0);
+                RealVector dp_vec(AMREX_SPACEDIM, 0.0);
+
+                Real * AMREX_RESTRICT dtemp = dtemp_vec.dataPtr();
+                Real * AMREX_RESTRICT dp = dp_vec.dataPtr();
+
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     Real nabla = 0.0;
 
                     if (state_arr(i,j,k,Rho) > base_cutoff_density_loc) {
                         // compute gradient
-                        RealVector dtemp(AMREX_SPACEDIM);
-                        RealVector dp(AMREX_SPACEDIM);
                         // forward difference
                         if (i == lo[0]) {
                             dtemp[0] = state_arr(i+1,j,k,Temp) - state_arr(i,j,k,Temp);
@@ -2041,7 +2045,7 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 
                 eos_state.rho   = state_arr(i,j,k,Rho);
                 eos_state.T     = state_arr(i,j,k,Temp);
-                if (use_pprime_in_tfromp) {
+                if (use_pprime_in_tfromp_loc) {
                     eos_state.p     = p0_arr(i,j,k) + state_arr(i,j,k,Pi);
                 } else {
                     eos_state.p     = p0_arr(i,j,k);
