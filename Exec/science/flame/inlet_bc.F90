@@ -63,4 +63,16 @@ contains
 
   end subroutine set_inlet_bcs
 
+  subroutine get_inlet_bcs(params) bind(C, name="get_inlet_bcs")
+    
+    double precision, intent(inout) :: params(4+nspec)
+    
+    params(1) = INLET_RHO
+    params(2) = INLET_RHOH
+    params(3) = INLET_TEMP
+    params(4:nspec+3) = INLET_RHOX(:)
+    params(nspec+4) = INLET_VEL
+    
+  end subroutine get_inlet_bcs
+  
 end module inlet_bc_module
