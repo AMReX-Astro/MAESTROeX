@@ -53,8 +53,7 @@ Maestro::NodalProj (int proj_type,
         for (int lev=0; lev<=finest_level; ++lev) {
             sig[lev].setVal(1.);
         }
-    }
-    else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
+    } else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         FillPatch(0.5*(t_old+t_new), sig, sold, snew, Rho, 0, 1, Rho, bcs_s);
     }
 
@@ -94,8 +93,7 @@ Maestro::NodalProj (int proj_type,
     // regular_timestep_comp:   (beta0_old+beta0_new)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
         Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
-    }
-    else {
+    } else {
         RealVector beta0_nph( (max_radial_level+1)*nr_fine );
         beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
@@ -164,19 +162,16 @@ Maestro::NodalProj (int proj_type,
     {
         if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
-        }
-        else {
+        } else {
             if (phys_bc[idim] == Outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
-            }
-            else {
+            } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
             if (phys_bc[AMREX_SPACEDIM+idim] == Outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
-            }
-            else {
+            } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             }
         }
@@ -263,35 +258,28 @@ Maestro::NodalProj (int proj_type,
     // of AMR levels, etc.
     if (proj_type == initial_projection_comp) {
         rel_tol = (spherical==1) ? eps_init_proj_sph : eps_init_proj_cart;
-    }
-    else if (proj_type == divu_iters_comp) {
+    } else if (proj_type == divu_iters_comp) {
         if (spherical == 1) {
             if (istep_divu_iter == init_divu_iter) {
                 rel_tol = eps_divu_sph;
-            }
-            else if (istep_divu_iter == init_divu_iter-1) {
+            } else if (istep_divu_iter == init_divu_iter-1) {
                 rel_tol = eps_divu_sph*divu_iter_factor;
-            }
-            else if (istep_divu_iter <= init_divu_iter-2) {
+            } else if (istep_divu_iter <= init_divu_iter-2) {
                 rel_tol = eps_divu_sph*pow(divu_iter_factor,2);
             }
-        }
-        else {
+        } else {
             if (istep_divu_iter == init_divu_iter) {
                 rel_tol = std::min(eps_divu_cart*pow(divu_level_factor,finest_level),
                                    eps_divu_cart*pow(divu_level_factor,2));
-            }
-            else if (istep_divu_iter == init_divu_iter-1) {
+            } else if (istep_divu_iter == init_divu_iter-1) {
                 rel_tol = std::min(eps_divu_cart*divu_iter_factor*pow(divu_level_factor,finest_level),
                                    eps_divu_cart*divu_iter_factor*pow(divu_level_factor,2));
-            }
-            else if (istep_divu_iter <= init_divu_iter-2) {
+            } else if (istep_divu_iter <= init_divu_iter-2) {
                 rel_tol = std::min(eps_divu_cart*pow(divu_iter_factor,2)*pow(divu_level_factor,finest_level),
                                    eps_divu_cart*pow(divu_iter_factor,2)*pow(divu_level_factor,2));
             }
         }
-    }
-    else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
+    } else if (proj_type == pressure_iters_comp || proj_type == regular_timestep_comp) {
         rel_tol = std::min( eps_hg_max, eps_hg*pow(hg_level_factor,finest_level) );
     }
 
@@ -368,14 +356,12 @@ Maestro::NodalProj (int proj_type,
             pi[lev].setVal(0.);
             gpi[lev].setVal(0.);
         }
-    }
-    else if (proj_type == pressure_iters_comp) {
+    } else if (proj_type == pressure_iters_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Add(pi[lev],phi[lev],0,0,1,0);
             MultiFab::Add(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
         }
-    }
-    else if (proj_type == regular_timestep_comp) {
+    } else if (proj_type == regular_timestep_comp) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(pi[lev],phi[lev],0,0,1,0);
             MultiFab::Copy(gpi[lev],gphi[lev],0,0,AMREX_SPACEDIM,0);
@@ -397,8 +383,7 @@ Maestro::NodalProj (int proj_type,
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Copy(uold[lev],Vproj[lev],0,0,AMREX_SPACEDIM,0);
         }
-    }
-    else if (proj_type == pressure_iters_comp) {
+    } else if (proj_type == pressure_iters_comp) {
         // Vproj = Vproj - sig*grad(phi)
         // we do this manually instead of using mlndlap.updateVelocity() because
         // for alt_energy_fix we neet beta0*grad(phi)
@@ -414,8 +399,7 @@ Maestro::NodalProj (int proj_type,
             unew[lev].mult(dt);
             MultiFab::Add(unew[lev],uold[lev],0,0,AMREX_SPACEDIM,0);
         }
-    }
-    else if (proj_type == regular_timestep_comp) {
+    } else if (proj_type == regular_timestep_comp) {
         // Vproj = Vproj - sig*grad(phi)
         // we do this manually instead of using mlndlap.updateVelocity() because
         // for alt_energy_fix we neet beta0*grad(phi)
@@ -445,7 +429,6 @@ Maestro::NodalProj (int proj_type,
         // average pi from nodes to cell-centers and store in the Pi component of snew
         MakePiCC(beta0_cart);
     }
-
 }
 
 // fill in Vproj

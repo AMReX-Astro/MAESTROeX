@@ -23,7 +23,6 @@ Maestro::Evolve ()
 
     for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
     {
-
         // check to see if we need to regrid, then regrid
         if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
                 Regrid();

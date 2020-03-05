@@ -976,6 +976,21 @@ public:
     ////////////
 
     ////////////
+    // MaestroMakePsi.cpp functions
+
+    void MakePsiPlanar(RealVector& psi);
+    
+    void MakePsiSphr(RealVector& psi, const RealVector& w0_in, 
+                     const RealVector& gamma1bar, 
+                     const RealVector& p0_avg,
+                     const RealVector& Sbar_in);
+
+    void MakePsiIrreg(RealVector& psi, const RealVector& grav_cell);
+
+    // end MaestroMakePsi.cpp functions
+    ////////////
+
+    ////////////
     // MaestroMakeS.cpp functions
 
     /// Compute S at cell-centers
