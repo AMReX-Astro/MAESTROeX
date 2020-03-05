@@ -8,6 +8,7 @@ CEXE_sources += MaestroAdvectBase.cpp
 CEXE_sources += MaestroAdvection.cpp
 CEXE_sources += MaestroAverage.cpp
 CEXE_sources += MaestroBaseStateGeometry.cpp
+CEXE_sources += MaestroCelltoEdge.cpp
 CEXE_sources += MaestroCheckpoint.cpp
 CEXE_sources += MaestroConvert.cpp
 CEXE_sources += MaestroDebug.cpp
