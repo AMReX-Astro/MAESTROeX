@@ -152,7 +152,6 @@
 <li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
@@ -269,7 +268,7 @@ outline.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#f/inlet_bc_module/inlet_bc_initialized" title="f/inlet_bc_module/inlet_bc_initialized"><code class="xref f f-var docutils literal notranslate"><span class="pre">inlet_bc_initialized</span></code></a></p>
 </dd>
 <dt class="field-even">Routines</dt>
-<dd class="field-even"><p><a class="reference internal" href="#f/inlet_bc_module/set_inlet_bcs" title="f/inlet_bc_module/set_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_inlet_bcs()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#f/inlet_bc_module/get_inlet_bcs" title="f/inlet_bc_module/get_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_inlet_bcs()</span></code></a>, <a class="reference internal" href="#f/inlet_bc_module/set_inlet_bcs" title="f/inlet_bc_module/set_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_inlet_bcs()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Variables</p>
@@ -291,6 +290,19 @@ and upon restart, just after the base state is read in.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Called from</dt>
 <dd class="field-odd"><p><a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state" title="f/base_state_module/init_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state()</span></code></a>, <a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state_irreg" title="f/base_state_module/init_base_state_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state_irreg()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/inlet_bc_module/get_inlet_bcs">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">inlet_bc_module/</code><code class="sig-name descname">get_inlet_bcs</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#f/inlet_bc_module/get_inlet_bcs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_error()</span></code>)</p>
 </dd>
 </dl>
 </dd></dl>
