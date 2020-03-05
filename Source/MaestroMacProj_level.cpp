@@ -41,7 +41,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     if (spherical == 1) {
         MakeS0mac(beta0, beta0_cart_edge);
     } else {
-        cell_to_edge(beta0.dataPtr(),beta0_edge.dataPtr());
+        CelltoEdge(beta0_old, beta0_edge);
     }
 
     // convert Utilde^* to beta0*Utilde^*

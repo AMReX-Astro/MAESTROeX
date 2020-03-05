@@ -305,7 +305,7 @@ public:
 
     ////////////
     // MaestroBCFill.cpp functions
-
+    
     static void ScalarFill(const amrex::Array4<amrex::Real>& scal, 
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
@@ -327,6 +327,15 @@ public:
                    const int comp, const bool is_vel=false);
 
     // end MaestroBCFill.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroCelltoEdge.cpp functions
+
+    void CelltoEdge(const RealVector& s0_cell_vec, 
+                    RealVector& s0_edge_vec);
+
+    // end MaestroCelltoEdge.cpp functions
     ////////////
 
     ////////////
@@ -999,6 +1008,21 @@ public:
                       const RealVector& rho0);
 
     // end MaestroMakeGrav.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroMakePsi.cpp functions
+
+    void MakePsiPlanar(RealVector& psi);
+    
+    void MakePsiSphr(RealVector& psi, const RealVector& w0_in, 
+                     const RealVector& gamma1bar, 
+                     const RealVector& p0_avg,
+                     const RealVector& Sbar_in);
+
+    void MakePsiIrreg(RealVector& psi, const RealVector& grav_cell);
+
+    // end MaestroMakePsi.cpp functions
     ////////////
 
     ////////////

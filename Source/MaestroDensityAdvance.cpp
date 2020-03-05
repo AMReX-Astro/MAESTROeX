@@ -30,8 +30,8 @@ Maestro::DensityAdvance (int which_step,
         // contains edge-centered quantities created via spatial interpolation.
         // This is to be contrasted to rho0_predicted_edge which is the half-time
         // edge state created in advect_base.
-        cell_to_edge(rho0_old.dataPtr(),rho0_edge_old.dataPtr());
-        cell_to_edge(rho0_new.dataPtr(),rho0_edge_new.dataPtr());
+        CelltoEdge(rho0_old, rho0_edge_old);
+        CelltoEdge(rho0_new, rho0_edge_new);
     }
 
     //////////////////////////////////
@@ -257,8 +257,8 @@ Maestro::DensityAdvanceSDC (int which_step,
         // contains edge-centered quantities created via spatial interpolation.
         // This is to be contrasted to rho0_predicted_edge which is the half-time
         // edge state created in advect_base.
-        cell_to_edge(rho0_old.dataPtr(),rho0_edge_old.dataPtr());
-        cell_to_edge(rho0_new.dataPtr(),rho0_edge_new.dataPtr());
+        CelltoEdge(rho0_old, rho0_edge_old);
+        CelltoEdge(rho0_new, rho0_edge_new);
     }
 
     //////////////////////////////////

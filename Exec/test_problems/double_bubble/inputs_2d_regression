@@ -94,7 +94,7 @@ maestro.small_temp = 1.e-5
 maestro.do_burning = false
 
 # OMP settings
-system.regtest_reduction = 1
+amrex.regtest_reduction = 1
 
 # GPU parameters 
 maestro.deterministic_nodal_solve = true
