@@ -73,7 +73,14 @@ extern "C"
     void get_finest_radial_level(int* lev);
 
     //////////////////////
+    
+    //////////////////////
+    // in inlet_bc.F90
 
+    void get_inlet_bcs (amrex::Real* params);
+
+    //////////////////////
+    
     //////////////////////
     // in bc_fill_nd.F90
 
@@ -147,12 +154,6 @@ extern "C"
                                       amrex::Real* rho_omegadot, const int* o_lo, const int* o_hi,
                                       amrex::Real* rho_Hext, const int* h_lo, const int* h_hi,
                                       const amrex::Real* scal, const int* s_lo, const int* s_hi);
-    //////////////////////
-
-    //////////////////////
-    // in cell_to_edge.f90
-    void cell_to_edge(const amrex::Real* s0_cell, amrex::Real* s0_edge);
-
     //////////////////////
 
     //////////////////////
@@ -442,31 +443,6 @@ extern "C"
                            const amrex::Real* r_edge_loc);
     //////////////////////
 
-
-    //////////////////////
-    // in make_eta.F90
-    void make_etarho_planar(amrex::Real* etarho_ec, amrex::Real* etarho_cc,
-                            const amrex::Real* etarhosum, const amrex::Real* ncell);
-
-    void sum_etarho(const int* lev, const int* domlo, const int* domhi,
-                    const int* lo,  const int* hi,
-                    const amrex::Real* etarhoflux, const int* x_lo, const int* x_hi,
-                    amrex::Real* etarhosum);
-
-    void construct_eta_cart(const int* lo, const int* hi,
-                            const amrex::Real* rho_old, const int* ro_lo, const int* ro_hi,
-                            const amrex::Real* rho_new, const int* rn_lo, const int* rn_hi,
-                            const amrex::Real* umac,    const int* u_lo,  const int* u_hi,
-                            const amrex::Real* vmac,    const int* v_lo,  const int* v_hi,
-                            const amrex::Real* wmac,    const int* w_lo,  const int* w_hi,
-                            const amrex::Real* w0macx,  const int* x_lo,  const int* x_hi,
-                            const amrex::Real* w0macy,  const int* y_lo,  const int* y_hi,
-                            const amrex::Real* w0macz,  const int* z_lo,  const int* z_hi,
-                            const amrex::Real* normal,  const int* n_lo,  const int* n_hi,
-                            amrex::Real* eta_cart, const int* e_lo,  const int* e_hi,
-                            const amrex::Real* rho0_nph_cart, const int* rp_lo, const int* rp_hi);
-    //////////////////////
-
     //////////////////////
     // in make_intra_coeffs.F90
     void make_intra_coeffs(const int* lo,  const int* hi,
@@ -587,29 +563,6 @@ extern "C"
     void make_abar(const int* lo, const int* hi,
                    const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                    amrex::Real* abar, const int* a_lo, const int* a_hi);
-
-    //////////////////////
-    // in make_psi.F90
-    void make_psi_planar(const amrex::Real* etarho_cc,
-                               amrex::Real* psi);
-
-    void make_psi_spherical(amrex::Real* psi,
-                            const amrex::Real* w0,
-                            const amrex::Real* gamma1bar,
-                            const amrex::Real* p0_avg,
-                            const amrex::Real* Sbar_in,
-                            const amrex::Real* r_cc_loc,
-                            const amrex::Real* r_edge_loc);
-
-    void make_psi_irreg(const amrex::Real* etarho_cc,
-                        const amrex::Real* grav_cell,
-                              amrex::Real* psi);
-
-    // void make_psi_irreg(amrex::Real* psi,
-    //                  const amrex::Real* p0_old,
-    //                  const amrex::Real* p0_new,
-    //                  const amrex::Real* dt);
-    //////////////////////
 
     //////////////////////
     // in make_S.f90

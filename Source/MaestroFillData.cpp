@@ -36,49 +36,47 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
                     const Vector<BCRec>& bcs_in, int variable_type)
 {
 
-        Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
+    Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
 
-        if (lev == 0)
-        {
-                Vector<MultiFab*> smf;
-                Vector<Real> stime;
-                GetData(0, time, smf, stime, mf_old, mf_new);
+    if (lev == 0)
+    {
+        Vector<MultiFab*> smf;
+        Vector<Real> stime;
+        GetData(0, time, smf, stime, mf_old, mf_new);
 
         PhysBCFunctMaestro physbc;
 
-                if (variable_type == 1) { // velocity
-                        physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(velfill));
-                } else { // scalar
-                        physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(scalarfill));
-                }
+        if (variable_type == 1) { // velocity
+            physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(VelFill));
+        } else { // scalar
+            physbc.define(geom[lev],bcs,BndryFuncArrayMaestro(ScalarFill));
+        }
 
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                             geom[lev], physbc, 0);
+                            geom[lev], physbc, 0);
+    } else {
+        Vector<MultiFab*> cmf, fmf;
+        Vector<Real> ctime, ftime;
+        GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
+        GetData(lev, time, fmf, ftime, mf_old, mf_new);
+
+        PhysBCFunctMaestro cphysbc;
+        PhysBCFunctMaestro fphysbc;
+
+        if (variable_type == 1) { // velocity
+            cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(VelFill));
+            fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(VelFill));
+        } else { // scalar
+            cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(ScalarFill));
+            fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(ScalarFill));
         }
-        else
-        {
-                Vector<MultiFab*> cmf, fmf;
-                Vector<Real> ctime, ftime;
-                GetData(lev-1, time, cmf, ctime, mf_old, mf_new);
-                GetData(lev, time, fmf, ftime, mf_old, mf_new);
 
-                PhysBCFunctMaestro cphysbc;
-                PhysBCFunctMaestro fphysbc;
-
-                if (variable_type == 1) { // velocity
-                        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
-                        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
-                } else { // scalar
-                        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
-                        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
-                }
-
-                Interpolater* mapper = &cell_cons_interp;
+        Interpolater* mapper = &cell_cons_interp;
         FillPatchTwoLevels(mf, time, cmf, ctime, fmf, ftime,
-                           srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
-                           cphysbc, 0, fphysbc, 0, refRatio(lev-1),
-                           mapper, bcs, 0);
-        }
+                        srccomp, destcomp, ncomp, geom[lev-1], geom[lev],
+                        cphysbc, 0, fphysbc, 0, refRatio(lev-1),
+                        mapper, bcs, 0);
+    }
 }
 
 // fill an entire multifab by interpolating from the coarser level
@@ -109,11 +107,11 @@ Maestro::FillCoarsePatch (int lev, Real time, MultiFab& mf,
     PhysBCFunctMaestro fphysbc;
 
     if (variable_type == 1) { // velocity
-        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(velfill));
-        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(velfill));
+        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(VelFill));
+        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(VelFill));
     } else { // scalar
-        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(scalarfill));
-        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(scalarfill));
+        cphysbc.define(geom[lev-1],bcs,BndryFuncArrayMaestro(ScalarFill));
+        fphysbc.define(geom[lev  ],bcs,BndryFuncArrayMaestro(ScalarFill));
     }
 
     Interpolater* mapper = &cell_cons_interp;
@@ -205,7 +203,7 @@ Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge
 // fill in ONE ghost cell for all components of a face-centered (MAC) velocity
 // field behind physical boundaries.  Does not modify the velocities on the boundary
 void
-Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
                         int level)
 {
     // timer for profiling
@@ -226,14 +224,13 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
         // Get the index space of the domain
         const Box& domainBox = geom[lev].Domain();
+        const auto domlo = domainBox.loVect3d();
+        const auto domhi = domainBox.hiVect3d();
+
+        const int * AMREX_RESTRICT physbc_p = phys_bc.dataPtr();
 
         // get references to the MultiFabs at level lev
         MultiFab& sold_mf = sold[lev];         // need a cell-centered MF for the MFIter
-        MultiFab& umacx_mf = umac[lev][0];
-        MultiFab& umacy_mf = umac[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& umacz_mf = umac[lev][2];
-#endif
 
         // DO NOT TILE THIS SUBROUTINE
         // this just filling ghost cells so the fortran logic has to be reworked
@@ -242,16 +239,241 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
             // Get the index space of the valid (cell-centered) region
             const Box& tilebox = mfi.tilebox();
-
-            fill_umac_ghost(ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-                            ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                            BL_TO_FORTRAN_3D(umacx_mf[mfi]),
-                            BL_TO_FORTRAN_3D(umacy_mf[mfi]),
+            const auto xbx = mfi.grownnodaltilebox(0, 1);
+            const auto ybx = mfi.grownnodaltilebox(1, 1);
 #if (AMREX_SPACEDIM == 3)
-                            BL_TO_FORTRAN_3D(umacz_mf[mfi]),
+            const auto zbx = mfi.grownnodaltilebox(2, 1);
 #endif
-                            phys_bc.dataPtr());
 
+            const Array4<Real> umac = umac_in[lev][0].array(mfi);
+            const Array4<Real> vmac = umac_in[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<Real> wmac = umac_in[lev][2].array(mfi);
+#endif
+
+        AMREX_PARALLEL_FOR_3D(xbx, i, j, k, 
+        {
+            // lo x-faces
+            if (i == domlo[0] - 1) {
+                switch(physbc_p[0]) {
+                    case Inflow:
+                        umac(i,j,k) = umac(i+1,j,k);
+                        vmac(i,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = 0.0;
+#endif
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j,k) = 0.0;
+                        vmac(i,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = 0.0;
+#endif
+                        break;
+                    case Outflow:
+                        umac(i,j,k) = umac(i+1,j,k);
+                        vmac(i,j,k) = vmac(i+1,j,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = wmac(i+1,j,k);
+#endif
+                        break;
+                    case Symmetry:
+                        umac(i,j,k) = -umac(i+2,j,k);
+                        vmac(i,j,k) = vmac(i+1,j,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = wmac(i+1,j,k);
+#endif
+                        break;
+                    case Interior:
+                    // do nothing
+                        break;
+                }
+            }
+
+            // hi x-faces
+            if (i == domhi[0]+2) {
+                switch(physbc_p[AMREX_SPACEDIM]) {
+                    case Inflow:
+                        umac(i,j,k) = umac(i-1,j,k);
+                        vmac(i-1,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i-1,j,k) = 0.0;
+#endif
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j,k) = 0.0;
+                        vmac(i-1,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i-1,j,k) = 0.0;
+#endif
+                        break;
+                    case Outflow:
+                        umac(i,j,k) = umac(i-1,j,k);
+                        vmac(i-1,j,k) = vmac(i-2,j,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i-1,j,k) = wmac(i-2,j,k);
+#endif
+                        break;
+                    case Symmetry:
+                        umac(i,j,k) = -umac(i-2,j,k);
+                        vmac(i-1,j,k) = vmac(i-2,j,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i-1,j,k) = wmac(i-2,j,k);
+#endif
+                        break;
+                    case Interior:
+                        // do nothing
+                        break;        
+                }
+            }
+        });
+
+        AMREX_PARALLEL_FOR_3D(ybx, i, j, k, 
+        {
+            // lo y-faces
+            if (j == domlo[1]-1) {
+                switch (physbc_p[1]) {
+                    case Inflow:
+                        umac(i,j,k) = 0.0;
+                        vmac(i,j,k) = vmac(i,j+1,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = 0.0;
+#endif
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j,k) = 0.0;
+                        vmac(i,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = 0.0;
+#endif
+                        break;
+                    case Outflow:
+                        umac(i,j,k) = umac(i,j+1,k);
+                        vmac(i,j,k) = vmac(i,j+1,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = wmac(i,j+1,k);
+#endif
+                        break;
+                    case Symmetry:
+                        umac(i,j,k) = umac(i,j+1,k);
+                        vmac(i,j,k) = -vmac(i,j+2,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j,k) = wmac(i,j+1,k);
+#endif
+                        break;
+                    case Interior:
+                        // do nothing
+                        break;            
+                }
+            }
+
+            // hi y-faces
+            if (j == domhi[1]+2) {
+                switch (physbc_p[AMREX_SPACEDIM+1]) {
+                    case Inflow:
+                        umac(i,j-1,k) = 0.0;
+                        vmac(i,j,k) = vmac(i,j-1,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j-1,k) = 0.0;
+#endif
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j-1,k) = 0.0;
+                        vmac(i,j,k) = 0.0;
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j-1,k) = 0.0;
+#endif
+                        break;
+                    case Outflow:
+                        umac(i,j-1,k) = umac(i,j-2,k);
+                        vmac(i,j,k) = vmac(i,j-1,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j-1,k) = wmac(i,j-2,k);
+#endif
+                        break;
+                    case Symmetry:
+                        umac(i,j-1,k) = umac(i,j-2,k);
+                        vmac(i,j,k) = -vmac(i,j-2,k);
+#if (AMREX_SPACEDIM == 3)
+                        wmac(i,j-1,k) = wmac(i,j-2,k);
+#endif
+                        break;
+                    case Interior:
+                        // do nothing
+                        break;            
+                }
+            }
+        });
+
+#if (AMREX_SPACEDIM == 3)
+
+        AMREX_PARALLEL_FOR_3D(zbx, i, j, k, 
+        {
+            // lo z-faces
+            if (k == domlo[2]-1) {
+                switch (physbc_p[2]) {
+                    case Inflow:
+                        umac(i,j,k) = 0.0;
+                        vmac(i,j,k) = 0.0;
+                        wmac(i,j,k) = wmac(i,j,k+1);
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j,k) = 0.0;
+                        vmac(i,j,k) = 0.0;
+                        wmac(i,j,k) = 0.0;
+                        break;
+                    case Outflow:
+                        umac(i,j,k) = umac(i,j,k+1);
+                        vmac(i,j,k) = vmac(i,j,k+1);
+                        wmac(i,j,k) = wmac(i,j,k+1);
+                        break;
+                    case Symmetry:
+                        umac(i,j,k) = umac(i,j,k+1);
+                        vmac(i,j,k) = vmac(i,j,k+1);
+                        wmac(i,j,k) = -wmac(i,j,k+2);
+                        break;
+                    case Interior:
+                        // do nothing
+                        break;        
+                }
+            }
+
+            // hi z-faces
+            if (k == domhi[2]+2) {
+                switch (physbc_p[2+AMREX_SPACEDIM]) {
+                    case Inflow:
+                        umac(i,j,k-1) = 0.0;
+                        vmac(i,j,k-1) = 0.0;
+                        wmac(i,j,k) = wmac(i,j,k-1);
+                        break;
+                    case SlipWall:
+                    case NoSlipWall:
+                        umac(i,j,k-1) = 0.0;
+                        vmac(i,j,k-1) = 0.0;
+                        wmac(i,j,k) = 0.0;
+                        break;
+                    case Outflow:
+                        umac(i,j,k-1) = umac(i,j,k-2);
+                        vmac(i,j,k-1) = vmac(i,j,k-2);
+                        wmac(i,j,k) = wmac(i,j,k-1);
+                        break;
+                    case Symmetry:
+                        umac(i,j,k-1) = umac(i,j,k-2);
+                        vmac(i,j,k-1) = vmac(i,j,k-2);
+                        wmac(i,j,k) = -wmac(i,j,k-2);
+                        break;
+                    case Interior:
+                        // do nothing
+                        break;        
+                }
+            }
+        });
+#endif
         }
     }
 }
@@ -335,41 +557,215 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
 #endif
                 for (MFIter mfi(crse_src); mfi.isValid(); ++mfi) {
                     const int nComp = 1;
-                    const Box& box   = crse_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
+                    const Box& box = crse_src[mfi].box();
+                    IntVect ratio = refRatio(lev-1);
+
+                    const auto lo = box.loVect3d();
+                    const auto hi = box.hiVect3d();
+
+                    const Array4<Real> fine = fine_src.array(mfi);
+                    const Array4<Real> crse = crse_src.array(mfi);
+
                     // For edge-based data, fill fine values with piecewise-constant interp of coarse data.
                     // Operate only on faces that overlap--ie, only fill the fine faces that make up each
                     // coarse face, leave the in-between faces alone.
-                    PC_EDGE_INTERP(box.loVect(), box.hiVect(), &nComp, rat, &dir,
-                                   BL_TO_FORTRAN_FAB(crse_src[mfi]),
-                                   BL_TO_FORTRAN_FAB(fine_src[mfi]));
+#if (AMREX_SPACEDIM == 2)
+                    int k = lo[2];
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                int jj = ratio[1]*j;
+                                for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                    int ii = ratio[0]*i;
+                                    for (auto L = 0; L < ratio[1]; ++L) {
+                                        fine(ii,jj+L,k,n) = crse(i,j,k,n);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                int jj = ratio[1]*j;
+                                for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                    int ii = ratio[0]*i;
+                                    for (auto L = 0; L < ratio[0]; ++L) {
+                                        fine(ii+L,jj,k,n) = crse(i,j,k,n);
+                                    }
+                                }
+                            }
+                        }
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[2]; ++P) {
+                                            for (auto L = 0; L < ratio[1]; ++L) {
+                                                fine(ii,jj+L,kk+P,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dir == 1) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[2]; ++P) {
+                                            for (auto L = 0; L < ratio[0]; ++L) {
+                                                fine(ii+L,jj,kk+P,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k = lo[2]; k <= hi[2]; ++k) {
+                                int kk = ratio[2]*k;
+                                for (auto j = lo[1]; j <= hi[1]; ++j) {
+                                    int jj = ratio[1]*j;
+                                    for (auto i = lo[0]; i <= hi[0]; ++i) {
+                                        int ii = ratio[0]*i;
+                                        for (auto P = 0; P < ratio[1]; ++P) {
+                                            for (auto L = 0; L < ratio[0]; ++L) {
+                                                fine(ii+L,jj+P,kk,n) = crse(i,j,k,n);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#endif
                 }
                 crse_src.clear();
-                //
+                
                 // Replace pc-interpd fine data with preferred u_mac data at
                 // this level u_mac valid only on surrounding faces of valid
                 // region - this op will not fill grow region.
-                //
                 fine_src.copy(uedge[lev][dir]);
-                //
+                
                 // Interpolate unfilled grow cells using best data from
                 // surrounding faces of valid region, and pc-interpd data
                 // on fine edges overlaying coarse edges.
-                //
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
                 for (MFIter mfi(fine_src); mfi.isValid(); ++mfi) {
                     const int nComp = 1;
                     const Box& fbox  = fine_src[mfi].box();
-                    IntVect rr = refRatio(lev-1);
-                    const int* rat = rr.getVect();
+                    IntVect ratio = refRatio(lev-1);
+
+                    const auto flo = fbox.loVect3d();
+                    const auto fhi = fbox.hiVect3d();
+
+                    const Array4<Real> fine = fine_src.array(mfi);
+
                     // Do linear in dir, pc transverse to dir, leave alone the fine values
                     // lining up with coarse edges--assume these have been set to hold the
                     // values you want to interpolate to the rest.
-                    EDGE_INTERP(fbox.loVect(), fbox.hiVect(), &nComp, rat, &dir,
-                                BL_TO_FORTRAN_FAB(fine_src[mfi]));
+
+#if (AMREX_SPACEDIM == 2)
+                    int k = flo[2];
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                for (auto i = flo[0]; i<= fhi[0]-ratio[dir]; i+=ratio[0]) {
+                                    Real df = fine(i+ratio[dir],j,k,n) - fine(i,j,k,n);
+                                    for (auto M=1; M < ratio[dir]; ++M) {
+                                        Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(j,flo[1]); P <= min(j+ratio[1]-1, fhi[1]); ++P) {
+                                                fine(i+M,P,k,n) = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto j = flo[1]; j <= fhi[1]-ratio[dir]; j+=ratio[1]) {
+                                for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j+ratio[dir],k,n) - fine(i,j,k,n);
+                                    for (auto M=1; M < ratio[dir]; ++M) {
+                                        Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                fine(P,j+M,k,n) = val;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#elif (AMREX_SPACEDIM == 3)
+                    if (dir == 0) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i<= fhi[0]-ratio[dir]; i+=ratio[0]) {
+                                    Real df = fine(i+ratio[dir],j,k,n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(j,flo[1]); P <= min(j+ratio[1]-1, fhi[1]); ++P) {
+                                                for (auto L = max(k, flo[2]); L <= min(k+ratio[2]-1, fhi[2]); ++L) {
+                                                    fine(i+M,P,L,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else if (dir == 1) {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]-ratio[dir]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j+ratio[dir],k,n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                for (auto L = max(k, flo[2]); L <= min(k+ratio[2]-1, fhi[2]); ++L) {
+                                                    fine(P,j+M,L,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        for (auto n = 0; n < nComp; ++n) {
+                            for (auto k=flo[2]; k <= fhi[2]-ratio[dir]; k+=ratio[2]) {
+                                for (auto j = flo[1]; j <= fhi[1]; j+=ratio[1]) {
+                                    for (auto i = flo[0]; i <= fhi[0]; i+=ratio[0]) {
+                                    Real df = fine(i,j,k+ratio[dir],n) - fine(i,j,k,n);
+                                        for (auto M=1; M < ratio[dir]; ++M) {
+                                            Real val = fine(i,j,k,n) + df*Real(M)/Real(ratio[dir]);
+                                            for (auto P=max(i,flo[0]); P <= min(i+ratio[0]-1, fhi[0]); ++P) {
+                                                for (auto L = max(j, flo[1]); L <= min(j+ratio[1]-1, fhi[1]); ++L) {
+                                                    fine(P,L,k+M,n) = val;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+#endif
                 }
 
                 // make a copy of the original fine uedge but with no ghost cells
@@ -384,7 +780,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
                 uedge[lev][dir].copy(uedge_f_save);
             }
 
-        }         // end if
+        } // end if
 
         // fill periodic ghost cells
         for (int d=0; d<AMREX_SPACEDIM; ++d) {
@@ -394,6 +790,5 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
         // fill ghost cells behind physical boundaries
         FillUmacGhost(uedge,lev);
 
-    }     // end loop over levels
-
+    } // end loop over levels
 }

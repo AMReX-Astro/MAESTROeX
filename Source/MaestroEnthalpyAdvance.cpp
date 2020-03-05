@@ -37,10 +37,10 @@ Maestro::EnthalpyAdvance (int which_step,
     rhoh0_edge_new.shrink_to_fit();
 
     if (spherical == 0) {
-        cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());
-        cell_to_edge( rho0_new.dataPtr(), rho0_edge_new.dataPtr());
-        cell_to_edge(rhoh0_old.dataPtr(),rhoh0_edge_old.dataPtr());
-        cell_to_edge(rhoh0_new.dataPtr(),rhoh0_edge_new.dataPtr());
+        CelltoEdge(rho0_old, rho0_edge_old);
+        CelltoEdge(rho0_new, rho0_edge_new);
+        CelltoEdge(rhoh0_old, rhoh0_edge_old);
+        CelltoEdge(rhoh0_new, rhoh0_edge_new);
     }
 
     if (enthalpy_pred_type == predict_h ||
@@ -353,10 +353,10 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     rhoh0_edge_new.shrink_to_fit();
 
     if (spherical == 0) {
-        cell_to_edge( rho0_old.dataPtr(), rho0_edge_old.dataPtr());
-        cell_to_edge( rho0_new.dataPtr(), rho0_edge_new.dataPtr());
-        cell_to_edge(rhoh0_old.dataPtr(),rhoh0_edge_old.dataPtr());
-        cell_to_edge(rhoh0_new.dataPtr(),rhoh0_edge_new.dataPtr());
+        CelltoEdge(rho0_old, rho0_edge_old);
+        CelltoEdge(rho0_new, rho0_edge_new);
+        CelltoEdge(rhoh0_old, rhoh0_edge_old);
+        CelltoEdge(rhoh0_new, rhoh0_edge_new);
     }
 
     if (enthalpy_pred_type == predict_h ||
