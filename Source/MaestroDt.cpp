@@ -139,10 +139,6 @@ Maestro::EstDt ()
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
                 if (spherical == 0) {
 
                     const Real rho_min = 1.e-20;
@@ -384,7 +380,7 @@ void
 Maestro::FirstDt ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::FirstDt()",FirstDt);
+    BL_PROFILE_VAR("Maestro::FirstDt()", FirstDt);
 
     dt = 1.e20;
 
@@ -462,73 +458,187 @@ Maestro::FirstDt ()
 
     for (int lev = 0; lev <= finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& uold_mf = uold[lev];
-        const MultiFab& sold_mf = sold[lev];
-        const MultiFab& vel_force_mf = vel_force[lev];
-        const MultiFab& S_cc_old_mf = S_cc_old[lev];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& gp0_cart_mf = gp0_cart[lev];
-#endif
-        const MultiFab& p0_mf = p0_cart[lev];
-        const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
+//         // get references to the MultiFabs at level lev
+//         const MultiFab& uold_mf = uold[lev];
+//         const MultiFab& sold_mf = sold[lev];
+//         const MultiFab& vel_force_mf = vel_force[lev];
+//         const MultiFab& S_cc_old_mf = S_cc_old[lev];
+// #if (AMREX_SPACEDIM == 3)
+//         const MultiFab& gp0_cart_mf = gp0_cart[lev];
+// #endif
+//         const MultiFab& p0_mf = p0_cart[lev];
+//         const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
         {
+            Real dt_grid = 1.e99;
+            Real umax_grid = 0.;
 
-        Real dt_grid = 1.e99;
-        Real umax_grid = 0.;
+            for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
-        for ( MFIter mfi(sold_mf,TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+                // Get the index space of the valid region
+                const Box& tileBox = mfi.tilebox();
+                const auto dx = geom[lev].CellSizeArray();
 
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
+                const Array4<const Real> scal_arr = sold[lev].array(mfi);
+                const Array4<const Real> u = uold[lev].array(mfi);
+                const Array4<const Real> force = vel_force[lev].array(mfi);
+                const Array4<const Real> S_cc_arr = S_cc_old[lev].array(mfi);
+                const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+                const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-            const Real* dx = geom[lev].CellSize();
+                if (spherical == 0 ) {
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 0 ) {
+                    const Real eps = 1.e-8;
+                    const Real rho_min = 1.e-20;
 
-#pragma gpu box(tileBox)
-                firstdt(lev,
-                    AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                    AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                    AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                    AMREX_REAL_ANYD(dx),
-                    BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
-                    BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
-                    BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
-                    BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                    BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
+                    Real spdx = 0.0;
+                    Real spdy = 0.0;
+                    Real spdz = 0.0;
+                    Real pforcex = 0.0;
+                    Real pforcey = 0.0;
+                    Real pforcez = 0.0;
+                    Real ux = 0.0;
+                    Real uy = 0.0;
+                    Real uz = 0.0;
 
-            } else {
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        eos_t eos_state;
+
+                        // compute the sound speed from rho and temp
+                        eos_state.rho = scal_arr(i,j,k,Rho);
+                        eos_state.T = scal_arr(i,j,k,Temp);
+                        for (auto comp = 0; comp < NumSpec; ++comp) {
+                            eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / scal_arr(i,j,k,Rho);
+                        }
+
+                        // dens, temp, and xmass are inputs
+                        eos(eos_input_rt, eos_state);
+
+                        spdx = amrex::max(spdx, eos_state.cs);
+                        ux = amrex::max(ux, fabs(u(i,j,k,0)));
+                        pforcex = amrex::max(pforcex, fabs(force(i,j,k,0)));
+
+                        spdy = amrex::max(spdy, eos_state.cs);
+                        uy = amrex::max(uy, fabs(u(i,j,k,1)));
+                        pforcey = amrex::max(pforcey, fabs(force(i,j,k,1)));
+#if (AMREX_SPACEDIM == 3)
+                        spdz = amrex::max(spdz, eos_state.cs);
+                        uz = amrex::max(uz, fabs(u(i,j,k,2)));
+                        pforcez = amrex::max(pforcez, fabs(force(i,j,k,2)));
+#endif
+                    });
+
+                    umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
+
+                    ux /= dx[0];
+                    spdx /= dx[0];
+                    uy /= dx[1];
+                    spdy /= dx[1];
+#if (AMREX_SPACEDIM == 3)
+                    uz /= dx[2];
+                    spdz /= dx[2];
+#endif
+
+                    // use advective constraint unless velocities are zero everywhere
+                    // in which case we use the sound speed
+                    if (ux != 0.0 || uy != 0.0 != uz != 0.0) {
+                        dt_grid = amrex::min(dt_grid, cfl / std::max(ux,std::max(uy,uz)));
+                    } else if (spdx != 0.0 || spdy != 0.0 || spdz != 0.0) {
+                        dt_grid = amrex::min(dt_grid, cfl / std::max(spdx,std::max(spdy,spdz)));
+                    }
+
+                    // sound speed constraint
+                    if (use_soundspeed_firstdt) {
+                        Real dt_sound = 0.0;
+
+                        if (spdx != 0.0 || spdy != 0.0 || spdz != 0.0) {
+                            dt_sound = 1.e99;
+                        } else {
+                            dt_sound = cfl / std::max(spdx,std::max(spdy,spdz));
+                        }
+                        dt_grid = amrex::min(dt_grid, dt_sound);
+                    }
+
+                    // force constraints
+                    if (pforcex > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
+                    if (pforcey > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
+#if (AMREX_SPACEDIM == 3)
+                    if (pforcez > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
+#endif
+
+                    // divU constraint
+                    if (use_divu_firstdt) {
+                        Real dt_divu = 1.e99;
+                        const auto nr_lev = nr[lev];
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                            Real gradp0 = 0.0;
+ #if (AMREX_SPACEDIM == 2)
+                            if (j == 0) {
+                                gradp0 = (p0_arr(i,j+1,k) - p0_arr(i,j,k)) / dx[1];
+                            } else if (j == nr_lev-1) {
+                                gradp0 = (p0_arr(i,j,k) - p0_arr(i,j-1,k)) / dx[1];
+                            } else {
+                                gradp0 = 0.5*(p0_arr(i,j+1,k) - p0_arr(i,j-1,k)) / dx[1];
+                            }
+ #else 
+                            if (k == 0) {
+                                gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
+                            } else if (j == nr_lev-1) {
+                                gradp0 = (p0_arr(i,j,k) - p0_arr(i,j,k-1)) / dx[2];
+                            } else {
+                                gradp0 = 0.5*(p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
+                            }
+ #endif                        
+
+                            Real denom = S_cc_arr(i,j,k) - u(i,j,k,AMREX_SPACEDIM-1) * gradp0 / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
+
+                            if (denom > 0.0) {
+                                dt_divu = amrex::min(dt_divu, 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom);
+                            }
+                        });
+
+                        dt_grid = amrex::min(dt_grid, dt_divu);
+                    }
+
+    // #pragma gpu box(tileBox)
+                    // firstdt(lev,
+                    //     AMREX_MFITER_REDUCE_MIN(&dt_grid),
+                    //     AMREX_MFITER_REDUCE_MAX(&umax_grid),
+                    //     AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+                    //     AMREX_REAL_ANYD(dx),
+                    //     BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+                    //     BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+                    //     BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+                    //     BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                    //     BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
+                    //     BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
+
+                } else {
 #if (AMREX_SPACEDIM == 3)
 
-#pragma gpu box(tileBox)
-                firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                             AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                             AMREX_REAL_ANYD(dx),
-                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
-                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
-                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
-                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                             BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
+    // #pragma gpu box(tileBox)
+    //                 firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
+    //                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
+    //                             AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
+    //                             AMREX_REAL_ANYD(dx),
+    //                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
+    //                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
+    //                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
+    //                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
+                                // BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
 #else
-                Abort("FirstDt: Spherical is not valid for DIM < 3");
+                    Abort("FirstDt: Spherical is not valid for DIM < 3");
 #endif
+                }
             }
-        }
 
-        dt_lev = std::min(dt_lev,dt_grid);
-        umax_lev = std::max(umax_lev,umax_grid);
+            dt_lev = std::min(dt_lev,dt_grid);
+            umax_lev = std::max(umax_lev,umax_grid);
 
         } //end openmp
 
