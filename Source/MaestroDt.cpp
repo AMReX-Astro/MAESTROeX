@@ -91,8 +91,9 @@ Maestro::EstDt ()
 
     // divU constraint
     if (spherical == 1) {
-      estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    //   estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
+    //              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
       
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
@@ -434,8 +435,9 @@ Maestro::FirstDt ()
 
     // divU constraint
     if (use_divu_firstdt && spherical == 1) {
-        estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-                   r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        // estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
+        //            r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+        EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
     Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
@@ -490,94 +492,94 @@ Maestro::FirstDt ()
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-                if (spherical == 0 ) {
+                const Real eps = 1.e-8;
+                const Real rho_min = 1.e-20;
 
-                    const Real eps = 1.e-8;
-                    const Real rho_min = 1.e-20;
+                Real spdx = 0.0;
+                Real spdy = 0.0;
+                Real spdz = 0.0;
+                Real pforcex = 0.0;
+                Real pforcey = 0.0;
+                Real pforcez = 0.0;
+                Real ux = 0.0;
+                Real uy = 0.0;
+                Real uz = 0.0;
 
-                    Real spdx = 0.0;
-                    Real spdy = 0.0;
-                    Real spdz = 0.0;
-                    Real pforcex = 0.0;
-                    Real pforcey = 0.0;
-                    Real pforcez = 0.0;
-                    Real ux = 0.0;
-                    Real uy = 0.0;
-                    Real uz = 0.0;
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    eos_t eos_state;
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                        eos_t eos_state;
-
-                        // compute the sound speed from rho and temp
-                        eos_state.rho = scal_arr(i,j,k,Rho);
-                        eos_state.T = scal_arr(i,j,k,Temp);
-                        for (auto comp = 0; comp < NumSpec; ++comp) {
-                            eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / scal_arr(i,j,k,Rho);
-                        }
-
-                        // dens, temp, and xmass are inputs
-                        eos(eos_input_rt, eos_state);
-
-                        spdx = amrex::max(spdx, eos_state.cs);
-                        ux = amrex::max(ux, fabs(u(i,j,k,0)));
-                        pforcex = amrex::max(pforcex, fabs(force(i,j,k,0)));
-
-                        spdy = amrex::max(spdy, eos_state.cs);
-                        uy = amrex::max(uy, fabs(u(i,j,k,1)));
-                        pforcey = amrex::max(pforcey, fabs(force(i,j,k,1)));
-#if (AMREX_SPACEDIM == 3)
-                        spdz = amrex::max(spdz, eos_state.cs);
-                        uz = amrex::max(uz, fabs(u(i,j,k,2)));
-                        pforcez = amrex::max(pforcez, fabs(force(i,j,k,2)));
-#endif
-                    });
-
-                    umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
-
-                    ux /= dx[0];
-                    spdx /= dx[0];
-                    uy /= dx[1];
-                    spdy /= dx[1];
-#if (AMREX_SPACEDIM == 3)
-                    uz /= dx[2];
-                    spdz /= dx[2];
-#endif
-
-                    // use advective constraint unless velocities are zero everywhere
-                    // in which case we use the sound speed
-                    if (ux != 0.0 || uy != 0.0 != uz != 0.0) {
-                        dt_grid = amrex::min(dt_grid, cfl / std::max(ux,std::max(uy,uz)));
-                    } else if (spdx != 0.0 || spdy != 0.0 || spdz != 0.0) {
-                        dt_grid = amrex::min(dt_grid, cfl / std::max(spdx,std::max(spdy,spdz)));
+                    // compute the sound speed from rho and temp
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / scal_arr(i,j,k,Rho);
                     }
 
-                    // sound speed constraint
-                    if (use_soundspeed_firstdt) {
-                        Real dt_sound = 0.0;
+                    // dens, temp, and xmass are inputs
+                    eos(eos_input_rt, eos_state);
 
-                        if (spdx != 0.0 || spdy != 0.0 || spdz != 0.0) {
-                            dt_sound = 1.e99;
-                        } else {
-                            dt_sound = cfl / std::max(spdx,std::max(spdy,spdz));
-                        }
-                        dt_grid = amrex::min(dt_grid, dt_sound);
-                    }
+                    spdx = amrex::max(spdx, eos_state.cs);
+                    ux = amrex::max(ux, fabs(u(i,j,k,0)));
+                    pforcex = amrex::max(pforcex, fabs(force(i,j,k,0)));
 
-                    // force constraints
-                    if (pforcex > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
-                    if (pforcey > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
+                    spdy = amrex::max(spdy, eos_state.cs);
+                    uy = amrex::max(uy, fabs(u(i,j,k,1)));
+                    pforcey = amrex::max(pforcey, fabs(force(i,j,k,1)));
 #if (AMREX_SPACEDIM == 3)
-                    if (pforcez > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
+                    spdz = amrex::max(spdz, eos_state.cs);
+                    uz = amrex::max(uz, fabs(u(i,j,k,2)));
+                    pforcez = amrex::max(pforcez, fabs(force(i,j,k,2)));
+#endif
+                });
+
+                umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
+
+                ux /= dx[0];
+                spdx /= dx[0];
+                uy /= dx[1];
+                spdy /= dx[1];
+#if (AMREX_SPACEDIM == 3)
+                uz /= dx[2];
+                spdz /= dx[2];
 #endif
 
-                    // divU constraint
-                    if (use_divu_firstdt) {
-                        Real dt_divu = 1.e99;
+                // use advective constraint unless velocities are zero everywhere
+                // in which case we use the sound speed
+                if (ux != 0.0 || uy != 0.0 || uz != 0.0) {
+                    dt_grid = amrex::min(dt_grid, cfl / std::max(ux,std::max(uy,uz)));
+                } else if (spdx != 0.0 && spdy != 0.0 && spdz != 0.0) {
+                    dt_grid = amrex::min(dt_grid, cfl / std::max(spdx,std::max(spdy,spdz)));
+                }
+
+                // sound speed constraint
+                if (use_soundspeed_firstdt) {
+                    Real dt_sound = 0.0;
+
+                    if (spdx == 0.0 && spdy == 0.0 && spdz == 0.0) {
+                        dt_sound = 1.e99;
+                    } else {
+                        dt_sound = cfl / std::max(spdx,std::max(spdy,spdz));
+                    }
+                    dt_grid = amrex::min(dt_grid, dt_sound);
+                }
+
+                // force constraints
+                if (pforcex > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
+                if (pforcey > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
+#if (AMREX_SPACEDIM == 3)
+                if (pforcez > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
+#endif
+
+                // divU constraint
+                if (use_divu_firstdt) {
+                    Real dt_divu = 1.e99;
+
+                    if (!spherical) {
                         const auto nr_lev = nr[lev];
 
                         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             Real gradp0 = 0.0;
- #if (AMREX_SPACEDIM == 2)
+#if (AMREX_SPACEDIM == 2)
                             if (j == 0) {
                                 gradp0 = (p0_arr(i,j+1,k) - p0_arr(i,j,k)) / dx[1];
                             } else if (j == nr_lev-1) {
@@ -585,7 +587,7 @@ Maestro::FirstDt ()
                             } else {
                                 gradp0 = 0.5*(p0_arr(i,j+1,k) - p0_arr(i,j-1,k)) / dx[1];
                             }
- #else 
+#else 
                             if (k == 0) {
                                 gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                             } else if (j == nr_lev-1) {
@@ -593,7 +595,7 @@ Maestro::FirstDt ()
                             } else {
                                 gradp0 = 0.5*(p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
                             }
- #endif                        
+#endif                        
 
                             Real denom = S_cc_arr(i,j,k) - u(i,j,k,AMREX_SPACEDIM-1) * gradp0 / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
 
@@ -601,45 +603,31 @@ Maestro::FirstDt ()
                                 dt_divu = amrex::min(dt_divu, 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom);
                             }
                         });
+                    } else {
 
-                        dt_grid = amrex::min(dt_grid, dt_divu);
+                        const Array4<const Real> gp0_arr = gp0_cart[lev].array(mfi);
+
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                            Real gp_dot_u = 0.0;
+
+                            for (auto n = 0; n < AMREX_SPACEDIM; ++n)    {
+                                gp_dot_u += gp0_arr(i,j,k,n) * u(i,j,k,n);
+                            }
+
+                            Real denom = S_cc_arr(i,j,k) - gp_dot_u;
+
+                            if (denom > 0.0) {
+                                dt_divu = amrex::min(dt_divu, 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom);
+                            }
+                        });
                     }
 
-    // #pragma gpu box(tileBox)
-                    // firstdt(lev,
-                    //     AMREX_MFITER_REDUCE_MIN(&dt_grid),
-                    //     AMREX_MFITER_REDUCE_MAX(&umax_grid),
-                    //     AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-                    //     AMREX_REAL_ANYD(dx),
-                    //     BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
-                    //     BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
-                    //     BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
-                    //     BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                    //     BL_TO_FORTRAN_ANYD(p0_mf[mfi]),
-                    //     BL_TO_FORTRAN_ANYD(gamma1bar_mf[mfi]));
-
-                } else {
-#if (AMREX_SPACEDIM == 3)
-
-    // #pragma gpu box(tileBox)
-    //                 firstdt_sphr(AMREX_MFITER_REDUCE_MIN(&dt_grid),
-    //                             AMREX_MFITER_REDUCE_MAX(&umax_grid),
-    //                             AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
-    //                             AMREX_REAL_ANYD(dx),
-    //                             BL_TO_FORTRAN_ANYD(sold_mf[mfi]), sold_mf[mfi].nCompPtr(),
-    //                             BL_TO_FORTRAN_ANYD(uold_mf[mfi]), uold_mf[mfi].nCompPtr(),
-    //                             BL_TO_FORTRAN_ANYD(vel_force_mf[mfi]), vel_force_mf[mfi].nCompPtr(),
-    //                             BL_TO_FORTRAN_ANYD(S_cc_old_mf[mfi]),
-                                // BL_TO_FORTRAN_ANYD(gp0_cart_mf[mfi]));
-#else
-                    Abort("FirstDt: Spherical is not valid for DIM < 3");
-#endif
+                    dt_grid = amrex::min(dt_grid, dt_divu);
                 }
             }
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
-
         } //end openmp
 
         // find the smallest dt over all processors
@@ -694,4 +682,38 @@ Maestro::FirstDt ()
     umax *= 1.e-8;
     c_rel_eps = umax;
     set_rel_eps(&umax);
+}
+
+
+void
+Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
+                    const RealVector& gamma1bar_vec)
+{
+    const int max_lev = max_radial_level + 1;
+
+    Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
+    const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
+    const Real * AMREX_RESTRICT gamma1bar = gamma1bar_vec.dataPtr();
+    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
+    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+
+    // spherical divU constraint
+    if (use_exact_base_state) {
+        AMREX_PARALLEL_FOR_1D(nr_fine-1, i, {
+            int r = i + 1;
+
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
+
+            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)])  / gamma1bar_p_avg;
+        });
+    } else {
+        const auto dr0 = dr[0];
+        AMREX_PARALLEL_FOR_1D(nr_fine-1, i, {
+            int r = i + 1;
+
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
+
+            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / dr0 / gamma1bar_p_avg;
+        });
+    }
 }

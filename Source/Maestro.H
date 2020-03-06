@@ -477,6 +477,9 @@ public:
     /// Compute initial time step
     void FirstDt ();
 
+    void EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
+                    const RealVector& gamma1bar_vec);
+
     // end MaestroDt.cpp functions
     ////////////////////////
 
