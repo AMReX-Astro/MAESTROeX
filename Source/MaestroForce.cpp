@@ -20,11 +20,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
-        // constants in Fortran
-        Real base_cutoff_density=0.0; 
-        get_base_cutoff_density(&base_cutoff_density);
-        Real buoyancy_cutoff_factor=0.0;
-        get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
+    // constants in Fortran
+    Real base_cutoff_density=0.0; 
+    get_base_cutoff_density(&base_cutoff_density);
+    Real buoyancy_cutoff_factor=0.0;
+    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -63,18 +63,15 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& vel_force_mf = vel_force_cart[lev];
         
         // Get grid spacing
-        const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(vel_force_cart[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get Array4 inputs
             const Array4<const Real> gpi_arr = gpi[lev].array(mfi);
@@ -91,7 +88,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
             
             // output
-            const Array4<Real> vel_force = vel_force_mf.array(mfi);
+            const Array4<Real> vel_force = vel_force_cart[lev].array(mfi);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -128,8 +125,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                         } else if (j >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
-                            vel_force(i,j,k,1) = vel_force(i,j,k,1)
-                                - (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
+                            vel_force(i,j,k,1) -= (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
                         }
 #else
                         
@@ -138,8 +134,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                         } else if (k >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
-                            vel_force(i,j,k,2) = vel_force(i,j,k,2) 
-                                - (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
+                            vel_force(i,j,k,2) -= (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
                         }
 #endif
                     }
@@ -186,7 +181,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     // it matches fortran MAESTRO but is that correct?
     FillPatch(t_old, vel_force_cart, vel_force_cart, vel_force_cart, 0, 0, AMREX_SPACEDIM, 0,
               bcs_u, 1);
-
 }
 
 
@@ -241,14 +235,11 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         // Get the index space and grid spacing of the domain
         const auto dx = geom[lev].CellSizeArray();
 
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_force_mf = scal_force[lev];
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
             
             // Get Array4 inputs
             const Array4<const Real> scal = state[lev].array(mfi,comp);
@@ -262,7 +253,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> force = scal_force_mf.array(mfi,comp);
+            const Array4<Real> force = scal_force[lev].array(mfi,comp);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -329,7 +320,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                             (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
                             (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
                             
-                        force(i,j,k) = force(i,j,k) - divs0u
+                        force(i,j,k) += -divs0u
                             - (scal(i,j,k)-s0_arr(i,j,k))*(divumac + divu_arr(i,j,k));
                     }
                 });
@@ -370,7 +361,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                               wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
-                        force(i,j,k) = force(i,j,k) - (scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
+                        force(i,j,k) += -(scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
                     }
                 });
             }
@@ -460,21 +451,18 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_force_mf = scal_force[lev];
-
         // Get cutoff coord
         int base_cutoff_density_coord_loc = 0;
         get_base_cutoff_density_coord(lev, &base_cutoff_density_coord_loc);
     
         // Get grid spacing
-        const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
         
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // inputs
             const Array4<const Real> umac = umac_cart[lev][0].array(mfi);
@@ -492,7 +480,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> rho0cart = rho0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> rhoh_force = scal_force_mf.array(mfi, RhoH);
+            const Array4<Real> rhoh_force = scal_force[lev].array(mfi, RhoH);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -503,8 +491,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
 
-                        // For non-spherical, add wtilde d(p0)/dr
-                        // For spherical, we make u grad p = div (u p) - p div (u)
+            // For non-spherical, add wtilde d(p0)/dr
+            // For spherical, we make u grad p = div (u p) - p div (u)
             if (spherical == 0) {
 
                 AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
@@ -627,18 +615,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-//         MultiFab& temp_force_mf = temp_force[lev];
-//         const MultiFab& umac_mf = umac[lev][0];
-//         const MultiFab& vmac_mf = umac[lev][1];
-// #if (AMREX_SPACEDIM == 3)
-//         const MultiFab& wmac_mf = umac[lev][2];
-// #endif
-//         const MultiFab& scal_mf = scal[lev];
-//         const MultiFab& p0cart_mf = p0_cart[lev];
-//         const MultiFab& thermal_mf = thermal[lev];
-        const MultiFab& psi_mf = psi_cart[lev];
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -647,9 +623,9 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
-            // const Box& domainBox = geom[lev].Domain();
-            const auto domlo = geom[lev].ProbLoArray();
-            const auto domhi = geom[lev].ProbHiArray();
+            const Box& domainBox = geom[lev].Domain();
+            const auto domlo = domainBox.loVect3d();
+            const auto domhi = domainBox.hiVect3d();
 
             // Get grid spacing
             const auto dx = geom[lev].CellSizeArray();
