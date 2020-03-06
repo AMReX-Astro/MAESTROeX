@@ -704,7 +704,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     if (do_sponge) {
-        init_sponge(rho0_old.dataPtr());
+        SpongeInit(rho0_old);
         MakeSponge(tempmf);
 
         if (plot_sponge_fdamp) {

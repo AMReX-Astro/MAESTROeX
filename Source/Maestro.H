@@ -1495,6 +1495,14 @@ public:
     ////////////
 
     ////////////
+    // MaestroRotation.cpp functions
+#ifdef ROTATION
+    void RotationInit();
+#endif
+    // end MaestroRotation.cpp functions
+    ////////////
+
+    ////////////
     // MaestroSetup.cpp functions
 
     void ExternInit ();
@@ -1541,6 +1549,8 @@ public:
 
     ////////////
     // MaestroSponge.cpp functions
+
+    void SpongeInit(const RealVector& rho0);
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
@@ -1943,6 +1953,28 @@ public:
 
     // problem information
     RealVector center;
+
+    // rotation 
+#ifdef ROTATION
+    Real sin_theta;
+    Real cos_theta;
+    Real omega;
+#endif
+
+    // sponge 
+    Real r_sp;
+    Real r_md;
+    Real r_tp;
+    // outer sponge parameters used for spherical problems 
+    Real r_sp_outer;
+    Real r_tp_outer;
+    /// the sponge_start_density should be the density below which the
+    /// sponge first turns on.  Different problems may compute this in
+    /// different ways (i.e. not using sponge_center_density and
+    /// sponge_start_factor), so we provide this public module variable to
+    /// ensure that the rest of the code always knows at what density the
+    /// sponge begins.
+    Real sponge_start_density;
 
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`

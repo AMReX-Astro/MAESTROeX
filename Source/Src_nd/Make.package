@@ -17,6 +17,4 @@ F90EXE_sources += make_intra_coeffs.F90
 F90EXE_sources += make_grav.F90
 F90EXE_sources += make_plot_variables.F90
 F90EXE_sources += regrid.F90
-F90EXE_sources += rotation.F90
-F90EXE_sources += sponge.F90
 F90EXE_sources += tagging.F90

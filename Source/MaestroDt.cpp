@@ -91,8 +91,6 @@ Maestro::EstDt ()
 
     // divU constraint
     if (spherical == 1) {
-    //   estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-    //              r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
       
@@ -434,9 +432,7 @@ Maestro::FirstDt ()
     std::fill(gp0.begin(),gp0.end(), 0.);
 
     // divU constraint
-    if (use_divu_firstdt && spherical == 1) {
-        // estdt_divu(gp0.dataPtr(), p0_old.dataPtr(), gamma1bar_old.dataPtr(),
-        //            r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+    if (use_divu_firstdt && spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
@@ -459,17 +455,6 @@ Maestro::FirstDt ()
     Real umax_lev = 0.;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
-
-//         // get references to the MultiFabs at level lev
-//         const MultiFab& uold_mf = uold[lev];
-//         const MultiFab& sold_mf = sold[lev];
-//         const MultiFab& vel_force_mf = vel_force[lev];
-//         const MultiFab& S_cc_old_mf = S_cc_old[lev];
-// #if (AMREX_SPACEDIM == 3)
-//         const MultiFab& gp0_cart_mf = gp0_cart[lev];
-// #endif
-//         const MultiFab& p0_mf = p0_cart[lev];
-//         const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -621,7 +606,6 @@ Maestro::FirstDt ()
                             }
                         });
                     }
-
                     dt_grid = amrex::min(dt_grid, dt_divu);
                 }
             }
