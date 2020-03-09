@@ -22,4 +22,14 @@ contains
 
   end subroutine set_inlet_bcs
 
+  subroutine get_inlet_bcs(params) bind(C, name="get_inlet_bcs")
+
+    use amrex_error_module, only: amrex_error
+    
+    double precision, intent(inout) :: params
+    
+    call amrex_error("ERROR: no parameters in inlet_bc")
+    
+  end subroutine get_inlet_bcs
+
 end module inlet_bc_module
