@@ -49,8 +49,8 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     eos_t eos_state;
 
     // use eos call to be consistent
-    eos_state.rho = p0_init[n];
-    eos_state.p = s0_init[n+max_lev*nr_fine*Rho];
+    eos_state.p = p0_init[n];
+    eos_state.rho = s0_init[n+max_lev*nr_fine*Rho];
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = xn_zone[comp];
     }
