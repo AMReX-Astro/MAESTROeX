@@ -1990,4 +1990,24 @@ public:
 
 };
 
+// namespace amrex{
+//     namespace HostDevice { namespace Atomic {
+
+//     template <class T>
+//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+//     void Max (T* max, T value) noexcept
+//     {
+// #if AMREX_DEVICE_COMPILE
+//         Gpu::Atomic::Max(sum,value);
+// #else
+// #ifdef _OPENMP
+// #pragma omp atomic update
+// #endif
+//         *sum += value;
+// #endif
+//     }
+
+// }}}
+
+
 #endif

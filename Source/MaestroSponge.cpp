@@ -131,7 +131,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                     sponge_arr(i,j,k) = 1.0;
                 });
 
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
+                for (int n = 0; n <= hi-lo; ++n) {
 #if (AMREX_SPACEDIM == 2)
                     int j = lo + n;
                     Real r = prob_lo[1] + (Real(j) + 0.5) * dx[1];
@@ -142,11 +142,10 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                     if (r >= r_sp_loc) {
                         if (r < r_tp_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_loc) / (r_tp_loc - r_sp_loc)));
-                            smdamp_idx = lo + n;;
+                            smdamp_idx = lo + n;
                         }
-                        // sponge_arr(i,j,k) = 1.0 / (1.0 + dt_loc * smdamp * sponge_kappa_loc);
                     }
-                });
+                }
                 if (smdamp_idx >= 0) {
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
 #if (AMREX_SPACEDIM == 2)
