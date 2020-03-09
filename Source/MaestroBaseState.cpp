@@ -77,10 +77,10 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     Real starting_rad = spherical ? 0.0 : geom[lev].ProbLo(AMREX_SPACEDIM-1);
 
     Real rho_above_cutoff = s0_init[n+max_lev*nr_fine*Rho];
-    Real rhoh_above_cutoff = s0_init[n+max_lev*nr_fine*Rho];
+    Real rhoh_above_cutoff = s0_init[n+max_lev*nr_fine*RhoH];
     RealVector spec_above_cutoff(NumSpec);
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        spec_above_cutoff[comp] = s0_init[n+max_lev*nr_fine*Rho];
+        spec_above_cutoff[comp] = s0_init[n+max_lev*nr_fine*(FirstSpec+comp)];
     } 
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
     Real p_above_cutoff = s0_init[n];
