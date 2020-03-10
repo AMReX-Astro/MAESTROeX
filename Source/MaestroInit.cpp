@@ -233,7 +233,7 @@ Maestro::InitData ()
     }
 
     if (use_exact_base_state) {
-	std::fill(psi.begin(), psi.end(), 0.);
+        std::fill(psi.begin(), psi.end(), 0.);
     }
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
