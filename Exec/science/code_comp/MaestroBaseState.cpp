@@ -3,10 +3,10 @@
 
 using namespace amrex;
 
-Real dUdy(Real y, RealVector U);
-Real fv(Real y);
-RealVector set_species(Real y);
-Real grav_zone(Real y);
+auto dUdy(Real y, RealVector U);
+auto fv(Real y);
+auto set_species(Real y);
+auto grav_zone(Real y);
 
 void 
 Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init, 
@@ -19,16 +19,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
     // define some helper functions with lambdas
-    auto set_species = [](Real y)
-    {
-        RealVector xn(NumSpec, 0.0);
-
-        xn[0] = 1.0 - fv(y);
-        xn[1] = fv[y]; 
-
-        return xn;   
-    };
-
     auto fv = [](Real y)
     {
         if (y < 1.9375 * 4.e8) {
@@ -40,25 +30,14 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         }
     };
 
-    auto dUdy = [](Real y, RealVector U) 
+    auto set_species = [this, &fv](Real y)
     {
-        eos_t eos_state;
+        RealVector xn(NumSpec, 0.0);
 
-        eos_state.rho = U[0];
-        eos_state.p = U[1];
-        eos_state.xn = set_species(y);
+        xn[0] = 1.0 - fv(y);
+        xn[1] = fv(y); 
 
-        eos(eos_input_rp, eos_state);
-
-        Real gamma0 = eos_state.gam1;
-        Real gamma = gamma0 + fv(y) * (gamma1 - gamma0);
-
-        RealVector dU(2);
-
-        dU[1] = exp(U[0]) * grav_zone(y) / exp(U[1]);
-        dU[0] = dU[1] / gamma;
-
-        return dU;
+        return xn;   
     };
 
     auto grav_zone = [](Real y)
@@ -72,6 +51,30 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         }
 
         return fg * g0 / pow(y / 4.e8, 1.25);
+    };
+
+    auto dUdy = [this, &fv, &set_species, &grav_zone](Real y, RealVector U) 
+    {
+        eos_t eos_state;
+	RealVector xn = set_species(y);
+
+        eos_state.rho = U[0];
+        eos_state.p = U[1];
+	for (auto comp = 0; comp < NumSpec; ++comp) {
+	    eos_state.xn[comp] = xn[comp];
+	}
+
+        eos(eos_input_rp, eos_state);
+
+        Real gamma0 = eos_state.gam1;
+        Real gamma = gamma0 + fv(y) * (gamma1 - gamma0);
+
+        RealVector dU(2);
+
+        dU[1] = exp(U[0]) * grav_zone(y) / exp(U[1]);
+        dU[0] = dU[1] / gamma;
+
+        return dU;
     };
 
     const int max_lev = max_radial_level + 1;
@@ -126,11 +129,13 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     for (auto r = 0; r < nr[n]; ++r) {
 
         Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
-
+	RealVector xn = set_species(y);
+	
         eos_state.rho = dens[r];
         eos_state.p = pres[r];
-
-        eos_state.xn = set_species(y);
+	for (auto comp = 0; comp < NumSpec; ++comp) {
+	    eos_state.xn[comp] = xn[comp];
+	}
 
         eos(eos_input_rp, eos_state);
 
