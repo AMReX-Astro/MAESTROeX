@@ -151,28 +151,20 @@ Maestro::EstDt ()
                     const Real eps = 1.e-8;
                     const auto ng = 0;
 
-                    Real spdx = uold[lev][mfi].maxabs(tileBox, 0);   
-#if (AMREX_SPACEDIM == 2)               
-                    tmp[mfi].setVal(0.0, tileBox, 0, 1);
-                    Real spdy = amrex::ReduceMax(uold[lev], ng,
-                    [=] AMREX_GPU_HOST_DEVICE (Box const& bx, const FArrayBox& fab) -> Real
-                    {
-                        Real r = 0.0;
-                        amrex::Loop(bx, [=,&r] (int i, int j, int k) noexcept
-                        {
-                            r = amrex::max(r, amrex::Math::abs(u(i,j,k,1) + 0.5 * (w0_arr(i,j,k) + w0_arr(i,j+1,k))));
-                        });
-                        return r;
+                    Real spdx = uold[lev][mfi].maxabs(tileBox, 0);                 
+                    tmp[mfi].setVal(0.0, tileBox, 0, 1); 
+#if (AMREX_SPACEDIM == 2)
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k) + w0_arr(i,j+1,k));
                     });
+                    Real spdy = tmp[mfi].maxabs(tileBox, 0);
                     Real spdz = 0.0;
 #else 
                     Real spdy = uold[lev][mfi].maxabs(tileBox, 1);
 
-                    tmp[mfi].setVal(0.0, tileBox, 0, 1);
-
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                         spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k) + w0_arr(i,j,k+1));
-                    })
+                    });
                     Real spdz = tmp[mfi].maxabs(tileBox, 0);
 #endif
                     Real spdr = w0_cart[lev][mfi].maxabs(tileBox, AMREX_SPACEDIM-1);
@@ -309,37 +301,25 @@ Maestro::EstDt ()
                     if (fy > eps) dt_temp = amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
                     if (fz > eps) dt_temp = amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
 
-                    // Print() << "dt_grid, dt_temp = " << dt_grid << ", " << dt_temp << std::endl;
-
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
                     tmp[mfi].setVal(1.e50, tileBox, 3, 2);
 
                     // divU constraint
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    // dt_temp = amrex::ReduceMin(sold[lev], ng,
-                    // [=] AMREX_GPU_HOST_DEVICE (Box const& bx, const FArrayBox& fab) -> Real
-                    // {
-                    //     Real r = AMREX_REAL_MAX;
-                    //     amrex::Loop(bx, [=,&r] (int i, int j, int k) noexcept
-                    //     {
-                            Real gp_dot_u = 0.0;
-                            for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
-                                gp_dot_u += u(i,j,k,n) * gp0_arr(i,j,k,n);
-                            }
-                            
-                            Real denom = S_cc_arr(i,j,k) - gp_dot_u;
+                        Real gp_dot_u = 0.0;
+                        for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                            gp_dot_u += u(i,j,k,n) * gp0_arr(i,j,k,n);
+                        }
+                        
+                        Real denom = S_cc_arr(i,j,k) - gp_dot_u;
 
-                            if (denom > 0.0) {
-                                spd(i,j,k,3) = 0.4*(1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom;
-                            }
-                        });
-                    //     return r;
-                    // });
+                        if (denom > 0.0) {
+                            spd(i,j,k,3) = 0.4*(1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom;
+                        }
+                    });
 
                     dt_temp = tmp[mfi].min(tileBox, 3);
-
-                    // Print() << "divu dt_grid, dt_temp = " << dt_grid << ", " << dt_temp << std::endl;
 
                     dt_grid = amrex::min(dt_grid, dt_temp);                    
 
@@ -351,23 +331,14 @@ Maestro::EstDt ()
                     // (rho/2)*dS/dt*dt^2 + rho*S*dt + (rho_min-rho) = 0
                     // which has solution dt = 2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c))
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    // dt_temp = amrex::ReduceMin(sold[lev], ng,
-                    // [=] AMREX_GPU_HOST_DEVICE (Box const& bx, const FArrayBox& fab) -> Real
-                    // {
-                    //     Real r = AMREX_REAL_MAX;
-                    //     amrex::Loop(bx, [=,&r] (int i, int j, int k) noexcept
-                    //     {
-                            if (dSdt_arr(i,j,k) > 1.e-20) {
-                                auto a = 0.5 * scal_arr(i,j,k,Rho) * dSdt_arr(i,j,k);
-                                auto b = scal_arr(i,j,k,Rho) * S_cc_arr(i,j,k);
-                                auto c = rho_min - scal_arr(i,j,k,Rho);
-                                spd(i,j,k,4) = 0.4*2.0*c / (-b-std::sqrt(b*b-4.0*a*c));
-                            }
-                        });
-                    //     return r;
-                    // });
+                        if (dSdt_arr(i,j,k) > 1.e-20) {
+                            auto a = 0.5 * scal_arr(i,j,k,Rho) * dSdt_arr(i,j,k);
+                            auto b = scal_arr(i,j,k,Rho) * S_cc_arr(i,j,k);
+                            auto c = rho_min - scal_arr(i,j,k,Rho);
+                            spd(i,j,k,4) = 0.4*2.0*c / (-b-std::sqrt(b*b-4.0*a*c));
+                        }
+                    });
 
-                    // Print() << "dSdt dt_grid, dt_temp = " << dt_grid << ", " << dt_temp << std::endl;
                     dt_temp = tmp[mfi].min(tileBox, 4);
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
@@ -376,13 +347,8 @@ Maestro::EstDt ()
 #endif
                 }
             }
-
-            // std::cout << "dt_lev, dt_grid = " << dt_lev << ", " << dt_grid << std::endl;
-
             dt_lev = std::min(dt_lev, dt_grid);
             umax_lev = std::max(umax_lev, umax_grid);
-
-            // Print() << "dt_lev = " << dt_lev << std::endl;
         } //end openmp
 
         // find the smallest dt over all processors
@@ -546,7 +512,7 @@ Maestro::FirstDt ()
 
                 const Array4<Real> spd_arr = spd.array();
 
-                spd.setVal(0.0, tileBox, 0, 0);
+                spd.setVal(0.0, tileBox, 0, 1);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;
@@ -590,8 +556,6 @@ Maestro::FirstDt ()
                     dt_grid = amrex::min(dt_grid, cfl / std::max(spdx,std::max(spdy,spdz)));
                 }
 
-                // Print() << "advective dt_grid = " << dt_grid << std::endl;
-
                 // sound speed constraint
                 if (use_soundspeed_firstdt) {
                     Real dt_sound = 1.e99;
@@ -601,7 +565,6 @@ Maestro::FirstDt ()
                     } else {
                         dt_sound = cfl / std::max(spdx,std::max(spdy,spdz));
                     }
-                    // Print() << "dt_grid, dt_sound = " << dt_grid << ", " << dt_sound << std::endl;
                     dt_grid = amrex::min(dt_grid, dt_sound);
                 }
 
@@ -611,8 +574,6 @@ Maestro::FirstDt ()
 #if (AMREX_SPACEDIM == 3)
                 if (pforcez > eps) dt_grid = amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
 #endif
-
-                // Print() << "force, dt_grid = " << dt_grid << std::endl;
 
                 // divU constraint
                 if (use_divu_firstdt) {
@@ -675,18 +636,13 @@ Maestro::FirstDt ()
                             if (denom > 0.0 && scal_arr(i,j,k,Rho) > 0.0) {
                                 if (rho_min / scal_arr(i,j,k,Rho) < 1.0) 
                                 tmp_arr(i,j,k) = 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom;
-                                // Print() << "tmparr = " << tmp_arr(i,j,k) << std::endl;
                             }
                         });
                         dt_divu = tmp[mfi].min(tileBox, 0);
                     }
-                    // Print() << "dt_grid, dt_divu = " << dt_grid << ", " << dt_divu << std::endl;
                     dt_grid = amrex::min(dt_grid, dt_divu);
                 }
             }
-
-            // Print() << "dt_grid, dt_lev = " << dt_grid << ", " << dt_lev << std::endl;
-
             dt_lev = std::min(dt_lev, dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
         } //end openmp
