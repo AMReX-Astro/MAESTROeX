@@ -240,7 +240,7 @@ must have compute capability of &gt;= 6.</p>
 <span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Permalink to this headline">¶</a></h2>
 <p>To build MAESTROeX with GPU support, add the following argument
 to the GNUmakefile:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_CUDA</span> <span class="p">:</span><span class="o">=</span> <span class="n">TRUE</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_CUDA</span> <span class="o">:=</span> <span class="n">TRUE</span>
 </pre></div>
 </div>
 <p>We also need to set <code class="docutils literal notranslate"><span class="pre">USE_OMP</span> <span class="pre">=</span> <span class="pre">FALSE</span></code> because OpenMP is currently
@@ -248,11 +248,11 @@ not compatible with building with CUDA.
 <code class="docutils literal notranslate"><span class="pre">USE_CUDA</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> and <code class="docutils literal notranslate"><span class="pre">USE_OMP</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> will fail to compile.
 However, you may use MPI with CUDA for additional parallelization.</p>
 <p>Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be set as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="p">:</span><span class="o">=</span> <span class="n">pgi</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="o">:=</span> <span class="n">pgi</span>
 </pre></div>
 </div>
 <p>The integrator used by the Microphysics library must be set to <code class="docutils literal notranslate"><span class="pre">VODE90</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INTEGRATOR_DIR</span>   <span class="p">:</span><span class="o">=</span> <span class="n">VODE90</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INTEGRATOR_DIR</span>   <span class="o">:=</span> <span class="n">VODE90</span>
 </pre></div>
 </div>
 <p>Depending on which system you are running on, it may be necessary to specify
@@ -264,7 +264,7 @@ script found in the CUDA samples directory:
 vary depending on where CUDA is installed on your system). The default value of
 this flag is 70, corresponding to a capability of 7.x. For a device with
 capability 6.x, the flag should be set to:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_ARCH</span> <span class="p">:</span><span class="o">=</span> <span class="mi">60</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_ARCH</span> <span class="o">:=</span> <span class="mi">60</span>
 </pre></div>
 </div>
 </div>
