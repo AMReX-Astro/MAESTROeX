@@ -118,7 +118,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                     vel_force(i,j,k,AMREX_SPACEDIM-1) = (rhopert * grav(i,j,k,AMREX_SPACEDIM-1) - gpi_arr(i,j,k,AMREX_SPACEDIM-1)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM-1);
 
                     if (do_add_utilde_force == 1) {
-                        
 #if (AMREX_SPACEDIM == 2)
                         if (j <= -1) {
                             // do not modify force since dw0/dr=0
@@ -128,7 +127,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                             vel_force(i,j,k,1) -= (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
                         }
 #else
-                        
                         if (k <= -1) {
                             // do not modify force since dw0/dr=0
                         } else if (k >= domhi) {
@@ -405,8 +403,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (which_step == 1) {
         rho0 = rho0_old;
         p0 =   p0_old;
-    }
-    else {
+    } else {
         for(int i=0; i<rho0.size(); ++i) {
             rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
             p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
@@ -434,7 +431,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-    if (spherical == 1) {
+    if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
     Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
@@ -526,17 +523,14 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
                     rhoh_force(i,j,k) = veladv * gradp0;
 #endif
-                    //
                     // psi should always be in the force if we are doing the final update
                     // For prediction, it should not be in the force if we are predicting
                     // (rho h)', but should be there if we are predicting h or rhoh
                     //
                     // If use_exact_base_state or average_base_state is on, psi is instead dpdt term
-                    //
-                    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
+                    if ((is_prediction && enthalpy_pred_type_in == predict_h_const) ||
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
-                        (is_prediction == 0)) {
-                    
+                        (!is_prediction)) {
                         rhoh_force(i,j,k) += psicart(i,j,k);
                     }
 
@@ -544,7 +538,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                         rhoh_force(i,j,k) += thermal_arr(i,j,k);
                     }
                 });
-                
             } else {
                 
 #if (AMREX_SPACEDIM == 3)
@@ -587,7 +580,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
                        const Vector<MultiFab>& scal,
                        const Vector<MultiFab>& thermal,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in)
-
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeTempForce()",MakeTempForce);

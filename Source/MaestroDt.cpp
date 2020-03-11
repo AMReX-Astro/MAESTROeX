@@ -468,8 +468,8 @@ Maestro::FirstDt ()
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_old,p0_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(gamma1bar_old,gamma1bar_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(gamma1bar_old, gamma1bar_cart, 0,0, bcs_f, 0);
 
     Real umax = 0.;
 
@@ -532,7 +532,7 @@ Maestro::FirstDt ()
 
                 Real ux = uold[lev][mfi].maxabs(tileBox, 0);
                 Real uy = uold[lev][mfi].maxabs(tileBox, 1);
-                Real uz = AMREX_SPACEDIM == 2 ? 0.0 : uold[lev][mfi].maxabs(tileBox, 2);
+                Real uz = AMREX_SPACEDIM == 2 ? 0.1*uy/dx[1] : uold[lev][mfi].maxabs(tileBox, 2);
 
                 umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
 
@@ -542,9 +542,10 @@ Maestro::FirstDt ()
                 uy /= dx[1];
                 Real spdy = spd.max(tileBox, 0) / dx[1];
                 Real pforcey = vel_force[lev][mfi].maxabs(tileBox, 1);
+                Real spdz = spdy * 0.1; // for 2d make sure this is < spdy
 #if (AMREX_SPACEDIM == 3)
                 uz /= dx[2];
-                Real spdz = spd.max(tileBox, 0) / dx[2];
+                spdz = spd.max(tileBox, 0) / dx[2];
                 Real pforcez = vel_force[lev][mfi].maxabs(tileBox, 2);
 #endif
 
@@ -559,7 +560,6 @@ Maestro::FirstDt ()
                 // sound speed constraint
                 if (use_soundspeed_firstdt) {
                     Real dt_sound = 1.e99;
-
                     if (spdx == 0.0 && spdy == 0.0 && spdz == 0.0) {
                         dt_sound = 1.e99;
                     } else {
@@ -579,50 +579,43 @@ Maestro::FirstDt ()
                 if (use_divu_firstdt) {
                     Real dt_divu = 1.e99;
 
+                    const Array4<Real> tmp_arr = tmp.array(mfi);
+                    tmp[mfi].setVal(1.e50, tileBox, 0, 1);
+
                     if (!spherical) {
                         const auto nr_lev = nr[lev];
 
-                        // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                        dt_divu = amrex::ReduceMin(sold[lev], ng,
-                        [=] AMREX_GPU_HOST_DEVICE (Box const& bx, const FArrayBox& fab) -> Real
-                        {
-                            Real r = AMREX_REAL_MAX;
-                            amrex::Loop(bx, [=,&r] (int i, int j, int k) noexcept
-                            {
-                                Real gradp0 = 0.0;
-    #if (AMREX_SPACEDIM == 2)
-                                if (j == 0) {
-                                    gradp0 = (p0_arr(i,j+1,k) - p0_arr(i,j,k)) / dx[1];
-                                } else if (j == nr_lev-1) {
-                                    gradp0 = (p0_arr(i,j,k) - p0_arr(i,j-1,k)) / dx[1];
-                                } else {
-                                    gradp0 = 0.5*(p0_arr(i,j+1,k) - p0_arr(i,j-1,k)) / dx[1];
-                                }
-    #else 
-                                if (k == 0) {
-                                    gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
-                                } else if (j == nr_lev-1) {
-                                    gradp0 = (p0_arr(i,j,k) - p0_arr(i,j,k-1)) / dx[2];
-                                } else {
-                                    gradp0 = 0.5*(p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
-                                }
-    #endif                        
+                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                            Real gradp0 = 0.0;
+#if (AMREX_SPACEDIM == 2)
+                            if (j == 0) {
+                                gradp0 = (p0_arr(i,j+1,k) - p0_arr(i,j,k)) / dx[1];
+                            } else if (j == nr_lev-1) {
+                                gradp0 = (p0_arr(i,j,k) - p0_arr(i,j-1,k)) / dx[1];
+                            } else {
+                                gradp0 = 0.5*(p0_arr(i,j+1,k) - p0_arr(i,j-1,k)) / dx[1];
+                            }
+#else 
+                            if (k == 0) {
+                                gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
+                            } else if (j == nr_lev-1) {
+                                gradp0 = (p0_arr(i,j,k) - p0_arr(i,j,k-1)) / dx[2];
+                            } else {
+                                gradp0 = 0.5*(p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
+                            }
+#endif                        
 
-                                Real denom = S_cc_arr(i,j,k) - u(i,j,k,AMREX_SPACEDIM-1) * gradp0 / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
+                            Real denom = S_cc_arr(i,j,k) - u(i,j,k,AMREX_SPACEDIM-1) * gradp0 / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
 
-                                if (denom > 0.0) {
-                                    r = amrex::min(r, 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom);
-                                }
-                            });
-                            return r;
+                            if (denom > 0.0) {
+                                tmp_arr(i,j,k) = 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom;
+                            }
                         });
+
+                        dt_divu = tmp[mfi].min(tileBox, 0);
                     } else {
-
+#if (AMREX_SPACEDIM == 3)
                         const Array4<const Real> gp0_arr = gp0_cart[lev].array(mfi);
-
-                        const Array4<Real> tmp_arr = tmp.array(mfi);
-
-                        tmp[mfi].setVal(1.e50, tileBox, 0, 1);
 
                         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             Real gp_dot_u = 0.0;
@@ -639,6 +632,7 @@ Maestro::FirstDt ()
                             }
                         });
                         dt_divu = tmp[mfi].min(tileBox, 0);
+#endif
                     }
                     dt_grid = amrex::min(dt_grid, dt_divu);
                 }

@@ -143,18 +143,17 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                         if (r < r_tp_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_loc) / (r_tp_loc - r_sp_loc)));
                             smdamp_idx = lo + n;
+
+                            AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+#if (AMREX_SPACEDIM == 2)
+                                if (jj == smdamp_idx) 
+#else
+                                if (kk == smdamp_idx) 
+#endif
+                                    sponge_arr(ii,jj,kk) = 1.0 / (1.0 + dt_loc * smdamp * sponge_kappa_loc);
+                            });
                         }
                     }
-                }
-                if (smdamp_idx >= 0) {
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-#if (AMREX_SPACEDIM == 2)
-                        if (j == smdamp_idx) 
-#else
-                        if (k == smdamp_idx) 
-#endif
-                            sponge_arr(i,j,k) = 1.0 / (1.0 + dt_loc * smdamp * sponge_kappa_loc);
-                    });
                 }
             } else {
 #if (AMREX_SPACEDIM == 3)
@@ -195,5 +194,4 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
     // average fine data onto coarser cells
     AverageDown(sponge, 0, 1);
-
 }
