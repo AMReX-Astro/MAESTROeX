@@ -399,9 +399,11 @@ public:
     ////////////////////////
     // MaestroDebug.cpp functions
 
+    /// Print out the contents of the base state
+    void PrintBase (const RealVector& base, const bool is_cell_centered=true);
+
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
-
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
