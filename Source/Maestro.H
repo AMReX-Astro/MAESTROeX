@@ -1400,6 +1400,13 @@ public:
     /// Set tagging array to include buffer zones for multilevel
     void TagArray ();
 
+    /// Regrid base state variables (ex. psi, etarho, rho0, etc.)
+    ///
+    /// We copy the coarsest level only, interpolate to all
+    /// the other levels and then copy the valid data from
+    /// the old arrays onto the new.
+    void RegridBaseState(RealVector& base, const bool is_edge=false);
+
     /// Tag all cells for refinement
     ///
     /// Overrides the pure virtual function in `AmrCore`

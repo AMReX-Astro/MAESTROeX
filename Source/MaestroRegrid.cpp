@@ -14,10 +14,17 @@ Maestro::Regrid ()
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
 
-    Vector<Real> rho0_temp ( (max_radial_level+1)*nr_fine );
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
+
+    const int max_lev = max_radial_level + 1;
+
+    Vector<Real> rho0_temp((max_radial_level+1)*nr_fine);
     rho0_temp.shrink_to_fit();
 
-    if (spherical == 0) {
+    if (!spherical) {
         finest_radial_level = finest_level;
 
         // look at MAESTRO/Source/varden.f90:750-1060
@@ -34,10 +41,10 @@ Maestro::Regrid ()
 
             // FIXME: may need if statement for irregularly-spaced base states
 
-            regrid_base_state_cc(psi.dataPtr());
-            regrid_base_state_cc(etarho_cc.dataPtr());
-            regrid_base_state_edge(etarho_ec.dataPtr());
-            regrid_base_state_edge(w0.dataPtr());
+            RegridBaseState(psi);
+            RegridBaseState(etarho_cc);
+            RegridBaseState(etarho_cc, true);
+            RegridBaseState(w0, true);
 
         } else {
             // evolve_base_state == F and spherical == 0
@@ -45,24 +52,23 @@ Maestro::Regrid ()
             // Here we want to fill in the rho0 array so there is
             // valid data in any new grid locations that are created
             // during the regrid.
-            for (int i=0; i<rho0_old.size(); ++i) {
+            for (int i = 0; i < rho0_old.size(); ++i) {
                 rho0_temp[i] = rho0_old[i];
             }
 
             // We will copy rho0_temp back into the rho0 array after we regrid.
-            regrid_base_state_cc(rho0_temp.dataPtr());
-
+            RegridBaseState(rho0_temp);
         }
 
         // regardless of evolve_base_state, if new grids were
         // created, we need to initialize tempbar_init there, in
         // case drive_initial_convection = T
-        regrid_base_state_cc(tempbar_init.dataPtr());
+        RegridBaseState(tempbar_init);
     } else {
         // Here we want to fill in the rho0 array so there is
         // valid data in any new grid locations that are created
         // during the regrid.
-        for (int i=0; i<rho0_old.size(); ++i) {
+        for (int i = 0; i < rho0_old.size(); ++i) {
             rho0_temp[i] = rho0_old[i];
         }
     }
@@ -72,7 +78,7 @@ Maestro::Regrid ()
     regrid(0, t_old);
 
     // Redefine numdisjointchunks, r_start_coord, r_end_coord
-    if (spherical == 0) {
+    if (!spherical) {
         TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
@@ -84,7 +90,7 @@ Maestro::Regrid ()
         }
     }
     
-    for (int lev=0; lev<=finest_level; ++lev) {
+    for (int lev = 0; lev <= finest_level; ++lev) {
         w0_cart[lev].setVal(0.);
     }
     // put w0 on Cartesian cell-centers
@@ -94,7 +100,7 @@ Maestro::Regrid ()
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
     } else {
-        for (int i=0; i<rho0_old.size(); ++i) {
+        for (int i = 0; i < rho0_old.size(); ++i) {
             rho0_old[i] = rho0_temp[i];
         }
     }
@@ -111,17 +117,17 @@ Maestro::Regrid ()
 
     if (use_tfromp) {
         // compute full state T = T(rho,p0,X)
-        TfromRhoP(sold,p0_old,0);
+        TfromRhoP(sold, p0_old, 0);
     } else {
         // compute full state T = T(rho,h,X)
-        TfromRhoH(sold,p0_old);
+        TfromRhoH(sold, p0_old);
     }
 
     // force tempbar to be the average of temp
-    Average(sold,tempbar,Temp);
+    Average(sold, tempbar, Temp);
 
     // gamma1bar needs to be recomputed
-    MakeGamma1bar(sold,gamma1bar_old,p0_old);
+    MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
     // beta0_old needs to be recomputed
     MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
@@ -135,7 +141,6 @@ Maestro::Regrid ()
     if (maestro_verbose > 0) {
         Print() << "Time to regrid: " << end_total << '\n';
     }
-
 }
 
 // re-compute tag_array since the actual grid structure changed due to buffering
@@ -149,12 +154,12 @@ Maestro::TagArray ()
     }
 
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::TagArray()",TagArray);
+    BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 
     const int clearval = TagBox::CLEAR;
     const int   tagval = TagBox::SET;
 
-    for (int lev=1; lev<=max_radial_level; ++lev) {
+    for (int lev = 1; lev <= max_radial_level; ++lev) {
 
         const MultiFab& state = sold[lev];
 
@@ -182,7 +187,7 @@ void
 Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ErrorEst()",ErrorEst);
+    BL_PROFILE_VAR("Maestro::ErrorEst()", ErrorEst);
 
     // reset the tag_array (marks radii for planar tagging)
     std::fill(tag_array.begin(), tag_array.end(), 0);
@@ -239,7 +244,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     // for planar refinement, we need to gather tagged entries in arrays
     // from all processors and then re-tag tileboxes across each tagged
     // height
-    if (spherical == 0) {
+    if (!spherical) {
         
         ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
 
@@ -277,7 +282,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     // convert back to full temperature states
     if (use_tpert_in_tagging) {
-        PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,false);
+        PutInPertForm(lev, sold, tempbar, Temp, Temp, bcs_s, false);
     }
 }
 
@@ -289,7 +294,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
                       const DistributionMapping& dm)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::RemakeLevel()",RemakeLevel);
+    BL_PROFILE_VAR("Maestro::RemakeLevel()", RemakeLevel);
 
     const int ng_s = snew[lev].nGrow();
     const int ng_u = unew[lev].nGrow();
@@ -343,7 +348,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     std::swap(intra_state,intra[lev]);
 #endif
 
-    if (spherical == 1) {
+    if (spherical) {
         const int ng_n = normal[lev].nGrow();
         const int ng_c = cell_cc_to_r[lev].nGrow();
         MultiFab normal_state(ba, dm, 3, ng_n);
@@ -365,7 +370,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
                                  const DistributionMapping& dm)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()",MakeNewLevelFromCoarse);
+    BL_PROFILE_VAR("Maestro::MakeNewLevelFromCoarse()", MakeNewLevelFromCoarse);
 
     sold[lev].define              (ba, dm,          Nscal, 0);
     snew[lev].define              (ba, dm,          Nscal, 0);
@@ -383,7 +388,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     intra[lev].define             (ba, dm,          Nscal, 0);
 #endif
 
-    if (spherical == 1) {
+    if (spherical) {
         normal      [lev].define(ba, dm, 3, 1);
         cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
@@ -409,7 +414,7 @@ void
 Maestro::ClearLevel (int lev)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ClearLevel()",ClearLevel);
+    BL_PROFILE_VAR("Maestro::ClearLevel()", ClearLevel);
 
     sold[lev].clear();
     snew[lev].clear();
@@ -431,4 +436,79 @@ Maestro::ClearLevel (int lev)
     }
 
     flux_reg_s[lev].reset(nullptr);
+}
+
+
+void
+Maestro::RegridBaseState(RealVector & base_vec, const bool is_edge)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
+
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
+
+    const int max_lev = max_radial_level + 1;
+
+    const int nrf = is_edge ? nr_fine+1 : nr_fine;
+    RealVector state_temp_vec(max_lev*nrf);
+
+    Real * AMREX_RESTRICT base = base_vec.dataPtr();
+    Real * AMREX_RESTRICT state_temp = state_temp_vec.dataPtr();
+
+    //copy the coarsest level of the real arrays into the
+    // temp arrays
+    AMREX_PARALLEL_FOR_1D(nrf, r,
+    {
+        state_temp[max_lev*r] = base[max_lev*r];
+    });
+
+    // piecewise linear interpolation to fill the cc temp arrays
+    for (auto n = 1; n < max_lev; ++n) {
+        if (is_edge) {
+            const auto nrn = nr[n] + 1;
+            AMREX_PARALLEL_FOR_1D(nrn, r,
+            {
+                if (r % 2 == 0) {
+                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*r/2];
+                } else {
+                    state_temp[n+max_lev*r] = 0.5 * (state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2+1)]);
+                }
+            });
+        } else {
+            const auto nrn = nr[n];
+            AMREX_PARALLEL_FOR_1D(nrn, r,
+            {
+                if (r == 0 || r == nrn-1) {
+                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*r/2];
+                } else {
+                    if (r % 2 == 0) {
+                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2-1)];
+                    } else {
+                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2+1)];
+                    }
+                }
+            });
+        }
+    }
+
+    // copy valid data into temp
+    for (auto n = 1; n < max_lev; ++n) {
+        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+            const auto lo = r_start_coord[n+max_lev*i];
+            const auto hi = is_edge ? r_end_coord[n+max_lev*i]+1 : r_end_coord[n+max_lev*i];
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
+            {
+                int r = k + lo;
+                state_temp[n+max_lev*r] = base[n+max_lev*r];
+            });
+        }
+    }
+
+    // copy temp array back into the real thing
+    AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
+        base[r] = state_temp[r];
+    })
 }
