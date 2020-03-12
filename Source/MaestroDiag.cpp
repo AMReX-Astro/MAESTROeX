@@ -62,7 +62,7 @@ Maestro::DiagFile (const int step,
 
         // put w0 in Cartesian cell-centers as a scalar (the radial
         // expansion velocity)
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
+        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0, 1);
     } 
 
     // compute rho_Hext and rho_Hnuc
@@ -114,27 +114,15 @@ Maestro::DiagFile (const int step,
         Real Mach_max_level = 0.0;
         Real kin_ener_level = 0.0;
         Real int_ener_level = 0.0;
-        RealVector vel_center_level(AMREX_SPACEDIM,0.0);
+        RealVector vel_center_level(AMREX_SPACEDIM, 0.0);
 
         // diag_enuc.out
         Real enuc_max_local = 0.0;
-        RealVector coord_enucmax_local(AMREX_SPACEDIM,0.0);
-        RealVector vel_enucmax_local(AMREX_SPACEDIM,0.0);
+        RealVector coord_enucmax_local(AMREX_SPACEDIM, 0.0);
+        RealVector vel_enucmax_local(AMREX_SPACEDIM, 0.0);
         Real nuc_ener_level = 0.0;
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& sin_mf = s_in[lev];
-        const MultiFab& uin_mf = u_in[lev];
-        const MultiFab& w0macx_mf = w0mac[lev][0]; // spherical only
-        const MultiFab& w0macy_mf = w0mac[lev][1]; // ^
-        const MultiFab& w0macz_mf = w0mac[lev][2]; // ^
-        const MultiFab& w0rcart_mf = w0r_cart[lev]; // ^
-        const MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
-        const MultiFab& rho_Hext_mf = rho_Hext[lev];
-        const MultiFab& normal_mf = normal[lev]; // spherical ==1
-
         const auto dx = geom[lev].CellSizeArray();
-        const Real* dx_vec = geom[lev].CellSize();
 
         const auto prob_lo = geom[lev].ProbLoArray();
         const auto prob_hi = geom[lev].ProbHiArray();
@@ -144,13 +132,13 @@ Maestro::DiagFile (const int step,
         if (lev == finest_level) finelev = finest_level;
 
         const BoxArray& fba = s_in[finelev].boxArray();
-        const iMultiFab& mask = makeFineMask(sin_mf, fba, IntVect(2));
+        const iMultiFab& mask = makeFineMask(s_in[lev], fba, IntVect(2));
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(+:kin_ener_level) reduction(+:int_ener_level) reduction(+:nuc_ener_level) reduction(max:U_max_level) reduction(max:Mach_max_level)
 #endif
-        for (MFIter mfi(sin_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for (MFIter mfi(s_in[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -171,11 +159,13 @@ Maestro::DiagFile (const int step,
             const auto weight = AMREX_SPACEDIM == 2 ? 1.0 / pow(4.0, lev) : 1.0 / pow(8.0, lev);
 
 #if (AMREX_SPACEDIM == 3)
-            const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
-            const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
-            const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
-            const Array4<const Real> normal_arr = normal[lev].array(mfi);
-            const Array4<const Real> w0r = w0r_cart[lev].array(mfi);
+            // for non-spherical we have to set these to be a valid array as 
+            // w0macx etc are not defined 
+            const Array4<const Real> w0macx = spherical ? w0mac[lev][0].array(mfi) : rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> w0macy = spherical ? w0mac[lev][1].array(mfi) : rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> w0macz = spherical ? w0mac[lev][2].array(mfi) : rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> normal_arr = spherical ? normal[lev].array(mfi) : rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> w0r = spherical ? w0r_cart[lev].array(mfi) : rho_Hnuc[lev].array(mfi);
 #endif
 
             // The locations of the maxima here make trying to do this on the 
@@ -185,7 +175,9 @@ Maestro::DiagFile (const int step,
             for (auto i = lo.x; i <= hi.x; ++i) {
                 const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
                 const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+#if (AMREX_SPACEDIM == 3)
                 const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
+#endif
 
                 // make sure the cell isn't covered by finer cells
                 bool cell_valid = true;
@@ -267,14 +259,15 @@ Maestro::DiagFile (const int step,
                             T_max_local = scal(i,j,k,Temp);
                             coord_Tmax_local[0] = x;
                             coord_Tmax_local[1] = y;
+#if (AMREX_SPACEDIM == 3)
                             coord_Tmax_local[2] = z;
+#endif                            
                             vel_Tmax_local[0]   = u(i,j,k,0);
                             vel_Tmax_local[1]   = u(i,j,k,1);
-                            vel_Tmax_local[2]   = u(i,j,k,2);
 #if (AMREX_SPACEDIM == 2)
                             vel_Tmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
 #else
-                            vel_Tmax_local[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_Tmax_local[2] = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
 #endif
                         }
 
@@ -283,14 +276,15 @@ Maestro::DiagFile (const int step,
                             enuc_max_local = rho_Hnuc_arr(i,j,k)/scal(i,j,k,Rho);
                             coord_enucmax_local[0] = x;
                             coord_enucmax_local[1] = y;
+#if (AMREX_SPACEDIM == 3)
                             coord_enucmax_local[2] = z;
+#endif                            
                             vel_enucmax_local[0]   = u(i,j,k,0);
                             vel_enucmax_local[1]   = u(i,j,k,1);
-                            vel_enucmax_local[2]   = u(i,j,k,2);
 #if (AMREX_SPACEDIM == 2)
                             vel_enucmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
 #else
-                            vel_enucmax_local[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_enucmax_local[2] = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
 #endif
                         }
                     }
@@ -488,11 +482,11 @@ Maestro::DiagFile (const int step,
 #endif
             }
 
-            T_center = T_center + T_center_level;
+            T_center += T_center_level;
             for (int i = 0; i < AMREX_SPACEDIM; ++i) {
-                vel_center[i] = vel_center[i] + vel_center_level[i];
+                vel_center[i] += vel_center_level[i];
             }
-            ncenter = ncenter + ncenter_level;
+            ncenter += ncenter_level;
         }
     }
 

@@ -33,10 +33,9 @@ Maestro::Regrid ()
             // track of where the old valid data was
 
             // FIXME: may need if statement for irregularly-spaced base states
-
             RegridBaseState(psi);
             RegridBaseState(etarho_cc);
-            RegridBaseState(etarho_cc, true);
+            RegridBaseState(etarho_ec, true);
             RegridBaseState(w0, true);
 
         } else {
@@ -423,7 +422,7 @@ Maestro::ClearLevel (int lev)
 #ifdef SDC
     intra[lev].clear();
 #endif
-    if (spherical == 1) {
+    if (spherical) {
         normal[lev].clear();
         cell_cc_to_r[lev].clear();
     }
@@ -433,7 +432,7 @@ Maestro::ClearLevel (int lev)
 
 
 void
-Maestro::RegridBaseState(RealVector & base_vec, const bool is_edge)
+Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
@@ -441,7 +440,6 @@ Maestro::RegridBaseState(RealVector & base_vec, const bool is_edge)
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
 
     const int max_lev = max_radial_level + 1;
 
@@ -475,12 +473,12 @@ Maestro::RegridBaseState(RealVector & base_vec, const bool is_edge)
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r == 0 || r == nrn-1) {
-                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*r/2];
+                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*(r/2)];
                 } else {
                     if (r % 2 == 0) {
-                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2-1)];
+                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*(r/2)] + 0.25 * state_temp[n-1+max_lev*(r/2-1)];
                     } else {
-                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2+1)];
+                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*(r/2)] + 0.25 * state_temp[n-1+max_lev*(r/2+1)];
                     }
                 }
             });
