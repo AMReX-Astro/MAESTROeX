@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <AMReX_VisMF.H>
 #include <Problem_F.H>
 using namespace amrex;
@@ -49,7 +50,7 @@ Maestro::InitData ()
 
 	init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
 	                rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
-	                tempbar_init.dataPtr());
+	                tempbar_init.dataPtr(),0);
 
 	// calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
 	// that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
