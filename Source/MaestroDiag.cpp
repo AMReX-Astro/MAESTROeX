@@ -106,8 +106,8 @@ Maestro::DiagFile (const int step,
         Real T_max_local = 0.0;
         Real T_center_level = 0.0;
         int ncenter_level = 0;
-        RealVector coord_Tmax_local(AMREX_SPACEDIM,0.0);
-        RealVector vel_Tmax_local(AMREX_SPACEDIM,0.0);
+        RealVector coord_Tmax_local(AMREX_SPACEDIM, 0.0);
+        RealVector vel_Tmax_local(AMREX_SPACEDIM, 0.0);
 
         // diag_vel.out
         Real U_max_level = 0.0;
@@ -155,6 +155,9 @@ Maestro::DiagFile (const int step,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
+            const auto lo = amrex::lbound(tileBox);
+            const auto hi = amrex::ubound(tileBox);
+
             int use_mask = !(lev==finest_level);
 
             const Array4<const Real> scal = s_in[lev].array(mfi);
@@ -162,134 +165,157 @@ Maestro::DiagFile (const int step,
             const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
             const Array4<const Real> u = u_in[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
-            // const Array4<const Real> w0 = w0r_cart[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
-            // const Array4<const Real> scal = s_in[lev].array(mfi);
 
-            Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-            Real * AMREX_RESTRICT coord_Tmax_p = coord_Tmax_local.dataPtr();
-            Real * AMREX_RESTRICT coord_enucmax_p = coord_enucmax_local.dataPtr();
-            Real * AMREX_RESTRICT vel_Tmax_p = vel_Tmax_local.dataPtr();
-            Real * AMREX_RESTRICT vel_enucmax_p = vel_enucmax_local.dataPtr();
+            // weight is the factor by which the volume of a cell at the current level
+            // relates to the volume of a cell at the coarsest level of refinement.
+            const auto weight = AMREX_SPACEDIM == 2 ? 1.0 / pow(4.0, lev) : 1.0 / pow(8.0, lev);
 
-            if (spherical) {
-              diag_sphr(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        BL_TO_FORTRAN_FAB(sin_mf[mfi]),
-                        BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-                        BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-                        BL_TO_FORTRAN_3D(uin_mf[mfi]),
-                        BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                        BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                        BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-                        BL_TO_FORTRAN_3D(w0rcart_mf[mfi]),
-                        dx_vec,
-                        BL_TO_FORTRAN_3D(normal_mf[mfi]),
-                        &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(),
-                        &enuc_max_local, coord_enucmax_local.dataPtr(), vel_enucmax_local.dataPtr(),
-                        &kin_ener_level, &int_ener_level, &nuc_ener_level,
-                        &U_max_level, &Mach_max_level,
-                        &ncenter_level, &T_center_level, vel_center_level.dataPtr(),
-                        BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
-            } else {
-            //   diag(&lev, ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-            //             BL_TO_FORTRAN_FAB(sin_mf[mfi]),
-            //             BL_TO_FORTRAN_3D(rho_Hnuc_mf[mfi]),
-            //             BL_TO_FORTRAN_3D(rho_Hext_mf[mfi]),
-            //             BL_TO_FORTRAN_3D(uin_mf[mfi]),
-            //             w0.dataPtr(),
-            //             dx_vec,
-            //             &T_max_local, coord_Tmax_local.dataPtr(), vel_Tmax_local.dataPtr(),
-            //             &enuc_max_local, coord_enucmax_local.dataPtr(), vel_enucmax_local.dataPtr(),
-            //             &kin_ener_level, &int_ener_level, &nuc_ener_level,
-            //             &U_max_level, &Mach_max_level,
-            //             BL_TO_FORTRAN_3D(mask[mfi]), &use_mask);
-            //     continue;
+#if (AMREX_SPACEDIM == 3)
+            const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
+            const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
+            const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
+            const Array4<const Real> normal_arr = normal[lev].array(mfi);
+            const Array4<const Real> w0r = w0r_cart[lev].array(mfi);
+#endif
 
-                // weight is the factor by which the volume of a cell at the current level
-                // relates to the volume of a cell at the coarsest level of refinement.
-                const auto weight = AMREX_SPACEDIM == 2 ? 1.0 / pow(4.0, lev) : 1.0 / pow(8.0, lev);
+            // The locations of the maxima here make trying to do this on the 
+            // GPU probably more trouble than it's worth.
+            for (auto k = lo.z; k <= hi.z; ++k) {
+            for (auto j = lo.y; j <= hi.y; ++j) {
+            for (auto i = lo.x; i <= hi.x; ++i) {
+                const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
+                const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+                const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
-                    const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
-                    const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
+                // make sure the cell isn't covered by finer cells
+                bool cell_valid = true;
+                if (use_mask) {
+                    if (mask_arr(i,j,k) == 1) cell_valid = false;
+                }
+                
+                // For spherical, we only consider cells inside of where the 
+                // sponging begins    
+                if (cell_valid && (!spherical || scal(i,j,k,Rho) >= sponge_start_factor*sponge_center_density)) {
 
-                    // make sure the cell isn't covered by finer cells
-                    bool cell_valid = true;
-                    if (use_mask) {
-                        if (mask_arr(i,j,k) == 1) cell_valid = false;
-                    }
-                    
-                    if (cell_valid) {
+                    Real vel = 0.0;
+                    if (spherical) {
+#if (AMREX_SPACEDIM == 3)
+                        // is it one of the 8 zones surrounding the center?
+                        if (fabs(x - center[0]) < dx[0] && 
+                            fabs(y - center[1]) < dx[1] &&
+                            fabs(z - center[2]) < dx[2]) {
+                            
+                            ncenter_level++;
+
+                            T_center_level += scal(i,j,k,Temp);
+
+                            vel_center_level[0] += u(i,j,k,0) + 0.5 * (w0macx(i,j,k) + w0macx(i+1,j,k));
+                            vel_center_level[1] += u(i,j,k,1) + 0.5 * (w0macy(i,j,k) + w0macy(i,j+1,k));
+                            vel_center_level[2] += u(i,j,k,2) + 0.5 * (w0macz(i,j,k) + w0macz(i,j,k+1));
+                        }
+
+                        // velr is the projection of the velocity (including w0) onto
+                        // the radial unit vector
+                        Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \
+                            u(i,j,k,1)*normal_arr(i,j,k,1) + \
+                            u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
+
+                        // vel is the magnitude of the velocity, including w0
+                        vel = std::sqrt((u(i,j,k,0)+0.5*(w0macx(i,j,k)+w0macx(i+1,j,k))) * 
+                            (u(i,j,k,0)+0.5*(w0macx(i,j,k)+w0macx(i+1,j,k))) + 
+                            (u(i,j,k,1)+0.5*(w0macy(i,j,k)+w0macy(i,j+1,k))) * 
+                            (u(i,j,k,1)+0.5*(w0macy(i,j,k)+w0macy(i,j+1,k))) + 
+                            (u(i,j,k,2)+0.5*(w0macz(i,j,k)+w0macz(i,j,k+1))) * 
+                            (u(i,j,k,2)+0.5*(w0macz(i,j,k)+w0macz(i,j,k+1))));
+
+                        // max T, location, and velocity at that location (including w0)
+                        if (scal(i,j,k,Temp) > T_max_local) {
+                            T_max_local  = scal(i,j,k,Temp);
+                            coord_Tmax_local[0] = x;
+                            coord_Tmax_local[1] = y;
+                            coord_Tmax_local[2] = z;
+                            vel_Tmax_local[0]   = u(i,j,k,0)+0.5*(w0macx(i,j,k)+w0macx(i+1,j,k));
+                            vel_Tmax_local[1]   = u(i,j,k,1)+0.5*(w0macy(i,j,k)+w0macy(i,j+1,k));
+                            vel_Tmax_local[2]   = u(i,j,k,2)+0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
+                        }
+                        
+                        // max enuc
+                        if (rho_Hnuc_arr(i,j,k)/scal(i,j,k,Rho) > enuc_max_local) {
+                            enuc_max_local = rho_Hnuc_arr(i,j,k)/scal(i,j,k,Rho);
+                            coord_enucmax_local[0] = x;
+                            coord_enucmax_local[1] = y;
+                            coord_enucmax_local[2] = z;
+                            vel_enucmax_local[0] = u(i,j,k,0)+0.5*(w0macx(i,j,k)+w0macx(i+1,j,k));
+                            vel_enucmax_local[1] = u(i,j,k,1)+0.5*(w0macy(i,j,k)+w0macy(i,j+1,k));
+                            vel_enucmax_local[2] = u(i,j,k,2)+0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
+                        }
+#endif
+                    } else {
                         // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
-                        Real vert_vel = u(i,j,k,1) + 0.5*(w0_p[lev+max_lev*j] + w0_p[lev+max_lev*(j+1)]);
-                        Real vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
+                        Real vert_vel = u(i,j,k,1) + 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                        vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     vert_vel*vert_vel);
-#elif (AMREX_SPACEDIM == 3)
-                        Real vert_vel = u(i,j,k,2) + 0.5*(w0_p[lev+max_lev*k] + w0_p[lev+max_lev*(k+1)]);
-                        Real vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
+#else
+                        Real vert_vel = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                        vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     u(i,j,k,1)*u(i,j,k,1) + vert_vel*vert_vel);
 #endif
 
                         // max T, location, and velocity at that location (including w0)
                         if (scal(i,j,k,Temp) > T_max_local) {
                             T_max_local = scal(i,j,k,Temp);
-                            coord_Tmax_p[0] = x;
-                            coord_Tmax_p[1] = y;
-                            coord_Tmax_p[2] = z;
-                            vel_Tmax_p[0]   = u(i,j,k,0);
-                            vel_Tmax_p[1]   = u(i,j,k,1);
-                            vel_Tmax_p[2]   = u(i,j,k,2);
+                            coord_Tmax_local[0] = x;
+                            coord_Tmax_local[1] = y;
+                            coord_Tmax_local[2] = z;
+                            vel_Tmax_local[0]   = u(i,j,k,0);
+                            vel_Tmax_local[1]   = u(i,j,k,1);
+                            vel_Tmax_local[2]   = u(i,j,k,2);
 #if (AMREX_SPACEDIM == 2)
-                            vel_Tmax_p[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                            vel_Tmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
 #else
-                            vel_Tmax_p[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_Tmax_local[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
 #endif
                         }
 
                         // max enuc
                         if (rho_Hnuc_arr(i,j,k)/scal(i,j,k,Rho) > enuc_max_local) {
                             enuc_max_local = rho_Hnuc_arr(i,j,k)/scal(i,j,k,Rho);
-                            coord_enucmax_p[0] = x;
-                            coord_enucmax_p[1] = y;
-                            coord_enucmax_p[2] = z;
-                            vel_enucmax_p[0]   = u(i,j,k,0);
-                            vel_enucmax_p[1]   = u(i,j,k,1);
-                            vel_enucmax_p[2]   = u(i,j,k,2);
+                            coord_enucmax_local[0] = x;
+                            coord_enucmax_local[1] = y;
+                            coord_enucmax_local[2] = z;
+                            vel_enucmax_local[0]   = u(i,j,k,0);
+                            vel_enucmax_local[1]   = u(i,j,k,1);
+                            vel_enucmax_local[2]   = u(i,j,k,2);
 #if (AMREX_SPACEDIM == 2)
-                            vel_enucmax_p[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                            vel_enucmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
 #else
-                            vel_enucmax_p[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_enucmax_local[2] += 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
 #endif
                         }
+                    }
 
-                        eos_t eos_state;
+                    eos_t eos_state;
 
-                        // call the EOS to get the sound speed and internal energy
-                        eos_state.T = scal(i,j,k,Temp);
-                        eos_state.rho = scal(i,j,k,Rho);
-                        for (auto comp = 0; comp < NumSpec; ++comp) {
-                            eos_state.xn[comp] = scal(i,j,k,FirstSpec+comp)/eos_state.rho;
-                        }
-                            
-                        eos(eos_input_rt, eos_state);
-
-                        // kinetic, internal, and nuclear energies
-                        kin_ener_level += weight * scal(i,j,k,Rho) * vel*vel;
-                        int_ener_level += weight * scal(i,j,k,Rho) * eos_state.e;
-                        nuc_ener_level += weight * rho_Hnuc_arr(i,j,k);
+                    // call the EOS to get the sound speed and internal energy
+                    eos_state.T = scal(i,j,k,Temp);
+                    eos_state.rho = scal(i,j,k,Rho);
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        eos_state.xn[comp] = scal(i,j,k,FirstSpec+comp)/eos_state.rho;
+                    }
                         
-                        // max vel and Mach number
-                        U_max_level = amrex::max(U_max_level,vel);
-                        Mach_max_level = amrex::max(Mach_max_level,vel/eos_state.cs);
-                    }   
-                });
-            }
+                    eos(eos_input_rt, eos_state);
+
+                    // kinetic, internal, and nuclear energies
+                    kin_ener_level += weight * scal(i,j,k,Rho) * vel*vel;
+                    int_ener_level += weight * scal(i,j,k,Rho) * eos_state.e;
+                    nuc_ener_level += weight * rho_Hnuc_arr(i,j,k);
+                    
+                    // max vel and Mach number
+                    U_max_level = amrex::max(U_max_level, vel);
+                    Mach_max_level = amrex::max(Mach_max_level, vel/eos_state.cs);
+                }
+            }}}
         } // end MFIter
 
         // sum quantities over all processors
@@ -413,7 +439,7 @@ Maestro::DiagFile (const int step,
             Mach_max = max(Mach_max, Mach_max_level);
 
             // if T_max_level is the new max, then copy the location as well
-            if ( T_max_level > T_max ) {
+            if (T_max_level > T_max) {
                 T_max = T_max_level;
 
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
@@ -473,7 +499,49 @@ Maestro::DiagFile (const int step,
     // compute the graviational potential energy too
     Real grav_ener = 0.0;
     if (spherical) {
-        diag_grav_energy_sphr(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
+#if (AMREX_SPACEDIM == 3)
+        const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();
+
+        // m(r) will contain mass enclosed by the center
+        RealVector m(nr_fine);
+        m[0] = 4.0/3.0 * M_PI * rho0[0] * r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
+
+        // dU = - G M dM / r;  dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
+        grav_ener = -4.0 * M_PI * Gconst * m[0] * r_cc_loc[0] * rho0[0] * (r_edge_loc[max_lev] - r_edge_loc[0]);
+
+        for (auto r = 1; r < nr_fine; ++r) {
+            // the mass is defined at the cell-centers, so to compute the
+            // mass at the current center, we need to add the contribution
+            // of the upper half of the zone below us and the lower half of
+            // the current zone.
+       
+            // don't add any contributions from outside the star -- i.e.
+            // rho < base_cutoff_density
+            Real term1 = 0.0;
+            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
+                term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] * 
+                    (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) * 
+                    (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] + 
+                    r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] + 
+                    r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)]);
+            } 
+
+            Real term2 = 0.0;
+            if (rho0[max_lev*r] > base_cutoff_density) {
+                term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
+                    (r_cc_loc[max_lev*r] - r_edge_loc[max_lev*r]) * 
+                    (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r] + 
+                    r_cc_loc[max_lev*r]*r_edge_loc[max_lev*r] + 
+                    r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);      
+            } 
+
+            m[r] = m[r-1] + term1 + term2;
+                
+            // dU = - G M dM / r;  
+            // dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
+            grav_ener -= 4.0*M_PI*Gconst*m[r]*r_cc_loc[max_lev*r] * rho0[max_lev*r]*(r_edge_loc[max_lev*(r+1)]-r_edge_loc[max_lev*r]);
+        }
+#endif
     } else {
         // diag_grav_energy(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
         for (auto r = 0; r < nr_fine; ++r) {
@@ -489,7 +557,7 @@ Maestro::DiagFile (const int step,
         // zone.  This is because the weight used in the loop over cells
         // was with reference to the coarse level
         const Real* dx = geom[0].CellSize();
-        for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+        for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
             kin_ener *= dx[i];
             int_ener *= dx[i];
             nuc_ener *= dx[i];
@@ -499,8 +567,7 @@ Maestro::DiagFile (const int step,
             // for a full star ncenter should be 8 -- there are only 8 zones
             // that have a vertex at the center of the star.  For an octant,
             // ncenter should be 1
-            if ( !((ncenter == 8 && !octant) ||
-                    (ncenter == 1 && octant)) ) {
+            if (!((ncenter == 8 && !octant) || (ncenter == 1 && octant))) {
                 Abort("ERROR: ncenter invalid in Diag()");
             } else {
                 T_center /= ncenter;
@@ -715,7 +782,7 @@ Maestro::DiagFile (const int step,
 
             index += 1;
         }
-    } // end if IOProcessor
+    } // } IOProcessor
 }
 
 // put together a vector of multifabs for writing
