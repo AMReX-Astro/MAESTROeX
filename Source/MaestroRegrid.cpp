@@ -13,15 +13,8 @@ Maestro::Regrid ()
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
-
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
-
-    const int max_lev = max_radial_level + 1;
-
-    Vector<Real> rho0_temp((max_radial_level+1)*nr_fine);
+    
+    RealVector rho0_temp((max_radial_level+1)*nr_fine);
     rho0_temp.shrink_to_fit();
 
     if (!spherical) {
