@@ -55,18 +55,6 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     if (!found_ext_boundary) return;
 
     // get parameters for EXT_DIR bcs
-    // RealVector ext_bcs(NumSpec+4, 0.0);
-    // ext_bcs.shrink_to_fit();
-    // get_inlet_bcs(ext_bcs.dataPtr());
-
-    // Real INLET_RHO = ext_bcs[0];
-    // Real INLET_RHOH = ext_bcs[1];
-    // Real INLET_TEMP = ext_bcs[2];
-    // RealVector INLET_RHOX(NumSpec);
-    // for (int i=0; i<NumSpec; ++i)
-	// INLET_RHOX[i] = ext_bcs[3+i];
-    // Real INLET_VEL = ext_bcs[3+NumSpec];
-
     const Real INLET_RHO_l = INLET_RHO;
     const Real INLET_RHOH_l = INLET_RHOH;
     const Real INLET_TEMP_l = INLET_TEMP;

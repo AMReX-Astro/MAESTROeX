@@ -1,6 +1,8 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
 
 /*
@@ -10,6 +12,12 @@ As these are problem-specific, any problem needing inlet boundary
 conditions should create its own version of this module, using this
 outline.
 */
+
+Real InletBCs::INLET_RHO;
+Real InletBCs::INLET_RHOH;
+Real InletBCs::INLET_TEMP;
+Real InletBCs::INLET_CS;
+Real InletBCs::INLET_dr_fine;
 
 void 
 Maestro::SetInletBCs()
@@ -32,7 +40,7 @@ Maestro::SetInletBCs()
 
     eos(eos_input_rp, eos_state);
 
-    inlet_bcs.INLET_CS = eos_state.cs;
+    InletBCs::INLET_CS = eos_state.cs;
 
     eos_state.T     = 10.e0;
     eos_state.rho   = 5.e-4;
@@ -43,7 +51,9 @@ Maestro::SetInletBCs()
 
     eos(eos_input_rp, eos_state);
 
-    inlet_bcs.INLET_RHO  = eos_state.rho;
-    inlet_bcs.INLET_RHOH = eos_state.rho * eos_state.h;
-    inlet_bcs.INLET_TEMP = eos_state.T;
+    InletBCs::INLET_RHO  = eos_state.rho;
+    InletBCs::INLET_RHOH = eos_state.rho * eos_state.h;
+    InletBCs::INLET_TEMP = eos_state.T;
+
+    InletBCs::INLET_dr_fine = dr_fine;
 }
