@@ -262,6 +262,5 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     }
 
     // initialize any inlet BC parameters
-    // SetInletBCs();
-    set_inlet_bcs();
+    SetInletBCs();
 }

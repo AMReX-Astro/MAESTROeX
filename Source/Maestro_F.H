@@ -77,7 +77,6 @@ extern "C"
     //////////////////////
     // in inlet_bc.F90
 
-    void set_inlet_bcs ();
     void get_inlet_bcs (amrex::Real* params);
 
     //////////////////////

@@ -1,7 +1,15 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
+
+Real InletBCs::INLET_RHO;
+Real InletBCs::INLET_RHOH;
+Real InletBCs::INLET_TEMP;
+RealVector InletBCs::INLET_RHOX;
+Real InletBCs::INLET_VEL;
 
 /*
 inlet_bc_module is a simple container module that holds the parameters
@@ -10,7 +18,6 @@ As these are problem-specific, any problem needing inlet boundary
 conditions should create its own version of this module, using this
 outline.
 */
-
 void 
 Maestro::SetInletBCs()
 {
@@ -35,19 +42,19 @@ Maestro::SetInletBCs()
     eos_state.T   = temp_fuel;
 
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        eos_state.xn[comp]    = 0.0;
+        eos_state.xn[comp] = 0.0;
     }
     eos_state.xn[ic12] = xc12_fuel;
-    eos_state.xn[io16] = 1.e0 - xc12_fuel;
+    eos_state.xn[io16] = 1.0 - xc12_fuel;
 
     eos(eos_input_rt, eos_state);
 
-    inlet_bcs.INLET_RHO     = dens_fuel;
-    inlet_bcs.INLET_RHOH    = dens_fuel*eos_state.h;
-    inlet_bcs.INLET_TEMP    = temp_fuel;
-    inlet_bcs.INLET_RHOHX.resize(NumSpec);
+    InletBCs::INLET_RHO     = dens_fuel;
+    InletBCs::INLET_RHOH    = dens_fuel * eos_state.h;
+    InletBCs::INLET_TEMP    = temp_fuel;
+    InletBCs::INLET_RHOX.resize(NumSpec);
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        inlet_bcs.INLET_RHOHX[comp] = dens_fuel*eos_state.xn[comp];
+        InletBCs::INLET_RHOX[comp] = dens_fuel * eos_state.xn[comp];
     }
-    inlet_bcs.INLET_VEL     = vel_fuel;
+    InletBCs::INLET_VEL     = vel_fuel;
 }

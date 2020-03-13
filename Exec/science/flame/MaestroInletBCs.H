@@ -1,13 +1,15 @@
 #ifndef _MaestroInletBCs_H_
 #define _MaestroInletBCs_H_
 
-struct InletBCs
-{
-    amrex::Real INLET_RHO;
-    amrex::Real INLET_RHOH;
-    amrex::Real INLET_TEMP;
-    RealVector INLET_RHOHX;
-    amrex::Real INLET_VEL;
+#include <AMReX_BLFort.H>
+
+namespace InletBCs {
+
+    extern amrex::Real INLET_RHO;
+    extern amrex::Real INLET_RHOH;
+    extern amrex::Real INLET_TEMP;
+    extern RealVector INLET_RHOX;
+    extern amrex::Real INLET_VEL;
 };
 
 #endif

@@ -20,6 +20,7 @@
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
+// #include <MaestroInletBCs.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -30,8 +31,6 @@ typedef amrex::Gpu::ManagedVector<int> IntVector;
 typedef amrex::Vector< amrex::Real > RealVector;
 typedef amrex::Vector< int > IntVector;
 #endif
-
-#include <MaestroInletBCs.H>
 
 /// hard code a maximum level limit
 #define MAESTRO_MAX_LEVELS 15
@@ -325,20 +324,20 @@ public:
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
                     const amrex::Real* dx, 
-                    const amrex::BCRec bcs, 
+                    const amrex::BCRec bcs,
                     const amrex::Real* gridlo, const int comp);
 
     static void VelFill(const amrex::Array4<amrex::Real>& vel, 
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
                     const amrex::Real* dx, 
-                    const amrex::BCRec bcs, 
+                    const amrex::BCRec bcs,
                     const amrex::Real * gridlo, const int comp=0);
 
     static void FillExtBC(const amrex::Array4<amrex::Real>& q, 
                    const amrex::Box& bx, 
                    const amrex::Box& domainBox, 
-                   const amrex::BCRec bcs, 
+                   const amrex::BCRec bcs,
                    const int comp, const bool is_vel=false);
 
     // end MaestroBCFill.cpp functions
@@ -1858,9 +1857,6 @@ public:
 
     // log file 
     SimpleLog log_file;
-
-    // Inlet BCs
-    InletBCs inlet_bcs;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
