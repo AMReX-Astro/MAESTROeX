@@ -73,10 +73,8 @@ contains
                 
 #if (AMREX_SPACEDIM == 3)
                 r = k
-#elif (AMREX_SPACEDIM == 2)
-                r = j
 #else
-                r = i
+                r = j
 #endif
                 tag_array(lev,r) = set
              endif
@@ -96,10 +94,8 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
              r = k
-#elif (AMREX_SPACEDIM == 2)
-             r = j
 #else
-             r = i
+             r = j
 #endif
              tag_array(lev,r) = set
           endif
@@ -141,7 +137,7 @@ contains
 
     enddo
 
-#elif (AMREX_SPACEDIM == 2)
+#else
     do k = lo(3), hi(3)
        do j = lo(2), hi(2)
           
@@ -151,19 +147,6 @@ contains
              enddo
           endif
 
-       enddo
-    enddo
-
-#else
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-             
-             if (tag_array(lev,i) > 0) then
-                tag(i,j,k) = set
-             endif
-             
-          enddo
        enddo
     enddo
     
@@ -190,10 +173,8 @@ contains
 
 #if (AMREX_SPACEDIM == 3)
           r = k/2
-#elif (AMREX_SPACEDIM == 2)
+#else 
           r = j/2
-#else
-          r = i/2
 #endif
           tag_array(lev-1,r) = set
     enddo

@@ -141,33 +141,20 @@ void
 Maestro::TagArray ()
 {
     // this routine is not required for spherical
-    if (spherical == 1) {
+    if (spherical) {
         return;
     }
 
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 
-    const int clearval = TagBox::CLEAR;
-    const int   tagval = TagBox::SET;
-
     for (int lev = 1; lev <= max_radial_level; ++lev) {
 
-        const MultiFab& state = sold[lev];
-
-        {
-            Vector<int>  itags;
-
-            for (MFIter mfi(state); mfi.isValid(); ++mfi)
-            {
-                const Box& validBox = mfi.validbox();
-
-                // re-compute tag_array since the actual grid structure changed due to buffering
-                // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
-                retag_array(&tagval, &clearval,
-                            ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                            &lev, tag_array.dataPtr());
-            }
+        for (MFIter mfi(sold[lev], false); mfi.isValid(); ++mfi) {
+            const Box& validBox = mfi.validbox();
+            // re-compute tag_array since the actual grid structure changed due to buffering
+            // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
+            RetagArray(validBox, lev, tag_array);
         }
     }
     ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
@@ -189,48 +176,15 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
     }
 
-    const int clearval = TagBox::CLEAR;
-    const int   tagval = TagBox::SET;
-
-    const Real* dx = geom[lev].CellSize();
-
-    const MultiFab& state = sold[lev];
-    
-    Vector<int> itags;
-
     // if you add openMP here, make sure to collect tag_array across threads
-    for (MFIter mfi(state, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-
-        const Box& tilebox  = mfi.tilebox();
-
-        TagBox& tagfab  = tags[mfi];
-
-        // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
-        // So we are going to get a temporary integer array.
-        // set itags initially to 'untagged' everywhere
-        // we define itags over the tilebox region
-        tagfab.get_itags(itags, tilebox);
-
-        // data pointer and index space
-        int*        tptr    = itags.dataPtr();
-        const int*  tlo     = tilebox.loVect();
-        const int*  thi     = tilebox.hiVect();
-
+#ifdef _OPENMP
+#pragma omp parallel if(Gpu::notInLaunchRegion())
+#endif
+    for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
         // tag cells for refinement
         // for planar problems, we keep track of when a cell at a particular
         // latitude is tagged using tag_array
-        state_error(tptr,  ARLIM_3D(tlo), ARLIM_3D(thi),
-                    BL_TO_FORTRAN_3D(state[mfi]),
-                    &tagval, &clearval,
-                    ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                    ZFILL(dx), &time,
-                    &lev, tag_array.dataPtr());
-
-        //
-        // Now update the tags in the TagBox in the tilebox region
-        // to be equal to itags
-        //
-        tagfab.tags_and_untags(itags, tilebox);
+        StateError(tags, sold[lev], mfi, lev, tag_array, time);
     }
 
     // for planar refinement, we need to gather tagged entries in arrays
@@ -241,34 +195,12 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
 
         // NOTE: adding OpenMP breaks the code - not exactly sure why
-        for (MFIter mfi(state, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-
-            const Box& tilebox  = mfi.tilebox();
-
-            TagBox& tagfab  = tags[mfi];
-
-            // We cannot pass tagfab to Fortran becuase it is BaseFab<char>.
-            // So we are going to get a temporary integer array.
-            // set itags initially to 'untagged' everywhere
-            // we define itags over the tilebox region
-            tagfab.get_itags(itags, tilebox);
-
-            // data pointer and index space
-            int*        tptr    = itags.dataPtr();
-            const int*  tlo     = tilebox.loVect();
-            const int*  thi     = tilebox.hiVect();
-
+#ifdef _OPENMP
+#pragma omp parallel if(Gpu::notInLaunchRegion())
+#endif
+        for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // tag all cells at a given height if any cells at that height were tagged
-            tag_boxes(tptr, ARLIM_3D(tlo), ARLIM_3D(thi),
-                      &tagval, &clearval,
-                      ARLIM_3D(tilebox.loVect()), ARLIM_3D(tilebox.hiVect()),
-                      ZFILL(dx), &time, &lev, tag_array.dataPtr());
-
-            //
-            // Now update the tags in the TagBox in the tilebox region
-            // to be equal to itags
-            //
-            tagfab.tags_and_untags(itags, tilebox);
+            TagBoxes(tags, mfi, lev, tag_array, time);
         }
     } // if (spherical == 0)
 
@@ -503,3 +435,42 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
         base[r] = state_temp[r];
     })
 }
+
+// void 
+// Maestro::get_itags(const FArrayBox& fab, Vector<int>& ar, const Box& tilebx) const noexcept
+// {
+//     auto dlen = fab.length();
+//     int Lbx[] = {1,1,1};
+//     for (int idim=0; idim<AMREX_SPACEDIM; idim++) {
+//         Lbx[idim] = dlen[idim];
+//     }
+    
+//     long stride[] = {1, Lbx[0], long(Lbx[0])*long(Lbx[1])};
+
+//     long Ntb = 1, stb=0;
+//     int Ltb[] = {1,1,1};
+//     for (int idim=0; idim<AMREX_SPACEDIM; idim++) {
+//         Ltb[idim] = tilebx.length(idim);
+//         Ntb *= Ltb[idim];
+//         stb += stride[idim] * (tilebx.smallEnd(idim) - domain.smallEnd(idim));
+//     }
+    
+//     if (ar.size() < Ntb) ar.resize(Ntb);
+    
+//     const TagType* const p0   = fab.dataPtr() + stb;  // +stb to the lower corner of tilebox
+//     int*                 iptr = ar.dataPtr();
+
+//     for (int k=0; k<Ltb[2]; k++) {
+//         for (int j=0; j<Ltb[1]; j++) {
+//             const TagType* cptr = p0 + j*stride[1] + k*stride[2];
+//             for (int i=0; i<Ltb[0]; i++, cptr++, iptr++) {
+//                 if (*cptr) {
+//                     *iptr = *cptr;
+//                 }
+//                 else {
+//                     *iptr = TagBox::CLEAR;
+//                 }
+//             }
+//         }
+//     }
+// }

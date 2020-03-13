@@ -1551,6 +1551,23 @@ public:
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
 
+    ////////////
+    // MaestroTagging.cpp functions
+
+    void RetagArray(const amrex::Box& bx,
+                    const int lev, IntVector& tag_array);
+
+    void TagBoxes(amrex::TagBoxArray& tags, 
+                  const amrex::MFIter& mfi,
+                  const int lev, IntVector& tag_array,
+                  const amrex::Real time);
+
+    void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
+                   const amrex::MFIter& mfi,
+                   const int lev, IntVector& tag_array,
+                   const amrex::Real time);              
+    ////////////
+
     ////////////////////////
     // MaestroThermal.cpp functions
 
