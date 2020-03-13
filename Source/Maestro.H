@@ -5,8 +5,6 @@
 #include <omp.h>
 #endif
 
-#include <state_indices.H>
-
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
@@ -32,6 +30,8 @@ typedef amrex::Gpu::ManagedVector<int> IntVector;
 typedef amrex::Vector< amrex::Real > RealVector;
 typedef amrex::Vector< int > IntVector;
 #endif
+
+#include <MaestroInletBCs.H>
 
 /// hard code a maximum level limit
 #define MAESTRO_MAX_LEVELS 15
@@ -1858,6 +1858,9 @@ public:
 
     // log file 
     SimpleLog log_file;
+
+    // Inlet BCs
+    InletBCs inlet_bcs;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
