@@ -1560,7 +1560,7 @@ public:
     void TagBoxes(amrex::TagBoxArray& tags, 
                   const amrex::MFIter& mfi,
                   const int lev, IntVector& tag_array,
-                  const amrex::Real time);
+                  const amrex::Real time) ;
 
     void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
                    const amrex::MFIter& mfi,

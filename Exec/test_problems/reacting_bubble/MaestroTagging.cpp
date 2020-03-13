@@ -4,7 +4,6 @@
 
 using namespace amrex;
 
-// 
 void
 Maestro::RetagArray(const Box& bx,
                     const int lev, IntVector& tag_array)
@@ -25,7 +24,6 @@ Maestro::RetagArray(const Box& bx,
    }
 }
 
-
 void
 Maestro::TagBoxes(TagBoxArray& tags, 
                   const MFIter& mfi,
@@ -42,7 +40,6 @@ Maestro::TagBoxes(TagBoxArray& tags,
     const int max_lev = max_radial_level + 1;
 
     const Box& tilebox  = mfi.tilebox();
-    const auto dx = geom[lev].CellSizeArray();
 
     AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -52,8 +49,7 @@ Maestro::TagBoxes(TagBoxArray& tags,
         }
     });
 }
-
-// 
+ 
 void
 Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf, 
                    const MFIter& mfi,
