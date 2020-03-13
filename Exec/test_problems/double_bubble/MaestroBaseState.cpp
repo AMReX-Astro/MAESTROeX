@@ -52,9 +52,9 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     s0_init[lev+max_lev*nr_fine*Rho] = dens_base;
     s0_init[lev+max_lev*nr_fine*RhoH] = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        s0_init[lev+max_lev*nr_fine*(FirstSpec+comp)] = xn_zone[comp];
+        s0_init[lev+max_lev*nr_fine*(FirstSpec+comp)] = dens_base * xn_zone[comp];
     }
-    s0_init[lev+max_lev*nr_fine*Temp] = temp_base;
+    s0_init[lev+max_lev*nr_fine*Temp] = eos_state.T;
 
     Real z0 = 0.5 * dr[n];
 
