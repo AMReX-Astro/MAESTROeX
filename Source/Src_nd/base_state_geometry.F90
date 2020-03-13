@@ -680,7 +680,11 @@ contains
     integer, value,   intent(in   ) :: lev
     integer,          intent(inout) :: base_cutoff_density_coord_in
 
-    base_cutoff_density_coord_in = base_cutoff_density_coord(lev)
+    if (spherical == 1) then
+        base_cutoff_density_coord_in = base_cutoff_density_coord(0)
+    else
+        base_cutoff_density_coord_in = base_cutoff_density_coord(lev)
+    endif
 
   end subroutine get_base_cutoff_density_coord
   

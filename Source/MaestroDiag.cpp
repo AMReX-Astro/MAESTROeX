@@ -144,7 +144,7 @@ Maestro::DiagFile (const int step,
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
-#pragma omp parallel
+#pragma omp parallel reduction(+:kin_ener_level) reduction(+:int_ener_level) reduction(+:nuc_ener_level) reduction(max:U_max_level) reduction(max:Mach_max_level)
 #endif
         for ( MFIter mfi(sin_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
