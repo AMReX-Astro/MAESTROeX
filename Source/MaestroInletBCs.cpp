@@ -1,6 +1,8 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
 
 /*
@@ -11,10 +13,8 @@ conditions should create its own version of this module, using this
 outline.
 */
 
-struct InletBCs
-{
-    // put your bcs here
-};
+// Inlet BCs defined in header file should go here
+
 
 void 
 Maestro::SetInletBCs()

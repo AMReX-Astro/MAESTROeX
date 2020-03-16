@@ -58,7 +58,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         if (use_exact_base_state) {
             mod_dr = r_cc_loc[lev] < model_dr_irreg[0] ? remainder(model_dr_irreg[0], r_cc_loc[lev]) : remainder(r_cc_loc[lev], model_dr_irreg[0]);
         } else {
-            mod_dr = dr[n] > model_dr ? 
+            mod_dr = dr[n] < model_dr ? 
                 remainder(model_dr, dr[n]) : remainder(dr[n], model_dr);
         }
 
@@ -77,13 +77,13 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     Real starting_rad = spherical ? 0.0 : geom[lev].ProbLo(AMREX_SPACEDIM-1);
 
     Real rho_above_cutoff = s0_init[n+max_lev*nr_fine*Rho];
-    Real rhoh_above_cutoff = s0_init[n+max_lev*nr_fine*Rho];
+    Real rhoh_above_cutoff = s0_init[n+max_lev*nr_fine*RhoH];
     RealVector spec_above_cutoff(NumSpec);
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        spec_above_cutoff[comp] = s0_init[n+max_lev*nr_fine*Rho];
+        spec_above_cutoff[comp] = s0_init[n+max_lev*nr_fine*(FirstSpec+comp)];
     } 
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
-    Real p_above_cutoff = s0_init[n];
+    Real p_above_cutoff = p0_init[n];
 
     // do r=0,nr(n)-1
     for (auto r = 0; r < nr[n]; ++r) {
@@ -126,7 +126,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
             // Print() << "sumX = " << sumX << std::endl;
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                if (sumX > 0.0) xn_ambient[comp] /= sumX;
+                if (sumX != 0.0) xn_ambient[comp] /= sumX;
             }
 
             eos_t eos_state;
@@ -206,7 +206,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         Real rloc = starting_rad + (Real(r) + 0.5) * dr[n];
         rloc = min(rloc, rmax);
 
-        if (rloc > base_cutoff_density_loc) {
+        if (rloc < base_cutoff_density_loc) {
 
             Real r_r = starting_rad;
             r_r += use_exact_base_state ? r_edge_loc[n+max_lev*(r+1)] : Real(r+1) * dr[n];

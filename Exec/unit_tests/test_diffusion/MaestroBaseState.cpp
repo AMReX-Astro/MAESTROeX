@@ -13,6 +13,9 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
+    const int max_lev = max_radial_level + 1;
+    const int n = lev;
+    
     // get species indices
     const int ihe4 = network_spec_index("helium-4");
     const int ic12 = network_spec_index("carbon-12");

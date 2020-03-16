@@ -232,6 +232,10 @@ Maestro::InitData ()
                         p0_old, tempbar, tempbar_init, lev);
     }
 
+    if (use_exact_base_state) {
+        std::fill(psi.begin(), psi.end(), 0.);
+    }
+
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);

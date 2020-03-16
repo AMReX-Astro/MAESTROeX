@@ -136,12 +136,12 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
         s0_init[n+max_lev*(r+nr_fine*Temp)] = temp_fuel + 
             (temp_ash - temp_fuel) * 0.5 * (1.0 + 
             tanh((rloc - (geom[lev].ProbLo(AMREX_SPACEDIM-1) + 
-            interface_pos_Frac*rlen)) / (smooth_len_frac*rlen)));
+            interface_pos_frac*rlen)) / (smooth_len_frac*rlen)));
 
         // give the carbon mass fraction a smooth profile too
         RealVector xn_smooth(NumSpec, 0.0);
 
-        xn_smooth[ic12] = xn_fuel[ix12] + (xn_ash[ic12] - xn_fuel[ic12]) * 
+        xn_smooth[ic12] = xn_fuel[ic12] + (xn_ash[ic12] - xn_fuel[ic12]) * 
             0.5 * (1.0 + tanh((rloc - (geom[lev].ProbLo(AMREX_SPACEDIM-1) + 
             interface_pos_frac*rlen)) / (smooth_len_frac*rlen)));
 

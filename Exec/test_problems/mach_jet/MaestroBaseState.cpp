@@ -114,9 +114,7 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
             s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
             s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
-            for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = eos_state.rho/NumSpec;
-            }
+	    s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = eos_state.rho;
             s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
 
             p0_init[n+max_lev*r] = eos_state.p;

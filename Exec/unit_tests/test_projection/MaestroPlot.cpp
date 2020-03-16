@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
 
@@ -16,7 +17,8 @@ Maestro::WritePlotFile (const int step,
                         const Vector<Real>& d,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& e,
-                        const Vector<MultiFab>& f)
+                        const Vector<MultiFab>& f,
+			const bool is_small)
 {
 	// timer for profiling
 	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
@@ -70,10 +72,10 @@ Maestro::WritePlotFile (const int step,
 
 
 // get plotfile name
-std::string
-Maestro::PlotFileName (int lev) const
+void
+Maestro::PlotFileName (const int lev, std::string* plotfilename)
 {
-	return Concatenate(plot_base_name, lev, 7);
+	*plotfilename = Concatenate(*plotfilename, lev, 7);
 }
 
 // put together a vector of multifabs for writing
@@ -375,6 +377,71 @@ Maestro::WriteJobInfo (const std::string& dir) const
 }
 
 void
+Maestro::WriteBuildInfo ()
+{
+        std::string PrettyLine = std::string(78, '=') + "\n";
+	std::string OtherLine = std::string(78, '-') + "\n";
+	std::string SkipSpace = std::string(8, ' ');
+
+	// build information
+	std::cout << PrettyLine;
+	std::cout << " MAESTROeX Build Information\n";
+	std::cout << PrettyLine;
+	
+	std::cout << "build date:    " << buildInfoGetBuildDate() << "\n";
+	std::cout << "build machine: " << buildInfoGetBuildMachine() << "\n";
+	std::cout << "build dir:     " << buildInfoGetBuildDir() << "\n";
+	std::cout << "AMReX dir:     " << buildInfoGetAMReXDir() << "\n";
+	
+	std::cout << "\n";
+	
+	std::cout << "COMP:          " << buildInfoGetComp() << "\n";
+	std::cout << "COMP version:  " << buildInfoGetCompVersion() << "\n";
+	
+	std::cout << "\n";
+	
+	std::cout << "C++ compiler:  " << buildInfoGetCXXName() << "\n";
+	std::cout << "C++ flags:     " << buildInfoGetCXXFlags() << "\n";
+	
+	std::cout << "\n";
+	
+	std::cout << "Fortran comp:  " << buildInfoGetFName() << "\n";
+	std::cout << "Fortran flags: " << buildInfoGetFFlags() << "\n";
+	
+	std::cout << "\n";
+	
+	std::cout << "Link flags:    " << buildInfoGetLinkFlags() << "\n";
+	std::cout << "Libraries:     " << buildInfoGetLibraries() << "\n";
+	
+	std::cout << "\n";
+	
+	for (int n = 1; n <= buildInfoGetNumModules(); n++) {
+	        std::cout << buildInfoGetModuleName(n) << ": " << buildInfoGetModuleVal(n) << "\n";
+	}
+	
+	const char* githash1 = buildInfoGetGitHash(1);
+	const char* githash2 = buildInfoGetGitHash(2);
+	const char* githash3 = buildInfoGetGitHash(3);
+	if (strlen(githash1) > 0) {
+	        std::cout << "MAESTROeX git describe: " << githash1 << "\n";
+	}
+	if (strlen(githash2) > 0) {
+	        std::cout << "AMReX git describe: " << githash2 << "\n";
+	}
+	if (strlen(githash3) > 0) {
+	        std::cout << "Microphysics git describe: " << githash3 << "\n";
+	}
+
+	const char* buildgithash = buildInfoGetBuildGitHash();
+	const char* buildgitname = buildInfoGetBuildGitName();
+	if (strlen(buildgithash) > 0) {
+	        std::cout << buildgitname << " git describe: " << buildgithash << "\n";
+	}
+	
+	std::cout << "\n\n";
+}
+
+void
 Maestro::MakeMagvel (const Vector<MultiFab>& vel,
                      Vector<MultiFab>& magvel)
 {
@@ -399,6 +466,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 		// get references to the MultiFabs at level lev
 		const MultiFab& vel_mf = vel[lev];
 		MultiFab& magvel_mf = magvel[lev];
+		const MultiFab& w0_mf = w0_cart[lev];
 
 		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 		if (spherical == 0) {
@@ -414,9 +482,10 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_magvel(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				make_magvel(ARLIM_3D(tileBox.loVect()),
+					    ARLIM_3D(tileBox.hiVect()),
 				            BL_TO_FORTRAN_3D(vel_mf[mfi]),
-				            w0.dataPtr(),
+				            BL_TO_FORTRAN_3D(w0_mf[mfi]), w0_mf.nComp(),
 				            BL_TO_FORTRAN_3D(magvel_mf[mfi]));
 			}
 
@@ -530,7 +599,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
 				make_ad_excess(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				               BL_TO_FORTRAN_FAB(state_mf[mfi]),
+				               BL_TO_FORTRAN_3D(state_mf[mfi]), state_mf.nComp(),
 				               BL_TO_FORTRAN_3D(ad_excess_mf[mfi]));
 			}
 
@@ -553,7 +622,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 
 				make_ad_excess_sphr(ARLIM_3D(tileBox.loVect()),
 				                    ARLIM_3D(tileBox.hiVect()),
-				                    BL_TO_FORTRAN_FAB(state_mf[mfi]),
+				                    BL_TO_FORTRAN_3D(state_mf[mfi]), state_mf.nComp(),
 				                    BL_TO_FORTRAN_3D(normal_mf[mfi]),
 				                    BL_TO_FORTRAN_3D(ad_excess_mf[mfi]));
 			}
@@ -587,6 +656,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 			// Get the index space of the valid region
 			const Box& tileBox = mfi.tilebox();
+	                const Box& domainBox = geom[lev].Domain();
 			const Real* dx = geom[lev].CellSize();
 
 			// call fortran subroutine
@@ -594,7 +664,8 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
 			make_vorticity(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			               BL_TO_FORTRAN_3D(vel_mf[mfi]), dx,
+				       ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()), 
+			               BL_TO_FORTRAN_3D(vel_mf[mfi]), AMREX_REAL_ANYD(dx),
 			               BL_TO_FORTRAN_3D(vorticity_mf[mfi]), phys_bc.dataPtr());
 		}
 
@@ -623,53 +694,27 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
 		const MultiFab& state_mf = state[lev];
 		MultiFab& deltagamma_mf = deltagamma[lev];
 
-		if (spherical == 0) {
-
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+		const MultiFab& p0cart_mf = p0_cart[lev];
+		const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
+	
+		// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+		for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
+		    
+		    // Get the index space of the valid region
+		    const Box& tileBox = mfi.tilebox();
 
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
-
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
-				make_deltagamma(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                BL_TO_FORTRAN_FAB(state_mf[mfi]),
-				                p0.dataPtr(), gamma1bar.dataPtr(),
-				                BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
-			}
-
-		} else {
-
-			const MultiFab& p0cart_mf = p0_cart[lev];
-			const MultiFab& gamma1barcart_mf = gamma1bar_cart[lev];
-
-			// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-			for ( MFIter mfi(state_mf, true); mfi.isValid(); ++mfi ) {
-
-				// Get the index space of the valid region
-				const Box& tileBox = mfi.tilebox();
-
-				// call fortran subroutine
-				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-				// lo/hi coordinates (including ghost cells), and/or the # of components
-				// We will also pass "validBox", which specifies the "valid" region.
-				make_deltagamma_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				                     BL_TO_FORTRAN_FAB(state_mf[mfi]),
-				                     BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
-				                     BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
-			}
-
+		    // call fortran subroutine
+		    // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
+		    // lo/hi coordinates (including ghost cells), and/or the # of components
+		    // We will also pass "validBox", which specifies the "valid" region.
+		    make_deltagamma(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				    BL_TO_FORTRAN_3D(state_mf[mfi]), state_mf.nComp(),
+				    BL_TO_FORTRAN_3D(p0cart_mf[mfi]), BL_TO_FORTRAN_3D(gamma1barcart_mf[mfi]),
+				    BL_TO_FORTRAN_3D(deltagamma_mf[mfi]));
 		}
-
 
 	}
 
@@ -689,6 +734,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
 		// get references to the MultiFabs at level lev
 		MultiFab& divw0_mf = divw0[lev];
+	        const MultiFab& w0_mf = w0_cart[lev];
 
 		if (spherical == 0) {
 
@@ -706,8 +752,9 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 				// use macros in AMReX_ArrayLim.H to pass in each FAB's data,
 				// lo/hi coordinates (including ghost cells), and/or the # of components
 				// We will also pass "validBox", which specifies the "valid" region.
-				make_divw0(&lev,ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-				           w0.dataPtr(), dx,
+				make_divw0(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+				           BL_TO_FORTRAN_3D(w0_mf[mfi]), w0_mf.nComp(),
+					   AMREX_REAL_ANYD(dx),
 				           BL_TO_FORTRAN_3D(divw0_mf[mfi]));
 			}
 
@@ -734,7 +781,8 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 				make_divw0_sphr(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
 				                BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
 				                BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-				                BL_TO_FORTRAN_3D(w0macz_mf[mfi]), dx,
+				                BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
+						AMREX_REAL_ANYD(dx),
 				                BL_TO_FORTRAN_3D(divw0_mf[mfi]));
 			}
 
@@ -780,9 +828,10 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 			// lo/hi coordinates (including ghost cells), and/or the # of components
 			// We will also pass "validBox", which specifies the "valid" region.
 			make_pidivu(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-			            BL_TO_FORTRAN_3D(vel_mf[mfi]), dx,
+			            BL_TO_FORTRAN_3D(vel_mf[mfi]),
+				    AMREX_REAL_ANYD(dx),
 			            // BL_TO_FORTRAN_3D(pi_mf[mfi]),
-			            BL_TO_FORTRAN_FAB(state_mf[mfi]),
+			            BL_TO_FORTRAN_3D(state_mf[mfi]), state_mf.nComp(),
 			            BL_TO_FORTRAN_3D(pidivu_mf[mfi]));
 		}
 

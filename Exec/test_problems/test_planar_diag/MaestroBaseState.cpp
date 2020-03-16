@@ -49,8 +49,8 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     eos_t eos_state;
 
     // use eos call to be consistent
-    eos_state.rho = p0_init[n];
-    eos_state.p = s0_init[n+max_lev*nr_fine*Rho];
+    eos_state.p = p0_init[n];
+    eos_state.rho = s0_init[n+max_lev*nr_fine*Rho];
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = xn_zone[comp];
     }
@@ -64,10 +64,10 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     }
     s0_init[n+max_lev*nr_fine*Temp] = eos_state.T;
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 1; r < nr[n]; ++r) {
 
         // height above the bottom of the domain
-        Real z = (Real(z) + 0.5) * dr[n];
+        Real z = (Real(r) + 0.5) * dr[n];
 
         // set rho analytically  
         Real dens_zone = dens_base * exp(-z/H);
