@@ -625,7 +625,7 @@ public:
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0, int variable_type=0);
+                           const int sbccomp = 0, int variable_type=0);
 
     /// Maps 1d arrays onto multi-D cartesian MultiFabs
     ///
@@ -757,9 +757,30 @@ public:
     ////////////
 
     ////////////
+    // MaestroInitData.cpp functions
+
+    void InitLevelData(const int lev, 
+                       const amrex::Real time, 
+                       const amrex::MFIter& mfi, 
+                       const amrex::Array4<amrex::Real> scal, 
+                       const amrex::Array4<amrex::Real> vel, 
+                       const RealVector& s0_init, 
+                       const RealVector& p0_init);
+
+    void InitLevelDataSphr(const int lev,
+                       const amrex::Real time, 
+                       const amrex::MFIter& mfi, 
+                       MultiFab& scal, 
+                       MultiFab& vel, 
+                       const RealVector& s0_init, 
+                       const RealVector& p0_init);
+
+    // end MaestroInitData.cpp functions
+    ////////////
+
+    ////////////
     // MaestroInletBC.cpp functions
 
-    /// Calculate the horizontal average of \f$\Gamma_1\f$
     void SetInletBCs();
 
     // end InletBC.cpp functions

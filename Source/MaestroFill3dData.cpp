@@ -13,7 +13,7 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp, int variable_type)
+                           const int sbccomp, int variable_type)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
@@ -47,7 +47,7 @@ Maestro::Put1dArrayOnCart (int lev,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp)
+                           const int sbccomp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
