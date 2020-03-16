@@ -20,9 +20,11 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
-       w0, p0, gamma1bar) bind (C,name="estdt")
+       w0_cart, w_lo, w_hi, &
+       p0_cart, p_lo, p_hi, &
+       gamma1bar_cart, g_lo, g_hi) bind (C,name="estdt")
 
-    integer         , intent(in   ) :: lev
+    integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -31,20 +33,23 @@ contains
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
     integer         , intent(in   ) :: t_lo(3), t_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
     double precision, intent(in   ) :: dSdt (t_lo(1):t_hi(1),t_lo(2):t_hi(2),t_lo(3):t_hi(3))
-    double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent(in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     double precision :: dr_fine
 
     dr_fine = (prob_hi(1) - prob_lo(1))/nr_fine
 
-    dt = min(1.1d0 * dt, cfl * dr_fine / (maxval(abs(w0(1,0:nr_fine-2))) + SMALL))
+    dt = min(1.1d0 * dt, cfl * dr_fine / (maxval(abs(w0_cart(:,:,:))) + SMALL))
 
   end subroutine estdt
 
@@ -54,13 +59,11 @@ contains
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
        dSdt,  t_lo, t_hi, &
-       w0, &
+       w0_cart, w_lo, w_hi, &
        w0macx, x_lo, x_hi, &
        w0macy, y_lo, y_hi, &
        w0macz, z_lo, z_hi, &
-       p0, gamma1bar, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="estdt_sphr")
+       gp0_cart, g_lo, g_hi) bind (C,name="estdt_sphr")
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -73,6 +76,8 @@ contains
     integer         , intent(in   ) :: x_lo(3), x_hi(3)
     integer         , intent(in   ) :: y_lo(3), y_hi(3)
     integer         , intent(in   ) :: z_lo(3), z_hi(3)
+    integer         , intent(in   ) :: w_lo(3), w_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal  (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u     (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force (f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
@@ -81,14 +86,8 @@ contains
     double precision, intent(in   ) :: w0macx(x_lo(1):x_hi(1),x_lo(2):x_hi(2),x_lo(3):x_hi(3))
     double precision, intent(in   ) :: w0macy(y_lo(1):y_hi(1),y_lo(2):y_hi(2),y_lo(3):y_hi(3))
     double precision, intent(in   ) :: w0macz(z_lo(1):z_hi(1),z_lo(2):z_hi(2),z_lo(3):z_hi(3))
-    double precision, intent(in   ) :: w0       (0:max_radial_level,0:nr_fine)
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_cc_loc(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent(in   ) :: w0_cart(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
+    double precision, intent(in   ) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     double precision :: dr_fine
 
@@ -101,7 +100,7 @@ contains
        dr_fine = prob_hi(1) * dx(1) / drdxfac
     endif
 
-    dt = min(1.1d0 * dt, cfl * dr_fine / (maxval(abs(w0(1,0:nr_fine-2))) + SMALL))
+    dt = min(1.1d0 * dt, cfl * dr_fine / (maxval(abs(w0_cart(:,:,:))) + SMALL))
 
   end subroutine estdt_sphr
 
@@ -110,9 +109,10 @@ contains
        u,     u_lo, u_hi, nc_u, &
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
-       p0, gamma1bar) bind (C,name="firstdt")
+       p0_cart, p_lo, p_hi, &
+       gamma1bar_cart, g_lo, g_hi) bind (C,name="firstdt")
 
-    integer         , intent(in   ) :: lev
+    integer, value  , intent(in   ) :: lev
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
     double precision, intent(in   ) :: dx(3)
@@ -120,12 +120,14 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: p_lo(3), p_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
+    double precision, intent(in   ) :: p0_cart(p_lo(1):p_hi(1),p_lo(2):p_hi(2),p_lo(3):p_hi(3))
+    double precision, intent(in   ) :: gamma1bar_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     dt = initial_dt
 
@@ -136,9 +138,7 @@ contains
        u,     u_lo, u_hi, nc_u, &
        force, f_lo, f_hi, nc_f, &
        divu,  d_lo, d_hi, &
-       p0, gamma1bar, &
-       r_cc_loc, r_edge_loc, &
-       cc_to_r, ccr_lo, ccr_hi) bind (C,name="firstdt_sphr")
+       gp0_cart, g_lo, g_hi) bind (C,name="firstdt_sphr")
 
     double precision, intent(inout) :: dt, umax
     integer         , intent(in   ) :: lo(3), hi(3)
@@ -147,17 +147,12 @@ contains
     integer         , intent(in   ) :: u_lo(3), u_hi(3), nc_u
     integer         , intent(in   ) :: f_lo(3), f_hi(3), nc_f
     integer         , intent(in   ) :: d_lo(3), d_hi(3)
+    integer         , intent(in   ) :: g_lo(3), g_hi(3)
     double precision, intent(in   ) :: scal (s_lo(1):s_hi(1),s_lo(2):s_hi(2),s_lo(3):s_hi(3),nc_s)
     double precision, intent(in   ) :: u    (u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),nc_u)
     double precision, intent(in   ) :: force(f_lo(1):f_hi(1),f_lo(2):f_hi(2),f_lo(3):f_hi(3),nc_f)
     double precision, intent(in   ) :: divu (d_lo(1):d_hi(1),d_lo(2):d_hi(2),d_lo(3):d_hi(3))
-    double precision, intent(in   ) :: p0       (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: gamma1bar(0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_cc_loc (0:max_radial_level,0:nr_fine-1)
-    double precision, intent(in   ) :: r_edge_loc(0:max_radial_level,0:nr_fine)
-    integer         , intent(in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent(in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
-         ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
+    double precision, intent(in   ) :: gp0_cart(g_lo(1):g_hi(1),g_lo(2):g_hi(2),g_lo(3):g_hi(3))
 
     dt = initial_dt
 
