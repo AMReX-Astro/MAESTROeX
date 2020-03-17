@@ -207,7 +207,6 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     }
 }
 
-
 void Perturb(const Real p0_init, 
              const Real* s0_init,
              Real* perturbations,  
