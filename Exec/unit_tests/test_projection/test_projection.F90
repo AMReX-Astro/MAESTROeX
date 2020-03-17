@@ -3,6 +3,7 @@
 module test_projection_module
 
   use amrex_constants_module
+  use amrex_error_module
   use probin_module, only: project_type
   use amrex_fort_module, only : amrex_spacedim
   use meth_params_module, only: prob_lo

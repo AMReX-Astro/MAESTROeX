@@ -9,7 +9,7 @@ typedef void (*BndryFuncDefaultMaestro)(const amrex::Array4<amrex::Real>& scal,
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
                     const amrex::Real* dx, 
-                    const amrex::BCRec bcs, 
+                    const amrex::BCRec bcs,
                     const amrex::Real* gridlo, const int comp);
 }
 
