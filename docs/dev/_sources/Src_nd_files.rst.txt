@@ -18,8 +18,6 @@ Src_nd
    file/make_explicit_thermal_f
    file/make_grav_f
    file/make_heating_f
-   file/make_intra_coeffs_f
-   file/make_plot_variables_f
    file/make_scal_force_f
    file/regrid_f
    file/rotation_f

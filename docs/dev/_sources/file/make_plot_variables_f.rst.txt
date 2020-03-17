@@ -1,8 +1,0 @@
-make_plot_variables.F90
-=======================
-
-plot\_variables\_module
------------------------
-
-.. f:automodule:: plot_variables_module
-
