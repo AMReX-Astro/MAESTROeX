@@ -10,7 +10,7 @@ Maestro::InitLevelData(const int lev, const Real time,
                        const Real* p0_init)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitData()", InitData);
+    BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
     const int max_lev = max_radial_level + 1;
@@ -43,7 +43,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                        const RealVector& p0_init)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitDataSphr()", InitDataSphr);
+    BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
 
     const auto tileBox = mfi.tilebox();
     const int max_lev = max_radial_level + 1;
