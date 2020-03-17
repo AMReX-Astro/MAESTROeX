@@ -155,7 +155,7 @@ Maestro::EstDt ()
                     tmp[mfi].setVal(0.0, tileBox, 0, 1); 
 #if (AMREX_SPACEDIM == 2)
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-			    spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
+                            spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
                     });
                     Real spdy = tmp[mfi].maxabs(tileBox, 0);
                     Real spdz = 0.0;
@@ -163,7 +163,7 @@ Maestro::EstDt ()
                     Real spdy = uold[lev][mfi].maxabs(tileBox, 1);
 
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-			    spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
+                            spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     });
                     Real spdz = tmp[mfi].maxabs(tileBox, 0);
 #endif
