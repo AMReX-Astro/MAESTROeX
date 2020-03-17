@@ -1,0 +1,78 @@
+
+#include <Maestro.H>
+using namespace amrex;
+
+// initializes data on a specific level
+void
+Maestro::InitLevelData(const int lev, const Real time, 
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
+                       const Real* s0_init, 
+                       const Real* p0_init)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
+
+    const auto tileBox = mfi.tilebox();
+    const int max_lev = max_radial_level + 1;
+    const auto nrf = nr_fine;
+
+    // set velocity to zero 
+    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+        vel(i,j,k,n) = 0.0;
+    });
+
+    const auto prob_lo = geom[lev].ProbLoArray();
+    const auto prob_hi = geom[lev].ProbHiArray();
+    const auto dx = geom[lev].CellSizeArray();
+
+    const auto rho0_loc = rho_0;
+
+    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        const int r = AMREX_SPACEDIM == 2 ? j : k;
+
+        const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
+        const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+        const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
+
+#if (AMREX_SPACEDIM == 2) 
+        Real fheat = (y < 1.125 * 4.e8) ? std::sin(8.0 * M_PI * (y / 4.e8 - 1.0)) : 0.0;
+#else
+        Real fheat = (z < 1.125 * 4.e8) ? std::sin(8.0 * M_PI * (z / 4.e8 - 1.0)) : 0.0;
+#endif
+
+        Real rhopert = 5.e-5 * rho0_loc * fheat * \
+            (std::sin(3.0 * M_PI * x/4.e8) + 
+             std::cos(M_PI * x/4.e8)) * \
+            (std::sin(3.0 * M_PI * y/4.e8) - 
+             std::cos(M_PI * y/4.e8));
+
+        eos_t eos_state;
+        
+        eos_state.rho = s0_init[lev+max_lev*(r+nrf*Rho)] + rhopert;
+        eos_state.p = p0_init[lev+max_lev*r];
+        for (auto comp = 0; comp < NumSpec; ++comp) {
+            eos_state.xn[comp] = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))] / s0_init[lev+max_lev*(r+nrf*Rho)];
+        }
+
+        eos(eos_input_rp, eos_state);
+
+        // set the scalars using eos_state
+        scal(i,j,k,Rho) = eos_state.rho;
+        scal(i,j,k,RhoH) = eos_state.rho * eos_state.h;
+        scal(i,j,k,Temp) = eos_state.T;
+        for (auto comp = 0; comp < NumSpec; ++comp) {
+            scal(i,j,k,FirstSpec+comp) = eos_state.xn[comp] * eos_state.rho;
+        }
+        // initialize pi to zero for now
+        scal(i,j,k,Pi) = 0.0;
+    });    
+}
+
+void
+Maestro::InitLevelDataSphr(const int lev, const Real time, 
+                       const MFIter& mfi, MultiFab& scal, MultiFab& vel, 
+                       const RealVector& s0_init, 
+                       const RealVector& p0_init)
+{
+    Abort("InitLevelDataSphr not implemented");
+}
