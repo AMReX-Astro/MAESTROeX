@@ -55,10 +55,3 @@ matrix:
       if: type = pull_request OR type = api OR type = cron
       script:
         - ./Util/scripts/pr_tab_remover.sh
-# deploy:
-#   provider: pages
-#   skip-cleanup: true
-#   github-token: $GITHUB_TOKEN
-#   keep-history: true
-#   on:
-#     branch: master

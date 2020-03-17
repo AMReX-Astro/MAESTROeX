@@ -9,7 +9,7 @@ TARGET_BRANCH="gh-pages"
 
 # Pull requests and commits to other branches shouldn't try to deploy
 if [ "$TRAVIS_PULL_REQUEST" != "false" ] || { [ "$TRAVIS_BRANCH" != "$MASTER_BRANCH" ] && [ "$TRAVIS_BRANCH" != "$DEV_BRANCH" ]; }; then
-    echo "Skipping deploy on $TRAVIS_BRANCH. We only deploy docs automatically from development."
+    echo "Skipping deploy on $TRAVIS_BRANCH. We only deploy docs automatically from development and master."
     exit 0
 fi
 
