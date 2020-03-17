@@ -7,6 +7,7 @@ CEXE_sources += MaestroAdvanceSdc.cpp
 CEXE_sources += MaestroAdvectBase.cpp
 CEXE_sources += MaestroAdvection.cpp
 CEXE_sources += MaestroAverage.cpp
+CEXE_sources += MaestroBaseState.cpp
 CEXE_sources += MaestroBaseStateGeometry.cpp
 CEXE_sources += MaestroBCFill.cpp
 CEXE_sources += MaestroCelltoEdge.cpp
@@ -25,6 +26,7 @@ CEXE_sources += MaestroForce.cpp
 CEXE_sources += MaestroGamma.cpp
 CEXE_sources += MaestroHeating.cpp
 CEXE_sources += MaestroInit.cpp
+CEXE_sources += MaestroInletBCs.cpp
 CEXE_sources += MaestroIntra.cpp
 CEXE_sources += MaestroMacProj.cpp
 CEXE_sources += MaestroMakeBeta0.cpp
@@ -52,7 +54,9 @@ CEXE_sources += MaestroVelPred.cpp
 
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroBCThreads.H
+CEXE_headers += MaestroInletBCs.H
 CEXE_headers += MaestroPlot.H
+CEXE_headers += MaestroUtil.H
 CEXE_headers += PhysBCFunctMaestro.H
 
 FEXE_headers += Maestro_F.H

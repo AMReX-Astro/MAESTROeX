@@ -2,12 +2,15 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
+using namespace InletBCs;
 
 void
 Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx, 
                     const Box& domainBox, const Real* dx, 
-                    const BCRec bcs, 
+                    const BCRec bcs,
                     const Real* gridlo, const int comp)
 {
     // timer for profiling
@@ -22,7 +25,8 @@ void
 Maestro::VelFill(const Array4<Real>& vel, 
                  const Box& bx, const Box& domainBox, 
                  const Real* dx, 
-                 const BCRec bcs, const Real * gridlo, const int comp)
+                 const BCRec bcs,
+                 const Real * gridlo, const int comp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelFill()", VelFill);
@@ -34,7 +38,7 @@ Maestro::VelFill(const Array4<Real>& vel,
 
 void
 Maestro::FillExtBC(const Array4<Real>& q, const Box& bx, 
-                   const Box& domainBox, const BCRec bcs, 
+                   const Box& domainBox, const BCRec bcs,
                    const int comp, const bool is_vel)
 {
     // timer for profiling
@@ -51,17 +55,13 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     if (!found_ext_boundary) return;
 
     // get parameters for EXT_DIR bcs
-    RealVector ext_bcs(NumSpec+4, 0.0);
-    ext_bcs.shrink_to_fit();
-    get_inlet_bcs(ext_bcs.dataPtr());
-
-    Real INLET_RHO = ext_bcs[0];
-    Real INLET_RHOH = ext_bcs[1];
-    Real INLET_TEMP = ext_bcs[2];
-    RealVector INLET_RHOX(NumSpec);
+    const Real INLET_RHO_l = INLET_RHO;
+    const Real INLET_RHOH_l = INLET_RHOH;
+    const Real INLET_TEMP_l = INLET_TEMP;
+    RealVector INLET_RHOX_l(NumSpec);
     for (int i=0; i<NumSpec; ++i)
-	INLET_RHOX[i] = ext_bcs[3+i];
-    Real INLET_VEL = ext_bcs[3+NumSpec];
+        INLET_RHOX_l[i] = INLET_RHOX[i];
+    const Real INLET_VEL_l = INLET_VEL;
     
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();

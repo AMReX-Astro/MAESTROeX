@@ -2,7 +2,10 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
+using namespace InletBCs;
 
 void
 Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx, 

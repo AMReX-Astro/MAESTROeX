@@ -5,8 +5,6 @@
 #include <omp.h>
 #endif
 
-#include <state_indices.H>
-
 #include <AMReX_AmrCore.H>
 #include <AMReX_FillPatchUtil.H>
 #include <AMReX_FluxRegister.H>
@@ -18,7 +16,11 @@
 #include <network.H>
 #include <eos.H>
 
+#include <state_indices.H>
+#include <ModelParser.H>
+#include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
+// #include <MaestroInletBCs.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -282,6 +284,18 @@ public:
     ////////////
 
     ////////////
+    // MaestroBaseState.cpp functions
+
+    void InitBaseState(RealVector& s0_init, RealVector& p0_init, 
+                       RealVector& rho0, RealVector& rhoh0, 
+                       RealVector& p0, RealVector& tempbar, 
+                       RealVector& tempbar_init,
+                       const int lev);
+
+    // end MaestroBaseState.cpp functions
+    ////////////
+
+    ////////////
     // MaestroBaseStateGeometry.cpp functions
 
     void InitBaseStateGeometry(const int max_radial_level_in, 
@@ -310,20 +324,20 @@ public:
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
                     const amrex::Real* dx, 
-                    const amrex::BCRec bcs, 
+                    const amrex::BCRec bcs,
                     const amrex::Real* gridlo, const int comp);
 
     static void VelFill(const amrex::Array4<amrex::Real>& vel, 
                     const amrex::Box& bx, 
                     const amrex::Box& domainBox,
                     const amrex::Real* dx, 
-                    const amrex::BCRec bcs, 
+                    const amrex::BCRec bcs,
                     const amrex::Real * gridlo, const int comp=0);
 
     static void FillExtBC(const amrex::Array4<amrex::Real>& q, 
                    const amrex::Box& bx, 
                    const amrex::Box& domainBox, 
-                   const amrex::BCRec bcs, 
+                   const amrex::BCRec bcs,
                    const int comp, const bool is_vel=false);
 
     // end MaestroBCFill.cpp functions
@@ -740,6 +754,15 @@ public:
     void InitIter ();
 
     // end MaestroInit.cpp functions
+    ////////////
+
+    ////////////
+    // MaestroInletBC.cpp functions
+
+    /// Calculate the horizontal average of \f$\Gamma_1\f$
+    void SetInletBCs();
+
+    // end InletBC.cpp functions
     ////////////
 
     ////////////
@@ -1828,6 +1851,12 @@ public:
 
     /// number of ghost cells needed for hyperbolic step
     int ng_adv;
+
+    // model file
+    ModelParser input_model;
+
+    // log file 
+    SimpleLog log_file;
 
     // array of multifabs to store the solution at each level of refinement
     // after advancing a level we use "swap" to change pointers to old/new
