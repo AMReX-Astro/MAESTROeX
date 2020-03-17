@@ -1474,9 +1474,9 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 
                 for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
                     radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal_arr(i,j,k,n);
-		}
-		
-		for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                }
+                
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
                     Real circ_comp = vel_arr(i,j,k,n) - radvel_arr(i,j,k) * normal_arr(i,j,k,n);
                     circvel_arr(i,j,k) += circ_comp * circ_comp;
                 }
