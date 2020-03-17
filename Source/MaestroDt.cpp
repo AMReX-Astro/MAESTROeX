@@ -155,7 +155,7 @@ Maestro::EstDt ()
                     tmp[mfi].setVal(0.0, tileBox, 0, 1); 
 #if (AMREX_SPACEDIM == 2)
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                        spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k) + w0_arr(i,j+1,k));
+			    spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
                     });
                     Real spdy = tmp[mfi].maxabs(tileBox, 0);
                     Real spdz = 0.0;
@@ -163,7 +163,7 @@ Maestro::EstDt ()
                     Real spdy = uold[lev][mfi].maxabs(tileBox, 1);
 
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                        spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k) + w0_arr(i,j,k+1));
+			    spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     });
                     Real spdz = tmp[mfi].maxabs(tileBox, 0);
 #endif
@@ -532,7 +532,7 @@ Maestro::FirstDt ()
 
                 Real ux = uold[lev][mfi].maxabs(tileBox, 0);
                 Real uy = uold[lev][mfi].maxabs(tileBox, 1);
-                Real uz = AMREX_SPACEDIM == 2 ? 0.1*uy/dx[1] : uold[lev][mfi].maxabs(tileBox, 2);
+                Real uz = AMREX_SPACEDIM == 2 ? 0.1*uy : uold[lev][mfi].maxabs(tileBox, 2);
 
                 umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
 
@@ -543,8 +543,8 @@ Maestro::FirstDt ()
                 Real spdy = spd.max(tileBox, 0) / dx[1];
                 Real pforcey = vel_force[lev][mfi].maxabs(tileBox, 1);
                 Real spdz = spdy * 0.1; // for 2d make sure this is < spdy
+                uz /= AMREX_SPACEDIM == 2 ? dx[1] : dx[2];
 #if (AMREX_SPACEDIM == 3)
-                uz /= dx[2];
                 spdz = spd.max(tileBox, 0) / dx[2];
                 Real pforcez = vel_force[lev][mfi].maxabs(tileBox, 2);
 #endif
@@ -598,7 +598,7 @@ Maestro::FirstDt ()
 #else 
                             if (k == 0) {
                                 gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
-                            } else if (j == nr_lev-1) {
+                            } else if (k == nr_lev-1) {
                                 gradp0 = (p0_arr(i,j,k) - p0_arr(i,j,k-1)) / dx[2];
                             } else {
                                 gradp0 = 0.5*(p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
