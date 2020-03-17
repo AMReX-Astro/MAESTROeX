@@ -1426,9 +1426,9 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
                 const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    Real u_total = vel_arr(i,j,k,0) + 0.5 * (w0macx(i,j,k,0) + w0macx(i+1,j,k,0));
-                    Real v_total = vel_arr(i,j,k,1) + 0.5 * (w0macy(i,j,k,1) + w0macy(i,j+1,k,1));
-                    Real w_total = vel_arr(i,j,k,2) + 0.5 * (w0macz(i,j,k,2) + w0macz(i,j,k+1,2));
+                    Real u_total = vel_arr(i,j,k,0) + 0.5 * (w0macx(i,j,k) + w0macx(i+1,j,k));
+                    Real v_total = vel_arr(i,j,k,1) + 0.5 * (w0macy(i,j,k) + w0macy(i,j+1,k));
+                    Real w_total = vel_arr(i,j,k,2) + 0.5 * (w0macz(i,j,k) + w0macz(i,j,k+1));
                     magvel_arr(i,j,k) = sqrt(u_total*u_total + 
                         v_total*v_total + w_total*w_total);
                 });
@@ -1474,7 +1474,10 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 
                 for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
                     radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal_arr(i,j,k,n);
-                    Real circ_comp = (vel_arr(i,j,k,n) - radvel_arr(i,j,k)) * normal_arr(i,j,k,n);
+		}
+		
+		for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    Real circ_comp = vel_arr(i,j,k,n) - radvel_arr(i,j,k) * normal_arr(i,j,k,n);
                     circvel_arr(i,j,k) += circ_comp * circ_comp;
                 }
 
