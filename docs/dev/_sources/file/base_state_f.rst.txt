@@ -1,8 +1,0 @@
-base_state.F90
-==============
-
-base\_state\_module
--------------------
-
-.. f:automodule:: base_state_module
-

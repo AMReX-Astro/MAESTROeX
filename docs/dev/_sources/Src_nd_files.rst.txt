@@ -5,7 +5,6 @@ Src_nd
    :maxdepth: 2
 
    file/average_f
-   file/base_state_f
    file/base_state_geometry_f
    file/burner_loop_f
    file/compute_dt_f
