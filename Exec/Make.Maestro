@@ -69,7 +69,8 @@ Bdirs 	:= Source \
            Source/param_includes \
            constants \
            Util/model_parser \
-           Util/simple_log
+           Util/simple_log \
+           Util/utils
 
 # add / define any special physics we need
 #
