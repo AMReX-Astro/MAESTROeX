@@ -38,7 +38,7 @@ Maestro::InitLevelData(const int lev, const Real time,
 
 void
 Maestro::InitLevelDataSphr(const int lev, const Real time, 
-                       const MFIter& mfi, MultiFab& scal, MultiFab& vel)
+                           MultiFab& scal, MultiFab& vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
