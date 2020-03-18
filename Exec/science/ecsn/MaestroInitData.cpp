@@ -39,10 +39,10 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     // if we are spherical, we want to make sure that p0 is good, since that is
     // what is needed for HSE.  Therefore, we will put p0 onto a cart array and
     // then initialize h from rho, X, and p0.
-    Vector<MultiFab> p0_cart(finest_level);
+    Vector<MultiFab> p0_cart(finest_level+1);
 
     // make a temporary MultiFab and RealVector to hold the cartesian data then copy it back to scal 
-    Vector<MultiFab> temp_mf(finest_level);
+    Vector<MultiFab> temp_mf(finest_level+1);
 
     for (auto i = 0; i <= finest_level; ++i) {
         p0_cart[i].define(grids[lev], dmap[lev], 1, ng_s);
@@ -142,7 +142,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
         const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
-        const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[1];
+        const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
 
         // set perturbational velocity to zero
         Real vpert[3];

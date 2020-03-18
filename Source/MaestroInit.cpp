@@ -104,7 +104,7 @@ Maestro::Init ()
     compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
 
-    if (spherical == 1) {
+    if (spherical) {
         MakeNormal();
         MakeCCtoRadii();
     }
@@ -361,48 +361,78 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     MultiFab& vel = uold[lev];
     MultiFab& cc_to_r = cell_cc_to_r[lev];
 
-    // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+    if (!spherical) {
+
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
-    {
-        const Box& tilebox = mfi.tilebox();
-        const int* lo  = tilebox.loVect();
-        const int* hi  = tilebox.hiVect();
+        for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        {
+            const Box& tilebox = mfi.tilebox();
+            const int* lo  = tilebox.loVect();
+            const int* hi  = tilebox.hiVect();
 
-        const Array4<Real> scal_arr = scal.array(mfi);
-        const Array4<Real> vel_arr = vel.array(mfi);
+            const Array4<Real> scal_arr = scal.array(mfi);
+            const Array4<Real> vel_arr = vel.array(mfi);
 
-        const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-        const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
+            const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+            const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
 
-        if (spherical == 0) {
             InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
             // initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
             //          BL_TO_FORTRAN_FAB(scal[mfi]),
             //          BL_TO_FORTRAN_FAB(vel[mfi]),
             //          s0_init.dataPtr(), p0_init.dataPtr(),
             //          ZFILL(dx));
-        } else {
+        }
+
+    } else {
+#if (AMREX_SPACEDIM == 3)
+        const auto dx_fine_vec = geom[max_level].CellSizeArray();
+        const auto dx_lev = geom[lev].CellSizeArray();
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        {
+            const Box& tilebox = mfi.tilebox();
+            const int* lo  = tilebox.loVect();
+            const int* hi  = tilebox.hiVect();
             init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi), 
                                      BL_TO_FORTRAN_3D(cc_to_r[mfi]),
                                      ZFILL(dx_fine),
                                      ZFILL(dx));
 
-            initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-                          BL_TO_FORTRAN_FAB(scal[mfi]),
-                          BL_TO_FORTRAN_FAB(vel[mfi]),
-                          s0_init.dataPtr(), p0_init.dataPtr(),
-                          ZFILL(dx),
-                          r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-                          BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+            InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
         }
+
+        InitLevelDataSphr(lev, t_old, scal, vel);
+
+// #ifdef _OPENMP
+// #pragma omp parallel
+// #endif
+//         for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+//         {
+//             const Box& tilebox = mfi.tilebox();
+//             const int* lo  = tilebox.loVect();
+//             const int* hi  = tilebox.hiVect();
+//             initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+//                           BL_TO_FORTRAN_FAB(scal[mfi]),
+//                           BL_TO_FORTRAN_FAB(vel[mfi]),
+//                           s0_init.dataPtr(), p0_init.dataPtr(),
+//                           ZFILL(dx),
+//                           r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+//                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+//         }
+#endif        
     }
 
     if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
+
+    // exit(0);
 }
 
 

@@ -10,8 +10,8 @@ using namespace amrex;
 void
 Maestro::Put1dArrayOnCart (const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const Vector<BCRec>& bcs,
                            const int sbccomp, int variable_type)
 {
@@ -41,19 +41,28 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 }
 
 void
-Maestro::Put1dArrayOnCart (int lev,
+Maestro::Put1dArrayOnCart (const int lev,
                            const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const Vector<BCRec>& bcs,
+                           const int sbccomp)
+{
+    Put1dArrayOnCart(lev, s0, s0_cart[lev], is_input_edge_centered, is_output_a_vector, bcs, sbccomp);
+}
+
+void
+Maestro::Put1dArrayOnCart (const int lev,
+                           const RealVector& s0,
+                           MultiFab& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const Vector<BCRec>& bcs,
                            const int sbccomp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
-
-    // get references to the MultiFabs at level lev
-    MultiFab& s0_cart_mf = s0_cart[lev];
 
     const auto dx = geom[lev].CellSizeArray();
     const auto prob_lo = geom[lev].ProbLoArray();
@@ -75,12 +84,12 @@ Maestro::Put1dArrayOnCart (int lev,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for ( MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+    for ( MFIter mfi(s0_cart, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
         // Get the index space of the valid region
         const Box& tileBox = mfi.tilebox();
 
-        const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
+        const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
 
         if (spherical == 0) {
 

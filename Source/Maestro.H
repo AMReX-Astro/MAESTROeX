@@ -622,8 +622,8 @@ public:
     /// @param sbccomp      start boundary conditions component
     void Put1dArrayOnCart (const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            const int sbccomp = 0, int variable_type=0);
 
@@ -636,10 +636,26 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (int level, const RealVector& s0,
+    void Put1dArrayOnCart (const int level, const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
+
+       /// Maps 1d arrays onto multi-D cartesian MultiFabs
+    ///
+    /// @param level        AMR level to perform calculation on
+    /// @param s0           1d base state
+    /// @param s0_cart      base state mapped to multi-d cartesian MultiFab
+    /// @param is_input_edge_centered   is the input edge-centered?
+    /// @param is_output_a_vector       is the output a vector?
+    /// @param bcs          boundary conditions
+    /// @param sbccomp      start boundary conditions component
+    void Put1dArrayOnCart (const int level, const RealVector& s0,
+                           amrex::MultiFab& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
 
@@ -764,16 +780,13 @@ public:
                        const amrex::MFIter& mfi, 
                        const amrex::Array4<amrex::Real> scal, 
                        const amrex::Array4<amrex::Real> vel, 
-                       const Real* s0_init, 
-                       const Real* p0_init);
+                       const Real* s0_p, 
+                       const Real* p0_p);
 
     void InitLevelDataSphr(const int lev,
                        const amrex::Real time, 
-                       const amrex::MFIter& mfi, 
                        MultiFab& scal, 
-                       MultiFab& vel, 
-                       const RealVector& s0_init, 
-                       const RealVector& p0_init);
+                       MultiFab& vel);
 
     // end MaestroInitData.cpp functions
     ////////////
