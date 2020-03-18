@@ -517,7 +517,7 @@ Maestro::PlotFileMF (const int nPlot,
             // in the case that there are zeros rho0
             MultiFab& plot_mf_data_mf = *plot_mf_data[i];
             for ( MFIter mfi(plot_mf_data_mf); mfi.isValid(); ++mfi ) {
-                plot_mf_data_mf[mfi].protected_divide(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
+                plot_mf_data_mf[mfi].protected_divide<RunOn::Device>(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
             }
 
             plot_mf_data[i]->copy(p0_cart[i],0,dest_comp+3,1);
