@@ -42,7 +42,7 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
             center[i] = 0.0;
         }
     } else {
-        for (auto i = 0; i < 3; ++i) {
+        for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
             center[i] = 0.5*(probLo[i] + probHi[i]);
         }
     }
