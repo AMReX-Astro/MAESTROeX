@@ -2155,7 +2155,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
-                const Real* dx = geom[lev].CellSize();
+                const auto dx = geom[lev].CellSizeArray();
                 
                 const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
                 const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
