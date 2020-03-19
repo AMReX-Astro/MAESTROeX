@@ -74,11 +74,11 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(0) == BCType::ext_dir) {
             
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                    if (i < imax) {
-                        q(i,j,k) = 1.0;
-                    }
-                });
+			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+				if (i < imax) {
+					q(i,j,k) = 1.0;
+				}
+			});
         }
     }
 
@@ -86,12 +86,11 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto imin = domhi[0]+1;
 
         if (bcs.hi(0) == BCType::ext_dir) {
-	    
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                    if (i > imin) {
-                        q(i,j,k) = 1.0;
-                    }
-                });
+			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+				if (i > imin) {
+					q(i,j,k) = 1.0;
+				}
+			});
         }
     }
 
@@ -99,62 +98,62 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto jmax = domlo[1];
 
         if (bcs.lo(1) == BCType::ext_dir) {
-	    if (is_vel) {
-		if (comp == 0) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (j < jmax) {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == 1) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (j < jmax) {
-			    q(i,j,k) = INLET_VEL;
-			}
-		    });
-		}
-	    } else {
-		if (INLET_VEL != 0.0) {
-		    if (comp == Rho) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (j < jmax) {
-				q(i,j,k) = INLET_RHO;
-			    }
-			});
-		    } else if (comp == RhoH) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (j < jmax) {
-				q(i,j,k) = INLET_RHOH;
-			    }
-			});
-		    } else if (comp >= FirstSpec && comp < FirstSpec+NumSpec) {
-			Real * AMREX_RESTRICT INLET_RHOX_p = INLET_RHOX.dataPtr();
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (j < jmax) {
-				q(i,j,k) = INLET_RHOX_p[comp-FirstSpec];
-			    }
-			});
-		    } else if (comp == Temp) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (j < jmax) {
-				q(i,j,k) = INLET_TEMP;
-			    }
-			});
-		    } else {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (j < jmax) {
-				q(i,j,k) = 0.0;
-			    }
-			});
-		    } 
-		} else {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (j < jmax) {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		}
-	    } // end if is_vel
+			if (is_vel) {
+				if (comp == 0) {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (j < jmax) {
+							q(i,j,k) = 0.0;
+						}
+					});
+				} else if (comp == 1) {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (j < jmax) {
+							q(i,j,k) = INLET_VEL_l;
+						}
+					});
+				}
+			} else {
+				if (INLET_VEL != 0.0) {
+					if (comp == Rho) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (j < jmax) {
+								q(i,j,k) = INLET_RHO_l;
+							}
+						});
+					} else if (comp == RhoH) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (j < jmax) {
+								q(i,j,k) = INLET_RHOH_l;
+							}
+						});
+					} else if (comp >= FirstSpec && comp < FirstSpec+NumSpec) {
+						Real * AMREX_RESTRICT INLET_RHOX_p = INLET_RHOX.dataPtr();
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (j < jmax) {
+								q(i,j,k) = INLET_RHOX_p[comp-FirstSpec];
+							}
+						});
+					} else if (comp == Temp) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (j < jmax) {
+								q(i,j,k) = INLET_TEMP_l;
+							}
+						});
+					} else {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (j < jmax) {
+								q(i,j,k) = 0.0;
+							}
+						});
+					} 
+				} else {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (j < jmax) {
+							q(i,j,k) = 0.0;
+						}
+					});
+				}
+			} // end if is_vel
         }
     }
 
@@ -167,7 +166,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     q(i,j,k) = 1.0;
                 }
             });
-	} 
+		} 
     }
 
 #if AMREX_SPACEDIM == 3
@@ -176,62 +175,62 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto kmax = domlo[2];
 
         if (bcs.lo(2) == BCType::ext_dir) {
-	    if (is_vel) {
-		if (comp == 0 || comp == 1) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (k < kmax) {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == 2) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (k < kmax) {
-			    q(i,j,k) = INLET_VEL;
-			}
-		    });
-		}
-	    } else {
-		if (INLET_VEL != 0.0) {
-		    if (comp == Rho) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (k < kmax) {
-				q(i,j,k) = INLET_RHO;
-			    }
-			});
-		    } else if (comp == RhoH) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (k < kmax) {
-				q(i,j,k) = INLET_RHOH;
-			    }
-			});
-		    } else if (comp >= FirstSpec && comp < FirstSpec+NumSpec) {
-			Real * AMREX_RESTRICT INLET_RHOX_p = INLET_RHOX.dataPtr();
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (k < kmax) {
-				q(i,j,k) = INLET_RHOX_p[comp-FirstSpec];
-			    }
-			});
-		    } else if (comp == Temp) {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (k < kmax) {
-				q(i,j,k) = INLET_TEMP;
-			    }
-			});
-		    } else {
-			AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			    if (k < kmax) {
-				q(i,j,k) = 0.0;
-			    }
-			});
-		    }
-		} else {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (k < kmax) {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		}
-	    } // end if is_vel
+			if (is_vel) {
+				if (comp == 0 || comp == 1) {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (k < kmax) {
+							q(i,j,k) = 0.0;
+						}
+					});
+				} else if (comp == 2) {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (k < kmax) {
+							q(i,j,k) = INLET_VEL_l;
+						}
+					});
+				}
+			} else {
+				if (INLET_VEL != 0.0) {
+					if (comp == Rho) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (k < kmax) {
+							q(i,j,k) = INLET_RHO_l;
+							}
+						});
+					} else if (comp == RhoH) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (k < kmax) {
+							q(i,j,k) = INLET_RHOH_l;
+							}
+						});
+					} else if (comp >= FirstSpec && comp < FirstSpec+NumSpec) {
+						Real * AMREX_RESTRICT INLET_RHOX_p = INLET_RHOX.dataPtr();
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (k < kmax) {
+								q(i,j,k) = INLET_RHOX_p[comp-FirstSpec];
+							}
+						});
+					} else if (comp == Temp) {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (k < kmax) {
+							q(i,j,k) = INLET_TEMP_l;
+							}
+						});
+					} else {
+						AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+							if (k < kmax) {
+							q(i,j,k) = 0.0;
+							}
+						});
+					}
+				} else {
+					AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+						if (k < kmax) {
+							q(i,j,k) = 0.0;
+						}
+					});
+				}
+			} // end if is_vel
         }
     }
 
@@ -241,10 +240,10 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         if (bcs.hi(2) == BCType::ext_dir) {
             AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                 if (k > kmin) {
-		    q(i,j,k) = 0.0;
+					q(i,j,k) = 0.0;
                 }
             });
-	} 
+		} 
     }
 #endif
 }
