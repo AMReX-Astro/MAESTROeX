@@ -105,24 +105,55 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const Real* dx = geom[lev].CellSize();
 	const Real* dx_fine = geom[max_level].CellSize();
 
-	MultiFab& scal = sold[lev];
-
 	const Box& domainBox = geom[lev].Domain();
+	const auto dom_lo = domainBox.loVect3d();
+	const auto dom_hi = domainBox.hiVect3d();
+
+	const auto xn_hi = dom_hi[2] - dom_lo[2];
+
+	const auto dlogrho = (std::log10(dens_max/dens_min)) / (dom_hi[0] - dom_lo[0]);
+	const auto dlogT = (std::log10(temp_max/temp_min)) / (dom_hi[1] - dom_lo[1]);
+
+	const auto temp_min_l = temp_min;
+	const auto dens_min_l = dens_min;
+
+	GpuArray<Real,NumSpec> xn_zone;
+	// FIXME: need to allocate the xns here
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+	for (MFIter mfi(sold[lev], true); mfi.isValid(); ++mfi)
 	{
 		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
 
-		initdata_thermal(ARLIM_3D(lo), ARLIM_3D(hi),
-		                 BL_TO_FORTRAN_FAB(scal[mfi]),
-		                 ARLIM_3D(domainBox.loVect()), ARLIM_3D(domainBox.hiVect()),
-		                 s0_init.dataPtr(), p0_init.dataPtr(),
-		                 ZFILL(dx));
+		const Array4<Real> scal = sold[lev].array(mfi);
+
+		AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+			// set the temperature 
+			const auto temp_zone = std::pow(10.0, std::log10(temp_min_l) + Real(j) * dlogT);
+
+			// set the density 
+			const auto dens_zone = std::pow(10.0, std::log10(dens_min_l) + Real(i) * dlogrho);
+
+			// call the eos with rho, temp & X as inputs 
+			eos_t eos_state;
+			eos_state.T = temp_zone;
+			eos_state.rho = dens_zone;
+			for (auto comp = 0; comp < NumSpec; ++comp) {
+				eos_state.xn[comp] = xn_zone[comp];
+			}
+
+			eos(eos_input_rt, eos_state);
+
+			// initialize this element of the state 
+			scal(i,j,k,Rho) = dens_zone;
+			scal(i,j,k,RhoH) = dens_zone * eos_state.h;
+			scal(i,j,k,Temp) = temp_zone;
+			for (auto comp = 0; comp < NumSpec; ++comp) {
+				scal(i,j,k,FirstSpec+comp) = dens_zone * xn_zone[comp];
+			}
+		});
 	}
 }

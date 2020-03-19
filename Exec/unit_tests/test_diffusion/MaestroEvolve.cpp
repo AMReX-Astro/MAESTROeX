@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Problem_F.H>
 
 using namespace amrex;
 
@@ -56,16 +55,33 @@ Maestro::Evolve ()
 	// calculate analytic solution
 	for (int lev = 0; lev <= finest_level; ++lev) {
 
-		MultiFab& analytic_mf = analytic[lev];
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-		for ( MFIter mfi(analytic_mf, true); mfi.isValid(); ++mfi ) {
+		for ( MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi ) {
 
-			const Box& tileBox = mfi.tilebox();
-			const Real* dx = geom[lev].CellSize();
+			const auto tileBox = mfi.tilebox();
+			const auto prob_lo = geom[lev].ProbLoArray();
+			const auto dx = geom[lev].CellSizeArray();
+			const Real * AMREX_RESTRICT center_p = center.dataPtr();
+			const Array4<Real> analytic_arr = analytic[lev].array(mfi);
 
-			make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
+			const auto peak_h_loc = peak_h;
+			const auto ambient_h_loc = ambient_h;
+			const auto t0_loc = t0;
+			const auto diff_coeff = diffusion_coefficient;
+
+			AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+				const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0]; 
+				const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1]; 
+
+				const auto dist2 = x*x + y*y;
+
+				analytic_arr(i,j,k) = (peak_h_loc - ambient_h_loc) * \
+					(t0_loc / (t_new+t0_loc)) * \
+					std::exp(-dist2 / (4.0 * diff_coeff * (t_new+t0))) + \
+					ambient_h_loc;
+				});
 		}
 	}
 
@@ -112,16 +128,36 @@ Maestro::Evolve ()
 		// calculate analytic solution
 		for (int lev = 0; lev <= finest_level; ++lev) {
 
-			MultiFab& analytic_mf = analytic[lev];
+			// MultiFab& analytic_mf = analytic[lev];
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(analytic_mf, true); mfi.isValid(); ++mfi ) {
+			for ( MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi ) {
 
-				const Box& tileBox = mfi.tilebox();
-				const Real* dx = geom[lev].CellSize();
+				const auto tileBox = mfi.tilebox();
+				const auto prob_lo = geom[lev].ProbLoArray();
+				const auto dx = geom[lev].CellSizeArray();
+				const Real * AMREX_RESTRICT center_p = center.dataPtr();
+				const Array4<Real> analytic_arr = analytic[lev].array(mfi);
 
-				make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
+				const auto peak_h_loc = peak_h;
+				const auto ambient_h_loc = ambient_h;
+				const auto t0_loc = t0;
+				const auto diff_coeff = diffusion_coefficient;
+
+				AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+					const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0]; 
+					const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1]; 
+
+					const auto dist2 = x*x + y*y;
+
+					analytic_arr(i,j,k) = (peak_h_loc - ambient_h_loc) * \
+						(t0_loc / (t_new+t0_loc)) * \
+						std::exp(-dist2 / (4.0 * diff_coeff * (t_new+t0))) + \
+						ambient_h_loc;
+				});
+
+				// make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
 			}
 		}
 

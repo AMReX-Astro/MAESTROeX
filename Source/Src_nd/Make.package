@@ -18,5 +18,3 @@ F90EXE_sources += regrid.F90
 F90EXE_sources += rotation.F90
 F90EXE_sources += sponge.F90
 F90EXE_sources += tagging.F90
-
-F90EXE_sources += initdata.F90
