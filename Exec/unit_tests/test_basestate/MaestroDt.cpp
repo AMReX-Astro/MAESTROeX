@@ -82,73 +82,53 @@ Maestro::EstDt ()
         Real umax_lev = 0.;
 
         // get references to the MultiFabs at level lev
-        MultiFab& uold_mf = uold[lev];
-        MultiFab& sold_mf = sold[lev];
-        MultiFab& vel_force_mf = vel_force[lev];
-        MultiFab& S_cc_old_mf = S_cc_old[lev];
-        MultiFab& dSdt_mf = dSdt[lev];
-#if (AMREX_SPACEDIM == 3)
-        MultiFab& w0macx_mf = w0mac[lev][0];
-        MultiFab& w0macy_mf = w0mac[lev][1];
-        MultiFab& w0macz_mf = w0mac[lev][2];
-        const MultiFab& gp0_cart_mf = gp0_cart[lev];
-#endif
 	const MultiFab& w0_mf = w0_cart[lev];
-	const MultiFab& p0_mf = p0_cart[lev];
-	const MultiFab& gamma1bar_mf = gamma1bar_cart[lev];
-
+	
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) reduction(max:umax_lev)
 #endif
-        for ( MFIter mfi(uold_mf, true); mfi.isValid(); ++mfi ) {
+	{
+	Real dt_grid = dt;
+	Real umax_grid = 0.;
+	const Real SMALL = 1.0e-12;
 
-            Real dt_grid = dt;
-            Real umax_grid = 0.;
+        for ( MFIter mfi(uold[lev], true); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
 
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 0) {
-                estdt(lev,&dt_grid,&umax_grid,
-                      ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                      ZFILL(dx),
-                      BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                      BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                      BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                      BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
-                      BL_TO_FORTRAN_3D(w0_mf[mfi]),
-                      BL_TO_FORTRAN_3D(p0_mf[mfi]),
-                      BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]));
+	    const Real prob_lo = geom[lev].ProbLo()[0];
+	    const Real prob_hi = geom[lev].ProbHi()[0];
+	    Real dr_fine_loc;
+	    
+	    if (spherical == 0) {
+		const Real maxw0 = w0_mf[mfi].maxabs(tileBox, AMREX_SPACEDIM-1);
+
+		dr_fine_loc = (prob_hi - prob_lo)/nr_fine;
+                dt_grid = std::min(1.1 * dt_grid, cfl * dr_fine_loc / (maxw0 + SMALL));
+		
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                estdt_sphr(&dt_grid,&umax_grid,
-                           ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                           ZFILL(dx),
-                           BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                           BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                           BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                           BL_TO_FORTRAN_3D(dSdt_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macx_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macy_mf[mfi]),
-                           BL_TO_FORTRAN_3D(w0macz_mf[mfi]),
-			   BL_TO_FORTRAN_3D(gp0_cart_mf[mfi]));
-#else
-                // Abort("EstDt: Spherical is not valid for DIM < 3");
+                const Real maxw0 = w0_mf[mfi].maxabs(tileBox, 0);
+		
+		if (prob_type == 1 || prob_type == 3 || prob_type == 4) {
+		    dr_fine_loc = (prob_hi - prob_lo)/nr_fine; 
+		} else {
+		    // need to compute it this way to agree with how the initial model
+		    // was computed
+		    dr_fine_loc = prob_hi * dx[0] / drdxfac;
+		}
+		
+		dt_grid = std::min(1.1 * dt_grid, cfl * dr_fine_loc / (maxw0 + SMALL));
 #endif
             }
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
+	} // end openmp
         }
 
         // find the smallest dt over all processors
@@ -285,42 +265,8 @@ Maestro::FirstDt ()
 #endif
         for ( MFIter mfi(sold_mf); mfi.isValid(); ++mfi ) {
 
-            Real dt_grid = dt;
+            Real dt_grid = initial_dt;
             Real umax_grid = 0.;
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            const Real* dx = geom[lev].CellSize();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 0 ) {
-                firstdt(lev,&dt_grid,&umax_grid,
-                        ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                        ZFILL(dx),
-                        BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                        BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                        BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                        BL_TO_FORTRAN_3D(p0_mf[mfi]),
-                        BL_TO_FORTRAN_3D(gamma1bar_mf[mfi]));
-            } else {
-#if (AMREX_SPACEDIM == 3)
-                firstdt_sphr(&dt_grid,&umax_grid,
-                             ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
-                             ZFILL(dx),
-                             BL_TO_FORTRAN_FAB(sold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(uold_mf[mfi]),
-                             BL_TO_FORTRAN_FAB(vel_force_mf[mfi]),
-                             BL_TO_FORTRAN_3D(S_cc_old_mf[mfi]),
-                             BL_TO_FORTRAN_3D(gp0_cart_mf[mfi]));
-#else
-		Abort("FirstDt: Spherical is not valid for DIM < 3");
-#endif 
-            }
 
             dt_lev = std::min(dt_lev,dt_grid);
             umax_lev = std::max(umax_lev,umax_grid);
