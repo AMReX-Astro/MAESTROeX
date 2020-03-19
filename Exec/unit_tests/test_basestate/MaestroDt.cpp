@@ -104,7 +104,7 @@ Maestro::EstDt ()
 	    Real dr_fine_loc;
 	    
 	    if (spherical == 0) {
-		const Real maxw0 = w0_mf[mfi].maxabs(tileBox, AMREX_SPACEDIM-1);
+		const Real maxw0 = w0_mf[mfi].maxabs<RunOn::Device>(tileBox, AMREX_SPACEDIM-1);
 
 		dr_fine_loc = (prob_hi - prob_lo)/nr_fine;
                 dt_grid = std::min(1.1 * dt_grid, cfl * dr_fine_loc / (maxw0 + SMALL));
@@ -112,7 +112,7 @@ Maestro::EstDt ()
             } else {
 
 #if (AMREX_SPACEDIM == 3)
-                const Real maxw0 = w0_mf[mfi].maxabs(tileBox, 0);
+                const Real maxw0 = w0_mf[mfi].maxabs<RunOn::Device>(tileBox, 0);
 		
 		if (prob_type == 1 || prob_type == 3 || prob_type == 4) {
 		    dr_fine_loc = (prob_hi - prob_lo)/nr_fine; 

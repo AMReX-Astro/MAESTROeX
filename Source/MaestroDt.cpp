@@ -151,23 +151,23 @@ Maestro::EstDt ()
                     const Real eps = 1.e-8;
                     const auto ng = 0;
 
-                    Real spdx = uold[lev][mfi].maxabs(tileBox, 0);                 
-                    tmp[mfi].setVal(0.0, tileBox, 0, 1); 
+                    Real spdx = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);                 
+                    tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 1); 
 #if (AMREX_SPACEDIM == 2)
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
                     });
-                    Real spdy = tmp[mfi].maxabs(tileBox, 0);
+                    Real spdy = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
                     Real spdz = 0.0;
 #else 
-                    Real spdy = uold[lev][mfi].maxabs(tileBox, 1);
+                    Real spdy = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
 
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     });
-                    Real spdz = tmp[mfi].maxabs(tileBox, 0);
+                    Real spdz = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
 #endif
-                    Real spdr = w0_cart[lev][mfi].maxabs(tileBox, AMREX_SPACEDIM-1);
+                    Real spdr = w0_cart[lev][mfi].maxabs<RunOn::Device>(tileBox, AMREX_SPACEDIM-1);
 
                     umax_grid = amrex::max(umax_grid, std::max(spdx,std::max(spdy,std::max(spdz,spdr))));
 
@@ -179,10 +179,10 @@ Maestro::EstDt ()
                     dt_temp *= cfl;
 
                     // Limit dt based on forcing terms
-                    Real fx = vel_force[lev][mfi].maxabs(tileBox, 0);
-                    Real fy = vel_force[lev][mfi].maxabs(tileBox, 1);
+                    Real fx = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);
+                    Real fy = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
 #if (AMREX_SPACEDIM == 3)                    
-                    Real fz = vel_force[lev][mfi].maxabs(tileBox, 2);
+                    Real fz = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 #endif
 
                     if (fx > eps) dt_temp = amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
@@ -195,7 +195,7 @@ Maestro::EstDt ()
 
                     const auto nr_lev = nr[lev];
 
-                    tmp[mfi].setVal(1.e99, tileBox, 1, 1);
+                    tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 1, 1);
 
                     // divU constraint
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
@@ -225,11 +225,11 @@ Maestro::EstDt ()
                         }
                     });
 
-                    dt_temp = tmp[mfi].min(tileBox, 1);
+                    dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 1);
                     
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
-                    tmp[mfi].setVal(1.e99, tileBox, 2, 1);
+                    tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 2, 1);
 
                     // An additional dS/dt timestep constraint originally
                     // used in nova
@@ -247,7 +247,7 @@ Maestro::EstDt ()
                         }
                     });
 
-                    dt_temp = tmp[mfi].min(tileBox, 2);
+                    dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 2);
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
                 } else {
@@ -265,23 +265,23 @@ Maestro::EstDt ()
 
                     const Array4<Real> spd = tmp.array(mfi);
 
-                    tmp[mfi].setVal(0.0, tileBox, 0, 3);
+                    tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 3);
 
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                         spd(i,j,k,0) = u(i,j,k,0) + 0.5*(w0macx(i,j,k)+w0macx(i+1,j,k));
                     });
-                    Real spdx = tmp[mfi].maxabs(tileBox, 0);
+                    Real spdx = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
                     
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                         spd(i,j,k,1) = u(i,j,k,1) + 0.5*(w0macy(i,j,k)+w0macy(i,j+1,k));
                     });
-                    Real spdy = tmp[mfi].maxabs(tileBox, 1);
+                    Real spdy = tmp[mfi].maxabs<RunOn::Device>(tileBox, 1);
 
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                         spd(i,j,k,2) = u(i,j,k,2) + 0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
                     });
-                    Real spdz = tmp[mfi].maxabs(tileBox, 2);
-                    Real spdr = w0_cart[lev][mfi].maxabs(tileBox, 0);          
+                    Real spdz = tmp[mfi].maxabs<RunOn::Device>(tileBox, 2);
+                    Real spdr = w0_cart[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);          
 
                     umax_grid = amrex::max(umax_grid, std::max(spdx,std::max(spdy,std::max(spdz,spdr))));
 
@@ -293,9 +293,9 @@ Maestro::EstDt ()
                     dt_temp *= cfl;
 
                     // Limit dt based on forcing terms
-                    Real fx = vel_force[lev][mfi].maxabs(tileBox, 0);
-                    Real fy = vel_force[lev][mfi].maxabs(tileBox, 1);              
-                    Real fz = vel_force[lev][mfi].maxabs(tileBox, 2);
+                    Real fx = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);
+                    Real fy = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);              
+                    Real fz = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
                     if (fx > eps) dt_temp = amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
                     if (fy > eps) dt_temp = amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
@@ -303,7 +303,7 @@ Maestro::EstDt ()
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
-                    tmp[mfi].setVal(1.e50, tileBox, 3, 2);
+                    tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 3, 2);
 
                     // divU constraint
                     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -319,7 +319,7 @@ Maestro::EstDt ()
                         }
                     });
 
-                    dt_temp = tmp[mfi].min(tileBox, 3);
+                    dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 3);
 
                     dt_grid = amrex::min(dt_grid, dt_temp);                    
 
@@ -339,7 +339,7 @@ Maestro::EstDt ()
                         }
                     });
 
-                    dt_temp = tmp[mfi].min(tileBox, 4);
+                    dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 4);
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 #else
@@ -512,7 +512,7 @@ Maestro::FirstDt ()
 
                 const Array4<Real> spd_arr = spd.array();
 
-                spd.setVal(0.0, tileBox, 0, 1);
+                spd.setVal<RunOn::Device>(0.0, tileBox, 0, 1);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;
@@ -530,23 +530,23 @@ Maestro::FirstDt ()
                     spd_arr(i,j,k) = eos_state.cs;
                 });
 
-                Real ux = uold[lev][mfi].maxabs(tileBox, 0);
-                Real uy = uold[lev][mfi].maxabs(tileBox, 1);
-                Real uz = AMREX_SPACEDIM == 2 ? 0.1*uy : uold[lev][mfi].maxabs(tileBox, 2);
+                Real ux = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);
+                Real uy = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
+                Real uz = AMREX_SPACEDIM == 2 ? 0.1*uy : uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
                 umax_grid = amrex::max(umax_grid, std::max(ux,std::max(uy,uz)));
 
                 ux /= dx[0];
-                Real spdx = spd.max(tileBox, 0) / dx[0];
-                Real pforcex = vel_force[lev][mfi].maxabs(tileBox, 0);
+                Real spdx = spd.max<RunOn::Device>(tileBox, 0) / dx[0];
+                Real pforcex = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);
                 uy /= dx[1];
-                Real spdy = spd.max(tileBox, 0) / dx[1];
-                Real pforcey = vel_force[lev][mfi].maxabs(tileBox, 1);
+                Real spdy = spd.max<RunOn::Device>(tileBox, 0) / dx[1];
+                Real pforcey = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
                 Real spdz = spdy * 0.1; // for 2d make sure this is < spdy
                 uz /= AMREX_SPACEDIM == 2 ? dx[1] : dx[2];
 #if (AMREX_SPACEDIM == 3)
-                spdz = spd.max(tileBox, 0) / dx[2];
-                Real pforcez = vel_force[lev][mfi].maxabs(tileBox, 2);
+                spdz = spd.max<RunOn::Device>(tileBox, 0) / dx[2];
+                Real pforcez = vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 #endif
 
                 // use advective constraint unless velocities are zero everywhere
@@ -580,7 +580,7 @@ Maestro::FirstDt ()
                     Real dt_divu = 1.e99;
 
                     const Array4<Real> tmp_arr = tmp.array(mfi);
-                    tmp[mfi].setVal(1.e50, tileBox, 0, 1);
+                    tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 0, 1);
 
                     if (!spherical) {
                         const auto nr_lev = nr[lev];
@@ -612,7 +612,7 @@ Maestro::FirstDt ()
                             }
                         });
 
-                        dt_divu = tmp[mfi].min(tileBox, 0);
+                        dt_divu = tmp[mfi].min<RunOn::Device>(tileBox, 0);
                     } else {
 #if (AMREX_SPACEDIM == 3)
                         const Array4<const Real> gp0_arr = gp0_cart[lev].array(mfi);
@@ -631,7 +631,7 @@ Maestro::FirstDt ()
                                 tmp_arr(i,j,k) = 0.4 * (1.0 - rho_min / scal_arr(i,j,k,Rho)) / denom;
                             }
                         });
-                        dt_divu = tmp[mfi].min(tileBox, 0);
+                        dt_divu = tmp[mfi].min<RunOn::Device>(tileBox, 0);
 #endif
                     }
                     dt_grid = amrex::min(dt_grid, dt_divu);
