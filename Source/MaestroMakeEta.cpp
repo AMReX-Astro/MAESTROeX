@@ -14,7 +14,6 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
 
     // Local variables
-    const int nrf = nr_fine + 1;
     const int max_lev = max_radial_level + 1;
     RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0);
     etarhosum.shrink_to_fit();
@@ -35,15 +34,11 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
         }
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& sold_mf = sold[lev];
-        const MultiFab& etarhoflux_mf = etarho_flux[lev];
-
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel if (!system::regtest_reduction)
 #endif
-        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid tile region
             const Box& tilebox = mfi.tilebox();

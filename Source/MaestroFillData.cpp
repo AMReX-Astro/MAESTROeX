@@ -238,7 +238,6 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in
         for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid (cell-centered) region
-            const Box& tilebox = mfi.tilebox();
             const auto xbx = mfi.grownnodaltilebox(0, 1);
             const auto ybx = mfi.grownnodaltilebox(1, 1);
 #if (AMREX_SPACEDIM == 3)

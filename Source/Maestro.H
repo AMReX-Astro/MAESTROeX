@@ -286,10 +286,8 @@ public:
     ////////////
     // MaestroBaseState.cpp functions
 
-    void InitBaseState(RealVector& s0_init, RealVector& p0_init, 
-                       RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, RealVector& tempbar, 
-                       RealVector& tempbar_init,
+    void InitBaseState(RealVector& rho0, RealVector& rhoh0, 
+                       RealVector& p0, 
                        const int lev);
 
     // end MaestroBaseState.cpp functions
@@ -1968,7 +1966,7 @@ public:
     amrex::Vector<amrex::Real> diagfile3_data;
 
     // problem information
-    RealVector center;
+    amrex::GpuArray<Real,3> center;
 
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`

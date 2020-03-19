@@ -604,7 +604,6 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();

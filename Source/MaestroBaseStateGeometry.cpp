@@ -14,8 +14,8 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
 
     Print() << "Calling InitBaseStateGeometry()" << std::endl;
 
-    const Real* probLo = geom[0].ProbLo();
-    const Real* probHi = geom[0].ProbHi();
+    const auto probLo = geom[0].ProbLoArray();
+    const auto probHi = geom[0].ProbHiArray();
 
     max_radial_level = max_radial_level_in;
     finest_radial_level = max_radial_level_in; // FIXME - we want to set this after regridding
@@ -23,7 +23,6 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
     dr_fine = dr_fine_in;
     nr_irreg = nr_irreg_in;
 
-    center.resize(3);
     dr.resize(max_radial_level+1);
     nr.resize(max_radial_level+1);
     base_cutoff_density_coord.resize(max_radial_level+1);
@@ -113,13 +112,12 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
         const Box& tilebox = mfi.tilebox();
         const Array4<Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
-        const Real* AMREX_RESTRICT probLo = geom[0].ProbLo();
-        const Real* AMREX_RESTRICT center_p = center.dataPtr();
+        const auto probLo = geom[0].ProbLoArray();
 
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-            Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center_p[0];
-            Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center_p[1];
-            Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center_p[2];
+            Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center[0];
+            Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center[1];
+            Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
             cc_to_r(i,j,k) = round(index);
@@ -133,7 +131,7 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
-    const int max_lev = max_radial_level+1;
+    const int max_lev = max_radial_level + 1;
     int which_lev = 0;
     
     get_finest_radial_level(&finest_radial_level);
