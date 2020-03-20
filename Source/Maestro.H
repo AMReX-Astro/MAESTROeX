@@ -15,6 +15,7 @@
 #include <AMReX_PlotFileUtil.H>
 #include <network.H>
 #include <eos.H>
+#include <BaseState.H>
 
 #include <state_indices.H>
 #include <ModelParser.H>

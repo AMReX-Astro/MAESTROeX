@@ -1,4 +1,5 @@
 CEXE_sources += main.cpp
+CEXE_sources += BaseState.cpp
 CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvanceIrreg.cpp
@@ -52,6 +53,7 @@ CEXE_sources += MaestroThermal.cpp
 CEXE_sources += MaestroVelocityAdvance.cpp
 CEXE_sources += MaestroVelPred.cpp
 
+CEXE_headers += BaseState.H
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroBCThreads.H
 CEXE_headers += MaestroInletBCs.H
