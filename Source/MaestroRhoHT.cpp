@@ -71,7 +71,6 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
                     eos(eos_input_rh, eos_state);
 
                     state(i,j,k,Temp) = eos_state.T;
-
                 });
             }
         }
@@ -96,7 +95,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
 
     const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
 
@@ -114,7 +113,6 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
             // (rho, p) --> T
-
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
 
                 eos_t eos_state;
@@ -177,7 +175,6 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
             const Array4<Real> peos_arr = peos[lev].array(mfi);
 
             // (rho, H) --> T, p
-
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
 
                 eos_t eos_state;
@@ -219,7 +216,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
 
     const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
 
@@ -382,7 +379,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     rhoh0_edge.shrink_to_fit();
     tempbar_edge.shrink_to_fit();
 
-    if (spherical == 0) {
+    if (!spherical) {
         CelltoEdge(tempbar, tempbar_edge);
         for (int i = 0; i < (max_radial_level+1)*(nr_fine+1); ++i) {
             rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);

@@ -6,9 +6,7 @@ using namespace amrex;
 
 // compute eta_rho at edge- and cell-centers
 void
-Maestro::MakeEtarho (RealVector& etarho_edge,
-                     RealVector& etarho_cell,
-                     const Vector<MultiFab>& etarho_flux)
+Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
@@ -110,12 +108,12 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     get_r_end_coord(r_end_coord.dataPtr());
     get_finest_radial_level(&finest_radial_level);
 
-    std::fill(etarho_edge.begin(), etarho_edge.end(), 0.0);
-    std::fill(etarho_cell.begin(), etarho_cell.end(), 0.0);
+    std::fill(etarho_ec.begin(), etarho_ec.end(), 0.0);
+    std::fill(etarho_cc.begin(), etarho_cc.end(), 0.0);
 
-    Real * AMREX_RESTRICT etarho_edge_p = etarho_edge.dataPtr();
+    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
     const Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
-    Real * AMREX_RESTRICT etarho_cell_p = etarho_cell.dataPtr();
+    Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
@@ -124,7 +122,7 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             const int hi = r_end_coord[n+max_lev*i]+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_edge_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
+                etarho_ec_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
             });
         }
     }
@@ -132,8 +130,8 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
     // These calls shouldn't be needed since the planar algorithm doesn't use
     // these outside of this function, but this is just to be safe in case
     // things change in the future.
-    RestrictBase(etarho_edge, false);
-    FillGhostBase(etarho_edge, false);
+    RestrictBase(etarho_ec, false);
+    FillGhostBase(etarho_ec, false);
 
     // make the cell-centered etarho_cc by averaging etarho to centers
     for (auto n = 0; n <= finest_radial_level; ++n) {
@@ -142,17 +140,17 @@ Maestro::MakeEtarho (RealVector& etarho_edge,
             const int hi = r_end_coord[n+max_lev*i]+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_cell_p[n+max_lev*r] = 0.5 * (etarho_edge_p[n+max_lev*r] + 
-                    etarho_edge_p[n+max_lev*(r+1)]);
+                etarho_cc_p[n+max_lev*r] = 0.5 * (etarho_ec_p[n+max_lev*r] + 
+                    etarho_ec_p[n+max_lev*(r+1)]);
             });
         }
     }
 
     // These calls shouldn't be needed since the planar algorithm only uses
-    // etarho_cell to make_psi, and then we fill ghost cells in make_psi, but
+    // etarho_cc to make_psi, and then we fill ghost cells in make_psi, but
     // this is just to be safe in case things change in the future
-    RestrictBase(etarho_cell, true);
-    FillGhostBase(etarho_cell, true);
+    RestrictBase(etarho_cc, true);
+    FillGhostBase(etarho_cc, true);
 }
 
 
@@ -160,9 +158,7 @@ void
 Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
                          const Vector<MultiFab>& scal_new,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                         RealVector& etarho_edge,
-                         RealVector& etarho_cell)
+                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);
@@ -196,7 +192,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_old[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal_old[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tilebox = mfi.tilebox();
@@ -237,12 +233,12 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
 
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
-    Average(eta_cart,etarho_cell,0);
+    Average(eta_cart,etarho_cc,0);
 
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
-    Real * AMREX_RESTRICT etarho_edge_p = etarho_edge.dataPtr();
-    const Real * AMREX_RESTRICT etarho_cell_p = etarho_cell.dataPtr();
+    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
 
     // put eta on base state edges
     // note that in spherical the base state has no refinement
@@ -251,17 +247,17 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     const bool sph_loc = spherical;
     AMREX_PARALLEL_FOR_1D(nrf, r, {
         if (r == 0) {
-            etarho_edge_p[r] = 0.0;
+            etarho_ec_p[r] = 0.0;
         } else if (r == nrf-1) {
             // probably should do some better extrapolation here eventually
-            etarho_edge_p[r] = etarho_cell_p[r-1];
+            etarho_ec_p[r] = etarho_cc_p[r-1];
         } else {
             if (sph_loc) {
                 Real dr1 = r_cc_loc_p[r] - r_edge_loc_p[r];
                 Real dr2 = r_edge_loc_p[r] - r_cc_loc_p[r-1];
-                etarho_edge_p[r] = (dr2*etarho_cell_p[r] + dr1*etarho_cell_p[r-1])/(dr1+dr2);
+                etarho_ec_p[r] = (dr2*etarho_cc_p[r] + dr1*etarho_cc_p[r-1])/(dr1+dr2);
             } else {
-                etarho_edge_p[r] = 0.5*(etarho_cell_p[r] + etarho_cell_p[r-1]);
+                etarho_ec_p[r] = 0.5*(etarho_cc_p[r] + etarho_cc_p[r-1]);
             }
         }
     });

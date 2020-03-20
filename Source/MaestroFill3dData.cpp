@@ -50,7 +50,7 @@ Maestro::Put1dArrayOnCart (int lev,
                            int sbccomp)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()",Put1dArrayOnCart);
+    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()", Put1dArrayOnCart);
 
     // get references to the MultiFabs at level lev
     MultiFab& s0_cart_mf = s0_cart[lev];
@@ -70,7 +70,7 @@ Maestro::Put1dArrayOnCart (int lev,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for ( MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+    for (MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         // Get the index space of the valid region
         const Box& tileBox = mfi.tilebox();

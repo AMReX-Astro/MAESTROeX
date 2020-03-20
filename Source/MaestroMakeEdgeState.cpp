@@ -20,7 +20,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                                   RealVector& force)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()",MakeEdgeState1dSphr);
+    BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()", MakeEdgeState1dSphr);
 
     Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
@@ -65,13 +65,12 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
     if (ppm_type == 0) {
 
-        // this will hold values at r-1, r and r+1
-        RealVector dsscr_vec(4*3);
-        Real * AMREX_RESTRICT dsscr = dsscr_vec.dataPtr();
-
         AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
             Real slope = 0.0;
+
+            // this will hold values at r-1, r and r+1
+            Real dsscr[4*3];
 
             if (slope_order_loc == 0) {
                 slope = 0.0;
@@ -191,13 +190,12 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         });
     } else if (ppm_type == 2) {
 
-        // this will hold values at r-1, r, r+1 and r+2
-        RealVector sedget_vec(4);
-        Real * AMREX_RESTRICT sedget = sedget_vec.dataPtr();
-
         AMREX_PARALLEL_FOR_1D(nr_fine, i, {
             int r = i * max_lev;
             // interpolate s to radial edges, store these temporary values into sedgel
+
+            // this will hold values at r-1, r, r+1 and r+2
+            Real sedget[4];
 
             for (int j = 0; j < 4; j++) {
                 int g = i + ng - 1 + j;
@@ -323,7 +321,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         }
 
         // solve Riemann problem to get final edge state
-        sedge[r]= w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
+        sedge[r] = w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
         sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[i]+sedgel[i]) : sedge[r];
     });
 
@@ -391,11 +389,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
             if (ppm_type == 0) {
 
-                RealVector dxscr_vec(3);
-                Real * AMREX_RESTRICT dxscr = dxscr_vec.dataPtr();
-
                 // compute slopes
-
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
 
                     Real slope = 0.0;
@@ -404,6 +398,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
                     int pp = n + max_lev*(r+1);
                     int pm = n + max_lev*(r-1);
+
+                    Real dxscr[3];
 
                     if (slope_order_loc == 0) {
                         slope = 0.0;

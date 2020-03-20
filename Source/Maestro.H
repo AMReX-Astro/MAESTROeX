@@ -872,7 +872,7 @@ public:
                                amrex::Array4<amrex::Real> const simhy,
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
-                               const amrex::Real* dx,
+                               const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                int comp, int bccomp, bool is_vel);
 
     void MakeEdgeScalEdges(const amrex::MFIter& mfi,
@@ -892,7 +892,7 @@ public:
                             amrex::Array4<amrex::Real> const simhy,
                             const amrex::Box& domainBox,
                             const amrex::Vector<amrex::BCRec>& bcs,
-                            const amrex::Real* dx,
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative);
 #else
@@ -901,7 +901,7 @@ public:
                   amrex::Array4<amrex::Real> const umac,
                   amrex::Array4<amrex::Real> const vmac,
                   amrex::Array4<amrex::Real> const wmac,
-                  const amrex::Real* dx);
+                  const amrex::GpuArray<Real,AMREX_SPACEDIM> dx);
 
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,
@@ -922,7 +922,7 @@ public:
                                amrex::Array4<amrex::Real> const simhz,
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
-                               const amrex::Real* dx,
+                               const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                int comp, int bccomp, bool is_vel);
 
     void MakeEdgeScalTransverse(const amrex::MFIter& mfi,
@@ -948,7 +948,7 @@ public:
                                amrex::Array4<amrex::Real> const simhzy,
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
-                               const amrex::Real* dx,
+                               const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                int comp, int bccomp, 
                                bool is_vel, bool is_conservative);
 
@@ -977,7 +977,7 @@ public:
                             amrex::Array4<amrex::Real> const simhzy,
                             const amrex::Box& domainBox,
                             const amrex::Vector<amrex::BCRec>& bcs,
-                            const amrex::Real* dx,
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative);
 #endif
@@ -1005,16 +1005,12 @@ public:
     /// @param etarho_edge  face-centered \f$\eta_\rho\f$
     /// @param etarho_cell  cell-centered \f$\eta_\rho\f$
     /// @param etarho_flux  \f$\eta_\rho\f$ flux
-    void MakeEtarho (RealVector& etarho_edge,
-                     RealVector& etarho_cell,
-                     const amrex::Vector<amrex::MultiFab>& etarho_flux);
+    void MakeEtarho (const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
     void MakeEtarhoSphr (const amrex::Vector<amrex::MultiFab>& scal_old,
                                      const amrex::Vector<amrex::MultiFab>& scal_new,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                         RealVector& etarho_edge,
-                         RealVector& etarho_cell);
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac);
 
     // end MaestroMakeEta.cpp functions
     ////////////
@@ -1034,14 +1030,13 @@ public:
     ////////////
     // MaestroMakePsi.cpp functions
 
-    void MakePsiPlanar(RealVector& psi);
+    void MakePsiPlanar();
     
-    void MakePsiSphr(RealVector& psi, const RealVector& w0_in, 
-                     const RealVector& gamma1bar, 
+    void MakePsiSphr(const RealVector& gamma1bar, 
                      const RealVector& p0_avg,
                      const RealVector& Sbar_in);
 
-    void MakePsiIrreg(RealVector& psi, const RealVector& grav_cell);
+    void MakePsiIrreg(const RealVector& grav_cell);
 
     // end MaestroMakePsi.cpp functions
     ////////////
@@ -1061,8 +1056,7 @@ public:
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const RealVector& p0,
                     const RealVector& gamma1bar,
-                    RealVector& delta_gamma1_termbar,
-                    const RealVector& psi_in);
+                    RealVector& delta_gamma1_termbar);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
@@ -1113,8 +1107,7 @@ public:
     ////////////
     // MaestroMakew0.cpp functions
 
-    void Makew0(RealVector& w0_in, 
-                const RealVector& w0_old, 
+    void Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
                 const RealVector& Sbar_in, 
                 const RealVector& rho0_old_in,
@@ -1127,8 +1120,7 @@ public:
                 RealVector& delta_chi_w0, 
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
 
-    void Makew0PlanarVarg(RealVector& w0_in, 
-                        const RealVector& w0_old, 
+    void Makew0PlanarVarg(const RealVector& w0_old, 
                         RealVector& w0_force, 
                         const RealVector& Sbar_in, 
                         const RealVector& rho0_old_in,
@@ -1141,8 +1133,7 @@ public:
                         RealVector& delta_chi_w0, 
                         const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Makew0Planar(RealVector& w0_in, 
-                    const RealVector& w0_old, 
+    void Makew0Planar(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const RealVector& Sbar_in, 
                     const RealVector& rho0_old_in,
@@ -1156,8 +1147,7 @@ public:
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
                     const bool is_predictor);
 
-    void Makew0SphrIrreg(RealVector& w0_in, 
-                    const RealVector& w0_old, 
+    void Makew0SphrIrreg(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const RealVector& Sbar_in, 
                     const RealVector& rho0_old_in,
@@ -1170,8 +1160,7 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Makew0Sphr(RealVector& w0_in, 
-                    const RealVector& w0_old, 
+    void Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const RealVector& Sbar_in, 
                     const RealVector& rho0_old_in,
@@ -1348,7 +1337,7 @@ public:
              amrex::Array4<amrex::Real> const Im,
              const amrex::Box& domainBox,
              const amrex::Vector<amrex::BCRec>& bcs,
-             const amrex::Real* dx,
+             const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
              const bool is_umac, const int comp, const int bccomp);
     ////////////
 
@@ -1695,7 +1684,7 @@ public:
                         amrex::Array4<amrex::Real> const ury,
                         amrex::Array4<amrex::Real> const uimhy,
                         const amrex::Box& domainBox,
-                        const amrex::Real* dx);
+                        const amrex::GpuArray<Real,AMREX_SPACEDIM> dx);
                         
     void VelPredVelocities(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
@@ -1716,7 +1705,7 @@ public:
                         amrex::Array4<const amrex::Real> const force,
                         amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
-                        const amrex::Real* dx);
+                        const amrex::GpuArray<Real,AMREX_SPACEDIM> dx);
 #else 
     void VelPredInterface(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
@@ -1740,7 +1729,7 @@ public:
                         amrex::Array4<amrex::Real> const urz,
                         amrex::Array4<amrex::Real> const uimhz,
                         const amrex::Box& domainBox,
-                        const amrex::Real* dx); 
+                        const amrex::GpuArray<Real,AMREX_SPACEDIM> dx); 
 
     void VelPredTransverse(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
@@ -1763,7 +1752,7 @@ public:
                         amrex::Array4<amrex::Real> const wimhxy,
                         amrex::Array4<amrex::Real> const wimhyx,
                         const amrex::Box& domainBox,
-                        const amrex::Real* dx);
+                        const amrex::GpuArray<Real,AMREX_SPACEDIM> dx);
                         
     void VelPredVelocities(const amrex::MFIter& mfi, 
                         amrex::Array4<const amrex::Real> const utilde,
@@ -1797,7 +1786,7 @@ public:
                         amrex::Array4<const amrex::Real> const force,
                         amrex::Array4<const amrex::Real> const w0_cart_in,
                         const amrex::Box& domainBox,
-                        const amrex::Real* dx);
+                        const amrex::GpuArray<Real,AMREX_SPACEDIM> dx);
 #endif
     ////////////////////////
 

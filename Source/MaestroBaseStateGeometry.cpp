@@ -161,22 +161,22 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // if the anelastic cutoff density was not found anywhere, { set
     // it to above the top of the domain on the finest level
     if (!found) {
-       which_lev = finest_radial_level;
-       anelastic_cutoff_density_coord[finest_radial_level] = nr[finest_radial_level];
+        which_lev = finest_radial_level;
+        anelastic_cutoff_density_coord[finest_radial_level] = nr[finest_radial_level];
     }
 
     // set the anelastic cutoff coordinate on the finer levels
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
-       anelastic_cutoff_density_coord[n] = 2*anelastic_cutoff_density_coord[n-1]+1;
+        anelastic_cutoff_density_coord[n] = 2*anelastic_cutoff_density_coord[n-1]+1;
     }
 
     // set the anelastic cutoff coordinate on the coarser levels
     for (auto n = which_lev-1; n >= 0; --n) {
-       if (anelastic_cutoff_density_coord[n+1] % 2 == 0) {
-          anelastic_cutoff_density_coord[n] = anelastic_cutoff_density_coord[n+1] / 2;
-       } else {
-          anelastic_cutoff_density_coord[n] = anelastic_cutoff_density_coord[n+1] / 2 + 1;
-       }
+        if (anelastic_cutoff_density_coord[n+1] % 2 == 0) {
+            anelastic_cutoff_density_coord[n] = anelastic_cutoff_density_coord[n+1] / 2;
+        } else {
+            anelastic_cutoff_density_coord[n] = anelastic_cutoff_density_coord[n+1] / 2 + 1;
+        }
     }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -206,24 +206,24 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // if the base cutoff density was not found anywhere, { set
     // it to above the top of the domain on the finest level
     if (!found) {
-       which_lev = finest_radial_level;
-       base_cutoff_density_coord[finest_radial_level] = nr[finest_radial_level];
+        which_lev = finest_radial_level;
+        base_cutoff_density_coord[finest_radial_level] = nr[finest_radial_level];
     }
 
     // set the base cutoff coordinate on the finer levels
     // do n=which_lev+1,finest_radial_level
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
-       base_cutoff_density_coord[n] = 2*base_cutoff_density_coord[n-1]+1;
+        base_cutoff_density_coord[n] = 2*base_cutoff_density_coord[n-1]+1;
     }
 
     // set the base cutoff coordinate on the coarser levels
     // do n=which_lev-1,0,-1
     for (auto n = which_lev-1; n >= 0; --n) {
-       if (base_cutoff_density_coord[n+1] % 2 == 0) {
-          base_cutoff_density_coord[n] = base_cutoff_density_coord[n+1] / 2;
-       } else {
-          base_cutoff_density_coord[n] = base_cutoff_density_coord[n+1] / 2 + 1;
-       }
+        if (base_cutoff_density_coord[n+1] % 2 == 0) {
+            base_cutoff_density_coord[n] = base_cutoff_density_coord[n+1] / 2;
+        } else {
+            base_cutoff_density_coord[n] = base_cutoff_density_coord[n+1] / 2 + 1;
+        }
     }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -254,24 +254,24 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // if the burning cutoff density was not found anywhere, { set
     // it to above the top of the domain on the finest level
     if (!found) {
-       which_lev = finest_radial_level;
-       burning_cutoff_density_lo_coord[finest_radial_level] = nr[finest_radial_level];
+        which_lev = finest_radial_level;
+        burning_cutoff_density_lo_coord[finest_radial_level] = nr[finest_radial_level];
     }
 
     // set the burning cutoff coordinate on the finer levels
     // do n=which_lev+1,finest_radial_level
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
-       burning_cutoff_density_lo_coord[n] = 2*burning_cutoff_density_lo_coord[n-1]+1;
+        burning_cutoff_density_lo_coord[n] = 2*burning_cutoff_density_lo_coord[n-1]+1;
     }
 
     // set the burning cutoff coordinate on the coarser levels
     // do n=which_lev-1,0,-1
     for (auto n = which_lev-1; n >= 0; --n) {
-       if (burning_cutoff_density_lo_coord[n+1]%2 == 0) {
-          burning_cutoff_density_lo_coord[n] = burning_cutoff_density_lo_coord[n+1] / 2;
-       } else {
-          burning_cutoff_density_lo_coord[n] = burning_cutoff_density_lo_coord[n+1] / 2 + 1;
-       }
+        if (burning_cutoff_density_lo_coord[n+1]%2 == 0) {
+            burning_cutoff_density_lo_coord[n] = burning_cutoff_density_lo_coord[n+1] / 2;
+        } else {
+            burning_cutoff_density_lo_coord[n] = burning_cutoff_density_lo_coord[n+1] / 2 + 1;
+        }
     }
 
     // compute the coordinates of the burning cutoff density upper limit
@@ -300,22 +300,22 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // if the burning cutoff density was not found anywhere, { set
     // it to above the bottom of the domain
     if (!found) {
-       which_lev = finest_radial_level;
-       burning_cutoff_density_hi_coord[finest_radial_level] = 0;
+        which_lev = finest_radial_level;
+        burning_cutoff_density_hi_coord[finest_radial_level] = 0;
     }
 
     // set the burning cutoff coordinate on the finer levels
     for (auto n = which_lev+1; n <= finest_radial_level; ++n) {
-       burning_cutoff_density_hi_coord[n] = 0;
+        burning_cutoff_density_hi_coord[n] = 0;
     }
 
     // set the burning cutoff coordinate on the coarser levels
     for (auto n = which_lev-1; n >= 0; --n) {
-       if (burning_cutoff_density_hi_coord[n+1]%2 == 0) {
-          burning_cutoff_density_hi_coord[n] = 0;
-       } else {
-          burning_cutoff_density_hi_coord[n] = 0;
-       }
+        if (burning_cutoff_density_hi_coord[n+1]%2 == 0) {
+            burning_cutoff_density_hi_coord[n] = 0;
+        } else {
+            burning_cutoff_density_hi_coord[n] = 0;
+        }
     }
 }
 

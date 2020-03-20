@@ -10,7 +10,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
                         const RealVector& p0)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeGamma1bar()",MakeGamma1bar);
+    BL_PROFILE_VAR("Maestro::MakeGamma1bar()", MakeGamma1bar);
 
     Vector<MultiFab> gamma1(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -33,7 +33,7 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(gamma1[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(gamma1[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();

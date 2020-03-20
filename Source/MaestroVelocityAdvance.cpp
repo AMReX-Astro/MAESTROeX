@@ -40,36 +40,38 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Create the velocity forcing term at time n using rho
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,sold,rho0_old,grav_cell_old,w0_force_cart,1);
+    MakeVelForce(vel_force, umac, sold, rho0_old, 
+                 grav_cell_old, w0_force_cart, 1);
 
     //////////////////////////////////
     // Add w0 to MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     //////////////////////////////////
     // Create the edge states of velocity using the MAC velocity plus w0 on edges.
     //////////////////////////////////
 
-    MakeEdgeScal(uold,uedge,umac,vel_force,1,bcs_u,AMREX_SPACEDIM,0,0,AMREX_SPACEDIM,0);
+    MakeEdgeScal(uold, uedge, umac, vel_force, 1, bcs_u, 
+                 AMREX_SPACEDIM, 0, 0, AMREX_SPACEDIM, 0);
 
     //////////////////////////////////
     // Subtract w0 from MAC velocities.
     //////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     //////////////////////////////////
     // Now create the force at half-time using rhohalf
     //////////////////////////////////
 
-    MakeVelForce(vel_force,umac,rhohalf,rho0_nph,grav_cell_nph,w0_force_cart,1);
+    MakeVelForce(vel_force, umac, rhohalf, rho0_nph, 
+                 grav_cell_nph, w0_force_cart, 1);
 
     //////////////////////////////////
     // Update the velocity with convective differencing
     //////////////////////////////////
 
     UpdateVel(umac, uedge, vel_force, sponge, w0mac);
-
 }
