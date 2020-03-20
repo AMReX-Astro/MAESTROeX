@@ -42,6 +42,9 @@ public:
     /// allocate memory for the BaseState
     void define(const int num_levs, const int length, const int ncomp=1);
 
+    /// set to some scalar value 
+    void setVal(const T& val);
+
     /// number of levels in base 
     int nLevels() { return data.size(); };
     int len() { return len; };
@@ -55,7 +58,44 @@ public:
     /// same but for const BaseStates
     const T& operator() (const int lev, const int i, const int n=0);
 
-private:
+    /// scalar addition to the whole base state 
+    friend BaseState<T>& operator+ (const T& val, const BaseState<T>& p);
+    BaseState<T>& operator+= (const T& val);
+
+    /// element-wise addition 
+    friend BaseState<T>& operator+ (BaseState<T>& lhs, const BaseState<T>& rhs);
+    BaseState<T>& operator+= (const BaseState<T>& rhs);
+
+    /// scalar subtraction from the whole base state 
+    friend BaseState<T>& operator- (const T& val, const BaseState<T>& p);
+    BaseState<T>& operator-= (const T& val);
+
+    /// element-wise subtraction
+    friend BaseState<T>& operator- (BaseState<T>& lhs, const BaseState<T>& rhs);
+    BaseState<T>& operator-= (const BaseState<T>& rhs);
+
+    /// scalar multiplication of the whole base state 
+    friend BaseState<T>& operator* (const T& val, const BaseState<T>& p);
+    BaseState<T>& operator*= (const T& val);
+
+    /// element-wise multiplication 
+    friend BaseState<T>& operator* (BaseState<T>& lhs, const BaseState<T>& rhs);
+    BaseState<T>& operator*= (const BaseState<T>& rhs);
+
+    /// scalar division of the whole base state 
+    friend BaseState<T>& operator/ (const T& val, const BaseState<T>& p);
+    BaseState<T>& operator/= (const T& val);
+
+    /// element-wise division 
+    friend BaseState<T>& operator/ (BaseState<T>& lhs, const BaseState<T>& rhs);
+    BaseState<T>& operator/= (const BaseState<T>& rhs);
+
+    /// comparison operator
+    friend bool operator==(BaseState<T>& lhs, const BaseState<T>& rhs);
+
+
+
+protected:
 
     amrex::Vector< amrex::Gpu::ManagedVector<T> > data;
 
@@ -63,30 +103,5 @@ private:
     static int len;
 };
 
-template <class T>
-T&
-BaseState<T>::operator() (const int lev, const int i, const int n) {
-    AMREX_ASSERT(lev >= 0);
-    AMREX_ASSERT(i < this->len && i >= 0);
-    AMREX_ASSERT(n < this->nvar && n >= 0);
-
-    return data[lev][nvar*i + n];
-}
-
-template <class T>
-amrex::Gpu::ManagedVector<T>
-BaseState<T>::operator() (const int lev, const int i, const int ncomp, const int start_comp) {
-    AMREX_ASSERT(lev >= 0);
-    AMREX_ASSERT(i < this->len && i >= 0);
-    AMREX_ASSERT(ncomp < this->nvar && ncomp > 0);
-    AMREX_ASSERT(start_comp < this-> nvar && start_comp >= 0);
-    AMREX_ASSERT(ncomp+start_comp < this->nvar);
-
-    amrex::Gpu::ManagedVector<T> vec(ncomp);
-
-    for (auto comp = 0; comp < ncomp; ++comp) {
-        vec[comp] = data[lev][nvar*i + start_comp+comp];
-    }
-}
 
 #endif
