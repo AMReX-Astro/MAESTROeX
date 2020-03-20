@@ -46,7 +46,7 @@ Maestro::EnthalpyAdvance (int which_step,
     if (enthalpy_pred_type == predict_h ||
         enthalpy_pred_type == predict_hprime) {
         // convert (rho h) -> h
-        ConvertRhoHToH(scalold,true);
+        ConvertRhoHToH(scalold, true);
     }
 
     //////////////////////////////////
@@ -68,7 +68,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     /////////////////////////////////////////////////////////////////
     // Compute forcing terms
@@ -95,13 +95,11 @@ Maestro::EnthalpyAdvance (int which_step,
             }
         }
 
-    }
-    else if (enthalpy_pred_type == predict_hprime) {
+    } else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
         // make force for hprime
         Abort("MaestroEnthalpyAdvance forcing");
-    }
-    else if (enthalpy_pred_type == predict_T_then_rhohprime ||
+    } else if (enthalpy_pred_type == predict_T_then_rhohprime ||
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
@@ -112,7 +110,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Add w0 to MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     //////////////////////////////////
     // Create the edge states of (rho h)' or h or T
@@ -139,16 +137,14 @@ Maestro::EnthalpyAdvance (int which_step,
          enthalpy_pred_type == predict_T_then_h         ||
          enthalpy_pred_type == predict_Tprime_then_h)  {
         pred_comp = Temp;
-    }
-    else {
+    } else {
         pred_comp = RhoH;
     }
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,1);
-    }
-    else {
+    } else {
         // use the advective form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
     }
@@ -224,8 +220,7 @@ Maestro::EnthalpyAdvance (int which_step,
                      rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
                      rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
                      h0mac_old,h0mac_old);
-    }
-    else if (which_step == 2) {
+    } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
@@ -233,7 +228,7 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_new(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int i=0; i<h0_old.size(); ++i) {
                 h0_old[i] = rhoh0_old[i] / rho0_old[i];
                 h0_new[i] = rhoh0_new[i] / rho0_new[i];
@@ -290,7 +285,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Subtract w0 from MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     //**************************************************************************
     //     1) Create (rho h)' force at time n+1/2.
@@ -305,7 +300,7 @@ Maestro::EnthalpyAdvance (int which_step,
     // Add w0 to MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     
     Vector<MultiFab> p0_new_cart(finest_level+1);
@@ -352,7 +347,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     rhoh0_edge_old.shrink_to_fit();
     rhoh0_edge_new.shrink_to_fit();
 
-    if (spherical == 0) {
+    if (!spherical) {
         CelltoEdge(rho0_old, rho0_edge_old);
         CelltoEdge(rho0_new, rho0_edge_new);
         CelltoEdge(rhoh0_old, rhoh0_edge_old);
@@ -362,7 +357,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     if (enthalpy_pred_type == predict_h ||
         enthalpy_pred_type == predict_hprime) {
         // convert (rho h) -> h
-        ConvertRhoHToH(scalold,true);
+        ConvertRhoHToH(scalold, true);
     }
 
     //////////////////////////////////
@@ -382,7 +377,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     /////////////////////////////////////////////////////////////////
     // Compute forcing terms
@@ -395,9 +390,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
 
         ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
-
-    }
-    else if (enthalpy_pred_type == predict_h ||
+    } else if (enthalpy_pred_type == predict_h ||
              enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
@@ -408,14 +401,11 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                 MultiFab::Divide(scal_force[lev],scalold[lev],Rho,RhoH,1,1);
             }
         }
-
-    }
-    else if (enthalpy_pred_type == predict_hprime) {
+    } else if (enthalpy_pred_type == predict_hprime) {
         // first compute h0_old
         // make force for hprime
         Abort("MaestroEnthalpyAdvance does not support enthalpy_pred_type == predict_hprime");
-    }
-    else if (enthalpy_pred_type == predict_T_then_rhohprime ||
+    } else if (enthalpy_pred_type == predict_T_then_rhohprime ||
              enthalpy_pred_type == predict_T_then_h ||
              enthalpy_pred_type == predict_Tprime_then_h) {
         // make force for temperature
@@ -441,7 +431,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     // Add w0 to MAC velocities (trans velocities already have w0).
     //////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     //////////////////////////////////
     // Create the edge states of (rho h)' or h or T
@@ -468,16 +458,14 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
          enthalpy_pred_type == predict_T_then_h         ||
          enthalpy_pred_type == predict_Tprime_then_h)  {
         pred_comp = Temp;
-    }
-    else {
+    } else {
         pred_comp = RhoH;
     }
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,1);
-    }
-    else {
+    } else {
         // use the advective form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
     }
@@ -522,7 +510,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int i=0; i<h0_old.size(); ++i) {
                 h0_old[i] = rhoh0_old[i] / rho0_old[i];
             }
@@ -553,8 +541,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                      rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
                      rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
                      h0mac_old,h0mac_old);
-    }
-    else if (which_step == 2) {
+    } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
@@ -562,7 +549,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_new(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int i=0; i<h0_old.size(); ++i) {
                 h0_old[i] = rhoh0_old[i] / rho0_old[i];
                 h0_new[i] = rhoh0_new[i] / rho0_new[i];
@@ -619,7 +606,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     // Subtract w0 from MAC velocities
     //////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     //**************************************************************************
     //     1) Create (rho h)' force at time n+1/2.
@@ -641,7 +628,6 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     Addw0(umac,w0mac,1.);
 
-    
     Vector<MultiFab> p0_new_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);

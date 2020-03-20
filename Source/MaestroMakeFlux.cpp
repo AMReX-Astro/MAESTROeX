@@ -42,11 +42,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
 
-
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf  = state[lev];
    
 #if (AMREX_SPACEDIM == 3)
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
@@ -65,7 +61,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& xbx = mfi.nodaltilebox(0);
@@ -465,9 +461,6 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf   = state[lev];
-
 #if (AMREX_SPACEDIM == 3)
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
         MultiFab h0mac_edgex, h0mac_edgey, h0mac_edgez;
@@ -515,7 +508,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& xbx = mfi.nodaltilebox(0);

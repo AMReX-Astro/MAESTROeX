@@ -227,19 +227,16 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                                 const int& mult_or_div)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MultFacesByBeta0()",MultFacesByBeta0);
+    BL_PROFILE_VAR("Maestro::MultFacesByBeta0()", MultFacesByBeta0);
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // Must get cell-centered MultiFab boxes for MIter
-        MultiFab& sold_mf = sold[lev];
-
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& xbx = mfi.nodaltilebox(0);
@@ -256,7 +253,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             const Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
             const Real * AMREX_RESTRICT beta0_edge_p = beta0_edge.dataPtr();
 
-            int max_lev_loc = max_radial_level;
+            int max_lev = max_radial_level+1;
 
             if (mult_or_div == 1) {
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
@@ -265,20 +262,20 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #else 
                     int r = k;
 #endif
-                    uedge(i,j,k) *= beta0_p[lev+r*(max_lev_loc+1)];
+                    uedge(i,j,k) *= beta0_p[lev+r*max_lev];
                 });
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
 #if (AMREX_SPACEDIM == 2)
-                    vedge(i,j,k) *= beta0_edge_p[lev+j*(max_lev_loc+1)];
+                    vedge(i,j,k) *= beta0_edge_p[lev+j*max_lev];
 #else 
-                    vedge(i,j,k) *= beta0_p[lev+k*(max_lev_loc+1)];
+                    vedge(i,j,k) *= beta0_p[lev+k*max_lev];
 #endif
                 });
 
 #if (AMREX_SPACEDIM == 3)
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) *= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                    wedge(i,j,k) *= beta0_edge_p[lev+k*max_lev];
                 });
 #endif
             } else {
@@ -289,20 +286,20 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #else 
                     int r = k;
 #endif
-                    uedge(i,j,k) /= beta0_p[lev+r*(max_lev_loc+1)];
+                    uedge(i,j,k) /= beta0_p[lev+r*max_lev];
                 });
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
 #if (AMREX_SPACEDIM == 2)
-                    vedge(i,j,k) /= beta0_edge_p[lev+j*(max_lev_loc+1)];
+                    vedge(i,j,k) /= beta0_edge_p[lev+j*max_lev];
 #else 
-                    vedge(i,j,k) /= beta0_p[lev+k*(max_lev_loc+1)];
+                    vedge(i,j,k) /= beta0_p[lev+k*max_lev];
 #endif
                 });
 
 #if (AMREX_SPACEDIM == 3)
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) /= beta0_edge_p[lev+k*(max_lev_loc+1)];
+                    wedge(i,j,k) /= beta0_edge_p[lev+k*max_lev];
                 });
 #endif
             }
@@ -321,14 +318,11 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& solverrhs_mf = solverrhs[lev];
-
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(solverrhs_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(solverrhs[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
@@ -362,19 +356,16 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                                 const Vector<MultiFab>& rhocc)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
+    BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()", AvgFaceBcoeffsInv);
 
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // Must get cell-centered MultiFab boxes for MIter
-        const MultiFab& rhocc_mf = rhocc[lev];
-
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(rhocc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for (MFIter mfi(rhocc[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();

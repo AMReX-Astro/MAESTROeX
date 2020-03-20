@@ -40,7 +40,7 @@ Maestro::DiagFile (const int step,
     Vector<MultiFab> rho_omegadot      (finest_level+1);
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
 
         for (int lev=0; lev<=finest_level; ++lev) {
             AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -60,8 +60,7 @@ Maestro::DiagFile (const int step,
 
         // put w0 in Cartesian cell-centers as a scalar (the radial
         // expansion velocity)
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0,1);
-
+        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0, 1);
     } 
 
     // compute rho_Hext and rho_Hnuc

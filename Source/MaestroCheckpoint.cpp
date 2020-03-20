@@ -96,8 +96,6 @@ Maestro::WriteCheckPoint (int step) {
             CPUFile << std::setprecision(15) << getCPUTime();
             CPUFile.close();
         }
-
-
     }
 
     // write the MultiFab data to, e.g., chk00010/Level_0/
