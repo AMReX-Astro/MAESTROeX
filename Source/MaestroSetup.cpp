@@ -47,7 +47,7 @@ Maestro::Setup ()
 
     burner_init();
 
-    maestro_conductivity_init();
+    // maestro_conductivity_init();
     conductivity_init();
 
     // check max level does not exceed hardcoded limit 
