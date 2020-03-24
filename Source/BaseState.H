@@ -49,64 +49,68 @@ public:
     void setVal(const int comp, const T& val);
 
     /// number of levels in base 
-    int nLevels() { return data.size(); };
-    int length() { return len; };
-    int nComp() { return nvar; };
+    int nLevels() const { return data.size(); };
+    int length() const { return len; };
+    int nComp() const { return nvar; };
 
     /// returns a references to the nth component at position i and level lev.
     T& operator() (const int lev, const int i, const int n=0);
 
     T* AMREX_RESTRICT operator() (const int lev, const int i, const int ncomp, const int start_comp);
 
+    T* ptr (const int lev, const int i, const int n=0);
+
     amrex::Gpu::ManagedVector<T>& operator[](const int lev) { return data[lev]; };
+
+    const amrex::Gpu::ManagedVector<T>& operator[](const int lev) const { return data[lev]; };
 
     /// scalar addition to the whole base state 
     template <class U>
-    friend BaseState<U>& operator+ (const U& val, const BaseState<U>& p);
-    BaseState<T>& operator+= (const T& val);
+    friend BaseState<U> operator+ (const U val, const BaseState<U>& p);
+    BaseState<T>& operator+= (const T val);
 
     /// element-wise addition 
     template <class U>
-    friend BaseState<U>& operator+ (BaseState<U>& lhs, const BaseState<U>& rhs);
+    friend BaseState<U> operator+ (const BaseState<U>& lhs, const BaseState<U>& rhs);
     BaseState<T>& operator+= (const BaseState<T>& rhs);
 
     /// scalar subtraction from the whole base state 
     template <class U>
-    friend BaseState<U>& operator- (const U& val, const BaseState<U>& p);
-    BaseState<T>& operator-= (const T& val);
+    friend BaseState<U> operator- (const U val, const BaseState<U>& p);
+    BaseState<T>& operator-= (const T val);
 
     /// element-wise subtraction
     template <class U>
-    friend BaseState<U>& operator- (BaseState<U>& lhs, const BaseState<U>& rhs);
+    friend BaseState<U> operator- (const BaseState<U>& lhs, const BaseState<U>& rhs);
     BaseState<T>& operator-= (const BaseState<T>& rhs);
 
     /// scalar multiplication of the whole base state 
     template <class U>
-    friend BaseState<U>& operator* (const U& val, const BaseState<U>& p);
-    BaseState<T>& operator*= (const T& val);
+    friend BaseState<U> operator* (const U val, const BaseState<U>& p);
+    BaseState<T>& operator*= (const T val);
 
     /// element-wise multiplication 
     template <class U>
-    friend BaseState<U>& operator* (BaseState<U>& lhs, const BaseState<U>& rhs);
+    friend BaseState<U> operator* (const BaseState<U>& lhs, const BaseState<U>& rhs);
     BaseState<T>& operator*= (const BaseState<T>& rhs);
 
     /// scalar division of the whole base state 
     template <class U>
-    friend BaseState<U>& operator/ (const U& val, const BaseState<U>& p);
-    BaseState<T>& operator/= (const T& val);
+    friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
+    BaseState<T>& operator/= (const T val);
 
     /// element-wise division 
     template <class U>
-    friend BaseState<U>& operator/ (BaseState<U>& lhs, const BaseState<U>& rhs);
+    friend BaseState<U> operator/ (const BaseState<U>& lhs, const BaseState<U>& rhs);
     BaseState<T>& operator/= (const BaseState<T>& rhs);
 
     /// comparison operator
     template <class U>
-    friend bool operator==(BaseState<U>& lhs, BaseState<U>& rhs);
+    friend bool operator==(const BaseState<U>& lhs, const BaseState<U>& rhs);
 
     /// comparison operator
     template <class U>
-    friend bool operator!=(BaseState<U>& lhs, BaseState<U>& rhs);
+    friend bool operator!=(const BaseState<U>& lhs, const BaseState<U>& rhs);
 
 protected:
 
@@ -135,7 +139,7 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp)
 
 template <class T>
 BaseState<T>::BaseState(const BaseState<T>& src) 
-: len(src.len()), nvar(src.nComp())
+: len(src.length()), nvar(src.nComp())
 {
     data.resize(src.data.size());
 
@@ -177,7 +181,7 @@ BaseState<T>::setVal(const int comp, const T& val)
 {
     for (auto l = 0; l < data.size(); ++l) {
         AMREX_PARALLEL_FOR_1D(len, i, {
-            data(l, i, comp) = val;
+            data[l][comp + i*nvar] = val;
         });
     }
 }
@@ -210,19 +214,31 @@ BaseState<T>::operator() (const int lev, const int i, const int ncomp, const int
     return vec.dataPtr();
 }
 
+template <class T>
+T*
+BaseState<T>::ptr (const int lev, const int i, const int n) {
+    AMREX_ASSERT(lev >= 0);
+    AMREX_ASSERT(i < this->len && i >= 0);
+    AMREX_ASSERT(n < this->nvar && n >= 0);
+
+    T* AMREX_RESTRICT p = data[lev].dataPtr();
+
+    return p + n + nvar*i;
+}
+
 
 template <class T>
-BaseState<T>&
-operator+ (const T& val, const BaseState<T>& p) {
+BaseState<T>
+operator+ (const T val, const BaseState<T>& p) {
     // make a deep copy
-    auto s = BaseState<T>(p);
+    BaseState<T> s(p);
     s += val;
     return s;
 }
 
 template <class T>
 BaseState<T>&
-BaseState<T>::operator+= (const T& val) {
+BaseState<T>::operator+= (const T val) {
     for (auto l = 0; l < data.size(); ++l) {
         for (auto i = 0; i < nvar*len; ++i) {
             data[l][i] += val;
@@ -232,10 +248,10 @@ BaseState<T>::operator+= (const T& val) {
 }
 
 template <class T>
-BaseState<T>&
-operator+ (BaseState<T>& lhs, const BaseState<T>& rhs) {
+BaseState<T>
+operator+ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     // make a deep copy
-    auto s = BaseState<T>(lhs);
+    BaseState<T> s(lhs);
     s += rhs;
     return s;
 }
@@ -256,17 +272,17 @@ BaseState<T>::operator+= (const BaseState<T>& rhs) {
 }
 
 template <class T>
-BaseState<T>&
-operator- (const T& val, const BaseState<T>& p) {
+BaseState<T>
+operator- (const T val, const BaseState<T>& p) {
     // make a deep copy
-    auto s = BaseState<T>(p);
+    BaseState<T> s(p);
     s -= val;
     return s;
 }
 
 template <class T>
 BaseState<T>&
-BaseState<T>::operator-= (const T& val) {
+BaseState<T>::operator-= (const T val) {
     for (auto l = 0; l < data.size(); ++l) {
         for (auto i = 0; i < nvar*len; ++i) {
             data[l][i] -= val;
@@ -276,10 +292,10 @@ BaseState<T>::operator-= (const T& val) {
 }
 
 template <class T>
-BaseState<T>&
-operator- (BaseState<T>& lhs, const BaseState<T>& rhs) {
+BaseState<T>
+operator- (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     // make a deep copy
-    auto s = BaseState<T>(lhs);
+    BaseState<T> s(lhs);
     s -= rhs;
     return s;
 }
@@ -301,17 +317,17 @@ BaseState<T>::operator-= (const BaseState<T>& rhs) {
 
 
 template <class T>
-BaseState<T>&
-operator* (const T& val, const BaseState<T>& p) {
+BaseState<T>
+operator* (const T val, const BaseState<T>& p) {
     // make a deep copy
-    auto s = BaseState<T>(p);
+    BaseState<T> s(p);
     s *= val;
     return s;
 }
 
 template <class T>
 BaseState<T>&
-BaseState<T>::operator*= (const T& val) {
+BaseState<T>::operator*= (const T val) {
     for (auto l = 0; l < data.size(); ++l) {
         for (auto i = 0; i < nvar*len; ++i) {
             data[l][i] *= val;
@@ -321,10 +337,10 @@ BaseState<T>::operator*= (const T& val) {
 }
 
 template <class T>
-BaseState<T>&
-operator* (BaseState<T>& lhs, const BaseState<T>& rhs) {
+BaseState<T>
+operator* (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     // make a deep copy
-    auto s = BaseState<T>(lhs);
+    BaseState<T> s(lhs);
     s *= rhs;
     return s;
 }
@@ -345,17 +361,17 @@ BaseState<T>::operator*= (const BaseState<T>& rhs) {
 }
 
 template <class T>
-BaseState<T>&
-operator/ (const T& val, const BaseState<T>& p) {
+BaseState<T>
+operator/ (const T val, const BaseState<T>& p) {
     // make a deep copy
-    auto s = BaseState<T>(p);
+    BaseState<T> s(p);
     s /= val;
     return s;
 }
 
 template <class T>
 BaseState<T>&
-BaseState<T>::operator/= (const T& val) {
+BaseState<T>::operator/= (const T val) {
     for (auto l = 0; l < data.size(); ++l) {
         for (auto i = 0; i < nvar*len; ++i) {
             data[l][i] /= val;
@@ -365,10 +381,10 @@ BaseState<T>::operator/= (const T& val) {
 }
 
 template <class T>
-BaseState<T>&
-operator/ (BaseState<T>& lhs, const BaseState<T>& rhs) {
+BaseState<T>
+operator/ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     // make a deep copy
-    auto s = BaseState<T>(lhs);
+    BaseState<T> s(lhs);
     s /= rhs;
     return s;
 }
@@ -390,7 +406,7 @@ BaseState<T>::operator/= (const BaseState<T>& rhs) {
 
 template <class T>
 bool
-operator== (BaseState<T>& lhs, BaseState<T>& rhs) {
+operator== (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     AMREX_ASSERT(lhs.data.size() == rhs.data.size());
     AMREX_ASSERT(lhs.nvar == rhs.nvar);
     AMREX_ASSERT(lhs.len == rhs.len);
@@ -410,7 +426,7 @@ operator== (BaseState<T>& lhs, BaseState<T>& rhs) {
 
 template <class T>
 bool
-operator!= (BaseState<T>& lhs, BaseState<T>& rhs) {
+operator!= (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     AMREX_ASSERT(lhs.data.size() == rhs.data.size());
     AMREX_ASSERT(lhs.nvar == rhs.nvar);
     AMREX_ASSERT(lhs.len == rhs.len);
@@ -425,6 +441,4 @@ operator!= (BaseState<T>& lhs, BaseState<T>& rhs) {
     }
     return equiv;
 }
-
-
 #endif
