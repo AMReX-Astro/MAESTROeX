@@ -228,8 +228,8 @@ Maestro::InitData ()
 
     // read in model file and fill in s0_init and p0_init for all levels
     for (auto lev = 0; lev <= max_radial_level; ++lev) {
-        InitBaseState(s0_init, p0_init, rho0_old, rhoh0_old, 
-                        p0_old, tempbar, tempbar_init, lev);
+        InitBaseState(rho0_old, rhoh0_old, 
+                      p0_old, lev);
     }
 
     if (use_exact_base_state) {
@@ -498,7 +498,7 @@ void Maestro::InitProj ()
 
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
@@ -596,7 +596,7 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
@@ -615,7 +615,7 @@ void Maestro::DivuIter (int istep_divu_iter)
             }
 
             int is_predictor = 1;
-            Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
+            Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_peosbar, delta_chi_w0, dt, dt, is_predictor);
 
@@ -741,7 +741,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     
     // compute S at cell-centers
     Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar,psi);
+              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
@@ -760,7 +760,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
             }
             
             int is_predictor = 1;
-            Makew0(w0, w0, w0_force, Sbar, rho0_old, rho0_old, 
+            Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_pthermbar, delta_chi_w0, dt, dt, is_predictor);
         }

@@ -34,9 +34,8 @@ Maestro::PutInPertForm(Vector<MultiFab>& scal,
         }
     }
 
-    AverageDown(scal,comp,1);
-    FillPatch(t_old,scal,scal,scal,comp,comp,1,bccomp,bcs);
-
+    AverageDown(scal, comp, 1);
+    FillPatch(t_old, scal, scal, scal, comp, comp, 1, bccomp, bcs);
 }
 
 void
@@ -56,7 +55,7 @@ Maestro::PutInPertForm(int level,
 
     // s0 is not edge centered
     // note that bcs parameter is not used
-    Put1dArrayOnCart(level,s0,s0_cart,0,0);
+    Put1dArrayOnCart(level, s0, s0_cart, 0, 0);
 
     if (flag) {
         MultiFab::Subtract(scal[level],s0_cart[level],0,comp,1,0);
@@ -69,8 +68,7 @@ Maestro::PutInPertForm(int level,
                      comp,1,refRatio(level-1));
     }
 
-    FillPatch(level,t_old,scal[level],scal,scal,comp,comp,1,bccomp,bcs);
-
+    FillPatch(level, t_old, scal[level], scal, scal, comp, comp, 1, bccomp, bcs);
 }
 
 void
@@ -103,7 +101,6 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
     else {
         FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
     }
-
 }
 
 void

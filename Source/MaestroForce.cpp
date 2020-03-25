@@ -20,11 +20,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
-        // constants in Fortran
-        Real base_cutoff_density=0.0; 
-        get_base_cutoff_density(&base_cutoff_density);
-        Real buoyancy_cutoff_factor=0.0;
-        get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
+    // constants in Fortran
+    Real base_cutoff_density = 0.0; 
+    get_base_cutoff_density(&base_cutoff_density);
+    Real buoyancy_cutoff_factor = 0.0;
+    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -68,7 +68,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
         MultiFab& vel_force_mf = vel_force_cart[lev];
         
         // Get grid spacing
-        const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -120,7 +120,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
                     vel_force(i,j,k,AMREX_SPACEDIM-1) = (rhopert * grav(i,j,k,AMREX_SPACEDIM-1) - gpi_arr(i,j,k,AMREX_SPACEDIM-1)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM-1);
 
-                    if (do_add_utilde_force == 1) {
+                    if (do_add_utilde_force) {
                         
 #if (AMREX_SPACEDIM == 2)
                         if (j <= -1) {
@@ -180,13 +180,12 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     }
 
     // average fine data onto coarser cells
-    AverageDown(vel_force_cart,0,AMREX_SPACEDIM);
+    AverageDown(vel_force_cart, 0, AMREX_SPACEDIM);
 
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
     FillPatch(t_old, vel_force_cart, vel_force_cart, vel_force_cart, 0, 0, AMREX_SPACEDIM, 0,
               bcs_u, 1);
-
 }
 
 
@@ -217,7 +216,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     RealVector divw0;
     Vector<MultiFab> divu_cart(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         divw0.resize(nr_fine);
         std::fill(divw0.begin(), divw0.end(), 0.);
 
@@ -241,14 +240,11 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         // Get the index space and grid spacing of the domain
         const auto dx = geom[lev].CellSizeArray();
 
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_force_mf = scal_force[lev];
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
             
             // Get Array4 inputs
             const Array4<const Real> scal = state[lev].array(mfi,comp);
@@ -262,13 +258,13 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> force = scal_force_mf.array(mfi,comp);
+            const Array4<Real> force = scal_force[lev].array(mfi,comp);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
             // offload to GPU
-            if (spherical == 1) {
+            if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                 // lo and hi of domain
                 const Box& domainBox = geom[lev].Domain();
@@ -378,7 +374,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     }
 
     // average fine data onto coarser cells
-    AverageDown(scal_force,comp,1);
+    AverageDown(scal_force, comp, 1);
 
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
@@ -460,21 +456,18 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& scal_force_mf = scal_force[lev];
-
         // Get cutoff coord
         int base_cutoff_density_coord_loc = 0;
         get_base_cutoff_density_coord(lev, &base_cutoff_density_coord_loc);
     
         // Get grid spacing
-        const GpuArray<Real, AMREX_SPACEDIM> dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
         
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // inputs
             const Array4<const Real> umac = umac_cart[lev][0].array(mfi);
@@ -492,7 +485,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             const Array4<const Real> rho0cart = rho0_cart[lev].array(mfi);
 
             // output
-            const Array4<Real> rhoh_force = scal_force_mf.array(mfi, RhoH);
+            const Array4<Real> rhoh_force = scal_force[lev].array(mfi, RhoH);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -503,9 +496,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             // if use_exact_base_state or average_base_state,
             // psi is set to dpdt in advance subroutine
 
-                        // For non-spherical, add wtilde d(p0)/dr
-                        // For spherical, we make u grad p = div (u p) - p div (u)
-            if (spherical == 0) {
+            // For non-spherical, add wtilde d(p0)/dr
+            // For spherical, we make u grad p = div (u p) - p div (u)
+            if (!spherical) {
 
                 AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
                 {
@@ -538,13 +531,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
                     rhoh_force(i,j,k) = veladv * gradp0;
 #endif
-                    //
                     // psi should always be in the force if we are doing the final update
                     // For prediction, it should not be in the force if we are predicting
                     // (rho h)', but should be there if we are predicting h or rhoh
                     //
                     // If use_exact_base_state or average_base_state is on, psi is instead dpdt term
-                    //
                     if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
                         (is_prediction == 0)) {

@@ -232,16 +232,13 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
     BL_PROFILE_VAR("Maestro::MultFacesByBeta0()",MultFacesByBeta0);
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
-    for (int lev = 0; lev <= finest_level; ++lev)
-    {
-        // Must get cell-centered MultiFab boxes for MIter
-        MultiFab& sold_mf = sold[lev];
+    for (int lev = 0; lev <= finest_level; ++lev) {
 
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(sold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& xbx = mfi.nodaltilebox(0);
@@ -323,14 +320,11 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
     // Note that umac = beta0*mac
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        MultiFab& solverrhs_mf = solverrhs[lev];
-
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(solverrhs_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for (MFIter mfi(solverrhs[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
@@ -364,19 +358,16 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                                 const Vector<MultiFab>& rhocc)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()",AvgFaceBcoeffsInv);
+    BL_PROFILE_VAR("Maestro::AvgFaceBcoeffsInv()", AvgFaceBcoeffsInv);
 
     // write an MFIter loop
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // Must get cell-centered MultiFab boxes for MIter
-        const MultiFab& rhocc_mf = rhocc[lev];
-
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(rhocc_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(rhocc[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& tileBox = mfi.tilebox();
