@@ -47,8 +47,8 @@ Maestro::InitData ()
 	// read in model file and fill in s0_init and p0_init for all levels
 
 	for (auto lev = 0; lev <= max_radial_level; ++lev) {
-	    InitBaseState(s0_init, p0_init, rho0_old, rhoh0_old,
-			  p0_old, tempbar, tempbar_init, lev);
+	    InitBaseState(rho0_old, rhoh0_old,
+			  p0_old, lev);
 	}
 	    
 	// calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
@@ -128,17 +128,24 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+	for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
 	{
 		const Box& tilebox = mfi.tilebox();
 		const int* lo  = tilebox.loVect();
 		const int* hi  = tilebox.hiVect();
 
-		initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-		         BL_TO_FORTRAN_FAB(scal[mfi]),
-		         BL_TO_FORTRAN_FAB(vel[mfi]),
-		         s0_init.dataPtr(), p0_init.dataPtr(),
-		         ZFILL(dx));
+		const Array4<Real> scal_arr = scal.array(mfi);
+		const Array4<Real> vel_arr = vel.array(mfi);
+
+		const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+		const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
+
+		InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
+		// initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+		//          BL_TO_FORTRAN_FAB(scal[mfi]),
+		//          BL_TO_FORTRAN_FAB(vel[mfi]),
+		//          s0_init.dataPtr(), p0_init.dataPtr(),
+		//          ZFILL(dx));
 
 	}
 

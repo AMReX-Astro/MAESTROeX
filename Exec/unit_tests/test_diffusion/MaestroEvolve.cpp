@@ -63,7 +63,7 @@ Maestro::Evolve ()
 			const auto tileBox = mfi.tilebox();
 			const auto prob_lo = geom[lev].ProbLoArray();
 			const auto dx = geom[lev].CellSizeArray();
-			const Real * AMREX_RESTRICT center_p = center.dataPtr();
+			const auto center_p = center;
 			const Array4<Real> analytic_arr = analytic[lev].array(mfi);
 
 			const auto peak_h_loc = peak_h;
@@ -137,7 +137,7 @@ Maestro::Evolve ()
 				const auto tileBox = mfi.tilebox();
 				const auto prob_lo = geom[lev].ProbLoArray();
 				const auto dx = geom[lev].CellSizeArray();
-				const Real * AMREX_RESTRICT center_p = center.dataPtr();
+				const auto center_p = center;
 				const Array4<Real> analytic_arr = analytic[lev].array(mfi);
 
 				const auto peak_h_loc = peak_h;

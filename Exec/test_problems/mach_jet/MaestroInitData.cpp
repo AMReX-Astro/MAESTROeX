@@ -38,9 +38,7 @@ Maestro::InitLevelData(const int lev, const Real time,
 
 void
 Maestro::InitLevelDataSphr(const int lev, const Real time, 
-                       const MFIter& mfi, MultiFab& scal, MultiFab& vel, 
-                       const RealVector& s0_init, 
-                       const RealVector& p0_init)
+			   MultiFab& scal, MultiFab& vel)
 {
     Abort("ERROR: InitLeveLDataSphr not implemented.");
 }

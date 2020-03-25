@@ -155,7 +155,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
             const auto prob_hi = geom[lev].ProbHiArray();
             const auto dx = geom[lev].CellSizeArray();
 
-            const Real * AMREX_RESTRICT center_p = center.dataPtr();
+            const auto center_p = center;
 
             const auto velpert_scale_loc = velpert_scale;
             const auto velpert_amplitude_loc = velpert_amplitude;

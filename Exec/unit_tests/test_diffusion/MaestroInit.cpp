@@ -46,8 +46,8 @@ Maestro::InitData ()
 
 	// read in model file and fill in s0_init and p0_init for all levels
 	for (auto lev = 0; lev <= max_radial_level; ++lev) {
-		InitBaseState(s0_init, p0_init, rho0_old, rhoh0_old,
-					  p0_old, tempbar, tempbar_init, lev);
+		InitBaseState(rho0_old, rhoh0_old,
+			      p0_old, lev);
 	}
 	
 	// calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
@@ -97,7 +97,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const auto prob_lo = geom[lev].ProbLoArray();
 	const auto dx = geom[lev].CellSizeArray();
 
-	const Real * AMREX_RESTRICT center_p = center.dataPtr();
+	const auto center_p = center;
 	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 	Real * AMREX_RESTRICT p0_p = p0_old.dataPtr();
 

@@ -24,7 +24,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         scal(i,j,k,n) = 0.0;
     });
 
-    Real * AMREX_RESTRICT center_p = center.dataPtr();
+    const auto center_p = center;
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto dx = geom[lev].CellSizeArray();
 
