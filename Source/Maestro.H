@@ -782,9 +782,9 @@ public:
                        const Real* p0_p);
 
     void InitLevelDataSphr(const int lev,
-			   const amrex::Real time, 
-			   amrex::MultiFab& scal, 
-			   amrex::MultiFab& vel);
+                           const amrex::Real time, 
+                           amrex::MultiFab& scal, 
+                           amrex::MultiFab& vel);
 
     // end MaestroInitData.cpp functions
     ////////////
