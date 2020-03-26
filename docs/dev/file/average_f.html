@@ -353,13 +353,11 @@
 <li><p><strong>phibar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>ncell</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p></li>
 </ul>
 </dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p>
-</dd>
-<dt class="field-odd">Call to</dt>
-<dd class="field-odd"><p><a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module/quad_interp" title="f/fill_3d_data_module/quad_interp"><code class="xref f f-func docutils literal notranslate"><span class="pre">quad_interp()</span></code></a></p>
+<dt class="field-even">Call to</dt>
+<dd class="field-even"><p><a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module/quad_interp" title="f/fill_3d_data_module/quad_interp"><code class="xref f f-func docutils literal notranslate"><span class="pre">quad_interp()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -378,6 +376,7 @@
 <li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>phisum</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ncell</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -385,9 +384,6 @@
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>use_mask</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -400,11 +396,9 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(radii,0)-1)</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(radii,0)-1)</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>

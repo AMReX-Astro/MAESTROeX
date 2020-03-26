@@ -378,11 +378,9 @@ the base state arrays begin with index 0, not 1.</p>
 <em class="property">subroutine  </em><code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">init_base_state_geometry</code><span class="sig-paren">(</span><em class="sig-param">max_radial_level_in</em>, <em class="sig-param">nr_fine_in</em>, <em class="sig-param">dr_fine_in</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em>, <em class="sig-param">dx_fine</em>, <em class="sig-param">nr_irreg_in</em><span class="sig-paren">)</span><a class="headerlink" href="#f/base_state_geometry_module/init_base_state_geometry" title="Permalink to this definition">¶</a></dt>
 <dd><p>Binds to C function <code class="docutils literal notranslate"><span class="pre">init_base_state_geometry</span></code></p>
 <dl class="field-list simple">
-<dt class="field-odd">Options</dt>
-<dd class="field-odd"><p><strong>max_radial_level_in</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(r_cc_loc,0)-1)</em><em>]</em></p>
-</dd>
-<dt class="field-even">Parameters</dt>
-<dd class="field-even"><ul class="simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_radial_level_in</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(r_cc_loc,0)-1)</em><em>]</em></p></li>
 <li><p><strong>nr_fine_in</strong><em> [</em><em>integer</em><em>,</em><em>in,</em><em>]</em></p></li>
 <li><p><strong>dr_fine_in</strong><em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>r_cc_loc</strong> (max_radial_level_in + 1,nr_fine_in)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
