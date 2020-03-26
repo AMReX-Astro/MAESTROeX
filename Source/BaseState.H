@@ -35,6 +35,8 @@ public:
     /// allocate memory for the BaseState
     void define(const int num_levs, const int length, const int ncomp=1);
 
+    void resize(const int num_levs, const int length, const int ncomp=1);
+
     /// set to some scalar value 
     void setVal(const T val);
 
@@ -187,6 +189,13 @@ BaseState<T>::define(const int num_levs, const int length, const int ncomp)
 
     base_data.resize(nlev*len*nvar);
     dptr = base_data.dataPtr();
+}
+
+template <class T>
+void
+BaseState<T>::resize(const int num_levs, const int length, const int ncomp)
+{
+    this->define(num_levs, length, ncomp);
 }
 
 template <class T>

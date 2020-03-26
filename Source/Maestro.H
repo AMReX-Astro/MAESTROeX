@@ -1912,6 +1912,7 @@ public:
     RealVector grav_cell_old;
     RealVector grav_cell_new;
     RealVector r_cc_loc;
+    BaseState<Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
     RealVector beta0_nm1;
@@ -1921,6 +1922,7 @@ public:
     RealVector w0;
     RealVector etarho_ec;
     RealVector r_edge_loc;
+    BaseState<Real> r_edge_loc_b;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
