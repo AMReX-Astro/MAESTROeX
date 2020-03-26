@@ -17,10 +17,7 @@ public:
       public member functions
     */
 
-   BaseState() {};
-
-    /// constructor
-    // constexpr BaseState() : dptr(nullptr) {};
+    BaseState() {};
 
     BaseState(const int num_levs, const int length, const int ncomp=1);
 
@@ -30,9 +27,8 @@ public:
     // /// destructor
     // ~BaseState () { };
 
-    // /// allocate memory for the BaseState
-    // inline
-    // void define(const int num_levs, const int length, const int ncomp=1);
+    /// allocate memory for the BaseState
+    void define(const int num_levs, const int length, const int ncomp=1);
 
     /// set to some scalar value 
     void setVal(const T val);
@@ -66,94 +62,64 @@ public:
     AMREX_GPU_HOST_DEVICE inline
     const T& operator[](const int i) const { return dptr[i]; };
 
-//     /// scalar addition to the whole base state 
-//     template <class U>
-//     friend BaseState<U> operator+ (const U val, const BaseState<U>& p);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator+= (const T val);
+    /// scalar addition to the whole base state 
+    template <class U>
+    friend BaseState<U> operator+ (const U val, const BaseState<U>& p);
+    BaseState<T>& operator+= (const T val);
 
-//     /// element-wise addition 
-//     template <class U>
-//     friend BaseState<U> operator+ (const BaseState<U>& lhs, const BaseState<U>& rhs);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator+= (const BaseState<T>& rhs);
+    /// element-wise addition 
+    template <class U>
+    friend BaseState<U> operator+ (const BaseState<U>& lhs, const BaseState<U>& rhs);
+    BaseState<T>& operator+= (const BaseState<T>& rhs);
 
-//     /// scalar subtraction from the whole base state 
-//     template <class U>
-//     friend BaseState<U> operator- (const U val, const BaseState<U>& p);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator-= (const T val);
+    /// scalar subtraction from the whole base state 
+    template <class U>
+    friend BaseState<U> operator- (const U val, const BaseState<U>& p);
+    BaseState<T>& operator-= (const T val);
 
-//     /// element-wise subtraction
-//     template <class U>
-//     friend BaseState<U> operator- (const BaseState<U>& lhs, const BaseState<U>& rhs);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator-= (const BaseState<T>& rhs);
+    /// element-wise subtraction
+    template <class U>
+    friend BaseState<U> operator- (const BaseState<U>& lhs, const BaseState<U>& rhs);
+    BaseState<T>& operator-= (const BaseState<T>& rhs);
 
-//     /// scalar multiplication of the whole base state 
-//     template <class U>
-//     friend BaseState<U> operator* (const U val, const BaseState<U>& p);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator*= (const T val);
+    /// scalar multiplication of the whole base state 
+    template <class U>
+    friend BaseState<U> operator* (const U val, const BaseState<U>& p);
+    BaseState<T>& operator*= (const T val);
 
-//     /// element-wise multiplication 
-//     template <class U>
-//     friend BaseState<U> operator* (const BaseState<U>& lhs, const BaseState<U>& rhs);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator*= (const BaseState<T>& rhs);
+    /// element-wise multiplication 
+    template <class U>
+    friend BaseState<U> operator* (const BaseState<U>& lhs, const BaseState<U>& rhs);
+    BaseState<T>& operator*= (const BaseState<T>& rhs);
 
-//     /// scalar division of the whole base state 
-//     template <class U>
-//     friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator/= (const T val);
+    /// scalar division of the whole base state 
+    template <class U>
+    friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
+    BaseState<T>& operator/= (const T val);
 
-//     /// element-wise division 
-//     template <class U>
-//     friend BaseState<U> operator/ (const BaseState<U>& lhs, const BaseState<U>& rhs);
-//     AMREX_GPU_HOST_DEVICE inline
-//     BaseState<T>& operator/= (const BaseState<T>& rhs);
+    /// element-wise division 
+    template <class U>
+    friend BaseState<U> operator/ (const BaseState<U>& lhs, const BaseState<U>& rhs);
+    BaseState<T>& operator/= (const BaseState<T>& rhs);
 
     /// comparison operator
     template <class U>
     friend bool operator==(const BaseState<U>& lhs, const BaseState<U>& rhs);
 
-//     /// comparison operator
-//     template <class U>
-//     friend bool operator!=(const BaseState<U>& lhs, const BaseState<U>& rhs);
-
-    
+    /// comparison operator
+    template <class U>
+    friend bool operator!=(const BaseState<U>& lhs, const BaseState<U>& rhs);
 
 // // protected:
-
-    // amrex::GpuArray<T,nlev*len*nvar> base_data;
 
     amrex::Gpu::ManagedVector<T> base_data;
 
     T*  dptr;
-//     amrex::Real * AMREX_RESTRICT real_ptr;
 
     int nlev;
     int nvar;
-    int len;
-
-
-    // amrex::MFIter MakeMFIter () {
-    //     amrex::Vector< amrex::MultiFab> m_dummy_mf(1);
-    //     m_dummy_mf[0].define(grids[0], dmap[0], 1, 0);
-    //     return amrex::MFIter(m_dummy_mf[0], false);
-    // }
-
-    
+    int len;    
 };
-
-
-
-// template <class T, int nlev, int len, int nvar>
-// BaseState<T,nlev,len,nvar>::BaseState()
-// {
-
-// }
 
 template <class T>
 BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp) 
@@ -163,94 +129,52 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp)
     dptr = base_data.dataPtr();
 }
 
-// template <class T>
-// BaseState<T>::BaseState(const BaseState<T>& src) 
-// : nlev(src.nLevels()), len(src.length()), nvar(src.nComp())
-// {
-//     base_data.resize(nlev*len*nvar);
-//     dptr = base_data.dataPtr();
-//     for (auto i = 0; i < nlev*len*nvar; ++i) {
-//         dptr[i] = src[i];
-//     }
-// }
+template <class T>
+BaseState<T>::BaseState(const BaseState<T>& src) 
+: nlev(src.nLevels()), len(src.length()), nvar(src.nComp())
+{
+    base_data.resize(nlev*len*nvar);
+    dptr = base_data.dataPtr();
+    for (auto i = 0; i < nlev*len*nvar; i++) {
+        base_data[i] = src[i];
+    }
+}
 
-// template <class T>
-// inline
-// void
-// BaseState<T>::define(const int num_levs, const int length, const int ncomp)
-// {
-//     nlev = num_levs;
-//     len = length;
-//     nvar = ncomp;
+template <class T>
+void
+BaseState<T>::define(const int num_levs, const int length, const int ncomp)
+{
+    nlev = num_levs;
+    len = length;
+    nvar = ncomp;
 
-//     base_data.resize(nlev*len*nvar);
-//     dptr = base_data.dataPtr();
-// }
+    base_data.resize(nlev*len*nvar);
+    dptr = base_data.dataPtr();
+}
 
 template <class T>
 void
 BaseState<T>::setVal(const T val)
 {
-    T * AMREX_RESTRICT ptr = base_data.dataPtr();
+    T * AMREX_RESTRICT ptr = dptr;
     AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
         ptr[i] = val;
     });
 
     amrex::Gpu::synchronize();
-
-    // AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
-    //     dptr[i] = val;
-    // });
-
-    // T* AMREX_RESTRICT p = this->base_data.data();
-    // const int l = this->nvar*this->len*this->nlev;
-    // amrex::ParallelFor(l,
-    // [=] AMREX_GPU_DEVICE (long idx)
-    // {
-    //     p[idx] = val;
-    // });
-    amrex::Print() << "print data here " << base_data[0] << std::endl;
-
-    // amrex::Print() << "print pointer " << p[0] << std::endl;
-    // // amrex::Print() << "print dptr " << dptr[0] << std::endl;
-
-    // AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
-    //     real_ptr[i] = val;
-    // });
-
-    // amrex::Print() << "print real data here " << real_base[0] << std::endl;
-
-    // amrex::Print() << "print real pointer " << real_ptr[0] << std::endl;
-
-
-
-    // amrex::Gpu::ManagedVector<T> testvec(nvar*len*nlev, 0.0);
-
-    // T* tp = testvec.dataPtr();
-    // AMREX_PARALLEL_FOR_1D(l, i, {
-    //     tp[i] = val;
-    // });
-
-    // amrex::Print() << "print tp here " << testvec[0] << std::endl;
-
-
-    // for (auto i = 0; i < nvar*len*nlev; ++i) {
-    //     dptr[i] = val;
-    // }
-
-    // amrex::Print() << "print data again here " << base_data[0] << std::endl;
-
-    // amrex::Print() << "val = " << val << std::endl;
 }
 
 template <class T>
 void
 BaseState<T>::setVal(const int comp, const T val)
 {
-    T * AMREX_RESTRICT ptr = base_data.dataPtr();
+    T * AMREX_RESTRICT ptr = dptr;
+    const auto ncomp = nvar;
     AMREX_PARALLEL_FOR_1D(len*nlev, i, {
-        ptr[comp + i*nvar] = val;
+        ptr[comp + i*ncomp] = val;
     });
+
+    amrex::Gpu::synchronize();
 }
 
 template <class T>
@@ -293,187 +217,190 @@ BaseState<T>::ptr (const int lev, const int i, const int n) {
 
     T* p = dptr[(lev*len + i)*nvar + n];
 
-    return p;// + n + nvar*i;
+    return p;
 }
 
 
-// template <class T>
-// inline
-// BaseState<T>
-// operator+ (const T val, const BaseState<T>& p) {
-//     // make a deep copy
-//     BaseState<T> s(p);
-//     s += val;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator+= (const T val) {
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] += val;
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator+ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
-//     // make a deep copy
-//     BaseState<T> s(lhs);
-//     s += rhs;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator+= (const BaseState<T>& rhs) {
-//     AMREX_ASSERT(nlev == rhs.nlev);
-//     AMREX_ASSERT(nvar == rhs.nvar);
-//     AMREX_ASSERT(len == rhs.len);
-
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] += rhs[i];
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator- (const T val, const BaseState<T>& p) {
-//     // make a deep copy
-//     BaseState<T> s(p);
-//     s -= val;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator-= (const T val) {
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] -= val;
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator- (const BaseState<T>& lhs, const BaseState<T>& rhs) {
-//     // make a deep copy
-//     BaseState<T> s(lhs);
-//     s -= rhs;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator-= (const BaseState<T>& rhs) {
-//     AMREX_ASSERT(nlev == rhs.nlev);
-//     AMREX_ASSERT(nvar == rhs.nvar);
-//     AMREX_ASSERT(len == rhs.len);
-
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] += rhs[i];
-//     }
-//     return *this;
-// }
-
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator* (const T val, const BaseState<T>& p) {
-//     // make a deep copy
-//     BaseState<T> s(p);
-//     s *= val;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator*= (const T val) {
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] *= val;
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator* (const BaseState<T>& lhs, const BaseState<T>& rhs) {
-//     // make a deep copy
-//     BaseState<T> s(lhs);
-//     s *= rhs;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator*= (const BaseState<T>& rhs) {
-//     AMREX_ASSERT(nlev == rhs.nlev);
-//     AMREX_ASSERT(nvar == rhs.nvar);
-//     AMREX_ASSERT(len == rhs.len);
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] += rhs[i];
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator/ (const T val, const BaseState<T>& p) {
-//     // make a deep copy
-//     BaseState<T> s(p);
-//     s /= val;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator/= (const T val) {
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] /= val;
-//     }
-//     return *this;
-// }
-
-// template <class T>
-// inline
-// BaseState<T>
-// operator/ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
-//     // make a deep copy
-//     BaseState<T> s(lhs);
-//     s /= rhs;
-//     return s;
-// }
-
-// template <class T>
-// AMREX_GPU_HOST_DEVICE inline
-// BaseState<T>&
-// BaseState<T>::operator/= (const BaseState<T>& rhs) {
-//     AMREX_ASSERT(nlev == rhs.nlev);
-//     AMREX_ASSERT(nvar == rhs.nvar);
-//     AMREX_ASSERT(len == rhs.len);
-//     for (auto i = 0; i < nvar*len*nlev; ++i) {
-//         dptr[i] /= rhs[i];
-//     }
-//     return *this;
-// }
+template <class T>
+BaseState<T>
+operator+ (const T val, const BaseState<T>& p) {
+    // make a deep copy
+    BaseState<T> s(p);
+    s += val;
+    return s;
+}
 
 template <class T>
-inline
+BaseState<T>&
+BaseState<T>::operator+= (const T val) {
+    T * AMREX_RESTRICT ptr = dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] += val;
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator+ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
+    // make a deep copy
+    BaseState<T> s(lhs);
+    s += rhs;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator+= (const BaseState<T>& rhs) {
+    AMREX_ASSERT(nlev == rhs.nlev);
+    AMREX_ASSERT(nvar == rhs.nvar);
+    AMREX_ASSERT(len == rhs.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT rhs_ptr = rhs.dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] += rhs_ptr[i];
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator- (const T val, const BaseState<T>& p) {
+    // make a deep copy
+    BaseState<T> s(p);
+    s -= val;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator-= (const T val) {
+    T * AMREX_RESTRICT ptr = dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] -= val;
+    });
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator- (const BaseState<T>& lhs, const BaseState<T>& rhs) {
+    // make a deep copy
+    BaseState<T> s(lhs);
+    s -= rhs;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator-= (const BaseState<T>& rhs) {
+    AMREX_ASSERT(nlev == rhs.nlev);
+    AMREX_ASSERT(nvar == rhs.nvar);
+    AMREX_ASSERT(len == rhs.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT rhs_ptr = rhs.dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] -= rhs_ptr[i];
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+
+template <class T>
+BaseState<T>
+operator* (const T val, const BaseState<T>& p) {
+    // make a deep copy
+    BaseState<T> s(p);
+    s *= val;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator*= (const T val) {
+    T * AMREX_RESTRICT ptr = dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] *= val;
+    });
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator* (const BaseState<T>& lhs, const BaseState<T>& rhs) {
+    // make a deep copy
+    BaseState<T> s(lhs);
+    s *= rhs;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator*= (const BaseState<T>& rhs) {
+    AMREX_ASSERT(nlev == rhs.nlev);
+    AMREX_ASSERT(nvar == rhs.nvar);
+    AMREX_ASSERT(len == rhs.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT rhs_ptr = rhs.dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] *= rhs_ptr[i];
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator/ (const T val, const BaseState<T>& p) {
+    // make a deep copy
+    BaseState<T> s(p);
+    s /= val;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator/= (const T val) {
+    T * AMREX_RESTRICT ptr = dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] /= val;
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+template <class T>
+BaseState<T>
+operator/ (const BaseState<T>& lhs, const BaseState<T>& rhs) {
+    // make a deep copy
+    BaseState<T> s(lhs);
+    s /= rhs;
+    return s;
+}
+
+template <class T>
+BaseState<T>&
+BaseState<T>::operator/= (const BaseState<T>& rhs) {
+    AMREX_ASSERT(nlev == rhs.nlev);
+    AMREX_ASSERT(nvar == rhs.nvar);
+    AMREX_ASSERT(len == rhs.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT rhs_ptr = rhs.dptr;
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        ptr[i] /= rhs_ptr[i];
+    });
+    amrex::Gpu::synchronize();
+    return *this;
+}
+
+template <class T>
 bool
 operator== (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     AMREX_ASSERT(lhs.nlev == rhs.nlev);
@@ -488,23 +415,18 @@ operator== (const BaseState<T>& lhs, const BaseState<T>& rhs) {
     return true;
 }
 
-// template <class T>
-// inline
-// bool
-// operator!= (const BaseState<T>& lhs, const BaseState<T>& rhs) {
-//     AMREX_ASSERT(lhs.nlev == rhs.nlev);
-//     AMREX_ASSERT(lhs.nvar == rhs.nvar);
-//     AMREX_ASSERT(lhs.len == rhs.len);
+template <class T>
+bool
+operator!= (const BaseState<T>& lhs, const BaseState<T>& rhs) {
+    AMREX_ASSERT(lhs.nlev == rhs.nlev);
+    AMREX_ASSERT(lhs.nvar == rhs.nvar);
+    AMREX_ASSERT(lhs.len == rhs.len);
 
-//     for (auto i = 0; i < lhs.nvar*lhs.len*lhs.nlev; ++i) {
-//         if (lhs[i] != rhs[i]) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-
-
-
+    for (auto i = 0; i < lhs.nvar*lhs.len*lhs.nlev; ++i) {
+        if (lhs[i] != rhs[i]) {
+            return true;
+        }
+    }
+    return false;
+}
 #endif
