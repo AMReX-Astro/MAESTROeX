@@ -20,6 +20,11 @@ public:
     BaseState() {};
 
     BaseState(const int num_levs, const int length, const int ncomp=1);
+    
+    /// create a BaseState object from an existing Fortran-friendly base state
+    BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length, const int ncomp=1);
+
+    BaseState(const amrex::Vector<T>& src, const int num_levs, const int length, const int ncomp=1);
 
     /// copy constructor. This makes a deep copy of the src.
     BaseState(const BaseState<T>& src);
@@ -110,7 +115,7 @@ public:
     template <class U>
     friend bool operator!=(const BaseState<U>& lhs, const BaseState<U>& rhs);
 
-// // protected:
+protected:
 
     amrex::Gpu::ManagedVector<T> base_data;
 
@@ -127,6 +132,38 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp)
 {
     base_data.resize(nlev*len*nvar);
     dptr = base_data.dataPtr();
+}
+
+template <class T>
+BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length, const int ncomp)
+: nlev(num_levs), len(length), nvar(ncomp)
+{
+    base_data.resize(nlev*len*nvar);
+    dptr = base_data.dataPtr();
+    // need to switch from Fortran array-ordering to C++ ordering
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto n = 0; n < nvar; ++n) {
+                base_data[n + nvar*(r + len*l)] = src[l + nlev*(r + len*n)];
+            }
+        }
+    }
+}
+
+template <class T>
+BaseState<T>::BaseState(const amrex::Vector<T>& src, const int num_levs, const int length, const int ncomp)
+: nlev(num_levs), len(length), nvar(ncomp)
+{
+    base_data.resize(nlev*len*nvar);
+    dptr = base_data.dataPtr();
+    // need to switch from Fortran array-ordering to C++ ordering
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto n = 0; n < nvar; ++n) {
+                base_data[n + nvar*(r + len*l)] = src[l + nlev*(r + len*n)];
+            }
+        }
+    }
 }
 
 template <class T>

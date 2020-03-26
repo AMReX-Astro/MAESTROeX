@@ -56,6 +56,12 @@ int main(int argc, char* argv[])
 
         Print() << "are the two base states equal? " << (base_state == deep_copy) << std::endl;
 
+        Print() << "Initialize from a Fortran-style 1d base state" << std::endl;
+
+        Gpu::ManagedVector<Real> f_base(nlevs*len*ncomp);
+
+        BaseState<Real> c_base(f_base, nlevs, len, ncomp);
+
         Print() << "let's iterate over the base state" << std::endl;
         for (auto l = 0; l < nlevs; ++l) {
             AMREX_PARALLEL_FOR_1D(base_state.length(), n, {
