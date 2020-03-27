@@ -235,8 +235,8 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
     Average(eta_cart,etarho_cc,0);
 
-    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
-    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto r_edge_loc_p = r_edge_loc_b;
     Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
 
@@ -253,8 +253,8 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
             etarho_ec_p[r] = etarho_cc_p[r-1];
         } else {
             if (sph_loc) {
-                Real dr1 = r_cc_loc_p[r] - r_edge_loc_p[r];
-                Real dr2 = r_edge_loc_p[r] - r_cc_loc_p[r-1];
+                Real dr1 = r_cc_loc_p(0,r) - r_edge_loc_p(0,r);
+                Real dr2 = r_edge_loc_p(0,r) - r_cc_loc_p(0,r-1);
                 etarho_ec_p[r] = (dr2*etarho_cc_p[r] + dr1*etarho_cc_p[r-1])/(dr1+dr2);
             } else {
                 etarho_ec_p[r] = 0.5*(etarho_cc_p[r] + etarho_cc_p[r-1]);

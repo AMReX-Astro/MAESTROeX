@@ -15,7 +15,6 @@ Maestro::MakeGravCell(RealVector& grav_cell,
     if (!spherical) {
         if (do_planar_invsq_grav)  {
             Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
-            // const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
             const auto r_cc_loc_p = r_cc_loc_b;
             const Real planar_invsq_mass_loc = planar_invsq_mass;
             // we are doing a plane-parallel geometry with a 1/r**2
@@ -26,7 +25,6 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                 // for (auto r = 0; r < nr[n]; ++r) {
                 const int nr_lev = nr[n];
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    // grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc_p[n+max_lev*r]*r_cc_loc_p[n+max_lev*r]);
                     grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc_p(n,r)*r_cc_loc_p(n,r));
                 });
             }
@@ -35,8 +33,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             RealVector m((finest_radial_level+1)*nr_fine);
 
             // level = 0
-            m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
-            grav_cell[0] = -Gconst * m[0] / (r_cc_loc[0]*r_cc_loc[0]);
+            m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+            grav_cell[0] = -Gconst * m[0] / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
             int nr_lev = nr[0];
 
@@ -52,24 +50,24 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                 Real term1 = 0.0;
                 if (rho0[max_lev*(r-1)] > base_cutoff_density) {
                     term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
-                        (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) *
-                        (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] +
-                        r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] +
-                        r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)]);
+                        (r_edge_loc_b(0,r) - r_cc_loc_b(0,r-1)) *
+                        (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
+                        r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) +
+                        r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1));
                 } 
 
                 Real term2 = 0.0;
                 if (rho0[max_lev*r] > base_cutoff_density) {
                     term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
-                        (r_cc_loc[max_lev*r] - r_edge_loc[max_lev*r]) *
-                        (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r] +
-                        r_cc_loc[max_lev*r]*r_edge_loc[max_lev*r] +
-                        r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+                        (r_cc_loc_b(0,r) - r_edge_loc_b(0,r)) *
+                        (r_cc_loc_b(0,r)*r_cc_loc_b(0,r) +
+                        r_cc_loc_b(0,r)*r_edge_loc_b(0,r) +
+                        r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
                 } 
 
                 m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2;
 
-                grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r]);
+                grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
             }
 
             // level > 0
@@ -78,8 +76,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                 for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
 
                     if (r_start_coord[n+max_lev*i] == 0) {
-                        m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc[n]*r_cc_loc[n]*r_cc_loc[n];
-                        grav_cell[n] = -Gconst * m[n] / (r_cc_loc[n]*r_cc_loc[n]);
+                        m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
+                        grav_cell[n] = -Gconst * m[n] / (r_cc_loc_b(n,0)*r_cc_loc_b(n,0));
                     } else {
                         int r = r_start_coord[n+max_lev*i];
                         m[n+max_lev*r] = m[n-1+max_lev*(r/2-1)];
@@ -94,23 +92,23 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         Real term1 = 0.0;
                         if (rho0[n-1+max_lev*(r/2-1)] > base_cutoff_density) {
                             term1 = 4.0/3.0*M_PI*rho0[n-1+max_lev*(r/2-1)] *
-                                (r_edge_loc[n-1+max_lev*r/2] - r_cc_loc[n-1+max_lev*(r/2-1)]) *
-                                (r_edge_loc[n-1+max_lev*r/2]*r_edge_loc[n-1+max_lev*r/2] +
-                                r_edge_loc[n-1+max_lev*r/2]*r_cc_loc[n-1+max_lev*(r/2-1)] +
-                                r_cc_loc[n-1+max_lev*(r/2-1)]*r_cc_loc[n-1+max_lev*(r/2-1)]);
+                                (r_edge_loc_b(n-1,r/2) - r_cc_loc_b(n-1,r/2-1)) *
+                                (r_edge_loc_b(n-1,r/2)*r_edge_loc_b(n-1,r/2) +
+                                r_edge_loc_b(n-1,r/2)*r_cc_loc_b(n-1,r/2-1) +
+                                r_cc_loc_b(n-1,r/2-1)*r_cc_loc_b(n-1,r/2-1));
                         } 
 
                         Real term2 = 0.0;
                         if (rho0[n+max_lev*r] > base_cutoff_density) {
                             term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
-                                (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]) *
-                                (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r] +
-                                r_cc_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
-                                r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                                (r_cc_loc_b(n,r) - r_edge_loc_b(n,r)) *
+                                (r_cc_loc_b(n,r)*r_cc_loc_b(n,r) +
+                                r_cc_loc_b(n,r)*r_edge_loc_b(n,r) +
+                                r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                         } 
 
                         m[n+max_lev*r] += term1 + term2;
-                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
+                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
                     }
 
                     for (auto r = r_start_coord[n+max_lev*i]+1;
@@ -126,24 +124,24 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         Real term1 = 0.0;
                         if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
                             term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
-                                (r_edge_loc[n+max_lev*r] - r_cc_loc[n+max_lev*(r-1)]) *
-                                (r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
-                                r_edge_loc[n+max_lev*r]*r_cc_loc[n+max_lev*(r-1)] +
-                                r_cc_loc[n+max_lev*(r-1)]*r_cc_loc[n+max_lev*(r-1)]);
+                                (r_edge_loc_b(n,r) - r_cc_loc_b(n,r-1)) *
+                                (r_edge_loc_b(n,r)*r_edge_loc_b(n,r) +
+                                r_edge_loc_b(n,r)*r_cc_loc_b(n,r-1) +
+                                r_cc_loc_b(n,r-1)*r_cc_loc_b(n,r-1));
                         } 
 
                         Real term2 = 0.0;
                         if (rho0[n+max_lev*r] > base_cutoff_density) {
                             term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
-                                (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]) *
-                                (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r] +
-                                r_cc_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
-                                r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                                (r_cc_loc_b(n,r) - r_edge_loc_b(n,r)) *
+                                (r_cc_loc_b(n,r)*r_cc_loc_b(n,r) +
+                                r_cc_loc_b(n,r)*r_edge_loc_b(n,r) +
+                                r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                         } 
 
                         m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2;
 
-                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc[n+max_lev*r]*r_cc_loc[n+max_lev*r]);
+                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
                     }
                 }
             }
@@ -158,8 +156,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
         RealVector m(nr_fine);
 
-        m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
-        grav_cell[0] = -Gconst * m[0] / (r_cc_loc[0]*r_cc_loc[0]);
+        m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+        grav_cell[0] = -Gconst * m[0] / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
         for (auto r = 1; r < nr_fine; ++r) {
 
@@ -173,24 +171,24 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             Real term1 = 0.0;
             if (rho0[max_lev*(r-1)] > base_cutoff_density) {
                 term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
-                    (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) *
-                    (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] +
-                    r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] +
-                    r_cc_loc[max_lev*(r-1)]*r_cc_loc[max_lev*(r-1)]);
+                    (r_edge_loc_b(0,r) - r_cc_loc_b(0,r-1)) *
+                    (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
+                    r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) +
+                    r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1));
             } 
 
             Real term2 = 0.0;
             if (rho0[max_lev*r] > base_cutoff_density) {
                 term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
-                    (r_cc_loc[max_lev*r] - r_edge_loc[max_lev*r]) *
-                    (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r] +
-                    r_cc_loc[max_lev*r]*r_edge_loc[max_lev*r] +
-                    r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+                    (r_cc_loc_b(0,r) - r_edge_loc_b(0,r)) *
+                    (r_cc_loc_b(0,r)*r_cc_loc_b(0,r) +
+                    r_cc_loc_b(0,r)*r_edge_loc_b(0,r) +
+                    r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
             } 
 
             m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2;
 
-            grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r]);
+            grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
         }
     }
 }
@@ -210,7 +208,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
     if (!spherical) {
         if (do_planar_invsq_grav)  {
             Real * AMREX_RESTRICT grav_edge_p = grav_edge.dataPtr();
-            const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+            const auto r_edge_loc_p = r_edge_loc_b;
             const Real planar_invsq_mass_loc = planar_invsq_mass;
             // we are doing a plane-parallel geometry with a 1/r**2
             // gravitational acceleration.  The mass is assumed to be
@@ -221,7 +219,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 // for (auto r = 0; r < nr[n]; ++r) {
                 const int nr_lev = nr[n];
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc_p[n+max_lev*r]*r_edge_loc_p[n+max_lev*r]);
+                    grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc_p(n,r)*r_edge_loc_p(n,r));
                 });
             }
         } else if (do_2d_planar_octant) {
@@ -239,15 +237,15 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 // > base_cutoff_density
                 if (rho0[max_lev*(r-1)] > base_cutoff_density) {
                     m[max_lev*r] = m[max_lev*(r-1)] + 4.0/3.0*M_PI *
-                        (r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)]) *
-                        (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] +
-                        r_edge_loc[max_lev*r]*r_edge_loc[max_lev*(r-1)] +
-                        r_edge_loc[max_lev*(r-1)]*r_edge_loc[max_lev*(r-1)]) * rho0[max_lev*(r-1)];
+                        (r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1)) *
+                        (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
+                        r_edge_loc_b(0,r)*r_edge_loc_b(0,r-1) +
+                        r_edge_loc_b(0,r-1)*r_edge_loc_b(0,r-1)) * rho0[max_lev*(r-1)];
                 } else {
                     m[max_lev*r] = m[max_lev*(r-1)];
                 }
 
-                grav_edge[max_lev*r] = -Gconst * m[max_lev*r] / (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+                grav_edge[max_lev*r] = -Gconst * m[max_lev*r] / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
             }
 
             for (auto n = 1; n <= finest_radial_level; ++n) {
@@ -267,15 +265,15 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                         // > base_cutoff_density
                         if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
                             m[n+max_lev*r] = m[n+max_lev*(r-1)] + 4.0/3.0*M_PI *
-                                (r_edge_loc[n+max_lev*r] - r_edge_loc[n+max_lev*(r-1)]) *
-                                (r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r] +
-                                r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*(r-1)] +
-                                r_edge_loc[n+max_lev*(r-1)]*r_edge_loc[n+max_lev*(r-1)]) * rho0[n+max_lev*(r-1)];
+                                (r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1)) *
+                                (r_edge_loc_b(n,r)*r_edge_loc_b(n,r) +
+                                r_edge_loc_b(n,r)*r_edge_loc_b(n,r-1) +
+                                r_edge_loc_b(n,r-1)*r_edge_loc_b(n,r-1)) * rho0[n+max_lev*(r-1)];
                         } else {
                             m[n+max_lev*r] = m[n+max_lev*(r-1)];
                         }
 
-                        grav_edge[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_edge_loc[n+max_lev*r]*r_edge_loc[n+max_lev*r]);
+                        grav_edge[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                     }
                 }
             }
@@ -297,13 +295,13 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // > base_cutoff_density
             if (rho0[max_lev*(r-1)] > base_cutoff_density) {
                 mencl += 4.0/3.0 * M_PI *
-                    (r_edge_loc[max_lev*r] - r_edge_loc[max_lev*(r-1)]) *
-                    (r_edge_loc[max_lev*r] * r_edge_loc[max_lev*r] +
-                    r_edge_loc[max_lev*r] * r_edge_loc[max_lev*(r-1)] +
-                    r_edge_loc[max_lev*(r-1)]*r_edge_loc[max_lev*(r-1)]) * rho0[max_lev*(r-1)];
+                    (r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1)) *
+                    (r_edge_loc_b(0,r) * r_edge_loc_b(0,r) +
+                    r_edge_loc_b(0,r) * r_edge_loc_b(0,r-1) +
+                    r_edge_loc_b(0,r-1)*r_edge_loc_b(0,r-1)) * rho0[max_lev*(r-1)];
             }
 
-            grav_edge[max_lev*r] = -Gconst * mencl / (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r]);
+            grav_edge[max_lev*r] = -Gconst * mencl / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
         }
     }
 }

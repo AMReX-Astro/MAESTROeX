@@ -222,9 +222,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
-                Real dr_loc = r_edge_loc[r+1] - r_edge_loc[r];
-                divw0[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
-                           - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr_loc * r_cc_loc[r]*r_cc_loc[r]);
+                Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
+                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0[r+1]
+                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
             }
         }
 

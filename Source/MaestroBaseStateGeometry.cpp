@@ -64,12 +64,12 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         // compute r_cc_loc, r_edge_loc
         for (auto n = 0; n <= max_radial_level; ++n) {
             for (auto i = 0; i < nr[n]; ++i) {
-                r_cc_loc[n + max_lev*i] = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr[n];
+                r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr[n];
 
                 r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr[n];
             }
             for (auto i = 0; i <= nr[n]; ++i) {
-                r_edge_loc[n + max_lev*i] = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr[n];
+                r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr[n];
                 r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr[n];
             }
         }
@@ -81,22 +81,22 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
             const Real* dx_fine = geom[max_level].CellSize();
             // nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc[max_lev*i] = sqrt(0.75+2.0*Real(i))*dx_fine[0];
+                r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
                 r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
             }
-            r_edge_loc[0] = 0.0;
+            r_edge_loc_b(0,0) = 0.0;
             r_edge_loc_b(0,0) = 0.0;
             for (auto i = 0; i < nr_fine; ++i) {
-                r_edge_loc[max_lev*(i+1)] = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
+                r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
                 r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
             }
         } else {
             for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc[max_lev*i] = (Real(i)+0.5)*dr[0];
+                r_cc_loc_b(0,i) = (Real(i)+0.5)*dr[0];
                 r_cc_loc_b(0,i) = (Real(i)+0.5)*dr[0];
             }
             for (auto i = 0; i <= nr_fine; ++i) {
-                r_edge_loc[max_lev*i] = Real(i)*dr[0];
+                r_edge_loc_b(0,i) = Real(i)*dr[0];
                 r_edge_loc_b(0,i) = Real(i)*dr[0];
             }
         }

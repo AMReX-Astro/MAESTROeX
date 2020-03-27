@@ -68,11 +68,11 @@ Maestro::MakeBeta0(RealVector& beta0,
                     if (r < anelastic_cutoff_density_coord[n]) {
 
                         Real drp = is_irreg ? 
-                            r_edge_loc[n+max_lev*(r+1)] - r_edge_loc[n+max_lev*r] : dr[n];
+                            r_edge_loc_b(n,r+1) - r_edge_loc_b(n,r) : dr[n];
                         Real drm = dr[n];
                         if (is_irreg) {
                             drm = r > 0 ? 
-                                r_edge_loc[n+max_lev*r] - r_edge_loc[n+max_lev*(r-1)] : drp;
+                                r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1) : drp;
                         }
 
                         if (r == 0 || r == nr[n]-1) {
@@ -81,7 +81,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                             // nu = 0.0;
                         } else {
                             Real drc = is_irreg ? 
-                                r_cc_loc[n+max_lev*(r+1)] - r_cc_loc[n+max_lev*(r-1)] : dr[n];
+                                r_cc_loc_b(n,r+1) - r_cc_loc_b(n,r-1) : dr[n];
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
@@ -112,8 +112,8 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                         if (is_irreg) {
                             // edge-to-cell-center spacings 
-                            drp = 2.0 * (r_edge_loc[n+max_lev*(r+1)] - r_cc_loc[n+max_lev*r]);
-                            drm = 2.0 * (r_cc_loc[n+max_lev*r] - r_edge_loc[n+max_lev*r]);
+                            drp = 2.0 * (r_edge_loc_b(n,r+1) - r_cc_loc_b(n,r));
+                            drm = 2.0 * (r_cc_loc_b(n,r) - r_edge_loc_b(n,r));
                         }
 
                         Real integral = 0.0;
