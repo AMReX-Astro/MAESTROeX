@@ -165,7 +165,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         Real * AMREX_RESTRICT radii_p = radii.dataPtr();
         Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
         int * AMREX_RESTRICT ncell_p = ncell.dataPtr();
-        const Real * AMREX_RESTRICT center_p = center.dataPtr();
+        const auto center_p = center;
 
         const int fine_lev = finest_level + 1;
         const int nr_irreg_loc = nr_irreg;

@@ -1166,7 +1166,7 @@ Maestro::MakeNormal ()
     // or
     //    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
 
-    const Real * AMREX_RESTRICT center_p = center.dataPtr();
+    const auto center_p = center;
 
     if (spherical == 1) {
 
