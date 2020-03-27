@@ -19,7 +19,7 @@ public:
 
     BaseState() {};
 
-    BaseState(const int num_levs, const int length, const int ncomp=1);
+    BaseState(const int num_levs, const int length=1, const int ncomp=1);
     
     /// create a BaseState object from an existing Fortran-friendly base state
     BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length, const int ncomp=1);
@@ -133,6 +133,7 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp)
 : nlev(num_levs), len(length), nvar(ncomp)
 {
     base_data.resize(nlev*len*nvar);
+    base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
 }
 
@@ -141,6 +142,7 @@ BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_l
 : nlev(num_levs), len(length), nvar(ncomp)
 {
     base_data.resize(nlev*len*nvar);
+    base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
     // need to switch from Fortran array-ordering to C++ ordering
     for (auto l = 0; l < nlev; ++l) {
@@ -157,6 +159,7 @@ BaseState<T>::BaseState(const amrex::Vector<T>& src, const int num_levs, const i
 : nlev(num_levs), len(length), nvar(ncomp)
 {
     base_data.resize(nlev*len*nvar);
+    base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
     // need to switch from Fortran array-ordering to C++ ordering
     for (auto l = 0; l < nlev; ++l) {
@@ -173,6 +176,7 @@ BaseState<T>::BaseState(const BaseState<T>& src)
 : nlev(src.nLevels()), len(src.length()), nvar(src.nComp())
 {
     base_data.resize(nlev*len*nvar);
+    base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
     for (auto i = 0; i < nlev*len*nvar; i++) {
         base_data[i] = src[i];
@@ -188,6 +192,7 @@ BaseState<T>::define(const int num_levs, const int length, const int ncomp)
     nvar = ncomp;
 
     base_data.resize(nlev*len*nvar);
+    base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
 }
 

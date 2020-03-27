@@ -30,11 +30,11 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             }
         } else if (do_2d_planar_octant) {
             //   compute gravity as in the spherical case
-            RealVector m((finest_radial_level+1)*nr_fine);
+            BaseState<Real> m(finest_radial_level+1, nr_fine);
 
             // level = 0
-            m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
-            grav_cell[0] = -Gconst * m[0] / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
+            m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+            grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
             int nr_lev = nr(0);
 
@@ -65,9 +65,9 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
                 } 
 
-                m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2;
+                m(0,r) = m(0,r-1) + term1 + term2;
 
-                grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                grav_cell[max_lev*r] = -Gconst * m(0,r) / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
             }
 
             // level > 0
@@ -76,11 +76,11 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                 for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
 
                     if (r_start_coord_b(n,i) == 0) {
-                        m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
-                        grav_cell[n] = -Gconst * m[n] / (r_cc_loc_b(n,0)*r_cc_loc_b(n,0));
+                        m(n,0) = 4.0/3.0*M_PI*rho0[n]*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
+                        grav_cell[n] = -Gconst * m(n,0) / (r_cc_loc_b(n,0)*r_cc_loc_b(n,0));
                     } else {
                         int r = r_start_coord_b(n,i);
-                        m[n+max_lev*r] = m[n-1+max_lev*(r/2-1)];
+                        m(n,r) = m(n-1,r/2-1);
 
                         // the mass is defined at the cell-centers, so to compute
                         // the mass at the current center, we need to add the
@@ -107,8 +107,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                                 r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                         } 
 
-                        m[n+max_lev*r] += term1 + term2;
-                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
+                        m(n,r) += term1 + term2;
+                        grav_cell[n+max_lev*r] = -Gconst * m(n,r) / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
                     }
 
                     for (auto r = r_start_coord_b(n,i)+1;
@@ -139,9 +139,9 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                                 r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                         } 
 
-                        m[n+max_lev*r] = m[n+max_lev*(r-1)] + term1 + term2;
+                        m(n,r) = m(n,r-1) + term1 + term2;
 
-                        grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
+                        grav_cell[n+max_lev*r] = -Gconst * m(n,r) / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
                     }
                 }
             }
@@ -154,10 +154,10 @@ Maestro::MakeGravCell(RealVector& grav_cell,
         }
     } else { // spherical = 1
 
-        RealVector m(nr_fine);
+        BaseState<Real> m(1, nr_fine);
 
-        m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
-        grav_cell[0] = -Gconst * m[0] / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
+        m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+        grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
         for (auto r = 1; r < nr_fine; ++r) {
 
@@ -186,9 +186,9 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                     r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
             } 
 
-            m[max_lev*r] = m[max_lev*(r-1)] + term1 + term2;
+            m(0,r) = m(0,r-1) + term1 + term2;
 
-            grav_cell[max_lev*r] = -Gconst * m[max_lev*r] / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+            grav_cell[max_lev*r] = -Gconst * m(0,r) / (r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
         }
     }
 }
@@ -224,36 +224,35 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
         } else if (do_2d_planar_octant) {
             // compute gravity as in spherical geometry
 
-            RealVector m((finest_radial_level+1)*(nr_fine+1));
-            m.shrink_to_fit();
+            BaseState<Real> m(finest_radial_level+1, nr_fine+1);
 
             grav_edge[0] = 0.0;
-            m[0] = 0.0;
+            m(0,0) = 0.0;
 
             for (auto r = 0; r < nr(0); ++r) {
 
                 // only add to the enclosed mass if the density is
                 // > base_cutoff_density
                 if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                    m[max_lev*r] = m[max_lev*(r-1)] + 4.0/3.0*M_PI *
+                    m(0,r) = m(0,r-1) + 4.0/3.0*M_PI *
                         (r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1)) *
                         (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
                         r_edge_loc_b(0,r)*r_edge_loc_b(0,r-1) +
                         r_edge_loc_b(0,r-1)*r_edge_loc_b(0,r-1)) * rho0[max_lev*(r-1)];
                 } else {
-                    m[max_lev*r] = m[max_lev*(r-1)];
+                    m(0,r) = m(0,r-1);
                 }
 
-                grav_edge[max_lev*r] = -Gconst * m[max_lev*r] / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
+                grav_edge[max_lev*r] = -Gconst * m(0,r) / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
             }
 
             for (auto n = 1; n <= finest_radial_level; ++n) {
                 for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
 
                     if (r_start_coord_b(n,i) == 0) {
-                        m[n] = 0.0;
+                        m(n,0) = 0.0;
                     } else {
-                        m[n+max_lev*r_start_coord_b(n,i)] = m[n-1*max_lev*r_start_coord_b(n,i)/2];
+                        m(n,r_start_coord_b(n,i)) = m(n-1,r_start_coord_b(n,i)/2);
                         grav_edge[n+max_lev*r_start_coord_b(n,i)] = grav_edge[n-1+max_lev*r_start_coord_b(n,i)/2];
                     }
 
@@ -263,16 +262,16 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                         // only add to the enclosed mass if the density is
                         // > base_cutoff_density
                         if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
-                            m[n+max_lev*r] = m[n+max_lev*(r-1)] + 4.0/3.0*M_PI *
+                            m(n,r) = m(n,r-1) + 4.0/3.0*M_PI *
                                 (r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1)) *
                                 (r_edge_loc_b(n,r)*r_edge_loc_b(n,r) +
                                 r_edge_loc_b(n,r)*r_edge_loc_b(n,r-1) +
                                 r_edge_loc_b(n,r-1)*r_edge_loc_b(n,r-1)) * rho0[n+max_lev*(r-1)];
                         } else {
-                            m[n+max_lev*r] = m[n+max_lev*(r-1)];
+                            m(n,r) = m(n,r-1);
                         }
 
-                        grav_edge[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
+                        grav_edge[n+max_lev*r] = -Gconst * m(n,r) / (r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
                     }
                 }
             }

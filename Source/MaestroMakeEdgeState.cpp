@@ -37,26 +37,22 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
 
-    RealVector sedgel_vec(nr_fine+1);
-    RealVector sedger_vec(nr_fine+1);
+    BaseState<Real> sedgel(nr_fine+1);
+    BaseState<Real> sedger(nr_fine+1);
 
     // copy valid data into array with ghost cells
     const int ng = 3; // number of ghost cells
-    RealVector s_ghost_vec(nr_fine+2*ng);
+    BaseState<Real> s_ghost(nr_fine+2*ng);
     for (int i = 0; i < s_vec.size(); ++i) {
-        s_ghost_vec[i+ng] = s_vec[max_lev*i];
+        s_ghost(i+ng) = s_vec[max_lev*i];
     }
 
     for (int i = 0; i < ng; i++) {
         // symmetry boundary condition at center 
-        s_ghost_vec[ng-1-i] = s_vec[max_lev*i];
+        s_ghost(ng-1-i) = s_vec[max_lev*i];
         // first-order extrapolation at top of star
-        s_ghost_vec[ng+nr_fine+i] = s_vec[max_lev*(nr_fine-1)];
+        s_ghost(ng+nr_fine+i) = s_vec[max_lev*(nr_fine-1)];
     }
-
-    Real * AMREX_RESTRICT sedgel = sedgel_vec.dataPtr();
-    Real * AMREX_RESTRICT sedger = sedger_vec.dataPtr();
-    Real * AMREX_RESTRICT s_ghost = s_ghost_vec.dataPtr();
 
     Real * AMREX_RESTRICT s = s_vec.dataPtr();
     Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
@@ -78,9 +74,9 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 // index of ghost array offset by ng
                 int g = r + ng;
 
-                Real del = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
-                Real dpls = 2.0*(s_ghost[g+1] - s_ghost[g]);
-                Real dmin = 2.0*(s_ghost[g] - s_ghost[g-1]);
+                Real del = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
+                Real dpls = 2.0*(s_ghost(g+1) - s_ghost(g));
+                Real dmin = 2.0*(s_ghost(g) - s_ghost(g-1));
                 Real slim = min(fabs(dpls), fabs(dmin));
                 slim = dpls*dmin > 0.0 ? slim : 0.0;
                 Real sflag = copysign(1.0,del);
@@ -90,9 +86,9 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                     // index of ghost array offset by ng
                     int g = r + ng - 1 + i;
                     // do standard limiting to compute temporary slopes
-                    dsscr[i*4+cen] = 0.5*(s_ghost[g+1]-s_ghost[g-1]);
-                    Real dpls = 2.0*(s_ghost[g+1]-s_ghost[g]);
-                    Real dmin = 2.0*(s_ghost[g]-s_ghost[g-1]);
+                    dsscr[i*4+cen] = 0.5*(s_ghost(g+1)-s_ghost(g-1));
+                    Real dpls = 2.0*(s_ghost(g+1)-s_ghost(g));
+                    Real dmin = 2.0*(s_ghost(g)-s_ghost(g-1));
                     dsscr[i*4+lim] = min(fabs(dmin),fabs(dpls));
                     dsscr[i*4+lim] = dpls*dmin > 0.0 ? dsscr[i*4+lim] : 0.0;
                     dsscr[i*4+flag] = copysign(1.0,dsscr[i*4+cen]);
@@ -107,8 +103,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // compute sedgel and sedger
             Real u = 0.5*(w0_p[r]+w0_p[r+1]);
             Real ubardth = dth*u/dr0;  // NOTE: ubardth=0 for use_exact_base_state case
-            sedgel[r+1]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
-            sedger[r] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
+            sedgel(r+1)= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
+            sedger(r) = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
         });
 
     } else if (ppm_type == 1) {
@@ -123,26 +119,26 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // right side
             int g = i + ng; 
             // compute van Leer slopes
-            Real del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
-            Real dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
-            Real dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
+            Real del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
+            Real dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
+            Real dpls = 2.0  * (s_ghost(g+1) - s_ghost(g));
             Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // left side 
             g = i + ng - 1;
             // compute van Leer slopes
-            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
-            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
-            dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
+            del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
+            dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
+            dpls = 2.0  * (s_ghost(g+1) - s_ghost(g));
             Real dsscrl = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sm
             g = i + ng;
             // 4th order interpolation of s to radial faces
-            Real sm = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
+            Real sm = 0.5*(s_ghost(g)+s_ghost(g-1))-(dsscrr-dsscrl) / 6.0;
             // make sure sm lies in between adjacent cell-centered values
-            sm = max(sm,min(s_ghost[g],s_ghost[g-1]));
-            sm = min(sm,max(s_ghost[g],s_ghost[g-1]));
+            sm = max(sm,min(s_ghost(g),s_ghost(g-1)));
+            sm = min(sm,max(s_ghost(g),s_ghost(g-1)));
 
             // sp
 
@@ -152,18 +148,18 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // right side
             g = i + ng + 1; 
             // compute van Leer slopes
-            del  = 0.5 * (s_ghost[g+1] - s_ghost[g-1]);
-            dmin = 2.0  * (s_ghost[g] - s_ghost[g-1]);
-            dpls = 2.0  * (s_ghost[g+1] - s_ghost[g]);
+            del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
+            dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
+            dpls = 2.0  * (s_ghost(g+1) - s_ghost(g));
             dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sp
             // g = i + ng + 1;
             // 4th order interpolation of s to radial faces
-            Real sp = 0.5*(s_ghost[g]+s_ghost[g-1])-(dsscrr-dsscrl) / 6.0;
+            Real sp = 0.5*(s_ghost(g)+s_ghost(g-1))-(dsscrr-dsscrl) / 6.0;
             // make sure sp lies in between adjacent cell-centered values
-            sp = max(sp,min(s_ghost[g],s_ghost[g-1]));
-            sp = min(sp,max(s_ghost[g],s_ghost[g-1]));
+            sp = max(sp,min(s_ghost(g),s_ghost(g-1)));
+            sp = min(sp,max(s_ghost(g),s_ghost(g-1)));
 
             // modify using quadratic limiters
             if ((sp-s[r])*(s[r]-sm) <= 0.0) {
@@ -185,8 +181,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // // compute sedgel and sedger
-            sedgel[i+1] = Ip + dth*force_p[r];
-            sedger[i] = Im + dth*force_p[r];
+            sedgel(i+1) = Ip + dth*force_p[r];
+            sedger(i) = Im + dth*force_p[r];
         });
     } else if (ppm_type == 2) {
 
@@ -200,17 +196,17 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             for (int j = 0; j < 4; j++) {
                 int g = i + ng - 1 + j;
 
-                sedget[j] = (7.0/12.0)*(s_ghost[g-1]+s_ghost[g]) 
-                        - (1.0/12.0)*(s_ghost[g-2]+s_ghost[g+1]);
+                sedget[j] = (7.0/12.0)*(s_ghost(g-1)+s_ghost(g)) 
+                        - (1.0/12.0)*(s_ghost(g-2)+s_ghost(g+1));
 
                 // limit sedge
-                if ((sedget[j]-s_ghost[g-1])*(s_ghost[g]-sedget[j]) < 0.0) {
-                    Real D2  = 3.0*(s_ghost[g-1]-2.0*sedget[j]+s_ghost[g]);
-                    Real D2L = s_ghost[g-2]-2.0*s_ghost[g-1]+s_ghost[g];
-                    Real D2R = s_ghost[g-1]-2.0*s_ghost[g]+s_ghost[g+1];
+                if ((sedget[j]-s_ghost(g-1))*(s_ghost(g)-sedget[j]) < 0.0) {
+                    Real D2  = 3.0*(s_ghost(g-1)-2.0*sedget[j]+s_ghost(g));
+                    Real D2L = s_ghost(g-2)-2.0*s_ghost(g-1)+s_ghost(g);
+                    Real D2R = s_ghost(g-1)-2.0*s_ghost(g)+s_ghost(g+1);
                     Real sgn = copysign(1.0,D2);
                     Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                    sedget[j] = 0.5*(s_ghost[g-1]+s_ghost[g]) - D2LIM/6.0;
+                    sedget[j] = 0.5*(s_ghost(g-1)+s_ghost(g)) - D2LIM/6.0;
                 }
             }
 
@@ -219,8 +215,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             // use Colella 2008 limiters
             // This is a new version of the algorithm
             // to eliminate sensitivity to roundoff.
-            Real alphap = sedget[2]-s_ghost[g];
-            Real alpham = sedget[1]-s_ghost[g];
+            Real alphap = sedget[2]-s_ghost(g);
+            Real alpham = sedget[1]-s_ghost(g);
             bool bigp = fabs(alphap) > 2.0*fabs(alpham);
             bool bigm = fabs(alpham) > 2.0*fabs(alphap);
             bool extremum = false;
@@ -234,8 +230,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 // the largest, and thus least susceptible to sensitivity to roundoff.
                 Real dafacem = sedget[1] - sedget[0];
                 Real dafacep = sedget[3] - sedget[2];
-                Real dabarm = s_ghost[g] - s_ghost[g-1];
-                Real dabarp = s_ghost[g+1] - s_ghost[g];
+                Real dabarm = s_ghost(g) - s_ghost(g-1);
+                Real dabarp = s_ghost(g+1) - s_ghost(g);
                 Real dafacemin = min(fabs(dafacem),fabs(dafacep));
                 Real dabarmin = min(fabs(dabarm),fabs(dabarp));
                 Real dachkm = 0.0;
@@ -252,9 +248,9 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
             if (extremum) {
                 Real D2  = 6.0*(alpham + alphap);
-                Real D2L = s_ghost[g-2]-2.0*s_ghost[g-1]+s_ghost[g];
-                Real D2R = s_ghost[g]-2.0*s_ghost[g+1]+s_ghost[g+2];
-                Real D2C = s_ghost[g-1]-2.0*s_ghost[g]+s_ghost[g+1];
+                Real D2L = s_ghost(g-2)-2.0*s_ghost(g-1)+s_ghost(g);
+                Real D2R = s_ghost(g)-2.0*s_ghost(g+1)+s_ghost(g+2);
+                Real D2C = s_ghost(g-1)-2.0*s_ghost(g)+s_ghost(g+1);
                 Real sgn = copysign(1.0,D2);
                 Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
                 Real D2ABS = max(fabs(D2),1.e-10);
@@ -264,7 +260,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 if (bigp) {
                     Real sgn = copysign(1.0,alpham);
                     Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                    Real delam = s_ghost[g-1] - s_ghost[g];
+                    Real delam = s_ghost(g-1) - s_ghost(g);
                     if (sgn*amax >= sgn*delam) {
                         if (sgn*(delam - alpham) >= 1.e-10) {
                             alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
@@ -276,7 +272,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 if (bigm) {
                     Real sgn = copysign(1.0,alphap);
                     Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                    Real delap = s_ghost[g+1] - s_ghost[g];
+                    Real delap = s_ghost(g+1) - s_ghost(g);
                     if (sgn*amax >= sgn*delap) {
                         if (sgn*(delap - alphap)>=1.e-10) {
                             alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
@@ -287,8 +283,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                 }
             }
 
-            Real sm = s_ghost[g] + alpham;
-            Real sp = s_ghost[g] + alphap;
+            Real sm = s_ghost(g) + alpham;
+            Real sp = s_ghost(g) + alphap;
 
             // compute Ip and Im
             Real sigmap = fabs(w0_p[r+1])*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
@@ -300,8 +296,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
             Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // // compute sedgel and sedger
-            sedgel[r+1] = Ip + dth*force_p[r];
-            sedger[r] = Im + dth*force_p[r];
+            sedgel(r+1) = Ip + dth*force_p[r];
+            sedger(r) = Im + dth*force_p[r];
         });
     }
 
@@ -315,14 +311,14 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         // By symmetry arguments, this would make no difference at the center of the star
         // and the accuracy at the edge of the star is not important here
         if (i == 0) {
-            sedgel[i] = sedger[i];
+            sedgel(i) = sedger(i);
         } else if (i == nr_fine_loc) {
-            sedger[i] = sedgel[i];
+            sedger(i) = sedgel(i);
         }
 
         // solve Riemann problem to get final edge state
-        sedge[r] = w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
-        sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[i]+sedgel[i]) : sedge[r];
+        sedge[r] = w0_p[r] > 0.0 ? sedgel(i) : sedger(i);
+        sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger(i)+sedgel(i)) : sedge[r];
     });
 
 }
@@ -345,8 +341,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
 
-    Vector<RealVector> sedgel_vec(max_radial_level+1);
-    Vector<RealVector> sedger_vec(max_radial_level+1);
+    BaseState<Real> sedgel(max_radial_level+1,nr_fine+1);
+    BaseState<Real> sedger(max_radial_level+1,nr_fine+1);
 
     Real * AMREX_RESTRICT s = s_vec.dataPtr();
     Real * AMREX_RESTRICT sedge = sedge_vec.dataPtr();
@@ -354,12 +350,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
     Real * AMREX_RESTRICT force_p = force.dataPtr();
 
     for (int n = 0; n <= finest_radial_level; ++n) {
-
-        sedgel_vec[n].resize(nr_fine+1);
-        sedger_vec[n].resize(nr_fine+1);
-
-        Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
-        Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr();   
 
         const int nr_lev = nr(n);
         const Real dr_lev = dr(n);
@@ -488,8 +478,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     // compute sedgel and sedger
                     Real u = 0.5*(w0_p[p]+w0_p[pp]);
                     Real ubardth = dth*u/dr_lev;
-                    sedgel[r+1] = s[p] + (0.5-ubardth)*slope + dth * force_p[p];
-                    sedger[r] = s[p] - (0.5+ubardth)*slope + dth * force_p[p];
+                    sedgel(n,r+1) = s[p] + (0.5-ubardth)*slope + dth * force_p[p];
+                    sedger(n,r) = s[p] - (0.5+ubardth)*slope + dth * force_p[p];
                 });
 
             } else if (ppm_type == 1) {
@@ -619,8 +609,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     }
 
                     // compute sedgel and sedger
-                    sedgel[r+1] = Ip + dth * force_p[p];
-                    sedger[r] = Im + dth * force_p[p];
+                    sedgel(n,r+1) = Ip + dth * force_p[p];
+                    sedger(n,r) = Im + dth * force_p[p];
                 });
 
             } else if (ppm_type == 2) {
@@ -799,8 +789,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     }
 
                     // compute sedgel and sedger
-                    sedgel[r+1] = Ip + dth * force_p[p];
-                    sedger[r] = Im + dth * force_p[p];
+                    sedgel(n,r+1) = Ip + dth * force_p[p];
+                    sedger(n,r) = Im + dth * force_p[p];
                 }); 
             }
         }
@@ -817,23 +807,20 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
             // if we are not at the finest level, copy in the sedger and sedgel states
             // from the next finer level at the c-f interface
             if (n < finest_radial_level) {
-                sedger_vec[n][r_start_coord_b(n+1,i)/2] = sedger_vec[n+1][r_start_coord_b(n+1,i)];
-                sedgel_vec[n][(r_end_coord_b(n+1,i)+1)/2] = sedgel_vec[n+1][r_end_coord_b(n+1,i)+1];
+                sedger(n,r_start_coord_b(n+1,i)/2) = sedger(n+1,r_start_coord_b(n+1,i));
+                sedgel(n,(r_end_coord_b(n+1,i)+1)/2) = sedgel(n+1,r_end_coord_b(n+1,i)+1);
             }
 
             // if we are not at the coarsest level, copy in the sedgel and sedger states
             // from the next coarser level at the c-f interface
             if (n > 0) {
-                sedgel_vec[n][lo] = sedgel_vec[n-1][lo/2];
-                sedger_vec[n][hi+1] = sedger_vec[n-1][(hi+1)/2];
+                sedgel(n,lo) = sedgel(n-1,lo/2);
+                sedger(n,hi+1) = sedger(n-1,(hi+1)/2);
             }
         }
     }
 
     for (int n = 0; n <= finest_radial_level; ++n) {
-
-        Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
-        Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr(); 
 
         const int nr_lev = nr(n);
 
@@ -849,14 +836,14 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
                 if (r == 0) {
                     // pick interior state at lo domain boundary
-                    sedge[p] = sedger[r];
+                    sedge[p] = sedger(n,r);
                 } else if (r == nr_lev) {
                     // pick interior state at hi domain boundary
-                    sedge[p] = sedgel[r];
+                    sedge[p] = sedgel(n,r);
                 } else {
                     // upwind
-                    sedge[p] = w0_p[p] > 0.0 ? sedgel[r] : sedger[r];
-                    sedge[p] = fabs(w0_p[p]) < rel_eps ? 0.5*(sedger[r] + sedgel[r]) : sedge[p];
+                    sedge[p] = w0_p[p] > 0.0 ? sedgel(n,r) : sedger(n,r);
+                    sedge[p] = fabs(w0_p[p]) < rel_eps ? 0.5*(sedger(n,r) + sedgel(n,r)) : sedge[p];
                 }
             });
         }  // loop over disjointchunks
