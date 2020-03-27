@@ -63,9 +63,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& vel_force_mf = vel_force_cart[lev];
         
         // Get grid spacing
         const auto dx = geom[lev].CellSizeArray();
@@ -74,7 +71,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(vel_force_cart[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get Array4 inputs
             const Array4<const Real> gpi_arr = gpi[lev].array(mfi);
@@ -91,7 +88,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
             
             // output
-            const Array4<Real> vel_force = vel_force_mf.array(mfi);
+            const Array4<Real> vel_force = vel_force_cart[lev].array(mfi);
             
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -128,18 +125,15 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                         } else if (j >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
-                            vel_force(i,j,k,1) = vel_force(i,j,k,1)
-                                - (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
+                            vel_force(i,j,k,1) -= (vedge(i,j+1,k)+vedge(i,j,k))*(w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1))/(2.0*dx[1]);
                         }
 #else
-                        
                         if (k <= -1) {
                             // do not modify force since dw0/dr=0
                         } else if (k >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
-                            vel_force(i,j,k,2) = vel_force(i,j,k,2) 
-                                - (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
+                            vel_force(i,j,k,2) -= (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
                         }
 #endif
                     }
@@ -325,7 +319,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                             (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
                             (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
                             
-                        force(i,j,k) = force(i,j,k) - divs0u
+                        force(i,j,k) += -divs0u
                             - (scal(i,j,k)-s0_arr(i,j,k))*(divumac + divu_arr(i,j,k));
                     }
                 });
@@ -366,7 +360,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                               wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
-                        force(i,j,k) = force(i,j,k) - (scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
+                        force(i,j,k) += -(scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
                     }
                 });
             }
@@ -410,8 +404,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (which_step == 1) {
         rho0 = rho0_old;
         p0 =   p0_old;
-    }
-    else {
+    } else {
         for(int i=0; i<rho0.size(); ++i) {
             rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
             p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
@@ -439,7 +432,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-    if (spherical == 1) {
+    if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
     Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
@@ -538,8 +531,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     // If use_exact_base_state or average_base_state is on, psi is instead dpdt term
                     if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
-                        (is_prediction == 0)) {
-                    
+                        (!is_prediction)) {
                         rhoh_force(i,j,k) += psicart(i,j,k);
                     }
 
@@ -547,7 +539,6 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                         rhoh_force(i,j,k) += thermal_arr(i,j,k);
                     }
                 });
-                
             } else {
                 
 #if (AMREX_SPACEDIM == 3)
@@ -589,8 +580,7 @@ void
 Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
                        const Vector<MultiFab>& scal,
                        const Vector<MultiFab>& thermal,
-                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac)
-
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeTempForce()",MakeTempForce);
@@ -618,60 +608,126 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        MultiFab& temp_force_mf = temp_force[lev];
-        const MultiFab& umac_mf = umac[lev][0];
-        const MultiFab& vmac_mf = umac[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& wmac_mf = umac[lev][2];
-#endif
-        const MultiFab& scal_mf = scal[lev];
-        const MultiFab& p0cart_mf = p0_cart[lev];
-        const MultiFab& thermal_mf = thermal[lev];
-        const MultiFab& psi_mf = psi_cart[lev];
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(temp_force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(temp_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
+            const auto domlo = domainBox.loVect3d();
+            const auto domhi = domainBox.hiVect3d();
 
             // Get grid spacing
-            const Real* dx = geom[lev].CellSize();
-                
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-            // We will also pass "validBox", which specifies the "valid" region.
+            const auto dx = geom[lev].CellSizeArray();
 
-            // if use_exact_base_state or average_base_state,
-            // psi is set to dpdt in advance subroutine
-#pragma gpu box(tileBox)
-            mktempforce(AMREX_INT_ANYD(tileBox.loVect()),
-                        AMREX_INT_ANYD(tileBox.hiVect()),
-                        lev,
-                        temp_force_mf[mfi].dataPtr(Temp),
-                        AMREX_INT_ANYD(temp_force_mf[mfi].loVect()),
-                        AMREX_INT_ANYD(temp_force_mf[mfi].hiVect()),
-                        BL_TO_FORTRAN_ANYD(scal_mf[mfi]), 
-                        BL_TO_FORTRAN_ANYD(umac_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(vmac_mf[mfi]),
+            const Array4<Real> temp_force_arr = temp_force[lev].array(mfi);
+            const Array4<const Real> scal_arr = scal[lev].array(mfi);
+            const Array4<const Real> umac = umac_in[lev][0].array(mfi);
+            const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
 #if (AMREX_SPACEDIM == 3)
-                        BL_TO_FORTRAN_ANYD(wmac_mf[mfi]),
+            const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
 #endif
-                        BL_TO_FORTRAN_ANYD(thermal_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(p0cart_mf[mfi]),
-                        BL_TO_FORTRAN_ANYD(psi_mf[mfi]),
-                        AMREX_REAL_ANYD(dx), 
-                        AMREX_INT_ANYD(domainBox.hiVect()));
+            const Array4<const Real> thermal_arr = thermal[lev].array(mfi);
+            const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+            const Array4<const Real> psi_arr = psi_cart[lev].array(mfi);
+
+            if (!spherical) {
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real gradp0 = 0.0;
+#if (AMREX_SPACEDIM == 2)
+                    if (j == 0) {
+                        gradp0 = (p0_arr(i,j+1,k) - p0_arr(i,j,k)) / dx[1];
+                    } else if (j == domhi[1]) {
+                        gradp0 = (p0_arr(i,j,k) - p0_arr(i,j-1,k)) / dx[1];
+                    } else {
+                        gradp0 = 0.5 * (p0_arr(i,j+1,k) - p0_arr(i,j-1,k)) / dx[1];
+                    }
+#else 
+                    if (k == 0) {
+                        gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
+                    } else if (k == domhi[2]) {
+                        gradp0 = (p0_arr(i,j,k) - p0_arr(i,j,k-1)) / dx[2];
+                    } else {
+                        gradp0 = 0.5 * (p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
+                    }
+#endif                
+                    eos_t eos_state;
+
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / scal_arr(i,j,k,Temp);
+                    }
+
+                    // dens, temp, xmass inputs
+                    eos(eos_input_rt, eos_state);
+
+                    auto dhdp = 1.0 / scal_arr(i,j,k,Rho) + 
+                        (scal_arr(i,j,k,Rho) * eos_state.dedr - 
+                        eos_state.p / scal_arr(i,j,k,Rho)) 
+                        / (scal_arr(i,j,k,Rho) * eos_state.dpdr);
+
+#if (AMREX_SPACEDIM == 2)
+                    auto veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
+#else
+                    auto veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
+#endif
+                    
+                    temp_force_arr(i,j,k) = thermal_arr(i,j,k) + 
+                        (1.0 - scal_arr(i,j,k,Rho) * dhdp) * 
+                        (veladv * gradp0 + psi_arr(i,j,k));
+                    temp_force_arr(i,j,k) /= (eos_state.cp * scal_arr(i,j,k,Rho));
+                });
+            } else {
+#if (AMREX_SPACEDIM == 3)
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    eos_t eos_state;
+
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / scal_arr(i,j,k,Temp);
+                    }
+
+                    // dens, temp, xmass inputs
+                    eos(eos_input_rt, eos_state);
+
+                    auto dhdp = 1.0 / scal_arr(i,j,k,Rho) + 
+                        (scal_arr(i,j,k,Rho) * eos_state.dedr - 
+                        eos_state.p / scal_arr(i,j,k,Rho)) 
+                        / (scal_arr(i,j,k,Rho) * eos_state.dpdr);
+
+                    auto p0_lox = 0.5 * (p0_arr(i,j,k) + p0_arr(i-1,j,k));
+                    auto p0_hix = 0.5 * (p0_arr(i,j,k) + p0_arr(i+1,j,k));
+                    auto p0_loy = 0.5 * (p0_arr(i,j,k) + p0_arr(i,j-1,k));
+                    auto p0_hiy = 0.5 * (p0_arr(i,j,k) + p0_arr(i,j+1,k));
+                    auto p0_loz = 0.5 * (p0_arr(i,j,k) + p0_arr(i,j,k-1));
+                    auto p0_hiz = 0.5 * (p0_arr(i,j,k) + p0_arr(i,j,k+1));
+            
+                    auto divup = (umac(i+1,j,k) * p0_hix - umac(i,j,k) * p0_lox) / dx[0] + 
+                        (vmac(i,j+1,k) * p0_hiy - vmac(i,j,k) * p0_loy) / dx[1] + 
+                        (wmac(i,j,k+1) * p0_hiz - wmac(i,j,k) * p0_loz) / dx[2];
+
+                    auto p0divu = ((umac(i+1,j,k) - umac(i,j,k)) / dx[0] + 
+                        (vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] + 
+                        (wmac(i,j,k+1) - wmac(i,j,k)) / dx[2]) * p0_arr(i,j,k);
+                
+                    auto ugradp = divup - p0divu;
+
+                    temp_force_arr(i,j,k) = thermal_arr(i,j,k) + 
+                        (1.0 - scal_arr(i,j,k,Rho) * dhdp) * 
+                        (ugradp + psi_arr(i,j,k));
+                    temp_force_arr(i,j,k) /= (eos_state.cp * scal_arr(i,j,k,Rho));
+                });
+#endif               
+            }
         }
     }
 
     // average down and fill ghost cells
-    AverageDown(temp_force,Temp,1);
-    FillPatch(t_old,temp_force,temp_force,temp_force,Temp,Temp,1,0,bcs_f);
+    AverageDown(temp_force, Temp, 1);
+    FillPatch(t_old, temp_force, temp_force, temp_force, Temp, Temp, 1, 0, bcs_f);
 }
