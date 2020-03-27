@@ -312,6 +312,9 @@ public:
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
+    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
 
@@ -1026,6 +1029,9 @@ public:
 
     void MakeGravEdge(RealVector& grav_edge, 
                       const RealVector& rho0);
+
+    void MakeGravEdge(BaseState<Real>& grav_edge, 
+                      const BaseState<Real>& rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////

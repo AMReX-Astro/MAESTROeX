@@ -434,6 +434,31 @@ Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
 }
 
 void 
+Maestro::RestrictBase(BaseState<Real>& s0, bool is_cell_centered)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
+
+    const int max_lev = max_radial_level + 1;
+
+    for (int n = finest_radial_level; n >= 1; --n) {        
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+            if (is_cell_centered) {
+                // for level n, make the coarser cells underneath simply the average of the fine
+                for (auto j = r_start_coord_b(n,i); j < r_end_coord_b(n,i); j+=2) {
+                    s0(n-1,j/2) = 0.5 * (s0(n,j) + s0(n,j+1));
+                }
+            } else {
+                // for level n, make the coarse edge underneath equal to the fine edge value
+                for (auto j = r_start_coord_b(n,i); j <= r_end_coord_b(n,i)+1; j+=2) {
+                    s0(n-1,j/2) = s0(n,j);
+                }
+            }
+        }
+    }
+}
+
+void 
 Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
 {
     // timer for profiling
@@ -507,6 +532,86 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
                         + s0[n+max_lev*(hi+1)] + s0[n-1+max_lev*((hi+3)/2)]/3.0;
                     // copy the next ghost cell value directly in from the coarser level
                     s0[n+max_lev*(hi+3)] = s0[n-1+max_lev*((hi+3)/2)];
+                }
+            }
+        }
+    }
+}
+
+void 
+Maestro::FillGhostBase(BaseState<Real>& s0, bool is_cell_centered)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
+
+    const int max_lev = max_radial_level + 1;
+
+    for (int n = finest_radial_level; n >= 1; --n) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+
+            const int lo = r_start_coord_b(n,i);
+            const int hi = r_end_coord_b(n,i);
+
+            if (is_cell_centered) {
+
+                if (lo != 0) {
+                    int r_crse = lo/2-1;
+                    Real del = 0.5*(s0(n-1,r_crse+1)-s0(n-1,r_crse-1));
+                    Real dpls = 2.0*(s0(n-1,r_crse+1)-s0(n-1,r_crse));
+                    Real dmin = 2.0*(s0(n-1,r_crse)-s0(n-1,r_crse-1));
+                    Real slim = min(fabs(dpls),fabs(dmin));
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
+                    Real slope = copysign(1.0,del)*min(slim,fabs(del));
+                    s0(n,lo-1) = s0(n-1,r_crse) + 0.25*slope;
+                    s0(n,lo-2) = s0(n-1,r_crse) - 0.25*slope;
+
+                    r_crse = lo/2-2;
+                    del = 0.5*(s0(n-1,r_crse+1)-s0(n-1,r_crse-1));
+                    dpls = 2.0*(s0(n-1,r_crse+1)-s0(n-1,r_crse));
+                    dmin = 2.0*(s0(n-1,r_crse)-s0(n-1,r_crse-1));
+                    slim = min(fabs(dpls),fabs(dmin));
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
+                    slope = copysign(1.0,del)*min(slim,fabs(del));
+                    s0(n,lo-3) = s0(n-1,r_crse) + 0.25*slope;
+                    s0(n,lo-4) = s0(n-1,r_crse) - 0.25*slope;
+                }
+
+                if (hi != nr(n)-1) {
+                    int r_crse = (hi+1)/2;
+                    Real del = 0.5*(s0(n-1,r_crse+1)-s0(n-1,r_crse-1));
+                    Real dpls = 2.0*(s0(n-1,r_crse+1)-s0(n-1,r_crse));
+                    Real dmin = 2.0*(s0(n-1,r_crse)-s0(n-1,r_crse-1));
+                    Real slim = min(fabs(dpls),fabs(dmin));
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
+                    Real slope = copysign(1.0,del)*min(slim,fabs(del));
+                    s0(n,hi+1) = s0(n-1,r_crse) - 0.25*slope;
+                    s0(n,hi+2) = s0(n-1,r_crse) + 0.25*slope;
+
+                    r_crse = (hi+1)/2+1;
+                    del = 0.5*(s0(n-1,r_crse+1)-s0(n-1,r_crse-1));
+                    dpls = 2.0*(s0(n-1,r_crse+1)-s0(n-1,r_crse));
+                    dmin = 2.0*(s0(n-1,r_crse)-s0(n-1,r_crse-1));
+                    slim = min(fabs(dpls),fabs(dmin));
+                    slim = dpls*dmin > 0.0 ? slim : 0.0;
+                    slope = copysign(1.0,del)*min(slim,fabs(del));
+                    s0(n,hi+3) = s0(n-1,r_crse) - 0.25*slope;
+                    s0(n,hi+4) = s0(n-1,r_crse) + 0.25*slope;
+                }
+            } else {
+                if (lo != 0) {
+                    // quadratic interpolation from the three closest points
+                    s0(n,lo-1) = -s0(n,lo+1)/3.0
+                        + s0(n,lo) + s0(n-1,lo/2-1)/3.0;
+                    // copy the next ghost cell value directly in from the coarser level
+                    s0(n,lo-2) = s0(n-1,(lo-2)/2);
+                }
+
+                if (hi+1 != nr(n)) {
+                    // quadratic interpolation from the three closest points
+                    s0(n,hi+2) = -s0(n,hi)/3.0
+                        + s0(n,hi+1) + s0(n-1,(hi+3)/2)/3.0;
+                    // copy the next ghost cell value directly in from the coarser level
+                    s0(n,hi+3) = s0(n-1,(hi+3)/2);
                 }
             }
         }
