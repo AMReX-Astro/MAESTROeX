@@ -61,7 +61,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                     Real mu = 0.0;
                     Real nu = 0.0;
 
-                    if (r < anelastic_cutoff_density_coord[n]) {
+                    if (r < anelastic_cutoff_density_coord(n)) {
 
                         Real drp = is_irreg ? 
                             r_edge_loc_b(n,r+1) - r_edge_loc_b(n,r) : dr[n];
@@ -197,7 +197,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                         }
 
                         // Redo the anelastic cutoff part
-                        for (auto r = anelastic_cutoff_density_coord[i]; r <= nr[i]; ++r) {
+                        for (auto r = anelastic_cutoff_density_coord(i); r <= nr[i]; ++r) {
                             if (rho0[i+max_lev*(r-1)] != 0.0) {
                                 beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
                                     (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
@@ -209,8 +209,8 @@ Maestro::MakeBeta0(RealVector& beta0,
                         // level i+1 to level i in the region between the anelastic cutoff and 
                         // the top of grid n.  Then recompute beta0 at level i above the top 
                         // of grid n.
-                        if (r_end_coord_b(n,j) >= anelastic_cutoff_density_coord[n]) {
-                            for (auto r = anelastic_cutoff_density_coord[i]; 
+                        if (r_end_coord_b(n,j) >= anelastic_cutoff_density_coord(n)) {
+                            for (auto r = anelastic_cutoff_density_coord(i); 
                                  r <= (r_end_coord_b(n,j)+1)/refrat-1; ++r) {
                                 beta0[i+max_lev*r] = 0.5*(beta0[i+1+max_lev*2*r] + 
                                     beta0[i+1+max_lev*(2*r+1)]);

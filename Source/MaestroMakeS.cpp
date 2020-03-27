@@ -175,7 +175,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 });
 #endif
             } else {
-                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord[lev];
+                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord(lev);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;

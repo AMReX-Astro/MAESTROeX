@@ -38,7 +38,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     // now integrate upwards from the bottom later, we will offset the
     // entire pressure so we have effectively integrated from the "top"
     if (use_exact_base_state && spherical) {
-        for (auto r = 1; r <= min(r_end_coord_b(0,1),base_cutoff_density_coord[0]); ++r) {
+        for (auto r = 1; r <= min(r_end_coord_b(0,1),base_cutoff_density_coord(0)); ++r) {
             // uneven grid spacing
             Real dr1 = r_edge_loc_b(0,r)-r_cc_loc_b(0,r-1);
             Real dr2 = r_cc_loc_b(0,r)-r_edge_loc_b(0,r);
@@ -46,13 +46,13 @@ Maestro::EnforceHSE(const RealVector& rho0,
                 dr2*rho0[max_lev*r])*grav_edge[max_lev*r];
         }
     } else {
-        for (auto r = 1; r <= min(r_end_coord_b(0,1),base_cutoff_density_coord[0]); r++) {
+        for (auto r = 1; r <= min(r_end_coord_b(0,1),base_cutoff_density_coord(0)); r++) {
             // assume even grid spacing
             p0[max_lev*r] = p0[max_lev*(r-1)] + 0.5*dr[0]*
                 (rho0[max_lev*(r-1)] + rho0[max_lev*r])*grav_edge[max_lev*r];
         }
     }
-    for (auto r = base_cutoff_density_coord[0]+1; r <= r_end_coord_b(0,1); ++r) {
+    for (auto r = base_cutoff_density_coord(0)+1; r <= r_end_coord_b(0,1); ++r) {
         p0[max_lev*r] = p0[max_lev*(r-1)];
     }
 
@@ -66,7 +66,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     // if we are at the bottom of the domain, use the old
                     // pressure as reference
                     p0[n] = p0old[n];
-                } else if (r_start_coord_b(n,i) <= base_cutoff_density_coord[n]) {
+                } else if (r_start_coord_b(n,i) <= base_cutoff_density_coord(n)) {
                     // we integrate upwards starting from the nearest coarse
                     // cell at a lower physical height
 
@@ -96,11 +96,11 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
                 // integrate upwards as normal
                 for (auto r = r_start_coord_b(n,i)+1; 
-                     r <= min(r_end_coord_b(n,i),base_cutoff_density_coord[n]); ++r) {
+                     r <= min(r_end_coord_b(n,i),base_cutoff_density_coord(n)); ++r) {
                     p0[n+max_lev*r] = p0[n+max_lev*(r-1)] + 0.5 * dr[n] * 
                         (rho0[n+max_lev*r]+rho0[n+max_lev*(r-1)])*grav_edge[n+max_lev*r];
                 }
-                for (auto r = base_cutoff_density_coord[n]+1; 
+                for (auto r = base_cutoff_density_coord(n)+1; 
                      r <= r_end_coord_b(n,i); ++r) {
                     p0[n+max_lev*r] = p0[n+max_lev*(r-1)];
                 }
@@ -116,7 +116,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                 if (r_end_coord_b(n,i) == nr[n]-1) {
                     // for (auto nothing - we are at the top of the domain
                     offset = 0.0;
-                } else if (r_end_coord_b(n,i) <= base_cutoff_density_coord[n]) {
+                } else if (r_end_coord_b(n,i) <= base_cutoff_density_coord(n)) {
                     // use fine -> coarse stencil in notes
                     if (do_planar_invsq_grav || do_2d_planar_octant) {
                         // we have variable gravity

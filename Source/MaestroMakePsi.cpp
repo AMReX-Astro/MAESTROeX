@@ -17,7 +17,7 @@ Maestro::MakePsiPlanar()
         for (auto i = 1; i <= numdisjointchunks_b(n); ++i){
             for (auto r = r_start_coord_b(n,i); 
                  r<= r_end_coord_b(n,i); ++r) {
-                if (r < base_cutoff_density_coord[n]) {
+                if (r < base_cutoff_density_coord(n)) {
                     psi[n+max_lev*r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }
             }
@@ -50,7 +50,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     Real * AMREX_RESTRICT psi_p = psi.dataPtr();
 
-    const auto npts = base_cutoff_density_coord[0];
+    const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
         Real div_w0_sph = 1.0 / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) *
@@ -77,12 +77,12 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
     const Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
     Real * AMREX_RESTRICT psi_p = psi.dataPtr();
 
-    const auto npts = base_cutoff_density_coord[0];
+    const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
         psi_p[max_lev*r] = etarho_cc_p[max_lev*r] * grav_cell_p[max_lev*r];
     });
 
-    for (auto r = base_cutoff_density_coord[0]+1; r < nr_fine; ++r) {
+    for (auto r = base_cutoff_density_coord(0)+1; r < nr_fine; ++r) {
         psi[max_lev*r] = psi[max_lev*(r-1)];
     }
 

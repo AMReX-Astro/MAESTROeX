@@ -1934,11 +1934,11 @@ public:
     int nr_irreg;
     IntVector nr;
     RealVector dr;
-    IntVector base_cutoff_density_coord;
-    IntVector anelastic_cutoff_density_coord;
-    IntVector burning_cutoff_density_lo_coord;
-    IntVector burning_cutoff_density_hi_coord;
 
+    BaseState<int> base_cutoff_density_coord;
+    BaseState<int> anelastic_cutoff_density_coord;
+    BaseState<int> burning_cutoff_density_lo_coord;
+    BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
     amrex::Real c_rel_eps;
