@@ -119,7 +119,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-            const Real* AMREX_RESTRICT center_p = center.dataPtr();
+            const auto center_p = center;
 
             Real smdamp = 1.0;
             int smdamp_idx = -1;
