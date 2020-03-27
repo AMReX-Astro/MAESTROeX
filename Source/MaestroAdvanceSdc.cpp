@@ -292,7 +292,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
     
     if (evolve_base_state) {
-
         if (split_projection) {
 
             // compute Sbar = average(S_cc_nph)
@@ -303,12 +302,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 1;
-            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, 
+            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                    rho0_old, p0_old, p0_old, gamma1bar_old, 
                    gamma1bar_old, p0_minus_peosbar, 
                    delta_chi_w0_dummy, dt, dtold, is_predictor);
 
-            if (spherical == 1) {
+            if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
             }
@@ -557,10 +556,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         
         if (use_etarho) {
             // compute the new etarho
-            if (spherical == 0) {
-                MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+            if (!spherical) {
+                MakeEtarho(etarhoflux_dummy);
             } else {
-                MakeEtarhoSphr(sold,snew,umac,w0mac_dummy,etarho_ec,etarho_cc);
+                MakeEtarhoSphr(sold,snew,umac,w0mac_dummy);
             }
         }
 
@@ -701,7 +700,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             
             // compute S at cell-centers
             Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-                      rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+                      rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar);
         
             // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -765,12 +764,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute w0, w0_force, and delta_chi_w0
                     is_predictor = 0;
-                    Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, 
+                    Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                            rho0_new, p0_old, p0_new, gamma1bar_old, 
                            gamma1bar_new, p0_minus_peosbar, 
                            delta_chi_w0_dummy, dt, dtold, is_predictor);
                                 
-                    if (spherical == 1) {
+                    if (spherical) {
                         // put w0 on Cartesian edges
                         MakeW0mac(w0mac);
                     }
@@ -988,10 +987,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             if (use_etarho) {
                 // compute the new etarho
-                if (spherical == 0) {
-                    MakeEtarho(etarho_ec,etarho_cc,etarhoflux_dummy);
+                if (!spherical) {
+                    MakeEtarho(etarhoflux_dummy);
                 } else {
-                    MakeEtarhoSphr(sold,snew,umac,w0mac_dummy,etarho_ec,etarho_cc);
+                    MakeEtarhoSphr(sold, snew, umac, w0mac_dummy);
                 }
             }
 
@@ -1132,7 +1131,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     MakeReactionRates(rho_omegadot,rho_Hnuc,snew); 
     
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+              rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar);
 
     if (evolve_base_state) {
 
@@ -1150,12 +1149,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_new, 
+            Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, 
                    rho0_new, p0_new, p0_new, gamma1bar_new, 
                    gamma1bar_new, p0_minus_peosbar, 
                    delta_chi_w0_dummy, dt, dtold, is_predictor);
 
-            if (spherical == 1) {
+            if (spherical) {
                 // put w0 on Cartesian cell-centers
                 Put1dArrayOnCart(w0, w0cc, 1, 1, bcs_u, 0, 1);
             }

@@ -288,14 +288,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
-        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
-        if (spherical == 1) {
+        if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
@@ -451,7 +451,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
-        MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+        MakeEtarhoSphr(s1,s2,umac,w0mac_dummy);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -552,7 +552,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute S at cell-centers
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar,psi);
+              rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar);
 
     // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -603,14 +603,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_old, rho0_new, 
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_new, 
                p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
                p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
-        if (spherical == 1) {
+        if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
@@ -733,7 +733,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
-        MakeEtarhoSphr(s1,s2,umac,w0mac_dummy,etarho_ec,etarho_cc);
+        MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -810,7 +810,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar,psi);
+              rho_Hext,thermal2,p0_new,gamma1bar_new,delta_gamma1_termbar);
 
     // define dSdt = (S_cc_new - S_cc_old) / dt
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -829,7 +829,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
-        Makew0(w0, w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
                p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
                p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
 

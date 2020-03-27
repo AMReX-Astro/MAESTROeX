@@ -21,9 +21,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> rho0_cart(finest_level+1);
 
     // constants in Fortran
-    Real base_cutoff_density=0.0; 
+    Real base_cutoff_density = 0.0; 
     get_base_cutoff_density(&base_cutoff_density);
-    Real buoyancy_cutoff_factor=0.0;
+    Real buoyancy_cutoff_factor = 0.0;
     get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -117,7 +117,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
                     vel_force(i,j,k,AMREX_SPACEDIM-1) = (rhopert * grav(i,j,k,AMREX_SPACEDIM-1) - gpi_arr(i,j,k,AMREX_SPACEDIM-1)) / rho_arr(i,j,k) - w0_force(i,j,k,AMREX_SPACEDIM-1);
 
-                    if (do_add_utilde_force == 1) {
+                    if (do_add_utilde_force) {
+                        
 #if (AMREX_SPACEDIM == 2)
                         if (j <= -1) {
                             // do not modify force since dw0/dr=0
@@ -173,7 +174,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     }
 
     // average fine data onto coarser cells
-    AverageDown(vel_force_cart,0,AMREX_SPACEDIM);
+    AverageDown(vel_force_cart, 0, AMREX_SPACEDIM);
 
     // note - we need to reconsider the bcs type here
     // it matches fortran MAESTRO but is that correct?
@@ -209,7 +210,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     RealVector divw0;
     Vector<MultiFab> divu_cart(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         divw0.resize(nr_fine);
         std::fill(divw0.begin(), divw0.end(), 0.);
 
@@ -257,7 +258,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             const Box& tileBox = mfi.tilebox();
 
             // offload to GPU
-            if (spherical == 1) {
+            if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                 // lo and hi of domain
                 const Box& domainBox = geom[lev].Domain();
@@ -367,7 +368,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     }
 
     // average fine data onto coarser cells
-    AverageDown(scal_force,comp,1);
+    AverageDown(scal_force, comp, 1);
 
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
@@ -490,7 +491,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
             // For non-spherical, add wtilde d(p0)/dr
             // For spherical, we make u grad p = div (u p) - p div (u)
-            if (spherical == 0) {
+            if (!spherical) {
 
                 AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
                 {
@@ -528,7 +529,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     // (rho h)', but should be there if we are predicting h or rhoh
                     //
                     // If use_exact_base_state or average_base_state is on, psi is instead dpdt term
-                    if ((is_prediction && enthalpy_pred_type_in == predict_h_const) ||
+                    if ((is_prediction == 1 && enthalpy_pred_type_in == predict_h_const) ||
                         (is_prediction == 1 && enthalpy_pred_type_in == predict_rhoh_const) || 
                         (!is_prediction)) {
                         rhoh_force(i,j,k) += psicart(i,j,k);

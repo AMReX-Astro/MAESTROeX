@@ -17,8 +17,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& thermal,
                     const RealVector& p0,
                     const RealVector& gamma1bar,
-                    RealVector& delta_gamma1_termbar,
-                    const RealVector& psi_in)
+                    RealVector& delta_gamma1_termbar)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
@@ -30,8 +29,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Vector<MultiFab> psi_cart(finest_level+1);
 
     // calculate gradp0
-    RealVector gradp0;
-    gradp0.resize((max_radial_level+1)*nr_fine);
+    RealVector gradp0((max_radial_level+1)*nr_fine);
 
     if (spherical == 1) {
         if (use_delta_gamma1_term) {
@@ -91,7 +89,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (use_delta_gamma1_term) {
         Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
         Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(psi_in, psi_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     }
 
     const auto use_omegadot_terms_in_S_loc = use_omegadot_terms_in_S;
@@ -121,7 +119,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             const Array4<const Real> gradp0_arr = gradp0_cart[lev].array(mfi);
             const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-            if (spherical == 1) {
+            if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
@@ -137,7 +135,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     // dens, temp, and xmass are inputs
                     eos(eos_input_rt, eos_state);
 
-                    eos_xderivs_t eos_xderivs = composition_derivatives(eos_state);
+                    auto eos_xderivs = composition_derivatives(eos_state);
 
                     Real sigma = eos_state.dpdT / 
                         (eos_state.rho * eos_state.cp * eos_state.dpdr);
@@ -191,7 +189,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     // dens, temp, and xmass are inputs
                     eos(eos_input_rt, eos_state);
 
-                    eos_xderivs_t eos_xderivs = composition_derivatives(eos_state);
+                    auto eos_xderivs = composition_derivatives(eos_state);
 
                     Real sigma = eos_state.dpdT / 
                         (eos_state.rho * eos_state.cp * eos_state.dpdr);

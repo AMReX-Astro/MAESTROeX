@@ -4,12 +4,12 @@
 using namespace amrex;
 
 void 
-Maestro::MakePsiPlanar(RealVector& psi) 
+Maestro::MakePsiPlanar() 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiPlanar()", MakePsiPlanar);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = max_radial_level + 1;
     get_numdisjointchunks(numdisjointchunks.dataPtr());
     get_r_start_coord(r_start_coord.dataPtr());
     get_r_end_coord(r_end_coord.dataPtr());
@@ -33,15 +33,14 @@ Maestro::MakePsiPlanar(RealVector& psi)
 }
 
 void 
-Maestro::MakePsiSphr(RealVector& psi, const RealVector& w0_in, 
-                     const RealVector& gamma1bar, 
+Maestro::MakePsiSphr(const RealVector& gamma1bar, 
                      const RealVector& p0_avg,
                      const RealVector& Sbar_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiSphr()", MakePsiSphr);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = max_radial_level + 1;
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
@@ -49,7 +48,7 @@ Maestro::MakePsiSphr(RealVector& psi, const RealVector& w0_in,
 
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
-    const Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
     const Real * AMREX_RESTRICT p0_avg_p = p0_avg.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
@@ -69,7 +68,7 @@ Maestro::MakePsiSphr(RealVector& psi, const RealVector& w0_in,
 }
 
 void 
-Maestro::MakePsiIrreg(RealVector& psi, const RealVector& grav_cell) 
+Maestro::MakePsiIrreg(const RealVector& grav_cell) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiIrreg()", MakePsiIrreg);
