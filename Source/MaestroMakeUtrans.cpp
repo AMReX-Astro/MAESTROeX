@@ -11,38 +11,26 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                      const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeUtrans()",MakeUtrans);
+    BL_PROFILE_VAR("Maestro::MakeUtrans()", MakeUtrans);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get the index space and grid spacing of the domain
         const Box& domainBox = geom[lev].Domain();
-        const Real* dx = geom[lev].CellSize();
+        const auto dx = geom[lev].CellSizeArray();
 
         const Real rel_eps = c_rel_eps;
 
         const Real dt2 = 0.5 * dt;
 
-        const Real hx = dx[0];
-        const Real hy = dx[1];
+        const auto domlo = domainBox.loVect3d();
+        const auto domhi = domainBox.hiVect3d();
 #if (AMREX_SPACEDIM == 3)
-        const Real hz = dx[2];
-#endif
-        const int ilo = domainBox.loVect()[0];
-        const int ihi = domainBox.hiVect()[0];
-        const int jlo = domainBox.loVect()[1];
-        const int jhi = domainBox.hiVect()[1];
-#if (AMREX_SPACEDIM == 3)
-        const int klo = domainBox.loVect()[2];
-        const int khi = domainBox.hiVect()[2];
-
         const int spherical_local = spherical;
 #endif
         const int ppm_type_local = ppm_type;
         
-
         // get references to the MultiFabs at level lev
-        const MultiFab& utilde_mf  = utilde[lev];
         MultiFab Ip, Im;
         Ip.define(grids[lev],dmap[lev],AMREX_SPACEDIM,2);
         Im.define(grids[lev],dmap[lev],AMREX_SPACEDIM,2);
@@ -80,11 +68,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& xbx = mfi.nodaltilebox(0);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -123,9 +110,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
 
                     ulx = utilde_arr(i-1,j,k,0) 
-                        + (0.5-(dt2/hx)*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
+                        + (0.5-(dt2/dx[0])*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
                     urx = utilde_arr(i  ,j,k,0) 
-                        - (0.5+(dt2/hx)*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
+                        - (0.5+(dt2/dx[0])*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -134,7 +121,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 }
 
                 // impose lo i side bc's
-                if (i == ilo) {
+                if (i == domlo[0]) {
                     switch (bclo) {
                         case Inflow:
                             ulx = utilde_arr(i-1,j,k,0);
@@ -155,7 +142,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
 
                 // impose hi i side bc's
-                } else if (i == ihi+1) {
+                } else if (i == domhi[0]+1) {
                     switch (bchi) {
                         case Inflow:
                             ulx = utilde_arr(i,j,k,0);
@@ -187,11 +174,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& ybx = mfi.nodaltilebox(1);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -228,9 +214,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
+                        + (0.5-(dt2/dx[1])*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
+                        - (0.5+(dt2/dx[1])*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -239,7 +225,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 }
 
                 // impose lo side bc's
-                if (j == jlo) {
+                if (j == domlo[1]) {
                     switch (bclo) {
                         case Inflow:
                             vly = utilde_arr(i,j-1,k,1);
@@ -260,7 +246,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
 
                 // impose hi side bc's
-                } else if (j == jhi+1) {
+                } else if (j == domhi[1]+1) {
                     switch (bchi) {
                         case Inflow:
                             vly = utilde_arr(i,j,k,1);
@@ -296,11 +282,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& xbx = mfi.nodaltilebox(0);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -339,9 +324,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     ulx = utilde_arr(i-1,j,k,0) 
-                        + (0.5-(dt2/hx)*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
+                        + (0.5-(dt2/dx[0])*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
                     urx = utilde_arr(i  ,j,k,0) 
-                        - (0.5+(dt2/hx)*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
+                        - (0.5+(dt2/dx[0])*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
                     ulx = Ip_arr(i-1,j,k,0);
@@ -349,7 +334,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 }
 
                 // impose lo side bc's
-                if (i == ilo) {
+                if (i == domlo[0]) {
                     switch (bclo) {
                         case Inflow:
                             ulx = utilde_arr(i-1,j,k,0);
@@ -370,7 +355,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
 
                 // impose hi side bc's
-                } else if (i == ihi+1) {
+                } else if (i == domhi[0]+1) {
                     switch (bchi) {
                         case Inflow:
                             ulx = utilde_arr(i+1,j,k,0);
@@ -391,7 +376,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local == 1) {
+                if (spherical_local) {
                     // solve Riemann problem using full velocity
                     bool test = (ulx+w0macx(i,j,k) <= 0.0 && 
                                 urx+w0macx(i,j,k) >= 0.0) || 
@@ -412,11 +397,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& ybx = mfi.nodaltilebox(1);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -455,9 +439,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/hy)*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
+                        + (0.5-(dt2/dx[1])*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/hy)*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
+                        - (0.5+(dt2/dx[1])*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -466,7 +450,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 }
 
                 // impose lo side bc's
-                if (j == jlo) {
+                if (j == domlo[1]) {
                     switch (bclo) {
                         case Inflow:
                             vly = utilde_arr(i,j-1,k,1);
@@ -487,7 +471,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
 
                 // impose hi side bc's
-                } else if (j == jhi+1) {
+                } else if (j == domhi[1]+1) {
                     switch (bchi) {
                         case Inflow:
                             vly = utilde_arr(i,j+1,k,1);
@@ -508,7 +492,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local == 1) {
+                if (spherical_local) {
                     // solve Riemann problem using full velocity
                     bool test = (vly+w0macy(i,j,k) <= 0.0 && 
                                 vry+w0macy(i,j,k) >= 0.0) || 
@@ -529,11 +513,10 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& zbx = mfi.nodaltilebox(2);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -572,9 +555,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     wlz = utilde_arr(i,j,k-1,2) 
-                        + (0.5-(dt2/hz)*max(0.0,ufull_arr(i,j,k-1,2)))*Ip_arr(i,j,k-1,0);
+                        + (0.5-(dt2/dx[2])*max(0.0,ufull_arr(i,j,k-1,2)))*Ip_arr(i,j,k-1,0);
                     wrz = utilde_arr(i,j,k  ,2) 
-                        - (0.5+(dt2/hz)*min(0.0,ufull_arr(i,j,k  ,2)))*Ip_arr(i,j,k  ,0);
+                        - (0.5+(dt2/dx[2])*min(0.0,ufull_arr(i,j,k  ,2)))*Ip_arr(i,j,k  ,0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
                     wlz = Ip_arr(i,j,k-1,2);
@@ -582,7 +565,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 }
 
                 // impose lo side bc's
-                if (k == klo) {
+                if (k == domlo[2]) {
                     switch (bclo) {
                         case Inflow:
                             wlz = utilde_arr(i,j,k-1,2);
@@ -603,7 +586,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
 
                 // impose hi side bc's
-                } else if (k == khi+1) {
+                } else if (k == domhi[2]+1) {
                     switch (bchi) {
                         case Inflow:
                             wlz = utilde_arr(i,j,k+1,2);
@@ -624,7 +607,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local == 1) {
+                if (spherical_local) {
                     // solve Riemann problem using full velocity
                     bool test = (wlz+w0macz(i,j,k) <= 0.0 && 
                                 wrz+w0macz(i,j,k) >= 0.0) || 

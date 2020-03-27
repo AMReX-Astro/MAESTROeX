@@ -20,7 +20,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
                                   RealVector& force)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()",MakeEdgeState1dSphr);
+    BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()", MakeEdgeState1dSphr);
 
     Real rel_eps = 0.0;
     get_rel_eps(&rel_eps);
@@ -31,8 +31,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr_loc = dr_fine * pow(2.0, max_radial_level);
-    const Real dtdr = dt / dr_loc;
+    const Real dr0 = dr[0];
+    const Real dtdr = dt / dr0;
 
     const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
@@ -65,13 +65,12 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
     if (ppm_type == 0) {
 
-        // this will hold values at r-1, r and r+1
-        RealVector dsscr_vec(4*3);
-        Real * AMREX_RESTRICT dsscr = dsscr_vec.dataPtr();
-
         AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
             Real slope = 0.0;
+
+            // this will hold values at r-1, r and r+1
+            Real dsscr[4*3];
 
             if (slope_order_loc == 0) {
                 slope = 0.0;
@@ -107,7 +106,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
 
             // compute sedgel and sedger
             Real u = 0.5*(w0_p[r]+w0_p[r+1]);
-            Real ubardth = dth*u/dr_loc;  // NOTE: ubardth=0 for use_exact_base_state case
+            Real ubardth = dth*u/dr0;  // NOTE: ubardth=0 for use_exact_base_state case
             sedgel[r+1]= s[r] + (0.5-ubardth)*slope + dth*force_p[r];
             sedger[r] = s[r] - (0.5+ubardth)*slope + dth*force_p[r];
         });
@@ -191,13 +190,12 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         });
     } else if (ppm_type == 2) {
 
-        // this will hold values at r-1, r, r+1 and r+2
-        RealVector sedget_vec(4);
-        Real * AMREX_RESTRICT sedget = sedget_vec.dataPtr();
-
         AMREX_PARALLEL_FOR_1D(nr_fine, i, {
             int r = i * max_lev;
             // interpolate s to radial edges, store these temporary values into sedgel
+
+            // this will hold values at r-1, r, r+1 and r+2
+            Real sedget[4];
 
             for (int j = 0; j < 4; j++) {
                 int g = i + ng - 1 + j;
@@ -323,7 +321,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
         }
 
         // solve Riemann problem to get final edge state
-        sedge[r]= w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
+        sedge[r] = w0_p[r] > 0.0 ? sedgel[i] : sedger[i];
         sedge[r] = fabs(w0_p[r])<rel_eps ? 0.5*(sedger[i]+sedgel[i]) : sedge[r];
     });
 
@@ -368,8 +366,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr();   
 
-        const int nr_lev = nr_fine / pow(2, max_radial_level-n);
-        const Real dr_lev = dr_fine * pow(2.0, max_radial_level-n);
+        const int nr_lev = nr[n];
+        const Real dr_lev = dr[n];
         const Real dtdr = dt / dr_lev;
 
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
@@ -391,11 +389,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
             if (ppm_type == 0) {
 
-                RealVector dxscr_vec(3);
-                Real * AMREX_RESTRICT dxscr = dxscr_vec.dataPtr();
-
                 // compute slopes
-
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
 
                     Real slope = 0.0;
@@ -404,6 +398,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
                     int pp = n + max_lev*(r+1);
                     int pm = n + max_lev*(r-1);
+
+                    Real dxscr[3];
 
                     if (slope_order_loc == 0) {
                         slope = 0.0;
@@ -843,7 +839,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr(); 
 
-        const int nr_lev = nr_fine / pow(2, max_radial_level-n);
+        const int nr_lev = nr[n];
 
         for (int i = 1; i <= numdisjointchunks[n]; ++i) {
 

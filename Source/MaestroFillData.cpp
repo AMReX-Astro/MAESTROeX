@@ -38,8 +38,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
 
     Vector<BCRec> bcs{bcs_in.begin()+startbccomp,bcs_in.begin()+startbccomp+ncomp};
 
-    if (lev == 0)
-    {
+    if (lev == 0) {
         Vector<MultiFab*> smf;
         Vector<Real> stime;
         GetData(0, time, smf, stime, mf_old, mf_new);
@@ -53,7 +52,7 @@ Maestro::FillPatch (int lev, Real time, MultiFab& mf,
         }
 
         FillPatchSingleLevel(mf, time, smf, stime, srccomp, destcomp, ncomp,
-                            geom[lev], physbc, 0);
+                             geom[lev], physbc, 0);
     } else {
         Vector<MultiFab*> cmf, fmf;
         Vector<Real> ctime, ftime;
@@ -196,7 +195,6 @@ Maestro::AverageDownFaces (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge
 
         average_down_faces(edge_f, edge_c, refRatio(lev));
     }
-
 }
 
 
@@ -238,7 +236,6 @@ Maestro::FillUmacGhost (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in
         for ( MFIter mfi(sold_mf, false); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid (cell-centered) region
-            const Box& tilebox = mfi.tilebox();
             const auto xbx = mfi.grownnodaltilebox(0, 1);
             const auto ybx = mfi.grownnodaltilebox(1, 1);
 #if (AMREX_SPACEDIM == 3)
@@ -788,7 +785,7 @@ Maestro::FillPatchUedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge)
         }
 
         // fill ghost cells behind physical boundaries
-        FillUmacGhost(uedge,lev);
+        FillUmacGhost(uedge, lev);
 
     } // end loop over levels
 }

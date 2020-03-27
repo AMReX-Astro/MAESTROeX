@@ -564,7 +564,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                     for (BoxList::iterator it=bxlist2.begin(); it != bxlist2.end(); ++it) {
                         Box ovlp = *it & v_fab.box();
                         if (ovlp.ok()) {
-                            v_fab.setVal(0.0, ovlp, idir, 1);
+                            v_fab.setVal<RunOn::Device>(0.0, ovlp, idir, 1);
                         }
                     }
 

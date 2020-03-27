@@ -4,8 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::Makew0(RealVector& w0_in, 
-                const RealVector& w0_old, 
+Maestro::Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
                 const RealVector& Sbar_in, 
                 const RealVector& rho0_old_in,
@@ -20,7 +19,7 @@ Maestro::Makew0(RealVector& w0_in,
                 const bool is_predictor) 
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Makew0()",Makew0);
+    BL_PROFILE_VAR("Maestro::Makew0()", Makew0);
 
     std::fill(w0_force.begin(), w0_force.end(), 0.);
 
@@ -31,14 +30,14 @@ Maestro::Makew0(RealVector& w0_in,
 
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
-            Makew0PlanarVarg(w0_in, w0_old, w0_force, Sbar_in, 
+            Makew0PlanarVarg(w0_old, w0_force, Sbar_in, 
                              rho0_old_in, rho0_new_in,
                              p0_old_in, p0_new_in, 
                              gamma1bar_old_in, gamma1bar_new_in, 
                              p0_minus_peosbar, 
                              delta_chi_w0, dt_in, dtold_in);
         } else {
-            Makew0Planar(w0_in, w0_old, w0_force, Sbar_in, 
+            Makew0Planar(w0_old, w0_force, Sbar_in, 
                          rho0_old_in, rho0_new_in,
                          p0_old_in, p0_new_in, 
                          gamma1bar_old_in, gamma1bar_new_in, 
@@ -48,14 +47,14 @@ Maestro::Makew0(RealVector& w0_in,
         }
     } else {
         if (use_exact_base_state) {
-            Makew0SphrIrreg(w0_in, w0_old, w0_force, Sbar_in, 
+            Makew0SphrIrreg(w0_old, w0_force, Sbar_in, 
                             rho0_old_in, rho0_new_in,
                             p0_old_in, p0_new_in, 
                             gamma1bar_old_in, gamma1bar_new_in, 
                             p0_minus_peosbar, 
                             delta_chi_w0, dt_in, dtold_in);
         } else {
-            Makew0Sphr(w0_in, w0_old, w0_force, Sbar_in, 
+            Makew0Sphr(w0_old, w0_force, Sbar_in, 
                        rho0_old_in, rho0_new_in,
                        p0_old_in, p0_new_in, 
                        gamma1bar_old_in, gamma1bar_new_in, 
@@ -68,7 +67,7 @@ Maestro::Makew0(RealVector& w0_in,
         for (auto n = 0; n <= finest_radial_level; ++n) {
             Real max_w0 = 0.0;
             for (auto r = r_start_coord[n]; r <= r_end_coord[n]+1; ++r) {
-                max_w0 = max(max_w0, fabs(w0_in[n+max_lev*r]));
+                max_w0 = max(max_w0, fabs(w0[n+max_lev*r]));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / dr[n] << std::endl;
         }
@@ -77,8 +76,7 @@ Maestro::Makew0(RealVector& w0_in,
 }
 
 void 
-Maestro::Makew0Planar(RealVector& w0_in, 
-                      const RealVector& w0_old, 
+Maestro::Makew0Planar(const RealVector& w0_old, 
                       RealVector& w0_force, 
                       const RealVector& Sbar_in, 
                       const RealVector& rho0_old_in,
@@ -93,7 +91,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                       const bool is_predictor) 
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Makew0Planar()",Makew0Planar);
+    BL_PROFILE_VAR("Maestro::Makew0Planar()", Makew0Planar);
 
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Multilevel Outline
@@ -112,7 +110,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
     // }
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    std::fill(w0_in.begin(), w0_in.end(), 0.);
+    std::fill(w0.begin(), w0.end(), 0.);
 
     const int max_lev = max_radial_level+1;
 
@@ -121,7 +119,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
     Real * AMREX_RESTRICT psi_planar = psi_planar_vec.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
-    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
@@ -142,10 +140,10 @@ Maestro::Makew0Planar(RealVector& w0_in,
 
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
-                w0_in[0] = 0.0;
+                w0[0] = 0.0;
             } else {
                 // Obtain the starting value of w0 from the coarser grid
-                w0_in[n+max_lev*r_start_coord[n+max_lev*j]] = w0_in[n-1+max_lev*r_start_coord[n+max_lev*j]/2];
+                w0[n+max_lev*r_start_coord[n+max_lev*j]] = w0[n-1+max_lev*r_start_coord[n+max_lev*j]/2];
             }
 
             // compute psi for level n
@@ -182,7 +180,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     delta_chi_w0[n+max_lev*(r-1)] = 0.0;
                 }
 
-                w0_in[n+max_lev*r] = w0_in[n+max_lev*(r-1)]
+                w0[n+max_lev*r] = w0[n+max_lev*(r-1)]
                     + Sbar_in[n+max_lev*(r-1)] * dr_lev
                     - psi_planar_vec[r-1] / gamma1bar_p0_avg * dr_lev
                     - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
@@ -191,8 +189,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
                 // the corresponding point on level n-1
-                Real offset = w0_in[n+max_lev*(r_end_coord[n+max_lev*j]+1)]
-                    - w0_in[n-1+max_lev*(r_end_coord[n+max_lev*j]+1)/2];
+                Real offset = w0[n+max_lev*(r_end_coord[n+max_lev*j]+1)]
+                    - w0[n-1+max_lev*(r_end_coord[n+max_lev*j]+1)/2];
 
                 for (auto i = n-1; i >= 0; --i) {
 
@@ -201,7 +199,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
                     // Restrict w0 from level n to level i
                     for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
                         if (r % refrat == 0) {
-                            w0_in[n+max_lev*r/refrat] = w0_in[n+max_lev*r];
+                            w0[n+max_lev*r/refrat] = w0[n+max_lev*r];
                         }
                     }
 
@@ -243,8 +241,8 @@ Maestro::Makew0Planar(RealVector& w0_in,
         }
     }
 
-    RestrictBase(w0_in, false);
-    FillGhostBase(w0_in, false);
+    RestrictBase(w0, false);
+    FillGhostBase(w0, false);
 
     for (auto n = 0; n <= max_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
@@ -280,8 +278,7 @@ Maestro::Makew0Planar(RealVector& w0_in,
 }
 
 void 
-Maestro::Makew0PlanarVarg(RealVector& w0_in, 
-                          const RealVector& w0_old, 
+Maestro::Makew0PlanarVarg(const RealVector& w0_old, 
                           RealVector& w0_force, 
                           const RealVector& Sbar_in, 
                           const RealVector& rho0_old_in,
@@ -310,7 +307,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     const Real dr_finest = dr[finest_radial_level];
     const Real dpdt_factor_loc = dpdt_factor;
 
-    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
@@ -498,7 +495,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
     // to the fine edge value.
     for (auto n = finest_radial_level; n >= 1; --n) {
         for (auto r = 0; r <= nr[n]; n+=2) {
-            w0_in[n-1+max_lev*r/2] = w0_in[n+max_lev*r];
+            w0[n-1+max_lev*r/2] = w0[n+max_lev*r];
         }
     }
 
@@ -525,8 +522,8 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
         }
     }
 
-    RestrictBase(w0_in, false);
-    FillGhostBase(w0_in, false);
+    RestrictBase(w0, false);
+    FillGhostBase(w0, false);
 
     // compute the forcing terms
     for (auto n = 0; n <= finest_radial_level; ++n) {
@@ -557,8 +554,7 @@ Maestro::Makew0PlanarVarg(RealVector& w0_in,
 }
 
 void 
-Maestro::Makew0Sphr(RealVector& w0_in, 
-                    const RealVector& w0_old, 
+Maestro::Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const RealVector& Sbar_in, 
                     const RealVector& rho0_old_in,
@@ -608,7 +604,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
     const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
-    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
@@ -717,7 +713,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
     // Call the tridiagonal solver
     Tridiag(A_vec, B_vec, C_vec, F_vec, u_vec, max_cutoff+2);
 
-    w0_in[0] = w0_from_Sbar_vec[0];
+    w0[0] = w0_from_Sbar_vec[0];
 
     // for (auto r = 1; r <= max_cutoff+1; ++r) {
     lo = 1; 
@@ -749,8 +745,7 @@ Maestro::Makew0Sphr(RealVector& w0_in,
 }
 
 void 
-Maestro::Makew0SphrIrreg(RealVector& w0_in, 
-                        const RealVector& w0_old, 
+Maestro::Makew0SphrIrreg(const RealVector& w0_old, 
                         RealVector& w0_force, 
                         const RealVector& Sbar_in, 
                         const RealVector& rho0_old_in,
@@ -800,7 +795,7 @@ Maestro::Makew0SphrIrreg(RealVector& w0_in,
     const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
     const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
-    Real * AMREX_RESTRICT w0_p = w0_in.dataPtr();
+    Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
