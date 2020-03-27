@@ -13,13 +13,13 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<MultiFab>& w0_force_cart)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::AdvancePremac()",AdvancePremac);
+    BL_PROFILE_VAR("Maestro::AdvancePremac()", AdvancePremac);
 
     // create a uold with filled ghost cells
     Vector<MultiFab> utilde(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-            utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-            utilde[lev].setVal(0.);
+        utilde[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+        utilde[lev].setVal(0.);
     }
 
     FillPatch(t_new, utilde, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
@@ -27,12 +27,12 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // create a MultiFab to hold uold + w0
     Vector<MultiFab> ufull(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-            ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
-    // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
-    ufull[lev].setVal(0.);
+        ufull[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_adv);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        ufull[lev].setVal(0.);
     }
 
-        // create ufull = uold + w0
+    // create ufull = uold + w0
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::Copy(ufull[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
     }
@@ -45,13 +45,13 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // create a face-centered MultiFab to hold utrans
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > utrans(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-            utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
-            utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+        utrans[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+        utrans[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 #if (AMREX_SPACEDIM == 3)
-            utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+        utrans[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
 #endif
-            for (int j=0; j < AMREX_SPACEDIM; j++)
-                    utrans[lev][j].setVal(0.);
+        for (int j=0; j < AMREX_SPACEDIM; j++)
+            utrans[lev][j].setVal(0.);
     }
 
     // create utrans
@@ -60,19 +60,18 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-            if (ppm_trace_forces == 0) {
-                    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-            } else {
-                    // tracing needs more ghost cells
-                    vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
-            }
-            vel_force[lev].setVal(0.);
-
+        if (ppm_trace_forces == 0) {
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+        } else {
+            // tracing needs more ghost cells
+            vel_force[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
+        }
+        vel_force[lev].setVal(0.);
     }
 
     int do_add_utilde_force = 1;
     MakeVelForce(vel_force,utrans,sold,rho0_old,grav_cell_old,
-                    w0_force_cart,do_add_utilde_force);
+                 w0_force_cart,do_add_utilde_force);
 
     // add w0 to trans velocities
     Addw0 (utrans,w0mac,1.);
@@ -92,35 +91,19 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateScal()", UpdateScal);
 
-    const int rho_comp = Rho;
-    const int rhoh_comp = RhoH;
-    const int spec_comp = FirstSpec;
-    const int nspec = NumSpec;
     const Real dt_loc = dt;
     const Real base_cutoff_dens_loc = base_cutoff_density;
     const bool do_eos_h_above_cutoff_loc = do_eos_h_above_cutoff;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        // get references to the MultiFabs at level lev
-        const MultiFab& scalold_mf = stateold[lev];
-        MultiFab& scalnew_mf = statenew[lev];
-        const MultiFab& sfluxx_mf = sflux[lev][0];
-        const MultiFab& sfluxy_mf = sflux[lev][1];
-#if (AMREX_SPACEDIM == 3)
-        const MultiFab& sfluxz_mf = sflux[lev][2];
-#endif
-        const MultiFab& p0cart_mf = p0_cart[lev];
-        const MultiFab& force_mf = force[lev];
-
         const auto dx = geom[lev].CellSizeArray();
-        const Real* d_x = geom[lev].CellSize();
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scalold_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for ( MFIter mfi(stateold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -169,7 +152,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // RhoX update
 
                 AMREX_PARALLEL_FOR_4D(tileBox, NumSpec, i, j, k, n, {
-                    int comp = spec_comp + n;
+                    int comp = FirstSpec + n;
 
                     Real divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx[0];
                     divterm += (sfluxy(i,j+1,k,comp) - sfluxy(i,j,k,comp))/dx[1];
@@ -182,37 +165,37 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     // update density
-                    snew_arr(i,j,k,rho_comp) = sold_arr(i,j,k,rho_comp);
+                    snew_arr(i,j,k,Rho) = sold_arr(i,j,k,Rho);
 
                     bool has_negative_species = false;
 
                     // define the update to rho as the sum of the updates to (rho X)_i
-                    for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
-                        snew_arr(i,j,k,rho_comp) += snew_arr(i,j,k,comp)-sold_arr(i,j,k,comp);
+                    for (int comp=start_comp; comp<start_comp+NumSpec; ++comp) {
+                        snew_arr(i,j,k,Rho) += snew_arr(i,j,k,comp)-sold_arr(i,j,k,comp);
                         if (snew_arr(i,j,k,comp) < 0.0) 
                             has_negative_species = true;
                     }
 
                     // enforce a density floor
-                    if (snew_arr(i,j,k,rho_comp) < 0.5*base_cutoff_dens_loc) {
-                        for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
-                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_dens_loc/snew_arr(i,j,k,rho_comp);
+                    if (snew_arr(i,j,k,Rho) < 0.5*base_cutoff_dens_loc) {
+                        for (int comp=start_comp; comp<start_comp+NumSpec; ++comp) {
+                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_dens_loc/snew_arr(i,j,k,Rho);
                         }
-                        snew_arr(i,j,k,rho_comp) = 0.5*base_cutoff_dens_loc;
+                        snew_arr(i,j,k,Rho) = 0.5*base_cutoff_dens_loc;
                     }
 
                     // do not allow the species to leave here negative.
                     if (has_negative_species) {
-                        for (int comp=start_comp; comp<start_comp+nspec; ++comp) {
+                        for (int comp=start_comp; comp<start_comp+NumSpec; ++comp) {
                             if (snew_arr(i,j,k,comp) < 0.0) {
                                 Real delta = -snew_arr(i,j,k,comp);
                                 Real sumX = 0.0;
-                                for (int comp2=start_comp; comp2<start_comp+nspec; ++comp2) {
+                                for (int comp2=start_comp; comp2<start_comp+NumSpec; ++comp2) {
                                     if (comp2 != comp && snew_arr(i,j,k,comp2) >= 0.0) {
                                         sumX += snew_arr(i,j,k,comp2);
                                     }
                                 }
-                                for (int comp2 = start_comp; comp2 < start_comp+nspec; ++comp2) {
+                                for (int comp2 = start_comp; comp2 < start_comp+NumSpec; ++comp2) {
                                     if (comp2 != comp && snew_arr(i,j,k,comp2) >= 0.0) {
                                         Real frac = snew_arr(i,j,k,comp2) / sumX;
                                         snew_arr(i,j,k,comp2) -= frac * delta;
@@ -245,7 +228,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     // fill ghost cells
     AverageDown(statenew,start_comp,num_comp);
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp, 
-        num_comp, start_comp, bcs_s);
+              num_comp, start_comp, bcs_s);
 
     // do the same for density if we updated the species
     if (start_comp == FirstSpec) {
@@ -262,7 +245,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                     const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::UpdateVel()",UpdateVel);
+    BL_PROFILE_VAR("Maestro::UpdateVel()", UpdateVel);
 
     // 1) Subtract (Utilde dot grad) Utilde term from old Utilde
     // 2) Add forcing term to new Utilde
@@ -272,15 +255,13 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        const MultiFab& force_mf = force[lev];
-
         const auto dx = geom[lev].CellSizeArray();
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(force_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -429,7 +410,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     } // end loop over levels
 
     // average fine data onto coarser cells
-    AverageDown(unew,0,AMREX_SPACEDIM);
+    AverageDown(unew, 0, AMREX_SPACEDIM);
 
     // fill ghost cells
     FillPatch(t_old, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);

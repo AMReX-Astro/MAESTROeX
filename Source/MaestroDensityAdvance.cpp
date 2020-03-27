@@ -89,7 +89,7 @@ Maestro::DensityAdvance (int which_step,
     // Add w0 back to MAC velocities (trans velocities already have w0).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     /////////////////////////////////////////////////////////////////
     // Create the edge states of (rho X)' or X and rho'
@@ -102,7 +102,7 @@ Maestro::DensityAdvance (int which_step,
         // data to those quantities
 
         // convert (rho X) --> X in scalold
-        ConvertRhoXToX(scalold,true);
+        ConvertRhoXToX(scalold, true);
     }
 
     if (species_pred_type == predict_rhoprime_and_X) {
@@ -120,17 +120,20 @@ Maestro::DensityAdvance (int which_step,
 
         // we are predicting X to the edges, using the advective form of
         // the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s, 
+                     Nscal, FirstSpec, FirstSpec, NumSpec, 0);
 
     } else if (species_pred_type == predict_rhoX) {
 
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s,
+                     Nscal, FirstSpec, FirstSpec, NumSpec, 1);
     }
 
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s,
+                     Nscal, Rho, Rho, 1, 0);
 
     } else if (species_pred_type == predict_rhoX) {
 
@@ -152,7 +155,7 @@ Maestro::DensityAdvance (int which_step,
     if ((species_pred_type == predict_rhoprime_and_X) ||
         (species_pred_type == predict_rho_and_X)) {
         // convert X --> (rho X) in scalold
-        ConvertRhoXToX(scalold,false);
+        ConvertRhoXToX(scalold, false);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -168,7 +171,6 @@ Maestro::DensityAdvance (int which_step,
                              rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                              rho0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
-
             MakeS0mac(rho0_old,rho0mac_old);
         }
 
@@ -194,8 +196,8 @@ Maestro::DensityAdvance (int which_step,
                              rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rho0_new,rho0mac_new);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rho0_new, rho0mac_new);
         }
 
         // compute species fluxes
@@ -222,11 +224,10 @@ Maestro::DensityAdvance (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);
-
 }
 
 
@@ -286,13 +287,13 @@ Maestro::DensityAdvanceSDC (int which_step,
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(rho0_old, rho0_old_cart, 0, 0, bcs_s, Rho);
 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     /////////////////////////////////////////////////////////////////
     // Compute source terms
@@ -304,13 +305,12 @@ Maestro::DensityAdvanceSDC (int which_step,
     if (species_pred_type == predict_rhoprime_and_X) {
         // rho' source term
         // this is needed for pred_rhoprime_and_X
-        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,rho0_old_cart,Rho,bcs_s,0);
-
-    }
-    else if (species_pred_type == predict_rho_and_X) {
+        ModifyScalForce(scal_force, scalold, umac, rho0_old, rho0_edge_old,
+                        rho0_old_cart, Rho, bcs_s, 0);
+    } else if (species_pred_type == predict_rho_and_X) {
         // rho source term
-        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,rho0_old_cart,Rho,bcs_s,1);
-
+        ModifyScalForce(scal_force, scalold, umac, rho0_old, rho0_edge_old,
+                        rho0_old_cart, Rho, bcs_s, 1);
     }
 
     // ** species source term **
@@ -321,12 +321,11 @@ Maestro::DensityAdvanceSDC (int which_step,
     // for predict_rhoX, we are predicting (rho X)
     // as a conservative equation, and there is no force.
 
-
     /////////////////////////////////////////////////////////////////
     // Add w0 to MAC velocities (trans velocities already have w0).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
 
     /////////////////////////////////////////////////////////////////
     // Create the edge states of (rho X)' or X and rho'
@@ -339,7 +338,7 @@ Maestro::DensityAdvanceSDC (int which_step,
         // data to those quantities
 
         // convert (rho X) --> X in scalold
-        ConvertRhoXToX(scalold,true);
+        ConvertRhoXToX(scalold, true);
     }
 
     if (species_pred_type == predict_rhoprime_and_X) {
@@ -389,7 +388,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     if ((species_pred_type == predict_rhoprime_and_X) ||
         (species_pred_type == predict_rho_and_X)) {
         // convert X --> (rho X) in scalold
-        ConvertRhoXToX(scalold,false);
+        ConvertRhoXToX(scalold, false);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -414,7 +413,7 @@ Maestro::DensityAdvanceSDC (int which_step,
                      rho0_old,rho0_edge_old,rho0mac_old,
                      rho0_old,rho0_edge_old,rho0mac_old,
                      rho0_predicted_edge,
-                     FirstSpec,NumSpec);
+                     FirstSpec, NumSpec);
 
     } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
@@ -461,9 +460,8 @@ Maestro::DensityAdvanceSDC (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);
-    
 }

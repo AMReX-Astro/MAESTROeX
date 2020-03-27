@@ -8,7 +8,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                   const Vector<MultiFab>& ufull,
                   const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& utrans,
                   Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
-                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                  const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                   const Vector<MultiFab>& force)
 {
     // timer for profiling
@@ -18,7 +18,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 
         // Get the index space and grid spacing of the domain
         const Box& domainBox = geom[lev].Domain();
-        const Real* dx = geom[lev].CellSize();
+        const auto dx = geom[lev].CellSizeArray();
 
         // get references to the MultiFabs at level lev
               MultiFab& utilde_mf  = utilde[lev];
@@ -102,11 +102,10 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+	    const Box& obx = amrex::grow(mfi.tilebox(), 1);
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -213,11 +212,10 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-            const Box& obx = amrex::grow(tileBox, 1);
+	    const Box& obx = amrex::grow(mfi.tilebox(), 1);
 
             // x-direction
             if (ppm_type == 0) {
@@ -226,7 +224,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                 Slopex(obx, utilde_mf.array(mfi), 
                        Ipu.array(mfi), 
                        domainBox, bcs_u, 
-                       AMREX_SPACEDIM,0);
+                       AMREX_SPACEDIM, 0);
 
             } else {
 
@@ -261,14 +259,14 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 1, 1);
 
-              if (ppm_trace_forces == 1) {
+                if (ppm_trace_forces == 1) {
 
-                PPM(obx, force_mf.array(mfi), 
-                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                    Ipfy.array(mfi), Imfy.array(mfi), 
-                    domainBox, bcs_u, dx, 
-                    false, 1, 1);
-              }
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                        Ipfy.array(mfi), Imfy.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 1, 1);
+                }
             }
 
             // z-direction
@@ -289,14 +287,14 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
                     domainBox, bcs_u, dx, 
                     false, 2, 2);
 
-              if (ppm_trace_forces == 1) {
+                if (ppm_trace_forces == 1) {
 
-                PPM(obx, force_mf.array(mfi), 
-                    u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
-                    Ipfz.array(mfi), Imfz.array(mfi), 
-                    domainBox, bcs_u, dx, 
-                    false, 2, 2);
-              }
+                    PPM(obx, force_mf.array(mfi), 
+                        u_mf.array(mfi), v_mf.array(mfi), w_mf.array(mfi),
+                        Ipfz.array(mfi), Imfz.array(mfi), 
+                        domainBox, bcs_u, dx, 
+                        false, 2, 2);
+                }
             }
             
             VelPredInterface(mfi,
@@ -382,7 +380,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                           Array4<Real> const ury,
                           Array4<Real> const uimhy,
                           const Box& domainBox,
-                          const Real* dx)
+                          const amrex::GpuArray<Real,AMREX_SPACEDIM> dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredInterface()",VelPredInterface);
@@ -393,8 +391,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     // Create u_{\i-\half\e_x}^x, etc.
     ////////////////////////////////////
 
-    const Box& tileBox = mfi.tilebox();
-    const Box& obx = amrex::grow(tileBox, 1);
+    const Box& obx = amrex::grow(mfi.tilebox(), 1);
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
@@ -408,8 +405,8 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const int ppm_type_local = ppm_type;
 
     // x-direction
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
@@ -435,7 +432,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch(bclo) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -466,7 +463,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (bchi) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -506,8 +503,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     });
 
     // y-direction
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM+1];
 
@@ -532,7 +527,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (bclo) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -563,7 +558,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (bchi) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -622,7 +617,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                             Array4<const Real> const force,
                             Array4<const Real> const w0_cart_in,
                             const Box& domainBox,
-                            const Real* dx)
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredVelocities()",VelPredVelocities);
@@ -645,8 +640,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const int ppm_trace_forces_local = ppm_trace_forces;
 
     // x-direction
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
@@ -671,7 +666,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             0.0 : umac(i,j,k);
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch (bclo) {
                 case Inflow:
                     umac(i,j,k) = utilde(i-1,j,k,0);
@@ -689,7 +684,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (bchi) {
                 case Inflow:
                     umac(i,j,k) = utilde(i,j,k,0);
@@ -709,8 +704,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     });
 
     // y-direction
-    const int jlo = domainBox.loVect()[1];
-    const int jhi = domainBox.hiVect()[1];
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM+1];
 
@@ -737,7 +730,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (bclo) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j-1,k,1);
@@ -755,7 +748,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (bchi) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j,k,1);
@@ -800,7 +793,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                           Array4<Real> const urz,
                           Array4<Real> const uimhz,
                           const Box& domainBox,
-                          const Real* dx)
+                          const amrex::GpuArray<Real,AMREX_SPACEDIM> dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredInterface()",VelPredInterface);
@@ -815,8 +808,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
      // Allocated from lo:hi+1 in the normal direction
      // lo-1:hi+1 in the transverse directions
 
-    const Box& tileBox = mfi.tilebox();
-    const Box& obx = amrex::grow(tileBox, 1);
+    const Box& obx = amrex::grow(mfi.tilebox(), 1);
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
     const Box& mzbx = amrex::growLo(obx,2, -1);
@@ -832,8 +824,8 @@ Maestro::VelPredInterface(const MFIter& mfi,
     int ppm_type_local = ppm_type;
 
     // x-direction
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
@@ -863,7 +855,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch (bclo) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -895,7 +887,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (bchi) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -940,8 +932,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     });
 
     // y-direction
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM+1];
 
@@ -971,7 +961,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (bclo) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -1003,7 +993,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (bchi) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -1048,8 +1038,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     });
 
     // z-direction
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
     bclo = phys_bc[2];
     bchi = phys_bc[AMREX_SPACEDIM+2];
 
@@ -1079,7 +1067,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             switch (bclo) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -1111,7 +1099,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             switch (bchi) {
                 case Inflow:
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -1178,7 +1166,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
                           Array4<Real> const wimhxy,
                           Array4<Real> const wimhyx,
                           const Box& domainBox,
-                          const Real* dx)
+                          const amrex::GpuArray<Real,AMREX_SPACEDIM> dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredTransverse()",VelPredTransverse);
@@ -1194,12 +1182,8 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
     const Real hz = dx[2];
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
-    const int jlo = domainBox.loVect()[1];
-    const int jhi = domainBox.hiVect()[1];
-    const int klo = domainBox.loVect()[2];
-    const int khi = domainBox.hiVect()[2];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     GpuArray<int,AMREX_SPACEDIM*2> physbc;
     for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
@@ -1219,7 +1203,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhz(i,j  ,k+1,0)-uimhz(i,j  ,k,0));
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (physbc[1]) {
                 case Inflow:
                     ulyz = utilde(i,j-1,k,0);
@@ -1239,7 +1223,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (physbc[AMREX_SPACEDIM+1]) {
                 case Inflow:
                     ulyz = utilde(i,j,k,0);
@@ -1278,7 +1262,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhy(i,j+1,k  ,0)-uimhy(i,j,k  ,0));
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             switch (physbc[2]) {
                 case Inflow:
                     ulzy = utilde(i,j,k-1,0);
@@ -1298,7 +1282,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             switch (physbc[AMREX_SPACEDIM+2]) {
                 case Inflow:
                     ulzy = utilde(i,j,k,0);
@@ -1337,7 +1321,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhz(i  ,j,k+1,1)-uimhz(i  ,j,k,1));
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch (physbc[0]) {
                 case Inflow:
                     vlxz = utilde(i-1,j,k,1);
@@ -1357,7 +1341,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (physbc[AMREX_SPACEDIM]) {
                 case Inflow:
                     vlxz = utilde(i,j,k,1);
@@ -1396,7 +1380,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhx(i+1,j,k  ,1)-uimhx(i,j,k  ,1));
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             switch (physbc[2]) {
                 case Inflow:
                     vlzx = utilde(i,j,k-1,1);
@@ -1416,7 +1400,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             switch (physbc[AMREX_SPACEDIM+2]) {
                 case Inflow:
                     vlzx = utilde(i,j,k,1);
@@ -1455,7 +1439,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhy(i  ,j+1,k,2)-uimhy(i  ,j,k,2));
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch (physbc[0]) {
                 case Inflow:
                     wlxy = utilde(i-1,j,k,2);
@@ -1475,7 +1459,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (physbc[AMREX_SPACEDIM]) {
                 case Inflow:
                     wlxy = utilde(i,j,k,2);
@@ -1514,7 +1498,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             * (uimhx(i+1,j  ,k,2)-uimhx(i,j  ,k,2));
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (physbc[1]) {
                 case Inflow:
                     wlyx = utilde(i,j-1,k,2);
@@ -1534,7 +1518,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (physbc[AMREX_SPACEDIM+1]) {
                 case Inflow:
                     wlyx = utilde(i,j,k,2);
@@ -1594,7 +1578,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
                             Array4<const Real> const force,
                             Array4<const Real> const w0_cart_in,
                             const Box& domainBox,
-                            const Real* dx)
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredVelocities()",VelPredVelocities);
@@ -1616,12 +1600,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hy = dx[1];
     const Real hz = dx[2];
 
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
-    const int jlo = domainBox.loVect()[1];
-    const int jhi = domainBox.hiVect()[1];
-    const int klo = domainBox.loVect()[2];
-    const int khi = domainBox.hiVect()[2];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
     
     GpuArray<int,AMREX_SPACEDIM*2> physbc;
     for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
@@ -1668,7 +1648,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             switch (physbc[0]) {
                 case Inflow:
                     umac(i,j,k) = utilde(i-1,j,k,0);
@@ -1686,7 +1666,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             switch (physbc[AMREX_SPACEDIM]) {
                 case Inflow:
                     umac(i,j,k) = utilde(i,j,k,0);
@@ -1742,7 +1722,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             switch (physbc[1]) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j-1,k,1);
@@ -1760,7 +1740,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             switch (physbc[AMREX_SPACEDIM+1]) {
                 case Inflow:
                     vmac(i,j,k) = utilde(i,j,k,1);
@@ -1818,7 +1798,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         }
 
         // impose hi side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             switch (physbc[2]) {
                 case Inflow:
                     wmac(i,j,k) = utilde(i,j,k-1,2);
@@ -1836,7 +1816,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             }
 
         // impose lo side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             switch (physbc[AMREX_SPACEDIM+2]) {
                 case Inflow:
                     wmac(i,j,k) = utilde(i,j,k,2);

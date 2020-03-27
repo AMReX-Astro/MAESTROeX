@@ -4,10 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init, 
-                       RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, RealVector& tempbar, 
-                       RealVector& tempbar_init,
+Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
+                       RealVector& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -85,7 +83,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
     Real p_above_cutoff = p0_init[n];
 
-    // do r=0,nr(n)-1
     for (auto r = 0; r < nr[n]; ++r) {
 
         Real rloc = starting_rad + (Real(r) + 0.5)*dr[n];
@@ -115,15 +112,12 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
             RealVector xn_ambient(NumSpec);
 
             Real sumX = 0.0;
-            // do comp = 1, NumSpec
-            // Print() << "NumSpec = " << NumSpec << std::endl;
+
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 xn_ambient[comp] = max(0.0, min(1.0, 
                     input_model.Interpolate(rloc, input_model.ispec_model+comp)));
                 sumX += xn_ambient[comp];
             }
-
-            // Print() << "sumX = " << sumX << std::endl;
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 if (sumX != 0.0) xn_ambient[comp] /= sumX;
@@ -200,7 +194,6 @@ Maestro::InitBaseState(RealVector& s0_init, RealVector& p0_init,
 
     Real max_hse_error = -1.e30;
 
-    // do r=1,nr(n)-1
     for (auto r = 1; r < nr[n]; ++r) {
 
         Real rloc = starting_rad + (Real(r) + 0.5) * dr[n];

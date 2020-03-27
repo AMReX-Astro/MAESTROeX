@@ -19,7 +19,7 @@ Maestro::MakeEdgeScal (Vector<MultiFab>& state,
 
         // Get the index space and grid spacing of the domain
         const Box& domainBox = geom[lev].Domain();
-        const Real* dx = geom[lev].CellSize();
+        const auto dx = geom[lev].CellSizeArray();
 
         // get references to the MultiFabs at level lev
         const MultiFab& scal_mf = state[lev];
@@ -366,7 +366,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
                                     Array4<Real> const simhy,
                                     const Box& domainBox,
                                     const Vector<BCRec>& bcs,
-                                    const Real* dx,
+                                    const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                     int comp, int bccomp, bool is_vel)
 {
     // timer for profiling
@@ -383,16 +383,15 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     Real dt2 = 0.5 * dt;
 
     // Get the index space of the valid region
-    const Box& tileBox = mfi.tilebox();
-    const Box& obx = amrex::grow(tileBox, 1);
+    const Box& obx = mfi.growntilebox(1);
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
     const Real rel_eps = c_rel_eps;
 
     // loop over appropriate x-faces
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
@@ -408,7 +407,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 slx(i,j,k) = s(i-1,j,k,comp);
                 srx(i,j,k) = s(i-1,j,k,comp);
@@ -425,7 +424,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 slx(i,j,k) = s(i,j,k,comp);
                 srx(i,j,k) = s(i,j,k,comp);
@@ -450,8 +449,6 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     });
 
     // loop over appropriate y-faces
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
@@ -468,7 +465,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 sly(i,j,k) = s(i,j-1,k,comp);
                 sry(i,j,k) = s(i,j-1,k,comp);
@@ -485,7 +482,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 sly(i,j,k) = s(i,j,k,comp);
                 sry(i,j,k) = s(i,j,k,comp);
@@ -526,7 +523,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
                             Array4<Real> const simhy,
                             const Box& domainBox,
                             const Vector<BCRec>& bcs,
-                            const Real* dx,
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative) 
 {
@@ -545,10 +542,8 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     Real hx = dx[0];
     Real hy = dx[1];
 
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
@@ -597,7 +592,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             sedgex(i,j,k,comp) : 0.5*(sedgelx+sedgerx);
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 sedgex(i,j,k,comp) = s(i-1,j,k,comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
@@ -613,7 +608,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 sedgex(i,j,k,comp) = s(i,j,k,comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
@@ -669,7 +664,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             sedgey(i,j,k,comp): 0.5*(sedgely+sedgery);
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 sedgey(i,j,k,comp) = s(i,j-1,k,comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
@@ -685,7 +680,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 sedgey(i,j,k,comp) = s(i,j,k,comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
@@ -710,19 +705,17 @@ void Maestro::MakeDivU(const Box& bx,
                        Array4<Real> const umac,
                        Array4<Real> const vmac,
                        Array4<Real> const wmac,
-                       const Real* dx) 
+                       const GpuArray<Real,AMREX_SPACEDIM> dx) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDivU()",MakeDivU);
-
-    Real dx_local = dx[0];
 
     AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
     {
         divu(i,j,k) = umac(i+1,j,k) - umac(i,j,k) +
                       vmac(i,j+1,k) - vmac(i,j,k) +
                       wmac(i,j,k+1) - wmac(i,j,k);
-        divu(i,j,k) /= dx_local;
+        divu(i,j,k) /= dx[0];
     });
 }
 
@@ -745,7 +738,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
                                     Array4<Real> const simhz,
                                     const Box& domainBox,
                                     const Vector<BCRec>& bcs,
-                                    const Real* dx,
+                                    const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                     int comp, int bccomp, bool is_vel)
 {
     // timer for profiling
@@ -769,8 +762,8 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     const Box& mzbx = amrex::growLo(obx, 2, -1);
 
     // loop over appropriate x-faces
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, 
@@ -786,7 +779,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 slx(i,j,k) = scal(i-1,j,k,comp);
                 srx(i,j,k) = scal(i-1,j,k,comp);
@@ -803,7 +796,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 slx(i,j,k) = scal(i,j,k,comp);
                 srx(i,j,k) = scal(i,j,k,comp);
@@ -828,8 +821,6 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     });
 
     // loop over appropriate y-faces
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, 
@@ -845,7 +836,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 sly(i,j,k) = scal(i,j-1,k,comp);
                 sry(i,j,k) = scal(i,j-1,k,comp);
@@ -861,7 +852,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
                 sry(i,j,k) = 0.0;
             }
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 sly(i,j,k) = scal(i,j,k,comp);
                 sry(i,j,k) = scal(i,j,k,comp);
@@ -887,8 +878,6 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     });
 
     // loop over appropriate z-faces
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
     AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, 
@@ -904,7 +893,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             if (bclo == EXT_DIR) {
                 slz(i,j,k) = scal(i,j,k-1,comp);
                 srz(i,j,k) = scal(i,j,k-1,comp);
@@ -920,7 +909,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
                 srz(i,j,k) = 0.0;
             }
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             if (bchi == EXT_DIR) {
                 slz(i,j,k) = scal(i,j,k,comp);
                 srz(i,j,k) = scal(i,j,k,comp);
@@ -968,7 +957,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
                                     Array4<Real> const simhzy,
                                     const Box& domainBox,
                                     const Vector<BCRec>& bcs,
-                                    const Real* dx,
+                                    const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                     int comp, int bccomp, 
                                     bool is_vel, bool is_conservative)
 {
@@ -986,12 +975,8 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     Real hy = dx[1];
     Real hz = dx[2];
 
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     const Real rel_eps = c_rel_eps;
 
@@ -1032,7 +1017,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 slxy = scal(i-1,j,k,comp);
                 srxy = scal(i-1,j,k,comp);
@@ -1049,7 +1034,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 slxy = scal(i,j,k,comp);
                 srxy = scal(i,j,k,comp);
@@ -1109,7 +1094,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 slxz = scal(i-1,j,k,comp);
                 srxz = scal(i-1,j,k,comp);
@@ -1126,7 +1111,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 slxz = scal(i,j,k,comp);
                 srxz = scal(i,j,k,comp);
@@ -1189,7 +1174,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 slyx = scal(i,j-1,k,comp);
                 sryx = scal(i,j-1,k,comp);
@@ -1206,7 +1191,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 slyx = scal(i,j,k,comp);
                 sryx = scal(i,j,k,comp);
@@ -1265,7 +1250,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 slyz = scal(i,j-1,k,comp);
                 sryz = scal(i,j-1,k,comp);
@@ -1282,7 +1267,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 slyz = scal(i,j,k,comp);
                 sryz = scal(i,j,k,comp);
@@ -1344,7 +1329,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             if (bclo == EXT_DIR) {
                 slzx = scal(i,j,k-1,comp);
                 srzx = scal(i,j,k-1,comp);
@@ -1361,7 +1346,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             if (bchi == EXT_DIR) {
                 slzx = scal(i,j,k,comp);
                 srzx = scal(i,j,k,comp);
@@ -1420,7 +1405,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         }
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             if (bclo == EXT_DIR) {
                 slzy = scal(i,j,k-1,comp);
                 srzy = scal(i,j,k-1,comp);
@@ -1437,7 +1422,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             if (bchi == EXT_DIR) {
                 slzy = scal(i,j,k,comp);
                 srzy = scal(i,j,k,comp);
@@ -1487,7 +1472,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
                             Array4<Real> const simhzy,
                             const Box& domainBox,
                             const Vector<BCRec>& bcs,
-                            const Real* dx,
+                            const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
                             bool is_vel, bool is_conservative) 
 {
@@ -1507,12 +1492,8 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     Real hy = dx[1];
     Real hz = dx[2];
 
-    int ilo = domainBox.loVect()[0];
-    int ihi = domainBox.hiVect()[0];
-    int jlo = domainBox.loVect()[1];
-    int jhi = domainBox.hiVect()[1];
-    int klo = domainBox.loVect()[2];
-    int khi = domainBox.hiVect()[2];
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
@@ -1574,7 +1555,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             sedgex(i,j,k,comp) : 0.5*(sedgelx+sedgerx);
 
         // impose lo side bc's
-        if (i == ilo) {
+        if (i == domlo[0]) {
             if (bclo == EXT_DIR) {
                 sedgex(i,j,k,comp) = scal(i-1,j,k,comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
@@ -1590,7 +1571,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (i == ihi+1) {
+        } else if (i == domhi[0]+1) {
             if (bchi == EXT_DIR) {
                 sedgex(i,j,k,comp) = scal(i,j,k,comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
@@ -1661,7 +1642,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             sedgey(i,j,k,comp) : 0.5*(sedgely+sedgery);
 
         // impose lo side bc's
-        if (j == jlo) {
+        if (j == domlo[1]) {
             if (bclo == EXT_DIR) {
                 sedgey(i,j,k,comp) = scal(i,j-1,k,comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
@@ -1677,7 +1658,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (j == jhi+1) {
+        } else if (j == domhi[1]+1) {
             if (bchi == EXT_DIR) {
                 sedgey(i,j,k,comp) = scal(i,j,k,comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
@@ -1748,7 +1729,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             sedgez(i,j,k,comp) : 0.5*(sedgelz+sedgerz);
 
         // impose lo side bc's
-        if (k == klo) {
+        if (k == domlo[2]) {
             if (bclo == EXT_DIR) {
                 sedgez(i,j,k,comp) = scal(i,j,k-1,comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
@@ -1764,7 +1745,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
             }
 
         // impose hi side bc's
-        } else if (k == khi+1) {
+        } else if (k == domhi[2]+1) {
             if (bchi == EXT_DIR) {
                 sedgez(i,j,k,comp) = scal(i,j,k,comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {

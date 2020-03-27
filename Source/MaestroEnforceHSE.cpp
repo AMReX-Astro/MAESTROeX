@@ -60,7 +60,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
         p0[max_lev*r] = p0[max_lev*(r-1)];
     }
 
-    if (spherical == 0) {
+    if (!spherical) {
 
         for (auto n = 1; n <= finest_radial_level; ++n) {
             for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
@@ -74,7 +74,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     // we integrate upwards starting from the nearest coarse
                     // cell at a lower physical height
 
-                    if (do_planar_invsq_grav || do_2d_planar_octant == 1) {
+                    if (do_planar_invsq_grav || do_2d_planar_octant) {
                         // we have variable gravity
                         p0[n+max_lev*r_start_coord[n+max_lev*i]] = p0[n-1+max_lev*(r_start_coord[n+max_lev*i]/2-1)]
                                 + (dr[n]/4.0)* 
@@ -122,7 +122,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     offset = 0.0;
                 } else if (r_end_coord[n+max_lev*i] <= base_cutoff_density_coord[n]) {
                     // use fine -> coarse stencil in notes
-                    if (do_planar_invsq_grav || do_2d_planar_octant == 1) {
+                    if (do_planar_invsq_grav || do_2d_planar_octant) {
                         // we have variable gravity
                         Real temp = p0[n+max_lev*r_end_coord[n+max_lev*i]] 
                                 + (dr[n]/4.0)* 

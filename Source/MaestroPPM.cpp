@@ -16,11 +16,11 @@ Maestro::PPM (const Box& bx,
               Array4<Real> const Im,
               const Box& domainBox,
               const Vector<BCRec>& bcs,
-              const Real* dx,
+              const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
               const bool is_umac, const int comp, const int bccomp)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PPM()",PPM);
+    BL_PROFILE_VAR("Maestro::PPM()", PPM);
 
     // constant used in Colella 2008
     const Real C = 1.25;
@@ -28,20 +28,14 @@ Maestro::PPM (const Box& bx,
 
     const int n = comp;
 
-    const Real hx = dx[0];
-    const Real hy = dx[1];
-#if (AMREX_SPACEDIM == 3)
-    const Real hz = dx[2];
-#endif
-
     const Real dt_local = dt;
+
+    const auto domlo = domainBox.loVect3d();
+    const auto domhi = domainBox.hiVect3d();
 
     /////////////
     // x-dir
     /////////////
-
-    const int ilo = domainBox.loVect()[0];
-    const int ihi = domainBox.hiVect()[0];
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
 
@@ -116,7 +110,7 @@ Maestro::PPM (const Box& bx,
             }
 
             // Different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's.
-            if (i == ilo) {
+            if (i == domlo[0]) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -133,7 +127,7 @@ Maestro::PPM (const Box& bx,
                     sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
                 }
 
-            } else if (i == ilo+1) {
+            } else if (i == domlo[0]+1) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                     
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -160,7 +154,7 @@ Maestro::PPM (const Box& bx,
                     }
                 }
 
-            } else if (i == ihi) {
+            } else if (i == domhi[0]) {
                 if (bchi == EXT_DIR || bchi == HOEXTRAP) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -177,7 +171,7 @@ Maestro::PPM (const Box& bx,
                     sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)));
                 }
 
-            } else if (i == ihi-1) {
+            } else if (i == domhi[0]-1) {
                 if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
                     
                     // Use a modified stencil to get sp on the first interior edge.
@@ -213,14 +207,14 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i+1,j,k)) * dt_local / hx;
+                Real sigma = fabs(u(i+1,j,k)) * dt_local / dx[0];
                 if (u(i+1,j,k) > rel_eps) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
-                sigma = fabs(u(i,j,k)) * dt_local / hx;
+                sigma = fabs(u(i,j,k)) * dt_local / dx[0];
                 if (u(i,j,k) < -rel_eps) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -229,14 +223,14 @@ Maestro::PPM (const Box& bx,
 
             } else {
 
-                Real sigma = fabs(u(i,j,k))*dt_local/hx;
+                Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
                 if (u(i,j,k) > rel_eps) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/hx;
+                sigma = fabs(u(i,j,k))*dt_local/dx[0];
                 if (u(i,j,k) < -rel_eps) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -388,7 +382,7 @@ Maestro::PPM (const Box& bx,
 
             // different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
             if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-                if (i == ilo) {
+                if (i == domlo[0]) {
                     // The value in the first cc ghost cell represents the edge value.
                     sm = s(i-1,j,k,n);
 
@@ -402,7 +396,7 @@ Maestro::PPM (const Box& bx,
                     sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)));
                     sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
 
-                } else if (i == ilo+1) {
+                } else if (i == domlo[0]+1) {
 
                     sedgel = s(i-2,j,k,n);
 
@@ -416,7 +410,7 @@ Maestro::PPM (const Box& bx,
                     sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)));
                     sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)));
 
-                } else if (i == ilo+2) {
+                } else if (i == domlo[0]+2) {
 
                     // use a modified stencil to get sedge on the first interior edge
                     sedgel = -0.2 *s(i-3,j,k,n) 
@@ -431,7 +425,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (i == ilo+1 || i == ilo+2) {
+                if (i == domlo[0]+1 || i == domlo[0]+2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -508,7 +502,7 @@ Maestro::PPM (const Box& bx,
             }
 
             if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-                if (i == ihi) {
+                if (i == domhi[0]) {
                     // The value in the first cc ghost cell represents the edge value.
                     sp = s(i+1,j,k,n);
 
@@ -522,7 +516,7 @@ Maestro::PPM (const Box& bx,
                     sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)));
                     sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)));
 
-                } else if (i == ihi-1) {
+                } else if (i == domhi[0]-1) {
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedger = -0.2 *s(i+2,j,k,n) 
                             + 0.75*s(i+1,j,k,n) 
@@ -533,7 +527,7 @@ Maestro::PPM (const Box& bx,
                     sedger = max(sedger,min(s(i,j,k,n),s(i+1,j,k,n)));
                     sedger = min(sedger,max(s(i,j,k,n),s(i+1,j,k,n)));
 
-                } else if (i == ihi-2) {
+                } else if (i == domhi[0]-2) {
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgerr = -0.2 *s(i+3,j,k,n) 
                              + 0.75*s(i+2,j,k,n) 
@@ -547,7 +541,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (i == ihi-1 || i == ihi-2) {
+                if (i == domhi[0]-1 || i == domhi[0]-2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -631,7 +625,7 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i+1,j,k))*dt_local/hx;
+                Real sigma = fabs(u(i+1,j,k))*dt_local/dx[0];
                 
                 if (u(i+1,j,k) > rel_eps) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
@@ -639,7 +633,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/hx;
+                sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
                 if (u(i,j,k) < -rel_eps) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
@@ -648,7 +642,7 @@ Maestro::PPM (const Box& bx,
                 }
             } else {
 
-                Real sigma = fabs(u(i,j,k))*dt_local/hx;
+                Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
                 if (u(i,j,k) > rel_eps) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
@@ -656,7 +650,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/hx;
+                sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
                 if (u(i,j,k) < -rel_eps) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
@@ -670,9 +664,6 @@ Maestro::PPM (const Box& bx,
     /////////////
     // y-dir
     /////////////
-
-    const int jlo = domainBox.loVect()[1];
-    const int jhi = domainBox.hiVect()[1];
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
 
@@ -747,7 +738,7 @@ Maestro::PPM (const Box& bx,
             }
             
             // Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
-            if (j == jlo) {
+            if (j == domlo[1]) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                   
                     // The value in the first cc ghost cell represents the edge value.
@@ -764,7 +755,7 @@ Maestro::PPM (const Box& bx,
                     sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
                 }
 
-            } else if (j == jlo+1) {
+            } else if (j == domlo[1]+1) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
 
                     // Use a modified stencil to get sm on the first interior edge.
@@ -791,7 +782,7 @@ Maestro::PPM (const Box& bx,
                     }
                 }
 
-            } else if (j == jhi) {
+            } else if (j == domhi[1]) {
                 if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
             
                     // The value in the first cc ghost cell represents the edge value.
@@ -808,7 +799,7 @@ Maestro::PPM (const Box& bx,
                     sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)));
                 }
 
-            } else if (j == jhi-1) {
+            } else if (j == domhi[1]-1) {
                 if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
 
                     // Use a modified stencil to get sp on the first interior edge.
@@ -844,14 +835,14 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i,j+1,k))*dt_local/hy;
+                Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
                 if (v(i,j+1,k) > rel_eps) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/hy;
+                sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) < -rel_eps) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -860,14 +851,14 @@ Maestro::PPM (const Box& bx,
 
             } else {
 
-                Real sigma = fabs(v(i,j,k))*dt_local/hy;
+                Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) > rel_eps) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/hy;
+                sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) < -rel_eps) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1016,7 +1007,7 @@ Maestro::PPM (const Box& bx,
 
             // Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-                if (j == jlo) {
+                if (j == domlo[1]) {
                     // The value in the first cc ghost cell represents the edge value.
                     sm = s(i,j-1,k,n);
                     sedge = s(i,j-1,k,n);
@@ -1031,7 +1022,7 @@ Maestro::PPM (const Box& bx,
                     sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)));
                     sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
 
-                } else if (j == jlo+1) {
+                } else if (j == domlo[1]+1) {
 
                     sedgel = s(i,j-2,k,n);
                     
@@ -1045,7 +1036,7 @@ Maestro::PPM (const Box& bx,
                     sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)));
                     sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)));
 
-                } else if (j == jlo+2) {
+                } else if (j == domlo[1]+2) {
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgel = -0.2*s(i,j-3,k,n) 
                            + 0.75*s(i,j-2,k,n) 
@@ -1059,7 +1050,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (j == jlo+1 || j == jlo+2) {
+                if (j == domlo[1]+1 || j == domlo[1]+2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -1136,7 +1127,7 @@ Maestro::PPM (const Box& bx,
             }
 
             if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-                if (j == jhi) {
+                if (j == domhi[1]) {
                     // The value in the first cc ghost cell represents the edge value.
                     sp = s(i,j+1,k,n);
                     
@@ -1150,7 +1141,7 @@ Maestro::PPM (const Box& bx,
                     sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)));
                     sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)));
 
-                } else if (j == jhi-1) {
+                } else if (j == domhi[1]-1) {
 
                     sedgerr = s(i,j+2,k,n);
                     
@@ -1164,7 +1155,7 @@ Maestro::PPM (const Box& bx,
                     sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)));
                     sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)));
 
-                } else if (j == jhi-2) {
+                } else if (j == domhi[1]-2) {
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgerr = -0.2*s(i,j+3,k,n) 
                             + 0.75*s(i,j+2,k,n) 
@@ -1178,7 +1169,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (j == jhi-1 || j == jhi-2) {
+                if (j == domhi[1]-1 || j == domhi[1]-2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -1261,14 +1252,14 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i,j+1,k))*dt_local/hy;
+                Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
                 if (v(i,j+1,k) > rel_eps) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/hy;
+                sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) < -rel_eps) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1277,14 +1268,14 @@ Maestro::PPM (const Box& bx,
 
             } else {
 
-                Real sigma = fabs(v(i,j,k))*dt_local/hy;
+                Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) > rel_eps) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/hy;
+                sigma = fabs(v(i,j,k))*dt_local/dx[1];
                 if (v(i,j,k) < -rel_eps) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1298,9 +1289,6 @@ Maestro::PPM (const Box& bx,
     /////////////
     // z-dir
     /////////////
-
-    const int klo = domainBox.loVect()[2];
-    const int khi = domainBox.hiVect()[2];
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
 
@@ -1375,7 +1363,7 @@ Maestro::PPM (const Box& bx,
             }
             
             // Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
-            if (k == klo) {
+            if (k == domlo[2]) {
                 if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -1392,7 +1380,7 @@ Maestro::PPM (const Box& bx,
                     sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)));
                 }
                     
-            } else if (k == klo+1) {
+            } else if (k == domlo[2]+1) {
                 if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
 
                     // Use a modified stencil to get sm on the first interior edge.
@@ -1419,7 +1407,7 @@ Maestro::PPM (const Box& bx,
                     }
                 }
 
-            } else if (k == khi) {
+            } else if (k == domhi[2]) {
                 if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
 
                     // The value in the first cc ghost cell represents the edge value.
@@ -1436,7 +1424,7 @@ Maestro::PPM (const Box& bx,
                     sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)));
                 }
 
-            } else if (k == khi-1) {
+            } else if (k == domhi[2]-1) {
                 if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
 
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -1472,7 +1460,7 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i,j,k+1))*dt_local/hz;
+                Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
                 
                 if (w(i,j,k+1) > rel_eps) {
                     Ip(i,j,k,2) = sp - 
@@ -1481,7 +1469,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,2) = s(i,j,k,n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/hz;
+                sigma = fabs(w(i,j,k))*dt_local/dx[2];
 
                 if (w(i,j,k) < -rel_eps) {
                     Im(i,j,k,2) = sm + 
@@ -1491,7 +1479,7 @@ Maestro::PPM (const Box& bx,
                 }
             } else {
 
-                Real sigma = fabs(w(i,j,k))*dt_local/hz;
+                Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
                 if (w(i,j,k) > rel_eps) {
                     Ip(i,j,k,2) = sp - 
@@ -1500,7 +1488,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,2) = s(i,j,k,n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/hz;
+                sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
                 if (w(i,j,k) < -rel_eps) {
                     Im(i,j,k,2) = sm + 
@@ -1650,7 +1638,7 @@ Maestro::PPM (const Box& bx,
 
             // Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
-                if (k == klo) {
+                if (k == domlo[2]) {
 
                     // The value in the first cc ghost cell represents the edge value.
                     sm = s(i,j,k-1,n);
@@ -1665,7 +1653,7 @@ Maestro::PPM (const Box& bx,
                     sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)));
                     sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)));
 
-                } else if (k == klo+1) {
+                } else if (k == domlo[2]+1) {
 
                     sedgel = s(i,j,k-2,n);
                     
@@ -1679,7 +1667,7 @@ Maestro::PPM (const Box& bx,
                     sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)));
                     sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)));
 
-                } else if (k == klo+2) {
+                } else if (k == domlo[2]+2) {
 
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgel = -0.2 *s(i,j,k-3,n) 
@@ -1694,7 +1682,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (k == klo+1 || k == klo+2) {
+                if (k == domlo[2]+1 || k == domlo[2]+2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -1770,7 +1758,7 @@ Maestro::PPM (const Box& bx,
             }
 
             if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-                if (k == khi) {
+                if (k == domhi[2]) {
 
                     // The value in the first cc ghost cell represents the edge value.
                     sp = s(i,j,k+1,n);
@@ -1785,7 +1773,7 @@ Maestro::PPM (const Box& bx,
                     sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)));
                     sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)));
 
-                } else if (k == khi-1) {
+                } else if (k == domhi[2]-1) {
 
                     sedgerr = s(i,j,k+2,n);
                     
@@ -1799,7 +1787,7 @@ Maestro::PPM (const Box& bx,
                     sedger = max(sedger,min(s(i,j,k,n),s(i,j,k+1,n)));
                     sedger = min(sedger,max(s(i,j,k,n),s(i,j,k+1,n)));
 
-                } else if (k == khi-2) {
+                } else if (k == domhi[2]-2) {
 
                     // Use a modified stencil to get sedge on the first interior edge.
                     sedgerr = -0.2 *s(i,j,k+3,n) 
@@ -1814,7 +1802,7 @@ Maestro::PPM (const Box& bx,
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (k == khi-1 || k == khi-2) {
+                if (k == domhi[2]-1 || k == domhi[2]-2) {
 
                     alphap = sedger-s(i,j,k,n);
                     alpham = sedge-s(i,j,k,n);
@@ -1898,7 +1886,7 @@ Maestro::PPM (const Box& bx,
             if (is_umac) {
 
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i,j,k+1))*dt_local/hz;
+                Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
                 
                 if (w(i,j,k+1) > rel_eps) {
                     Ip(i,j,k,2) = sp - 
@@ -1907,7 +1895,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,2) = s(i,j,k,n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/hz;
+                sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
                 if (w(i,j,k) < -rel_eps) {
                     Im(i,j,k,2) = sm + 
@@ -1916,7 +1904,7 @@ Maestro::PPM (const Box& bx,
                     Im(i,j,k,2) = s(i,j,k,n);
                 }
             } else {
-                Real sigma = fabs(w(i,j,k))*dt_local/hz;
+                Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
                 if (w(i,j,k) > rel_eps) {
                     Ip(i,j,k,2) = sp - 
@@ -1925,7 +1913,7 @@ Maestro::PPM (const Box& bx,
                     Ip(i,j,k,2) = s(i,j,k,n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/hz;
+                sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
                 if (w(i,j,k) < -rel_eps) {
                     Im(i,j,k,2) = sm + 
