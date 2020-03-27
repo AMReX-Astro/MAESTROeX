@@ -1,5 +1,6 @@
 
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include <Problem_F.H>
 
 using namespace amrex;
@@ -77,35 +78,28 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	// compute w0, w0_force, and delta_chi_w0
 	is_predictor = 1;
-	make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar_old.dataPtr(),
-	        rho0_old.dataPtr(),rho0_old.dataPtr(),p0_old.dataPtr(),p0_old.dataPtr(),
-	        gamma1bar_old.dataPtr(),gamma1bar_old.dataPtr(),p0_minus_peosbar.dataPtr(),
-	        psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-	        r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-
+	Makew0(w0, w0_old, w0_force, Sbar_old, rho0_old, rho0_old,
+	       p0_old, p0_old, gamma1bar_old, gamma1bar_old,
+	       p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update density and compute rho0_predicted_edge
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
-	                 rho0_predicted_edge.dataPtr(), &dt,
-	                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-
+	AdvectBaseDens(rho0_predicted_edge);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! recompute cutoff coordinates now that rho0 has changed
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	compute_cutoff_coords(rho0_new.dataPtr());
+	ComputeCutoffCoords(rho0_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gravity
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	make_grav_cell(grav_cell_new.dataPtr(),
-	               rho0_new.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_new, rho0_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update species
@@ -124,11 +118,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	for (auto i=0; i < p0_old.size(); ++i)
 		p0_new[i] = p0_old[i];
 
-	enforce_HSE(rho0_new.dataPtr(),
-	            p0_new.dataPtr(),
-	            grav_cell_new.dataPtr(),
-	            r_cc_loc.dataPtr(),
-	            r_edge_loc.dataPtr());
+	EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new
@@ -151,6 +141,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! make Sbar
@@ -172,36 +163,29 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	w0_old = w0;
 
 	is_predictor = 0;
-	make_w0(w0.dataPtr(),w0_old.dataPtr(),w0_force.dataPtr(),Sbar_nph.dataPtr(),
-	        rho0_old.dataPtr(),rho0_new.dataPtr(),p0_old.dataPtr(),p0_new.dataPtr(),
-	        gamma1bar_old.dataPtr(),gamma1bar_new.dataPtr(),p0_minus_peosbar.dataPtr(),
-	        psi.dataPtr(),etarho_ec.dataPtr(),etarho_cc.dataPtr(),delta_chi_w0.dataPtr(),
-	        r_cc_loc.dataPtr(),r_edge_loc.dataPtr(),&dt,&dtold,&is_predictor);
-
+	Makew0(w0, w0_old, w0_force, Sbar_nph, rho0_old, rho0_new,
+	       p0_old, p0_new, gamma1bar_old, gamma1bar_new,
+	       p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+	
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update density and compute rho0_predicted_edge
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	advect_base_dens(w0.dataPtr(), rho0_old.dataPtr(), rho0_new.dataPtr(),
-	                 rho0_predicted_edge.dataPtr(), &dt,
-	                 r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-
+	AdvectBaseDens(rho0_predicted_edge);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! recompute cutoff coordinates now that rho0 has changed
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	compute_cutoff_coords(rho0_new.dataPtr());
-
+	ComputeCutoffCoords(rho0_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gravity
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	make_grav_cell(grav_cell_new.dataPtr(),
-	               rho0_new.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_new, rho0_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update species
@@ -217,11 +201,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	p0_new = p0_old;
 
-	enforce_HSE(rho0_new.dataPtr(),
-	            p0_new.dataPtr(),
-	            grav_cell_new.dataPtr(),
-	            r_cc_loc.dataPtr(),
-	            r_edge_loc.dataPtr());
+	EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new

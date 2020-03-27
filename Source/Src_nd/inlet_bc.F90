@@ -14,7 +14,7 @@ module inlet_bc_module
 
 contains
 
-  subroutine set_inlet_bcs()
+  subroutine set_inlet_bcs() bind(C, name="set_inlet_bcs")
     ! here we would initialize the parameters that are module variables.
     ! this routine is called when the base state is defined initially,
     ! and upon restart, just after the base state is read in.

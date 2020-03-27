@@ -2,7 +2,10 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#include <MaestroInletBCs.H>
+
 using namespace amrex;
+using namespace InletBCs;
 
 void
 Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx, 
@@ -51,16 +54,12 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     if (!found_ext_boundary) return;
 
     // get parameters for EXT_DIR bcs
-    RealVector ext_bcs(6, 0.0);
-    ext_bcs.shrink_to_fit();
-    get_inlet_bcs(ext_bcs.dataPtr());
-
-    const Real INLET_RHO = ext_bcs[0];
-    const Real INLET_RHOH = ext_bcs[1];
-    const Real INLET_TEMP = ext_bcs[2];
-    const Real INLET_CS = ext_bcs[3];
-    const Real inlet_mach = ext_bcs[4];
-    const Real dr_fine_loc = ext_bcs[5];
+    const Real INLET_RHO_l = INLET_RHO;
+    const Real INLET_RHOH_l = INLET_RHOH;
+    const Real INLET_TEMP_l = INLET_TEMP;
+    const Real INLET_CS_l = INLET_CS;
+    // const Real inlet_mach = inlet_mach;
+    const Real dr_fine_loc = INLET_dr_fine;
 
     const Real A = 4.5e-2;
     const Real B = 1.e2;
@@ -76,11 +75,11 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(0) == BCType::ext_dir) {
             
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                    if (i < imax) {
-                        q(i,j,k) = 0.0;
-                    }
-                });
+            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                if (i < imax) {
+                    q(i,j,k) = 0.0;
+                }
+            });
         }
     }
 
@@ -89,11 +88,11 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.hi(0) == BCType::ext_dir) {
 	    
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                    if (i > imin) {
-                        q(i,j,k) = 0.0;
-                    }
-                });
+            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                if (i > imin) {
+                    q(i,j,k) = 0.0;
+                }
+            });
         }
     }
 
@@ -102,85 +101,85 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(1) == BCType::ext_dir) {
 	    
-	    if (is_vel) {
-		if (comp == 0) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (j < jmax) {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == 1) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			Real x = (Real(i) + 0.5)*dr_fine_loc;
-			    
-			if (j < jmax) {
-			    q(i,j,k) = (inlet_mach/1.e-1) * 
-				INLET_CS*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
-			}
-		    });
-		}
-	    } else {
-		
-		if (comp == Rho) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			Real x = (Real(i) + 0.5)*dr_fine_loc;
-			Real vy = (inlet_mach/1.e-1) * 
-			    INLET_CS*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
+            if (is_vel) {
+                if (comp == 0) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        if (j < jmax) {
+                            q(i,j,k) = 0.0;
+                        }
+                    });
+                } else if (comp == 1) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        Real x = (Real(i) + 0.5)*dr_fine_loc;
+                            
+                        if (j < jmax) {
+                            q(i,j,k) = (inlet_mach/1.e-1) * 
+                            INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
+                        }
+                    });
+                }
+            } else {
+            
+                if (comp == Rho) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        Real x = (Real(i) + 0.5)*dr_fine_loc;
+                        Real vy = (inlet_mach/1.e-1) * 
+                            INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
 
-			if (vy != 0.0) {
-			    if (j < jmax) 
-				q(i,j,k) = INLET_RHO;
-			} else {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == RhoH) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			Real x = (Real(i) + 0.5)*dr_fine_loc;
-			Real vy = (inlet_mach/1.e-1) * 
-			    INLET_CS*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
-			
-			if (vy != 0) {
-			    if (j < jmax) 
-				q(i,j,k) = INLET_RHOH;
-			} else {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == FirstSpec) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			Real x = (Real(i) + 0.5)*dr_fine_loc;
-			Real vy = (inlet_mach/1.e-1) * 
-			    INLET_CS*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
-			
-			if (vy != 0.0) {
-			    if (j < jmax)
-				q(i,j,k) = INLET_RHO;
-			} else {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else if (comp == Temp) {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			Real x = (Real(i) + 0.5)*dr_fine_loc;
-			Real vy = (inlet_mach/1.e-1) * 
-			    INLET_CS*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
-			
-			if (vy != 0.0) {
-			    if (j < jmax)
-				q(i,j,k) = INLET_TEMP;
-			} else {
-			    q(i,j,k) = 0.0;
-			}
-		    });
-		} else {
-		    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-			if (j < jmax) {
-			    q(i,j,k) = 0.0;
-			} 
-		    });
-		}
-	    } // end if is_vel
+                        if (vy != 0.0) {
+                            if (j < jmax) 
+                            q(i,j,k) = INLET_RHO_l;
+                        } else {
+                            q(i,j,k) = 0.0;
+                        }
+                    });
+                } else if (comp == RhoH) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        Real x = (Real(i) + 0.5)*dr_fine_loc;
+                        Real vy = (inlet_mach/1.e-1) * 
+                            INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
+                        
+                        if (vy != 0) {
+                            if (j < jmax) 
+                            q(i,j,k) = INLET_RHOH_l;
+                        } else {
+                            q(i,j,k) = 0.0;
+                        }
+                    });
+                } else if (comp == FirstSpec) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        Real x = (Real(i) + 0.5)*dr_fine_loc;
+                        Real vy = (inlet_mach/1.e-1) * 
+                            INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
+                        
+                        if (vy != 0.0) {
+                            if (j < jmax)
+                            q(i,j,k) = INLET_RHO_l;
+                        } else {
+                            q(i,j,k) = 0.0;
+                        }
+                    });
+                } else if (comp == Temp) {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        Real x = (Real(i) + 0.5)*dr_fine_loc;
+                        Real vy = (inlet_mach/1.e-1) * 
+                            INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
+                        
+                        if (vy != 0.0) {
+                            if (j < jmax)
+                            q(i,j,k) = INLET_TEMP_l;
+                        } else {
+                            q(i,j,k) = 0.0;
+                        }
+                    });
+                } else {
+                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                        if (j < jmax) {
+                            q(i,j,k) = 0.0;
+                        } 
+                    });
+                }
+            } // end if is_vel
         }
     }
 
@@ -193,7 +192,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     q(i,j,k) = 0.0;
                 }
             });
-	} 
+        } 
     }
 
 #if AMREX_SPACEDIM == 3
@@ -202,11 +201,11 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto kmax = domlo[2];
 
         if (bcs.lo(2) == BCType::ext_dir) {
-	    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-		if (k < kmax) {
-		    q(i,j,k) = 0.0;
-		}
-	    });
+            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                if (k < kmax) {
+                    q(i,j,k) = 0.0;
+                }
+            });
         }
     }
 
@@ -216,10 +215,10 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         if (bcs.hi(2) == BCType::ext_dir) {
             AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                 if (k > kmin) {
-		    q(i,j,k) = 0.0;
+                    q(i,j,k) = 0.0;
                 }
             });
-	} 
+        } 
     }
 #endif
 }
