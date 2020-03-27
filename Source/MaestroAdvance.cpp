@@ -201,7 +201,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // make the sponge for all levels
     if (do_sponge) {
-        init_sponge(rho0_old.dataPtr());
+        SpongeInit(rho0_old);
         MakeSponge(sponge);
     }
 

@@ -436,24 +436,6 @@ extern "C"
     void make_abar(const int* lo, const int* hi,
                    const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                    amrex::Real* abar, const int* a_lo, const int* a_hi);
-
-   
-
-
-    //////////////////////
-    // in make_scal_force.F90
-    void mktempforce(const int* lo, const int* hi, const int lev,
-                     amrex::Real* temp_force, const int* f_lo, const int* f_hi,
-                     const amrex::Real* scal, const int* s_lo, const int* s_hi,
-                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-                     const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-#endif
-                     const amrex::Real* thermal, const int* t_lo, const int* t_hi,
-                     const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
-                     const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
-                     const amrex::Real* dx, const int* domhi);
     //////////////////////
 
     //////////////////////
@@ -466,7 +448,6 @@ extern "C"
     void finalize_meth_params();
 
     //////////////////////
-
 
     //////////////////////
     // in sponge.F90
