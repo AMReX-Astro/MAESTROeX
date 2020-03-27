@@ -1932,8 +1932,8 @@ public:
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
-    IntVector nr;
-    RealVector dr;
+    BaseState<int> nr;
+    BaseState<Real> dr;
 
     BaseState<int> base_cutoff_density_coord;
     BaseState<int> anelastic_cutoff_density_coord;

@@ -40,7 +40,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
-    Real dr0 = dr[0];
+    Real dr0 = dr(0);
 
     const auto r_cc_loc_p = r_cc_loc_b;
     const auto r_edge_loc_p = r_edge_loc_b;

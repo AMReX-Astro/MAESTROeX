@@ -47,7 +47,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             log_file.Log("model file mapping (spherical base state)");
         }
 
-        log_file.Log("dr of MAESTRO base state =                            ", dr[n]);
+        log_file.Log("dr of MAESTRO base state =                            ", dr(n));
         log_file.Log("dr of input file data =                               ", model_dr);
         log_file.Log(" ");
         log_file.Log("maximum radius (cell-centered) of input model =       ", rmax);
@@ -56,8 +56,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         if (use_exact_base_state) {
             mod_dr = r_cc_loc_b(lev,0) < model_dr_irreg[0] ? remainder(model_dr_irreg[0], r_cc_loc_b(lev,0)) : remainder(r_cc_loc_b(lev,0), model_dr_irreg[0]);
         } else {
-            mod_dr = dr[n] < model_dr ? 
-                remainder(model_dr, dr[n]) : remainder(dr[n], model_dr);
+            mod_dr = dr(n) < model_dr ? 
+                remainder(model_dr, dr(n)) : remainder(dr(n), model_dr);
         }
 
         if (mod_dr > TINY) {
@@ -83,9 +83,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
     Real p_above_cutoff = p0_init[n];
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < nr(n); ++r) {
 
-        Real rloc = starting_rad + (Real(r) + 0.5)*dr[n];
+        Real rloc = starting_rad + (Real(r) + 0.5)*dr(n);
 
         // here we account for r > rmax of the model.hse array, assuming
         // that the state stays constant beyond rmax
@@ -188,29 +188,29 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         }
     } else {
         if (spherical || do_2d_planar_octant) {
-            mencl = 4.0/3.0 * M_PI * dr[n]*dr[n]*dr[n] * s0_init[n+max_lev*nr_fine*Rho];
+            mencl = 4.0/3.0 * M_PI * dr(n)*dr(n)*dr(n) * s0_init[n+max_lev*nr_fine*Rho];
         }
     }
 
     Real max_hse_error = -1.e30;
 
-    for (auto r = 1; r < nr[n]; ++r) {
+    for (auto r = 1; r < nr(n); ++r) {
 
-        Real rloc = starting_rad + (Real(r) + 0.5) * dr[n];
+        Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
         rloc = min(rloc, rmax);
 
         if (rloc < base_cutoff_density_loc) {
 
             Real r_r = starting_rad;
-            r_r += use_exact_base_state ? r_edge_loc_b(n,r+1) : Real(r+1) * dr[n];
+            r_r += use_exact_base_state ? r_edge_loc_b(n,r+1) : Real(r+1) * dr(n);
             Real r_l = starting_rad;
-            r_l += use_exact_base_state ? r_edge_loc_b(n,r) : Real(r) * dr[n];
+            r_l += use_exact_base_state ? r_edge_loc_b(n,r) : Real(r) * dr(n);
 
             Real g = 0.0;
 
             if (spherical || do_2d_planar_octant) {
                 g = -Gconst * mencl / (r_l*r_l);
-                mencl += 4.0/3.0 * M_PI * dr[n] * 
+                mencl += 4.0/3.0 * M_PI * dr(n) * 
                     (r_l*r_l+r_l*r_r+r_r*r_r) * 
                     s0_init[n+max_lev*(r+nr_fine*Rho)];
             } else {
@@ -231,7 +231,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
                 rhog = ((1.0-rfrac) * s0_init[n+max_lev*(r+nr_fine*Rho)] +  
                         rfrac * s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
             } else {
-                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr[n];
+                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr(n);
                 rhog = 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] +  
                               s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
             }

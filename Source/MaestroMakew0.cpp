@@ -66,7 +66,7 @@ Maestro::Makew0(const RealVector& w0_old,
             for (auto r = r_start_coord_b(n,1); r <= r_end_coord_b(n,1)+1; ++r) {
                 max_w0 = max(max_w0, fabs(w0[n+max_lev*r]));
             }
-            Print() << "... max CFL of w0: " << max_w0 * dt_in / dr[n] << std::endl;
+            Print() << "... max CFL of w0: " << max_w0 * dt_in / dr(n) << std::endl;
         }
         Print() << std::endl;
     }
@@ -131,7 +131,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
         int base_cutoff_density_coord_loc = 0;
         get_base_cutoff_density_coord(n, &base_cutoff_density_coord_loc);
 
-        const Real dr_lev = dr[n];
+        const Real dr_lev = dr(n);
 
         for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
 
@@ -201,9 +201,9 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     }
 
                     // Offset the w0 on level i above the top of level n
-                    // for (auto r = (r_end_coord_b(n,j)+1)/refrat+1; r <= nr[i]; ++r) {
+                    // for (auto r = (r_end_coord_b(n,j)+1)/refrat+1; r <= nr(i); ++r) {
                     lo = (r_end_coord_b(n,j)+1)/refrat+1; 
-                    hi = nr[i];
+                    hi = nr(i);
                     AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                         int r = k + lo;
                         w0_p[i+max_lev*r] += offset;
@@ -218,9 +218,9 @@ Maestro::Makew0Planar(const RealVector& w0_old,
         for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
             if (j == numdisjointchunks_b(n)) {
                 // for (auto r = r_end_coord_b(n,j)+2; 
-                //      r <= nr[n]; ++r) {
+                //      r <= nr(n); ++r) {
                 const int lo = r_end_coord_b(n,j)+2; 
-                const int hi = nr[n];
+                const int hi = nr(n);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -247,7 +247,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
-            const Real dr_lev = dr[n];
+            const Real dr_lev = dr(n);
 
             // for (auto r = r_start_coord_b(n,j); 
             //      r <= r_end_coord_b(n,j); ++r) {
@@ -295,8 +295,8 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
 
     const int max_lev = max_radial_level+1;
-    const int nr_finest = nr[finest_radial_level];
-    const Real dr_finest = dr[finest_radial_level];
+    const int nr_finest = nr(finest_radial_level);
+    const Real dr_finest = dr(finest_radial_level);
     const Real dpdt_factor_loc = dpdt_factor;
 
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
@@ -486,7 +486,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     // just solved for.  Here, we make the coarse edge underneath equal
     // to the fine edge value.
     for (auto n = finest_radial_level; n >= 1; --n) {
-        for (auto r = 0; r <= nr[n]; n+=2) {
+        for (auto r = 0; r <= nr(n); n+=2) {
             w0[n-1+max_lev*r/2] = w0[n+max_lev*r];
         }
     }
@@ -495,9 +495,9 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     for (auto n = 1; n <= finest_radial_level; ++n) {
         for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
             if (j == numdisjointchunks_b(n)) {
-                // for (auto r = r_end_coord_b(n,j)+2; r <= nr[n]; ++r) {
+                // for (auto r = r_end_coord_b(n,j)+2; r <= nr(n); ++r) {
                 lo = r_end_coord_b(n,j)+2; 
-                hi = nr[n];
+                hi = nr(n);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -524,7 +524,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
-            const Real dr_lev = dr[n];
+            const Real dr_lev = dr(n);
 
             // for (auto r = r_start_coord_b(n,j); r <=r_end_coord_b(n,j); ++r) {
             lo = r_start_coord_b(n,j); 
@@ -605,7 +605,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     int base_cutoff_density_coord_loc = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
 
-    const Real dr0 = dr[0];
+    const Real dr0 = dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities

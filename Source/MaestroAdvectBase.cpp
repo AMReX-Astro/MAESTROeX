@@ -41,7 +41,7 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
         Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr(); 
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
 
-        const Real dr_lev = dr[n];
+        const Real dr_lev = dr(n);
 
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
@@ -66,7 +66,7 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
         Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr(); 
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
 
-        const Real dr_lev = dr[n];
+        const Real dr_lev = dr(n);
         const Real dt_loc = dt;
         
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
@@ -91,7 +91,7 @@ Maestro::AdvectBaseDensSphr(RealVector& rho0_predicted_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseDensSphr()", AdvectBaseDensSphr);
 
-    const Real dr0 = dr[0];
+    const Real dr0 = dr(0);
     const Real dtdr = dt / dr0;
     RealVector force_vec(nr_fine);
     const int max_lev = max_radial_level+1;
@@ -159,7 +159,7 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         Real * AMREX_RESTRICT psi_p = psi.dataPtr();  
 
-        const Real dr_lev = dr[n];
+        const Real dr_lev = dr(n);
 
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
@@ -186,7 +186,7 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         Real * AMREX_RESTRICT psi_p = psi.dataPtr(); 
 
-        const Real dr_lev = dr[n];
+        const Real dr_lev = dr(n);
         const Real dt_loc = dt;
 
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
@@ -211,7 +211,7 @@ Maestro::AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseEnthalpySphr()", AdvectBaseEnthalpySphr);
 
-    const Real dr0 = dr[0];
+    const Real dr0 = dr(0);
     const Real dtdr = dt / dr0;
     const Real dt_loc = dt;
 

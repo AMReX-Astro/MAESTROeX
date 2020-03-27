@@ -22,8 +22,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             // at the origin.  The mass in the computational domain
             // does not contribute to the gravitational acceleration.
             for (auto n = 0; n <= finest_radial_level; ++n) {
-                // for (auto r = 0; r < nr[n]; ++r) {
-                const int nr_lev = nr[n];
+                // for (auto r = 0; r < nr(n); ++r) {
+                const int nr_lev = nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc_p(n,r)*r_cc_loc_p(n,r));
                 });
@@ -36,7 +36,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             m[0] = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
             grav_cell[0] = -Gconst * m[0] / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
-            int nr_lev = nr[0];
+            int nr_lev = nr(0);
 
             for (auto r = 1; r < nr_lev; ++r) {
 
@@ -215,8 +215,8 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // does not contribute to the gravitational acceleration.
             //   
             for (auto n = 0; n <= finest_radial_level; ++n) {
-                // for (auto r = 0; r < nr[n]; ++r) {
-                const int nr_lev = nr[n];
+                // for (auto r = 0; r < nr(n); ++r) {
+                const int nr_lev = nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc_p(n,r)*r_edge_loc_p(n,r));
                 });
@@ -230,7 +230,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             grav_edge[0] = 0.0;
             m[0] = 0.0;
 
-            for (auto r = 0; r < nr[0]; ++r) {
+            for (auto r = 0; r < nr(0); ++r) {
 
                 // only add to the enclosed mass if the density is
                 // > base_cutoff_density

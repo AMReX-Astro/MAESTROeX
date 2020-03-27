@@ -31,7 +31,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr0 = dr[0];
+    const Real dr0 = dr(0);
     const Real dtdr = dt / dr0;
 
     const int max_lev = max_radial_level+1;
@@ -361,8 +361,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr();   
 
-        const int nr_lev = nr[n];
-        const Real dr_lev = dr[n];
+        const int nr_lev = nr(n);
+        const Real dr_lev = dr(n);
         const Real dtdr = dt / dr_lev;
 
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
@@ -835,7 +835,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
         Real * AMREX_RESTRICT sedgel = sedgel_vec[n].dataPtr();
         Real * AMREX_RESTRICT sedger = sedger_vec[n].dataPtr(); 
 
-        const int nr_lev = nr[n];
+        const int nr_lev = nr(n);
 
         for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
