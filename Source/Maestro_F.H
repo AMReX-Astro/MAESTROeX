@@ -80,21 +80,6 @@ extern "C"
     void get_inlet_bcs (amrex::Real* params);
 
     //////////////////////
-    
-    //////////////////////
-    // in bc_fill_nd.F90
-
-    void scalarfill (amrex::Real* phi, const int* phi_lo, const int* phi_hi,
-                     const int* domlo, const int* domhi,
-                     const amrex::Real* dx, const amrex::Real* gridlo,
-                     const amrex::Real* time, const int* bc, const int icomp);
-    
-    void velfill (amrex::Real* vel, const int* vel_lo, const int* vel_hi,
-                  const int* domlo, const int* domhi,
-                  const amrex::Real* dx, const amrex::Real* gridlo,
-                  const amrex::Real* time, const int* bc, const int icomp);
-
-    //////////////////////
 
     //////////////////////
     // in burner.F90
@@ -205,12 +190,6 @@ extern "C"
     void estdt_divu(amrex::Real* gp0,
                       const amrex::Real* p0, const amrex::Real* gamma1bar,
                       const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
-    //////////////////////
-
-    //////////////////////
-    // in compute_grad_phi.F90
-    void compute_grad_phi_rad(const amrex::Real* phi,
-                              amrex::Real* gphi_rad);
     //////////////////////
 
     //////////////////////
@@ -427,23 +406,6 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in make_beta0.f90
-    void make_beta0(      amrex::Real* beta0,
-                    const amrex::Real* rho0,
-                    const amrex::Real* p0,
-                    const amrex::Real* gamma1bar,
-                    const amrex::Real* grav_cell);
-
-    void make_beta0_irreg(      amrex::Real* beta0,
-                           const amrex::Real* rho0,
-                           const amrex::Real* p0,
-                           const amrex::Real* gamma1bar,
-                           const amrex::Real* grav_cell,
-                           const amrex::Real* r_cc_loc,
-                           const amrex::Real* r_edge_loc);
-    //////////////////////
-
-    //////////////////////
     // in make_intra_coeffs.F90
     void make_intra_coeffs(const int* lo,  const int* hi,
                            const amrex::Real* scalold, const int* s1_lo, const int* s1_hi,
@@ -460,15 +422,6 @@ extern "C"
                              amrex::Real* hcoeff, const int* h_lo, const int* h_hi,
                              amrex::Real* Xkcoeff, const int* xk_lo, const int* xk_hi,
                              amrex::Real* pcoeff, const int* p_lo, const int* p_hi);
-    //////////////////////
-
-    //////////////////////
-    // in make_gamma.F90
-    void make_gamma(const int* lo, const int* hi, 
-                          amrex::Real* gamma, const int* g_lo, const int* g_hi,
-                    const amrex::Real* scal,  const int* s_lo, const int* s_hi,
-                    const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi);
-
     //////////////////////
 
     //////////////////////
@@ -563,133 +516,6 @@ extern "C"
     void make_abar(const int* lo, const int* hi,
                    const amrex::Real* state, const int* s_lo, const int* s_hi, const int nc_s,
                    amrex::Real* abar, const int* a_lo, const int* a_hi);
-
-    //////////////////////
-    // in make_S.f90
-
-    // compute S from constraint div(u) = S
-    void make_S_cc(const int* lo, const int* hi, const int lev,
-                   amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-                   amrex::Real* delta_gamma1_term,  const int* dg_lo, const int* dg_hi,
-                   amrex::Real* delta_gamma1,  const int* df_lo, const int* df_hi,
-                   const amrex::Real* scal,  const int* c_lo, const int* c_hi,
-                   const amrex::Real* u,     const int* u_lo, const int* u_hi,
-                   const amrex::Real* rodot, const int* r_lo, const int* r_hi,
-                   const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
-                   const amrex::Real* rHext, const int* e_lo, const int* e_hi,
-                   const amrex::Real* therm, const int* t_lo, const int* t_hi,
-                   const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                   const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
-                   const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi);
-
-     void make_S_cc_sphr(const int* lo, const int* hi,
-                         amrex::Real* S_cc,  const int* s_lo, const int* s_hi,
-                         amrex::Real* delta_gamma1_term,const int* dg_lo, const int* dg_hi,
-                         amrex::Real* delta_gamma1,const int* df_lo, const int* df_hi,
-                         const amrex::Real* scal,  const int* c_lo, const int* c_hi,
-                         const amrex::Real* u,     const int* u_lo, const int* u_hi,
-                         const amrex::Real* rodot, const int* r_lo, const int* r_hi,
-                         const amrex::Real* rHnuc, const int* n_lo, const int* n_hi,
-                         const amrex::Real* rHext, const int* e_lo, const int* e_hi,
-                         const amrex::Real* therm, const int* t_lo, const int* t_hi,
-                         const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                         const amrex::Real* gradp0_cart, const int* gp0_lo, const int* gp0_hi,
-                         const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
-                         const amrex::Real* normal, const int* no_lo, const int* no_hi);
-
-    // rhcc = beta0 * (S - Sbar)
-    void make_rhcc_for_nodalproj(const int* lo, const int* hi,
-                                 amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
-                                 const amrex::Real* S_cc, const int* s_lo, const int* s_hi,
-                                 const amrex::Real* Sbar_cart, const int* sb_lo, const int* sb_hi,
-                                 const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi,
-                                 const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi);
-    
-    void create_correction_cc(const int* lo, const int* hi,
-                              amrex::Real* correction_cc, const int* c_lo, const int* c_hi,
-                              const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
-                              const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi,
-                              const amrex::Real* gamma1bar_cart, const int* g_lo, const int* g_hi,
-                              const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
-                              const amrex::Real* rho0_cart, const int* r_lo, const int* r_hi,
-                              const amrex::Real dt);
-
-    // rhcc = beta0 * (S - Sbar) + beta0 * delta_chi
-    void make_rhcc_for_macproj(const int* lo, const int* hi,
-                               amrex::Real* rhcc,  const int* c_lo, const int* c_hi,
-                               const amrex::Real* S_cc, const int* s_lo, const int* s_hi,
-                               const amrex::Real* Sbar_cart, const int* sb_lo, const int* sb_hi,
-                               const amrex::Real* beta0_cart, const int* b_lo, const int* b_hi,
-                               const amrex::Real* rho0_cart, const int* r_lo, const int* r_hi,
-                               const amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
-                               const amrex::Real* gamma1bar_cart, const int* g1_lo, const int* g1_hi,
-                               const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi,
-                               const amrex::Real* delta_p_term, const int* dp_lo, const int* dp_hi,
-                               amrex::Real* delta_chi, const int* dc_lo, const int* dc_hi,
-                               const amrex::Real dt, const int is_predictor);
-
-    void create_correction_delta_gamma1_term(const int* lo, const int* hi,
-                                             amrex::Real* delta_gamma1_term, const int* dg_lo, const int* dg_hi,
-                                             const amrex::Real* delta_gamma1, const int* df_lo, const int* df_hi,
-                                             const amrex::Real* gamma1bar_cart, const int* g1_lo, const int* g1_hi,
-                                             const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
-                                             const amrex::Real* p0_cart, const int* p0_lo, const int* p0_hi);
-
-    //////////////////////
-
-
-    //////////////////////
-    // in make_scal_force.F90
-    void mktempforce(const int* lo, const int* hi, const int lev,
-                     amrex::Real* temp_force, const int* f_lo, const int* f_hi,
-                     const amrex::Real* scal, const int* s_lo, const int* s_hi,
-                     const amrex::Real* umac,  const int* u_lo, const int* u_hi,
-                     const amrex::Real* vmac,  const int* v_lo, const int* v_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* wmac,  const int* w_lo, const int* w_hi,
-#endif
-                     const amrex::Real* thermal, const int* t_lo, const int* t_hi,
-                     const amrex::Real* p0_cart, const int* p_lo, const int* p_hi,
-                     const amrex::Real* psi_cart, const int* ps_lo, const int* ps_hi,
-                     const amrex::Real* dx, const int* domhi);
-    //////////////////////
-
-    //////////////////////
-    // in make_w0.f90
-    void make_w0(amrex::Real* w0, const amrex::Real* w0_old,
-                 const amrex::Real* w0_force, const amrex::Real* Sbar_in,
-                 const amrex::Real* rho0_old, const amrex::Real* rho0_new,
-                 const amrex::Real* p0_old, const amrex::Real* p0_new,
-                 const amrex::Real* gamma1bar_old, const amrex::Real* gamma1bar_new,
-                 const amrex::Real* p0_minus_peosbar,
-                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
-                 const amrex::Real* delta_chi_w0, const amrex::Real* r_cc_loc,
-                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
-                 const amrex::Real* dtold, const int* is_predictor);
-
-    void make_w0_sphr2(amrex::Real* w0, const amrex::Real* w0_old,
-                 const amrex::Real* Sbar_in,
-                 const amrex::Real* rho0_nph,
-                 const amrex::Real* p0_nph,
-                 const amrex::Real* gamma1bar_nph,
-                 const amrex::Real* grav_edge,
-                 const amrex::Real* w0_from_Sbar,
-                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
-                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
-                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
-                 const amrex::Real* dtold);
-
-    void make_w0_sphr1(amrex::Real* w0, const amrex::Real* w0_old,
-                 const amrex::Real* Sbar_in,
-                 const amrex::Real* rho0_nph,
-                 const amrex::Real* p0_nph,
-                 const amrex::Real* gamma1bar_nph,
-                 const amrex::Real* grav_edge,
-                 const amrex::Real* w0_from_Sbar,
-                 const amrex::Real* etarho_ec, const amrex::Real* etarho_cc,
-                 const amrex::Real* w0_force, const amrex::Real* r_cc_loc,
-                 const amrex::Real* r_edge_loc, const amrex::Real* dt,
-                 const amrex::Real* dtold);
     //////////////////////
 
     //////////////////////
@@ -711,50 +537,6 @@ extern "C"
     void get_r_start_coord(int* coord);
     void get_r_end_coord(int* coord);
     void get_finest_radial_level(int* lev);
-    //////////////////////
-
-    //////////////////////
-    // in rhoh_vs_t.F90
-    void makeTfromRhoH (const int* lo, const int* hi,
-                        amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const amrex::Real* p0, const int* p0_lo, const int* p0_hi);
-
-    void makeTfromRhoP (const int* lo, const int* hi,
-                        amrex::Real* state, const int* s_lo, const int* s_hi,
-                        const amrex::Real* p0, const int* p0_lo, const int* p0_hi,
-                        const int updateRhoH);
-
-    void makePfromRhoH(const int* lo, const int* hi,
-                       const amrex::Real* state, const int* s_lo, const int* s_hi,
-                       const amrex::Real* temp_old, const int* t_lo, const int* t_hi,
-                       amrex::Real* peos, const int* p_lo, const int* p_hi);
-
-    void makeMachfromRhoH (const int* lo, const int* hi,
-                           const amrex::Real* state,  const int* s_lo, const int* s_hi,
-                           const amrex::Real* u, const int* u_lo, const int* u_hi,
-                           const amrex::Real* p0, const int* p0_lo, const int* p0_hi,
-                           const amrex::Real* w0, const int* w_lo, const int* w_hi,
-                           amrex::Real* mach, const int* m_lo, const int* m_hi);
-
-    void makeCsfromRhoH (const int* lo, const int* hi,
-                         const amrex::Real* state, const int* s_lo, const int* s_hi,
-                         const amrex::Real* p0cart, const int* p_lo, const int* p_hi,
-                         amrex::Real* cs, const int* c_lo, const int* c_hi);
-    
-    void makeHfromRhoT_edge (const int* lo, const int* hi, const int idir,
-                             amrex::Real* sedge, const int* x_lo, const int* x_hi,    const amrex::Real* rho0, const int* r_lo, const int* r_hi,
-                             const amrex::Real* rhoh0, const int* rh_lo, const int* rh_hi,
-                             const amrex::Real* temp0, const int* t_lo, const int* t_hi,
-                             const amrex::Real* rho0_edge, const int* re_lo, const int* re_hi,
-                             const amrex::Real* rhoh0_edge, const int* rhe_lo, const int* rhe_hi,
-                             const amrex::Real* temp0_edge, const int* te_lo, const int* te_hi);
-    
-    void makeHfromRhoT_edge_sphr (const int* lo, const int* hi, 
-                  const int idir,
-                                  amrex::Real* sedge, const int* x_lo, const int* x_hi,
-                                  const amrex::Real* rho0_edge, const int* r_lo, const int* r_hi,
-                                  const amrex::Real* rhoh0_edge, const int* rh_lo, const int* rh_hi,
-                                  const amrex::Real* temp0_edge, const int* t_lo, const int* t_hi);
     //////////////////////
 
     //////////////////////
@@ -790,23 +572,6 @@ extern "C"
     void retag_array(const int* tagval, const int* clearval,
                      const int* lo, const int* hi,
                      const int* lev, const int* tag_array);
-    //////////////////////
-
-    //////////////////////
-    // in update_scal.F90
-
-    void update_rhoh(const int* lo, const int* hi,
-                     const amrex::Real* sold, const int* so_lo, const int* so_hi,
-                     amrex::Real* snew, const int* sn_lo, const int* sn_hi,
-                     const amrex::Real* sfluxx, const int* x_lo, const int* x_hi,
-                     const amrex::Real* sfluxy, const int* y_lo, const int* y_hi,
-#if (AMREX_SPACEDIM == 3)
-                     const amrex::Real* sfluxz, const int* z_lo, const int* z_hi,
-#endif
-                     const amrex::Real* force,  const int* f_lo, const int* f_hi,
-                     const amrex::Real* p0_new_cart, const int* p_lo, const int* p_hi,
-                     const amrex::Real* dx, const amrex::Real dt,
-                     const int nspec);
     //////////////////////
 
 #ifdef __cplusplus
