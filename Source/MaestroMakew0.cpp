@@ -24,10 +24,7 @@ Maestro::Makew0(const RealVector& w0_old,
     std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     const int max_lev = max_radial_level+1;
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-
+    
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
             Makew0PlanarVarg(w0_old, w0_force, Sbar_in, 
@@ -66,7 +63,7 @@ Maestro::Makew0(const RealVector& w0_old,
     if (maestro_verbose >= 2) {
         for (auto n = 0; n <= finest_radial_level; ++n) {
             Real max_w0 = 0.0;
-            for (auto r = r_start_coord[n]; r <= r_end_coord[n]+1; ++r) {
+            for (auto r = r_start_coord_b(n,1); r <= r_end_coord_b(n,1)+1; ++r) {
                 max_w0 = max(max_w0, fabs(w0[n+max_lev*r]));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / dr[n] << std::endl;
@@ -136,19 +133,19 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
         const Real dr_lev = dr[n];
 
-        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+        for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
 
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
                 w0[0] = 0.0;
             } else {
                 // Obtain the starting value of w0 from the coarser grid
-                w0[n+max_lev*r_start_coord[n+max_lev*j]] = w0[n-1+max_lev*r_start_coord[n+max_lev*j]/2];
+                w0[n+max_lev*r_start_coord_b(n,j)] = w0[n-1+max_lev*r_start_coord_b(n,j)/2];
             }
 
             // compute psi for level n
-            int lo = r_start_coord[n+max_lev*j]; 
-            int hi = r_end_coord[n+max_lev*j];
+            int lo = r_start_coord_b(n,j); 
+            int hi = r_end_coord_b(n,j);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord_loc) {
@@ -156,8 +153,8 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                 }
             });
 
-            for (auto r = r_start_coord[n+max_lev*j]+1; 
-                r <= r_end_coord[n+max_lev*j]+1; ++r) {
+            for (auto r = r_start_coord_b(n,j)+1; 
+                r <= r_end_coord_b(n,j)+1; ++r) {
 
                 Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
                     + gamma1bar_new_in[n+max_lev*(r-1)]) *
@@ -189,23 +186,23 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
                 // the corresponding point on level n-1
-                Real offset = w0[n+max_lev*(r_end_coord[n+max_lev*j]+1)]
-                    - w0[n-1+max_lev*(r_end_coord[n+max_lev*j]+1)/2];
+                Real offset = w0[n+max_lev*(r_end_coord_b(n,j)+1)]
+                    - w0[n-1+max_lev*(r_end_coord_b(n,j)+1)/2];
 
                 for (auto i = n-1; i >= 0; --i) {
 
                     int refrat = pow(2, n-i);
 
                     // Restrict w0 from level n to level i
-                    for (auto r = r_start_coord[n + max_lev*j]; r <= r_end_coord[n + max_lev*j]+1; ++r) {
+                    for (auto r = r_start_coord_b(n,j); r <= r_end_coord_b(n,j)+1; ++r) {
                         if (r % refrat == 0) {
                             w0[n+max_lev*r/refrat] = w0[n+max_lev*r];
                         }
                     }
 
                     // Offset the w0 on level i above the top of level n
-                    // for (auto r = (r_end_coord[n+max_lev*j]+1)/refrat+1; r <= nr[i]; ++r) {
-                    lo = (r_end_coord[n+max_lev*j]+1)/refrat+1; 
+                    // for (auto r = (r_end_coord_b(n,j)+1)/refrat+1; r <= nr[i]; ++r) {
+                    lo = (r_end_coord_b(n,j)+1)/refrat+1; 
                     hi = nr[i];
                     AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                         int r = k + lo;
@@ -218,21 +215,21 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
     // zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= max_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
-            if (j == numdisjointchunks[n]) {
-                // for (auto r = r_end_coord[n+max_lev*j]+2; 
+        for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
+            if (j == numdisjointchunks_b(n)) {
+                // for (auto r = r_end_coord_b(n,j)+2; 
                 //      r <= nr[n]; ++r) {
-                const int lo = r_end_coord[n+max_lev*j]+2; 
+                const int lo = r_end_coord_b(n,j)+2; 
                 const int hi = nr[n];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             } else {
-                // for (auto r = r_end_coord[n+max_lev*j]+2; 
-                //      r <= r_start_coord[n+max_lev*(j+1)]-1; ++r) {
-                const int lo = r_end_coord[n+max_lev*j]+2; 
-                const int hi = r_start_coord[n+max_lev*(j+1)]-1;
+                // for (auto r = r_end_coord_b(n,j)+2; 
+                //      r <= r_start_coord_b(n,j+1)-1; ++r) {
+                const int lo = r_end_coord_b(n,j)+2; 
+                const int hi = r_start_coord_b(n,j+1)-1;
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -245,17 +242,17 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     FillGhostBase(w0, false);
 
     for (auto n = 0; n <= max_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+        for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
             const Real dr_lev = dr[n];
 
-            // for (auto r = r_start_coord[n + max_lev*j]; 
-            //      r <= r_end_coord[n + max_lev*j]; ++r) {
-            const int lo = r_start_coord[n+max_lev*j]; 
-            const int hi = r_end_coord[n+max_lev*j];
+            // for (auto r = r_start_coord_b(n,j); 
+            //      r <= r_end_coord_b(n,j); ++r) {
+            const int lo = r_start_coord_b(n,j); 
+            const int hi = r_end_coord_b(n,j);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
 
@@ -293,11 +290,6 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
-
-    get_finest_radial_level(&finest_radial_level);
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
 
     int fine_base_density_cutoff_coord = 0;
     get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
@@ -501,19 +493,19 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
 
     // 8) zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= finest_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
-            if (j == numdisjointchunks[n]) {
-                // for (auto r = r_end_coord[n+max_lev*j]+2; r <= nr[n]; ++r) {
-                lo = r_end_coord[n+max_lev*j]+2; 
+        for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
+            if (j == numdisjointchunks_b(n)) {
+                // for (auto r = r_end_coord_b(n,j)+2; r <= nr[n]; ++r) {
+                lo = r_end_coord_b(n,j)+2; 
                 hi = nr[n];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             } else {
-                // for (auto r = r_end_coord[n+max_lev*j]+2; r < r_start_coord[n+max_lev*(j+1)]; ++r) {
-                lo = r_end_coord[n+max_lev*j]+2; 
-                hi = r_start_coord[n+max_lev*(j+1)];
+                // for (auto r = r_end_coord_b(n,j)+2; r < r_start_coord_b(n,j+1); ++r) {
+                lo = r_end_coord_b(n,j)+2; 
+                hi = r_start_coord_b(n,j+1);
                 AMREX_PARALLEL_FOR_1D(hi-lo, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -527,16 +519,16 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
 
     // compute the forcing terms
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks[n]; ++j) {
+        for (auto j = 1; j <= numdisjointchunks_b(n); ++j) {
 
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
             const Real dr_lev = dr[n];
 
-            // for (auto r = r_start_coord[n+max_lev*j]; r <=r_end_coord[n+max_lev*j]; ++r) {
-            lo = r_start_coord[n+max_lev*j]; 
-            hi = r_end_coord[n+max_lev*j];
+            // for (auto r = r_start_coord_b(n,j); r <=r_end_coord_b(n,j); ++r) {
+            lo = r_start_coord_b(n,j); 
+            hi = r_end_coord_b(n,j);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 Real w0_old_cen = 0.5 * (w0_old_p[n+max_lev*r] + w0_old_p[n+max_lev*(r+1)]);
@@ -970,16 +962,11 @@ Maestro::ProlongBasetoUniform(const RealVector& base_ml,
     // FINEST level
     int r1 = 1;
 
-    get_finest_radial_level(&finest_radial_level);
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-
     const int max_lev = max_radial_level+1;
 
     for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks[n]; ++j) {
-            for (auto r = r_start_coord[n+max_lev*j]; r <= r_end_coord[n+max_lev*j]; ++r) {
+        for (auto j = 1; j < numdisjointchunks_b(n); ++j) {
+            for (auto r = r_start_coord_b(n,j); r <= r_end_coord_b(n,j); ++r) {
                 // sum up mask to see if there are any elements set to true 
                 if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
                     for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {

@@ -135,25 +135,20 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
 #endif
 
 void 
-Maestro::ComputeCutoffCoords(RealVector& rho0)
+Maestro::ComputeCutoffCoords(const RealVector& rho0)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
     const int max_lev = max_radial_level + 1;
     int which_lev = 0;
-    
-    get_finest_radial_level(&finest_radial_level);
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
 
     // find the finest level containing the anelastic cutoff density,
     // and set the anelastic cutoff coord for this level
     for (auto n=finest_radial_level; n >= 0; --n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
             if (!found) {
-                int lo = r_start_coord[n + max_lev*i];
-                int hi = r_end_coord[n + max_lev*i];
+                int lo = r_start_coord_b(n,i);
+                int hi = r_end_coord_b(n,i);
                 for (auto r = lo; r <= hi; ++r) {
                     if (rho0[n + max_lev*r] <= anelastic_cutoff_density) {
                         anelastic_cutoff_density_coord[n] = r;
@@ -195,10 +190,10 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // find the finest level containing the base cutoff density,
     // and set the base cutoff coord for this level
     for (auto n=finest_radial_level; n >= 0; --n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
             if (!found) {
-                int lo = r_start_coord[n + max_lev*i];
-                int hi = r_end_coord[n + max_lev*i];
+                int lo = r_start_coord_b(n,i);
+                int hi = r_end_coord_b(n,i);
                 for (auto r = lo; r <= hi; ++r) {
                     if (rho0[n + max_lev*r] <= base_cutoff_density) {
                         base_cutoff_density_coord[n] = r;
@@ -242,11 +237,11 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // find the finest level containing the burning cutoff density,
     // and set the burning cutoff coord for this level
     for (auto n=finest_radial_level; n >= 0; --n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
             if (!found) {
                 //  do r=r_start_coord(n,i),r_end_coord(n,i)
-                int lo = r_start_coord[n + max_lev*i];
-                int hi = r_end_coord[n + max_lev*i];
+                int lo = r_start_coord_b(n,i);
+                int hi = r_end_coord_b(n,i);
                 for (auto r = lo; r <= hi; ++r) {
                     if (rho0[n + max_lev*r] <= burning_cutoff_density_lo) {
                         burning_cutoff_density_lo_coord[n] = r;
@@ -288,11 +283,11 @@ Maestro::ComputeCutoffCoords(RealVector& rho0)
     // find the finest level containing the burning cutoff density,
     // and set the burning cutoff coord for this level
     for (auto n=finest_radial_level; n >= 0; --n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
             if (!found) {
                 //  do r=r_end_coord(n,i),r_start_coord(n,i),1
-                int lo = r_start_coord[n + max_lev*i];
-                int hi = r_end_coord[n + max_lev*i];
+                int lo = r_start_coord_b(n,i);
+                int hi = r_end_coord_b(n,i);
                 for (auto r = lo; r <= hi; ++r) {
                     if (rho0[n + max_lev*r] >= burning_cutoff_density_hi) {
                         burning_cutoff_density_hi_coord[n] = r;
@@ -347,8 +342,7 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
        finest_radial_level = finest_radial_level_in;
     }
 
-    numdisjointchunks.resize(finest_radial_level+1);
-    numdisjointchunks.shrink_to_fit();
+    numdisjointchunks_b.resize(finest_radial_level+1);
 
     // loop through tag_array first to determine the maximum number of chunks
     // to use for allocating r_start_coord and r_end_coord
@@ -365,49 +359,49 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
             if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
                 chunk_start = true;
                 nchunks++;
-            } else if (tag_array[n-1 + max_lev*r]==0 && chunk_start) {
+            } else if (tag_array[n-1 + max_lev*r] == 0 && chunk_start) {
                 chunk_start = false;
             }
         }
-        maxchunks = max(nchunks,maxchunks);
+        maxchunks = max(nchunks, maxchunks);
     }
 
-    r_start_coord.resize((finest_radial_level+1)*maxchunks);
-    r_end_coord.resize((finest_radial_level+1)*maxchunks);
+    r_start_coord_b.resize(finest_radial_level+1, maxchunks+1);
+    r_end_coord_b.resize(finest_radial_level+1, maxchunks+1);
 
     if (!spherical) {
 
         // coarsest grid always has 1 chunk of data
-        numdisjointchunks[0] = 1;
-        r_start_coord[0] = 0;
-        r_end_coord[0] = nr[0]-1;
+        numdisjointchunks_b(0) = 1;
+        r_start_coord_b(0,1) = 0;
+        r_end_coord_b(0,1) = nr[0]-1;
 
         // for > 1 chunks (multilevel)
         for (auto n = 1; n <= finest_radial_level; ++n) {
             // initialize variables
             bool chunk_start = false;
-            numdisjointchunks[n] = 0;
+            numdisjointchunks_b(n) = 0;
 
             // increment numdisjointchunks at beginning of each chunk
             // (ex. when the tagging index changes from 0 to 1)
             for (auto r = 0; r < nr[n-1]; ++r) {
                 if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
                     chunk_start = true;
-                    numdisjointchunks[n] = numdisjointchunks[n] + 1;
-                    r_start_coord[n+max_lev*numdisjointchunks[n]] = 2*r;
+                    numdisjointchunks_b(n)++;
+                    r_start_coord_b(n,numdisjointchunks_b(n)) = 2*r;
                 } else if (tag_array[n-1+max_lev*r]==0 && chunk_start) {
-                    r_end_coord[n+max_lev*numdisjointchunks[n]] = 2*r-1;
+                    r_end_coord_b(n, numdisjointchunks_b(n)) = 2*r-1;
                     chunk_start = false;
                 } else if (r==nr[n-1]-1 && chunk_start) {
                     // if last chunk is at the end of array
-                    r_end_coord[n+max_lev*numdisjointchunks[n]] = 2*r-1;
+                    r_end_coord_b(n, numdisjointchunks_b(n)) = 2*r-1;
                 }
             }
         }
     } else {
-        numdisjointchunks[0] = 1;
-        r_start_coord[0] = 0;
-        r_end_coord[0] = nr[0]-1;
+        numdisjointchunks_b(0) = 1;
+        r_start_coord_b(0,1) = 0;
+        r_end_coord_b(0,1) = nr[0]-1;
     }
 }
 
@@ -417,23 +411,18 @@ Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
 
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
-
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {        
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
             if (is_cell_centered) {
                 // for level n, make the coarser cells underneath simply the average of the fine
-                for (auto j = r_start_coord[n+i*max_lev]; j < r_end_coord[n+i*max_lev]; j+=2) {
+                for (auto j = r_start_coord_b(n,i); j < r_end_coord_b(n,i); j+=2) {
                     s0[n-1 + max_lev*j/2] = 0.5 * (s0[n + max_lev*j] + s0[n + max_lev*(j+1)]);
                 }
             } else {
                 // for level n, make the coarse edge underneath equal to the fine edge value
-                for (auto j = r_start_coord[n+i*max_lev]; j <= r_end_coord[n+i*max_lev]+1; j+=2) {
+                for (auto j = r_start_coord_b(n,i); j <= r_end_coord_b(n,i)+1; j+=2) {
                     s0[n-1 + max_lev*j/2] = s0[n + max_lev*j];
                 }
             }
@@ -447,18 +436,13 @@ Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
 
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
-
     const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-            const int lo = r_start_coord[n+i*max_lev];
-            const int hi = r_end_coord[n+i*max_lev];
+            const int lo = r_start_coord_b(n,i);
+            const int hi = r_end_coord_b(n,i);
 
             if (is_cell_centered) {
 

@@ -137,9 +137,6 @@ Maestro::Setup ()
     r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
     etarho_cc    .resize( (max_radial_level+1)*nr_fine );
     psi          .resize( (max_radial_level+1)*nr_fine );
-    numdisjointchunks.resize( (max_radial_level+1) );
-    r_start_coord.resize( (max_radial_level+1)*(nr_fine+1));
-    r_end_coord  .resize( (max_radial_level+1)*(nr_fine+1));
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -153,6 +150,9 @@ Maestro::Setup ()
     numdisjointchunks.resize(max_radial_level+1);
     r_end_coord.resize((max_radial_level+1)*(nr_fine+1));
     r_start_coord.resize((max_radial_level+1)*(nr_fine+1));
+    numdisjointchunks_b.resize(max_radial_level+1);
+    r_start_coord_b.resize(max_radial_level+1, nr_fine+1);
+    r_end_coord_b.resize(max_radial_level+1, nr_fine+1);
 
     // diag file data arrays
     diagfile1_data.resize(diag_buf_size*11);

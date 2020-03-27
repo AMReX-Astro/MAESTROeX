@@ -305,7 +305,7 @@ public:
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
 #endif
-    void ComputeCutoffCoords(RealVector& rho0);
+    void ComputeCutoffCoords(const RealVector& rho0);
 
     void InitMultilevel(const int finest_radial_level_in);
                                
@@ -1945,8 +1945,11 @@ public:
 
     // these provide information about the multilevel base state configuration
     IntVector numdisjointchunks;
+    BaseState<int> numdisjointchunks_b;
     IntVector r_start_coord;
+    BaseState<int> r_start_coord_b;
     IntVector r_end_coord;
+    BaseState<int> r_end_coord_b;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;

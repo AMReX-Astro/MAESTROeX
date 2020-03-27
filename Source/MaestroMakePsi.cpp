@@ -10,17 +10,13 @@ Maestro::MakePsiPlanar()
     BL_PROFILE_VAR("Maestro::MakePsiPlanar()", MakePsiPlanar);
 
     const int max_lev = max_radial_level + 1;
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i){
-            for (auto r = r_start_coord[n+max_lev*i]; 
-                 r<= r_end_coord[n+max_lev*i]; ++r) {
+        for (auto i = 1; i <= numdisjointchunks_b(n); ++i){
+            for (auto r = r_start_coord_b(n,i); 
+                 r<= r_end_coord_b(n,i); ++r) {
                 if (r < base_cutoff_density_coord[n]) {
                     psi[n+max_lev*r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }

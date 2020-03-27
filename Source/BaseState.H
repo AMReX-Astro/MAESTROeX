@@ -33,9 +33,9 @@ public:
     // ~BaseState () { };
 
     /// allocate memory for the BaseState
-    void define(const int num_levs, const int length, const int ncomp=1);
+    void define(const int num_levs, const int length=1, const int ncomp=1);
 
-    void resize(const int num_levs, const int length, const int ncomp=1);
+    void resize(const int num_levs, const int length=1, const int ncomp=1);
 
     /// set to some scalar value 
     void setVal(const T val);
@@ -55,18 +55,18 @@ public:
 
     /// returns a reference to the nth component at position i and level lev.
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    T& operator() (int lev, int i, int n=0) const;
+    T& operator() (const int lev, const int i=0, const int n=0) const;
 
-    AMREX_GPU_HOST_DEVICE inline
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T* operator() (const int lev, const int i, const int ncomp, const int start_comp);
 
-    AMREX_GPU_HOST_DEVICE inline
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T* ptr (const int lev, const int i, const int n=0);
 
-    AMREX_GPU_HOST_DEVICE inline
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator[](const int i) { return dptr[i]; };
 
-    AMREX_GPU_HOST_DEVICE inline
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     const T& operator[](const int i) const { return dptr[i]; };
 
     /// scalar addition to the whole base state 
@@ -195,6 +195,9 @@ template <class T>
 void
 BaseState<T>::resize(const int num_levs, const int length, const int ncomp)
 {
+    if (base_data.size() > 0) {
+        base_data.resize(0);
+    }
     this->define(num_levs, length, ncomp);
 }
 
@@ -224,9 +227,9 @@ BaseState<T>::setVal(const int comp, const T val)
 }
 
 template <class T>
-AMREX_GPU_HOST_DEVICE inline
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 T&
-BaseState<T>::operator() (int lev, int i, int n) const {
+BaseState<T>::operator() (const int lev, const int i, const int n) const {
     AMREX_ASSERT(lev >= 0);
     AMREX_ASSERT(i < this->len && i >= 0);
     AMREX_ASSERT(n < this->nvar && n >= 0);
@@ -235,7 +238,7 @@ BaseState<T>::operator() (int lev, int i, int n) const {
 }
 
 template <class T>
-AMREX_GPU_HOST_DEVICE inline
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 T* 
 BaseState<T>::operator() (const int lev, const int i, const int ncomp, const int start_comp) {
     AMREX_ASSERT(lev >= 0);
@@ -254,7 +257,7 @@ BaseState<T>::operator() (const int lev, const int i, const int ncomp, const int
 }
 
 template <class T>
-AMREX_GPU_HOST_DEVICE inline
+AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 T*
 BaseState<T>::ptr (const int lev, const int i, const int n) {
     AMREX_ASSERT(lev >= 0);

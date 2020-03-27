@@ -73,13 +73,13 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             // level > 0
 
             for (auto n = 1; n <= finest_radial_level; ++n) {
-                for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+                for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-                    if (r_start_coord[n+max_lev*i] == 0) {
+                    if (r_start_coord_b(n,i) == 0) {
                         m[n] = 4.0/3.0*M_PI*rho0[n]*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
                         grav_cell[n] = -Gconst * m[n] / (r_cc_loc_b(n,0)*r_cc_loc_b(n,0));
                     } else {
-                        int r = r_start_coord[n+max_lev*i];
+                        int r = r_start_coord_b(n,i);
                         m[n+max_lev*r] = m[n-1+max_lev*(r/2-1)];
 
                         // the mass is defined at the cell-centers, so to compute
@@ -111,8 +111,8 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         grav_cell[n+max_lev*r] = -Gconst * m[n+max_lev*r] / (r_cc_loc_b(n,r)*r_cc_loc_b(n,r));
                     }
 
-                    for (auto r = r_start_coord[n+max_lev*i]+1;
-                         r <= r_end_coord[n+max_lev*i]; ++r) {
+                    for (auto r = r_start_coord_b(n,i)+1;
+                         r <= r_end_coord_b(n,i); ++r) {
 
                         // the mass is defined at the cell-centers, so to compute
                         // the mass at the current center, we need to add the
@@ -202,7 +202,6 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
 
     const int max_lev = max_radial_level+1;
 
-    get_finest_radial_level(&finest_radial_level);
     get_base_cutoff_density(&base_cutoff_density);
 
     if (!spherical) {
@@ -249,17 +248,17 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             }
 
             for (auto n = 1; n <= finest_radial_level; ++n) {
-                for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+                for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-                    if (r_start_coord[n+max_lev*i] == 0) {
+                    if (r_start_coord_b(n,i) == 0) {
                         m[n] = 0.0;
                     } else {
-                        m[n+max_lev*r_start_coord[n+max_lev*i]] = m[n-1*max_lev*r_start_coord[n+max_lev*i]/2];
-                        grav_edge[n+max_lev*r_start_coord[n+max_lev*i]] = grav_edge[n-1+max_lev*r_start_coord[n+max_lev*i]/2];
+                        m[n+max_lev*r_start_coord_b(n,i)] = m[n-1*max_lev*r_start_coord_b(n,i)/2];
+                        grav_edge[n+max_lev*r_start_coord_b(n,i)] = grav_edge[n-1+max_lev*r_start_coord_b(n,i)/2];
                     }
 
-                    for (auto r = r_start_coord[n+max_lev*i]+1; 
-                         r <= r_end_coord[n+max_lev*i]+1; ++r) {
+                    for (auto r = r_start_coord_b(n,i)+1; 
+                         r <= r_end_coord_b(n,i)+1; ++r) {
 
                         // only add to the enclosed mass if the density is
                         // > base_cutoff_density

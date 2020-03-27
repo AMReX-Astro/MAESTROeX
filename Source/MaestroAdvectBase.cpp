@@ -31,10 +31,6 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
     // regions that no longer have a corresponding full state
     std::fill(rho0_new.begin(), rho0_new.end(), 0.0);
 
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-
     const int max_lev = max_radial_level+1;
 
     // Predict rho_0 to vertical edges
@@ -47,10 +43,10 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
 
         const Real dr_lev = dr[n];
 
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-            int lo = r_start_coord[n + max_lev*i];
-            int hi = r_end_coord[n + max_lev*i];
+            int lo = r_start_coord_b(n,i);
+            int hi = r_end_coord_b(n,i);
 
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
@@ -73,10 +69,10 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
         const Real dr_lev = dr[n];
         const Real dt_loc = dt;
         
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-            int lo = r_start_coord[n + max_lev*i];
-            int hi = r_end_coord[n + max_lev*i];
+            int lo = r_start_coord_b(n,i);
+            int hi = r_end_coord_b(n,i);
 
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
@@ -165,10 +161,10 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
 
         const Real dr_lev = dr[n];
 
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-            int lo = r_start_coord[n + max_lev*i];
-            int hi = r_end_coord[n + max_lev*i];
+            int lo = r_start_coord_b(n,i);
+            int hi = r_end_coord_b(n,i);
 
             // here we predict (rho h)_0 on the edges
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -193,10 +189,10 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
         const Real dr_lev = dr[n];
         const Real dt_loc = dt;
 
-        for (int i = 1; i <= numdisjointchunks[n]; ++i) {
+        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
 
-            int lo = r_start_coord[n + max_lev*i];
-            int hi = r_end_coord[n + max_lev*i];
+            int lo = r_start_coord_b(n,i);
+            int hi = r_end_coord_b(n,i);
 
             // update (rho h)_0
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
