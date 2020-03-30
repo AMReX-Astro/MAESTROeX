@@ -7,8 +7,6 @@ Src_nd
    file/average_f
    file/base_state_geometry_f
    file/burner_loop_f
-   file/debug_f
-   file/diag_f
    file/enforce_HSE_f
    file/fill_3d_data_f
    file/initdata_f
@@ -17,6 +15,4 @@ Src_nd
    file/make_explicit_thermal_f
    file/make_grav_f
    file/make_heating_f
-   file/regrid_f
-   file/tagging_f
    

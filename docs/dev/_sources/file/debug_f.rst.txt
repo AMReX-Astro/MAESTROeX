@@ -1,8 +1,0 @@
-debug.F90
-=========
-
-debug\_module
--------------
-
-.. f:automodule:: debug_module
-
