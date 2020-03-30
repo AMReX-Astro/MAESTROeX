@@ -125,10 +125,12 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
 
         const auto probLo = geom[0].ProbLoArray();
 
+        const auto center_p = center;
+
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-            Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center[0];
-            Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center[1];
-            Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center[2];
+            Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center_p[0];
+            Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center_p[1];
+            Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center_p[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
             cc_to_r(i,j,k) = round(index);
