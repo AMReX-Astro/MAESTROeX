@@ -350,6 +350,9 @@ public:
     void CelltoEdge(const RealVector& s0_cell_vec, 
                     RealVector& s0_edge_vec);
 
+    void CelltoEdge(const RealVector& s0_cell_vec, 
+                    BaseState<Real>& s0_edge);
+
     // end MaestroCelltoEdge.cpp functions
     ////////////
 
@@ -631,6 +634,13 @@ public:
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0, int variable_type=0);
 
+    void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0, int variable_type=0);                       
+
     /// Maps 1d arrays onto multi-D cartesian MultiFabs
     ///
     /// @param level        AMR level to perform calculation on
@@ -646,6 +656,13 @@ public:
                            int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
+
+    void Put1dArrayOnCart (int level, const BaseState<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);                       
 
     AMREX_GPU_DEVICE amrex::Real QuadInterp(const amrex::Real x, 
                         const amrex::Real x0, const amrex::Real x1, 
@@ -669,6 +686,9 @@ public:
 
     /// MAC-project the base state scalar `s0`
     void MakeS0mac (const RealVector& s0,
+                    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
+
+    void MakeS0mac (const BaseState<amrex::Real>& s0,
                     amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     /// Create the unit normal across the grids

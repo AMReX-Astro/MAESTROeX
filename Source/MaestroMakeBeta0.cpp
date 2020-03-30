@@ -18,7 +18,7 @@ Maestro::MakeBeta0(RealVector& beta0,
 
     const Real rel_eps = c_rel_eps;
 
-    RealVector beta0_edge((finest_radial_level+1)*(nr_fine+1));
+    BaseState<Real> beta0_edge(finest_radial_level+1, nr_fine+1);
 
     std::fill(beta0.begin(), beta0.end(), 0.);
 
@@ -51,10 +51,10 @@ Maestro::MakeBeta0(RealVector& beta0,
             for (auto j = 1; j <= numdisjointchunks(n); ++j) {
                 // Compute beta0 on edges and centers at level n
                 if (n == 0) {
-                    beta0_edge[0] = rho0[0];
+                    beta0_edge(0,0) = rho0[0];
                 } else {
                     // Obtain the starting value of beta0_edge_lo from the coarser grid
-                    beta0_edge[n+max_lev*r_start_coord(n,j)] = beta0_edge[n-1+max_lev*r_start_coord(n,j)/2];
+                    beta0_edge(n,r_start_coord(n,j)) = beta0_edge(n-1,r_start_coord(n,j)/2);
                 }
 
                 // NOTE: the integral here prevents this from being done in parallel
@@ -173,9 +173,9 @@ Maestro::MakeBeta0(RealVector& beta0,
                             }
                         }
 
-                        beta0_edge[n+max_lev*(r+1)] = beta0_edge[n+max_lev*r] * exp(-integral);
-                        beta0[n+max_lev*r] = 0.5*(beta0_edge[n+max_lev*r] + 
-                            beta0_edge[n+max_lev*(r+1)]);
+                        beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral);
+                        beta0[n+max_lev*r] = 0.5*(beta0_edge(n,r) + 
+                            beta0_edge(n,r+1));
 
                     } else {// r >= anelastic_cutoff_density
 
@@ -185,16 +185,16 @@ Maestro::MakeBeta0(RealVector& beta0,
                         } else {
                             beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)];
                         }
-                        beta0_edge[n+max_lev*(r+1)] = 2.0*beta0[n+max_lev*r] - 
-                            beta0_edge[n+max_lev*r];
+                        beta0_edge(n,r+1) = 2.0*beta0[n+max_lev*r] - 
+                            beta0_edge(n,r);
                     }
                 }
 
                 if (n  >  0) {
                     // Compare the difference between beta0 at the top of level n to the 
                     // corresponding point on level n-1
-                    Real offset = beta0_edge[n+max_lev*(r_end_coord(n,j)+1)]
-                        - beta0_edge[n-1+max_lev*(r_end_coord(n,j)+1)/2];
+                    Real offset = beta0_edge(n,r_end_coord(n,j)+1)
+                        - beta0_edge(n-1,(r_end_coord(n,j)+1)/2);
 
                     for (auto i = n-1; i >= 0; --i) {
 
