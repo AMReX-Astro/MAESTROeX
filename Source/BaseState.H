@@ -236,7 +236,7 @@ AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 T&
 BaseState<T>::operator() (const int lev, const int i, const int n) const {
     AMREX_ASSERT(lev >= 0);
-    AMREX_ASSERT(i < this->len && i >= 0);
+    AMREX_ASSERT((i < this->len && i >= 0) || (lev == 0 && i < this->nlev));
     AMREX_ASSERT(n < this->nvar && n >= 0);
 
     return dptr[(lev*len + i)*nvar + n];

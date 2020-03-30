@@ -125,6 +125,14 @@ public:
     void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
     void AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge);
     void AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge);
+
+    void AdvectBaseDens(BaseState<amrex::Real>& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge);
+    void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge);
+
+    void AdvectBaseEnthalpy(BaseState<amrex::Real>& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpyPlanar(BaseState<amrex::Real>& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpySphr(BaseState<amrex::Real>& rhoh0_predicted_edge);
     // end MaestroAdvectBase.cpp functions
     ////////////
 
@@ -191,6 +199,21 @@ public:
                        const RealVector& r0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const RealVector& r0_predicted_edge,
+                       int start_comp, int num_comp);
+
+    void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                       amrex::Vector<amrex::MultiFab>& etarhoflux,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const RealVector& r0_old,
+                       const BaseState<amrex::Real>& rho0_edge_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const RealVector& r0_new,
+                       const BaseState<amrex::Real>& rho0_edge_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const BaseState<amrex::Real>& rho0_predicted_edge,
                        int start_comp, int num_comp);
 
     /// Calculate `rhoh` flux
@@ -467,6 +490,29 @@ public:
                             amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                             const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                             const RealVector& rho0_predicted_edge);
+
+    void DensityAdvance (int which_step,
+                         amrex::Vector<amrex::MultiFab>& scalold,
+                         amrex::Vector<amrex::MultiFab>& scalnew,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                         amrex::Vector<amrex::MultiFab>& scal_force,
+                         amrex::Vector<amrex::MultiFab>& etarhoflux,
+                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                         const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                         const BaseState<amrex::Real>& rho0_predicted_edge);
+
+    // SDC
+    void DensityAdvanceSDC (int which_step,
+                            amrex::Vector<amrex::MultiFab>& scalold,
+                            amrex::Vector<amrex::MultiFab>& scalnew,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                            amrex::Vector<amrex::MultiFab>& scal_force,
+                            amrex::Vector<amrex::MultiFab>& etarhoflux,
+                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                            const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                            const BaseState<amrex::Real>& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -720,6 +766,16 @@ public:
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
+                         const amrex::Vector<amrex::MultiFab>& s0_cart,
+                         int comp,
+                         const amrex::Vector<amrex::BCRec>& bcs,
+                         int fullform);
+
+    void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+                         const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
+                         const RealVector& s0,
+                         const BaseState<amrex::Real>& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
@@ -1020,6 +1076,16 @@ public:
                              RealVector& force);
 
     void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
+                               RealVector& force);
+
+
+    void MakeEdgeState1d(RealVector& s, BaseState<amrex::Real>& sedge, 
+                         RealVector& force);
+
+    void MakeEdgeState1dSphr(RealVector& s, BaseState<amrex::Real>& sedge, 
+                             RealVector& force);
+
+    void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
                                RealVector& force);
     // end MaestroMakeEdgeState.cpp functions
     ////////////

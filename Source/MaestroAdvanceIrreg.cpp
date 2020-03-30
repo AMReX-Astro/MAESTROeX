@@ -79,7 +79,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rho0_pred_edge_dummy( (max_radial_level+1)*(nr_fine+1) );
+    BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
     grav_cell_nph.shrink_to_fit();
@@ -91,7 +91,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Sbar.shrink_to_fit();
     beta0_nph.shrink_to_fit();
     gamma1bar_nph.shrink_to_fit();
-    rho0_pred_edge_dummy.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
@@ -199,7 +198,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // set dummy variables to zero
     std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
-    std::fill(rho0_pred_edge_dummy.begin(), rho0_pred_edge_dummy.end(), 0.);
+    rho0_pred_edge_dummy.setVal(0.0);
     std::fill(w0.begin(), w0.end(), 0.);
 
     // make the sponge for all levels

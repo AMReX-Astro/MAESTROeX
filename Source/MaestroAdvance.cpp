@@ -100,7 +100,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     RealVector w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+    BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
     grav_cell_nph.shrink_to_fit();
@@ -116,7 +116,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     w0_old.shrink_to_fit();
-    rho0_predicted_edge.shrink_to_fit();
 
     int is_predictor;
 
