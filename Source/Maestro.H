@@ -1096,8 +1096,11 @@ public:
     void MakeGravEdge(RealVector& grav_edge, 
                       const RealVector& rho0);
 
-    void MakeGravEdge(BaseState<Real>& grav_edge, 
-                      const BaseState<Real>& rho0);
+    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
+                      const RealVector& rho0);
+
+    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
+                      const BaseState<amrex::Real>& rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1489,6 +1492,9 @@ public:
     /// the other levels and then copy the valid data from
     /// the old arrays onto the new.
     void RegridBaseState(RealVector& base, const bool is_edge=false);
+
+
+    void RegridBaseState(BaseState<Real>& base, const bool is_edge=false);
 
     /// Tag all cells for refinement
     ///

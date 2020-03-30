@@ -53,6 +53,11 @@ public:
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
 
+    /// deep copy 
+    void copy(const BaseState<T>& src);
+    void copy(const amrex::Gpu::ManagedVector<T>& src);
+    void copy(const amrex::Vector<T>& src);
+
     /// returns a reference to the nth component at position i and level lev.
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator() (const int lev, const int i=0, const int n=0) const;
@@ -229,6 +234,49 @@ BaseState<T>::setVal(const int comp, const T val)
     });
 
     amrex::Gpu::synchronize();
+}
+
+template <class T>
+void
+BaseState<T>::copy(const BaseState<T>& src)
+{
+    AMREX_ASSERT(nlev == src.nlev);
+    AMREX_ASSERT(nvar == src.nvar);
+    AMREX_ASSERT(len == src.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT src_ptr = src.dptr;
+    AMREX_PARALLEL_FOR_1D(len*nlev*nvar, i, {
+        ptr[i] = src_ptr[i];
+    });
+
+    amrex::Gpu::synchronize();
+}
+
+template <class T>
+void
+BaseState<T>::copy(const amrex::Gpu::ManagedVector<T>& src)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
+            } 
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::copy(const amrex::Vector<T>& src)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
+            } 
+        }
+    }
 }
 
 template <class T>

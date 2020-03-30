@@ -83,19 +83,19 @@ Maestro::DiagFile (const int step,
     // diag_temp.out
     Real T_max = 0.0, T_center = 0.0;
     int ncenter = 0;
-    RealVector coord_Tmax(AMREX_SPACEDIM,0.0);
-    RealVector vel_Tmax(AMREX_SPACEDIM,0.0);
+    Vector<Real> coord_Tmax(AMREX_SPACEDIM,0.0);
+    Vector<Real> vel_Tmax(AMREX_SPACEDIM,0.0);
     Real Rloc_Tmax = 0.0, vr_Tmax = 0.0;
 
     // diag_vel.out
     Real U_max = 0.0, Mach_max = 0.0;
     Real kin_ener = 0.0, int_ener = 0.0;
-    RealVector vel_center(AMREX_SPACEDIM,0.0);
+    Vector<Real> vel_center(AMREX_SPACEDIM,0.0);
 
     // diag_enuc.out
     Real enuc_max = 0.0;
-    RealVector coord_enucmax(AMREX_SPACEDIM,0.0);
-    RealVector vel_enucmax(AMREX_SPACEDIM,0.0);
+    Vector<Real> coord_enucmax(AMREX_SPACEDIM,0.0);
+    Vector<Real> vel_enucmax(AMREX_SPACEDIM,0.0);
     Real Rloc_enucmax = 0.0, vr_enucmax = 0.0;
     Real nuc_ener = 0.0;
 
@@ -106,20 +106,20 @@ Maestro::DiagFile (const int step,
         Real T_max_local = 0.0;
         Real T_center_level = 0.0;
         int ncenter_level = 0;
-        RealVector coord_Tmax_local(AMREX_SPACEDIM, 0.0);
-        RealVector vel_Tmax_local(AMREX_SPACEDIM, 0.0);
+        Vector<Real> coord_Tmax_local(AMREX_SPACEDIM, 0.0);
+        Vector<Real> vel_Tmax_local(AMREX_SPACEDIM, 0.0);
 
         // diag_vel.out
         Real U_max_level = 0.0;
         Real Mach_max_level = 0.0;
         Real kin_ener_level = 0.0;
         Real int_ener_level = 0.0;
-        RealVector vel_center_level(AMREX_SPACEDIM, 0.0);
+        Vector<Real> vel_center_level(AMREX_SPACEDIM, 0.0);
 
         // diag_enuc.out
         Real enuc_max_local = 0.0;
-        RealVector coord_enucmax_local(AMREX_SPACEDIM, 0.0);
-        RealVector vel_enucmax_local(AMREX_SPACEDIM, 0.0);
+        Vector<Real> coord_enucmax_local(AMREX_SPACEDIM, 0.0);
+        Vector<Real> vel_enucmax_local(AMREX_SPACEDIM, 0.0);
         Real nuc_ener_level = 0.0;
 
         const auto dx = geom[lev].CellSizeArray();
@@ -331,7 +331,7 @@ Maestro::DiagFile (const int step,
         // pick the values corresponding to the maximum.
         int nprocs = ParallelDescriptor::NProcs();
         int ioproc = ParallelDescriptor::IOProcessorNumber();
-        RealVector T_max_data(nprocs);
+        Vector<Real> T_max_data(nprocs);
 
         if (nprocs == 1) {
             T_max_data[0] = T_max_local;
@@ -352,13 +352,13 @@ Maestro::DiagFile (const int step,
         // T_max_coords will contain both the coordinate information and
         // the velocity information, so there are 2*dm values on each
         // proc
-        RealVector T_max_coords(2*AMREX_SPACEDIM);
+        Vector<Real> T_max_coords(2*AMREX_SPACEDIM);
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             T_max_coords[i] = coord_Tmax_local[i];
             T_max_coords[i+AMREX_SPACEDIM] = vel_Tmax_local[i];
         }
 
-        RealVector T_max_coords_level(2*AMREX_SPACEDIM*nprocs);
+        Vector<Real> T_max_coords_level(2*AMREX_SPACEDIM*nprocs);
 
         if (nprocs == 1) {
             for (int i = 0; i < 2*AMREX_SPACEDIM; ++i) {
@@ -369,8 +369,8 @@ Maestro::DiagFile (const int step,
         }
 
         // initialize global variables
-        RealVector coord_Tmax_level(AMREX_SPACEDIM);
-        RealVector vel_Tmax_level(AMREX_SPACEDIM);
+        Vector<Real> coord_Tmax_level(AMREX_SPACEDIM);
+        Vector<Real> vel_Tmax_level(AMREX_SPACEDIM);
 
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             coord_Tmax_level[i] = T_max_coords_level[2*AMREX_SPACEDIM*index_max+i];
@@ -379,7 +379,7 @@ Maestro::DiagFile (const int step,
 
         // for enuc_max, we also want to know where the hot spot is, so
         // we do the same gather procedure as with the temperature
-        RealVector enuc_max_data(nprocs);
+        Vector<Real> enuc_max_data(nprocs);
 
         if (nprocs == 1) {
             enuc_max_data[0] = enuc_max_local;
@@ -397,13 +397,13 @@ Maestro::DiagFile (const int step,
             }
         }
 
-        RealVector enuc_max_coords(2*AMREX_SPACEDIM);
+        Vector<Real> enuc_max_coords(2*AMREX_SPACEDIM);
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             enuc_max_coords[i] = coord_enucmax_local[i];
             enuc_max_coords[i+AMREX_SPACEDIM] = vel_enucmax_local[i];
         }
 
-        RealVector enuc_max_coords_level(2*AMREX_SPACEDIM*nprocs);
+        Vector<Real> enuc_max_coords_level(2*AMREX_SPACEDIM*nprocs);
         if (nprocs == 1) {
             for (int i = 0; i < 2*AMREX_SPACEDIM; ++i) {
                 enuc_max_coords_level[i] = enuc_max_coords[i];
@@ -414,8 +414,8 @@ Maestro::DiagFile (const int step,
         }
 
         // initialize global variables
-        RealVector coord_enucmax_level(AMREX_SPACEDIM);
-        RealVector vel_enucmax_level(AMREX_SPACEDIM);
+        Vector<Real> coord_enucmax_level(AMREX_SPACEDIM);
+        Vector<Real> vel_enucmax_level(AMREX_SPACEDIM);
 
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             coord_enucmax_level[i] = enuc_max_coords_level[2*AMREX_SPACEDIM*index_max+i];
@@ -497,7 +497,7 @@ Maestro::DiagFile (const int step,
         const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();
 
         // m(r) will contain mass enclosed by the center
-        RealVector m(nr_fine);
+        BaseState<Real> m(nr_fine);
         m[0] = 4.0/3.0 * M_PI * rho0[0] * r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
 
         // dU = - G M dM / r;  dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr

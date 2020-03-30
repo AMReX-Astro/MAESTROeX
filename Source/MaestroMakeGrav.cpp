@@ -306,6 +306,116 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
 
 void
 Maestro::MakeGravEdge(BaseState<Real>& grav_edge, 
+                      const RealVector& rho0)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeGravEdge()",MakeGravEdge);
+
+    const int max_lev = max_radial_level+1;
+
+    get_base_cutoff_density(&base_cutoff_density);
+
+    if (!spherical) {
+        if (do_planar_invsq_grav)  {
+            const auto r_edge_loc_p = r_edge_loc_b;
+            const Real planar_invsq_mass_loc = planar_invsq_mass;
+            // we are doing a plane-parallel geometry with a 1/r**2
+            // gravitational acceleration.  The mass is assumed to be
+            // at the origin.  The mass in the computational domain
+            // does not contribute to the gravitational acceleration.
+            //   
+            for (auto n = 0; n <= finest_radial_level; ++n) {
+                // for (auto r = 0; r < nr(n); ++r) {
+                const int nr_lev = nr(n);
+                AMREX_PARALLEL_FOR_1D(nr_lev, r, {
+                    grav_edge(n,r) = -Gconst*planar_invsq_mass_loc / (r_edge_loc_p(n,r)*r_edge_loc_p(n,r));
+                });
+            }
+        } else if (do_2d_planar_octant) {
+            // compute gravity as in spherical geometry
+
+            BaseState<Real> m(finest_radial_level+1, nr_fine+1);
+
+            grav_edge[0] = 0.0;
+            m(0,0) = 0.0;
+
+            for (auto r = 0; r < nr(0); ++r) {
+
+                // only add to the enclosed mass if the density is
+                // > base_cutoff_density
+                if (rho0[max_lev*(r-1)] > base_cutoff_density) {
+                    m(0,r) = m(0,r-1) + 4.0/3.0*M_PI *
+                        (r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1)) *
+                        (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
+                        r_edge_loc_b(0,r)*r_edge_loc_b(0,r-1) +
+                        r_edge_loc_b(0,r-1)*r_edge_loc_b(0,r-1)) * rho0[max_lev*(r-1)];
+                } else {
+                    m(0,r) = m(0,r-1);
+                }
+
+                grav_edge(0,r) = -Gconst * m(0,r) / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
+            }
+
+            for (auto n = 1; n <= finest_radial_level; ++n) {
+                for (auto i = 1; i <= numdisjointchunks(n); ++i) {
+
+                    if (r_start_coord(n,i) == 0) {
+                        m(n,0) = 0.0;
+                    } else {
+                        m(n,r_start_coord(n,i)) = m(n-1,r_start_coord(n,i)/2);
+                        grav_edge(n,r_start_coord(n,i)) = grav_edge(n-1,r_start_coord(n,i)/2);
+                    }
+
+                    for (auto r = r_start_coord(n,i)+1; 
+                         r <= r_end_coord(n,i)+1; ++r) {
+
+                        // only add to the enclosed mass if the density is
+                        // > base_cutoff_density
+                        if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
+                            m(n,r) = m(n,r-1) + 4.0/3.0*M_PI *
+                                (r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1)) *
+                                (r_edge_loc_b(n,r)*r_edge_loc_b(n,r) +
+                                r_edge_loc_b(n,r)*r_edge_loc_b(n,r-1) +
+                                r_edge_loc_b(n,r-1)*r_edge_loc_b(n,r-1)) * rho0[n+max_lev*(r-1)];
+                        } else {
+                            m(n,r) = m(n,r-1);
+                        }
+
+                        grav_edge(n,r) = -Gconst * m(n,r) / (r_edge_loc_b(n,r)*r_edge_loc_b(n,r));
+                    }
+                }
+            }
+            RestrictBase(grav_edge, false);
+            FillGhostBase(grav_edge, false);
+        } else {
+            // constant gravity
+            grav_edge.setVal(grav_const);
+        }
+        
+    } else {
+
+        grav_edge[0] = 0.0;
+        Real mencl = 0.0;
+
+        for (auto r = 1; r <= nr_fine; ++r) {
+
+            // only add to the enclosed mass if the density is
+            // > base_cutoff_density
+            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
+                mencl += 4.0/3.0 * M_PI *
+                    (r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1)) *
+                    (r_edge_loc_b(0,r) * r_edge_loc_b(0,r) +
+                    r_edge_loc_b(0,r) * r_edge_loc_b(0,r-1) +
+                    r_edge_loc_b(0,r-1)*r_edge_loc_b(0,r-1)) * rho0[max_lev*(r-1)];
+            }
+
+            grav_edge(0,r) = -Gconst * mencl / (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
+        }
+    }
+}
+
+void
+Maestro::MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0)
 {
     // timer for profiling
