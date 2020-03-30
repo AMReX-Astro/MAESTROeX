@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::MakePsiPlanar() 
+Maestro::MakePsiPlanar()
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiPlanar()", MakePsiPlanar);

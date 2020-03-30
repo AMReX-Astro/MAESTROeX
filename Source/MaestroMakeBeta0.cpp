@@ -12,9 +12,11 @@ Maestro::MakeBeta0(RealVector& beta0,
                    const bool is_irreg) 
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeBeta0()",MakeBeta0);
+    BL_PROFILE_VAR("Maestro::MakeBeta0()", MakeBeta0);
 
     const int max_lev = max_radial_level+1;
+
+    const Real rel_eps = c_rel_eps;
 
     RealVector beta0_edge((finest_radial_level+1)*(nr_fine+1));
 
@@ -85,6 +87,10 @@ Maestro::MakeBeta0(RealVector& beta0,
                             Real dpls = 2.0 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*r])/drp;
                             Real dmin = 2.0 * (rho0[n+max_lev*r] - rho0[n+max_lev*(r-1)])/drm;
                             Real slim = min(fabs(dpls), fabs(dmin));
+                            // Print() << "slim = " << slim << " del = " << del << " dpls = " << dpls << " dmin = " << dmin << std::endl;
+                            // Print() << "rho0 = " << rho0[n+max_lev*(r-1)] << " " << rho0[n+max_lev*r] << " " << rho0[n+max_lev*(r+1)] << std::endl;
+                            // Print() << "drc, drp, drm = " << drc << " " << drp <<  " " << drm << std::endl;
+                            slim = slim == slim ? slim : 0.0;
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             Real sflag  = copysign(1.0, del);
                             lambda = sflag * min(slim, fabs(del));
@@ -173,8 +179,12 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                     } else {// r >= anelastic_cutoff_density
 
+                        if (fabs(rho0[n+max_lev*(r-1)]) > rel_eps) {
                         beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)] * 
                             (rho0[n+max_lev*r]/rho0[n+max_lev*(r-1)]);
+                        } else {
+                            beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)];
+                        }
                         beta0_edge[n+max_lev*(r+1)] = 2.0*beta0[n+max_lev*r] - 
                             beta0_edge[n+max_lev*r];
                     }

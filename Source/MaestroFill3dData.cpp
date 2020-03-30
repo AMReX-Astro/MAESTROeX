@@ -209,8 +209,8 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
 
+                        int index = int(radius / drf);
                         Real rfac = (radius - Real(index) * drf) / drf;
                         Real s0_cart_val = 0.0;
 
@@ -336,13 +336,15 @@ Maestro::Put1dArrayOnCart (int lev,
 AMREX_GPU_DEVICE 
 Real
 Maestro::QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
-                    const Real y0, const Real y1, const Real y2) 
+                    const Real y0, const Real y1, const Real y2, bool limit) 
 {
     Real y = y0 + (y1-y0)/(x1-x0)*(x-x0) 
          + ((y2-y1)/(x2-x1)-(y1-y0)/(x1-x0))/(x2-x0)*(x-x0)*(x-x1);
 
-    if (y > max(y0, max(y1, y2))) y = max(y0, max(y1, y2));
-    if (y < min(y0, min(y1, y2))) y = min(y0, min(y1, y2));
+    if (limit) {
+        if (y > max(y0, max(y1, y2))) y = max(y0, max(y1, y2));
+        if (y < min(y0, min(y1, y2))) y = min(y0, min(y1, y2));
+    }
 
     return y;
 }
@@ -1163,6 +1165,8 @@ Maestro::MakeNormal ()
     //    e_r = sin(theta)cos(phi) e_x + sin(theta)sin(phi) e_y + cos(theta) e_z
     // or
     //    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
+
+    const auto center_p = center;
 
     if (spherical == 1) {
 
