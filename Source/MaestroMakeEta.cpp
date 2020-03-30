@@ -64,8 +64,8 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             // we only add the contribution at the top edge if we are at the top of the domain
             // this prevents double counting
             auto top_edge = false;
-            for (auto i = 1; i <= numdisjointchunks_b(lev); ++i) {
-                if (tilebox.hiVect3d()[1] == r_end_coord_b(lev,i)) {
+            for (auto i = 1; i <= numdisjointchunks(lev); ++i) {
+                if (tilebox.hiVect3d()[1] == r_end_coord(lev,i)) {
                     top_edge = true;
                 }
             }
@@ -91,8 +91,8 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             // this prevents double counting
             auto top_edge = false;
 
-            for (auto i = 1; i <= numdisjointchunks_b(lev); ++i) {
-                if (tilebox.hiVect3d()[2] == r_end_coord_b(lev,i)) {
+            for (auto i = 1; i <= numdisjointchunks(lev); ++i) {
+                if (tilebox.hiVect3d()[2] == r_end_coord(lev,i)) {
                     top_edge = true;
                 }
             }
@@ -120,10 +120,10 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
     Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
             Real ncell_lev = ncell[n];
-            const int lo = r_start_coord_b(n,i);
-            const int hi = r_end_coord_b(n,i)+1;
+            const int lo = r_start_coord(n,i);
+            const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 etarho_ec_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
@@ -139,9 +139,9 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
     // make the cell-centered etarho_cc by averaging etarho to centers
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
-            const int lo = r_start_coord_b(n,i);
-            const int hi = r_end_coord_b(n,i)+1;
+        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
+            const int lo = r_start_coord(n,i);
+            const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 etarho_cc_p[n+max_lev*r] = 0.5 * (etarho_ec_p[n+max_lev*r] + 

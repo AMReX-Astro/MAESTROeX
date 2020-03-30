@@ -705,8 +705,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
     Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
     const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar = gamma1bar_vec.dataPtr();
-    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
-    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
+    const auto r_cc_loc_p = r_cc_loc_b;
 
     // spherical divU constraint
     if (use_exact_base_state) {
@@ -715,7 +714,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
 
-            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc_p[max_lev*r] - r_cc_loc_p[max_lev*(r-1)])  / gamma1bar_p_avg;
+            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
         const auto dr0 = dr[0];

@@ -20,10 +20,10 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
     Real * AMREX_RESTRICT s0_edge = s0_edge_vec.dataPtr();
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
             Real nr_lev = nr(n);
-            const int lo = r_start_coord_b(n,i);
-            const int hi = r_end_coord_b(n,i)+1;
+            const int lo = r_start_coord(n,i);
+            const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
              

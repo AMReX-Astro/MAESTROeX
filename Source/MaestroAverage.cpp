@@ -73,16 +73,11 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // reduction over boxes to get sum
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
 
-        get_numdisjointchunks(numdisjointchunks.dataPtr());
-        get_r_start_coord(r_start_coord.dataPtr());
-        get_r_end_coord(r_end_coord.dataPtr());
-        get_finest_radial_level(&finest_radial_level);
-
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) { 
-                const int lo = r_start_coord[lev+max_lev*i];
-                const int hi = r_end_coord[lev+max_lev*i];
+            for (auto i = 1; i <= numdisjointchunks(lev); ++i) { 
+                const int lo = r_start_coord(lev,i);
+                const int hi = r_end_coord(lev,i);
                 Real ncell_lev = ncell[lev];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;

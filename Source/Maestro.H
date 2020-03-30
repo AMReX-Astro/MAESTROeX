@@ -1964,12 +1964,9 @@ public:
     amrex::Real c_rel_eps;
 
     // these provide information about the multilevel base state configuration
-    IntVector numdisjointchunks;
-    BaseState<int> numdisjointchunks_b;
-    IntVector r_start_coord;
-    BaseState<int> r_start_coord_b;
-    IntVector r_end_coord;
-    BaseState<int> r_end_coord_b;
+    BaseState<int> numdisjointchunks;
+    BaseState<int> r_start_coord;
+    BaseState<int> r_end_coord;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;

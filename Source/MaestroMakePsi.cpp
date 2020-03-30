@@ -14,9 +14,9 @@ Maestro::MakePsiPlanar()
     std::fill(psi.begin(), psi.end(), 0.0);
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks_b(n); ++i){
-            for (auto r = r_start_coord_b(n,i); 
-                 r<= r_end_coord_b(n,i); ++r) {
+        for (auto i = 1; i <= numdisjointchunks(n); ++i){
+            for (auto r = r_start_coord(n,i); 
+                 r<= r_end_coord(n,i); ++r) {
                 if (r < base_cutoff_density_coord(n)) {
                     psi[n+max_lev*r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }

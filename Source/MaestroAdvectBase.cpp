@@ -43,10 +43,10 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
 
         const Real dr_lev = dr(n);
 
-        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (int i = 1; i <= numdisjointchunks(n); ++i) {
 
-            int lo = r_start_coord_b(n,i);
-            int hi = r_end_coord_b(n,i);
+            int lo = r_start_coord(n,i);
+            int hi = r_end_coord(n,i);
 
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
@@ -69,10 +69,10 @@ Maestro::AdvectBaseDensPlanar(RealVector& rho0_predicted_edge)
         const Real dr_lev = dr(n);
         const Real dt_loc = dt;
         
-        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (int i = 1; i <= numdisjointchunks(n); ++i) {
 
-            int lo = r_start_coord_b(n,i);
-            int hi = r_end_coord_b(n,i);
+            int lo = r_start_coord(n,i);
+            int hi = r_end_coord(n,i);
 
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
@@ -161,10 +161,10 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
 
         const Real dr_lev = dr(n);
 
-        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (int i = 1; i <= numdisjointchunks(n); ++i) {
 
-            int lo = r_start_coord_b(n,i);
-            int hi = r_end_coord_b(n,i);
+            int lo = r_start_coord(n,i);
+            int hi = r_end_coord(n,i);
 
             // here we predict (rho h)_0 on the edges
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -189,10 +189,10 @@ Maestro::AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge)
         const Real dr_lev = dr(n);
         const Real dt_loc = dt;
 
-        for (int i = 1; i <= numdisjointchunks_b(n); ++i) {
+        for (int i = 1; i <= numdisjointchunks(n); ++i) {
 
-            int lo = r_start_coord_b(n,i);
-            int hi = r_end_coord_b(n,i);
+            int lo = r_start_coord(n,i);
+            int hi = r_end_coord(n,i);
 
             // update (rho h)_0
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
