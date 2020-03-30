@@ -477,29 +477,6 @@ public:
                          amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                         const RealVector& rho0_predicted_edge);
-
-    // SDC
-    void DensityAdvanceSDC (int which_step,
-                            amrex::Vector<amrex::MultiFab>& scalold,
-                            amrex::Vector<amrex::MultiFab>& scalnew,
-                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                            amrex::Vector<amrex::MultiFab>& scal_force,
-                            amrex::Vector<amrex::MultiFab>& etarhoflux,
-                            amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                            const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                            const RealVector& rho0_predicted_edge);
-
-    void DensityAdvance (int which_step,
-                         amrex::Vector<amrex::MultiFab>& scalold,
-                         amrex::Vector<amrex::MultiFab>& scalnew,
-                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                         amrex::Vector<amrex::MultiFab>& scal_force,
-                         amrex::Vector<amrex::MultiFab>& etarhoflux,
-                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                         const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                          const BaseState<amrex::Real>& rho0_predicted_edge);
 
     // SDC

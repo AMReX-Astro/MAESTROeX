@@ -148,7 +148,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord_loc) {
-                    psi_planar[r] = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
+                    psi_planar(r) = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
                 }
             });
 
@@ -771,7 +771,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
-        rho0_nph[r] = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
+        rho0_nph(r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
     });
 
