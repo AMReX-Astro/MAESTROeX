@@ -118,14 +118,6 @@ public:
 
     ////////////
     // MaestroAdvectBase.cpp functions
-    void AdvectBaseDens(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
-
-    void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge);
-
     void AdvectBaseDens(BaseState<amrex::Real>& rho0_predicted_edge);
     void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge);
     void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge);
@@ -1048,24 +1040,14 @@ public:
 
     ////////////
     // MaestroMakeEdgeState.cpp functions
-    void MakeEdgeState1d(RealVector& s, RealVector& sedge, 
-                         RealVector& force);
-
-    void MakeEdgeState1dSphr(RealVector& s, RealVector& sedge, 
-                             RealVector& force);
-
-    void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
-                               RealVector& force);
-
-
     void MakeEdgeState1d(RealVector& s, BaseState<amrex::Real>& sedge, 
-                         RealVector& force);
+                         BaseState<amrex::Real>& force);
 
     void MakeEdgeState1dSphr(RealVector& s, BaseState<amrex::Real>& sedge, 
-                             RealVector& force);
+                             BaseState<amrex::Real>& force);
 
     void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
-                               RealVector& force);
+                               BaseState<amrex::Real>& force);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
@@ -1256,6 +1238,8 @@ public:
                  BaseState<Real>& u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
+
+    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<Real>& base_fine);
 
     // end MaestroMakew0.cpp functions
     ////////////

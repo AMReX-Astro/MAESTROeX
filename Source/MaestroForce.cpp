@@ -20,6 +20,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
+    const auto max_lev = max_radial_level + 1;
+    const auto nrf = nr_fine;
+
     // constants in Fortran
     Real base_cutoff_density = 0.0; 
     get_base_cutoff_density(&base_cutoff_density);
@@ -39,23 +42,24 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     }
 
-    RealVector gradw0( (max_radial_level+1)*nr_fine , 0.0);
-    gradw0.shrink_to_fit();
+    BaseState<Real> gradw0(max_radial_level+1,nr_fine);
+    gradw0.setVal(0.0);
 
-    Real* AMREX_RESTRICT p_gradw0 = gradw0.dataPtr();
     Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
     const Real dr0 = dr_fine;
 
     if ( !(use_exact_base_state || average_base_state) ) {
-        AMREX_PARALLEL_FOR_1D (gradw0.size(), i,
-        {       
-            p_gradw0[i] = (p_w0[i+1] - p_w0[i])/dr0;
-        });
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            AMREX_PARALLEL_FOR_1D (nr_fine, i,
+            {       
+                gradw0(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
+            });
+        }
     }
 
-    Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
-    Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
+    Put1dArrayOnCart(gradw0, gradw0_cart, 0, 0, bcs_u, 0, 1);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(grav_cell, grav_cart, 0, 1, bcs_f, 0);
 
     // Reset vel_force
     for (int lev=0; lev<=finest_level; ++lev) {
