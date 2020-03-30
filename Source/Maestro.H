@@ -411,9 +411,11 @@ public:
     ////////////////////////
     // MaestroDebug.cpp functions
 
+    /// Print out the contents of the base state
+    void PrintBase (const RealVector& base, const bool is_cell_centered=true);
+
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
-
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
@@ -1446,6 +1448,13 @@ public:
     /// Set tagging array to include buffer zones for multilevel
     void TagArray ();
 
+    /// Regrid base state variables (ex. psi, etarho, rho0, etc.)
+    ///
+    /// We copy the coarsest level only, interpolate to all
+    /// the other levels and then copy the valid data from
+    /// the old arrays onto the new.
+    void RegridBaseState(RealVector& base, const bool is_edge=false);
+
     /// Tag all cells for refinement
     ///
     /// Overrides the pure virtual function in `AmrCore`
@@ -1598,6 +1607,23 @@ public:
     void SpongeInit(const RealVector& rho0);
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
+    ////////////
+
+    ////////////
+    // MaestroTagging.cpp functions
+
+    void RetagArray(const amrex::Box& bx,
+                    const int lev, IntVector& tag_array);
+
+    void TagBoxes(amrex::TagBoxArray& tags, 
+                  const amrex::MFIter& mfi,
+                  const int lev, IntVector& tag_array,
+                  const amrex::Real time) ;
+
+    void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
+                   const amrex::MFIter& mfi,
+                   const int lev, IntVector& tag_array,
+                   const amrex::Real time);              
     ////////////
 
     ////////////////////////
