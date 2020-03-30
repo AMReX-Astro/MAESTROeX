@@ -193,92 +193,12 @@ extern "C"
     //////////////////////
 
     //////////////////////
-    // in debug.F90
-    void print_base_cc(const amrex::Real* base, const int lev);
-    void print_base_edge(const amrex::Real* base, const int lev);
-
-    void print_mf(const int* lev, const int* lo, const int* hi,
-                  const amrex::Real* mf,
-                  const int* m_lo, const int* m_hi, const int* nc_m);
-
-    void print_edge(const int* lev, const int* lo, const int* hi,
-                    const amrex::Real* mf,
-                    const int* m_lo, const int* m_hi, const int* nc_m);
-    //////////////////////
-
-    //////////////////////
-    // in diag.F90
-
-    void diag(const int* lev, const int* lo, const int* hi,
-              const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
-              const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
-              const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
-              const amrex::Real* u, const int* u_lo, const int* u_hi,
-              const amrex::Real* w0, const amrex::Real* dx,
-              amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
-              amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,                                                                                                           
-              amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
-              amrex::Real* U_max, amrex::Real* Mach_max,
-              const int* mask, const int* m_lo, const int* m_hi,
-              const int* use_mask);
-               
-    void diag_sphr(const int* lev, const int* lo, const int* hi,
-              const amrex::Real* scal, const int* s_lo, const int* s_hi, const int* nc_s,
-              const amrex::Real* rho_Hnuc, const int* hn_lo, const int* hn_hi,
-              const amrex::Real* rho_Hext, const int* he_lo, const int* he_hi,
-              const amrex::Real* u, const int* u_lo, const int* u_hi,
-              const amrex::Real* w0macx, const int* x_lo, const int* x_hi,
-              const amrex::Real* w0macy, const int* y_lo, const int* y_hi,
-              const amrex::Real* w0macz, const int* z_lo, const int* z_hi,
-              const amrex::Real* w0r, const int* wr_lo, const int* wr_hi,
-              const amrex::Real* dx,
-              const amrex::Real* normal, const int* n_lo, const int* n_hi,
-              amrex::Real* T_max, amrex::Real* coord_Tmax, amrex::Real* vel_Tmax,
-              amrex::Real* enuc_max, amrex::Real* coord_enucmax, amrex::Real* vel_enucmax,
-              amrex::Real* kin_ener, amrex::Real* int_ener, amrex::Real* nuc_ener,
-              amrex::Real* U_max, amrex::Real* Mach_max,
-              int* ncenter, amrex::Real* T_center, amrex::Real* vel_center,
-              const int* mask, const int* m_lo, const int* m_hi,
-              const int* use_mask);
-               
-    void diag_grav_energy(amrex::Real* grav_ener,
-                          const amrex::Real* rho0,
-                          const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
-               
-    void diag_grav_energy_sphr(amrex::Real* grav_ener,
-                          const amrex::Real* rho0,
-                          const amrex::Real* r_cc_loc, const amrex::Real* r_edge_loc);
-
-    //////////////////////
-
-    //////////////////////
     // in enforce_HSE.f90
     void enforce_HSE(const amrex::Real* rho0,
                            amrex::Real* p0,
                      const amrex::Real* grav_cell,
                              const amrex::Real* r_cc_loc,
                      const amrex::Real* r_edge_loc);
-    //////////////////////
-
-    //////////////////////
-    // in fill_umac_ghost.f90
-    void fill_umac_ghost(const int* domlo, const int* domhi,
-                         const int* lo, const int* hi,
-                         amrex::Real* umac, const int* umac_lo, const int* umac_hi,
-                         amrex::Real* vmac, const int* vmac_lo, const int* vmac_hi,
-#if (AMREX_SPACEDIM == 3)
-                         amrex::Real* wmac, const int* wmac_lo, const int* wmac_hi,
-#endif
-                         const int* phys_bc);
-
-    void PC_EDGE_INTERP(const int* flo, const int* fhi,
-                        const int* nc, const int* ratio, const int* dir,
-                        amrex::Real* crse, const int* c_lo, const int* c_hi, const int* nc_c,
-                        amrex::Real* fine, const int* f_lo, const int* f_hi, const int* nc_f);
-
-    void EDGE_INTERP(const int* flo, const int* fhi,
-                     const int* nc, const int* ratio, const int* dir,
-                     amrex::Real* fine, const int* f_lo, const int* f_hi, const int* nc_f);
     //////////////////////
 
     //////////////////////
@@ -528,16 +448,6 @@ extern "C"
     void finalize_meth_params();
 
     //////////////////////
-    
-    //////////////////////
-    // in regrid.f90
-    void regrid_base_state_cc(amrex::Real* state_cc);
-    void regrid_base_state_edge(amrex::Real* state_ec);
-    void get_numdisjointchunks(int* nchunks);
-    void get_r_start_coord(int* coord);
-    void get_r_end_coord(int* coord);
-    void get_finest_radial_level(int* lev);
-    //////////////////////
 
     //////////////////////
     // in sponge.F90
@@ -551,28 +461,6 @@ extern "C"
                     const amrex::Real* dx, const amrex::Real dt);
     //////////////////////
 
-
-    //////////////////////
-    // in tagging.f90
-    void state_error(int* tag, const int* tag_lo, const int* tag_hi,
-                     const amrex::Real* state, const int* state_lo, const int* state_hi,
-                     const int* tagval, const int* clearval,
-                     const int* lo, const int* hi,
-                     const amrex::Real* dx,
-                     const amrex::Real* time,
-                     const int* lev, int* tag_array);
-
-    void tag_boxes(int* tag, const int* tag_lo, const int* tag_hi,
-                   const int* tagval, const int* clearval,
-                   const int* lo, const int* hi,
-                   const amrex::Real* dx,
-                   const amrex::Real* time,
-                   const int* lev, const int* tag_array);
-
-    void retag_array(const int* tagval, const int* clearval,
-                     const int* lo, const int* hi,
-                     const int* lev, const int* tag_array);
-    //////////////////////
 
 #ifdef __cplusplus
 }

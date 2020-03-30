@@ -48,6 +48,7 @@ CEXE_sources += MaestroRhoHT.cpp
 CEXE_sources += MaestroSetup.cpp
 CEXE_sources += MaestroSlopes.cpp
 CEXE_sources += MaestroSponge.cpp
+CEXE_sources += MaestroTagging.cpp
 CEXE_sources += MaestroThermal.cpp
 CEXE_sources += MaestroVelocityAdvance.cpp
 CEXE_sources += MaestroVelPred.cpp

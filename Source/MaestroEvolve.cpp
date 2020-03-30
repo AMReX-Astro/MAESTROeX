@@ -137,14 +137,15 @@ Maestro::Evolve ()
         if ( (chk_int > 0 && istep % chk_int == 0) ||
             (chk_deltat > 0 && std::fmod(t_new, chk_deltat) < dt) ||
             ((chk_int > 0 || chk_deltat > 0) && (istep == max_step ||
-            t_new >= stop_time )))
+            t_old >= stop_time )))
         {
             // write a checkpoint file
             Print() << "\nWriting checkpoint " << istep << std::endl;
             WriteCheckPoint(istep);
         }
 
-        if (diag_index == diag_buf_size || istep == max_step) {
+        if ((diag_index == diag_buf_size || istep == max_step ||
+            t_old >= stop_time) && (sum_per > 0.0 || sum_interval > 0)) {
             // write out any buffered diagnostic information
             WriteDiagFile(diag_index);
         }
