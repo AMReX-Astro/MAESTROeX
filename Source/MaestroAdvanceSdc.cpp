@@ -442,8 +442,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++r) {
+                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+            }
         }
 
     }
@@ -572,8 +574,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for Make_S_cc
-        for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++r) {
+                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+            }
         }
 
         // update base state enthalpy
@@ -871,8 +875,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
             
             // hold dp0/dt in psi for enthalpy advance
-            for (int i=0; i<p0_old.size(); ++i) {
-                psi[i] = (p0_new[i] - p0_old[i])/dt;
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                }
             }
         }
         
@@ -1003,8 +1009,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             // hold dp0/dt in psi for Make_S_cc
-            for (int i=0; i<p0_old.size(); ++i) {
-                psi[i] = (p0_new[i] - p0_old[i])/dt;
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                }
             }
         
             // also update base state enthalpy

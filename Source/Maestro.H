@@ -2007,7 +2007,7 @@ public:
     RealVector gamma1bar_old;
     RealVector gamma1bar_new;
     RealVector etarho_cc;
-    RealVector psi;
+    BaseState<Real> psi;
     RealVector grav_cell_old;
     RealVector grav_cell_new;
     RealVector r_cc_loc;

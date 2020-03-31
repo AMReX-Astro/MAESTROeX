@@ -74,6 +74,15 @@ public:
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     const T& operator[](const int i) const { return dptr[i]; };
 
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    T* dataPtr () const noexcept {
+        T* AMREX_RESTRICT p = dptr;
+        return p;
+    };
+
+    /// convert to a Fortran-friendly ManagedVector
+    amrex::Gpu::ManagedVector<T> toVector();
+
     /// scalar addition to the whole base state 
     template <class U>
     friend BaseState<U> operator+ (const U val, const BaseState<U>& p);
@@ -320,6 +329,21 @@ BaseState<T>::ptr (const int lev, const int i, const int n) {
     T* p = dptr[(lev*len + i)*nvar + n];
 
     return p;
+}
+
+template <class T>
+amrex::Gpu::ManagedVector<T> 
+BaseState<T>::toVector() {
+    amrex::Gpu::ManagedVector<T> vec(nlev*len*nvar);
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                vec[l+nlev*(r + len*comp)] = base_data[comp+nvar*(r + len*l)];
+            }
+        }
+    }
+
+    return vec;
 }
 
 

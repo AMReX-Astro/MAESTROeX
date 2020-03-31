@@ -230,7 +230,7 @@ Maestro::InitData ()
     }
 
     if (use_exact_base_state) {
-        std::fill(psi.begin(), psi.end(), 0.);
+        psi.setVal(0.0);
     }
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
@@ -515,7 +515,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
     std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
+    psi.setVal(0.0);
     std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
     std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
@@ -658,7 +658,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
     std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
+    psi.setVal(0.0);
     std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
     std::fill(p0_minus_pthermbar.begin(),   p0_minus_pthermbar.end(),   0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
