@@ -48,7 +48,8 @@ Maestro::InitLevelData(const int lev, const Real time,
 
         const bool perturb_temp_true = xrb_pert_type == 1;
 
-        const auto fac = xrb_pert_factor / rad_pert;
+        const auto xrb_pert_factor_loc = xrb_pert_factor;
+	const auto rad_pert_loc = rad_pert;
 
         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
             int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -65,12 +66,12 @@ Maestro::InitLevelData(const int lev, const Real time,
 
             if (perturb_temp_true) {
                 Real t0 = s0_init[lev+max_lev*(r + nr_fine*Temp)];
-                temp = t0 * (1.0 + fac * std::exp(-dist*dist));
+                temp = t0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
                 dens = s0_init[lev+max_lev*(r + nr_fine*Rho)];
                 eos_input_flag = eos_input_tp;
             } else {
                 Real d0 = s0_init[lev+max_lev*(r + nr_fine*Rho)];
-                dens = d0 * (1.0 + fac * std::exp(-dist*dist));
+                dens = d0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
                 temp = s0_init[lev+max_lev*(r + nr_fine*Temp)];
                 eos_input_flag = eos_input_rp;
             }
@@ -90,7 +91,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             scal(i,j,k,RhoH) = eos_state.rho * eos_state.h;
             scal(i,j,k,Temp) = eos_state.T;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                scal(i,j,k,FirstSpec+comp) = eos_state.xn[comp];
+                scal(i,j,k,FirstSpec+comp) = eos_state.rho * eos_state.xn[comp];
             }
         });
     }
@@ -101,12 +102,12 @@ Maestro::InitLevelData(const int lev, const Real time,
         const auto num_vortices_loc = num_vortices;
         const auto velpert_height = velpert_height_loc;
 
-        const Real offset = (prob_hi[0] - prob_lo[0]) / num_vortices;
+        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices + 1);
 
         // vortex x-coords
         RealVector vortices_xloc(num_vortices);
         for (auto i = 0; i < num_vortices; ++i) {
-            vortices_xloc[i] = (Real(i-1) + 0.5) * offset + prob_lo[0];
+            vortices_xloc[i] = (Real(i) + 0.5) * offset;
         }
 
         const Real * vortices_xloc_p = vortices_xloc.dataPtr();
@@ -128,9 +129,9 @@ Maestro::InitLevelData(const int lev, const Real time,
                 // e.g. Calder et al. ApJSS 143, 201-229 (2002)
                 // we set things up so that every other vortex has the same
                 // orientation
-                upert -= ydist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex);
+                upert -= ydist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex+1);
 
-                vpert -= xdist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex);
+                vpert += xdist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex+1);
             }
 
             vel(i,j,k,0) += upert;

@@ -138,7 +138,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                         // phiz[n] = std::pow(0.7, i) * std::pow(0.5, j) * std::pow(0.3, k);
                         // phiz[n] *= 2.0 * M_PI;
 
-                        // normk[n] = std::sqrt(Real(i*i) + Real(j*j) + Real(k*k));
+                        normk[n] = std::sqrt(Real(i*i) + Real(j*j) + Real(k*k));
 
                         alpha[n] = 2.0 * amrex::Random() - 1.0;
                         beta[n] = 2.0 * amrex::Random() - 1.0;
@@ -186,13 +186,13 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                             // array index
                             const int n = ii-1 + 3 * (jj-1 + 3 * (kk-1));
                             // compute cosines and sines
-                            Real cx = std::cos(2.0 * M_PI * Real(ii) * x / velpert_scale_loc + phix[n]);
-                            Real cy = std::cos(2.0 * M_PI * Real(jj) * y / velpert_scale_loc + phiy[n]);
-                            Real cz = std::cos(2.0 * M_PI * Real(kk) * z / velpert_scale_loc + phiz[n]);
+                            Real cx = std::cos(2.0 * M_PI * Real(ii) * (x+center_p[0]) / velpert_scale_loc + phix[n]);
+                            Real cy = std::cos(2.0 * M_PI * Real(jj) * (y+center_p[1]) / velpert_scale_loc + phiy[n]);
+                            Real cz = std::cos(2.0 * M_PI * Real(kk) * (z+center_p[2]) / velpert_scale_loc + phiz[n]);
 
-                            Real sx = std::sin(2.0 * M_PI * Real(ii) * x / velpert_scale_loc + phix[n]);
-                            Real sy = std::sin(2.0 * M_PI * Real(jj) * y / velpert_scale_loc + phiy[n]);
-                            Real sz = std::sin(2.0 * M_PI * Real(kk) * z / velpert_scale_loc + phiz[n]);
+                            Real sx = std::sin(2.0 * M_PI * Real(ii) * (x+center_p[0]) / velpert_scale_loc + phix[n]);
+                            Real sy = std::sin(2.0 * M_PI * Real(jj) * (y+center_p[1]) / velpert_scale_loc + phiy[n]);
+                            Real sz = std::sin(2.0 * M_PI * Real(kk) * (z+center_p[2]) / velpert_scale_loc + phiz[n]);
 
                             // compute contribution from perturbation velocity from each mode
                             vpert[0] += (-gamma[n] * Real(jj) * cx*cz*sy + beta[n] * Real(kk) * cx*cy*sz) / normk[n];

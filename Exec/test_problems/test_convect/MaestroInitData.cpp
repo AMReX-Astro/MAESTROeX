@@ -34,7 +34,7 @@ Maestro::InitLevelData(const int lev, const Real time,
     // vortex x-coords
     RealVector vortices_xloc(num_vortices);
     for (auto i = 0; i < num_vortices; ++i) {
-        vortices_xloc[i] = (Real(i-1) + 0.5) * offset + prob_lo[0];
+        vortices_xloc[i] = (Real(i) + 0.5) * offset + prob_lo[0];
     }
 
     if (apply_vel_field) {
@@ -62,9 +62,9 @@ Maestro::InitLevelData(const int lev, const Real time,
                 // e.g. Calder et al. ApJSS 143, 201-229 (2002)
                 // we set things up so that every other vortex has the same
                 // orientation
-                upert -= ydist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex);
+                upert -= ydist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex+1);
 
-                vpert -= xdist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex);
+                vpert += xdist/velpert_scale_loc * velpert_amplitude_loc * std::exp(-rad*rad / (2.0 * velpert_scale_loc*velpert_scale_loc)) * pow(-1.0, vortex+1);
             }
 
             vel(i,j,k,0) += upert;

@@ -56,19 +56,27 @@ Maestro::InitLevelData(const int lev, const Real time,
         const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
         const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
 
+        const Real rho0 = s0_init[lev+max_lev*(r+nrf*Rho)];
+	
+	// This seems to work ok with sealed box?
+	// Real rho_local = rho0 * (1.0 + 
+	// 			    pert_amp_loc * std::exp(-y/(2.0 * scale_height_loc)) * 
+	// 			    std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]) ) * 
+	// 			    sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]) ) );
+
+	// What about this ?
+     
         const Real rho_base = pres_base_loc / scale_height_loc / grav_const_loc;
 
-        const Real rho0 = s0_init[lev+max_lev*(r+nrf*Rho)];
-
         Real rho_local = rho_base * pert_amp_loc * \
-            std::exp(-y / (2.0 * scale_height_loc)) * \
+            std::exp(-y / (2.0 * scale_height_loc)) *			\
             std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]));
 
         // if k_vert is 0, dont multiply by sin(0) = 0
         if (k_vert_loc != 0.0) {
             rho_local *= std::sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]));
         } 
-        rho_local += rho_base;
+        rho_local += rho0;
 
         eos_t eos_state;
 

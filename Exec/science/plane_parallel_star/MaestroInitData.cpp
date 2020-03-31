@@ -24,15 +24,17 @@ Maestro::InitLevelData(const int lev, const Real time,
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
-
+    
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_init[lev+max_lev*(r+nrf*Rho)];
+	// initialize rho as sum of partial densities rho*X_i
+	scal(i,j,k,Rho) = 0.0;
         scal(i,j,k,RhoH) = s0_init[lev+max_lev*(r+nrf*RhoH)];
         scal(i,j,k,Temp) = s0_init[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
+	    scal(i,j,k,Rho) += s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))];
             scal(i,j,k,FirstSpec+comp) = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))];
         }
         // initialize pi to zero for now
@@ -44,7 +46,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         eos_state.p = p0_init[lev+max_lev*r];
         eos_state.T = scal(i,j,k,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            eos_state.xn[comp] = scal(i,j,k,FirstSpec+comp);
+            eos_state.xn[comp] = scal(i,j,k,FirstSpec+comp)/eos_state.rho;
         }
 
         eos(eos_input_rp, eos_state);
