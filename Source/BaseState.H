@@ -58,6 +58,9 @@ public:
     void copy(const amrex::Gpu::ManagedVector<T>& src);
     void copy(const amrex::Vector<T>& src);
 
+    void toVector(amrex::Vector<T>& vec);
+    void toVector(amrex::Gpu::ManagedVector<T>& vec);
+
     /// returns a reference to the nth component at position i and level lev.
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator() (const int lev, const int i=0, const int n=0) const;
@@ -278,6 +281,32 @@ BaseState<T>::copy(const amrex::Vector<T>& src)
             for (auto comp = 0; comp < nvar; ++comp) {
                 base_data[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
             } 
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::toVector(amrex::Vector<T>& vec)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                vec[l + nlev*(r + len*comp)] = base_data[comp+nvar*(r + len*l)];
+            }
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                vec[l + nlev*(r + len*comp)] = base_data[comp+nvar*(r + len*l)];
+            }
         }
     }
 }

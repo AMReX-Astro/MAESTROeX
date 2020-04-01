@@ -114,7 +114,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     // local variables 
     BaseState<Real> psi_planar(nr_fine);
 
-    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const auto& etarho_cc_p = etarho_cc;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -148,7 +148,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord_loc) {
-                    psi_planar(r) = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
+                    psi_planar(r) = etarho_cc_p(n,r) * fabs(grav_const_loc);
                 }
             });
 
@@ -557,10 +557,10 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
-    const auto r_edge_loc_p = r_edge_loc_b;
-    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
-    const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& etarho_cc_p = etarho_cc;
+    const auto& etarho_ec_p = etarho_ec;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -644,11 +644,11 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         C(r) /= dr0*dr0;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
-                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
-                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
+                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p(0,r) - 
+                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p(0,r-1)) / 
                 (dr0 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p[max_lev*r];
+                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p(0,r);
     });
 
     // Lower boundary
@@ -736,10 +736,10 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
-    const auto r_edge_loc_p = r_edge_loc_b;
-    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
-    const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& etarho_cc_p = etarho_cc;
+    const auto& etarho_ec_p = etarho_ec;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -819,11 +819,11 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         C(r) /= dr2*dr3;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
-                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
-                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
+                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p(0,r) - 
+                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p(0,r-1)) / 
                 (dr3 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p[max_lev*r];
+                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p(0,r);
     });
 
     // Lower boundary
@@ -965,6 +965,46 @@ Maestro::ProlongBasetoUniform(const RealVector& base_ml,
                 if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
                     for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
                         base_fine[i] = base_ml[n+max_lev*r];
+                        imask_fine[i] = 0;
+                    }
+                }
+            }
+        }
+        // update r1 for the next coarsest level -- assume a jump by
+        // factor of 2
+        r1 *= 2;
+    }
+    
+    // check to make sure that no mask values are still true
+    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
+        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
+    }
+}
+
+void
+Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml, 
+                              BaseState<Real>& base_fine)
+
+{
+    // the mask array will keep track of whether we've filled in data
+    // in a corresponding radial bin.  .false. indicates that we've
+    // already output there.
+    IntVector imask_fine(nr_fine);
+    std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    // r1 is the factor between the current level grid spacing and the
+    // FINEST level
+    int r1 = 1;
+
+    const int max_lev = max_radial_level+1;
+
+    for (auto n = finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < numdisjointchunks(n); ++j) {
+            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+                // sum up mask to see if there are any elements set to true 
+                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
+                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
+                        base_fine[i] = base_ml(n,r);
                         imask_fine[i] = 0;
                     }
                 }

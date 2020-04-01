@@ -327,8 +327,8 @@ public:
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
-    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
-    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -366,7 +366,7 @@ public:
                     RealVector& s0_edge_vec);
 
     void CelltoEdge(const RealVector& s0_cell_vec, 
-                    BaseState<Real>& s0_edge);
+                    BaseState<amrex::Real>& s0_edge);
 
     // end MaestroCelltoEdge.cpp functions
     ////////////
@@ -1233,13 +1233,15 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseState<Real>& a, const BaseState<Real>& b, 
-                 const BaseState<Real>& c, const BaseState<Real>& r, 
-                 BaseState<Real>& u, const int n);
+    void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 
+                 const BaseState<amrex::Real>& c, const BaseState<amrex::Real>& r, 
+                 BaseState<amrex::Real>& u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
-    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<Real>& base_fine);
+    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<amrex::Real>& base_fine);
+
+    void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
     // end MaestroMakew0.cpp functions
     ////////////
@@ -1478,7 +1480,7 @@ public:
     void RegridBaseState(RealVector& base, const bool is_edge=false);
 
 
-    void RegridBaseState(BaseState<Real>& base, const bool is_edge=false);
+    void RegridBaseState(BaseState<amrex::Real>& base, const bool is_edge=false);
 
     /// Tag all cells for refinement
     ///
@@ -2006,12 +2008,12 @@ public:
     RealVector beta0_new;
     RealVector gamma1bar_old;
     RealVector gamma1bar_new;
-    RealVector etarho_cc;
-    BaseState<Real> psi;
+    BaseState<amrex::Real> etarho_cc;
+    BaseState<amrex::Real> psi;
     RealVector grav_cell_old;
     RealVector grav_cell_new;
     RealVector r_cc_loc;
-    BaseState<Real> r_cc_loc_b;
+    BaseState<amrex::Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
     RealVector beta0_nm1;
@@ -2019,9 +2021,9 @@ public:
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
     RealVector w0;
-    RealVector etarho_ec;
+    BaseState<amrex::Real> etarho_ec;
     RealVector r_edge_loc;
-    BaseState<Real> r_edge_loc_b;
+    BaseState<amrex::Real> r_edge_loc_b;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
@@ -2032,7 +2034,7 @@ public:
     amrex::Real dr_fine;
     int nr_irreg;
     BaseState<int> nr;
-    BaseState<Real> dr;
+    BaseState<amrex::Real> dr;
 
     BaseState<int> base_cutoff_density_coord;
     BaseState<int> anelastic_cutoff_density_coord;

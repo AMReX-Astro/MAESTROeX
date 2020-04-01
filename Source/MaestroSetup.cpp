@@ -139,7 +139,7 @@ Maestro::Setup ()
     grav_cell_new.resize( (max_radial_level+1)*nr_fine );
     r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
     r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
-    etarho_cc    .resize( (max_radial_level+1)*nr_fine );
+    etarho_cc    .resize(max_radial_level+1, nr_fine);
     psi          .resize(max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
@@ -147,7 +147,7 @@ Maestro::Setup ()
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     r_edge_loc_b.resize(max_radial_level+1, nr_fine+1);
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
-    etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
+    etarho_ec.resize(max_radial_level+1, nr_fine+1);
 
     // tagged box array for multilevel (planar)
     tag_array .resize( (max_radial_level+1)*nr_fine );
@@ -180,8 +180,6 @@ Maestro::Setup ()
     grav_cell_old.shrink_to_fit();
     grav_cell_new.shrink_to_fit();
     w0           .shrink_to_fit();
-    etarho_cc    .shrink_to_fit();
-    etarho_ec    .shrink_to_fit();
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     tag_array    .shrink_to_fit();

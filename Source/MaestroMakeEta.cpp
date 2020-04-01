@@ -112,12 +112,12 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
     ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
 
-    std::fill(etarho_ec.begin(), etarho_ec.end(), 0.0);
-    std::fill(etarho_cc.begin(), etarho_cc.end(), 0.0);
+    etarho_ec.setVal(0.0);
+    etarho_cc.setVal(0.0);
 
-    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    auto& etarho_ec_p = etarho_ec;
     const Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
-    Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    auto& etarho_cc_p = etarho_cc;
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks(n); ++i) {
@@ -126,7 +126,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_ec_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
+                etarho_ec_p(n,r) = etarhosum_p[n+max_lev*r] / ncell_lev;
             });
         }
     }
@@ -144,8 +144,8 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_cc_p[n+max_lev*r] = 0.5 * (etarho_ec_p[n+max_lev*r] + 
-                    etarho_ec_p[n+max_lev*(r+1)]);
+                etarho_cc_p(n,r) = 0.5 * (etarho_ec_p(n,r) + 
+                    etarho_ec_p(n,r+1));
             });
         }
     }
@@ -245,12 +245,15 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
 
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
-    Average(eta_cart,etarho_cc,0);
+    Vector<Real> etarho_cc_vec((max_radial_level+1)*nr_fine);
+    etarho_cc.toVector(etarho_cc_vec);
+    Average(eta_cart, etarho_cc_vec, 0);
+    etarho_cc.copy(etarho_cc_vec);
 
-    const auto r_cc_loc_p = r_cc_loc_b;
-    const auto r_edge_loc_p = r_edge_loc_b;
-    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
-    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc_b;
+    auto& etarho_ec_p = etarho_ec;
+    const auto& etarho_cc_p = etarho_cc;
 
     // put eta on base state edges
     // note that in spherical the base state has no refinement
@@ -259,17 +262,17 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     const bool sph_loc = spherical;
     AMREX_PARALLEL_FOR_1D(nrf, r, {
         if (r == 0) {
-            etarho_ec_p[r] = 0.0;
+            etarho_ec_p(0,r) = 0.0;
         } else if (r == nrf-1) {
             // probably should do some better extrapolation here eventually
-            etarho_ec_p[r] = etarho_cc_p[r-1];
+            etarho_ec_p(0,r) = etarho_cc_p(0,r-1);
         } else {
             if (sph_loc) {
                 Real dr1 = r_cc_loc_p(0,r) - r_edge_loc_p(0,r);
                 Real dr2 = r_edge_loc_p(0,r) - r_cc_loc_p(0,r-1);
-                etarho_ec_p[r] = (dr2*etarho_cc_p[r] + dr1*etarho_cc_p[r-1])/(dr1+dr2);
+                etarho_ec_p(0,r) = (dr2*etarho_cc_p(0,r) + dr1*etarho_cc_p(0,r-1))/(dr1+dr2);
             } else {
-                etarho_ec_p[r] = 0.5*(etarho_cc_p[r] + etarho_cc_p[r-1]);
+                etarho_ec_p(0,r) = 0.5*(etarho_cc_p(0,r) + etarho_cc_p(0,r-1));
             }
         }
     });
