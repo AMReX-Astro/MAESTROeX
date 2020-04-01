@@ -31,7 +31,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // calculate gradp0
     RealVector gradp0((max_radial_level+1)*nr_fine);
 
-    if (spherical == 1) {
+    if (spherical) {
         if (use_delta_gamma1_term) {
             Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
             gradp0[0] = (p0[1] - p0[0]) / dr_loc;
@@ -89,7 +89,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (use_delta_gamma1_term) {
         Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
         Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(psi_b, psi_cart, 0, 0, bcs_f, 0);
     }
 
     const auto use_omegadot_terms_in_S_loc = use_omegadot_terms_in_S;

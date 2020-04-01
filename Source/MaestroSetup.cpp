@@ -141,6 +141,7 @@ Maestro::Setup ()
     r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
     etarho_cc    .resize( (max_radial_level+1)*nr_fine );
     psi          .resize( (max_radial_level+1)*nr_fine );
+    psi_b         .resize(max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered

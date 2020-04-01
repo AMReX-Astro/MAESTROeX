@@ -149,9 +149,9 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
-        Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
-        Real * AMREX_RESTRICT psi_p = psi.dataPtr();  
+        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
+        const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
+        const auto& psi_p = psi_b;  
 
         const Real dr_lev = dr(n);
 
@@ -165,7 +165,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
                 int r = j + lo;
                 int p = n+max_lev*r;
                 force(n,r) = -rhoh0_old_p[p] * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev 
-                    + psi_p[p];
+                    + psi_p(n,r);
             });
         }
     }
@@ -174,10 +174,10 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
+        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
         Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr(); 
-        Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
-        Real * AMREX_RESTRICT psi_p = psi.dataPtr(); 
+        const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
+        const auto& psi_p = psi_b; 
 
         const Real dr_lev = dr(n);
         const Real dt_loc = dt;
@@ -192,7 +192,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
                 int r = j + lo;
                 int p = n+max_lev*r;
                 rhoh0_new_p[p] = rhoh0_old_p[p] 
-                    - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge(n,r)*w0_p[p]) + dt_loc * psi_p[p];
+                    - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge(n,r)*w0_p[p]) + dt_loc * psi_p(n,r);
             });
         }
     }
@@ -212,17 +212,17 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
     BaseState<Real> force(nr_fine);
 
     // predict (rho h)_0 on the edges
-    Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
+    const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
     Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr();
-    Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
-    const auto r_cc_loc_p = r_cc_loc_b;
-    const auto r_edge_loc_p = r_edge_loc_b;
-    Real * AMREX_RESTRICT psi_p = psi.dataPtr(); 
+    const Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
+    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& psi_p = psi_b; 
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;
         force(r) = -rhoh0_old_p[p] * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
-            rhoh0_old_p[p]*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r) + psi_p[p];
+            rhoh0_old_p[p]*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r) + psi_p(0,r);
     });
 
     MakeEdgeState1d(rhoh0_old, rhoh0_predicted_edge, force);
@@ -233,6 +233,6 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
         rhoh0_new_p[p] = rhoh0_old_p[p] - dtdr/(r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) * rhoh0_predicted_edge(0,r+1) * w0_p[max_lev*(r+1)] - 
             r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * rhoh0_predicted_edge(0,r) * w0_p[p]) + 
-            dt_loc * psi_p[p];
+            dt_loc * psi_p(0,r);
     });
 }

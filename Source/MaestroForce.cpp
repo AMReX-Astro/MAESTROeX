@@ -631,12 +631,12 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(psi_b, psi_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
 
     MakeGravCell(grav, rho0);
 
-    Put1dArrayOnCart(grav,grav_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(grav, grav_cart, 0, 0, bcs_f, 0);
 
     // constants in Fortran
     const int enthalpy_pred_type_in = enthalpy_pred_type;
@@ -800,7 +800,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     }
 
     Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(psi_b, psi_cart, 0, 0, bcs_f, 0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

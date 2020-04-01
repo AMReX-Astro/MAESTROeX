@@ -66,13 +66,16 @@ public:
     T* operator() (const int lev, const int i, const int ncomp, const int start_comp);
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    T* ptr (const int lev, const int i, const int n=0);
+    T* ptr (const int lev, const int i=0, const int n=0);
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator[](const int i) { return dptr[i]; };
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     const T& operator[](const int i) const { return dptr[i]; };
+
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    T* dataPtr () const noexcept { return this->dptr; }
 
     /// scalar addition to the whole base state 
     template <class U>

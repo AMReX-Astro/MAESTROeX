@@ -33,6 +33,7 @@ Maestro::Regrid ()
 
             // FIXME: may need if statement for irregularly-spaced base states
             RegridBaseState(psi);
+            RegridBaseState(psi_b);
             RegridBaseState(etarho_cc);
             RegridBaseState(etarho_ec, true);
             RegridBaseState(w0, true);
