@@ -1,0 +1,8 @@
+average.F90
+===========
+
+average\_module
+---------------
+
+.. f:automodule:: average_module
+

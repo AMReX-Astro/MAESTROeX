@@ -1,0 +1,635 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Notes on \(\beta_0\) &mdash; MAESTROeX 20.04
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Notes on Enthalpy" href="enthalpy.html" />
+    <link rel="prev" title="Notes on Thermodynamics" href="thermo_notes.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.04
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="../beta0.html">master</a> | <a href="./beta0.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#constant-composition">Constant Composition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#composition-gradient">Composition Gradient</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#on-the-effect-of-chemical-potential">On the Effect of Chemical Potential</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#derivation-of-alpha">Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#recalling-derivation-of-beta-0">Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/beta0.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="notes-on-beta-0">
+<h1>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#notes-on-beta-0" title="Permalink to this headline">¶</a></h1>
+<p>The goal of <span class="math notranslate nohighlight">\(\beta_0\)</span> is to capture the expansion of a displaced fluid
+element due to the stratification of the atmosphere. MAESTROeX computes
+<span class="math notranslate nohighlight">\(\beta_0\)</span> as:</p>
+<div class="math notranslate nohighlight" id="equation-beta0-0">
+<span class="eqno">(360)<a class="headerlink" href="#equation-beta0-0" title="Permalink to this equation">¶</a></span>\[\label{eq:beta_0}
+\beta_0(r,t) = \rho_0 \exp\left (  \int_0^r  \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r^\prime} dr^\prime \right )\]</div>
+<div class="section" id="constant-composition">
+<h2>Constant Composition<a class="headerlink" href="#constant-composition" title="Permalink to this headline">¶</a></h2>
+<p>Consider an isentropically stratified atmosphere, with a constant
+composition as a function of <span class="math notranslate nohighlight">\(r\)</span>. If you displace a parcel of fluid
+upwards, it will expand adabatically and continue to rise until its
+density matches the background density. Even if <span class="math notranslate nohighlight">\(\gammabar\)</span> is not
+constant in <span class="math notranslate nohighlight">\(r\)</span>, following from the definition of <span class="math notranslate nohighlight">\(\beta_0\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-beta0-1">
+<span class="eqno">(361)<a class="headerlink" href="#equation-beta0-1" title="Permalink to this equation">¶</a></span>\[\frac{1}{\beta_0} \frac{d\beta_0}{dr} = \frac{1}{\gammabar p_0} \frac{dp_0}{dr}\]</div>
+<p>and the definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span>,</p>
+<div class="math notranslate nohighlight" id="equation-beta0-2">
+<span class="eqno">(362)<a class="headerlink" href="#equation-beta0-2" title="Permalink to this equation">¶</a></span>\[\Gamma_1 = \left . \frac{d \log p}{d \log \rho} \right |_s\]</div>
+<p>So, at constant entropy, from the definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span>, it must hold
+that</p>
+<div class="math notranslate nohighlight" id="equation-beta0-3">
+<span class="eqno">(363)<a class="headerlink" href="#equation-beta0-3" title="Permalink to this equation">¶</a></span>\[\frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz}  .\]</div>
+<p>Comparing to the defintion of <span class="math notranslate nohighlight">\(\beta_0\)</span> then</p>
+<div class="math notranslate nohighlight" id="equation-beta0-4">
+<span class="eqno">(364)<a class="headerlink" href="#equation-beta0-4" title="Permalink to this equation">¶</a></span>\[\frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}   .\]</div>
+<p>Therefore, <span class="math notranslate nohighlight">\(\beta_0 = \rho_0\)</span>.</p>
+<p>This means that if we have a constant composition and an
+isentropically stratified atmosphere, as we displace a fluid element,
+it will always remain neutrally buoyant.</p>
+</div>
+<div class="section" id="composition-gradient">
+<h2>Composition Gradient<a class="headerlink" href="#composition-gradient" title="Permalink to this headline">¶</a></h2>
+<p>If there is a change in composition with <span class="math notranslate nohighlight">\(r\)</span>, the situation is more
+complicated. Consider again an isentropically stratified atmosphere,
+now with a composition gradient. If you displace a parcel of fluid
+upwards, it will rise. If there are no processes that change the
+composition (e.g. reactions), then the composition in the fluid
+element will remain fixed. As it rises, it will the ambient medium
+will have a different composition that it has. In this case, what is
+the path to equilibrium?</p>
+</div>
+<div class="section" id="on-the-effect-of-chemical-potential">
+<span id="sec-on-the-affect-of-chemical-potential"></span><h2>On the Effect of Chemical Potential<a class="headerlink" href="#on-the-effect-of-chemical-potential" title="Permalink to this headline">¶</a></h2>
+<p>In MAESTRO, we do things in an operator split fashion — the hydro is
+de-coupled from the burning. This means that during the hydro parts
+of the algorithm (where <span class="math notranslate nohighlight">\(\beta_0\)</span> is used), the system is fixed in
+chemical equilibrium. For completeness, however, here we describe the
+effects of the species’ chemical potentials, which were neglected in
+the original derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span>. Note that similar terms appear
+in the calculation of things such as specific heats,
+which <em>may</em> be important in the burning step — there appears to
+be very little about this in the literature, but everyone seems to
+assume it makes little difference.</p>
+<div class="section" id="derivation-of-alpha">
+<span id="sec-derivation-of-alpha"></span><h3>Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#derivation-of-alpha" title="Permalink to this headline">¶</a></h3>
+<p>In paper I, <span class="math notranslate nohighlight">\(\alpha\)</span> is defined as</p>
+<div class="math notranslate nohighlight" id="equation-eq-alpha">
+<span class="eqno">(365)<a class="headerlink" href="#equation-eq-alpha" title="Permalink to this equation">¶</a></span>\[\alpha\equiv -\left(
+\frac{(1-\rho h_p)p_T-\rho c_p}{\rho^2c_pp_\rho}\right)\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight" id="equation-beta0-5">
+<span class="eqno">(366)<a class="headerlink" href="#equation-beta0-5" title="Permalink to this equation">¶</a></span>\[h_p \equiv \left(\frac{\partial h}{\partial p}\right)_{T,X}, \quad
+c_p \equiv \left(\frac{\partial h}{\partial T}\right)_{p,X}, \quad
+p_T \equiv \left(\frac{\partial p}{\partial T}\right)_{\rho,X}, \quad
+p_\rho \equiv \left(\frac{\partial p}{\partial \rho}\right)_{T,X}\]</div>
+<p>where the subscript <span class="math notranslate nohighlight">\(X\)</span> means holding all <span class="math notranslate nohighlight">\(X_i\)</span> constant. In the
+absence of reactions, the <span class="math notranslate nohighlight">\(X\)</span> subscript can be dropped from all
+derivatives and with the use of the equation of state <span class="math notranslate nohighlight">\(p=p(\rho,T)\)</span>,
+<span class="math notranslate nohighlight">\(\alpha\)</span> can be written as <span class="math notranslate nohighlight">\(\alpha=\alpha(\rho,T)\)</span>. Such a system
+without reactions and in thermal equilibrium could be either a pure
+system of one species, or a system of many species in chemical (and
+therefore <em>thermodynamic</em>) equilibrium. Cox and Giuli (hereafter
+CG) call the former type of system a “simple system” and therefore
+the latter a “non-simple system” in chemical equilibrium. The
+analysis in paper I that reduced <a class="reference internal" href="#equation-eq-alpha">Eq.365</a> to</p>
+<div class="math notranslate nohighlight" id="equation-eq-alpha-simp-no-rxn">
+<span class="eqno">(367)<a class="headerlink" href="#equation-eq-alpha-simp-no-rxn" title="Permalink to this equation">¶</a></span>\[\alpha = \frac{1}{\Gamma_1p_0}\]</div>
+<p>used CG’s discussion of the various adiabatic <span class="math notranslate nohighlight">\(\Gamma\)</span>’s. However,
+their discussion only pertains to “simple systems” or “non-simple
+systems” in chemical equilibrium. In general, nuclear reactions will
+be important and therefore this analysis needs to be reformed.</p>
+<p>Even in the presence of reactions, <a class="reference internal" href="#equation-eq-alpha">Eq.365</a> can be rewritten
+as was done in paper I:</p>
+<div class="math notranslate nohighlight" id="equation-eq-alpha2">
+<span class="eqno">(368)<a class="headerlink" href="#equation-eq-alpha2" title="Permalink to this equation">¶</a></span>\[\alpha = -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
+- \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right],\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight" id="equation-beta0-6">
+<span class="eqno">(369)<a class="headerlink" href="#equation-beta0-6" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\chi_{\rho} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln\rho}
+\right)_{T,X} \\
+\chi_{T} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln T}
+\right)_{\rho,X}.\end{aligned}\end{split}\]</div>
+<p>Following the results of paper I, we want to find a relation
+between <span class="math notranslate nohighlight">\(p\chi_\rho\)</span> and <span class="math notranslate nohighlight">\(\Gamma_1\)</span>.</p>
+<p>For an equation of state <span class="math notranslate nohighlight">\(p=p(\rho,T,X)\)</span> we have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-7">
+<span class="eqno">(370)<a class="headerlink" href="#equation-beta0-7" title="Permalink to this equation">¶</a></span>\[d\ln p = \left(\frac{\partial\ln p}{\partial\ln\rho}\right)_{T,X}d\ln\rho +
+\left(\frac{\partial\ln p}{\partial\ln T}\right)_{\rho,X}d\ln T +
+\sum_i\left(\frac{\partial\ln p}{\partial\ln X_i}\right)_{\rho,T,(X_j,j
+\neq i)} d\ln X_i.\]</div>
+<p>We define another logarithmic derivative</p>
+<div class="math notranslate nohighlight" id="equation-beta0-8">
+<span class="eqno">(371)<a class="headerlink" href="#equation-beta0-8" title="Permalink to this equation">¶</a></span>\[\begin{aligned}
+\chi_{X_{i}} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln X_i}
+\right)_{\rho,T,(X_j,j\neq i)}\end{aligned}\]</div>
+<p>and therefore</p>
+<div class="math notranslate nohighlight" id="equation-beta0-9">
+<span class="eqno">(372)<a class="headerlink" href="#equation-beta0-9" title="Permalink to this equation">¶</a></span>\[d\ln p = \chi_\rho \ d\ln\rho + \chi_T \ d\ln T + \sum_i \chi_{X_i}\
+d\ln X_i.\]</div>
+<p>From here we get the general statement</p>
+<div class="math notranslate nohighlight" id="equation-beta0-10">
+<span class="eqno">(373)<a class="headerlink" href="#equation-beta0-10" title="Permalink to this equation">¶</a></span>\[\frac{\partial\ln p}{\partial \ln \rho} = \chi_\rho +
+\chi_T\frac{\partial \ln T}{\partial\ln \rho} +
+\sum_i\chi_{X_i}\frac{\partial\ln X_i}{\partial\ln \rho}\]</div>
+<p>which must hold for an adiabatic process as well, and therefore we have</p>
+<div class="math notranslate nohighlight" id="equation-eq-gamma1">
+<span class="eqno">(374)<a class="headerlink" href="#equation-eq-gamma1" title="Permalink to this equation">¶</a></span>\[\Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
+  + \sum_i\chi_{X_i}\Gamma_{4,i}\]</div>
+<p>where we use CG’s definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> and <span class="math notranslate nohighlight">\(\Gamma_3\)</span> and introduce a
+fourth gamma function:</p>
+<div class="math notranslate nohighlight" id="equation-beta0-11">
+<span class="eqno">(375)<a class="headerlink" href="#equation-beta0-11" title="Permalink to this equation">¶</a></span>\[\Gamma_1 \equiv \left(
+\frac{\partial \ln p}{\partial \ln \rho}\right)_{\text{AD}},\quad
+\Gamma_3-1\equiv \left(
+\frac{\partial \ln T}{\partial \ln \rho}\right)_{\text{AD}},\quad
+\Gamma_{4,i}\equiv \left(
+\frac{\partial\ln X_i}{\partial\ln\rho}\right)_{\text{AD}},\]</div>
+<p>where the subscript AD means along an adiabat. We now derive an expression
+for <span class="math notranslate nohighlight">\(\Gamma_3\)</span>.</p>
+<p>The first law of thermodynamics can be written as</p>
+<div class="math notranslate nohighlight" id="equation-beta0-12">
+<span class="eqno">(376)<a class="headerlink" href="#equation-beta0-12" title="Permalink to this equation">¶</a></span>\[dQ = dE + pdV - \sum_i\mu_idN_i\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mu_i=\left(
+\frac{\partial E}{\partial N_i}\right)_{\text{AD},\rho,(N_j,j\neq i)}\)</span> is
+the chemical potential; or per unit mass we have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-13">
+<span class="eqno">(377)<a class="headerlink" href="#equation-beta0-13" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+  dq &amp;= de - \frac{p}{\rho^2}d\rho - \sum_i\mu_id
+  \left(\frac{n_i}{\rho}\right)\\
+  &amp;= de - \frac{p}{\rho^2}d\rho - \sum_i
+  \left(
+  \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}dX_i\end{aligned}\end{split}\]</div>
+<p>where we have used <span class="math notranslate nohighlight">\(X_i \equiv \rho_i/\rho = A_in_i/\rho N_\text{A}\)</span>
+and the chemical potential has been replaced with
+:math:<a href="#id1"><span class="problematic" id="id2">`</span></a>mu_i = frac{A_i}{<a href="#id3"><span class="problematic" id="id4">N_</span></a>text{A}}left(frac{partial e}{partial X_i}</p>
+<blockquote>
+<div><p>right)_{rho,text{AD},(X_j,jneq i)}`.</p>
+</div></blockquote>
+<p>Using this and expressing the specific internal energy as <span class="math notranslate nohighlight">\(e=e(\rho,T,X)\)</span>
+we then have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-14">
+<span class="eqno">(378)<a class="headerlink" href="#equation-beta0-14" title="Permalink to this equation">¶</a></span>\[dq = c_vdT +
+\left[\left(\frac{\partial e}{\partial \rho}\right)_{T,X} -\frac{p}{\rho^2}
+  \right]d\rho +
+\sum_i\left[
+  \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)} -
+  \left(\frac{\partial e}{\partial X_i}
+  \right)_{\rho,\text{AD},(X_j,j\neq i)}\right]dX_i\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight" id="equation-eq-gamma3-first">
+<span class="eqno">(379)<a class="headerlink" href="#equation-eq-gamma3-first" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\left(\frac{d\ln T}{d\ln\rho}\right)_\text{AD} \equiv \Gamma_3-1
+&amp;= \frac{1}{c_vT}\left[
+\frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} +
+\right.{}\nonumber\\
+&amp;\qquad\qquad  \left.\sum_i \left[
+    \left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    -
+    \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
+    \right]X_i\Gamma_{4,i}\right]
+\end{aligned}\end{split}\]</div>
+<p>Now we need to evaluate <span class="math notranslate nohighlight">\(\left(\partial e/\partial \ln\rho\right)_{T,X}\)</span>.
+Again using the first law and the fact that <span class="math notranslate nohighlight">\(ds=dq/T\)</span> is an exact
+differential (i.e. mixed derivatives are equal) we have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-15">
+<span class="eqno">(380)<a class="headerlink" href="#equation-beta0-15" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\label{eq:dedlnrho}
+  \left(
+  \frac{\partial}{\partial\rho}\left[\frac{c_v}{T}\right]\right)_{T,X} &amp;=
+  \left(\frac{\partial}{\partial T}\left[\frac{1}{T}
+    \left(\frac{\partial e}{\partial\rho}\right)_{T,X} - \frac{p}{T\rho^2}
+    \right]\right)_{\rho,X}{}\nonumber\\
+  \frac{1}{T}\left(\frac{\partial}{\partial\rho}\left(
+  \frac{\partial e}{\partial T}\right)_{\rho,X}\right)_{T,X} &amp;=
+  -\frac{1}{T^2}\left(\frac{\partial e}{\partial\rho}\right)_{T,X} +
+  \frac{1}{T}\left(\frac{\partial}{\partial T}\left(
+  \frac{\partial e}{\partial\rho}\right)_{T,X}\right)_{\rho,X}
+  +\frac{p}{T^2\rho^2} -
+  \frac{1}{T\rho^2}\left(\frac{\partial p}{\partial T}\right)_{\rho,X}
+  {}\nonumber\\
+  \therefore\quad \left(\frac{\partial e}{\partial\ln \rho}\right)_{T,X} &amp;=
+  \frac{p}{\rho}\left(1-\chi_T\right),\end{aligned}\end{split}\]</div>
+<p>exactly the same result if we were to exclude species information.
+Simlarly, we can find an expression for the derivative of energy with
+respect to composition</p>
+<div class="math notranslate nohighlight" id="equation-beta0-16">
+<span class="eqno">(381)<a class="headerlink" href="#equation-beta0-16" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+  \left(\frac{\partial}{\partial X_i}\left[
+    \frac{c_v}{T}\right]\right)_{\rho,T,(X_j,j\neq i)} &amp;=
+  \left(\frac{\partial}{\partial T}\left[
+    \frac{1}{T}\left(\frac{\partial e}{\partial X_i}
+      \right)_{\rho,T,(X_j,j\neq i)} - \frac{1}{T}\left(
+      \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right]\right)_{\rho,X}\\
+  \frac{1}{T}\left(\frac{\partial }{\partial X_i}\left(
+  \frac{\partial e}{\partial T}\right)_{\rho,X}\right)_{\rho,T,(X_j,j\neq i)}
+  &amp;= \frac{1}{T^2}\left[\left(\frac{\partial e}{\partial X_i}
+    \right)_{\rho,\text{AD},(X_j,j\neq i)} -
+    \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
+    \right] + \\
+  &amp;\ \ \ \ \ \frac{1}{T}\left[
+    \left(\frac{\partial}{\partial T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}
+    \right)_{\rho,X} -
+    \left(\frac{\partial }{\partial T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}\right]\\
+  \therefore\quad
+  \left(\frac{\partial e}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)} &amp;=
+  \left(\frac{\partial e}{\partial X_i}
+  \right)_{\rho,\text{AD},(X_j,j\neq i)} - \left(
+  \frac{\partial}{\partial\ln T}\left(
+  \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+  \right)_{\rho,X}.\end{aligned}\end{split}\]</div>
+<p>Plugging these back into <a class="reference internal" href="#equation-eq-gamma3-first">Eq.379</a> we have</p>
+<div class="math notranslate nohighlight" id="equation-eq-gamma3-second">
+<span class="eqno">(382)<a class="headerlink" href="#equation-eq-gamma3-second" title="Permalink to this equation">¶</a></span>\[\Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
+    \left(\frac{\partial}{\partial\ln T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}X_i
+    \Gamma_{4,i}\right],\]</div>
+<p>or</p>
+<div class="math notranslate nohighlight" id="equation-eq-cv">
+<span class="eqno">(383)<a class="headerlink" href="#equation-eq-cv" title="Permalink to this equation">¶</a></span>\[c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
+    \left(\frac{\partial}{\partial\ln T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}X_i
+    \Gamma_{4,i}\right].\]</div>
+<p>We can obtain an expression for the specific heat at constant pressure
+from the enthalpy</p>
+<div class="math notranslate nohighlight" id="equation-beta0-17">
+<span class="eqno">(384)<a class="headerlink" href="#equation-beta0-17" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+  c_p \equiv \left(\frac{\partial h}{\partial T}\right)_{p,X} &amp;=
+  \left(\frac{\partial e}{\partial T}\right)_{p,X} - \frac{p}{\rho^2}
+  \left(\frac{\partial \rho}{\partial T}\right)_{p,X}\\
+  &amp;= \left(\frac{\partial e}{\partial T}\right)_{p,X} + \frac{p}{\rho^2}
+  \left(\frac{\partial p}{\partial T}\right)_{\rho,X}
+  \left(\frac{\partial \rho}{\partial p}\right)_{T,X}\\
+  &amp;=\left(\frac{\partial e}{\partial T}\right)_{p,X} + \frac{p}{\rho T}
+  \frac{\chi_t}{\chi_\rho}.\end{aligned}\end{split}\]</div>
+<p>The first term on the rhs can be obtained from writing <span class="math notranslate nohighlight">\(e=e(p,T,X)\)</span> and
+<span class="math notranslate nohighlight">\(p=p(\rho,T,X)\)</span>:</p>
+<div class="math notranslate nohighlight" id="equation-beta0-18">
+<span class="eqno">(385)<a class="headerlink" href="#equation-beta0-18" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+  de &amp;= \left(\frac{\partial e}{\partial p}\right)_{T,X}dp
+  + \left(\frac{\partial e}{\partial T}\right)_{p,X}dT +
+  \sum_i \left(\frac{\partial e}{\partial X_i}\right)_{p,T,(X_j,j\neq i)}
+  dX_i\\
+  dp &amp;= \left(\frac{\partial p}{\partial \rho}\right)_{T,X}d\rho +
+  \left(\frac{\partial p}{\partial T}\right)_{\rho,X}dT + \sum_i
+  \left(\frac{\partial p}{\partial X_i}\right)_{\rho,T,(X_j,j\neq i)}dX_i\\
+  \therefore \ \left(\frac{\partial e}{\partial T}\right)_{\rho,X} &amp;=
+  \left(\frac{\partial e}{\partial p}\right)_{T,X}
+  \left(\frac{\partial p}{\partial T}\right)_{\rho,X} +
+  \left(\frac{\partial e}{\partial T}\right)_{p,X}\\
+  \Rightarrow \ \left(\frac{\partial e}{\partial T}\right)_{p,X} &amp;= c_v -
+  \left(\frac{\partial e}{\partial \rho}\right)_{T,X}
+  \left(\frac{\partial \rho}{\partial p}\right)_{T,X}
+  \left(\frac{\partial p}{\partial T}\right)_{\rho,X}\\
+  &amp;= c_v - \frac{p\chi_T}{\rho T\chi_\rho}\left(1-\chi_T\right)\end{aligned}\end{split}\]</div>
+<p>and</p>
+<div class="math notranslate nohighlight" id="equation-beta0-19">
+<span class="eqno">(386)<a class="headerlink" href="#equation-beta0-19" title="Permalink to this equation">¶</a></span>\[c_p = \frac{p}{\rho T}\frac{\chi_T^2}{\chi_\rho} + c_v\]</div>
+<p>Dividing this by <a class="reference internal" href="#equation-eq-cv">Eq.383</a> and using the relation between the
+<span class="math notranslate nohighlight">\(\Gamma\)</span> ’s, <a class="reference internal" href="#equation-eq-gamma1">Eq.374</a>, we then have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-20">
+<span class="eqno">(387)<a class="headerlink" href="#equation-beta0-20" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\label{eq:pchirho}
+  \gamma \equiv \frac{c_p}{c_v} &amp;= 1 + \frac{p(\Gamma_3-1)}{\rho }
+  \frac{\chi_T^2}{\chi_\rho}\left[\frac{p}{\rho}\chi_T +\sum_i
+    \left(\frac{\partial}{\partial\ln T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}X_i
+    \Gamma_{4,i}\right]^{-1}{}\nonumber\\
+  &amp;= 1 + \frac{p\chi_T\left(\Gamma_1 - \chi_\rho -
+    \sum_i \chi_{X_i}\Gamma_{4,i}\right)}{p\chi_\rho\chi_T + \rho
+    \chi_\rho\sum_i \left(
+    \frac{\partial}{\partial \ln T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}X_i\Gamma_{4,i}}{}\nonumber\\
+  &amp;= \frac{p\chi_T\Gamma_1 + \sum_i \left[\rho\chi_\rho\left(
+    \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
+    \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
+    \chi_{X_i}\right]\Gamma_{4,i}}{p\chi_\rho\chi_T + \rho
+    \chi_\rho\sum_i \left(
+    \frac{\partial}{\partial \ln T}\left(
+    \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
+    \right)_{\rho,X}X_i\Gamma_{4,i}}{}\nonumber\\
+  \Rightarrow p\chi_\rho &amp;= \frac{1}{\chi_T\gamma}\left[p\chi_T\Gamma_1 +
+    \sum_i \left[\rho\chi_\rho\left(1-\gamma\right)\left(
+      \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
+      \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
+      \chi_{X_i}\right]\Gamma_{4,i}\right].\end{aligned}\end{split}\]</div>
+<p>Plugging <a class="reference external" href="#eq:pchirho">[eq:pchirho]</a> into <a class="reference internal" href="#equation-eq-alpha2">Eq.368</a> and rewriting the
+partial derivative of <span class="math notranslate nohighlight">\(e\)</span> with the help of <a class="reference external" href="#eq:dedlnrho">[eq:dedlnrho]</a> we have</p>
+<div class="math notranslate nohighlight" id="equation-beta0-21">
+<span class="eqno">(388)<a class="headerlink" href="#equation-beta0-21" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
+\alpha &amp;= -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
+  - \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right] \\
+&amp;=\frac{\gamma}{c_p}\frac{c_p\chi_T + \left(\rho
+  \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X}-p\right)
+  \frac{\chi_T^2}{T\rho\chi_\rho}}
+{p\chi_T\Gamma_1 +
+    \sum_i \left[\rho\chi_\rho\left(1-\gamma\right)\left(
+      \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
+      \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i - p\chi_T
+      \chi_{X_i}\right]\Gamma_{4,i}}\\
+&amp;=\frac{\gamma}{\Gamma_1 p c_p}\left[\frac{c_p - \frac{p\chi_T^2}
+    {T\rho\chi_\rho}}
+  {1 + \sum_i \left[\frac{\rho\chi_\rho}{p\chi_T}
+      \left(1-\gamma\right)\left(
+      \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
+      \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i -
+      \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}}\right]\\
+&amp;=\left(\frac{1}{\Gamma_1p}\right)
+\left[1 + \sum_i \left[\frac{\rho\chi_\rho}{p\chi_T}
+    \left(1-\gamma\right)\left(
+    \frac{\partial}{\partial \ln T}\left(\frac{\partial e}{\partial X_i}
+    \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i -
+    \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}\right]^{-1}\\\end{aligned}\end{split}\]</div>
+<div class="math notranslate nohighlight" id="equation-beta0-22">
+<span class="eqno">(389)<a class="headerlink" href="#equation-beta0-22" title="Permalink to this equation">¶</a></span>\[\boxed{
+  \alpha = \frac{1}{\Gamma_1p}\left[1 + \sum_i\left[\frac{\rho^2p_\rho}
+      {pp_T}(1-\gamma)\frac{N_\text{A}}{A_i}
+      \left(\frac{\partial\mu_i}{\partial T}\right)_{\rho,X}X_i -
+      \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}\right]^{-1}
+}\]</div>
+</div>
+<div class="section" id="recalling-derivation-of-beta-0">
+<span id="recalling-derivation-of-beta0"></span><h3>Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#recalling-derivation-of-beta-0" title="Permalink to this headline">¶</a></h3>
+<p>Recall from paper I that <span class="math notranslate nohighlight">\(\beta_0\)</span> was derived from the equation</p>
+<div class="math notranslate nohighlight" id="equation-beta0-23">
+<span class="eqno">(390)<a class="headerlink" href="#equation-beta0-23" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\mathbf{U} + \alpha\mathbf{U}\cdot\nabla p_0 = \tilde{S}\]</div>
+<p>in such a fashion that we ended up with an equation of the form</p>
+<div class="math notranslate nohighlight" id="equation-beta0-24">
+<span class="eqno">(391)<a class="headerlink" href="#equation-beta0-24" title="Permalink to this equation">¶</a></span>\[\label{eq:beta constraint}
+\nabla\cdot\left(\beta_0(r)\mathbf{U}\right) = \beta_0\tilde{S}.\]</div>
+<p>The derivation in Appendix B of paper I for a <span class="math notranslate nohighlight">\(\beta_0\)</span> that
+satisfies <a class="reference external" href="#eq:betaconstraint">[eq:beta constraint]</a> automatically assumed <span class="math notranslate nohighlight">\(\alpha
+= \left(\Gamma_{1_0}p_0\right)^{-1}\)</span>. This would have to be modified
+with the above derivation of <span class="math notranslate nohighlight">\(\alpha\)</span> to be correct in a non-operator
+split fashion.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="enthalpy.html" class="btn btn-neutral float-right" title="Notes on Enthalpy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="thermo_notes.html" class="btn btn-neutral float-left" title="Notes on Thermodynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>
