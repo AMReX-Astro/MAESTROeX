@@ -151,7 +151,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
         const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
-        const auto& psi_p = psi_b;  
+        const auto& psi_p = psi;  
 
         const Real dr_lev = dr(n);
 
@@ -177,7 +177,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
         const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
         Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr(); 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
-        const auto& psi_p = psi_b; 
+        const auto& psi_p = psi; 
 
         const Real dr_lev = dr(n);
         const Real dt_loc = dt;
@@ -217,7 +217,7 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
-    const auto& psi_p = psi_b; 
+    const auto& psi_p = psi; 
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;

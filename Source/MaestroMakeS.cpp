@@ -89,7 +89,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (use_delta_gamma1_term) {
         Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
         Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(psi_b, psi_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     }
 
     const auto use_omegadot_terms_in_S_loc = use_omegadot_terms_in_S;
