@@ -47,8 +47,8 @@ Maestro::InitData ()
 
 	// read in model file and fill in s0_init and p0_init for all levels
 	for (auto lev = 0; lev <= max_radial_level; ++lev) {
-	        InitBaseState(s0_init, p0_init, rho0_old, rhoh0_old,
-			      p0_old, tempbar, tempbar_init, lev);
+	        InitBaseState(rho0_old, rhoh0_old,
+			      p0_old, lev);
 	}
 	
 	// calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
