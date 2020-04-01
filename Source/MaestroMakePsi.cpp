@@ -11,14 +11,14 @@ Maestro::MakePsiPlanar()
 
     const int max_lev = max_radial_level + 1;
 
-    psi.setVal(0.0);
+    std::fill(psi.begin(), psi.end(), 0.0);
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks(n); ++i){
             for (auto r = r_start_coord(n,i); 
                  r<= r_end_coord(n,i); ++r) {
                 if (r < base_cutoff_density_coord(n)) {
-                    psi(n,r) = etarho_cc[n+max_lev*r] * fabs(grav_const);
+                    psi[n+max_lev*r] = etarho_cc[n+max_lev*r] * fabs(grav_const);
                 }
             }
         }
@@ -38,7 +38,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
 
     const int max_lev = max_radial_level + 1;
 
-    psi.setVal(0.0);
+    std::fill(psi.begin(), psi.end(), 0.0);
 
     Real dr0 = dr(0);
 
@@ -48,7 +48,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
     const Real * AMREX_RESTRICT p0_avg_p = p0_avg.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
-    auto psi_p = psi;
+    Real * AMREX_RESTRICT psi_p = psi.dataPtr();
 
     const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
@@ -58,7 +58,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
              r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * 
              w0_p[max_lev*r]) / dr0;
 
-        psi_p(0,r) = gamma1bar_p[max_lev*r] * p0_avg_p[max_lev*r] * 
+        psi_p[max_lev*r] = gamma1bar_p[max_lev*r] * p0_avg_p[max_lev*r] * 
             (Sbar_p[max_lev*r] - div_w0_sph);
     });
 }
@@ -71,19 +71,19 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
 
     const int max_lev = max_radial_level+1;
 
-    psi.setVal(0.0);
+    std::fill(psi.begin(), psi.end(), 0.0);
 
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
     const Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
-    auto psi_p = psi;
+    Real * AMREX_RESTRICT psi_p = psi.dataPtr();
 
     const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
-        psi_p(0,r) = etarho_cc_p[max_lev*r] * grav_cell_p[max_lev*r];
+        psi_p[max_lev*r] = etarho_cc_p[max_lev*r] * grav_cell_p[max_lev*r];
     });
 
     for (auto r = base_cutoff_density_coord(0)+1; r < nr_fine; ++r) {
-        psi(0,r) = psi(0,r-1);
+        psi[max_lev*r] = psi[max_lev*(r-1)];
     }
 
     RestrictBase(psi, true);

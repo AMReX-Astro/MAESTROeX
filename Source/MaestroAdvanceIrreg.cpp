@@ -423,10 +423,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
-            }
+        for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
         }
 
     }
@@ -714,10 +712,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
-            }
+        for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
         }
     }
 

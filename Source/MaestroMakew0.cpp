@@ -178,7 +178,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
                 w0[n+max_lev*r] = w0[n+max_lev*(r-1)]
                     + Sbar_in[n+max_lev*(r-1)] * dr_lev
-                    - psi_planar(r-1) / gamma1bar_p0_avg * dr_lev
+                    - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
                     - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
             }
 

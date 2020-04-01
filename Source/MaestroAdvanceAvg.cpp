@@ -430,13 +430,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
-            }
+        for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
         }
 
-    } else {
+    }
+    else {
         p0_new = p0_old;
     }
 
@@ -445,7 +444,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         // compute rhoh0_old by "averaging"
         Average(s1, rhoh0_old, RhoH);
         Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
-    } else {
+    }
+    else {
         rhoh0_new = rhoh0_old;
     }
 
@@ -731,10 +731,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
-            }
+        for (int i=0; i<p0_old.size(); ++i) {
+            psi[i] = (p0_new[i] - p0_old[i])/dt;
         }
     }
 
