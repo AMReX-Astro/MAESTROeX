@@ -1,8 +1,0 @@
-compute_grad_phi.F90
-====================
-
-compute\_grad\_phi\_module
---------------------------
-
-.. f:automodule:: compute_grad_phi_module
-

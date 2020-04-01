@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>average.F90 &mdash; MAESTROeX 20.03
+  <title>average.F90 &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="base_state.F90" href="base_state_f.html" />
+    <link rel="next" title="base_state_geometry.F90" href="base_state_geometry_f.html" />
     <link rel="prev" title="Src_nd" href="../Src_nd_files.html" /> 
 </head>
 
@@ -52,6 +52,7 @@
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
+
 
           
             <a href="../index.html" class="icon icon-home"> MAESTROeX
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -83,6 +84,10 @@
 </div>
 
           
+    <div class="branch">
+        Branch: <a href="../file/average_f.html">master</a> | <a href="../dev/file/average_f.html">development</a>
+    </div>
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
@@ -141,6 +146,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
@@ -148,37 +154,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#f/average_module">average_module</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_to_edge_f.html">cell_to_edge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_grad_phi_f.html">compute_grad_phi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="diag_f.html">diag.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fill_umac_ghost_f.html">fill_umac_ghost.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
@@ -360,13 +345,11 @@
 <li><p><strong>phibar</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>ncell</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p></li>
 </ul>
 </dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p>
-</dd>
-<dt class="field-odd">Call to</dt>
-<dd class="field-odd"><p><a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module/quad_interp" title="f/fill_3d_data_module/quad_interp"><code class="xref f f-func docutils literal notranslate"><span class="pre">quad_interp()</span></code></a></p>
+<dt class="field-even">Call to</dt>
+<dd class="field-even"><p><a class="reference internal" href="fill_3d_data_f.html#f/fill_3d_data_module/quad_interp" title="f/fill_3d_data_module/quad_interp"><code class="xref f f-func docutils literal notranslate"><span class="pre">quad_interp()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -385,6 +368,7 @@
 <li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>phisum</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ncell</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>)+2)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>mask</strong> (m_hi(1)-(m_lo(1))+1,m_hi(2)-(m_lo(2))+1,m_hi(3)-(m_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -392,9 +376,6 @@
 <li><p><strong>m_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>use_mask</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(phisum,0)-1)</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -407,11 +388,9 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lev</strong><em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>radii</strong> (finest_level + 1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_irreg" title="f/base_state_geometry_module/nr_irreg">nr_irreg</a>+1+2)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(radii,0)-1)</em><em>]</em></p></li>
 <li><p><strong>dx</strong> (3)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Options</dt>
-<dd class="field-even"><p><strong>finest_level</strong><em> [</em><em>integer</em><em>,</em><em>in,optional/default=(shape(radii,0)-1)</em><em>]</em></p>
 </dd>
 </dl>
 </dd></dl>
@@ -427,7 +406,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="base_state_f.html" class="btn btn-neutral float-right" title="base_state.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="base_state_geometry_f.html" class="btn btn-neutral float-right" title="base_state_geometry.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../Src_nd_files.html" class="btn btn-neutral float-left" title="Src_nd" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -439,7 +418,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2019, MAESTROeX development tem
+        &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>

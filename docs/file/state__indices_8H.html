@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>make_intra_coeffs.F90 &mdash; MAESTROeX 20.03
+  <title>File state_indices.H &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="make_plot_variables.F90" href="make_plot_variables_f.html" />
-    <link rel="prev" title="make_heating.F90" href="make_heating_f.html" /> 
+    <link rel="next" title="state_indices_nd.F90" href="state_indices_nd_f.html" />
+    <link rel="prev" title="meth_params.F90" href="meth_params_f.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -52,6 +52,7 @@
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
+
 
           
             <a href="../index.html" class="icon icon-home"> MAESTROeX
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -83,6 +84,10 @@
 </div>
 
           
+    <div class="branch">
+        Branch: <a href="../file/state__indices_8H.html">master</a> | <a href="../dev/file/state__indices_8H.html">development</a>
+    </div>
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
@@ -141,47 +146,19 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_to_edge_f.html">cell_to_edge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_grad_phi_f.html">compute_grad_phi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="diag_f.html">diag.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fill_umac_ghost_f.html">fill_umac_ghost.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">make_intra_coeffs.F90</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#f/make_intra_coeffs_module">make_intra_coeffs_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../param_includes_files.html">Param_includes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__params_8H.html">File maestro_params.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__queries_8H.html">File maestro_queries.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meth_params_f.html">meth_params.F90</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">File state_indices.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state_indices_nd_f.html">state_indices_nd.F90</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
@@ -236,15 +213,15 @@
         
           <li><a href="../filelist.html">File list</a> &raquo;</li>
         
-          <li><a href="../Src_nd_files.html">Src_nd</a> &raquo;</li>
+          <li><a href="../param_includes_files.html">Param_includes</a> &raquo;</li>
         
-      <li>make_intra_coeffs.F90</li>
+      <li>File state_indices.H</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/file/make_intra_coeffs_f.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/file/state__indices_8H.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -257,53 +234,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="make-intra-coeffs-f90">
-<h1>make_intra_coeffs.F90<a class="headerlink" href="#make-intra-coeffs-f90" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="f/make_intra_coeffs_module">
-<span id="make-intra-coeffs-module"></span><h2>make_intra_coeffs_module<a class="headerlink" href="#f/make_intra_coeffs_module" title="Permalink to this headline">¶</a></h2>
-<p class="rubric">Quick access</p>
-<dl class="field-list simple">
-<dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/make_intra_coeffs_module/make_intra_coeffs" title="f/make_intra_coeffs_module/make_intra_coeffs"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_intra_coeffs()</span></code></a></p>
-</dd>
-</dl>
-<p class="rubric">Required modules</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/rho_comp" title="f/meth_params_module/rho_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">rho_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/temp_comp" title="f/meth_params_module/temp_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">temp_comp()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spec_comp" title="f/meth_params_module/spec_comp"><code class="xref f f-func docutils literal notranslate"><span class="pre">spec_comp()</span></code></a>, <code class="xref f f-func docutils literal notranslate"><span class="pre">nscal()</span></code>)</p></li>
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code></p></li>
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code></p></li>
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">nspec()</span></code>)</p></li>
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
-</ul>
-<p class="rubric">Subroutines and functions</p>
-<dl class="subroutine">
-<dt id="f/make_intra_coeffs_module/make_intra_coeffs">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">make_intra_coeffs_module/</code><code class="sig-name descname">make_intra_coeffs</code><span class="sig-paren">(</span><em class="sig-param">lo</em>, <em class="sig-param">hi</em>, <em class="sig-param">scalold</em>, <em class="sig-param">s1_lo</em>, <em class="sig-param">s1_hi</em>, <em class="sig-param">scalnew</em>, <em class="sig-param">s2_lo</em>, <em class="sig-param">s2_hi</em>, <em class="sig-param">cp</em>, <em class="sig-param">cp_lo</em>, <em class="sig-param">cp_hi</em>, <em class="sig-param">xi</em>, <em class="sig-param">xi_lo</em>, <em class="sig-param">xi_hi</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_intra_coeffs_module/make_intra_coeffs" title="Permalink to this definition">¶</a></dt>
-<dd><p>input box is grown to include boundary cell information</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>scalold</strong> (s1_hi(1)-(s1_lo(1))+1,s1_hi(2)-(s1_lo(2))+1,s1_hi(3)-(s1_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s1_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s1_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>scalnew</strong> (s2_hi(1)-(s2_lo(1))+1,s2_hi(2)-(s2_lo(2))+1,s2_hi(3)-(s2_lo(3))+1,<a class="reference internal" href="state_sizes_f.html#f/state_sizes_module/nscal" title="f/state_sizes_module/nscal">nscal</a>)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s2_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>s2_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>cp</strong> (cp_hi(1)-(cp_lo(1))+1,cp_hi(2)-(cp_lo(2))+1,cp_hi(3)-(cp_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>cp_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>cp_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>xi</strong> (xi_hi(1)-(xi_lo(1))+1,xi_hi(2)-(xi_lo(2))+1,xi_hi(3)-(xi_lo(3))+1,nspec)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>xi_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>xi_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-</ul>
-</dd>
-<dt class="field-even">Use </dt>
-<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_type_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">eos_t()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">eos_input_rt()</span></code>), <code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_module</span></code>, <code class="xref f f-mod docutils literal notranslate"><span class="pre">eos_composition_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">eos_xderivs_t()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">composition_derivatives()</span></code>)</p>
-</dd>
-</dl>
-</dd></dl>
+  <div class="section" id="file-state-indices-h">
+<h1>File state_indices.H<a class="headerlink" href="#file-state-indices-h" title="Permalink to this headline">¶</a></h1>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Variables</p>
+<dl class="member">
+<dt id="_CPPv45Nscal">
+<span id="_CPPv35Nscal"></span><span id="_CPPv25Nscal"></span><span id="Nscal__i"></span><span class="target" id="state__indices_8H_1abf4cbf3f798e11ad50cb4b7adae3a2cf"></span><em class="property">constexpr</em> int <code class="sig-name descname">Nscal</code> = 4 + NumSpec<a class="headerlink" href="#_CPPv45Nscal" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv43Rho">
+<span id="_CPPv33Rho"></span><span id="_CPPv23Rho"></span><span id="Rho__i"></span><span class="target" id="state__indices_8H_1af807c71df65cccae3649db15b9aeb4bb"></span><em class="property">constexpr</em> int <code class="sig-name descname">Rho</code> = 0<a class="headerlink" href="#_CPPv43Rho" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv44RhoH">
+<span id="_CPPv34RhoH"></span><span id="_CPPv24RhoH"></span><span id="RhoH__i"></span><span class="target" id="state__indices_8H_1a9cd08f7fb1e557a55b158be80947dfbc"></span><em class="property">constexpr</em> int <code class="sig-name descname">RhoH</code> = 1<a class="headerlink" href="#_CPPv44RhoH" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv44Temp">
+<span id="_CPPv34Temp"></span><span id="_CPPv24Temp"></span><span id="Temp__i"></span><span class="target" id="state__indices_8H_1a81e48e505d0cc8662a8d1890b8186b19"></span><em class="property">constexpr</em> int <code class="sig-name descname">Temp</code> = 2<a class="headerlink" href="#_CPPv44Temp" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv42Pi">
+<span id="_CPPv32Pi"></span><span id="_CPPv22Pi"></span><span id="Pi__i"></span><span class="target" id="state__indices_8H_1a1fb28ed4dd45b8593779bc6553b8ff83"></span><em class="property">constexpr</em> int <code class="sig-name descname">Pi</code> = 3<a class="headerlink" href="#_CPPv42Pi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="member">
+<dt id="_CPPv49FirstSpec">
+<span id="_CPPv39FirstSpec"></span><span id="_CPPv29FirstSpec"></span><span id="FirstSpec__i"></span><span class="target" id="state__indices_8H_1a7408a3a79eb8fd4c53132d2db2a3c682"></span><em class="property">constexpr</em> int <code class="sig-name descname">FirstSpec</code> = 4<a class="headerlink" href="#_CPPv49FirstSpec" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
 
 </div>
 </div>
@@ -316,10 +279,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="make_plot_variables_f.html" class="btn btn-neutral float-right" title="make_plot_variables.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="state_indices_nd_f.html" class="btn btn-neutral float-right" title="state_indices_nd.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="make_heating_f.html" class="btn btn-neutral float-left" title="make_heating.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="meth_params_f.html" class="btn btn-neutral float-left" title="meth_params.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -328,7 +291,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2019, MAESTROeX development tem
+        &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>

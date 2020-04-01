@@ -1,8 +1,0 @@
-update_scal.F90
-===============
-
-update\_scal\_module
---------------------
-
-.. f:automodule:: update_scal_module
-

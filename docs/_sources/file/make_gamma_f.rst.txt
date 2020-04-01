@@ -1,8 +1,0 @@
-make_gamma.F90
-==============
-
-make\_gamma\_module
--------------------
-
-.. f:automodule:: make_gamma_module
-

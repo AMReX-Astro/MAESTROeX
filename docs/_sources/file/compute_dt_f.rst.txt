@@ -1,8 +1,0 @@
-compute_dt.F90
-==============
-
-compute\_dt\_module
--------------------
-
-.. f:automodule:: compute_dt_module
-

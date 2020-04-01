@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>inlet_bc.F90 &mdash; MAESTROeX 20.03
+  <title>inlet_bc.F90 &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -53,6 +53,7 @@
         <div class="wy-side-nav-search" >
           
 
+
           
             <a href="../index.html" class="icon icon-home"> MAESTROeX
           
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -83,6 +84,10 @@
 </div>
 
           
+    <div class="branch">
+        Branch: <a href="../file/inlet_bc_f.html">master</a> | <a href="../dev/file/inlet_bc_f.html">development</a>
+    </div>
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
@@ -141,44 +146,24 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="base_state_f.html">base_state.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="bc_fill_nd_f.html">bc_fill_nd.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="cell_to_edge_f.html">cell_to_edge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_dt_f.html">compute_dt.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="compute_grad_phi_f.html">compute_grad_phi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="debug_f.html">debug.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="diag_f.html">diag.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fill_umac_ghost_f.html">fill_umac_ghost.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">inlet_bc.F90</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#f/inlet_bc_module">inlet_bc_module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_S_f.html">make_S.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_eta_f.html">make_eta.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_gamma_f.html">make_gamma.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_intra_coeffs_f.html">make_intra_coeffs.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_plot_variables_f.html">make_plot_variables.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_psi_f.html">make_psi.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_scal_force_f.html">make_scal_force.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="regrid_f.html">regrid.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rhoh_vs_t_f.html">rhoh_vs_t.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="rotation_f.html">rotation.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="sponge_f.html">sponge.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tagging_f.html">tagging.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="update_scal_f.html">update_scal.F90</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
@@ -273,7 +258,7 @@ outline.</p>
 <dd class="field-odd"><p><a class="reference internal" href="#f/inlet_bc_module/inlet_bc_initialized" title="f/inlet_bc_module/inlet_bc_initialized"><code class="xref f f-var docutils literal notranslate"><span class="pre">inlet_bc_initialized</span></code></a></p>
 </dd>
 <dt class="field-even">Routines</dt>
-<dd class="field-even"><p><a class="reference internal" href="#f/inlet_bc_module/set_inlet_bcs" title="f/inlet_bc_module/set_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_inlet_bcs()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="#f/inlet_bc_module/get_inlet_bcs" title="f/inlet_bc_module/get_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">get_inlet_bcs()</span></code></a>, <a class="reference internal" href="#f/inlet_bc_module/set_inlet_bcs" title="f/inlet_bc_module/set_inlet_bcs"><code class="xref f f-func docutils literal notranslate"><span class="pre">set_inlet_bcs()</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Variables</p>
@@ -292,9 +277,17 @@ outline.</p>
 <dd><p>here we would initialize the parameters that are module variables.
 this routine is called when the base state is defined initially,
 and upon restart, just after the base state is read in.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Called from</dt>
-<dd class="field-odd"><p><a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state" title="f/base_state_module/init_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state()</span></code></a>, <a class="reference internal" href="base_state_f.html#f/base_state_module/init_base_state_irreg" title="f/base_state_module/init_base_state_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">init_base_state_irreg()</span></code></a></p>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/inlet_bc_module/get_inlet_bcs">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">inlet_bc_module/</code><code class="sig-name descname">get_inlet_bcs</code><span class="sig-paren">(</span><em class="sig-param">params</em><span class="sig-paren">)</span><a class="headerlink" href="#f/inlet_bc_module/get_inlet_bcs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong><em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_error_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">amrex_error()</span></code>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -322,7 +315,7 @@ and upon restart, just after the base state is read in.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2019, MAESTROeX development tem
+        &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>

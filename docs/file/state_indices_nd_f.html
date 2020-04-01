@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>enforce_HSE.F90 &mdash; MAESTROeX 20.03
+  <title>state_indices_nd.F90 &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -39,8 +39,8 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fill_3d_data.F90" href="fill_3d_data_f.html" />
-    <link rel="prev" title="burner_loop.F90" href="burner_loop_f.html" /> 
+    <link rel="next" title="Class list" href="../classlist.html" />
+    <link rel="prev" title="File state_indices.H" href="state__indices_8H.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -85,7 +85,7 @@
 
           
     <div class="branch">
-        Branch: <a href="../../file/enforce_HSE_f.html">master</a> | <a href="../file/enforce_HSE_f.html">development</a>
+        Branch: <a href="../file/state_indices_nd_f.html">master</a> | <a href="../dev/file/state_indices_nd_f.html">development</a>
     </div>
 
         </div>
@@ -149,24 +149,19 @@
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">enforce_HSE.F90</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#f/enforce_hse_module">enforce_hse_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../param_includes_files.html">Param_includes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__params_8H.html">File maestro_params.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__queries_8H.html">File maestro_queries.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meth_params_f.html">meth_params.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="state__indices_8H.html">File state_indices.H</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">state_indices_nd.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f/state_indices_module">state_indices_module</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
@@ -221,15 +216,15 @@
         
           <li><a href="../filelist.html">File list</a> &raquo;</li>
         
-          <li><a href="../Src_nd_files.html">Src_nd</a> &raquo;</li>
+          <li><a href="../param_includes_files.html">Param_includes</a> &raquo;</li>
         
-      <li>enforce_HSE.F90</li>
+      <li>state_indices_nd.F90</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/file/enforce_HSE_f.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/file/state_indices_nd_f.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -242,43 +237,59 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="enforce-hse-f90">
-<h1>enforce_HSE.F90<a class="headerlink" href="#enforce-hse-f90" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="f/enforce_hse_module">
-<span id="enforce-hse-module"></span><h2>enforce_hse_module<a class="headerlink" href="#f/enforce_hse_module" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="state-indices-nd-f90">
+<h1>state_indices_nd.F90<a class="headerlink" href="#state-indices-nd-f90" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="f/state_indices_module">
+<span id="state-indices-module"></span><h2>state_indices_module<a class="headerlink" href="#f/state_indices_module" title="Permalink to this headline">¶</a></h2>
 <p class="rubric">Quick access</p>
 <dl class="field-list simple">
-<dt class="field-odd">Routines</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a></p>
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#f/state_indices_module/nscal" title="f/state_indices_module/nscal"><code class="xref f f-var docutils literal notranslate"><span class="pre">nscal</span></code></a>, <a class="reference internal" href="#f/state_indices_module/pi_comp" title="f/state_indices_module/pi_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">pi_comp</span></code></a>, <a class="reference internal" href="#f/state_indices_module/rho_comp" title="f/state_indices_module/rho_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">rho_comp</span></code></a>, <a class="reference internal" href="#f/state_indices_module/rhoh_comp" title="f/state_indices_module/rhoh_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">rhoh_comp</span></code></a>, <a class="reference internal" href="#f/state_indices_module/spec_comp" title="f/state_indices_module/spec_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">spec_comp</span></code></a>, <a class="reference internal" href="#f/state_indices_module/temp_comp" title="f/state_indices_module/temp_comp"><code class="xref f f-var docutils literal notranslate"><span class="pre">temp_comp</span></code></a></p>
 </dd>
 </dl>
 <p class="rubric">Required modules</p>
 <ul class="simple">
-<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
-<li><p><a class="reference internal" href="make_grav_f.html#f/make_grav_module" title="f/make_grav_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">make_grav_module</span></code></a></p></li>
-<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/dr" title="f/base_state_geometry_module/dr"><code class="xref f f-func docutils literal notranslate"><span class="pre">dr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/base_cutoff_density_coord" title="f/base_state_geometry_module/base_cutoff_density_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density_coord()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
-<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_planar_invsq_grav" title="f/meth_params_module/do_planar_invsq_grav"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_planar_invsq_grav()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_2d_planar_octant" title="f/meth_params_module/do_2d_planar_octant"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_2d_planar_octant()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/spherical" title="f/meth_params_module/spherical"><code class="xref f f-func docutils literal notranslate"><span class="pre">spherical()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/use_exact_base_state" title="f/meth_params_module/use_exact_base_state"><code class="xref f f-func docutils literal notranslate"><span class="pre">use_exact_base_state()</span></code></a>)</p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">network</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">nspec()</span></code>, <code class="xref f f-func docutils literal notranslate"><span class="pre">naux()</span></code>)</p></li>
 </ul>
-<p class="rubric">Subroutines and functions</p>
-<dl class="subroutine">
-<dt id="f/enforce_hse_module/enforce_hse">
-<em class="property">subroutine  </em><code class="sig-prename descclassname">enforce_hse_module/</code><code class="sig-name descname">enforce_hse</code><span class="sig-paren">(</span><em class="sig-param">rho0</em>, <em class="sig-param">p0</em>, <em class="sig-param">grav_cell</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/enforce_hse_module/enforce_hse" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rho0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>p0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>grav_cell</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
-</ul>
-</dd>
-<dt class="field-even">Call to</dt>
-<dd class="field-even"><p><a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
-</dd>
-</dl>
-</dd></dl>
+<p class="rubric">Variables</p>
+<ul>
+<li><dl class="variable">
+<dt id="f/state_indices_module/nscal">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">nscal</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>4+nspec<em>]</em><a class="headerlink" href="#f/state_indices_module/nscal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
+</li>
+<li><dl class="variable">
+<dt id="f/state_indices_module/pi_comp">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">pi_comp</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>4<em>]</em><a class="headerlink" href="#f/state_indices_module/pi_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/state_indices_module/rho_comp">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">rho_comp</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>1<em>]</em><a class="headerlink" href="#f/state_indices_module/rho_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/state_indices_module/rhoh_comp">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">rhoh_comp</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>2<em>]</em><a class="headerlink" href="#f/state_indices_module/rhoh_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/state_indices_module/spec_comp">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">spec_comp</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>5<em>]</em><a class="headerlink" href="#f/state_indices_module/spec_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+<li><dl class="variable">
+<dt id="f/state_indices_module/temp_comp">
+<code class="sig-prename descclassname">state_indices_module/</code><code class="sig-name descname">temp_comp</code><em> [</em><em>integer</em><em>,</em><em>parameter=</em>3<em>]</em><a class="headerlink" href="#f/state_indices_module/temp_comp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</li>
+</ul>
 </div>
 </div>
 
@@ -290,10 +301,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="fill_3d_data_f.html" class="btn btn-neutral float-right" title="fill_3d_data.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../classlist.html" class="btn btn-neutral float-right" title="Class list" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="burner_loop_f.html" class="btn btn-neutral float-left" title="burner_loop.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="state__indices_8H.html" class="btn btn-neutral float-left" title="File state_indices.H" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

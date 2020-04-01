@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Adding A New Problem &mdash; MAESTROeX 20.03
+  <title>Adding A New Problem &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -53,6 +53,7 @@
         <div class="wy-side-nav-search" >
           
 
+
           
             <a href="index.html" class="icon icon-home"> MAESTROeX
           
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -83,6 +84,10 @@
 </div>
 
           
+    <div class="branch">
+        Branch: <a href="./addproblem.html">master</a> | <a href="./dev/addproblem.html">development</a>
+    </div>
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
@@ -242,9 +247,9 @@ be told to the build system—see below).</p>
 <div class="section" id="the-gnumakefile">
 <span id="sec-makefile"></span><h2>The GNUmakefile<a class="headerlink" href="#the-gnumakefile" title="Permalink to this headline">¶</a></h2>
 <p>A basic GNUmakefile begins with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span>   <span class="p">:</span><span class="o">=</span> <span class="n">FALSE</span>
-<span class="n">USE_MPI</span> <span class="p">:</span><span class="o">=</span>
-<span class="n">USE_OMP</span> <span class="p">:</span><span class="o">=</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span>   <span class="o">:=</span> <span class="n">FALSE</span>
+<span class="n">USE_MPI</span> <span class="o">:=</span>
+<span class="n">USE_OMP</span> <span class="o">:=</span>
 </pre></div>
 </div>
 <p>Here, <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> is false if we are building an optimized executable.
@@ -254,18 +259,18 @@ optimization and adds various runtime checks through compiler flags.
 or OpenMP for parallelization. If <code class="docutils literal notranslate"><span class="pre">USE_MPI</span> <span class="pre">:=</span> <span class="pre">TRUE</span></code>, you will need to
 have the MPI libraries installed.</p>
 <p>The next line sets the compiler to be used for compilation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="p">:</span><span class="o">=</span> <span class="n">gnu</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="o">:=</span> <span class="n">gnu</span>
 </pre></div>
 </div>
 <p>The MAESTROeX build system knows what options to use for various
 compiler families. The <code class="docutils literal notranslate"><span class="pre">COMP</span></code> flag specifies which compiler to
 use. Allowed values include <code class="docutils literal notranslate"><span class="pre">intel</span></code>, <code class="docutils literal notranslate"><span class="pre">gnu</span></code>, <code class="docutils literal notranslate"><span class="pre">pgi</span></code>, and <code class="docutils literal notranslate"><span class="pre">cray</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">USE_REACT</span></code> set to true will turn on the reactions solvers.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_REACT</span> <span class="p">:</span><span class="o">=</span> <span class="n">TRUE</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_REACT</span> <span class="o">:=</span> <span class="n">TRUE</span>
 </pre></div>
 </div>
 <p>The next line defines where the top of the MAESTROeX source tree is located.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAESTROEX_HOME</span> <span class="p">:</span><span class="o">=</span> <span class="o">../../..</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAESTROEX_HOME</span> <span class="o">:=</span> <span class="o">../../..</span>
 </pre></div>
 </div>
 <p>An MAESTROeX application is built from several packages (the
@@ -273,12 +278,12 @@ multigrid solver, an EOS, a reaction network, etc.). The core
 MAESTROeX packages are always included, so a problem only needs
 to define the EOS, reaction network, and conductivities to
 use, as well as any extra, problem-specific files.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EOS_DIR</span>          <span class="p">:</span><span class="o">=</span> <span class="n">helmholtz</span>
-<span class="n">CONDUCTIVITY_DIR</span> <span class="p">:</span><span class="o">=</span> <span class="n">constant</span>
-<span class="n">NETWORK_DIR</span>      <span class="p">:</span><span class="o">=</span> <span class="n">ignition_simple</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EOS_DIR</span>          <span class="o">:=</span> <span class="n">helmholtz</span>
+<span class="n">CONDUCTIVITY_DIR</span> <span class="o">:=</span> <span class="n">constant</span>
+<span class="n">NETWORK_DIR</span>      <span class="o">:=</span> <span class="n">ignition_simple</span>
 
-<span class="n">Bpack</span> <span class="p">:</span><span class="o">=</span> <span class="o">./</span><span class="n">Make</span><span class="o">.</span><span class="n">package</span>
-<span class="n">Blocs</span> <span class="p">:</span><span class="o">=</span> <span class="o">.</span>
+<span class="n">Bpack</span> <span class="o">:=</span> <span class="o">./</span><span class="n">Make</span><span class="o">.</span><span class="n">package</span>
+<span class="n">Blocs</span> <span class="o">:=</span> <span class="o">.</span>
 </pre></div>
 </div>
 <p>Note that the microphysics packages are listed simply by the name of
@@ -302,7 +307,7 @@ files placed there override those with the same name found elsewhere
 in the source tree.</p>
 <p>By default, some of the runtime parameters are listed in
 <code class="docutils literal notranslate"><span class="pre">_parameters</span></code> file in each problem directory.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PROBIN_PARAMETER_DIRS</span> <span class="p">:</span><span class="o">=</span> <span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PROBIN_PARAMETER_DIRS</span> <span class="o">:=</span> <span class="o">.</span>
 </pre></div>
 </div>
 <p>They are parsed at compile time and the file <code class="docutils literal notranslate"><span class="pre">extern.F90</span></code>
@@ -423,7 +428,7 @@ starting point for full spherical stars.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2019, MAESTROeX development tem
+        &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>

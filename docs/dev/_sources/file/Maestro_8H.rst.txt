@@ -1,4 +1,0 @@
-File Maestro.H
-==============
-
-.. doxygenfile:: Maestro.H

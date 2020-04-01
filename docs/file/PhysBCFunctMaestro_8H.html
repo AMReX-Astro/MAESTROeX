@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>File PhysBCFunctMaestro.H &mdash; MAESTROeX 20.03
+  <title>File PhysBCFunctMaestro.H &mdash; MAESTROeX 20.04
  documentation</title>
   
 
@@ -53,6 +53,7 @@
         <div class="wy-side-nav-search" >
           
 
+
           
             <a href="../index.html" class="icon icon-home"> MAESTROeX
           
@@ -67,7 +68,7 @@
             
             
               <div class="version">
-                20.03
+                20.04
 
               </div>
             
@@ -83,6 +84,10 @@
 </div>
 
           
+    <div class="branch">
+        Branch: <a href="../file/PhysBCFunctMaestro_8H.html">master</a> | <a href="../dev/file/PhysBCFunctMaestro_8H.html">development</a>
+    </div>
+
         </div>
 
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
@@ -141,6 +146,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
@@ -224,12 +230,7 @@
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
 <dl class="type">
 <dt id="_CPPv423BndryFuncDefaultMaestro">
-<span id="_CPPv323BndryFuncDefaultMaestro"></span><span id="_CPPv223BndryFuncDefaultMaestro"></span><span id="BndryFuncDefaultMaestro"></span><span class="target" id="PhysBCFunctMaestro_8H_1a6b4795d61bbd32f0e4500ff6fff05472"></span><em class="property">typedef </em>void (*<code class="sig-name descname">BndryFuncDefaultMaestro</code>)<span class="sig-paren">(</span>Real *data, AMREX_ARLIM_P<span class="sig-paren">(</span>lo<span class="sig-paren">)</span>, AMREX_ARLIM_P<span class="sig-paren">(</span>hi<span class="sig-paren">)</span>, <em class="property">const</em> int *dom_lo, <em class="property">const</em> int *dom_hi, <em class="property">const</em> Real *dx, <em class="property">const</em> Real *grd_lo, <em class="property">const</em> Real *time, <em class="property">const</em> int *bc, <em class="property">const</em> int icomp, <span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423BndryFuncDefaultMaestro" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="type">
-<dt id="_CPPv425BndryFunc3DDefaultMaestro">
-<span id="_CPPv325BndryFunc3DDefaultMaestro"></span><span id="_CPPv225BndryFunc3DDefaultMaestro"></span><span id="BndryFunc3DDefaultMaestro"></span><span class="target" id="PhysBCFunctMaestro_8H_1ab23dcffcb9bb8bd01f780859afc9fd8a"></span><em class="property">typedef </em>void (*<code class="sig-name descname">BndryFunc3DDefaultMaestro</code>)<span class="sig-paren">(</span>Real *data, <em class="property">const</em> int *lo, <em class="property">const</em> int *hi, <em class="property">const</em> int *dom_lo, <em class="property">const</em> int *dom_hi, <em class="property">const</em> Real *dx, <em class="property">const</em> Real *grd_lo, <em class="property">const</em> Real *time, <em class="property">const</em> int *bc, <em class="property">const</em> int icomp<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425BndryFunc3DDefaultMaestro" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv323BndryFuncDefaultMaestro"></span><span id="_CPPv223BndryFuncDefaultMaestro"></span><span id="BndryFuncDefaultMaestro"></span><span class="target" id="PhysBCFunctMaestro_8H_1a3a8dc2970890ba8d58f55d727024e3d2"></span><em class="property">typedef </em>void (*<code class="sig-name descname">BndryFuncDefaultMaestro</code>)<span class="sig-paren">(</span><em class="property">const</em> Array4&lt;Real&gt; &amp;scal, <em class="property">const</em> Box &amp;bx, <em class="property">const</em> Box &amp;domainBox, <em class="property">const</em> Real *dx, <em class="property">const</em> BCRec bcs, <em class="property">const</em> Real *gridlo, <em class="property">const</em> int comp<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423BndryFuncDefaultMaestro" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="type">
@@ -255,11 +256,6 @@
 <dd></dd></dl>
 
 <dl class="function">
-<dt id="_CPPv4N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE25BndryFunc3DDefaultMaestro">
-<span id="_CPPv3N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE25BndryFunc3DDefaultMaestro"></span><span id="_CPPv2N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE25BndryFunc3DDefaultMaestro"></span><span id="BndryFuncArrayMaestro::BndryFuncArrayMaestro__BndryFunc3DDefaultMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1ac4300dbfafec254cb57f2bdd021699c7"></span><code class="sig-name descname">BndryFuncArrayMaestro</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv425BndryFunc3DDefaultMaestro" title="BndryFunc3DDefaultMaestro">BndryFunc3DDefaultMaestro</a> <em>inFunc</em><span class="sig-paren">)</span><br /></dt>
-<dd></dd></dl>
-
-<dl class="function">
 <dt id="_CPPv4N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi">
 <span id="_CPPv3N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi"></span><span id="_CPPv2N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi"></span><span id="BndryFuncArrayMaestro::call-operator__BoxCR.FArrayBoxR.iC.iC.GeometryCR.RealC.Vector:BCRec:CR.iC.iC"></span><span class="target" id="classBndryFuncArrayMaestro_1aca60dff4e924d4d8e27249c47fb6d90f"></span>void <code class="sig-name descname">operator()</code><span class="sig-paren">(</span>Box <em class="property">const</em> &amp;<em>bx</em>, FArrayBox &amp;<em>dest</em>, <em class="property">const</em> int <em>dcomp</em>, <em class="property">const</em> int <em>numcomp</em>, Geometry <em class="property">const</em> &amp;<em>geom</em>, <em class="property">const</em> Real <em>time</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcr</em>, <em class="property">const</em> int <em>bcomp</em>, <em class="property">const</em> int <em>orig_comp</em><span class="sig-paren">)</span><br /></dt>
 <dd></dd></dl>
@@ -270,11 +266,6 @@
 <dl class="member">
 <dt id="_CPPv4N21BndryFuncArrayMaestro6m_funcE">
 <span id="_CPPv3N21BndryFuncArrayMaestro6m_funcE"></span><span id="_CPPv2N21BndryFuncArrayMaestro6m_funcE"></span><span id="BndryFuncArrayMaestro::m_func__BndryFuncDefaultMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1a2ca44d43c4a643834e42201536e632eb"></span><a class="reference internal" href="#_CPPv423BndryFuncDefaultMaestro" title="BndryFuncDefaultMaestro">BndryFuncDefaultMaestro</a> <code class="sig-name descname">m_func</code> = nullptr<br /></dt>
-<dd></dd></dl>
-
-<dl class="member">
-<dt id="_CPPv4N21BndryFuncArrayMaestro8m_func3DE">
-<span id="_CPPv3N21BndryFuncArrayMaestro8m_func3DE"></span><span id="_CPPv2N21BndryFuncArrayMaestro8m_func3DE"></span><span id="BndryFuncArrayMaestro::m_func3D__BndryFunc3DDefaultMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1a2e8a089e3ef374093f8e5512d5c48c02"></span><a class="reference internal" href="#_CPPv425BndryFunc3DDefaultMaestro" title="BndryFunc3DDefaultMaestro">BndryFunc3DDefaultMaestro</a> <code class="sig-name descname">m_func3D</code> = nullptr<br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -302,7 +293,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2019, MAESTROeX development tem
+        &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>
