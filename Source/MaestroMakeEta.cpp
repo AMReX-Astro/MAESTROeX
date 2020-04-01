@@ -184,15 +184,16 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         rho0_nph_cart[lev].define(grids[lev],dmap[lev],1,0);
     }
 
-    RealVector rho0_nph(max_lev*nr_fine);
+    BaseState<Real> rho0_nph(max_lev, nr_fine);
 
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr();
-    Real * AMREX_RESTRICT rho0_nph_p = rho0_nph.dataPtr();
 
-    AMREX_PARALLEL_FOR_1D(max_lev*nr_fine, i, {
-        rho0_nph_p[i] = 0.5*(rho0_old_p[i]+rho0_new_p[i]);
-    });
+    for (auto l = 0; l < max_lev; ++l) {
+        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+            rho0_nph(l,r) = 0.5*(rho0_old_p[l+max_lev*r]+rho0_new_p[l+max_lev*r]);
+        });
+    }
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
 
