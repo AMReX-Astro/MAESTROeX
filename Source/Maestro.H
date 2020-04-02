@@ -368,6 +368,9 @@ public:
     void CelltoEdge(const RealVector& s0_cell_vec, 
                     BaseState<amrex::Real>& s0_edge);
 
+    void CelltoEdge(const BaseState<amrex::Real>& s0_cell_vec, 
+                    BaseState<amrex::Real>& s0_edge);
+
     // end MaestroCelltoEdge.cpp functions
     ////////////
 
@@ -832,6 +835,11 @@ public:
                   const amrex::Vector<amrex::MultiFab>& macrhs,
                   const RealVector& beta0,
                   const int& is_predictor);
+    void MacProj(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                  amrex::Vector<amrex::MultiFab>& macphi,
+                  const amrex::Vector<amrex::MultiFab>& macrhs,
+                  const BaseState<amrex::Real>& beta0,
+                  const int& is_predictor);
 
     /// Multiply (or divide) face-centered data by `beta0`
     ///
@@ -842,6 +850,10 @@ public:
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
                            const RealVector& beta0,
                            const RealVector& beta0_edge,
+                           const int& mult_or_div);
+    void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
+                           const BaseState<amrex::Real>& beta0,
+                           const BaseState<amrex::Real>& beta0_edge,
                            const int& mult_or_div);
 
     /// Compute the RHS for the solve, `RHS = macrhs - div(beta0*umac)`
@@ -870,6 +882,13 @@ public:
     // MaestroMakeBeta0.cpp functions
 
     void MakeBeta0(RealVector& beta, 
+                   const RealVector& rho0,
+                   const RealVector& p0,
+                   const RealVector& gamma1bar,
+                   const RealVector& grav_cell,
+                   const bool is_irreg=false);
+
+    void MakeBeta0(BaseState<amrex::Real>& beta, 
                    const RealVector& rho0,
                    const RealVector& p0,
                    const RealVector& gamma1bar,
@@ -1141,6 +1160,33 @@ public:
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
                                  const RealVector& rho0,
                                  const RealVector& beta0,
+                                 const RealVector& gamma1bar,
+                                 const RealVector& p0,
+                                 const amrex::Vector<amrex::MultiFab>& delta_p_term);
+
+    /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
+    void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
+                               const amrex::Vector<amrex::MultiFab>& S_cc,
+                               const RealVector& Sbar,
+                               const BaseState<amrex::Real>& beta0,
+                               const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
+
+    /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
+    void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
+                                         const RealVector& rho0,
+                             const amrex::Vector<amrex::MultiFab>& S_cc,
+                             const RealVector& Sbar,
+                             const BaseState<amrex::Real>& beta0,
+                             const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
+                             const RealVector& gamma1bar,
+                                         const RealVector& p0,
+                             const amrex::Vector<amrex::MultiFab>& delta_p_term,
+                                         amrex::Vector<amrex::MultiFab>& delta_chi,
+                             int is_predictor);
+
+    void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
+                                 const RealVector& rho0,
+                                 const BaseState<amrex::Real>& beta0,
                                  const RealVector& gamma1bar,
                                  const RealVector& p0,
                                  const amrex::Vector<amrex::MultiFab>& delta_p_term);
@@ -2004,8 +2050,8 @@ public:
     RealVector p0_new;
     RealVector tempbar;
     RealVector tempbar_init;
-    RealVector beta0_old;
-    RealVector beta0_new;
+    BaseState<amrex::Real> beta0_old;
+    BaseState<amrex::Real> beta0_new;
     RealVector gamma1bar_old;
     RealVector gamma1bar_new;
     BaseState<amrex::Real> etarho_cc;
@@ -2016,7 +2062,7 @@ public:
     BaseState<amrex::Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
-    RealVector beta0_nm1;
+    BaseState<amrex::Real> beta0_nm1;
 
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered

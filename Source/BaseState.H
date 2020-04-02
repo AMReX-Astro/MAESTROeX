@@ -38,10 +38,10 @@ public:
     void resize(const int num_levs, const int length=1, const int ncomp=1);
 
     /// set to some scalar value 
-    void setVal(const T val);
+    void setVal(const T& val);
 
     /// set the comp'th component to some scalar value
-    void setVal(const int comp, const T val);
+    void setVal(const int comp, const T& val);
 
     /// number of levels in base 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
@@ -60,6 +60,9 @@ public:
 
     void toVector(amrex::Vector<T>& vec);
     void toVector(amrex::Gpu::ManagedVector<T>& vec);
+
+    /// swap the data with src
+    void swap(BaseState<T>& src);
 
     /// returns a reference to the nth component at position i and level lev.
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
@@ -219,7 +222,7 @@ BaseState<T>::resize(const int num_levs, const int length, const int ncomp)
 
 template <class T>
 void
-BaseState<T>::setVal(const T val)
+BaseState<T>::setVal(const T& val)
 {
     T * AMREX_RESTRICT ptr = dptr;
     AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
@@ -231,7 +234,7 @@ BaseState<T>::setVal(const T val)
 
 template <class T>
 void
-BaseState<T>::setVal(const int comp, const T val)
+BaseState<T>::setVal(const int comp, const T& val)
 {
     T * AMREX_RESTRICT ptr = dptr;
     const auto ncomp = nvar;
@@ -309,6 +312,25 @@ BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec)
             }
         }
     }
+}
+
+template <class T>
+void
+BaseState<T>::swap(BaseState<T>& src)
+{
+    AMREX_ASSERT(nlev == src.nlev);
+    AMREX_ASSERT(nvar == src.nvar);
+    AMREX_ASSERT(len == src.len);
+
+    T * AMREX_RESTRICT ptr = dptr;
+    T * AMREX_RESTRICT src_ptr = src.dptr;
+    AMREX_PARALLEL_FOR_1D(len*nlev*nvar, i, {
+        T temp = ptr[i];
+        ptr[i] = src_ptr[i];
+        src_ptr[i] = temp;
+    });
+
+    amrex::Gpu::synchronize();
 }
 
 template <class T>

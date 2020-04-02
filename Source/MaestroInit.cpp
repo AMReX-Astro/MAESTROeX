@@ -124,12 +124,10 @@ Maestro::Init ()
 
         // compute beta0
         MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
-                  grav_cell_old, use_exact_base_state);        
+                  grav_cell_old, use_exact_base_state);     
 
         // set beta0^{-1} = beta0_old
-        for (int i=0; i<beta0_old.size(); ++i) {
-            beta0_nm1[i] = beta0_old[i];
-        }
+        beta0_nm1.copy(beta0_old);
 
         // initial projection
         if (do_initial_projection) {
@@ -470,7 +468,8 @@ void Maestro::InitProj ()
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
 #ifndef SDC
@@ -586,7 +585,8 @@ void Maestro::DivuIter (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
@@ -728,7 +728,8 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
     
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter,false);

@@ -130,9 +130,9 @@ Maestro::Setup ()
     p0_nm1       .resize( (max_radial_level+1)*nr_fine );
     tempbar      .resize( (max_radial_level+1)*nr_fine );
     tempbar_init .resize( (max_radial_level+1)*nr_fine );
-    beta0_old    .resize( (max_radial_level+1)*nr_fine );
-    beta0_new    .resize( (max_radial_level+1)*nr_fine );
-    beta0_nm1    .resize( (max_radial_level+1)*nr_fine );
+    beta0_old    .resize(max_radial_level+1, nr_fine);
+    beta0_new    .resize(max_radial_level+1, nr_fine);
+    beta0_nm1    .resize(max_radial_level+1, nr_fine);
     gamma1bar_old.resize( (max_radial_level+1)*nr_fine );
     gamma1bar_new.resize( (max_radial_level+1)*nr_fine );
     grav_cell_old.resize( (max_radial_level+1)*nr_fine );
@@ -172,9 +172,6 @@ Maestro::Setup ()
     p0_nm1       .shrink_to_fit();
     tempbar      .shrink_to_fit();
     tempbar_init .shrink_to_fit();
-    beta0_old    .shrink_to_fit();
-    beta0_new    .shrink_to_fit();
-    beta0_nm1    .shrink_to_fit();
     gamma1bar_old.shrink_to_fit();
     gamma1bar_new.shrink_to_fit();
     grav_cell_old.shrink_to_fit();
