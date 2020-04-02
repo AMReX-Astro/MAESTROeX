@@ -163,7 +163,7 @@ Maestro::Evolve ()
         std::swap(   p0_old,   p0_new);
 
         beta0_old.swap(beta0_new);
-        std::swap(gamma1bar_old,gamma1bar_new);
+        gamma1bar_old.swap(gamma1bar_new);
         std::swap(grav_cell_old,grav_cell_new);
     }
 }

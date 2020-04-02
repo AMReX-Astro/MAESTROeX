@@ -6,7 +6,7 @@ using namespace amrex;
 
 void
 Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
-                        RealVector& gamma1bar,
+                        BaseState<Real>& gamma1bar,
                         const RealVector& p0)
 {
     // timer for profiling
@@ -69,5 +69,8 @@ Maestro::MakeGamma1bar (const Vector<MultiFab>& scal,
     AverageDown(gamma1, 0, 1);
 
     // call average to create gamma1bar
-    Average(gamma1, gamma1bar, 0);
+    RealVector gamma1bar_vec((max_radial_level+1)*nr_fine);
+    gamma1bar.toVector(gamma1bar_vec);
+    Average(gamma1, gamma1bar_vec, 0);
+    gamma1bar.copy(gamma1bar_vec);
 }

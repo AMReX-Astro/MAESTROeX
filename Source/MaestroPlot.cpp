@@ -13,7 +13,7 @@ void Maestro::WriteSmallPlotFile (const int step,
                                   const RealVector& rho0_in,
                                   const RealVector& rhoh0_in,
                                   const RealVector& p0_in,
-                                  const RealVector& gamma1bar_in,
+                                  const BaseState<Real>& gamma1bar_in,
                                   const Vector<MultiFab>& u_in,
                                   Vector<MultiFab>& s_in,
                                   const Vector<MultiFab>& S_cc_in)
@@ -30,7 +30,7 @@ Maestro::WritePlotFile (const int step,
                         const RealVector& rho0_in,
                         const RealVector& rhoh0_in,
                         const RealVector& p0_in,
-                        const RealVector& gamma1bar_in,
+                        const BaseState<Real>& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in,
                         const Vector<MultiFab>& S_cc_in,
@@ -232,7 +232,7 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
                      const RealVector& p0_in,
-                     const RealVector& gamma1bar_in,
+                     const BaseState<Real>& gamma1bar_in,
                      const Vector<MultiFab>& S_cc_in)
 {
     // timer for profiling
@@ -2018,7 +2018,7 @@ void
 Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
                          const RealVector& p0,
                          const Vector<MultiFab>& p0_cart,
-                         const RealVector& gamma1bar,
+                         const BaseState<Real>& gamma1bar,
                          const Vector<MultiFab>& gamma1bar_cart,
                          Vector<MultiFab>& deltagamma)
 {

@@ -516,7 +516,7 @@ public:
     void FirstDt ();
 
     void EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
-                    const RealVector& gamma1bar_vec);
+                    const BaseState<amrex::Real>& gamma1bar);
 
     // end MaestroDt.cpp functions
     ////////////////////////
@@ -774,7 +774,7 @@ public:
 
     /// Calculate the horizontal average of \f$\Gamma_1\f$
     void MakeGamma1bar (const amrex::Vector<amrex::MultiFab>& scal,
-                        RealVector& gamma1bar,
+                        BaseState<amrex::Real>& gamma1bar,
                         const RealVector& p0);
 
     // end MaestroGamma.cpp functions
@@ -875,7 +875,7 @@ public:
     void MakeBeta0(BaseState<amrex::Real>& beta, 
                    const RealVector& rho0,
                    const RealVector& p0,
-                   const RealVector& gamma1bar,
+                   const BaseState<amrex::Real>& gamma1bar,
                    const RealVector& grav_cell,
                    const bool is_irreg=false);
 
@@ -1095,7 +1095,7 @@ public:
 
     void MakePsiPlanar();
     
-    void MakePsiSphr(const RealVector& gamma1bar, 
+    void MakePsiSphr(const BaseState<amrex::Real>& gamma1bar, 
                      const RealVector& p0_avg,
                      const RealVector& Sbar_in);
 
@@ -1118,7 +1118,7 @@ public:
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const RealVector& p0,
-                    const RealVector& gamma1bar,
+                    const BaseState<amrex::Real>& gamma1bar,
                     RealVector& delta_gamma1_termbar);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
@@ -1135,7 +1135,7 @@ public:
                              const RealVector& Sbar,
                              const BaseState<amrex::Real>& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
-                             const RealVector& gamma1bar,
+                             const BaseState<amrex::Real>& gamma1bar,
                                          const RealVector& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
                                          amrex::Vector<amrex::MultiFab>& delta_chi,
@@ -1144,9 +1144,10 @@ public:
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
                                  const RealVector& rho0,
                                  const BaseState<amrex::Real>& beta0,
-                                 const RealVector& gamma1bar,
+                                 const BaseState<amrex::Real>& gamma1bar,
                                  const RealVector& p0,
                                  const amrex::Vector<amrex::MultiFab>& delta_p_term);
+
     // end MaestroMakeS.cpp functions
     ////////////
 
@@ -1177,8 +1178,8 @@ public:
                 const RealVector& rho0_new_in,
                 const RealVector& p0_old_in,
                 const RealVector& p0_new_in,
-                const RealVector& gamma1bar_old_in,
-                const RealVector& gamma1bar_new_in,
+                const BaseState<amrex::Real>& gamma1bar_old_in,
+                const BaseState<amrex::Real>& gamma1bar_new_in,
                 const RealVector& p0_minus_peosbar, 
                 RealVector& delta_chi_w0, 
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
@@ -1190,8 +1191,8 @@ public:
                         const RealVector& rho0_new_in,
                         const RealVector& p0_old_in,
                         const RealVector& p0_new_in,
-                        const RealVector& gamma1bar_old_in,
-                        const RealVector& gamma1bar_new_in,
+                        const BaseState<amrex::Real>& gamma1bar_old_in,
+                        const BaseState<amrex::Real>& gamma1bar_new_in,
                         const RealVector& p0_minus_peosbar,
                         RealVector& delta_chi_w0, 
                         const amrex::Real dt_in, const amrex::Real dtold_in);
@@ -1203,8 +1204,8 @@ public:
                     const RealVector& rho0_new_in,
                     const RealVector& p0_old_in,
                     const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
@@ -1217,8 +1218,8 @@ public:
                     const RealVector& rho0_new_in,
                     const RealVector& p0_old_in,
                     const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
@@ -1230,8 +1231,8 @@ public:
                     const RealVector& rho0_new_in,
                     const RealVector& p0_old_in,
                     const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
@@ -1290,17 +1291,17 @@ public:
 
     /// Put together an array of multifabs for writing
     amrex::Vector<const amrex::MultiFab*> PlotFileMF (const int nPlot,
-                                                      const amrex::Real t_in,
-                                                      const amrex::Real dt_in,
-                                                      const amrex::Vector<amrex::MultiFab>& rho0_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& p0_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
-                                                      const amrex::Vector<amrex::MultiFab>& u_in,
-                                                      amrex::Vector<amrex::MultiFab>& s_in,
-                                                      const RealVector& p0_in,
-                                                      const RealVector& gamma1bar_in,
-                                                      const amrex::Vector<amrex::MultiFab>& S_cc_in);
+        const amrex::Real t_in,
+        const amrex::Real dt_in,
+        const amrex::Vector<amrex::MultiFab>& rho0_cart,
+        const amrex::Vector<amrex::MultiFab>& rhoh0_cart,
+        const amrex::Vector<amrex::MultiFab>& p0_cart,
+        const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
+        const amrex::Vector<amrex::MultiFab>& u_in,
+        amrex::Vector<amrex::MultiFab>& s_in,
+        const RealVector& p0_in,
+        const BaseState<amrex::Real>& gamma1bar_in,
+        const amrex::Vector<amrex::MultiFab>& S_cc_in);
 
     amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
                            const int nSmallPlot,
@@ -1321,7 +1322,7 @@ public:
                         const RealVector& rho0_in,
                         const RealVector& rhoh0_in,
                         const RealVector& p0_in,
-                        const RealVector& gamma1bar_in,
+                        const BaseState<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
                         const amrex::Vector<amrex::MultiFab>& S_cc_in);
@@ -1333,7 +1334,7 @@ public:
                         const RealVector& rho0_in,
                         const RealVector& rhoh0_in,
                         const RealVector& p0_in,
-                        const RealVector& gamma1bar_in,
+                        const BaseState<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
                         amrex::Vector<amrex::MultiFab>& s_in,
                         const amrex::Vector<amrex::MultiFab>& S_cc_in,
@@ -1367,7 +1368,7 @@ public:
     void MakeDeltaGamma (const amrex::Vector<amrex::MultiFab>& state,
                          const RealVector& p0,
                          const amrex::Vector<amrex::MultiFab>& p0_cart,
-                         const RealVector& gamma1bar,
+                         const BaseState<amrex::Real>& gamma1bar,
                          const amrex::Vector<amrex::MultiFab>& gamma1bar_cart,
                          amrex::Vector<amrex::MultiFab>& deltagamma);
 
@@ -2009,8 +2010,8 @@ public:
     RealVector tempbar_init;
     BaseState<amrex::Real> beta0_old;
     BaseState<amrex::Real> beta0_new;
-    RealVector gamma1bar_old;
-    RealVector gamma1bar_new;
+    BaseState<amrex::Real> gamma1bar_old;
+    BaseState<amrex::Real> gamma1bar_new;
     BaseState<amrex::Real> etarho_cc;
     BaseState<amrex::Real> psi;
     RealVector grav_cell_old;

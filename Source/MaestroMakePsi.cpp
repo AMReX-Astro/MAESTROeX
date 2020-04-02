@@ -28,7 +28,7 @@ Maestro::MakePsiPlanar()
 }
 
 void 
-Maestro::MakePsiSphr(const RealVector& gamma1bar, 
+Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar, 
                      const RealVector& p0_avg,
                      const RealVector& Sbar_in) 
 {
@@ -44,7 +44,6 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
     const Real * AMREX_RESTRICT p0_avg_p = p0_avg.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     auto &psi_p = psi;
@@ -56,7 +55,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
              w0_p[max_lev*(r+1)] - 
              r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * 
              w0_p[max_lev*r]) / dr0;
-        psi_p(0,r) = gamma1bar_p[max_lev*r] * p0_avg_p[max_lev*r] * 
+        psi_p(0,r) = gamma1bar(0,r) * p0_avg_p[max_lev*r] * 
             (Sbar_p[max_lev*r] - div_w0_sph);
     });
 }

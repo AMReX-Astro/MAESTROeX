@@ -72,7 +72,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
     BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
-    RealVector   gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
+    BaseState<Real>   gamma1bar_nph   (max_radial_level+1, nr_fine);
     RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
 
@@ -89,7 +89,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     peosbar.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     Sbar.shrink_to_fit();
-    gamma1bar_nph.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
@@ -516,12 +515,10 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new.copy(beta0_old);
-        gamma1bar_new = gamma1bar_old;
+        gamma1bar_new.copy(gamma1bar_old);
     }
 
-    for(int i=0; i<gamma1bar_nph.size(); ++i) {
-        gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
-    }
+    gamma1bar_nph.copy(0.5*(gamma1bar_old+gamma1bar_new));
     beta0_nph.copy(0.5*(beta0_old + beta0_new));
 
     //////////////////////////////////////////////////////////////////////////////

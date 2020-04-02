@@ -71,7 +71,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
     BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
-    RealVector   gamma1bar_nph   ( (max_radial_level+1)*nr_fine );
+    BaseState<Real>   gamma1bar_nph   (max_radial_level+1, nr_fine);
     RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
 
@@ -88,7 +88,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     peosbar.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     Sbar.shrink_to_fit();
-    gamma1bar_nph.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
@@ -324,8 +323,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     if (evolve_base_state && !split_projection) {
-        for (int i=0; i<Sbar.size(); ++i) {
-            Sbar[i] = 1.0/(gamma1bar_old[i]*p0_old[i]) * (p0_old[i] - p0_nm1[i])/dtold;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (int r=0; r < nr_fine; ++r) {
+                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old[l+(max_radial_level+1)*r]) * (p0_old[l+(max_radial_level+1)*r] - p0_nm1[l+(max_radial_level+1)*r])/dtold;
+            }
         }
     }
 
@@ -526,12 +527,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new.copy(beta0_old);
-        gamma1bar_new = gamma1bar_old;
+        gamma1bar_new.copy(gamma1bar_old);
     }
 
-    for(int i=0; i<gamma1bar_nph.size(); ++i) {
-        gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
-    }
+    gamma1bar_nph.copy(0.5*(gamma1bar_old + gamma1bar_new));
     beta0_nph.copy(0.5*(beta0_old+beta0_new));
 
     //////////////////////////////////////////////////////////////////////////////
@@ -642,8 +641,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
     if (evolve_base_state && !split_projection) {
-        for (int i=0; i<Sbar.size(); ++i) {
-            Sbar[i] = (1.0/(gamma1bar_nph[i]*p0_nph[i]))*(p0_new[i] - p0_old[i])/dt;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (int r=0; r < nr_fine; ++r) {
+                Sbar[l+(max_radial_level+1)*r] = (1.0/(gamma1bar_nph(l,r)*p0_nph[l+(max_radial_level+1)*r]))*(p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+            }
         }
     }
 
@@ -891,8 +892,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
     }
     if (evolve_base_state && !split_projection) {
-        for (int i=0; i<Sbar.size(); ++i) {
-            Sbar[i] = (p0_new[i] - p0_old[i])/(dt*gamma1bar_new[i]*p0_new[i]);
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (int r=0; r < nr_fine; ++r) {
+                Sbar[l+(max_radial_level+1)*r] = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/(dt*gamma1bar_new(l,r)*p0_new[l+(max_radial_level+1)*r]);
+            }
         }
     }
 

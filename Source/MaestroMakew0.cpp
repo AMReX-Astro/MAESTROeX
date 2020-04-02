@@ -3,6 +3,154 @@
 
 using namespace amrex;
 
+void
+Maestro::Tridiag(const BaseState<Real>& a, const BaseState<Real>& b, 
+                 const BaseState<Real>& c, const BaseState<Real>& r, 
+                 BaseState<Real>& u, const int n)
+{
+    BaseState<Real> gam(n);
+
+    if (b[0] == 0) Abort("tridiag: CANT HAVE B[0] = 0.0");
+
+    Real bet = b[0];
+    u[0] = r[0] / bet;
+
+    for (auto j = 1; j < n; j++) {
+        gam[j] = c[j-1] / bet;
+        bet = b[j] - a[j] * gam[j];
+        if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
+        u[j] = (r[j] - a[j] * u[j-1]) / bet;
+    }
+
+    for (auto j = n-2; j >= 0; --j) {
+        u[j] -= gam[j+1] * u[j+1];
+    }
+}
+
+void
+Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
+                              RealVector& base_fine)
+
+{
+    // the mask array will keep track of whether we've filled in data
+    // in a corresponding radial bin.  .false. indicates that we've
+    // already output there.
+    IntVector imask_fine(nr_fine);
+    std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    // r1 is the factor between the current level grid spacing and the
+    // FINEST level
+    int r1 = 1;
+
+    const int max_lev = max_radial_level+1;
+
+    for (auto n = finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < numdisjointchunks(n); ++j) {
+            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+                // sum up mask to see if there are any elements set to true 
+                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
+                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
+                        base_fine[i] = base_ml[n+max_lev*r];
+                        imask_fine[i] = 0;
+                    }
+                }
+            }
+        }
+        // update r1 for the next coarsest level -- assume a jump by
+        // factor of 2
+        r1 *= 2;
+    }
+    
+    // check to make sure that no mask values are still true
+    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
+        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
+    }
+}
+
+
+void
+Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
+                              BaseState<Real>& base_fine)
+
+{
+    // the mask array will keep track of whether we've filled in data
+    // in a corresponding radial bin.  .false. indicates that we've
+    // already output there.
+    IntVector imask_fine(nr_fine);
+    std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    // r1 is the factor between the current level grid spacing and the
+    // FINEST level
+    int r1 = 1;
+
+    const int max_lev = max_radial_level+1;
+
+    for (auto n = finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < numdisjointchunks(n); ++j) {
+            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+                // sum up mask to see if there are any elements set to true 
+                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
+                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
+                        base_fine[i] = base_ml[n+max_lev*r];
+                        imask_fine[i] = 0;
+                    }
+                }
+            }
+        }
+        // update r1 for the next coarsest level -- assume a jump by
+        // factor of 2
+        r1 *= 2;
+    }
+    
+    // check to make sure that no mask values are still true
+    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
+        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
+    }
+}
+
+void
+Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml, 
+                              BaseState<Real>& base_fine)
+
+{
+    // the mask array will keep track of whether we've filled in data
+    // in a corresponding radial bin.  .false. indicates that we've
+    // already output there.
+    IntVector imask_fine(nr_fine);
+    std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    // r1 is the factor between the current level grid spacing and the
+    // FINEST level
+    int r1 = 1;
+
+    const int max_lev = max_radial_level+1;
+
+    for (auto n = finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < numdisjointchunks(n); ++j) {
+            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+                // sum up mask to see if there are any elements set to true 
+                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
+                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
+                        base_fine[i] = base_ml(n,r);
+                        imask_fine[i] = 0;
+                    }
+                }
+            }
+        }
+        // update r1 for the next coarsest level -- assume a jump by
+        // factor of 2
+        r1 *= 2;
+    }
+    
+    // check to make sure that no mask values are still true
+    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
+        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
+    }
+}
+
+
+
+
 void 
 Maestro::Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
@@ -11,8 +159,8 @@ Maestro::Makew0(const RealVector& w0_old,
                 const RealVector& rho0_new_in,
                 const RealVector& p0_old_in,
                 const RealVector& p0_new_in,
-                const RealVector& gamma1bar_old_in,
-                const RealVector& gamma1bar_new_in,
+                const BaseState<Real>& gamma1bar_old_in,
+                const BaseState<Real>& gamma1bar_new_in,
                 const RealVector& p0_minus_peosbar, 
                 RealVector& delta_chi_w0, 
                 const Real dt_in, const Real dtold_in, 
@@ -80,8 +228,8 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                       const RealVector& rho0_new_in,
                       const RealVector& p0_old_in,
                       const RealVector& p0_new_in,
-                      const RealVector& gamma1bar_old_in,
-                      const RealVector& gamma1bar_new_in,
+                      const BaseState<Real>& gamma1bar_old_in,
+                      const BaseState<Real>& gamma1bar_new_in,
                       const RealVector& p0_minus_peosbar,  
                       RealVector& delta_chi_w0, 
                       const Real dt_in, const Real dtold_in, 
@@ -155,8 +303,8 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             for (auto r = r_start_coord(n,j)+1; 
                 r <= r_end_coord(n,j)+1; ++r) {
 
-                Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
-                    + gamma1bar_new_in[n+max_lev*(r-1)]) *
+                Real gamma1bar_p0_avg = (gamma1bar_old_in(n,r-1)
+                    + gamma1bar_new_in(n,r-1)) *
                     (p0_old_in[n+max_lev*(r-1)] + 
                     p0_new_in[n+max_lev*(r-1)])/4.0;
 
@@ -164,12 +312,12 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     if (is_predictor) {
                         delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor_loc * 
                             p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_old_in[n+max_lev*(r-1)]*
+                            (gamma1bar_old_in(n,r-1)*
                             p0_old_in[n+max_lev*(r-1)]*dt_loc);
                     } else {
                         delta_chi_w0[n+max_lev*(r-1)] += dpdt_factor_loc *
                             p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_new_in[n+max_lev*(r-1)]*
+                            (gamma1bar_new_in(n,r-1)*
                             p0_new_in[n+max_lev*(r-1)]*dt_loc);
                     }
                 } else {
@@ -281,8 +429,8 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                           const RealVector& rho0_new_in,
                           const RealVector& p0_old_in,
                           const RealVector& p0_new_in,
-                          const RealVector& gamma1bar_old_in,
-                          const RealVector& gamma1bar_new_in,
+                          const BaseState<Real>& gamma1bar_old_in,
+                          const BaseState<Real>& gamma1bar_new_in,
                           const RealVector& p0_minus_peosbar,  
                           RealVector& delta_chi_w0, 
                           const Real dt_in, const Real dtold_in) 
@@ -529,8 +677,8 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
                     const RealVector& rho0_new_in,
                     const RealVector& p0_old_in,
                     const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
+                    const BaseState<Real>& gamma1bar_old_in,
+                    const BaseState<Real>& gamma1bar_new_in,
                     const RealVector& p0_minus_peosbar,  
                     RealVector& delta_chi_w0, 
                     const Real dt_in, const Real dtold_in) 
@@ -555,8 +703,6 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const auto& etarho_cc_p = etarho_cc;
@@ -578,7 +724,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
         rho0_nph(0,r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
-        gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
+        gamma1bar_nph(r) = 0.5*(gamma1bar_old_in(0,r) + gamma1bar_new_in(0,r));
     });
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
@@ -708,8 +854,8 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
                         const RealVector& rho0_new_in,
                         const RealVector& p0_old_in,
                         const RealVector& p0_new_in,
-                        const RealVector& gamma1bar_old_in,
-                        const RealVector& gamma1bar_new_in,
+                        const BaseState<Real>& gamma1bar_old_in,
+                        const BaseState<Real>& gamma1bar_new_in,
                         const RealVector& p0_minus_peosbar,  
                         RealVector& delta_chi_w0, 
                         const Real dt_in, const Real dtold_in) 
@@ -734,8 +880,6 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const auto& etarho_cc_p = etarho_cc;
@@ -755,7 +899,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
         rho0_nph(r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
-        gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
+        gamma1bar_nph(r) = 0.5*(gamma1bar_old_in(0,r) + gamma1bar_new_in(0,r));
     });
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
@@ -876,147 +1020,5 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     });
 }
 
-void
-Maestro::Tridiag(const BaseState<Real>& a, const BaseState<Real>& b, 
-                 const BaseState<Real>& c, const BaseState<Real>& r, 
-                 BaseState<Real>& u, const int n)
-{
-    BaseState<Real> gam(n);
-
-    if (b[0] == 0) Abort("tridiag: CANT HAVE B[0] = 0.0");
-
-    Real bet = b[0];
-    u[0] = r[0] / bet;
-
-    for (auto j = 1; j < n; j++) {
-        gam[j] = c[j-1] / bet;
-        bet = b[j] - a[j] * gam[j];
-        if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
-        u[j] = (r[j] - a[j] * u[j-1]) / bet;
-    }
-
-    for (auto j = n-2; j >= 0; --j) {
-        u[j] -= gam[j+1] * u[j+1];
-    }
-}
-
-void
-Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
-                              RealVector& base_fine)
-
-{
-    // the mask array will keep track of whether we've filled in data
-    // in a corresponding radial bin.  .false. indicates that we've
-    // already output there.
-    IntVector imask_fine(nr_fine);
-    std::fill(imask_fine.begin(), imask_fine.end(), 1);
-
-    // r1 is the factor between the current level grid spacing and the
-    // FINEST level
-    int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
-
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                // sum up mask to see if there are any elements set to true 
-                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
-                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml[n+max_lev*r];
-                        imask_fine[i] = 0;
-                    }
-                }
-            }
-        }
-        // update r1 for the next coarsest level -- assume a jump by
-        // factor of 2
-        r1 *= 2;
-    }
-    
-    // check to make sure that no mask values are still true
-    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
-        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
-    }
-}
 
 
-void
-Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
-                              BaseState<Real>& base_fine)
-
-{
-    // the mask array will keep track of whether we've filled in data
-    // in a corresponding radial bin.  .false. indicates that we've
-    // already output there.
-    IntVector imask_fine(nr_fine);
-    std::fill(imask_fine.begin(), imask_fine.end(), 1);
-
-    // r1 is the factor between the current level grid spacing and the
-    // FINEST level
-    int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
-
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                // sum up mask to see if there are any elements set to true 
-                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
-                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml[n+max_lev*r];
-                        imask_fine[i] = 0;
-                    }
-                }
-            }
-        }
-        // update r1 for the next coarsest level -- assume a jump by
-        // factor of 2
-        r1 *= 2;
-    }
-    
-    // check to make sure that no mask values are still true
-    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
-        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
-    }
-}
-
-void
-Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml, 
-                              BaseState<Real>& base_fine)
-
-{
-    // the mask array will keep track of whether we've filled in data
-    // in a corresponding radial bin.  .false. indicates that we've
-    // already output there.
-    IntVector imask_fine(nr_fine);
-    std::fill(imask_fine.begin(), imask_fine.end(), 1);
-
-    // r1 is the factor between the current level grid spacing and the
-    // FINEST level
-    int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
-
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                // sum up mask to see if there are any elements set to true 
-                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
-                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml(n,r);
-                        imask_fine[i] = 0;
-                    }
-                }
-            }
-        }
-        // update r1 for the next coarsest level -- assume a jump by
-        // factor of 2
-        r1 *= 2;
-    }
-    
-    // check to make sure that no mask values are still true
-    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
-        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
-    }
-}

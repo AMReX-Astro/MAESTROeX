@@ -92,8 +92,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     RealVector w0_force        ( (max_radial_level+1)*nr_fine );
     RealVector Sbar            ( (max_radial_level+1)*nr_fine );
     BaseState<Real> beta0_nph  (max_radial_level+1, nr_fine);
-    RealVector gamma1bar_temp1 ( (max_radial_level+1)*nr_fine );
-    RealVector gamma1bar_temp2 ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> gamma1bar_temp1 (max_radial_level+1, nr_fine);
+    BaseState<Real> gamma1bar_temp2 (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0    ( (max_radial_level+1)*nr_fine );
 
@@ -110,8 +110,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     peosbar.shrink_to_fit();
     w0_force.shrink_to_fit();
     Sbar.shrink_to_fit();
-    gamma1bar_temp1.shrink_to_fit();
-    gamma1bar_temp2.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -487,9 +485,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             MakeGamma1bar(s2, gamma1bar_temp2, p0_new);
 
             // compute gamma1bar^{nph,*} and store it in gamma1bar_temp2
-            for(int i=0; i<gamma1bar_temp2.size(); ++i) {
-                gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
-            }
+            gamma1bar_temp2.copy(0.5*(gamma1bar_temp1 + gamma1bar_temp2));
 
             // make time-centered psi
             MakePsiSphr(gamma1bar_temp2, p0_nph, Sbar);
@@ -608,7 +604,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     } else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new.copy(beta0_old);
-        gamma1bar_new = gamma1bar_old;
+        gamma1bar_new.copy(gamma1bar_old);
     }
 
     beta0_nph.copy(0.5 * (beta0_old + beta0_new));
@@ -858,9 +854,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             base_time_start = ParallelDescriptor::second();
 
             // compute gamma1bar^{nph} and store it in gamma1bar_temp2
-            for (int i=0; i<gamma1bar_temp2.size(); ++i) {
-                gamma1bar_temp2[i] = 0.5*(gamma1bar_temp1[i] + gamma1bar_temp2[i]);
-            }
+            gamma1bar_temp2.copy(0.5*(gamma1bar_temp1 + gamma1bar_temp2));
 
             MakePsiSphr(gamma1bar_temp2, p0_nph, Sbar);
 
