@@ -1,3 +1,7 @@
+# 20.04a
+
+  * Include latest release from Microphysics submodule
+
 # 20.04
 
   * Offloaded more routines to GPU: MakePsi, MakeEtarho, FillUmacGhost, BCFill, Sponge, Dt, BaseState, EOS routines, Average
