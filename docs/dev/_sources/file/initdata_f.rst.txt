@@ -1,8 +1,0 @@
-initdata.F90
-============
-
-initdata\_module
-----------------
-
-.. f:automodule:: initdata_module
-

@@ -1,8 +1,0 @@
-inlet_bc.F90
-============
-
-inlet\_bc\_module
------------------
-
-.. f:automodule:: inlet_bc_module
-
