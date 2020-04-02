@@ -830,11 +830,6 @@ public:
     ///   enters as either zero, or the solution to the predictor MAC projection
     /// @param macrhs enters as `beta0*(S-Sbar)`
     /// @param beta0 is a 1d cell-centered array
-    void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                  amrex::Vector<amrex::MultiFab>& macphi,
-                  const amrex::Vector<amrex::MultiFab>& macrhs,
-                  const RealVector& beta0,
-                  const int& is_predictor);
     void MacProj(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
@@ -847,10 +842,6 @@ public:
     /// @param beta0        cell-centered \f$\beta_0\f$
     /// @param beta0_edge   face-centered \f$\beta_0\f$
     /// @param mult_or_div  do we multiply or divide?
-    void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
-                           const RealVector& beta0,
-                           const RealVector& beta0_edge,
-                           const int& mult_or_div);
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
                            const BaseState<amrex::Real>& beta0,
                            const BaseState<amrex::Real>& beta0_edge,
@@ -880,13 +871,6 @@ public:
 
     ////////////
     // MaestroMakeBeta0.cpp functions
-
-    void MakeBeta0(RealVector& beta, 
-                   const RealVector& rho0,
-                   const RealVector& p0,
-                   const RealVector& gamma1bar,
-                   const RealVector& grav_cell,
-                   const bool is_irreg=false);
 
     void MakeBeta0(BaseState<amrex::Real>& beta, 
                    const RealVector& rho0,
@@ -1136,33 +1120,6 @@ public:
                     const RealVector& p0,
                     const RealVector& gamma1bar,
                     RealVector& delta_gamma1_termbar);
-
-    /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
-    void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
-                               const amrex::Vector<amrex::MultiFab>& S_cc,
-                               const RealVector& Sbar,
-                               const RealVector& beta0,
-                               const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
-
-    /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
-    void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-                                         const RealVector& rho0,
-                             const amrex::Vector<amrex::MultiFab>& S_cc,
-                             const RealVector& Sbar,
-                             const RealVector& beta0,
-                             const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
-                             const RealVector& gamma1bar,
-                                         const RealVector& p0,
-                             const amrex::Vector<amrex::MultiFab>& delta_p_term,
-                                         amrex::Vector<amrex::MultiFab>& delta_chi,
-                             int is_predictor);
-
-    void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
-                                 const RealVector& rho0,
-                                 const RealVector& beta0,
-                                 const RealVector& gamma1bar,
-                                 const RealVector& p0,
-                                 const amrex::Vector<amrex::MultiFab>& delta_p_term);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
