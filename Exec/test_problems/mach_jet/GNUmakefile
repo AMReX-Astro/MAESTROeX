@@ -11,8 +11,6 @@ PROFILE      = FALSE
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..
 
-# if not already defined, point to Microphysics
-MICROPHYSICS_HOME ?= ../../../../Microphysics
 
 # Set the EOS, conductivity, and network directories
 # We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
