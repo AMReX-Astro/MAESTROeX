@@ -46,7 +46,7 @@ Maestro::InitData ()
 
 	// read in model file and fill in s0_init and p0_init for all levels
 	for (auto lev = 0; lev <= max_radial_level; ++lev) {
-		InitBaseState(rho0_old, rhoh0_old,
+	        InitBaseState(rho0_old, rhoh0_old,
 			      p0_old, lev);
 	}
 	

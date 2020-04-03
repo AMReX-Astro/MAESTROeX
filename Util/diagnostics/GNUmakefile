@@ -20,7 +20,6 @@ Blocs   := .
 # EXTERN_SEARCH = .
 
 MAESTROEX_HOME := ../..
-MICROPHYSICS_HOME ?= ../../../../Microphysics
 
 EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := stellar
