@@ -50,6 +50,10 @@ Maestro::Setup ()
     // maestro_conductivity_init();
     conductivity_init();
 
+#ifdef ROTATION
+    RotationInit();
+#endif
+
     // check max level does not exceed hardcoded limit 
     if (max_level > MAESTRO_MAX_LEVELS) Abort("max_level exceeds MAESTROeX's limit!");
 

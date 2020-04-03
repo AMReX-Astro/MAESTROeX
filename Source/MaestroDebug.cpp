@@ -4,13 +4,37 @@
 
 using namespace amrex;
 
+void
+Maestro::PrintBase(const RealVector& base, const bool is_cell_centered)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
+
+    get_numdisjointchunks(numdisjointchunks.dataPtr());
+    get_r_start_coord(r_start_coord.dataPtr());
+    get_r_end_coord(r_end_coord.dataPtr());
+    get_finest_radial_level(&finest_radial_level);
+
+    const int max_lev = max_radial_level + 1;
+
+    for (auto lev = 0; lev <= finest_radial_level; ++lev) {
+        for (auto i = 0; i <= numdisjointchunks[lev]; ++i) {
+            auto lo = r_start_coord[lev+max_lev*i];
+            auto hi = is_cell_centered ? r_end_coord[lev+max_lev*i] : r_end_coord[lev+max_lev*i]+1;
+            for (auto r = lo; r <= hi; ++r) {
+                Print() << "base lev, r " << lev << ", " << r << ", " << base[lev+max_lev*r] << std::endl;
+            }
+        }
+    }
+}
+
 
 // print out the contents of a Vector of MultiFabs
 void
 Maestro::PrintMF (const Vector<MultiFab>& MF)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PrintMF()",PrintMF);
+    BL_PROFILE_VAR("Maestro::PrintMF()", PrintMF);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -21,7 +45,7 @@ Maestro::PrintMF (const Vector<MultiFab>& MF)
         const DistributionMapping& dm = MF_mf.DistributionMap();
         const int myProc = ParallelDescriptor::MyProc();
 
-        for (int i=0; i<ba.size(); ++i) {
+        for (int i = 0; i < ba.size(); ++i) {
             if (dm[i] == myProc) {
 
                 // we want all processors to write, not just the IOProcessor
@@ -30,13 +54,31 @@ Maestro::PrintMF (const Vector<MultiFab>& MF)
 
                 const Box& validBox = ba[i];
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-                print_mf(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                         BL_TO_FORTRAN_FAB(MF_mf[i]));
+                auto lo = validBox.loVect3d();
+                auto hi = validBox.hiVect3d();
 
+                std::cout << "Level " << lev << std::endl;
+                std::cout << "valid box ";
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    std::cout << "(" << lo[n] << ", " << hi[n] << ")  ";
+                }
+                std::cout << std::endl;
+
+                const Array4<const Real> MF_arr = MF_mf.array(i);
+
+                for (auto comp = 0; comp < MF_mf.nComp(); ++comp) {
+                    for (auto k = lo[2]; k <= hi[2]; ++k) {
+                        for (auto j = lo[1]; j <= hi[1]; ++j) {
+                            for (auto ii = lo[0]; ii <= hi[0]; ++ii) {
+#if (AMREX_SPACEDIM == 2)
+                                std::cout << "lev, i, j, comp" << lev << " " << ii << " " << j << " " << comp << " " << MF_arr(ii,j,k,comp);
+#else
+                                std::cout << "lev, i, j, k, comp" << lev << " " << ii << " " << j << " " << k << " " << comp << " " << MF_arr(ii,j,k,comp);
+#endif
+                            }
+                        }
+                    }
+                }
             }
             // add this barrier so only one grid gets printed out at a time
             ParallelDescriptor::Barrier();
@@ -49,7 +91,7 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                     int dir)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PrintEdge()",PrintEdge);
+    BL_PROFILE_VAR("Maestro::PrintEdge()", PrintEdge);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -69,14 +111,31 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
 
                 // EDGE BASED
                 const Box& validBox = ba[i];
+                auto lo = validBox.loVect3d();
+                auto hi = validBox.hiVect3d();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-                print_edge(&lev, ARLIM_3D(validBox.loVect()), ARLIM_3D(validBox.hiVect()),
-                           BL_TO_FORTRAN_FAB(EDGE_mf[i]));
+                std::cout << "Level " << lev << std::endl;
+                std::cout << "valid box ";
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    std::cout << "(" << lo[n] << ", " << hi[n] << ")  ";
+                }
+                std::cout << std::endl;
 
+                const Array4<const Real> EDGE_arr = EDGE_mf.array(i);
+
+                for (auto comp = 0; comp < EDGE_mf.nComp(); ++comp) {
+                    for (auto k = lo[2]; k <= hi[2]; ++k) {
+                        for (auto j = lo[1]; j <= hi[1]; ++j) {
+                            for (auto ii = lo[0]; ii <= hi[0]; ++ii) {
+#if (AMREX_SPACEDIM == 2)
+                                std::cout << "lev, i, j, comp" << lev << " " << ii << " " << j << " " << comp << " " << EDGE_arr(ii,j,k,comp);
+#else
+                                std::cout << "lev, i, j, k, comp" << lev << " " << ii << " " << j << " " << k << " " << comp << " " << EDGE_arr(ii,j,k,comp);
+#endif
+                            }
+                        }
+                    }
+                }
             }
             // add this barrier so only one grid gets printed out at a time
             ParallelDescriptor::Barrier();
@@ -119,6 +178,4 @@ void Maestro::WriteMF (const Vector<MultiFab>& mf,
 
     WriteMultiLevelPlotfile(name, finest_level+1, plot_mf, varnames,
                             Geom(), 0., step_array, refRatio());
-
-
 }

@@ -412,9 +412,11 @@ public:
     ////////////////////////
     // MaestroDebug.cpp functions
 
+    /// Print out the contents of the base state
+    void PrintBase (const RealVector& base, const bool is_cell_centered=true);
+
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
-
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
@@ -489,6 +491,9 @@ public:
 
     /// Compute initial time step
     void FirstDt ();
+
+    void EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
+                    const RealVector& gamma1bar_vec);
 
     // end MaestroDt.cpp functions
     ////////////////////////
@@ -646,7 +651,8 @@ public:
                         const amrex::Real x0, const amrex::Real x1, 
                         const amrex::Real x2,
                         const amrex::Real y0, const amrex::Real y1, 
-                        const amrex::Real y2);
+                        const amrex::Real y2,
+                        const bool limit=true);
 
     /// Add (`mult` times) the MAC-projected base state velocity to the edge-based
     /// velocity `uedge`
@@ -1409,6 +1415,13 @@ public:
     /// Set tagging array to include buffer zones for multilevel
     void TagArray ();
 
+    /// Regrid base state variables (ex. psi, etarho, rho0, etc.)
+    ///
+    /// We copy the coarsest level only, interpolate to all
+    /// the other levels and then copy the valid data from
+    /// the old arrays onto the new.
+    void RegridBaseState(RealVector& base, const bool is_edge=false);
+
     /// Tag all cells for refinement
     ///
     /// Overrides the pure virtual function in `AmrCore`
@@ -1503,6 +1516,14 @@ public:
     ////////////
 
     ////////////
+    // MaestroRotation.cpp functions
+#ifdef ROTATION
+    void RotationInit();
+#endif
+    // end MaestroRotation.cpp functions
+    ////////////
+
+    ////////////
     // MaestroSetup.cpp functions
 
     void ExternInit ();
@@ -1550,7 +1571,26 @@ public:
     ////////////
     // MaestroSponge.cpp functions
 
+    void SpongeInit(const RealVector& rho0);
+
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
+    ////////////
+
+    ////////////
+    // MaestroTagging.cpp functions
+
+    void RetagArray(const amrex::Box& bx,
+                    const int lev, IntVector& tag_array);
+
+    void TagBoxes(amrex::TagBoxArray& tags, 
+                  const amrex::MFIter& mfi,
+                  const int lev, IntVector& tag_array,
+                  const amrex::Real time) ;
+
+    void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
+                   const amrex::MFIter& mfi,
+                   const int lev, IntVector& tag_array,
+                   const amrex::Real time);              
     ////////////
 
     ////////////////////////
@@ -1958,6 +1998,28 @@ public:
     // problem information
     amrex::GpuArray<Real,3> center;
 
+    // rotation 
+#ifdef ROTATION
+    Real sin_theta;
+    Real cos_theta;
+    Real omega;
+#endif
+
+    // sponge 
+    Real r_sp;
+    Real r_md;
+    Real r_tp;
+    // outer sponge parameters used for spherical problems 
+    Real r_sp_outer;
+    Real r_tp_outer;
+    /// the sponge_start_density should be the density below which the
+    /// sponge first turns on.  Different problems may compute this in
+    /// different ways (i.e. not using sponge_center_density and
+    /// sponge_start_factor), so we provide this public module variable to
+    /// ensure that the rest of the code always knows at what density the
+    /// sponge begins.
+    Real sponge_start_density;
+
     /// Stores fluxes at coarse-fine interface for synchronization.
     /// This will be sized `max_level+1`
     ///
@@ -1971,5 +2033,25 @@ public:
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
+
+// namespace amrex{
+//     namespace HostDevice { namespace Atomic {
+
+//     template <class T>
+//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+//     void Max (T* max, T value) noexcept
+//     {
+// #if AMREX_DEVICE_COMPILE
+//         Gpu::Atomic::Max(sum,value);
+// #else
+// #ifdef _OPENMP
+// #pragma omp atomic update
+// #endif
+//         *sum += value;
+// #endif
+//     }
+
+// }}}
+
 
 #endif

@@ -464,7 +464,6 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                             dxscr[flag] = copysign(1.0,dxscr[cen]);
                             dxscrp = dxscr[flag] * min(dxscr[lim],fabs(dxscr[cen]));
                         }
-                        // end do
 
                         // now find dxscr for r
                         if (r > 0 && r < nr_lev-1) {
