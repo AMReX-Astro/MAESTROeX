@@ -191,7 +191,6 @@ void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const RealVector& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
@@ -383,7 +382,6 @@ void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const BaseState<Real>& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
@@ -569,6 +567,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     // fill ghost cells
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
 }
+
 
 void
 Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,

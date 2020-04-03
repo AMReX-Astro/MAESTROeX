@@ -142,12 +142,16 @@ Maestro::Init ()
             if (plot_int > 0 || plot_deltat > 0) {
                 Print() << "\nWriting plotfile " << plot_base_name << "after_InitProj after InitProj" << std::endl;
 
-                WritePlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WritePlotFile(plotInitProj, t_old, 0, rho0_old,
+                    rhoh0_old, p0_old, gamma1bar_old, uold,
+                    sold, S_cc_old);
 
             } else if (small_plot_int > 0 || small_plot_deltat > 0) {
                 Print() << "\nWriting small plotfile " << small_plot_base_name << "after_InitProj after InitProj" << std::endl;
 
-                WriteSmallPlotFile(plotInitProj,t_old,0,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WriteSmallPlotFile(plotInitProj, t_old, 0,
+                    rho0_old, rhoh0_old, p0_old,
+                    gamma1bar_old, uold, sold, S_cc_old);
             }
         }
 
@@ -167,10 +171,14 @@ Maestro::Init ()
 
             if (plot_int > 0 || plot_deltat > 0) {
                 Print() << "\nWriting plotfile " << plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
-                WritePlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WritePlotFile(plotDivuIter, t_old, dt, 
+                    rho0_old, rhoh0_old, p0_old,
+                    gamma1bar_old, uold, sold, S_cc_old);
             } else if (small_plot_int > 0 || small_plot_deltat > 0) {
                 Print() << "\nWriting small plotfile " << small_plot_base_name << "after_DivuIter after final DivuIter" << std::endl;
-                WriteSmallPlotFile(plotDivuIter,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+                WriteSmallPlotFile(plotDivuIter, t_old, dt,
+                    rho0_old, rhoh0_old, p0_old, 
+                    gamma1bar_old,uold, sold, S_cc_old);
             }
         }
 
@@ -195,10 +203,13 @@ Maestro::Init ()
 
         if (plot_int > 0 || plot_deltat > 0) {
             Print() << "\nWriting plotfile 0 after all initialization" << std::endl;
-            WritePlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            WritePlotFile(0, t_old, dt, rho0_old, rhoh0_old,
+                p0_old, gamma1bar_old, uold, sold, S_cc_old);
         } else if (small_plot_int > 0 || small_plot_deltat > 0) {
             Print() << "\nWriting small plotfile 0 after all initialization" << std::endl;
-            WriteSmallPlotFile(0,t_old,dt,rho0_old,rhoh0_old,p0_old,gamma1bar_old,uold,sold,S_cc_old);
+            WriteSmallPlotFile(0, t_old, dt, rho0_old,
+                rhoh0_old, p0_old, gamma1bar_old, uold, sold,
+                S_cc_old);
         }
 
         if (chk_int > 0 || chk_deltat > 0) {
@@ -276,7 +287,7 @@ Maestro::InitData ()
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
-            std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
+            rhoh0_old.setVal(0.0);
         } else {
             // set rho0 to be the average
             Average(sold,rho0_old,Rho);
@@ -293,7 +304,9 @@ Maestro::InitData ()
             TfromRhoP(sold,p0_old,1);
 
             // set rhoh0 to be the average
-            Average(sold,rhoh0_old,RhoH);
+            RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
+            Average(sold, rhoh0_old_vec, RhoH);
+            rhoh0_old.copy(rhoh0_old_vec);
         }
 
         // set tempbar to be the average

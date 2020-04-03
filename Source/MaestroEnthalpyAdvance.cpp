@@ -19,24 +19,18 @@ Maestro::EnthalpyAdvance (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
     // Create cell-centered base state quantity
-    RealVector h0_old( (max_radial_level+1)*nr_fine );
-    RealVector h0_new( (max_radial_level+1)*nr_fine );
-    h0_old.shrink_to_fit();
-    h0_new.shrink_to_fit();
+    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    RealVector  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    rho0_edge_old.shrink_to_fit();
-    rho0_edge_new.shrink_to_fit();
-    rhoh0_edge_old.shrink_to_fit();
-    rhoh0_edge_new.shrink_to_fit();
+    BaseState<Real>  rho0_edge_old(max_radial_level+1, nr_fine+1);
+    BaseState<Real>  rho0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
 
-    if (spherical == 0) {
+    if (!spherical ) {
         CelltoEdge(rho0_old, rho0_edge_old);
         CelltoEdge(rho0_new, rho0_edge_new);
         CelltoEdge(rhoh0_old, rhoh0_edge_old);
@@ -76,14 +70,14 @@ Maestro::EnthalpyAdvance (int which_step,
     
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
-        MakeRhoHForce(scal_force,1,thermal,umac,1,1);
+        MakeRhoHForce(scal_force, 1, thermal, umac, 1, 1);
 
-        Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
+        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, 0, 0, bcs_s, RhoH);
 
-        ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
+        ModifyScalForce(scal_force, scalold, umac, 
+            rhoh0_edge_old, rhoh0_old_cart, RhoH, bcs_s, 0);
 
-    }
-    else if (enthalpy_pred_type == predict_h ||
+    } else if (enthalpy_pred_type == predict_h ||
              enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
         MakeRhoHForce(scal_force,1,thermal,umac,1,1);
@@ -175,7 +169,8 @@ Maestro::EnthalpyAdvance (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-        HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
+        HfromRhoTedge(sedge, rho0_edge_old, rhoh0_edge_old,
+                      rho0_edge_new, rhoh0_edge_new);
     }
 
     //////////////////////////////////
@@ -189,9 +184,14 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
-        if (spherical == 1) {
-            for (int i=0; i<h0_old.size(); ++i) {
-                h0_old[i] = rhoh0_old[i] / rho0_old[i];
+        if (spherical) {
+            // for (int i=0; i<h0_old.size(); ++i) {
+            //     h0_old[i] = rhoh0_old[i] / rho0_old[i];
+            // }
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+                }
             }
 
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -208,18 +208,18 @@ Maestro::EnthalpyAdvance (int which_step,
                              h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rhoh0_old,rhoh0mac_old);
-            MakeS0mac(h0_old,h0mac_old);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rhoh0_old, rhoh0mac_old);
+            MakeS0mac(h0_old, h0mac_old);
         }
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
-                     h0mac_old,h0mac_old);
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
+                     h0mac_old, h0mac_old);
     } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
@@ -229,9 +229,11 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            for (int i=0; i<h0_old.size(); ++i) {
-                h0_old[i] = rhoh0_old[i] / rho0_old[i];
-                h0_new[i] = rhoh0_new[i] / rho0_new[i];
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+                    h0_new(l,r) = rhoh0_new(l,r) / rho0_new[l+(max_radial_level+1)*r];
+                }
             }
 
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -260,21 +262,21 @@ Maestro::EnthalpyAdvance (int which_step,
                              h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rhoh0_old,rhoh0mac_old);
-            MakeS0mac(h0_old,h0mac_old);
-            MakeS0mac(rho0_new,rho0mac_new);
-            MakeS0mac(rhoh0_new,rhoh0mac_new);
-            MakeS0mac(h0_new,h0mac_new);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rhoh0_old, rhoh0mac_old);
+            MakeS0mac(h0_old, h0mac_old);
+            MakeS0mac(rho0_new, rho0mac_new);
+            MakeS0mac(rhoh0_new, rhoh0mac_new);
+            MakeS0mac(h0_new, h0mac_new);
         }
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_new,rho0_edge_new,rho0mac_new,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
-                     rhoh0_new,rhoh0_edge_new,rhoh0mac_new,
-                     h0mac_old,h0mac_new);
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_new, rho0_edge_new, rho0mac_new,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
+                     rhoh0_new, rhoh0_edge_new, rhoh0mac_new,
+                     h0mac_old, h0mac_new);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -330,22 +332,16 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
 
     // Create cell-centered base state quantity
-    RealVector h0_old( (max_radial_level+1)*nr_fine );
-    RealVector h0_new( (max_radial_level+1)*nr_fine );
-    h0_old.shrink_to_fit();
-    h0_new.shrink_to_fit();
+    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    RealVector  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    rho0_edge_old.shrink_to_fit();
-    rho0_edge_new.shrink_to_fit();
-    rhoh0_edge_old.shrink_to_fit();
-    rhoh0_edge_new.shrink_to_fit();
+    BaseState<Real> rho0_edge_old(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rho0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(rho0_old, rho0_edge_old);
@@ -385,15 +381,16 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_rhohprime) {
         // make force for (rho h)'
-        MakeRhoHForce(scal_force,1,thermal,umac,1,1);
+        MakeRhoHForce(scal_force, 1, thermal, umac, 1, 1);
 
-        Put1dArrayOnCart(rhoh0_old,rhoh0_old_cart,0,0,bcs_s,RhoH);
+        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, 0, 0, bcs_s, RhoH);
 
-        ModifyScalForce(scal_force,scalold,umac,rhoh0_old,rhoh0_edge_old,rhoh0_old_cart,RhoH,bcs_s,0);
+        ModifyScalForce(scal_force, scalold, umac, 
+            rhoh0_edge_old, rhoh0_old_cart, RhoH, bcs_s, 0);
     } else if (enthalpy_pred_type == predict_h ||
              enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
-        MakeRhoHForce(scal_force,1,thermal,umac,1,1);
+        MakeRhoHForce(scal_force, 1, thermal, umac, 1, 1);
 
         // make force for h by calling mkrhohforce then dividing by rho
         if (enthalpy_pred_type == predict_h) {
@@ -464,7 +461,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,1);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, 0, bcs_s, Nscal, pred_comp, pred_comp, 1, 1);
     } else {
         // use the advective form of the prediction
         MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
@@ -496,7 +493,8 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     if ( (enthalpy_pred_type == predict_T_then_rhohprime) ||
          (enthalpy_pred_type == predict_T_then_h        ) ||
          (enthalpy_pred_type == predict_Tprime_then_h) ) {
-        HfromRhoTedge(sedge,rho0_edge_old,rhoh0_edge_old,rho0_edge_new,rhoh0_edge_new);
+        HfromRhoTedge(sedge, rho0_edge_old, rhoh0_edge_old, 
+                      rho0_edge_new, rhoh0_edge_new);
     }
 
     //////////////////////////////////
@@ -511,8 +509,10 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            for (int i=0; i<h0_old.size(); ++i) {
-                h0_old[i] = rhoh0_old[i] / rho0_old[i];
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+                }
             }
 
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -529,17 +529,17 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rhoh0_old,rhoh0mac_old);
-            MakeS0mac(h0_old,h0mac_old);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rhoh0_old, rhoh0mac_old);
+            MakeS0mac(h0_old, h0mac_old);
         }
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
                      h0mac_old,h0mac_old);
     } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >  rho0mac_old(finest_level+1);
@@ -550,9 +550,11 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            for (int i=0; i<h0_old.size(); ++i) {
-                h0_old[i] = rhoh0_old[i] / rho0_old[i];
-                h0_new[i] = rhoh0_new[i] / rho0_new[i];
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+                    h0_new(l,r) = rhoh0_new(l,r) / rho0_new[l+(max_radial_level+1)*r];
+                }
             }
 
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -581,21 +583,21 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rhoh0_old,rhoh0mac_old);
-            MakeS0mac(h0_old,h0mac_old);
-            MakeS0mac(rho0_new,rho0mac_new);
-            MakeS0mac(rhoh0_new,rhoh0mac_new);
-            MakeS0mac(h0_new,h0mac_new);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rhoh0_old, rhoh0mac_old);
+            MakeS0mac(h0_old, h0mac_old);
+            MakeS0mac(rho0_new,  rho0mac_new);
+            MakeS0mac(rhoh0_new, rhoh0mac_new);
+            MakeS0mac(h0_new, h0mac_new);
         }
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_new,rho0_edge_new,rho0mac_new,
-                     rhoh0_old,rhoh0_edge_old,rhoh0mac_old,
-                     rhoh0_new,rhoh0_edge_new,rhoh0mac_new,
-                     h0mac_old,h0mac_new);
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_new, rho0_edge_new, rho0mac_new,
+                     rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
+                     rhoh0_new, rhoh0_edge_new, rhoh0mac_new,
+                     h0mac_old, h0mac_new);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -615,7 +617,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     //     2) Update (rho h) with conservative differencing.
     //**************************************************************************
 
-    MakeRhoHForce(scal_force,0,thermal,umac,0,which_step);
+    MakeRhoHForce(scal_force, 0, thermal, umac, 0, which_step);
 
     // reaction forcing terms
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -633,7 +635,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

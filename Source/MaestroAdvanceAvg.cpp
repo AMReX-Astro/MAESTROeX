@@ -435,19 +435,21 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             }
         }
 
-    }
-    else {
+    } else {
         p0_new = p0_old;
     }
 
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_old by "averaging"
-        Average(s1, rhoh0_old, RhoH);
-        Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
-    }
-    else {
-        rhoh0_new = rhoh0_old;
+        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(s1, rhoh0_old_vec, RhoH);
+        Average(s2, rhoh0_new_vec, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
+        rhoh0_old.copy(rhoh0_old_vec);
+        rhoh0_new.copy(rhoh0_new_vec);
+    } else {
+        rhoh0_new.copy(rhoh0_old);
     }
 
     if (maestro_verbose >= 1) {
@@ -741,7 +743,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // base state enthalpy averaging
     if (evolve_base_state) {
-        Average(s2, rhoh0_new, RhoH);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(s2, rhoh0_new_vec, RhoH);
+        rhoh0_new.copy(rhoh0_new_vec);
     }
 
     // base state enthalpy update

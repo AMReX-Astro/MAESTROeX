@@ -122,7 +122,7 @@ Maestro::AdvectBaseEnthalpy(BaseState<Real>& rhoh0_predicted_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseEnthalpy()", AdvectBaseEnthalpy); 
 
-    if (spherical == 0) {
+    if (!spherical) {
         AdvectBaseEnthalpyPlanar(rhoh0_predicted_edge);
         RestrictBase(rhoh0_new, true);
         FillGhostBase(rhoh0_new, true);
@@ -141,7 +141,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
     // zero the new enthalpy so we don't leave a non-zero enthalpy in fine radial
     // regions that no longer have a corresponding full state
-    std::fill(rhoh0_new.begin(), rhoh0_new.end(), 0);
+    rhoh0_new.setVal(0.0);
 
     const int max_lev = max_radial_level+1;
 
@@ -149,7 +149,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
+        const auto& rhoh0_old_p = rhoh0_old; 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         const auto& psi_p = psi;  
 
@@ -164,7 +164,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 int p = n+max_lev*r;
-                force(n,r) = -rhoh0_old_p[p] * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev 
+                force(n,r) = -rhoh0_old_p(n,r) * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev 
                     + psi_p(n,r);
             });
         }
@@ -174,8 +174,8 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
-        Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr(); 
+        const auto& rhoh0_old_p = rhoh0_old; 
+        auto& rhoh0_new_p = rhoh0_new; 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         const auto& psi_p = psi; 
 
@@ -191,7 +191,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 int p = n+max_lev*r;
-                rhoh0_new_p[p] = rhoh0_old_p[p] 
+                rhoh0_new_p(n,r) = rhoh0_old_p(n,r) 
                     - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge(n,r)*w0_p[p]) + dt_loc * psi_p(n,r);
             });
         }
@@ -212,8 +212,8 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
     BaseState<Real> force(nr_fine);
 
     // predict (rho h)_0 on the edges
-    const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
-    Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr();
+    const auto& rhoh0_old_p = rhoh0_old; 
+    auto& rhoh0_new_p = rhoh0_new;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
@@ -221,8 +221,8 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;
-        force(r) = -rhoh0_old_p[p] * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
-            rhoh0_old_p[p]*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r) + psi_p(0,r);
+        force(r) = -rhoh0_old_p(0,r) * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
+            rhoh0_old_p(0,r)*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r) + psi_p(0,r);
     });
 
     MakeEdgeState1d(rhoh0_old, rhoh0_predicted_edge, force);
@@ -230,7 +230,7 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;
 
-        rhoh0_new_p[p] = rhoh0_old_p[p] - dtdr/(r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
+        rhoh0_new_p(0,r) = rhoh0_old_p(0,r) - dtdr/(r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) * rhoh0_predicted_edge(0,r+1) * w0_p[max_lev*(r+1)] - 
             r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * rhoh0_predicted_edge(0,r) * w0_p[p]) + 
             dt_loc * psi_p(0,r);

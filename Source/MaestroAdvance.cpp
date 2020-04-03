@@ -492,7 +492,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // base state enthalpy update
         // compute rhoh0_old by "averaging"
-        Average(s1, rhoh0_old, RhoH);
+        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
+        Average(s1, rhoh0_old_vec, RhoH);
+        rhoh0_old.copy(rhoh0_old_vec);
 
         base_time_start = ParallelDescriptor::second();
 
@@ -502,7 +504,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     } else {
-        rhoh0_new = rhoh0_old;
+        rhoh0_new.copy(rhoh0_old);
         grav_cell_new.copy(grav_cell_old);
         p0_new = p0_old;
     }

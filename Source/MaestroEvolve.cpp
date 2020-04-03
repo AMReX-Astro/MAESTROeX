@@ -120,8 +120,9 @@ Maestro::Evolve ()
         {
         // write a plotfile
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
-                            gamma1bar_new,unew,snew,S_cc_new);
+            WritePlotFile(istep, t_new, dt, rho0_new,
+                            rhoh0_new, p0_new,
+                            gamma1bar_new, unew, snew, S_cc_new);
         }
 
         if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
@@ -130,8 +131,8 @@ Maestro::Evolve ()
         {
             // write a small plotfile
             Print() << "\nWriting small plotfile " << istep << std::endl;
-            WriteSmallPlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
-                                gamma1bar_new,unew,snew,S_cc_new);
+            WriteSmallPlotFile(istep, t_new, dt, rho0_new, rhoh0_new, p0_new,
+                                gamma1bar_new, unew, snew, S_cc_new);
         }
 
         if ( (chk_int > 0 && istep % chk_int == 0) ||
@@ -158,7 +159,7 @@ Maestro::Evolve ()
         }
 
         std::swap( rho0_old, rho0_new);
-        std::swap(rhoh0_old,rhoh0_new);
+        rhoh0_old.swap(rhoh0_new);
         std::swap(   p0_nm1,   p0_old);
         std::swap(   p0_old,   p0_new);
 

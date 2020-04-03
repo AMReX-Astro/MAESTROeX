@@ -71,7 +71,7 @@ Maestro::Regrid ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
-    if (spherical == 1) {
+    if (spherical) {
         MakeNormal();
         if (use_exact_base_state) {
             Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");

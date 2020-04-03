@@ -235,8 +235,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // set S_cc_nph = S_cc_old + (dt/2) * dSdt
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
@@ -265,8 +264,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // these should have no effect if dpdt_factor <= 0
         std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -296,8 +294,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
             MakeW0mac(w0mac);
         }
 
-    }
-    else {
+    } else {
         // these should have no effect if evolve_base_state = false
         std::fill(Sbar.begin(), Sbar.end(), 0.);
     }
@@ -340,7 +337,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && evolve_base_state) {
+    if (spherical && evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac,w0mac,1.);
     }
@@ -426,19 +423,21 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
             }
         }
 
-    }
-    else {
+    } else {
         p0_new = p0_old;
     }
 
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_old by "averaging"
-        Average(s1, rhoh0_old, RhoH);
-        Average(s2, rhoh0_new, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
-    }
-    else {
-        rhoh0_new = rhoh0_old;
+        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(s1, rhoh0_old_vec, RhoH);
+        Average(s2, rhoh0_new_vec, RhoH); // -> rhoh0_new = rhoh0_old (bad?)
+        rhoh0_old.copy(rhoh0_old_vec);
+        rhoh0_new.copy(rhoh0_new_vec);
+    } else {
+        rhoh0_new.copy(rhoh0_old);
     }
 
     if (maestro_verbose >= 1) {
@@ -474,8 +473,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // now update temperature
     if (use_tfromp) {
         TfromRhoP(s2,p0_new);
-    }
-    else {
+    } else {
         TfromRhoH(s2,p0_new);
     }
 
@@ -510,8 +508,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
                   grav_cell_new, true);
-    }
-    else {
+    } else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new.copy(beta0_old);
         gamma1bar_new.copy(gamma1bar_old);
@@ -539,8 +536,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
                             temp_diffusion_formulation);
-    }
-    else {
+    } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             thermal2[lev].setVal(0.);
         }
@@ -576,8 +572,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // these should have no effect if dpdt_factor <= 0
         std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -628,7 +623,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
                        gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
 
-    if (spherical == 1 && evolve_base_state) {
+    if (spherical && evolve_base_state) {
         // subtract w0mac from umac
         Addw0(umac,w0mac,-1.);
     }
@@ -644,7 +639,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && evolve_base_state) {
+    if (spherical && evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac,w0mac,1.);
     }
@@ -719,7 +714,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // base state enthalpy averaging
     // add new dp/dt term to rhoh0_new
     if (evolve_base_state) {
-        Average(s2, rhoh0_new, RhoH);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(s2, rhoh0_new_vec, RhoH);
+        rhoh0_new.copy(rhoh0_new_vec);
     }
 
     // base state enthalpy update
@@ -758,8 +755,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // now update temperature
     if (use_tfromp) {
         TfromRhoP(s2,p0_new);
-    }
-    else {
+    } else {
         TfromRhoH(s2,p0_new);
     }
 
@@ -882,9 +878,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
             MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
             rhcc_for_nodalproj[lev].mult(1./dt,0,1,1);
         }
-
-    }
-    else {
+    } else {
 
         proj_type = regular_timestep_comp;
 

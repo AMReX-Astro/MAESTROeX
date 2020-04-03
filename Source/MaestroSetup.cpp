@@ -123,8 +123,8 @@ Maestro::Setup ()
     p0_init      .resize( (max_radial_level+1)*nr_fine );
     rho0_old     .resize( (max_radial_level+1)*nr_fine );
     rho0_new     .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_old    .resize( (max_radial_level+1)*nr_fine );
-    rhoh0_new    .resize( (max_radial_level+1)*nr_fine );
+    rhoh0_old    .resize(max_radial_level+1, nr_fine);
+    rhoh0_new    .resize(max_radial_level+1, nr_fine);
     p0_old       .resize( (max_radial_level+1)*nr_fine );
     p0_new       .resize( (max_radial_level+1)*nr_fine );
     p0_nm1       .resize( (max_radial_level+1)*nr_fine );
@@ -165,8 +165,6 @@ Maestro::Setup ()
     p0_init      .shrink_to_fit();
     rho0_old     .shrink_to_fit();
     rho0_new     .shrink_to_fit();
-    rhoh0_old    .shrink_to_fit();
-    rhoh0_new    .shrink_to_fit();
     p0_old       .shrink_to_fit();
     p0_new       .shrink_to_fit();
     p0_nm1       .shrink_to_fit();

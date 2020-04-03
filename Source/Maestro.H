@@ -237,16 +237,16 @@ public:
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                        const RealVector& r0_old,
-                       const RealVector& r0_edge_old,
+                       const BaseState<amrex::Real>& r0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
                        const RealVector& r0_new,
-                       const RealVector& r0_edge_new,
+                       const BaseState<amrex::Real>& r0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const RealVector& rh0_old,
-                       const RealVector& rh0_edge_old,
+                       const BaseState<amrex::Real>& rh0_old,
+                       const BaseState<amrex::Real>& rh0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-                       const RealVector& rh0_new,
-                       const RealVector& rh0_edge_new,
+                       const BaseState<amrex::Real>& rh0_new,
+                       const BaseState<amrex::Real>& rh0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
@@ -302,6 +302,10 @@ public:
     // MaestroBaseState.cpp functions
 
     void InitBaseState(RealVector& rho0, RealVector& rhoh0, 
+                       RealVector& p0, 
+                       const int lev);
+
+    void InitBaseState(RealVector& rho0, BaseState<amrex::Real>& rhoh0, 
                        RealVector& p0, 
                        const int lev);
 
@@ -403,6 +407,12 @@ public:
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
+    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
+                        const BaseState<Real>& s0,
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        bool flag);
+
 
     /// If `flag`, subtract the base state, returning the perturbed quantity.
     /// Otherwise, add the base state, returning the full quantity.
@@ -417,6 +427,11 @@ public:
     /// @param flag     determines whether base state is subtracted (true) or added (false)
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const RealVector& s0,
+                        int comp, int bccomp,
+                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        bool flag);
+    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
+                        const BaseState<Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
                         bool flag);
@@ -738,7 +753,6 @@ public:
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
                          const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const RealVector& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
@@ -748,7 +762,6 @@ public:
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
                          const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const BaseState<amrex::Real>& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
@@ -1051,6 +1064,14 @@ public:
 
     void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
                                BaseState<amrex::Real>& force);
+    void MakeEdgeState1d(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
+                         BaseState<amrex::Real>& force);
+
+    void MakeEdgeState1dSphr(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
+                             BaseState<amrex::Real>& force);
+
+    void MakeEdgeState1dPlanar(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
+                               BaseState<amrex::Real>& force);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
@@ -1320,7 +1341,7 @@ public:
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
                         const RealVector& rho0_in,
-                        const RealVector& rhoh0_in,
+                        const BaseState<amrex::Real>& rhoh0_in,
                         const RealVector& p0_in,
                         const BaseState<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
@@ -1332,7 +1353,7 @@ public:
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
                         const RealVector& rho0_in,
-                        const RealVector& rhoh0_in,
+                        const BaseState<amrex::Real>& rhoh0_in,
                         const RealVector& p0_in,
                         const BaseState<amrex::Real>& gamma1bar_in,
                         const amrex::Vector<amrex::MultiFab>& u_in,
@@ -1573,10 +1594,10 @@ public:
 
     // Calculate the enthalpy at edges given the density and the temperature
     void HfromRhoTedge (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                        const RealVector& rho0_edge_old,
-                        const RealVector& rhoh0_edge_old,
-                        const RealVector& rho0_edge_new,
-                        const RealVector& rhoh0_edge_new);
+                        const BaseState<amrex::Real>& rho0_edge_old,
+                        const BaseState<amrex::Real>& rhoh0_edge_old,
+                        const BaseState<amrex::Real>& rho0_edge_new,
+                        const BaseState<amrex::Real>& rhoh0_edge_new);
     ////////////
 
     ////////////
@@ -2000,8 +2021,8 @@ public:
     RealVector p0_init;
     RealVector rho0_old;
     RealVector rho0_new;
-    RealVector rhoh0_old;
-    RealVector rhoh0_new;
+    BaseState<amrex::Real> rhoh0_old;
+    BaseState<amrex::Real> rhoh0_new;
     RealVector rhoX0_old;
     RealVector rhoX0_new;
     RealVector p0_old;

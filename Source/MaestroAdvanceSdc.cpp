@@ -447,19 +447,19 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
         }
 
-    }
-    else {
+    } else {
         p0_new = p0_old;
         p0_nph = p0_old;
-   }
+    }
 
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_old by "averaging"
-        Average(sold, rhoh0_old, RhoH);
-    }
-    else {
-        rhoh0_new = rhoh0_old;
+        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
+        Average(sold, rhoh0_old_vec, RhoH);
+        rhoh0_old.copy(rhoh0_old_vec);
+    } else {
+        rhoh0_new.copy(rhoh0_old);
     }
 
     if (maestro_verbose >= 1) {
@@ -471,11 +471,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_new by "averaging"
-        Average(shat, rhoh0_new, RhoH);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(shat, rhoh0_new_vec, RhoH);
+        rhoh0_new.copy(rhoh0_new_vec);
 
         // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-        for (int i=0; i<rhoh0_new.size(); ++i) {
-            delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++r) {
+                delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt;
+            }
         }
     }
 
@@ -580,12 +584,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
 
         // update base state enthalpy
-        Average(snew, rhoh0_new, RhoH);
+        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+        Average(snew, rhoh0_new_vec, RhoH);
+        rhoh0_new.copy(rhoh0_new_vec);
 
         // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
         //                       - (rhoh0_hat - rhoh0_old)/dt
-        for (int i=0; i<rhoh0_new.size(); ++i) {
-            delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt - delta_rhoh0[i];
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++r) {
+                delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt - delta_rhoh0[l+(max_radial_level+1)*r];
+            }
         }
         Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
     }
@@ -890,11 +898,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // base state enthalpy update
         if (evolve_base_state) {
-            Average(shat, rhoh0_new, RhoH);
+            RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+            Average(shat, rhoh0_new_vec, RhoH);
+            rhoh0_new.copy(rhoh0_new_vec);
 
             // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-            for (int i=0; i<rhoh0_new.size(); ++i) {
-                delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt;
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt;
+                }
             }
         }
 
@@ -1015,12 +1027,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
             
             // also update base state enthalpy
-            Average(snew, rhoh0_new, RhoH);
+            RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
+            Average(snew, rhoh0_new_vec, RhoH);
+            rhoh0_new.copy(rhoh0_new_vec);
             
             // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
             //                       - (rhoh0_hat - rhoh0_old)/dt
-            for (int i=0; i<rhoh0_new.size(); ++i) {
-                delta_rhoh0[i] = (rhoh0_new[i] - rhoh0_old[i])/dt - delta_rhoh0[i];
+            for (auto l = 0; l <= max_radial_level; ++l) {
+                for (auto r = 0; r < nr_fine; ++r) {
+                    delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt - delta_rhoh0[l+(max_radial_level+1)*r];
+                }
             }
             Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
         }

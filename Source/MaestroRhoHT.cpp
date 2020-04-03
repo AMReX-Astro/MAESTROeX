@@ -336,10 +336,10 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-                        const RealVector& rho0_edge_old,
-                        const RealVector& rhoh0_edge_old,
-                        const RealVector& rho0_edge_new,
-                        const RealVector& rhoh0_edge_new)
+                        const BaseState<Real>& rho0_edge_old,
+                        const BaseState<Real>& rhoh0_edge_old,
+                        const BaseState<Real>& rho0_edge_new,
+                        const BaseState<Real>& rhoh0_edge_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::HfromRhoTedge()", HfromRhoTedge);
@@ -372,19 +372,14 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     Put1dArrayOnCart(tempbar,tempbar_cart,0,0,bcs_s,Temp);
 
     // edge variables    
-    RealVector rho0_edge( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge( (max_radial_level+1)*(nr_fine+1) );
-    RealVector tempbar_edge( (max_radial_level+1)*(nr_fine+1) );
-    rho0_edge.shrink_to_fit();
-    rhoh0_edge.shrink_to_fit();
-    tempbar_edge.shrink_to_fit();
+    BaseState<Real> rho0_edge(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rhoh0_edge(max_radial_level+1, nr_fine+1);
+    BaseState<Real> tempbar_edge(max_radial_level+1, nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(tempbar, tempbar_edge);
-        for (int i = 0; i < (max_radial_level+1)*(nr_fine+1); ++i) {
-            rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);
-            rhoh0_edge[i] = 0.5*(rhoh0_edge_old[i] + rhoh0_edge_new[i]);
-        }
+        rho0_edge.copy(0.5*(rho0_edge_old + rho0_edge_new));
+        rhoh0_edge.copy(0.5*(rhoh0_edge_old + rhoh0_edge_new));
     }
     
     Vector<MultiFab> rho0_edge_cart(finest_level+1);
@@ -400,10 +395,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         tempbar_edge_cart[lev].setVal(0.);
     }
 
-    if (spherical == 0) {
-        Put1dArrayOnCart(rho0_edge,rho0_edge_cart,1,0,bcs_s,Rho);
-        Put1dArrayOnCart(rhoh0_edge,rhoh0_edge_cart,1,0,bcs_s,RhoH);
-        Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,1,0,bcs_s,Temp);
+    if (!spherical) {
+        Put1dArrayOnCart(rho0_edge, rho0_edge_cart, 1, 0, bcs_s, Rho);
+        Put1dArrayOnCart(rhoh0_edge, rhoh0_edge_cart, 1, 0, bcs_s, RhoH);
+        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, 1, 0, bcs_s, Temp);
     }
 
     // make a lot of local copies
@@ -443,7 +438,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             const Array4<Real> sedgez = sedge[lev][2].array(mfi);
 #endif
 
-            if (spherical == 0) {
+            if (!spherical) {
                 const Array4<const Real> rho0_edge_arr = rho0_edge_cart[lev].array(mfi);
                 const Array4<const Real> rhoh0_edge_arr = rhoh0_edge_cart[lev].array(mfi);
                 const Array4<const Real> tempbar_edge_arr = tempbar_edge_cart[lev].array(mfi);
