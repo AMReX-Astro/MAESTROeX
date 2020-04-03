@@ -1685,16 +1685,15 @@ Maestro::MakeGrav (const RealVector& rho0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGrav()", MakeGrav);
 
-    RealVector grav_cell( (max_radial_level+1)*nr_fine );
-    grav_cell.shrink_to_fit();
+    BaseState<Real> grav_cell(max_radial_level+1, nr_fine);
 
     MakeGravCell(grav_cell, rho0);
 
-    Put1dArrayOnCart(grav_cell,grav,0,0,bcs_f,0);
+    Put1dArrayOnCart(grav_cell, grav, 0, 0, bcs_f, 0);
 
     // average down and fill ghost cells
-    AverageDown(grav,0,1);
-    FillPatch(t_old,grav,grav,grav,0,0,1,0,bcs_f);
+    AverageDown(grav, 0, 1);
+    FillPatch(t_old, grav, grav, grav, 0, 0, 1 ,0, bcs_f);
 }
 
 

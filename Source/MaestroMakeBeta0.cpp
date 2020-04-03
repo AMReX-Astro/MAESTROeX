@@ -8,7 +8,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                    const RealVector& rho0,
                    const RealVector& p0,
                    const BaseState<Real>& gamma1bar,
-                   const RealVector& grav_cell,
+                   const BaseState<Real>& grav_cell,
                    const bool is_irreg) 
 {
     // timer for profiling
@@ -125,16 +125,16 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                             (p0[n+max_lev*r] - 0.5*nu*drm)) <= 0.0) {
                             
                             // just do piecewise constant integration
-                            integral = fabs(grav_cell[n+max_lev*r])*rho0[n+max_lev*r]*0.5*(drp+drm)
+                            integral = fabs(grav_cell(n,r))*rho0[n+max_lev*r]*0.5*(drp+drm)
                                 / (p0[n+max_lev*r]*gamma1bar(n,r));
                             
                         } else {
                             if (use_linear_grav_in_beta0 && !is_irreg) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
-                                Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/dr(n);
-                                Real dpls = 2.0 * (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*r])/dr(n);
-                                Real dmin = 2.0 * (grav_cell[n+max_lev*r] - grav_cell[n+max_lev*(r-1)])/dr(n);
+                                Real del = 0.5* (grav_cell(n,r+1) - grav_cell(n,r-1))/dr(n);
+                                Real dpls = 2.0 * (grav_cell(n,r+1) - grav_cell(n,r))/dr(n);
+                                Real dmin = 2.0 * (grav_cell(n,r) - grav_cell(n,r-1))/dr(n);
                                 Real slim = min(fabs(dpls), fabs(dmin));
                                 slim = dpls * dmin > 0.0 ? slim : 0.0;
                                 Real sflag = copysign(1.0, del);
@@ -142,10 +142,10 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                                 
                                 Real denom = nu*gamma1bar(n,r) - mu*p0[n+max_lev*r];
                                 Real coeff1 = (lambda*gamma1bar(n,r) - mu*rho0[n+max_lev*r]) *
-                                    (kappa *gamma1bar(n,r) + mu*fabs(grav_cell[n+max_lev*r])) /
+                                    (kappa *gamma1bar(n,r) + mu*fabs(grav_cell(n,r))) /
                                     (mu*mu*denom);
                                 Real coeff2 = (lambda*p0[n+max_lev*r] - nu*rho0[n+max_lev*r])*
-                                    (-kappa*p0[n+max_lev*r] - nu*fabs(grav_cell[n+max_lev*r])) /
+                                    (-kappa*p0[n+max_lev*r] - nu*fabs(grav_cell(n,r))) /
                                     (nu*nu*denom);
                                 Real coeff3 = kappa*lambda / (mu*nu);
                                 
@@ -162,7 +162,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                                 Real coeff1 = lambda*gamma1bar(n,r)/mu - rho0[n+max_lev*r];
                                 Real coeff2 = lambda*p0[n+max_lev*r]/nu - rho0[n+max_lev*r];
 
-                                integral = (fabs(grav_cell[n+max_lev*r]) / denom) *
+                                integral = (fabs(grav_cell(n,r)) / denom) *
                                     (coeff1*log((gamma1bar(n,r) + 0.5*mu*drp)/
                                                 (gamma1bar(n,r) - 0.5*mu*drm)) -
                                      coeff2*log((p0[n+max_lev*r] + 0.5*nu*drp)/

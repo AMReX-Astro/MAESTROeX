@@ -74,7 +74,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    RealVector     grav_cell_nph    ( (max_radial_level+1)*nr_fine );
+    BaseState<Real>     grav_cell_nph    (max_radial_level+1, nr_fine);
     RealVector     rho0_nph         ( (max_radial_level+1)*nr_fine );
     RealVector     p0_nph           ( (max_radial_level+1)*nr_fine );
     RealVector     p0_minus_peosbar ( (max_radial_level+1)*nr_fine );
@@ -93,7 +93,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    grav_cell_nph.shrink_to_fit();
     rho0_nph.shrink_to_fit();
     p0_nph.shrink_to_fit();
     p0_minus_peosbar.shrink_to_fit();
@@ -425,7 +424,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         MakeGravCell(grav_cell_new, rho0_new);
     }
     else {
-        grav_cell_new = grav_cell_old;
+        grav_cell_new.copy(grav_cell_old);
    }
 
     // base state pressure update
@@ -859,7 +858,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             MakeGravCell(grav_cell_nph, rho0_nph);
         } else {
             rho0_nph = rho0_old;
-            grav_cell_nph = grav_cell_old;
+            grav_cell_nph.copy(grav_cell_old);
         }
         
         // base state pressure update

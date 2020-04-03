@@ -11,7 +11,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           const RealVector& w0_force,
                           const Vector<MultiFab>& w0_force_cart,
                           const RealVector& rho0_nph,
-                          const RealVector& grav_cell_nph,
+                          const BaseState<Real>& grav_cell_nph,
                           const Vector<MultiFab>& sponge)
 {
     // timer for profiling
@@ -75,3 +75,4 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
 
     UpdateVel(umac, uedge, vel_force, sponge, w0mac);
 }
+

@@ -526,7 +526,7 @@ public:
 
     void EnforceHSE(const RealVector& rho0, 
                     RealVector& p0,
-                    const RealVector& grav_cell);
+                    const BaseState<amrex::Real>& grav_cell);
 
     // end  MaestroEnforceHSE.cpp functions
     ////////////////////////
@@ -731,7 +731,7 @@ public:
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const RealVector& rho0,
-                       const RealVector& grav,
+                       const BaseState<amrex::Real>& grav,
                        const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
 
@@ -876,7 +876,7 @@ public:
                    const RealVector& rho0,
                    const RealVector& p0,
                    const BaseState<amrex::Real>& gamma1bar,
-                   const RealVector& grav_cell,
+                   const BaseState<amrex::Real>& grav_cell,
                    const bool is_irreg=false);
 
     // end MaestroMakeBeta0.cpp functions
@@ -1075,7 +1075,7 @@ public:
     ////////////
     // MaestroMakeGrav.cpp functions
 
-    void MakeGravCell(RealVector& grav_cell, 
+    void MakeGravCell(BaseState<amrex::Real>& grav_cell, 
                       const RealVector& rho0);
 
     void MakeGravEdge(RealVector& grav_edge, 
@@ -1099,7 +1099,7 @@ public:
                      const RealVector& p0_avg,
                      const RealVector& Sbar_in);
 
-    void MakePsiIrreg(const RealVector& grav_cell);
+    void MakePsiIrreg(const BaseState<amrex::Real>& grav_cell);
 
     // end MaestroMakePsi.cpp functions
     ////////////
@@ -1749,7 +1749,7 @@ public:
                           const RealVector& w0_force,
                           const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const RealVector& rho0_nph,
-                          const RealVector& grav_cell_nph,
+                          const BaseState<amrex::Real>& grav_cell_nph,
                           const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
 
@@ -2014,8 +2014,8 @@ public:
     BaseState<amrex::Real> gamma1bar_new;
     BaseState<amrex::Real> etarho_cc;
     BaseState<amrex::Real> psi;
-    RealVector grav_cell_old;
-    RealVector grav_cell_new;
+    BaseState<amrex::Real> grav_cell_old;
+    BaseState<amrex::Real> grav_cell_new;
     RealVector r_cc_loc;
     BaseState<amrex::Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing

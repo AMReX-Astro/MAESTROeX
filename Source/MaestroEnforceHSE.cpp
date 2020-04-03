@@ -6,7 +6,7 @@ using namespace amrex;
 void 
 Maestro::EnforceHSE(const RealVector& rho0, 
                     RealVector& p0,
-                    const RealVector& grav_cell) 
+                    const BaseState<Real>& grav_cell) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
@@ -75,16 +75,16 @@ Maestro::EnforceHSE(const RealVector& rho0,
                             (2.0*rho0[n+max_lev*r_start_coord(n,i)]/3.0 + 
                             4.0*rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]/3.0)* 
                             (grav_edge(n,r_start_coord(n,i)) + 
-                            grav_cell[n-1+max_lev*(r_start_coord(n,i)/2-1)])  
+                            grav_cell(n-1,r_start_coord(n,i)/2-1))  
                             + (dr(n)/8.0)* 
                             (5.0*rho0[n+max_lev*r_start_coord(n,i)]/3.0 + 
                             1.0*rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]/3.0)* 
                             (grav_edge(n,r_start_coord(n,i)) + 
-                            grav_cell[n+max_lev*r_start_coord(n,i)]);
+                            grav_cell(n,r_start_coord(n,i)));
                     } else {
                         // assuming constant g here
                         p0[n+max_lev*r_start_coord(n,i)] = p0[n-1+max_lev*(r_start_coord(n,i)/2-1)] 
-                            + (3.0*grav_cell[1]*dr(n)/4.0)* 
+                            + (3.0*grav_cell(1,0)*dr(n)/4.0)* 
                             (rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]+rho0[n+max_lev*r_start_coord(n,i)]);
                     }
                 } else {
@@ -123,16 +123,16 @@ Maestro::EnforceHSE(const RealVector& rho0,
                             (2.0*rho0[n+max_lev*r_end_coord(n,i)]/3.0 + 
                             4.0*rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]/3.0)* 
                             (grav_edge(n-1,(r_end_coord(n,i)+1)/2) + 
-                            grav_cell[n-1+max_lev*(r_end_coord(n,i)+1)/2]) 
+                            grav_cell(n-1,(r_end_coord(n,i)+1)/2)) 
                             + (dr(n)/8.0)* 
                             (5.0*rho0[n+max_lev*r_end_coord(n,i)]/3.0 + 
                             1.0*rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]/3.0)* 
-                            (grav_cell[n+max_lev*r_end_coord(n,i)] + 
+                            (grav_cell(n,r_end_coord(n,i)) + 
                             grav_edge(n-1,(r_end_coord(n,i)+1)/2));
                         offset = p0[n-1+max_lev*(r_end_coord(n,i)+1)/2] - temp;
                     } else {
                         // assuming constant g here
-                        Real temp = p0[n+max_lev*r_end_coord(n,i)] + (3.0*grav_cell[1]*dr(n)/4.0)* 
+                        Real temp = p0[n+max_lev*r_end_coord(n,i)] + (3.0*grav_cell(1,0)*dr(n)/4.0)* 
                             (rho0[n+max_lev*r_end_coord(n,i)]+rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]);
                         offset = p0[n-1+max_lev*(r_end_coord(n,i)+1)/2] - temp;
                     }

@@ -61,7 +61,7 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
 }
 
 void 
-Maestro::MakePsiIrreg(const RealVector& grav_cell) 
+Maestro::MakePsiIrreg(const BaseState<Real>& grav_cell) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiIrreg()", MakePsiIrreg);
@@ -71,12 +71,11 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
     psi.setVal(0.0);
 
     const auto& etarho_cc_p = etarho_cc;
-    const Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
     auto& psi_p = psi;
 
     const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
-        psi_p(0,r) = etarho_cc_p(0,r) * grav_cell_p[max_lev*r];
+        psi_p(0,r) = etarho_cc_p(0,r) * grav_cell(0,r);
     });
 
     for (auto r = base_cutoff_density_coord(0)+1; r < nr_fine; ++r) {

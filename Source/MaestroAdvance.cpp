@@ -84,7 +84,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    RealVector grav_cell_nph   ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> grav_cell_nph   (max_radial_level+1, nr_fine);
     RealVector rho0_nph        ( (max_radial_level+1)*nr_fine );
     RealVector p0_nph          ( (max_radial_level+1)*nr_fine );
     RealVector p0_minus_peosbar( (max_radial_level+1)*nr_fine );
@@ -103,7 +103,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    grav_cell_nph.shrink_to_fit();
     rho0_nph.shrink_to_fit();
     p0_nph.shrink_to_fit();
     p0_minus_peosbar.shrink_to_fit();
@@ -504,7 +503,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     } else {
         rhoh0_new = rhoh0_old;
-        grav_cell_new = grav_cell_old;
+        grav_cell_new.copy(grav_cell_old);
         p0_new = p0_old;
     }
 
@@ -871,10 +870,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
-    }
-    else {
+    } else {
         rho0_nph = rho0_old;
-        grav_cell_nph = grav_cell_old;
+        grav_cell_nph.copy(grav_cell_old);
     }
 
     if (maestro_verbose >= 1) {

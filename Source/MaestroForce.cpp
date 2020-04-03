@@ -9,7 +9,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const Vector<MultiFab>& rho,
                        const RealVector& rho0,
-                       const RealVector& grav_cell,
+                       const BaseState<Real>& grav_cell,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
@@ -592,10 +592,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
 
     RealVector rho0( (max_radial_level+1)*nr_fine );
     RealVector   p0( (max_radial_level+1)*nr_fine );
-    RealVector grav( (max_radial_level+1)*nr_fine );
+    BaseState<Real> grav(max_radial_level+1, nr_fine);
     rho0.shrink_to_fit();
     p0.shrink_to_fit();
-    grav.shrink_to_fit();
 
     if (which_step == 1) {
         rho0 = rho0_old;
@@ -767,8 +766,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     // average down and fill ghost cells
-    AverageDown(scal_force,RhoH,1);
-    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,0,bcs_f);
+    AverageDown(scal_force, RhoH, 1);
+    FillPatch(t_old, scal_force, scal_force, scal_force, 
+              RhoH, RhoH, 1, 0, bcs_f);
 }
 
 

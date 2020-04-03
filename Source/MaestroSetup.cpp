@@ -135,9 +135,9 @@ Maestro::Setup ()
     beta0_nm1    .resize(max_radial_level+1, nr_fine);
     gamma1bar_old.resize(max_radial_level+1, nr_fine);
     gamma1bar_new.resize(max_radial_level+1, nr_fine);
-    grav_cell_old.resize( (max_radial_level+1)*nr_fine);
-    grav_cell_new.resize( (max_radial_level+1)*nr_fine);
-    r_cc_loc     .resize( (max_radial_level+1)*nr_fine);
+    grav_cell_old.resize(max_radial_level+1, nr_fine);
+    grav_cell_new.resize(max_radial_level+1, nr_fine);
+    r_cc_loc     .resize((max_radial_level+1)*nr_fine);
     r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
     etarho_cc    .resize(max_radial_level+1, nr_fine);
     psi          .resize(max_radial_level+1, nr_fine);
@@ -172,8 +172,6 @@ Maestro::Setup ()
     p0_nm1       .shrink_to_fit();
     tempbar      .shrink_to_fit();
     tempbar_init .shrink_to_fit();
-    grav_cell_old.shrink_to_fit();
-    grav_cell_new.shrink_to_fit();
     w0           .shrink_to_fit();
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
