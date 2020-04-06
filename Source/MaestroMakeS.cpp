@@ -33,17 +33,17 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     const auto max_lev = max_radial_level + 1;
 
-    if (spherical == 1) {
+    if (spherical) {
         if (use_delta_gamma1_term) {
-            Real dr_loc = r_cc_loc[1] - r_cc_loc[0];
-            gradp0[0] = (p0[1] - p0[0]) / dr_loc;
+            Real dr_loc = r_cc_loc[max_lev] - r_cc_loc[0];
+            gradp0[0] = (p0[max_lev] - p0[0]) / dr_loc;
 
-            dr_loc = r_cc_loc[nr_fine-1] - r_cc_loc[nr_fine-2];
-            gradp0[nr_fine-1] = (p0[nr_fine-1] - p0[nr_fine-2]) / dr_loc;
+            dr_loc = r_cc_loc[max_lev*(nr_fine-1)] - r_cc_loc[max_lev*(nr_fine-2)];
+            gradp0[max_lev*(nr_fine-1)] = (p0[max_lev*(nr_fine-1)] - p0[max_lev*(nr_fine-2)]) / dr_loc;
 
             for (int r=1; r < nr_fine-1; r++) {
-                dr_loc = r_cc_loc[r+1] - r_cc_loc[r-1];
-                gradp0[r] = (p0[r+1] - p0[r-1]) / dr_loc;
+                dr_loc = r_cc_loc[max_lev*(r+1)] - r_cc_loc[max_lev*(r-1)];
+                gradp0[max_lev*r] = (p0[max_lev*(r+1)] - p0[max_lev*(r-1)]) / dr_loc;
             }
         }
 
@@ -54,7 +54,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     } else {
         if (use_delta_gamma1_term) {
             for (int lev=0; lev<=finest_level; ++lev) {
-                int index;
                 const Real* dx = geom[lev].CellSize();
 
                 // bottom and top edge cases for planar
