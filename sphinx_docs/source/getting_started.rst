@@ -31,7 +31,9 @@ paper 3.
    https://github.com/AMReX-Astro/MAESTROeX  . There are several
    options: you can fork it directly on github (recommended if
    you intend to develop the code) or clone it using git from the
-   project page.
+   project page by typing::
+
+      git clone https://github.com/AMReX-Astro/MAESTROeX.git
 
    MAESTROeX is under active development, so you will want to keep in
    sync with the changes by periodically pulling from the repository.
@@ -46,13 +48,35 @@ paper 3.
    MAESTROeX and its compressible counterpart CASTRO share a
    common-set of microphysics solvers (nuclear reaction networks and
    equations of state). These are kept in a separate repo.
-   Microphysics is also available on github and can be obtained
-   via::
+   There are two ways to access the Microphysics repo: you can use a
+   submodule or clone the Microphysics repo itself.
+
+   If you choose to use the submodule, enter the ``MAESTROeX/``
+   directory and type::
+
+      git submodule --init
+
+   Note that in the future when you pull MAESTROeX, to make sure the
+   Microphysics submodule is also updated you must instead use::
+
+      git pull --recurse-submodules
+
+   Alternatively, you can run the following command on your system to
+   ensure that updating the submodules upon a git pull is the default
+   behavior::
+
+     git config --global submodule.recurse true
+      
+   If you choose to use the Microphysics repo directly, it is
+   available on github and can be obtained via::
 
        git clone https://github.com/starkiller-astro/Microphysics.git
 
-   You will periodic want to update Microphysics by doing::
+   Next you must specify the path to the Microphysics repository as
+   a global environment variable on your machine, ``MICROPHYSICS_HOME``
 
+   You will periodic want to update Microphysics by doing::
+   
        git pull
 
    in the ``Microphysics/`` directory.

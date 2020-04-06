@@ -8,8 +8,6 @@ USE_REACT  = TRUE
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..
 
-# if not already defined, point to Microphysics
-MICROPHYSICS_HOME ?= ../../../../Microphysics
 
 # define the physics packages to build this problem
 # EOS_DIR := gamma_law_general
