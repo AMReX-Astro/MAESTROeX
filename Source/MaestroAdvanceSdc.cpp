@@ -251,7 +251,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
     }
     // no ghost cells for S_cc_nph
-    AverageDown(S_cc_nph,0,1);
+    AverageDown(S_cc_nph, 0, 1);
 
     // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
@@ -260,9 +260,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         PfromRhoH(sold,sold,peos_old);
 
         // compute peosbar = Avg(peos_old)
-        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-        Average(delta_p_term, peosbar_vec, 0);
-        peosbar.copy(peosbar_vec);
+        Average(delta_p_term, peosbar, 0);
 
         // compute p0_minus_peosbar = p0_old - peosbar
         p0_minus_peosbar.copy(p0_old - peosbar);
@@ -286,7 +284,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (split_projection) {
 
             // compute Sbar = average(S_cc_nph)
-            Average(S_cc_nph,Sbar,0);
+            Average(S_cc_nph, Sbar, 0);
 
             // save old-time value
             w0_old = w0;
@@ -447,9 +445,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_old by "averaging"
-        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
-        Average(sold, rhoh0_old_vec, RhoH);
-        rhoh0_old.copy(rhoh0_old_vec);
+        Average(sold, rhoh0_old, RhoH);
     } else {
         rhoh0_new.copy(rhoh0_old);
     }
@@ -463,9 +459,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // base state enthalpy update
     if (evolve_base_state) {
         // compute rhoh0_new by "averaging"
-        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
-        Average(shat, rhoh0_new_vec, RhoH);
-        rhoh0_new.copy(rhoh0_new_vec);
+        Average(shat, rhoh0_new, RhoH);
 
         // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
         for (auto l = 0; l <= max_radial_level; ++l) {
@@ -574,9 +568,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
 
         // update base state enthalpy
-        RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
-        Average(snew, rhoh0_new_vec, RhoH);
-        rhoh0_new.copy(rhoh0_new_vec);
+        Average(snew, rhoh0_new, RhoH);
 
         // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
         //                       - (rhoh0_hat - rhoh0_old)/dt
@@ -715,9 +707,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 }
                 
                 // compute peosbar = Avg(peos_new)
-                RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-                Average(delta_p_term, peosbar_vec, 0);
-                peosbar.copy(peosbar_vec);
+                Average(delta_p_term, peosbar, 0);
 
                 // compute p0_nph
                 p0_nph.copy(0.5*(p0_old + p0_new));
@@ -745,7 +735,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 if (split_projection) {
                     
                     // compute Sbar = average(S_cc_nph)
-                    Average(S_cc_nph,Sbar,0);
+                    Average(S_cc_nph, Sbar, 0);
                     
                     // compute Sbar = Sbar + delta_gamma1_termbar
                     if (use_delta_gamma1_term) {
@@ -876,9 +866,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // base state enthalpy update
         if (evolve_base_state) {
-            RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
-            Average(shat, rhoh0_new_vec, RhoH);
-            rhoh0_new.copy(rhoh0_new_vec);
+            Average(shat, rhoh0_new, RhoH);
 
             // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
             for (auto l = 0; l <= max_radial_level; ++l) {
@@ -1002,9 +990,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
             
             // also update base state enthalpy
-            RealVector rhoh0_new_vec((max_radial_level+1)*nr_fine);
-            Average(snew, rhoh0_new_vec, RhoH);
-            rhoh0_new.copy(rhoh0_new_vec);
+            Average(snew, rhoh0_new, RhoH);
             
             // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
             //                       - (rhoh0_hat - rhoh0_old)/dt
@@ -1220,9 +1206,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             PfromRhoH(snew,snew,delta_p_term);
 
             // compute peosbar = Avg(peos_new)
-            RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-            Average(delta_p_term, peosbar_vec, 0);
-            peosbar.copy(peosbar_vec);
+            Average(delta_p_term, peosbar, 0);
 
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
@@ -1263,7 +1247,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (!is_initIter) {
         if (!fix_base_state) {
             // compute tempbar by "averaging"
-            Average(snew,tempbar,Temp);
+            Average(snew, tempbar, Temp);
         }
     }
 

@@ -261,9 +261,9 @@ Maestro::InitData ()
     InitMultilevel(finest_level);
 
     // average down data and fill ghost cells
-    AverageDown(sold,0,Nscal);
+    AverageDown(sold, 0, Nscal);
     FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
-    AverageDown(uold,0,AMREX_SPACEDIM);
+    AverageDown(uold, 0, AMREX_SPACEDIM);
     FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
 
     // free memory in s0_init and p0_init by swapping it
@@ -289,7 +289,7 @@ Maestro::InitData ()
             rhoh0_old.setVal(0.0);
         } else {
             // set rho0 to be the average
-            Average(sold,rho0_old,Rho);
+            Average(sold, rho0_old, Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
 
@@ -303,9 +303,7 @@ Maestro::InitData ()
             TfromRhoP(sold, p0_old, 1);
 
             // set rhoh0 to be the average
-            RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
-            Average(sold, rhoh0_old_vec, RhoH);
-            rhoh0_old.copy(rhoh0_old_vec);
+            Average(sold, rhoh0_old, RhoH);
         }
 
         // set tempbar to be the average
@@ -474,7 +472,7 @@ void Maestro::InitProj ()
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
         // average S into Sbar
-        Average(S_cc_old,Sbar,0);
+        Average(S_cc_old, Sbar, 0);
     } else {
         std::fill(Sbar.begin(), Sbar.end(), 0.);
     }
@@ -576,7 +574,7 @@ void Maestro::DivuIter (int istep_divu_iter)
                 Sbar[i] += delta_gamma1_termbar[i];
             }
         } else {
-            Average(S_cc_old,Sbar,0);
+            Average(S_cc_old, Sbar, 0);
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
@@ -720,7 +718,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
                 Sbar[i] += delta_gamma1_termbar[i];
             }
         } else {
-            Average(S_cc_old,Sbar,0);
+            Average(S_cc_old, Sbar, 0);
             
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {

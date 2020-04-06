@@ -294,6 +294,9 @@ public:
     void Average (const amrex::Vector<amrex::MultiFab>& mf,
                   RealVector& phibar,
                   int comp);
+    void Average (const amrex::Vector<amrex::MultiFab>& mf,
+                  BaseState<amrex::Real>& phibar,
+                  int comp);
 
     // end MaestroAverage.cpp functions
     ////////////

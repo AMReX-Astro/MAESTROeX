@@ -250,9 +250,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         PfromRhoH(sold, sold, delta_p_term);
 
         // compute peosbar = Avg(peos_old)
-        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-        Average(delta_p_term, peosbar_vec, 0);
-        peosbar.copy(peosbar_vec);
+        Average(delta_p_term, peosbar, 0);
 
         // compute p0_minus_peosbar = p0_old - peosbar
         p0_minus_peosbar.copy(p0_old - peosbar);
@@ -287,7 +285,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
 
         // compute Sbar = average(S_cc_nph)
-        Average(S_cc_nph,Sbar,0);
+        Average(S_cc_nph, Sbar, 0);
 
         // save old-time value
         w0_old = w0;
@@ -484,9 +482,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // base state enthalpy update
         // compute rhoh0_old by "averaging"
-        RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
-        Average(s1, rhoh0_old_vec, RhoH);
-        rhoh0_old.copy(rhoh0_old_vec);
+        Average(s1, rhoh0_old, RhoH);
 
         base_time_start = ParallelDescriptor::second();
 
@@ -649,9 +645,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         PfromRhoH(snew, snew, delta_p_term);
 
         // compute peosbar = Avg(peos_new)
-        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-        Average(delta_p_term, peosbar_vec, 0);
-        peosbar.copy(peosbar_vec);
+        Average(delta_p_term, peosbar, 0);
 
         // compute p0_minus_peosbar = p0_new - peosbar
         p0_minus_peosbar.copy(p0_new - peosbar);
@@ -674,7 +668,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
 
         // compute Sbar = average(S_cc_nph)
-        Average(S_cc_nph,Sbar,0);
+        Average(S_cc_nph, Sbar, 0);
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
@@ -1069,9 +1063,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             PfromRhoH(snew,snew,delta_p_term);
 
             // compute peosbar = Avg(peos_new)
-            RealVector peosbar_vec((max_radial_level+1)*nr_fine);
-            Average(delta_p_term, peosbar_vec, 0);
-            peosbar.copy(peosbar_vec);
+            Average(delta_p_term, peosbar, 0);
 
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
@@ -1102,7 +1094,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (!is_initIter) {
         if (!fix_base_state) {
             // compute tempbar by "averaging"
-            Average(snew,tempbar,Temp);
+            Average(snew, tempbar, Temp);
         }
     }
 

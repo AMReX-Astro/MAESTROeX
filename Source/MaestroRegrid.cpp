@@ -86,7 +86,7 @@ Maestro::Regrid ()
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
-        Average(sold,rho0_old,Rho);
+        Average(sold, rho0_old, Rho);
     } else {
         for (auto lev = 0; lev <= max_radial_level+1; ++lev) {
             for (auto r = 0; r < nr_fine; ++r) {
