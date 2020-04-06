@@ -426,12 +426,11 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((max_radial_level+1)*nr_fine, 0.0);
-        phisum.shrink_to_fit();
-        Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
+        BaseState<Real> phisum(max_radial_level+1, nr_fine);
+        phisum.setVal(0.0);
 
         // this stores how many cells there are laterally at each level
-        IntVector ncell(max_radial_level+1);
+        BaseState<int> ncell(max_radial_level+1);
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -441,14 +440,10 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // compute number of cells at any given height for each level
             if (AMREX_SPACEDIM==2) {
-                ncell[lev] = domainBox.bigEnd(0)+1;
+                ncell(lev) = domainBox.bigEnd(0)+1;
+            } else if (AMREX_SPACEDIM==3) {
+                ncell(lev) = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
-            else if (AMREX_SPACEDIM==3) {
-                ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
-            }
-
-            // get references to the MultiFabs at level lev
-            const MultiFab& phi_mf = phi[lev];
         
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -466,7 +461,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 #if (AMREX_SPACEDIM == 2)
                     if (k == 0)
 #endif
-                        amrex::HostDevice::Atomic::Add(&(phisum_p[lev+max_lev*r]), phi_arr(i, j, k));
+                        amrex::HostDevice::Atomic::Add(&(phisum(lev,r)), phi_arr(i, j, k));
                 });
             }
         }
@@ -479,10 +474,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             for (auto i = 1; i <= numdisjointchunks(lev); ++i) { 
                 const int lo = r_start_coord(lev,i);
                 const int hi = r_end_coord(lev,i);
-                Real ncell_lev = ncell[lev];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
-                    phisum_p[lev+max_lev*r] /= ncell_lev;
+                    phisum(lev,r) /= ncell(lev);
                 });
             }
         }
@@ -491,9 +485,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         FillGhostBase(phisum, true);
 
         // swap pointers so phibar contains the computed average
-        BaseState<Real> phisum_b(max_radial_level+1, nr_fine);
-        phisum_b.copy(phisum);
-        phisum_b.swap(phibar);
+        phisum.swap(phibar);
 
     } else if (spherical && use_exact_base_state) {
         // spherical case with uneven base state spacing
