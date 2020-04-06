@@ -125,7 +125,7 @@ Maestro::Init ()
     if (restart_file == "") {
 
         // compute gamma1bar
-        MakeGamma1bar(sold,gamma1bar_old,p0_old);
+        MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
         // compute beta0
         MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
@@ -223,7 +223,6 @@ Maestro::Init ()
             DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
         }
     }
-
 }
 
 // fill in multifab and base state data
@@ -270,8 +269,8 @@ Maestro::InitData ()
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope
     RealVector s0_swap, p0_swap;
-    std::swap(s0_swap,s0_init);
-    std::swap(p0_swap,p0_init);
+    std::swap(s0_swap, s0_init);
+    std::swap(p0_swap, p0_init);
 
     if (fix_base_state) {
         // compute cutoff coordinates
@@ -301,7 +300,7 @@ Maestro::InitData ()
             EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
             // call eos with r,p as input to recompute T,h
-            TfromRhoP(sold,p0_old,1);
+            TfromRhoP(sold, p0_old, 1);
 
             // set rhoh0 to be the average
             RealVector rhoh0_old_vec((max_radial_level+1)*nr_fine);
@@ -317,9 +316,7 @@ Maestro::InitData ()
     }
 
     // set p0^{-1} = p0_old
-    for (int i=0; i<p0_old.size(); ++i) {
-        p0_nm1[i] = p0_old[i];
-    }
+    p0_nm1.copy(p0_old);
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -516,13 +513,12 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
     RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-    RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> p0_minus_peosbar      (max_radial_level+1, nr_fine);
     RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
     Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
-    p0_minus_peosbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
@@ -531,7 +527,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
-    std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
+    p0_minus_peosbar.setVal(0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -561,7 +557,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
 
-        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+        MakeExplicitThermal(thermal, sold, Tcoeff, hcoeff,Xkcoeff, pcoeff, p0_old,
                             temp_diffusion_formulation);
     } else {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -660,13 +656,12 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     
     RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
     RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-    RealVector p0_minus_pthermbar    ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> p0_minus_pthermbar    (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     
     Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
-    p0_minus_pthermbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     
@@ -675,7 +670,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
-    std::fill(p0_minus_pthermbar.begin(),   p0_minus_pthermbar.end(),   0.);
+    p0_minus_pthermbar.setVal(0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
     std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
     
@@ -699,12 +694,12 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
         sdc_source[lev].setVal(0.);
     }
     
-    ReactSDC(sold,stemp,rho_Hext,p0_old,0.5*dt,t_old,sdc_source);
+    ReactSDC(sold, stemp, rho_Hext, p0_old, 0.5*dt, t_old, sdc_source);
     
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
         
-        MakeExplicitThermal(thermal,sold,Tcoeff,hcoeff,Xkcoeff,pcoeff,p0_old,
+        MakeExplicitThermal(thermal, sold, Tcoeff, hcoeff, Xkcoeff, pcoeff, p0_old,
                             temp_diffusion_formulation);
     } else {
         for (int lev=0; lev<=finest_level; ++lev) {

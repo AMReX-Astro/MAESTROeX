@@ -99,7 +99,7 @@ Maestro::Evolve ()
             Real diag_start_total = ParallelDescriptor::second();
 
             // save diag output into buffer
-            DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+            DiagFile(istep, t_new, rho0_new, p0_new, unew,snew, diag_index);
 
             // wallclock time
             Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
@@ -160,8 +160,8 @@ Maestro::Evolve ()
 
         std::swap( rho0_old, rho0_new);
         rhoh0_old.swap(rhoh0_new);
-        std::swap(   p0_nm1,   p0_old);
-        std::swap(   p0_old,   p0_new);
+        p0_nm1.swap(p0_old);
+        p0_old.swap(p0_new);
 
         beta0_old.swap(beta0_new);
         gamma1bar_old.swap(gamma1bar_new);

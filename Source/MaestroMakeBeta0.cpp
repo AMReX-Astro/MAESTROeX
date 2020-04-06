@@ -6,7 +6,7 @@ using namespace amrex;
 void 
 Maestro::MakeBeta0(BaseState<Real>& beta0, 
                    const RealVector& rho0,
-                   const RealVector& p0,
+                   const BaseState<Real>& p0,
                    const BaseState<Real>& gamma1bar,
                    const BaseState<Real>& grav_cell,
                    const bool is_irreg) 
@@ -100,9 +100,9 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                             sflag = copysign(1.0, del);
                             mu = sflag * min(slim, fabs(del));
                             
-                            del = 0.5* (p0[n+max_lev*(r+1)] - p0[n+max_lev*(r-1)])/drc;
-                            dpls = 2.0 * (p0[n+max_lev*(r+1)] - p0[n+max_lev*r])/drp;
-                            dmin = 2.0 * (p0[n+max_lev*r] - p0[n+max_lev*(r-1)])/drm;
+                            del = 0.5* (p0(n,r+1) - p0(n,r-1))/drc;
+                            dpls = 2.0 * (p0(n,r+1) - p0(n,r))/drp;
+                            dmin = 2.0 * (p0(n,r) - p0(n,r-1))/drm;
                             slim = min(fabs(dpls), fabs(dmin));
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             sflag = copysign(1.0, del);
@@ -118,15 +118,15 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                         Real integral = 0.0;
 
                         if (nu == 0.0 || mu == 0.0 ||
-                            (nu*gamma1bar(n,r) - mu*p0[n+max_lev*r]) == 0.0 ||
+                            (nu*gamma1bar(n,r) - mu*p0(n,r)) == 0.0 ||
                             ((gamma1bar(n,r) + 0.5*mu*drp)/
                             (gamma1bar(n,r) - 0.5*mu*drm)) <= 0.0 ||
-                            ((p0[n+max_lev*r] + 0.5*nu*drp)/
-                            (p0[n+max_lev*r] - 0.5*nu*drm)) <= 0.0) {
+                            ((p0(n,r) + 0.5*nu*drp)/
+                            (p0(n,r) - 0.5*nu*drm)) <= 0.0) {
                             
                             // just do piecewise constant integration
                             integral = fabs(grav_cell(n,r))*rho0[n+max_lev*r]*0.5*(drp+drm)
-                                / (p0[n+max_lev*r]*gamma1bar(n,r));
+                                / (p0(n,r)*gamma1bar(n,r));
                             
                         } else {
                             if (use_linear_grav_in_beta0 && !is_irreg) {
@@ -140,33 +140,33 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
                                 Real sflag = copysign(1.0, del);
                                 Real kappa = sflag * min(slim, fabs(del));
                                 
-                                Real denom = nu*gamma1bar(n,r) - mu*p0[n+max_lev*r];
+                                Real denom = nu*gamma1bar(n,r) - mu*p0(n,r);
                                 Real coeff1 = (lambda*gamma1bar(n,r) - mu*rho0[n+max_lev*r]) *
                                     (kappa *gamma1bar(n,r) + mu*fabs(grav_cell(n,r))) /
                                     (mu*mu*denom);
-                                Real coeff2 = (lambda*p0[n+max_lev*r] - nu*rho0[n+max_lev*r])*
-                                    (-kappa*p0[n+max_lev*r] - nu*fabs(grav_cell(n,r))) /
+                                Real coeff2 = (lambda*p0(n,r) - nu*rho0[n+max_lev*r])*
+                                    (-kappa*p0(n,r) - nu*fabs(grav_cell(n,r))) /
                                     (nu*nu*denom);
                                 Real coeff3 = kappa*lambda / (mu*nu);
                                 
                                 integral = 
                                     coeff1*log( (gamma1bar(n,r) + 0.5*mu*dr(n))/
                                                 (gamma1bar(n,r) - 0.5*mu*dr(n)) ) +
-                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*dr(n))/
-                                                (p0[n+max_lev*r] - 0.5*nu*dr(n)) ) -
+                                    coeff2*log( (p0(n,r) + 0.5*nu*dr(n))/
+                                                (p0(n,r) - 0.5*nu*dr(n)) ) -
                                     coeff3*dr(n);
 
                             } else {
                                 // paper III, equation C2
-                                Real denom = nu*gamma1bar(n,r) - mu*p0[n+max_lev*r];
+                                Real denom = nu*gamma1bar(n,r) - mu*p0(n,r);
                                 Real coeff1 = lambda*gamma1bar(n,r)/mu - rho0[n+max_lev*r];
-                                Real coeff2 = lambda*p0[n+max_lev*r]/nu - rho0[n+max_lev*r];
+                                Real coeff2 = lambda*p0(n,r)/nu - rho0[n+max_lev*r];
 
                                 integral = (fabs(grav_cell(n,r)) / denom) *
                                     (coeff1*log((gamma1bar(n,r) + 0.5*mu*drp)/
                                                 (gamma1bar(n,r) - 0.5*mu*drm)) -
-                                     coeff2*log((p0[n+max_lev*r] + 0.5*nu*drp)/
-                                                (p0[n+max_lev*r] - 0.5*nu*drm)) );
+                                     coeff2*log((p0(n,r) + 0.5*nu*drp)/
+                                                (p0(n,r) - 0.5*nu*drm)) );
                             }
                         }
 

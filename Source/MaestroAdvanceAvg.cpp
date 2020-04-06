@@ -65,9 +65,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // these are cell-centered
     BaseState<Real> grav_cell_nph   (max_radial_level+1, nr_fine);
     RealVector   rho0_nph        ( (max_radial_level+1)*nr_fine );
-    RealVector p0_nph          ( (max_radial_level+1)*nr_fine );
-    RealVector p0_minus_peosbar( (max_radial_level+1)*nr_fine );
-    RealVector   peosbar         ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> p0_nph          (max_radial_level+1, nr_fine);
+    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
+    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
     BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
@@ -82,9 +82,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // make sure C++ is as efficient as possible with memory usage
     rho0_nph.shrink_to_fit();
-    p0_nph.shrink_to_fit();
-    p0_minus_peosbar.shrink_to_fit();
-    peosbar.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
@@ -254,12 +251,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         PfromRhoH(sold,sold,delta_p_term);
 
         // compute peosbar = Avg(peos_old)
-        Average(delta_p_term,peosbar,0);
+        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+        Average(delta_p_term, peosbar_vec, 0);
+        peosbar.copy(peosbar_vec);
 
         // compute p0_minus_peosbar = p0_old - peosbar
-        for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-            p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
-        }
+        p0_minus_peosbar.copy(p0_old - peosbar);
 
         // compute peosbar_cart from peosbar
         Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -268,10 +265,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // these should have no effect if dpdt_factor <= 0
-        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+        p0_minus_peosbar.setVal(0.0);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -324,7 +320,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state && !split_projection) {
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old[l+(max_radial_level+1)*r]) * (p0_old[l+(max_radial_level+1)*r] - p0_nm1[l+(max_radial_level+1)*r])/dtold;
+                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old(l,r)) * (p0_old(l,r) - p0_nm1(l,r))/dtold;
             }
         }
     }
@@ -419,24 +415,21 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
 
         // set new p0 through HSE
-        p0_new = p0_old;
+        p0_new.copy(p0_old);
 
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
-        for (int i=0; i<p0_nph.size(); ++i) {
-            p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-        }
+        p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
             }
         }
-
     } else {
-        p0_new = p0_old;
+        p0_new.copy(p0_old);
     }
 
     // base state enthalpy update
@@ -488,10 +481,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2,p0_new);
-    }
-    else {
-        TfromRhoH(s2,p0_new);
+        TfromRhoP(s2, p0_new);
+    } else {
+        TfromRhoH(s2, p0_new);
     }
 
     if (use_thermal_diffusion) {
@@ -553,8 +545,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
         MakeExplicitThermal(thermal2,snew,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
                             temp_diffusion_formulation);
-    }
-    else {
+    } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             thermal2[lev].setVal(0.);
         }
@@ -576,12 +567,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         PfromRhoH(snew,snew,delta_p_term);
 
         // compute peosbar = Avg(peos_new)
-        Average(delta_p_term,peosbar,0);
+        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+        Average(delta_p_term, peosbar_vec, 0);
+        peosbar.copy(peosbar_vec);
 
         // compute p0_minus_peosbar = p0_new - peosbar
-        for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-            p0_minus_peosbar[i] = p0_new[i] - peosbar[i];
-        }
+        p0_minus_peosbar.copy(p0_new - peosbar);
 
         // compute peosbar_cart from peosbar
         Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -590,10 +581,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // these should have no effect if dpdt_factor <= 0
-        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+        p0_minus_peosbar.setVal(0.);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -644,7 +634,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state && !split_projection) {
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (1.0/(gamma1bar_nph(l,r)*p0_nph[l+(max_radial_level+1)*r]))*(p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                Sbar[l+(max_radial_level+1)*r] = (1.0/(gamma1bar_nph(l,r)*p0_nph(l,r)))*(p0_new(l,r) - p0_old(l,r))/dt;
             }
         }
     }
@@ -725,18 +715,16 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state) {
 
         // set new p0 through HSE
-        p0_new = p0_old;
+        p0_new.copy(p0_old);
 
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
-        for (int i=0; i<p0_nph.size(); ++i) {
-            p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-        }
+        p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
             }
         }
     }
@@ -787,10 +775,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2,p0_new);
-    }
-    else {
-        TfromRhoH(s2,p0_new);
+        TfromRhoP(s2, p0_new);
+    } else {
+        TfromRhoH(s2, p0_new);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -897,7 +884,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     if (evolve_base_state && !split_projection) {
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/(dt*gamma1bar_new(l,r)*p0_new[l+(max_radial_level+1)*r]);
+                Sbar[l+(max_radial_level+1)*r] = (p0_new(l,r) - p0_old(l,r))/(dt*gamma1bar_new(l,r)*p0_new(l,r));
             }
         }
     }
@@ -938,7 +925,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             PfromRhoH(snew,snew,delta_p_term);
 
             // compute peosbar = Avg(peos_new)
-            Average(delta_p_term,peosbar,0);
+            RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+            Average(delta_p_term, peosbar_vec, 0);
+            peosbar.copy(peosbar_vec);
 
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 

@@ -697,32 +697,31 @@ Maestro::FirstDt ()
 
 
 void
-Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
+Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0, 
                     const BaseState<Real>& gamma1bar)
 {
     const int max_lev = max_radial_level + 1;
 
     Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
-    const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc_b;
 
     // spherical divU constraint
     if (use_exact_base_state) {
         AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0[max_lev*r] + gamma1bar(0,r-1)*p0[max_lev*(r-1)]);
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
 
-            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
+            gp0[max_lev*r] = (p0(0,r) - p0(0,r-1)) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
         const auto dr0 = dr[0];
         AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0[max_lev*r] + gamma1bar(0,r-1)*p0[max_lev*(r-1)]);
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
 
-            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / dr0 / gamma1bar_p_avg;
+            gp0[max_lev*r] = (p0(0,r) - p0(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
 

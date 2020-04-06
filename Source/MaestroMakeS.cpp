@@ -15,7 +15,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
-                    const RealVector& p0,
+                    const BaseState<Real>& p0,
                     const BaseState<Real>& gamma1bar,
                     RealVector& delta_gamma1_termbar)
 {
@@ -36,14 +36,14 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (spherical) {
         if (use_delta_gamma1_term) {
             Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
-            gradp0[0] = (p0[1] - p0[0]) / dr_loc;
+            gradp0[0] = (p0(0,1) - p0(0,0)) / dr_loc;
 
             dr_loc = r_cc_loc_b(0,nr_fine-1) - r_cc_loc_b(0,nr_fine-2);
-            gradp0[nr_fine-1] = (p0[nr_fine-1] - p0[nr_fine-2]) / dr_loc;
+            gradp0[nr_fine-1] = (p0(0,nr_fine-1) - p0(0,nr_fine-2)) / dr_loc;
 
             for (int r=1; r < nr_fine-1; r++) {
                 dr_loc = r_cc_loc_b(0,r+1) - r_cc_loc_b(0,r-1);
-                gradp0[r] = (p0[r+1] - p0[r-1]) / dr_loc;
+                gradp0[r] = (p0(0,r+1) - p0(0,r-1)) / dr_loc;
             }
         }
 
@@ -58,11 +58,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 const Real* dx = geom[lev].CellSize();
 
                 // bottom and top edge cases for planar
-                gradp0[lev] = (p0[lev+max_lev] - p0[lev]) / dx[AMREX_SPACEDIM-1];
-                gradp0[lev+max_lev*(nr_fine-1)] = (p0[lev+max_lev*(nr_fine-1)] - p0[lev+max_lev*(nr_fine-2)]) / dx[AMREX_SPACEDIM-1];
+                gradp0[lev] = (p0(lev,1) - p0(lev,0)) / dx[AMREX_SPACEDIM-1];
+                gradp0[lev+max_lev*(nr_fine-1)] = (p0(lev,nr_fine-1) - p0(lev,nr_fine-2)) / dx[AMREX_SPACEDIM-1];
                 
                 for (int r=1; r<nr_fine-1; r++) {
-                    gradp0[lev+max_lev*r] = (p0[lev+max_lev*(r+1)] - p0[lev+max_lev*(r-1)]) / (2.0*dx[AMREX_SPACEDIM-1]);
+                    gradp0[lev + max_lev*r] = (p0(lev,r+1) - p0(lev,r-1)) / (2.0*dx[AMREX_SPACEDIM-1]);
                 }
             }
         }
@@ -74,7 +74,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gradp0,gradp0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(gradp0, gradp0_cart, 0, 0, bcs_f, 0);
     }
         
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -324,7 +324,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
                                  const RealVector& rho0,
                                  const BaseState<Real>& beta0,
                                  const BaseState<Real>& gamma1bar,
-                                 const RealVector& p0,
+                                 const BaseState<Real>& p0,
                                  const Vector<MultiFab>& delta_p_term)
 {
     // timer for profiling
@@ -409,7 +409,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const BaseState<Real>& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
                              const BaseState<Real>& gamma1bar,
-                             const RealVector& p0,
+                             const BaseState<Real>& p0,
                              const Vector<MultiFab>& delta_p_term,
                              Vector<MultiFab>& delta_chi,
                              int is_predictor)

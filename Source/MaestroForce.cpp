@@ -590,19 +590,18 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     RealVector rho0( (max_radial_level+1)*nr_fine );
-    RealVector   p0( (max_radial_level+1)*nr_fine );
+    BaseState<Real>   p0(max_radial_level+1, nr_fine);
     BaseState<Real> grav(max_radial_level+1, nr_fine);
     rho0.shrink_to_fit();
-    p0.shrink_to_fit();
 
     if (which_step == 1) {
         rho0 = rho0_old;
-        p0 =   p0_old;
+        p0.copy(p0_old);
     } else {
         for(int i=0; i<rho0.size(); ++i) {
             rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-            p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
         }
+        p0.copy(0.5*(p0_old + p0_new));
     }
 
     Vector<MultiFab> p0_cart(finest_level+1);

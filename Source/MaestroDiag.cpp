@@ -17,7 +17,7 @@ void
 Maestro::DiagFile (const int step,
                    const Real t_in,
                    const RealVector& rho0_in,
-                   const RealVector& p0_in,
+                   const BaseState<Real>& p0_in,
                    const Vector<MultiFab>& u_in,
                    const Vector<MultiFab>& s_in,
                    int& index)

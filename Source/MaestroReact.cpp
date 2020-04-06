@@ -13,7 +13,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 Vector<MultiFab>& rho_Hext,
                 Vector<MultiFab>& rho_omegadot,
                 Vector<MultiFab>& rho_Hnuc,
-                const RealVector& p0,
+                const BaseState<Real>& p0,
                 const Real dt_in,
                 const Real time_in)
 {
@@ -50,7 +50,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
 #ifndef SDC
         // do the burning, update rho_omegadot and rho_Hnuc
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
-        Burner(s_in,s_out,rho_Hext,rho_omegadot,rho_Hnuc,p0,dt_in,time_in);
+        Burner(s_in, s_out, rho_Hext, rho_omegadot, rho_Hnuc, p0, dt_in, time_in);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -84,12 +84,10 @@ Maestro::React (const Vector<MultiFab>& s_in,
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s_out,p0);
+        TfromRhoP(s_out, p0);
+    } else {
+        TfromRhoH(s_out, p0);
     }
-    else {
-        TfromRhoH(s_out,p0);
-    }
-
 }
 
 // SDC subroutines
@@ -99,13 +97,13 @@ void
 Maestro::ReactSDC (const Vector<MultiFab>& s_in,
                    Vector<MultiFab>& s_out,
                    Vector<MultiFab>& rho_Hext,
-                   const RealVector& p0,
+                   const BaseState<Real>& p0,
                    const Real dt_in,
                    const Real time_in,
                    Vector<MultiFab>& source)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ReactSDC()",ReactSDC);
+    BL_PROFILE_VAR("Maestro::ReactSDC()", ReactSDC);
 
     // external heating
     if (do_heating) {
@@ -139,7 +137,7 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
     if (do_burning) {
 #ifdef SDC
         // do the burning, update s_out
-        Burner(s_in,s_out,p0,dt_in,time_in,source);
+        Burner(s_in, s_out, p0, dt_in, time_in, source);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -163,12 +161,10 @@ Maestro::ReactSDC (const Vector<MultiFab>& s_in,
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s_out,p0);
+        TfromRhoP(s_out, p0);
+    } else {
+        TfromRhoH(s_out, p0);
     }
-    else {
-        TfromRhoH(s_out,p0);
-    }
-
 }
 
 
@@ -178,7 +174,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot,
                      Vector<MultiFab>& rho_Hnuc,
-                     const RealVector& p0,
+                     const BaseState<Real>& p0,
                      const Real dt_in,
                      const Real time_in)
 {
@@ -262,7 +258,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 // SDC burner
 void Maestro::Burner(const Vector<MultiFab>& s_in,
                      Vector<MultiFab>& s_out,
-                     const RealVector& p0,
+                     const BaseState<Real>& p0,
                      const Real dt_in,
                      const Real time_in,
                      const Vector<MultiFab>& source)
@@ -273,15 +269,20 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     // Put tempbar_init on cart
     Vector<MultiFab> p0_cart(finest_level+1);
 
-    if (spherical == 1) {
+    // make a Fortran-friendly RealVector of p0
+    RealVector p0_vec((max_radial_level+1)*nr_fine);
+
+    if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
             p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             p0_cart[lev].setVal(0.);
         }
 
-        if (drive_initial_convection == 1) {
-            Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+        if (drive_initial_convection) {
+            Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
         }
+    } else {
+        p0.toVector(p0_vec);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -313,7 +314,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
             // call fortran subroutine
             
-            if (spherical == 1) {
+            if (spherical) {
 #pragma gpu box(tileBox)
                 burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), 
                     AMREX_INT_ANYD(tileBox.hiVect()),
@@ -330,7 +331,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                     BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(s_out_mf[mfi]),
                     BL_TO_FORTRAN_ANYD(source_mf[mfi]), 
-                    p0.dataPtr(), dt_in, time_in,
+                    p0_vec.dataPtr(), dt_in, time_in,
                     BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }

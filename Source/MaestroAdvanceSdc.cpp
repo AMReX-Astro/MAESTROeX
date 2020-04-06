@@ -76,9 +76,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // these are cell-centered
     BaseState<Real>     grav_cell_nph    (max_radial_level+1, nr_fine);
     RealVector     rho0_nph         ( (max_radial_level+1)*nr_fine );
-    RealVector     p0_nph           ( (max_radial_level+1)*nr_fine );
-    RealVector     p0_minus_peosbar ( (max_radial_level+1)*nr_fine );
-    RealVector     peosbar          ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
+    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector     w0_force_dummy   ( (max_radial_level+1)*nr_fine );
     RealVector     Sbar             ( (max_radial_level+1)*nr_fine );
     BaseState<Real>     beta0_nph   (max_radial_level+1, nr_fine);
@@ -94,9 +94,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // make sure C++ is as efficient as possible with memory usage
     rho0_nph.shrink_to_fit();
-    p0_nph.shrink_to_fit();
-    p0_minus_peosbar.shrink_to_fit();
-    peosbar.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
@@ -247,8 +244,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // set S_cc_nph = S_cc_old + (dt/2) * dSdt
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
@@ -264,12 +260,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         PfromRhoH(sold,sold,peos_old);
 
         // compute peosbar = Avg(peos_old)
-        Average(peos_old,peosbar,0);
+        RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+        Average(delta_p_term, peosbar_vec, 0);
+        peosbar.copy(peosbar_vec);
 
         // compute p0_minus_peosbar = p0_old - peosbar
-        for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-            p0_minus_peosbar[i] = p0_old[i] - peosbar[i];
-        }
+        p0_minus_peosbar.copy(p0_old - peosbar);
 
         // compute peosbar_cart from peosbar
         Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
@@ -278,10 +274,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(delta_p_term[lev],1.0,peos_old[lev],0,-1.0,peosbar_cart[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // these should have no effect if dpdt_factor <= 0
-        std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+        p0_minus_peosbar.setVal(0.0);
         for (int lev=0; lev<=finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -324,7 +319,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state && !split_projection) {
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (int r = 0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old[l+(max_radial_level+1)*r]) * (p0_old[l+(max_radial_level+1)*r] - p0_nm1[l+(max_radial_level+1)*r])/dtold;
+                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old(l,r)) * (p0_old(l,r) - p0_nm1(l,r))/dtold;
             }
         }
     }
@@ -422,34 +417,31 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // update grav_cell_new
     if (evolve_base_state) {
         MakeGravCell(grav_cell_new, rho0_new);
-    }
-    else {
+    } else {
         grav_cell_new.copy(grav_cell_old);
-   }
+    }
 
     // base state pressure update
     if (evolve_base_state) {
 
         // set new p0 through HSE
-        p0_new = p0_old;
+        p0_new.copy(p0_old);
 
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
-        for (int i=0; i<p0_nph.size(); ++i) {
-            p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-        }
+        p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
             }
         }
 
     } else {
-        p0_new = p0_old;
-        p0_nph = p0_old;
+        p0_new.copy(p0_old);
+        p0_nph.copy(p0_old);
     }
 
     // base state enthalpy update
@@ -572,14 +564,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
-        for (int i=0; i<p0_nph.size(); ++i) {
-            p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-        }
+        p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for Make_S_cc
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
             }
         }
 
@@ -600,13 +590,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(snew,p0_new);
+        TfromRhoP(snew, p0_new);
     }
     else {
-        TfromRhoH(snew,p0_new);
+        TfromRhoH(snew, p0_new);
     }
     
-
     if (enthalpy_pred_type == predict_rhohprime) {
 
         // intra is only different from predict_rhoh if rhoh0 is not constant
@@ -649,7 +638,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             MultiFab::Divide(intra[lev],rhohalf[lev],0,Temp,1,0);
             MultiFab::Divide(intra[lev],cphalf[lev],0,Temp,1,0);
         }
-
     }     
 
     // for some species_pred_types, we need to make intra in terms of
@@ -668,18 +656,17 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (use_thermal_diffusion) {
         MakeThermalCoeffs(snew,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2);
 
-        MakeExplicitThermal(diff_new,snew,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+        MakeExplicitThermal(diff_new, snew, Tcoeff2, hcoeff2, Xkcoeff2, pcoeff2, p0_new,
                             temp_diffusion_formulation);
     }
 
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        MakeGamma1bar(snew, gamma1bar_new, p0_new);
 
         MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
                   grav_cell_new);
-    }
-    else {
+    } else {
         // Just pass beta0 and gamma1bar through if not evolving base state
         beta0_new.copy(beta0_old);
         gamma1bar_new.copy(gamma1bar_old);
@@ -728,18 +715,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 }
                 
                 // compute peosbar = Avg(peos_new)
-                Average(delta_p_term,peosbar,0);
+                RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+                Average(delta_p_term, peosbar_vec, 0);
+                peosbar.copy(peosbar_vec);
 
                 // compute p0_nph
-                for (int i=0; i<p0_nph.size(); ++i) {
-                    p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-                }
+                p0_nph.copy(0.5*(p0_old + p0_new));
                 
-                // compute p0_minus_peosbar = p0_new - peosbar
-                for (int i=0; i<p0_minus_peosbar.size(); ++i) {
-                    p0_minus_peosbar[i] = p0_nph[i] - peosbar[i];
-                }
-
+                // compute p0_minus_peosbar = p0_nph - peosbar
+                p0_minus_peosbar.copy(p0_nph - peosbar);
+            
                 // compute peosbar_cart from peosbar
                 Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
                 
@@ -747,10 +732,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 for (int lev=0; lev<=finest_level; ++lev) {
                     MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
                 }
-            }
-            else {
+            } else {
                 // these should have no effect if dpdt_factor <= 0
-                std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+                p0_minus_peosbar.setVal(0.);
                 for (int lev=0; lev<=finest_level; ++lev) {
                     delta_p_term[lev].setVal(0.);
                 }
@@ -773,9 +757,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     // compute w0, w0_force, and delta_chi_w0
                     is_predictor = 0;
                     Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
-                           rho0_new, p0_old, p0_new, gamma1bar_old, 
-                           gamma1bar_new, p0_minus_peosbar, 
-                           delta_chi_w0_dummy, dt, dtold, is_predictor);
+                            rho0_new, p0_old, p0_new, gamma1bar_old, 
+                            gamma1bar_new, p0_minus_peosbar, 
+                            delta_chi_w0_dummy, dt, dtold, is_predictor);
                                 
                     if (spherical) {
                         // put w0 on Cartesian edges
@@ -784,8 +768,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 }
             }
 
-            
-    
             // compute unprojected MAC velocities
             is_predictor = 0;
             AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
@@ -793,14 +775,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             if (evolve_base_state && !split_projection) {
                 for (auto l = 0; l <= max_radial_level; ++l) {
                     for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_nph(l,r)*p0_nph[l+(max_radial_level+1)*r]) * (p0_nph[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                        Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_nph(l,r)*p0_nph(l,r)) * (p0_nph(l,r) - p0_old(l,r))/dt;
                     }
                 }
             }
 
             // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-            MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
-                               gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
+            MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
+                                gamma1bar_new, p0_new,delta_p_term, delta_chi,is_predictor);
 
             if (spherical == 1 && evolve_base_state && split_projection) {
                 // subtract w0mac from umac
@@ -823,7 +805,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 // add w0mac back to umac
                 Addw0(umac,w0mac,1.);
             }
-
         } // end sdc_couple_mac_velocity
     
     //////////////////////////////////////////////////////////////////////////////
@@ -846,7 +827,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // advect rhoX, rho, and tracers
         DensityAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
-    
 
         if (evolve_base_state) {
             // correct the base state density by "averaging"
@@ -873,18 +853,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             
             // set new p0 through HSE
-            p0_new = p0_old;
+            p0_new.copy(p0_old);
 
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
             
-            for (int i=0; i<p0_nph.size(); ++i) {
-                p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-            }
+            p0_nph.copy(0.5*(p0_old + p0_new));
             
             // hold dp0/dt in psi for enthalpy advance
             for (auto l = 0; l <= max_radial_level; ++l) {
                 for (auto r = 0; r < nr_fine; ++r) {
-                    psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                    psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
                 }
             }
         }
@@ -910,7 +888,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
         }
 
-
         // extract aofs = (shat - sold) / dt - intra
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(aofs[lev],1.0/dt,shat[lev],0,-1.0/dt,sold[lev],0,0,Nscal,0);
@@ -934,12 +911,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         if (use_thermal_diffusion) {
             // 1 = predictor, 2 = corrector
-            ThermalConductSDC(2,sold,shat,snew,p0_old,p0_new,hcoeff1,Xkcoeff1,pcoeff1,
-                              hcoeff2,Xkcoeff2,pcoeff2);
+            ThermalConductSDC(2, sold, shat, snew, p0_old, p0_new, hcoeff1, Xkcoeff1, pcoeff1,
+                              hcoeff2, Xkcoeff2, pcoeff2);
 
             // compute diff_hat using shat, p0_new, and new coefficients from previous iteration
             // note p0_new = p0_hat if evolve_base_state = T
-            MakeExplicitThermal(diff_hat,shat,Tcoeff2,hcoeff2,Xkcoeff2,pcoeff2,p0_new,
+            MakeExplicitThermal(diff_hat, shat, Tcoeff2, hcoeff2, Xkcoeff2, pcoeff2, p0_new,
                                 temp_diffusion_formulation);
 
             // compute only the h term in diff_hat and diff_new
@@ -970,7 +947,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // wallclock time
         Real start_total_react_corrector = ParallelDescriptor::second();
     
-        ReactSDC(sold,snew,rho_Hext,p0_new,dt,t_old,sdc_source);
+        ReactSDC(sold, snew, rho_Hext, p0_new, dt, t_old, sdc_source);
 
         // wallclock time
         Real end_total_react_corrector = ParallelDescriptor::second() - start_total_react_corrector;
@@ -1015,14 +992,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
             // compute p0_nph
-            for (int i=0; i<p0_nph.size(); ++i) {
-                p0_nph[i] = 0.5*(p0_old[i] + p0_new[i]);
-            }
+            p0_nph.copy(0.5*(p0_old + p0_new));
 
             // hold dp0/dt in psi for Make_S_cc
             for (auto l = 0; l <= max_radial_level; ++l) {
                 for (auto r = 0; r < nr_fine; ++r) {
-                    psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+                    psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
                 }
             }
             
@@ -1043,12 +1018,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // now update temperature
         if (use_tfromp) {
-            TfromRhoP(snew,p0_new);
+            TfromRhoP(snew, p0_new);
+        } else {
+            TfromRhoH(snew, p0_new);
         }
-        else {
-            TfromRhoH(snew,p0_new);
-        }
-            
         
         if (is_initIter) {
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -1099,7 +1072,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 MultiFab::Divide(intra[lev],rhohalf[lev],0,Temp,1,0);
                 MultiFab::Divide(intra[lev],cphalf[lev],0,Temp,1,0);
             }
-            
         }     
         
         // for some species_pred_types, we need to make intra in terms of
@@ -1124,16 +1096,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         if (evolve_base_state) {
             // compute beta0 and gamma1bar
-            MakeGamma1bar(snew,gamma1bar_new,p0_new);
+            MakeGamma1bar(snew, gamma1bar_new, p0_new);
 
             MakeBeta0(beta0_new, rho0_new, p0_new, gamma1bar_new, 
                       grav_cell_new);
-        }
-        else {
+        } else {
             // Just pass beta0 and gamma1bar through if not evolving base state
             beta0_new.copy(beta0_old);
             gamma1bar_new.copy(gamma1bar_old);
-      }
+        }
 
         gamma1bar_nph.copy(0.5*(gamma1bar_old+gamma1bar_new));
         beta0_nph.copy(0.5*(beta0_old + beta0_new));
@@ -1209,7 +1180,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state && !split_projection) {
         for (auto l = 0; l <= max_radial_level; ++l) {
             for (auto r = 0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/(dt*gamma1bar_new(l,r)*p0_new[l+(max_radial_level+1)*r]);
+                Sbar[l+(max_radial_level+1)*r] = (p0_new(l,r) - p0_old(l,r))/(dt*gamma1bar_new(l,r)*p0_new(l,r));
             }
         }
     }
@@ -1237,8 +1208,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             rhcc_for_nodalproj[lev].mult(1./dt,0,1,1);
         }
 
-    }
-    else {
+    } else {
 
         proj_type = regular_timestep_comp;
 
@@ -1250,7 +1220,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             PfromRhoH(snew,snew,delta_p_term);
 
             // compute peosbar = Avg(peos_new)
-            Average(delta_p_term,peosbar,0);
+            RealVector peosbar_vec((max_radial_level+1)*nr_fine);
+            Average(delta_p_term, peosbar_vec, 0);
+            peosbar.copy(peosbar_vec);
 
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 

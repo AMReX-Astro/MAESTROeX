@@ -19,7 +19,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
                              const Vector<MultiFab>& hcoeff,
                              const Vector<MultiFab>& Xkcoeff,
                              const Vector<MultiFab>& pcoeff,
-                             const RealVector& p0,
+                             const BaseState<Real>& p0,
                              int temp_formulation) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeExplicitThermal()",MakeExplicitThermal);
@@ -74,8 +74,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
                 MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
             }
         }
-    }
-    else {     // if temp_formulation == 2
+    } else {     // if temp_formulation == 2
 
         // 1. Compute div hcoeff grad h
         mlabec.setScalars(0.0, 1.0);
@@ -129,7 +128,6 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
             MultiFab::Add(thermal[lev],resid[lev],0,0,1,0);
         }
     }     // end if
-
 }
 
 // compute only the h term in thermal
@@ -493,8 +491,8 @@ Maestro::ThermalConductSDC (int which_step,
                             const Vector<MultiFab>& s_old,
                             Vector<MultiFab>& s_hat,
                             const Vector<MultiFab>& s_new,
-                            const RealVector& p0old,
-                            const RealVector& p0new,
+                            const BaseState<Real>& p0old,
+                            const BaseState<Real>& p0new,
                             const Vector<MultiFab>& hcoeff1,
                             const Vector<MultiFab>& Xkcoeff1,
                             const Vector<MultiFab>& pcoeff1,

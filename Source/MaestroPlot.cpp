@@ -12,7 +12,7 @@ void Maestro::WriteSmallPlotFile (const int step,
                                   const Real dt_in,
                                   const RealVector& rho0_in,
                                   const BaseState<Real>& rhoh0_in,
-                                  const RealVector& p0_in,
+                                  const BaseState<Real>& p0_in,
                                   const BaseState<Real>& gamma1bar_in,
                                   const Vector<MultiFab>& u_in,
                                   Vector<MultiFab>& s_in,
@@ -29,7 +29,7 @@ Maestro::WritePlotFile (const int step,
                         const Real dt_in,
                         const RealVector& rho0_in,
                         const BaseState<Real>& rhoh0_in,
-                        const RealVector& p0_in,
+                        const BaseState<Real>& p0_in,
                         const BaseState<Real>& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in,
@@ -95,7 +95,7 @@ Maestro::WritePlotFile (const int step,
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(p0_in,p0_cart,0,0);
+    Put1dArrayOnCart(p0_in, p0_cart, 0, 0);
 
     // convert gamma1bar to multi-D MultiFab
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
@@ -163,7 +163,7 @@ Maestro::WritePlotFile (const int step,
                 BaseCCFile << r_cc_loc_b(lev,i) << " "
                            << rho0_in[lev+(max_radial_level+1)*i] << " "
                            << rhoh0_in(lev,i) << " "
-                           << p0_in[lev+(max_radial_level+1)*i] << " "
+                           << p0_in(lev,i) << " "
                            << gamma1bar_in(lev,i) << "\n";
             }
         }
@@ -231,7 +231,7 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& gamma1bar_cart,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
-                     const RealVector& p0_in,
+                     const BaseState<Real>& p0_in,
                      const BaseState<Real>& gamma1bar_in,
                      const Vector<MultiFab>& S_cc_in)
 {
@@ -407,7 +407,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // compute tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in, p0_in);
     // tfromp
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -415,7 +415,7 @@ Maestro::PlotFileMF (const int nPlot,
     ++dest_comp;
 
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
         // tfromh
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -434,12 +434,12 @@ Maestro::PlotFileMF (const int nPlot,
 
     // deltaT
     // compute & copy tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
     }
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in, p0_in);
     // compute deltaT = (tfromp - tfromh) / tfromh
     for (int i = 0; i <= finest_level; ++i) {
         MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
@@ -449,7 +449,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // restore tfromp if necessary
     if (use_tfromp) {
-        TfromRhoP(s_in,p0_in);
+        TfromRhoP(s_in, p0_in);
     }
 
     // pi
@@ -555,7 +555,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // Mach number
-    MachfromRhoH(s_in,u_in,p0_in,w0r_cart,tempmf);
+    MachfromRhoH(s_in, u_in, p0_in, w0r_cart, tempmf);
 
     // MachNumber
     for (int i = 0; i <= finest_level; ++i) {
@@ -627,7 +627,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // soundspeed
     if (plot_cs) {
-        CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
+        CsfromRhoH(s_in, p0_cart, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
         }
@@ -2015,7 +2015,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 void
 Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
-                         const RealVector& p0,
+                         const BaseState<Real>& p0,
                          const Vector<MultiFab>& p0_cart,
                          const BaseState<Real>& gamma1bar,
                          const Vector<MultiFab>& gamma1bar_cart,

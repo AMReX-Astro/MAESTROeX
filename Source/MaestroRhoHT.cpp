@@ -6,7 +6,7 @@ using namespace amrex;
 
 void
 Maestro::TfromRhoH (Vector<MultiFab>& scal,
-                    const RealVector& p0)
+                    const BaseState<Real>& p0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()", TfromRhoH);
@@ -17,7 +17,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
 
     const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
 
@@ -83,7 +83,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
-                    const RealVector& p0,
+                    const BaseState<Real>& p0,
                     const bool updateRhoH)
 {
     // timer for profiling
@@ -105,7 +105,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -142,13 +142,13 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     }
 
     // average down and fill ghost cells (Temperature)
-    AverageDown(scal,Temp,1);
-    FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
+    AverageDown(scal, Temp, 1);
+    FillPatch(t_old, scal, scal, scal, Temp, Temp, 1, Temp, bcs_s);
 
     // average down and fill ghost cells (Enthalpy)
     if (updateRhoH) {
-        AverageDown(scal,RhoH,1);
-        FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
+        AverageDown(scal, RhoH, 1);
+        FillPatch(t_old, scal, scal, scal, RhoH, RhoH, 1, RhoH, bcs_s);
     }
 }
 
@@ -203,7 +203,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 void
 Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
                            const Vector<MultiFab>& vel,
-                           const RealVector& p0,
+                           const BaseState<Real>& p0,
                            const Vector<MultiFab>& w0cart,
                            Vector<MultiFab>& mach)
 {
@@ -226,7 +226,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -280,7 +280,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
-                     const RealVector& p0,
                      const Vector<MultiFab>& p0_cart,
                      Vector<MultiFab>& cs)
 {
@@ -295,7 +294,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
