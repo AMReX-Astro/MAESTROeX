@@ -3,9 +3,6 @@ F90EXE_sources += base_state_geometry.F90
 #ifdef REACTIONS
 F90EXE_sources += burner_loop.F90
 #endif
-F90EXE_sources += compute_dt.F90
-F90EXE_sources += debug.F90
-F90EXE_sources += diag.F90
 F90EXE_sources += enforce_HSE.F90
 F90EXE_sources += fill_3d_data.F90
 F90EXE_sources += initdata.F90
@@ -14,8 +11,3 @@ F90EXE_sources += maestro_init.F90
 F90EXE_sources += make_explicit_thermal.F90
 F90EXE_sources += make_heating.F90
 F90EXE_sources += make_grav.F90
-F90EXE_sources += make_scal_force.F90
-F90EXE_sources += regrid.F90
-F90EXE_sources += rotation.F90
-F90EXE_sources += sponge.F90
-F90EXE_sources += tagging.F90

@@ -105,7 +105,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
         for (MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -215,7 +215,7 @@ Maestro::VelPred (Vector<MultiFab>& utilde,
         for (MFIter mfi(utilde_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
 
             // x-direction
             if (ppm_type == 0) {
@@ -391,7 +391,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     // Create u_{\i-\half\e_x}^x, etc.
     ////////////////////////////////////
 
-    const Box& obx = mfi.growntilebox(1);
+    const Box& obx = amrex::grow(mfi.tilebox(), 1);
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
@@ -808,7 +808,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
      // Allocated from lo:hi+1 in the normal direction
      // lo-1:hi+1 in the transverse directions
 
-    const Box& obx = mfi.growntilebox(1);
+    const Box& obx = amrex::grow(mfi.tilebox(), 1);
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
     const Box& mzbx = amrex::growLo(obx,2, -1);

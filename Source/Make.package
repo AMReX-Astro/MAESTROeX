@@ -49,11 +49,17 @@ CEXE_sources += MaestroRhoHT.cpp
 CEXE_sources += MaestroSetup.cpp
 CEXE_sources += MaestroSlopes.cpp
 CEXE_sources += MaestroSponge.cpp
+CEXE_sources += MaestroTagging.cpp
 CEXE_sources += MaestroThermal.cpp
 CEXE_sources += MaestroVelocityAdvance.cpp
 CEXE_sources += MaestroVelPred.cpp
 
 CEXE_headers += BaseState.H
+
+ifeq ($(USE_ROTATION), TRUE)
+    CEXE_sources += MaestroRotation.cpp
+endif
+
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroBCThreads.H
 CEXE_headers += MaestroInletBCs.H

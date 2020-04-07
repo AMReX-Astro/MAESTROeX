@@ -71,7 +71,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         for (MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& xbx = mfi.nodaltilebox(0);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -177,7 +177,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& ybx = mfi.nodaltilebox(1);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -285,7 +285,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& xbx = mfi.nodaltilebox(0);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -400,7 +400,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& ybx = mfi.nodaltilebox(1);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
@@ -516,7 +516,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         for (MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
-            const Box& obx = mfi.growntilebox(1);
+            const Box& obx = amrex::grow(mfi.tilebox(), 1);
             const Box& zbx = mfi.nodaltilebox(2);
 
             Array4<const Real> const utilde_arr = utilde[lev].array(mfi);
