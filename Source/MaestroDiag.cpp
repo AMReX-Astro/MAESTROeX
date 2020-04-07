@@ -208,9 +208,9 @@ Maestro::DiagFile (const int step,
 
                         // velr is the projection of the velocity (including w0) onto
                         // the radial unit vector
-                        Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \
-                            u(i,j,k,1)*normal_arr(i,j,k,1) + \
-                            u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
+                        // Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \
+                        //     u(i,j,k,1)*normal_arr(i,j,k,1) + \
+                        //     u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
 
                         // vel is the magnitude of the velocity, including w0
                         vel = std::sqrt((u(i,j,k,0)+0.5*(w0macx(i,j,k)+w0macx(i+1,j,k))) * 

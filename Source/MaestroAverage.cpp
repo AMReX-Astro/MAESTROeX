@@ -46,9 +46,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
 
-            // get references to the MultiFabs at level lev
-            const MultiFab& phi_mf = phi[lev];
-        
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel if (!system::regtest_reduction)

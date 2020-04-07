@@ -142,14 +142,13 @@ Maestro::EstDt ()
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-                const Array4<Real> spd = tmp.array(mfi);
+		const Array4<Real> spd = tmp.array(mfi);
 
                 if (spherical == 0) {
 
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
                     const Real eps = 1.e-8;
-                    const auto ng = 0;
 
                     Real spdx = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);                 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 1); 
@@ -261,9 +260,6 @@ Maestro::EstDt ()
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
                     const Real eps = 1.e-8;
-                    const auto ng = 0;
-
-                    const Array4<Real> spd = tmp.array(mfi);
 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 3);
 
@@ -505,7 +501,6 @@ Maestro::FirstDt ()
 
                 const Real eps = 1.e-8;
                 const Real rho_min = 1.e-20;
-                const int ng = 0;
 
                 FArrayBox spd(tileBox);
                 Elixir e_s = spd.elixir();
@@ -706,7 +701,6 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
     const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar = gamma1bar_vec.dataPtr();
     const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
-    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
 
     // spherical divU constraint
     if (use_exact_base_state) {

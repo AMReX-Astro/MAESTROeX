@@ -131,7 +131,7 @@ Maestro::Put1dArrayOnCart (const int lev,
                                 - r_cc_loc_p[(index-1)*max_lev]);
                         }
 
-                        Real s0_cart_val;
+                        Real s0_cart_val = s0_p[index*max_lev];
 
                         if (w0_interp_type_loc == 1) {
 
@@ -1174,8 +1174,6 @@ Maestro::MakeNormal ()
     //    e_r = sin(theta)cos(phi) e_x + sin(theta)sin(phi) e_y + cos(theta) e_z
     // or
     //    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
-
-    const auto center_p = center;
 
     if (spherical == 1) {
 
