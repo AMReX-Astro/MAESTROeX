@@ -10,7 +10,7 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
                           const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                           const RealVector& w0_force,
                           const Vector<MultiFab>& w0_force_cart,
-                          const RealVector& rho0_nph,
+                          const BaseState<Real>& rho0_nph,
                           const BaseState<Real>& grav_cell_nph,
                           const Vector<MultiFab>& sponge)
 {

@@ -131,7 +131,7 @@ Maestro::WriteCheckPoint (int step) {
 
         BaseCCFile.precision(17);
 
-        for (int i=0; i<rho0_new.size(); ++i) {
+        for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
             BaseCCFile << rho0_new[i] << " "
                        << p0_new[i] << " "
                        << gamma1bar_new[i] << " "
@@ -323,11 +323,10 @@ Maestro::ReadCheckPoint ()
         }
     }
 
-
     if (do_smallscale) {
-        Average(sold,rho0_old,Rho);
-        compute_cutoff_coords(rho0_old.dataPtr());
-        std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+        Average(sold, rho0_old, Rho);
+        ComputeCutoffCoords(rho0_old);
+        rho0_old.setVal(0.);
     }
 
     // BaseFC

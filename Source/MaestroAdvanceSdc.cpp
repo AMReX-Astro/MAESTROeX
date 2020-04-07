@@ -74,8 +74,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    BaseState<Real>     grav_cell_nph    (max_radial_level+1, nr_fine);
-    RealVector     rho0_nph         ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
@@ -93,7 +93,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    rho0_nph.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -361,7 +360,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    rho0_new = rho0_old;
+    rho0_new.copy(rho0_old);
 
     // set diff to zero
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -397,13 +396,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     // advect rhoX and rho
-    DensityAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+    DensityAdvanceSDC(1, sold, shat, sedge, sflux, 
+                      scal_force, etarhoflux_dummy, umac,
+                      w0mac, rho0_pred_edge_dummy);
     
 
     if (evolve_base_state) {
         // correct the base state density by "averaging"
         Average(shat, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -536,7 +537,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state) {
         // update base state density and pressure
         Average(snew, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
         
         if (use_etarho) {
@@ -801,19 +802,21 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
         
         // no need to advect the base state density
-        rho0_new = rho0_old;
+        rho0_new.copy(rho0_old);
         
         if (maestro_verbose >= 1) {
             Print() << "            :  density_advance >>>" << std::endl;
         }
 
         // advect rhoX, rho, and tracers
-        DensityAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+        DensityAdvanceSDC(2, sold, shat, sedge, sflux,
+                          scal_force, etarhoflux_dummy, umac,
+                          w0mac, rho0_pred_edge_dummy);
 
         if (evolve_base_state) {
             // correct the base state density by "averaging"
             Average(shat, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
+            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 
@@ -821,13 +824,11 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             MakeGravCell(grav_cell_new, rho0_new);
             
-            for(int i=0; i<rho0_nph.size(); ++i) {
-                rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-            }
+            rho0_nph.copy(0.5*(rho0_old+rho0_new));
             
             MakeGravCell(grav_cell_nph, rho0_nph);
         } else {
-            rho0_nph = rho0_old;
+            rho0_nph.copy(rho0_old);
             grav_cell_nph.copy(grav_cell_old);
         }
         
@@ -955,7 +956,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             // update base state density and pressure
             Average(snew, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
+            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
 
             if (use_etarho) {

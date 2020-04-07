@@ -107,7 +107,7 @@ Maestro::Init ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
-    compute_cutoff_coords(rho0_old.dataPtr());
+    // compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
 
     if (spherical) {
@@ -220,7 +220,7 @@ Maestro::Init ()
         if (sum_interval > 0  || sum_per > 0) {
             int index_dummy = 0;
             Print() << "\nWriting diagnosis file after all initialization" << std::endl;
-            DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
+            DiagFile(0, t_old, rho0_old, p0_old, uold, sold, index_dummy);
         }
     }
 }
@@ -273,23 +273,23 @@ Maestro::InitData ()
 
     if (fix_base_state) {
         // compute cutoff coordinates
-        compute_cutoff_coords(rho0_old.dataPtr());
+        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
 
         // first compute cutoff coordinates using initial density profile
-        compute_cutoff_coords(rho0_old.dataPtr());
+        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
-            std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+            rho0_old.setVal(0.0);
             rhoh0_old.setVal(0.0);
         } else {
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
-            compute_cutoff_coords(rho0_old.dataPtr());
+            // compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
 
             // compute gravity

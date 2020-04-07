@@ -5,7 +5,7 @@ using namespace amrex;
 
 void
 Maestro::MakeGravCell(BaseState<Real>& grav_cell, 
-                      const RealVector& rho0)
+                      const BaseState<Real>& rho0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
@@ -32,7 +32,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             BaseState<Real> m(finest_radial_level+1, nr_fine);
 
             // level = 0
-            m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+            m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
             grav_cell(0,0) = -Gconst * m(0,0) / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
             int nr_lev = nr(0);
@@ -47,8 +47,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                 // don't add any contributions from outside the star --
                 // i.e.  rho < base_cutoff_density
                 Real term1 = 0.0;
-                if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                    term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
+                if (rho0(0,r-1) > base_cutoff_density) {
+                    term1 = 4.0/3.0*M_PI*rho0(0,r-1) *
                         (r_edge_loc_b(0,r) - r_cc_loc_b(0,r-1)) *
                         (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
                         r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) +
@@ -56,8 +56,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                 } 
 
                 Real term2 = 0.0;
-                if (rho0[max_lev*r] > base_cutoff_density) {
-                    term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
+                if (rho0(0,r) > base_cutoff_density) {
+                    term2 = 4.0/3.0*M_PI*rho0(0,r)*
                         (r_cc_loc_b(0,r) - r_edge_loc_b(0,r)) *
                         (r_cc_loc_b(0,r)*r_cc_loc_b(0,r) +
                         r_cc_loc_b(0,r)*r_edge_loc_b(0,r) +
@@ -75,7 +75,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                 for (auto i = 1; i <= numdisjointchunks(n); ++i) {
 
                     if (r_start_coord(n,i) == 0) {
-                        m(n,0) = 4.0/3.0*M_PI*rho0[n]*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
+                        m(n,0) = 4.0/3.0*M_PI*rho0(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0)*r_cc_loc_b(n,0);
                         grav_cell(n,0) = -Gconst * m(n,0) / (r_cc_loc_b(n,0)*r_cc_loc_b(n,0));
                     } else {
                         int r = r_start_coord(n,i);
@@ -89,8 +89,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                         // don't add any contributions from outside the star --
                         // i.e.  rho < base_cutoff_density
                         Real term1 = 0.0;
-                        if (rho0[n-1+max_lev*(r/2-1)] > base_cutoff_density) {
-                            term1 = 4.0/3.0*M_PI*rho0[n-1+max_lev*(r/2-1)] *
+                        if (rho0(n-1,r/2-1) > base_cutoff_density) {
+                            term1 = 4.0/3.0*M_PI*rho0(n-1,r/2-1) *
                                 (r_edge_loc_b(n-1,r/2) - r_cc_loc_b(n-1,r/2-1)) *
                                 (r_edge_loc_b(n-1,r/2)*r_edge_loc_b(n-1,r/2) +
                                 r_edge_loc_b(n-1,r/2)*r_cc_loc_b(n-1,r/2-1) +
@@ -98,8 +98,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                         } 
 
                         Real term2 = 0.0;
-                        if (rho0[n+max_lev*r] > base_cutoff_density) {
-                            term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
+                        if (rho0(n,r) > base_cutoff_density) {
+                            term2 = 4.0/3.0*M_PI*rho0(n,r)*
                                 (r_cc_loc_b(n,r) - r_edge_loc_b(n,r)) *
                                 (r_cc_loc_b(n,r)*r_cc_loc_b(n,r) +
                                 r_cc_loc_b(n,r)*r_edge_loc_b(n,r) +
@@ -121,8 +121,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                         // don't add any contributions from outside the star --
                         // i.e.  rho < base_cutoff_density
                         Real term1 = 0.0;
-                        if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
-                            term1 = 4.0/3.0*M_PI*rho0[n+max_lev*(r-1)] *
+                        if (rho0(n,r-1) > base_cutoff_density) {
+                            term1 = 4.0/3.0*M_PI*rho0(n,r-1) *
                                 (r_edge_loc_b(n,r) - r_cc_loc_b(n,r-1)) *
                                 (r_edge_loc_b(n,r)*r_edge_loc_b(n,r) +
                                 r_edge_loc_b(n,r)*r_cc_loc_b(n,r-1) +
@@ -130,8 +130,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
                         } 
 
                         Real term2 = 0.0;
-                        if (rho0[n+max_lev*r] > base_cutoff_density) {
-                            term2 = 4.0/3.0*M_PI*rho0[n+max_lev*r]*
+                        if (rho0(n,r) > base_cutoff_density) {
+                            term2 = 4.0/3.0*M_PI*rho0(n,r)*
                                 (r_cc_loc_b(n,r) - r_edge_loc_b(n,r)) *
                                 (r_cc_loc_b(n,r)*r_cc_loc_b(n,r) +
                                 r_cc_loc_b(n,r)*r_edge_loc_b(n,r) +
@@ -155,7 +155,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
 
         BaseState<Real> m(1, nr_fine);
 
-        m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
+        m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0)*r_cc_loc_b(0,0);
         grav_cell(0,0) = -Gconst * m(0,0) / (r_cc_loc_b(0,0)*r_cc_loc_b(0,0));
 
         for (auto r = 1; r < nr_fine; ++r) {
@@ -168,8 +168,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             // don't add any contributions from outside the star --
             // i.e.  rho < base_cutoff_density
             Real term1 = 0.0;
-            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] *
+            if (rho0(0,r-1) > base_cutoff_density) {
+                term1 = 4.0/3.0*M_PI*rho0(0,r-1) *
                     (r_edge_loc_b(0,r) - r_cc_loc_b(0,r-1)) *
                     (r_edge_loc_b(0,r)*r_edge_loc_b(0,r) +
                     r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) +
@@ -177,8 +177,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             } 
 
             Real term2 = 0.0;
-            if (rho0[max_lev*r] > base_cutoff_density) {
-                term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
+            if (rho0(0,r) > base_cutoff_density) {
+                term2 = 4.0/3.0*M_PI*rho0(0,r)*
                     (r_cc_loc_b(0,r) - r_edge_loc_b(0,r)) *
                     (r_cc_loc_b(0,r)*r_cc_loc_b(0,r) +
                     r_cc_loc_b(0,r)*r_edge_loc_b(0,r) +

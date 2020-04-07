@@ -140,7 +140,7 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
 #endif
 
 void 
-Maestro::ComputeCutoffCoords(const RealVector& rho0)
+Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
@@ -155,7 +155,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = r_start_coord(n,i);
                 int hi = r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= anelastic_cutoff_density) {
+                    if (rho0(n,r) <= anelastic_cutoff_density) {
                         anelastic_cutoff_density_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -200,7 +200,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = r_start_coord(n,i);
                 int hi = r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= base_cutoff_density) {
+                    if (rho0(n,r) <= base_cutoff_density) {
                         base_cutoff_density_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -248,7 +248,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = r_start_coord(n,i);
                 int hi = r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= burning_cutoff_density_lo) {
+                    if (rho0(n,r) <= burning_cutoff_density_lo) {
                         burning_cutoff_density_lo_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -294,7 +294,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = r_start_coord(n,i);
                 int hi = r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] >= burning_cutoff_density_hi) {
+                    if (rho0(n,r) >= burning_cutoff_density_hi) {
                         burning_cutoff_density_hi_coord(n) = r;
                         which_lev = n;
                         found = true;

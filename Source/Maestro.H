@@ -199,10 +199,10 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
+                       const BaseState<amrex::Real>& r0_old,
                        const BaseState<amrex::Real>& rho0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
+                       const BaseState<amrex::Real>& r0_new,
                        const BaseState<amrex::Real>& rho0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const BaseState<amrex::Real>& rho0_predicted_edge,
@@ -236,10 +236,10 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
+                       const BaseState<amrex::Real>& r0_old,
                        const BaseState<amrex::Real>& r0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
+                       const BaseState<amrex::Real>& r0_new,
                        const BaseState<amrex::Real>& r0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const BaseState<amrex::Real>& rh0_old,
@@ -304,7 +304,7 @@ public:
     ////////////
     // MaestroBaseState.cpp functions
 
-    void InitBaseState(RealVector& rho0, BaseState<amrex::Real>& rhoh0, 
+    void InitBaseState(BaseState<amrex::Real>& rho0, BaseState<amrex::Real>& rhoh0, 
                        BaseState<amrex::Real>& p0, 
                        const int lev);
 
@@ -323,7 +323,7 @@ public:
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
 #endif
-    void ComputeCutoffCoords(const RealVector& rho0);
+    void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
     void InitMultilevel(const int finest_radial_level_in);
                                
@@ -512,7 +512,7 @@ public:
     /// Write plotfile to disk
     void DiagFile (const int step,
                    const amrex::Real dt_in,
-                   const RealVector& rho0_in,
+                   const BaseState<amrex::Real>& rho0_in,
                    const BaseState<amrex::Real>& p0_in,
                    const amrex::Vector<amrex::MultiFab>& u_in,
                    const amrex::Vector<amrex::MultiFab>& s_in,
@@ -538,7 +538,7 @@ public:
     ////////////
     // MaestroEnforceHSE.cpp
 
-    void EnforceHSE(const RealVector& rho0, 
+    void EnforceHSE(const BaseState<amrex::Real>& rho0, 
                     BaseState<amrex::Real>& p0,
                     const BaseState<amrex::Real>& grav_cell);
 
@@ -744,7 +744,7 @@ public:
     void MakeVelForce (amrex::Vector<amrex::MultiFab>& vel_force_cart,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
-                       const RealVector& rho0,
+                       const BaseState<amrex::Real>& rho0,
                        const BaseState<amrex::Real>& grav,
                        const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
@@ -885,7 +885,7 @@ public:
     // MaestroMakeBeta0.cpp functions
 
     void MakeBeta0(BaseState<amrex::Real>& beta, 
-                   const RealVector& rho0,
+                   const BaseState<amrex::Real>& rho0,
                    const BaseState<amrex::Real>& p0,
                    const BaseState<amrex::Real>& gamma1bar,
                    const BaseState<amrex::Real>& grav_cell,
@@ -1096,7 +1096,7 @@ public:
     // MaestroMakeGrav.cpp functions
 
     void MakeGravCell(BaseState<amrex::Real>& grav_cell, 
-                      const RealVector& rho0);
+                      const BaseState<amrex::Real>& rho0);
 
     void MakeGravEdge(RealVector& grav_edge, 
                       const RealVector& rho0);
@@ -1150,7 +1150,7 @@ public:
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
-                                         const RealVector& rho0,
+                                         const BaseState<amrex::Real>& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const BaseState<amrex::Real>& Sbar,
                              const BaseState<amrex::Real>& beta0,
@@ -1162,7 +1162,7 @@ public:
                              int is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
-                                 const RealVector& rho0,
+                                 const BaseState<amrex::Real>& rho0,
                                  const BaseState<amrex::Real>& beta0,
                                  const BaseState<amrex::Real>& gamma1bar,
                                  const BaseState<amrex::Real>& p0,
@@ -1194,8 +1194,8 @@ public:
     void Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
                 const BaseState<amrex::Real>& Sbar_in, 
-                const RealVector& rho0_old_in,
-                const RealVector& rho0_new_in,
+                const BaseState<amrex::Real>& rho0_old_in,
+                const BaseState<amrex::Real>& rho0_new_in,
                 const BaseState<amrex::Real>& p0_old_in,
                 const BaseState<amrex::Real>& p0_new_in,
                 const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1207,8 +1207,8 @@ public:
     void Makew0PlanarVarg(const RealVector& w0_old, 
                         RealVector& w0_force, 
                         const BaseState<amrex::Real>& Sbar_in, 
-                        const RealVector& rho0_old_in,
-                        const RealVector& rho0_new_in,
+                        const BaseState<amrex::Real>& rho0_old_in,
+                        const BaseState<amrex::Real>& rho0_new_in,
                         const BaseState<amrex::Real>& p0_old_in,
                         const BaseState<amrex::Real>& p0_new_in,
                         const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1220,8 +1220,8 @@ public:
     void Makew0Planar(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
-                    const RealVector& rho0_old_in,
-                    const RealVector& rho0_new_in,
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,
                     const BaseState<amrex::Real>& p0_new_in,
                     const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1234,8 +1234,8 @@ public:
     void Makew0SphrIrreg(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
-                    const RealVector& rho0_old_in,
-                    const RealVector& rho0_new_in,
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,
                     const BaseState<amrex::Real>& p0_new_in,
                     const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1247,8 +1247,8 @@ public:
     void Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
-                    const RealVector& rho0_old_in,
-                    const RealVector& rho0_new_in,
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,
                     const BaseState<amrex::Real>& p0_new_in,
                     const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1339,7 +1339,7 @@ public:
     void WriteSmallPlotFile (const int step,
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
-                        const RealVector& rho0_in,
+                        const BaseState<amrex::Real>& rho0_in,
                         const BaseState<amrex::Real>& rhoh0_in,
                         const BaseState<amrex::Real>& p0_in,
                         const BaseState<amrex::Real>& gamma1bar_in,
@@ -1351,7 +1351,7 @@ public:
     void WritePlotFile (const int step,
                         const amrex::Real t_in,
                         const amrex::Real dt_in,
-                        const RealVector& rho0_in,
+                        const BaseState<amrex::Real>& rho0_in,
                         const BaseState<amrex::Real>& rhoh0_in,
                         const BaseState<amrex::Real>& p0_in,
                         const BaseState<amrex::Real>& gamma1bar_in,
@@ -1377,7 +1377,7 @@ public:
                        amrex::Vector<amrex::MultiFab>& ad_excess);
 
     /// Calculate the gravitational acceleration
-    void MakeGrav (const RealVector& rho0,
+    void MakeGrav (const BaseState<amrex::Real>& rho0,
                    amrex::Vector<amrex::MultiFab>& grav);
 
     /// Calculate the vorticity
@@ -1654,7 +1654,7 @@ public:
     ////////////
     // MaestroSponge.cpp functions
 
-    void SpongeInit(const RealVector& rho0);
+    void SpongeInit(const BaseState<amrex::Real>& rho0);
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////
@@ -1767,7 +1767,7 @@ public:
                           const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
                           const RealVector& w0_force,
                           const amrex::Vector<amrex::MultiFab>& w0_force_cart,
-                          const RealVector& rho0_nph,
+                          const BaseState<amrex::Real>& rho0_nph,
                           const BaseState<amrex::Real>& grav_cell_nph,
                           const amrex::Vector<amrex::MultiFab>& sponge);
     ////////////////////////
@@ -2017,8 +2017,8 @@ public:
     // these are cell-centered
     RealVector s0_init;
     BaseState<amrex::Real> p0_init;
-    RealVector rho0_old;
-    RealVector rho0_new;
+    BaseState<amrex::Real> rho0_old;
+    BaseState<amrex::Real> rho0_new;
     BaseState<amrex::Real> rhoh0_old;
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;

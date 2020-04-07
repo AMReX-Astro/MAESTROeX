@@ -16,7 +16,7 @@ const int setwVal = outfilePrecision+2+4+4; // 0. + precision + 4 for exp + 4 fo
 void
 Maestro::DiagFile (const int step,
                    const Real t_in,
-                   const RealVector& rho0_in,
+                   const BaseState<Real>& rho0,
                    const BaseState<Real>& p0_in,
                    const Vector<MultiFab>& u_in,
                    const Vector<MultiFab>& s_in,
@@ -24,7 +24,7 @@ Maestro::DiagFile (const int step,
 {
 
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DiagFile()",DiagFile);
+    BL_PROFILE_VAR("Maestro::DiagFile()", DiagFile);
 
     const int max_lev = max_radial_level + 1;
 
@@ -494,14 +494,13 @@ Maestro::DiagFile (const int step,
     Real grav_ener = 0.0;
     if (spherical) {
 #if (AMREX_SPACEDIM == 3)
-        const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();
 
         // m(r) will contain mass enclosed by the center
         BaseState<Real> m(nr_fine);
-        m[0] = 4.0/3.0 * M_PI * rho0[0] * r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
+        m[0] = 4.0/3.0 * M_PI * rho0(0,0)* r_cc_loc[0]*r_cc_loc[0]*r_cc_loc[0];
 
         // dU = - G M dM / r;  dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
-        grav_ener = -4.0 * M_PI * Gconst * m[0] * r_cc_loc[0] * rho0[0] * (r_edge_loc[max_lev] - r_edge_loc[0]);
+        grav_ener = -4.0 * M_PI * Gconst * m[0] * r_cc_loc[0] * rho0(0,0) * (r_edge_loc[max_lev] - r_edge_loc[0]);
 
         for (auto r = 1; r < nr_fine; ++r) {
             // the mass is defined at the cell-centers, so to compute the
@@ -512,8 +511,8 @@ Maestro::DiagFile (const int step,
             // don't add any contributions from outside the star -- i.e.
             // rho < base_cutoff_density
             Real term1 = 0.0;
-            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] * 
+            if (rho0(0,r-1) > base_cutoff_density) {
+                term1 = 4.0/3.0*M_PI*rho0(0,r-1) * 
                     (r_edge_loc[max_lev*r] - r_cc_loc[max_lev*(r-1)]) * 
                     (r_edge_loc[max_lev*r]*r_edge_loc[max_lev*r] + 
                     r_edge_loc[max_lev*r]*r_cc_loc[max_lev*(r-1)] + 
@@ -521,8 +520,8 @@ Maestro::DiagFile (const int step,
             } 
 
             Real term2 = 0.0;
-            if (rho0[max_lev*r] > base_cutoff_density) {
-                term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
+            if (rho0(0,r) > base_cutoff_density) {
+                term2 = 4.0/3.0*M_PI*rho0(0,r)*
                     (r_cc_loc[max_lev*r] - r_edge_loc[max_lev*r]) * 
                     (r_cc_loc[max_lev*r]*r_cc_loc[max_lev*r] + 
                     r_cc_loc[max_lev*r]*r_edge_loc[max_lev*r] + 
@@ -533,14 +532,14 @@ Maestro::DiagFile (const int step,
                 
             // dU = - G M dM / r;  
             // dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
-            grav_ener -= 4.0*M_PI*Gconst*m[r]*r_cc_loc[max_lev*r] * rho0[max_lev*r]*(r_edge_loc[max_lev*(r+1)]-r_edge_loc[max_lev*r]);
+            grav_ener -= 4.0*M_PI*Gconst*m[r]*r_cc_loc[max_lev*r] * rho0(0,r)*(r_edge_loc[max_lev*(r+1)]-r_edge_loc[max_lev*r]);
         }
 #endif
     } else {
         // diag_grav_energy(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
         for (auto r = 0; r < nr_fine; ++r) {
             Real dr_loc = r_edge_loc[max_lev*(r+1)] - r_edge_loc[max_lev*r];
-            grav_ener -= rho0_in[max_lev*r] * r_cc_loc[max_lev*r] * grav_const * dr_loc;
+            grav_ener -= rho0(0,r) * r_cc_loc[max_lev*r] * grav_const * dr_loc;
         }
     }
 

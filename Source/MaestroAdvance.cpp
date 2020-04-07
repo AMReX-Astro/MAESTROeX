@@ -84,7 +84,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
-    RealVector rho0_nph        ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
@@ -102,7 +102,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    rho0_nph.shrink_to_fit();
     w0_force.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
@@ -377,10 +376,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     } else {
-        rho0_new = rho0_old;
+        rho0_new.copy(rho0_old);
     }
 
     // thermal is the forcing for rhoh or temperature
@@ -413,13 +412,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
   
     // need full UMAC velocities for DensityAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
     
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac,  w0mac,-1.);
     
     if (evolve_base_state) {
 
@@ -433,7 +432,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
+            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 
@@ -611,7 +610,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        compute_cutoff_coords(rho0_old.dataPtr());
+        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
     }
 
@@ -752,7 +751,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -773,13 +772,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // need full UMAC velocities for DensityAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac,1.);
     
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
     
     if (evolve_base_state) {
 
@@ -794,7 +793,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
+            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 
@@ -803,9 +802,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         MakeGravCell(grav_cell_new, rho0_new);
 
-        for(int i=0; i<rho0_nph.size(); ++i) {
-            rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-        }
+        rho0_nph.copy(0.5*(rho0_old + rho0_new));
         MakeGravCell(grav_cell_nph, rho0_nph);
 
         base_time += ParallelDescriptor::second() - base_time_start;
@@ -854,7 +851,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     } else {
-        rho0_nph = rho0_old;
+        rho0_nph.copy(rho0_old);
         grav_cell_nph.copy(grav_cell_old);
     }
 

@@ -10,7 +10,7 @@ using namespace amrex;
 void Maestro::WriteSmallPlotFile (const int step,
                                   const Real t_in,
                                   const Real dt_in,
-                                  const RealVector& rho0_in,
+                                  const BaseState<Real>& rho0_in,
                                   const BaseState<Real>& rhoh0_in,
                                   const BaseState<Real>& p0_in,
                                   const BaseState<Real>& gamma1bar_in,
@@ -27,7 +27,7 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
-                        const RealVector& rho0_in,
+                        const BaseState<Real>& rho0_in,
                         const BaseState<Real>& rhoh0_in,
                         const BaseState<Real>& p0_in,
                         const BaseState<Real>& gamma1bar_in,
@@ -81,7 +81,7 @@ Maestro::WritePlotFile (const int step,
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(rho0_in,rho0_cart,0,0);
+    Put1dArrayOnCart(rho0_in, rho0_cart, 0, 0);
 
     // convert rhoh0 to multi-D MultiFab
     Vector<MultiFab> rhoh0_cart(finest_level+1);
@@ -161,7 +161,7 @@ Maestro::WritePlotFile (const int step,
 
             for (int i=0; i<nr(lev); ++i) {
                 BaseCCFile << r_cc_loc_b(lev,i) << " "
-                           << rho0_in[lev+(max_radial_level+1)*i] << " "
+                           << rho0_in(lev,i) << " "
                            << rhoh0_in(lev,i) << " "
                            << p0_in(lev,i) << " "
                            << gamma1bar_in(lev,i) << "\n";
@@ -1679,7 +1679,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
 
 
 void
-Maestro::MakeGrav (const RealVector& rho0,
+Maestro::MakeGrav (const BaseState<Real>& rho0,
                    Vector<MultiFab>& grav)
 {
     // timer for profiling

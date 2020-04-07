@@ -356,19 +356,15 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         tempbar_cart[lev].setVal(0.);
     }
 
-    RealVector rho0_halftime( (max_radial_level+1)*nr_fine );
-    RealVector rhoh0_halftime( (max_radial_level+1)*nr_fine );
-    rho0_halftime.shrink_to_fit();
-    rhoh0_halftime.shrink_to_fit();
+    BaseState<Real> rho0_halftime(max_radial_level+1, nr_fine);
+    BaseState<Real> rhoh0_halftime(max_radial_level+1, nr_fine);
 
-    for (int i = 0; i < (max_radial_level+1)*nr_fine; ++i) {
-        rho0_halftime[i] = 0.5*(rho0_old[i] + rho0_new[i]);
-        rhoh0_halftime[i] = 0.5*(rhoh0_old[i] + rhoh0_new[i]);
-    }
+    rho0_halftime.copy(0.5*(rho0_old + rho0_new));
+    rhoh0_halftime.copy(0.5*(rhoh0_old + rhoh0_new));
     
-    Put1dArrayOnCart(rho0_halftime,rho0_cart,0,0,bcs_s,Rho);
-    Put1dArrayOnCart(rhoh0_halftime,rhoh0_cart,0,0,bcs_s,RhoH);
-    Put1dArrayOnCart(tempbar,tempbar_cart,0,0,bcs_s,Temp);
+    Put1dArrayOnCart(rho0_halftime, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(rhoh0_halftime, rhoh0_cart, 0, 0, bcs_s, RhoH);
+    Put1dArrayOnCart(tempbar, tempbar_cart, 0, 0, bcs_s, Temp);
 
     // edge variables    
     BaseState<Real> rho0_edge(max_radial_level+1, nr_fine+1);

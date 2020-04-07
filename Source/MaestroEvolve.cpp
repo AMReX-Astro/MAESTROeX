@@ -158,7 +158,7 @@ Maestro::Evolve ()
                 std::swap(S_cc_old[lev], S_cc_new[lev]);
         }
 
-        std::swap( rho0_old, rho0_new);
+        rho0_old.swap(rho0_new);
         rhoh0_old.swap(rhoh0_new);
         p0_nm1.swap(p0_old);
         p0_old.swap(p0_new);

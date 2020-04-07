@@ -5,7 +5,7 @@
 using namespace amrex;
 
 void
-Maestro::SpongeInit(const RealVector& rho0)
+Maestro::SpongeInit(const BaseState<Real>& rho0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SpongeInit()", SpongeInit);
@@ -38,7 +38,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     if (!use_exact_base_state) {
         // set r_sp;
         for (auto r = 0; r <= r_end_coord(0,1); ++r) {
-            if (rho0[max_lev*r] < sponge_start_density) {
+            if (rho0(0,r) < sponge_start_density) {
                 r_sp = prob_lo_r + (Real(r) + 0.5) * dr[0];
                 break;
             }
@@ -47,7 +47,7 @@ Maestro::SpongeInit(const RealVector& rho0)
         // set r_md
         r_md = r_top;
         for (auto r = 0; r <= r_end_coord(0,1); ++r) {
-            if (rho0[max_lev*r] < sponge_center_density) {
+            if (rho0(0,r) < sponge_center_density) {
                 r_md = prob_lo_r + (Real(r) + 0.5) * dr[0];
                 break;
             }
@@ -55,7 +55,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     } else {
         // set r_sp;
         for (auto r = 0; r < nr_fine; ++r) {
-            if (rho0[max_lev*r] < sponge_start_density) {
+            if (rho0(0,r) < sponge_start_density) {
                 r_sp = prob_lo_r + r_cc_loc_b(0,r);
                 break;
             }
@@ -64,7 +64,7 @@ Maestro::SpongeInit(const RealVector& rho0)
         // set r_md
         r_md = r_top;
         for (auto r = 0; r < nr_fine; ++r) {
-            if (rho0[max_lev*r] < sponge_center_density) {
+            if (rho0(0,r) < sponge_center_density) {
                 r_md = prob_lo_r +r_cc_loc_b(0,r);
                 break;
             }
@@ -90,7 +90,6 @@ Maestro::SpongeInit(const RealVector& rho0)
             Print() << "outer sponge: r_sp_outer, r_tp_outer: " << r_sp_outer << ", " << r_tp_outer << std::endl;
         }
     }
-
 }
 
 void

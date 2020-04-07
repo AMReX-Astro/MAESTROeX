@@ -7,8 +7,8 @@ void
 Maestro::Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
                 const BaseState<Real>& Sbar_in, 
-                const RealVector& rho0_old_in,
-                const RealVector& rho0_new_in,
+                const BaseState<Real>& rho0_old_in,
+                const BaseState<Real>& rho0_new_in,
                 const BaseState<Real>& p0_old_in,
                 const BaseState<Real>& p0_new_in,
                 const BaseState<Real>& gamma1bar_old_in,
@@ -76,8 +76,8 @@ void
 Maestro::Makew0Planar(const RealVector& w0_old, 
                       RealVector& w0_force, 
                       const BaseState<Real>& Sbar_in, 
-                      const RealVector& rho0_old_in,
-                      const RealVector& rho0_new_in,
+                      const BaseState<Real>& rho0_old_in,
+                      const BaseState<Real>& rho0_new_in,
                       const BaseState<Real>& p0_old_in,
                       const BaseState<Real>& p0_new_in,
                       const BaseState<Real>& gamma1bar_old_in,
@@ -127,8 +127,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     for (auto n = 0; n <= max_radial_level; ++n) {
 
         psi_planar.setVal(0.0);
-        int base_cutoff_density_coord_loc = 0;
-        get_base_cutoff_density_coord(n, &base_cutoff_density_coord_loc);
+        int base_cutoff_density_coord_loc = base_cutoff_density_coord(n);
 
         const Real dr_lev = dr(n);
 
@@ -277,8 +276,8 @@ void
 Maestro::Makew0PlanarVarg(const RealVector& w0_old, 
                           RealVector& w0_force, 
                           const BaseState<Real>& Sbar_in, 
-                          const RealVector& rho0_old_in,
-                          const RealVector& rho0_new_in,
+                          const BaseState<Real>& rho0_old_in,
+                          const BaseState<Real>& rho0_new_in,
                           const BaseState<Real>& p0_old_in,
                           const BaseState<Real>& p0_new_in,
                           const BaseState<Real>& gamma1bar_old_in,
@@ -290,8 +289,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
 
-    int fine_base_density_cutoff_coord = 0;
-    get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
+    int fine_base_density_cutoff_coord = base_cutoff_density_coord(finest_radial_level);
 
     const int max_lev = max_radial_level+1;
     const int nr_finest = nr(finest_radial_level);
@@ -525,8 +523,8 @@ void
 Maestro::Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
                     const BaseState<Real>& Sbar_in, 
-                    const RealVector& rho0_old_in,
-                    const RealVector& rho0_new_in,
+                    const BaseState<Real>& rho0_old_in,
+                    const BaseState<Real>& rho0_new_in,
                     const BaseState<Real>& p0_old_in,
                     const BaseState<Real>& p0_new_in,
                     const BaseState<Real>& gamma1bar_old_in,
@@ -553,8 +551,6 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     const auto& p0_old_p = p0_old_in;
     const auto& p0_new_p = p0_new_in;
-    const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
-    const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const auto& etarho_cc_p = etarho_cc;
@@ -565,8 +561,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    int base_cutoff_density_coord_loc = 0;
-    get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
+    int base_cutoff_density_coord_loc = base_cutoff_density_coord(0);
 
     const Real dr0 = dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
@@ -575,7 +570,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p(0,r)+ p0_new_p(0,r));
-        rho0_nph(0,r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
+        rho0_nph(0,r) = 0.5*(rho0_old_in(0,r) + rho0_new_in(0,r));
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_in(0,r) + gamma1bar_new_in(0,r));
     });
 
@@ -585,7 +580,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     w0_from_Sbar(0) = 0.0;
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
+        Real volume_discrepancy = rho0_old_in(0,r-1) > base_cutoff_dens ? 
             dpdt_factor_loc * p0_minus_peosbar(0,r-1)/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
@@ -702,8 +697,8 @@ void
 Maestro::Makew0SphrIrreg(const RealVector& w0_old, 
                         RealVector& w0_force, 
                         const BaseState<Real>& Sbar_in, 
-                        const RealVector& rho0_old_in,
-                        const RealVector& rho0_new_in,
+                        const BaseState<Real>& rho0_old_in,
+                        const BaseState<Real>& rho0_new_in,
                         const BaseState<Real>& p0_old_in,
                         const BaseState<Real>& p0_new_in,
                         const BaseState<Real>& gamma1bar_old_in,
@@ -730,8 +725,6 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
     const auto& p0_old_p = p0_old_in;
     const auto& p0_new_p = p0_new_in;
-    const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
-    const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const auto& etarho_cc_p = etarho_cc;
@@ -742,15 +735,14 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    int base_cutoff_density_coord_loc = 0;
-    get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
+    int base_cutoff_density_coord_loc = base_cutoff_density_coord(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
     // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p(0,r) + p0_new_p(0,r));
-        rho0_nph(r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
+        rho0_nph(r) = 0.5*(rho0_old_in(0,r) + rho0_new_in(0,r));
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_in(0,r) + gamma1bar_new_in(0,r));
     });
 
@@ -760,7 +752,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     w0_from_Sbar(0) = 0.0;
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
+        Real volume_discrepancy = rho0_old_in(0,r-1) > base_cutoff_dens ? 
             dpdt_factor_loc * p0_minus_peosbar(0,r-1)/dt_in : 0.0;
 
         Real dr1 = r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1);

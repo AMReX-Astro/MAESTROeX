@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
                        BaseState<Real>& p0, 
                        const int lev)
 {
@@ -169,7 +169,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
+        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
         tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
         tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];

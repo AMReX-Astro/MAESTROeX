@@ -63,8 +63,8 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    BaseState<Real> grav_cell_nph   (max_radial_level+1, nr_fine);
-    RealVector   rho0_nph        ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_nph          (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
@@ -81,7 +81,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    rho0_nph.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -319,12 +318,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
-                       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+    MakeRHCCforMacProj(macrhs, rho0_old, S_cc_nph, Sbar, beta0_old, delta_gamma1_term,
+                       gamma1bar_old, p0_old, delta_p_term,delta_chi, is_predictor);
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // subtract w0mac from umac
-        Addw0(umac,w0mac,-1.);
+        Addw0(umac, w0mac, -1.);
     }
 
     // wallclock time
@@ -352,7 +351,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    rho0_new = rho0_old;
+    rho0_new.copy(rho0_old);
 
     // thermal is the forcing for rhoh or temperature
     if (use_thermal_diffusion) {
@@ -388,12 +387,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+    DensityAdvance(1, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac, w0mac, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -525,7 +524,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        compute_cutoff_coords(rho0_old.dataPtr());
+        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
     }
 
@@ -658,7 +657,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // no need to advect the base state density
-    rho0_new = rho0_old;
+    rho0_new.copy(rho0_old);
 
     // copy temperature from s1 into s2 for seeding eos calls
     // temperature will be overwritten later after enthalpy advance
@@ -672,12 +671,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+    DensityAdvance(2, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac, w0mac, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        compute_cutoff_coords(rho0_new.dataPtr());
+        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -686,13 +685,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         
         MakeGravCell(grav_cell_new, rho0_new);
 
-        for(int i=0; i<rho0_nph.size(); ++i) {
-            rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-        }
+        rho0_nph.copy(0.5*(rho0_old + rho0_new));
         
         MakeGravCell(grav_cell_nph, rho0_nph);
     } else {
-        rho0_nph = rho0_old;
+        rho0_nph.copy(rho0_old);
         grav_cell_nph.copy(grav_cell_old);
     }
 

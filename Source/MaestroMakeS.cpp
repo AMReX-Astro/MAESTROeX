@@ -318,7 +318,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 
 void
 Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
-                                 const RealVector& rho0,
+                                 const BaseState<Real>& rho0,
                                  const BaseState<Real>& beta0,
                                  const BaseState<Real>& gamma1bar,
                                  const BaseState<Real>& p0,
@@ -400,7 +400,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
 // compute rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi
 void
 Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
-                             const RealVector& rho0,
+                             const BaseState<Real>& rho0,
                              const Vector<MultiFab>& S_cc,
                              const BaseState<Real>& Sbar,
                              const BaseState<Real>& beta0,

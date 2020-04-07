@@ -28,7 +28,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
 
     // zero the new density so we don't leave a non-zero density in fine radial
     // regions that no longer have a corresponding full state
-    std::fill(rho0_new.begin(), rho0_new.end(), 0.0);
+    rho0_new.setVal(0.0);
 
     const int max_lev = max_radial_level+1;
 
@@ -36,7 +36,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr(); 
+        const auto& rho0_old_p = rho0_old; 
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
 
         const Real dr_lev = dr(n);
@@ -50,7 +50,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
                 int r = j + lo;
                 int p = n+max_lev*r;
 
-                force(n,r) = -rho0_old_p[p] * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev;
+                force(n,r) = -rho0_old_p(n,r) * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev;
             });
         }
     }
@@ -59,8 +59,8 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
 
     for (int n = 0; n <= max_radial_level; ++n) {
 
-        Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr(); 
-        Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr(); 
+        const auto& rho0_old_p = rho0_old; 
+        auto& rho0_new_p = rho0_new; 
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
 
         const Real dr_lev = dr(n);
@@ -75,7 +75,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
                 int r = j + lo;
                 int p = n+max_lev*r;
 
-                rho0_new_p[p] = rho0_old_p[p] 
+                rho0_new_p(n,r) = rho0_old_p(n,r)
                     - dt_loc/dr_lev * (rho0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rho0_predicted_edge(n,r)*w0_p[p]);
             });
         }
@@ -94,23 +94,23 @@ Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge)
     const int max_lev = max_radial_level+1;
 
     // Predict rho_0 to vertical edges
-    Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr(); 
-    Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr();
+    const auto& rho0_old_p = rho0_old; 
+    auto& rho0_new_p = rho0_new;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
     const auto r_cc_loc_p = r_cc_loc_b;
     const auto r_edge_loc_p = r_edge_loc_b;
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;
-        force(r) = -rho0_old_p[p] * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
-            rho0_old_p[p]*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r);
+        force(r) = -rho0_old_p(0,r) * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
+            rho0_old_p(0,r)*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc_p(0,r);
     });
 
     MakeEdgeState1d(rho0_old, rho0_predicted_edge, force);
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         int p = max_lev*r;
-        rho0_new_p[p] = rho0_old_p[p] - dtdr/(r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
+        rho0_new_p(0,r) = rho0_old_p(0,r) - dtdr/(r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) * rho0_predicted_edge(0,r+1) * w0_p[max_lev*(r+1)] - 
             r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * rho0_predicted_edge(0,r) * w0_p[p]);
     });
