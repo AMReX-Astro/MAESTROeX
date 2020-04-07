@@ -184,15 +184,20 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     // Put tempbar_init on cart
     Vector<MultiFab> tempbar_init_cart(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
             tempbar_init_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             tempbar_init_cart[lev].setVal(0.);
         }
 
-        if (drive_initial_convection == 1) {
-            Put1dArrayOnCart(tempbar_init,tempbar_init_cart,0,0,bcs_f,0);
+        if (drive_initial_convection) {
+            Put1dArrayOnCart(tempbar_init, tempbar_init_cart, 0, 0, bcs_f, 0);
         }
+    }
+
+    RealVector tempbar_init_vec((max_radial_level+1)*nr_fine);
+    if (!spherical) {
+        tempbar_init.toVector(tempbar_init_vec);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -247,7 +252,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                             BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                            tempbar_init.dataPtr(), dt_in, time_in, 
+                            tempbar_init_vec.dataPtr(), dt_in, time_in, 
                             BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
             }
         }
@@ -266,7 +271,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::BurnerSDC()",BurnerSDC);
 
-    // Put tempbar_init on cart
     Vector<MultiFab> p0_cart(finest_level+1);
 
     // make a Fortran-friendly RealVector of p0

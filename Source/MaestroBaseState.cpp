@@ -171,8 +171,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     for (auto i = 0; i < nr_fine; ++i) {
         rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
         p0(lev,i) = p0_init[lev+max_lev*i];
     }
 

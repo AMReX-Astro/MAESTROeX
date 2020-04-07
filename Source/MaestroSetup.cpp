@@ -126,8 +126,8 @@ Maestro::Setup ()
     p0_old       .resize(max_radial_level+1, nr_fine);
     p0_new       .resize(max_radial_level+1, nr_fine);
     p0_nm1       .resize(max_radial_level+1, nr_fine);
-    tempbar      .resize( (max_radial_level+1)*nr_fine );
-    tempbar_init .resize( (max_radial_level+1)*nr_fine );
+    tempbar      .resize(max_radial_level+1, nr_fine);
+    tempbar_init .resize(max_radial_level+1, nr_fine);
     beta0_old    .resize(max_radial_level+1, nr_fine);
     beta0_new    .resize(max_radial_level+1, nr_fine);
     beta0_nm1    .resize(max_radial_level+1, nr_fine);
@@ -163,8 +163,6 @@ Maestro::Setup ()
     p0_init      .shrink_to_fit();
     rho0_old     .shrink_to_fit();
     rho0_new     .shrink_to_fit();
-    tempbar      .shrink_to_fit();
-    tempbar_init .shrink_to_fit();
     w0           .shrink_to_fit();
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();

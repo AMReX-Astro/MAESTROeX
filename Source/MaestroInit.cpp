@@ -307,10 +307,8 @@ Maestro::InitData ()
         }
 
         // set tempbar to be the average
-        Average(sold,tempbar,Temp);
-        for (int i=0; i<tempbar.size(); ++i) {
-            tempbar_init[i] = tempbar[i];
-        }
+        Average(sold, tempbar, Temp);
+        tempbar_init.copy(tempbar);
     }
 
     // set p0^{-1} = p0_old

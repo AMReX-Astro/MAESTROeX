@@ -2023,8 +2023,8 @@ public:
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;
     BaseState<amrex::Real> p0_new;
-    RealVector tempbar;
-    RealVector tempbar_init;
+    BaseState<amrex::Real> tempbar;
+    BaseState<amrex::Real> tempbar_init;
     BaseState<amrex::Real> beta0_old;
     BaseState<amrex::Real> beta0_new;
     BaseState<amrex::Real> gamma1bar_old;
