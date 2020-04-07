@@ -268,9 +268,8 @@ Maestro::InitData ()
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope
-    RealVector s0_swap, p0_swap;
+    RealVector s0_swap;
     std::swap(s0_swap, s0_init);
-    std::swap(p0_swap, p0_init);
 
     if (fix_base_state) {
         // compute cutoff coordinates
@@ -366,6 +365,10 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     MultiFab& vel = uold[lev];
     MultiFab& cc_to_r = cell_cc_to_r[lev];
 
+    // convert p0_init to a vector to pass to the Fortran 
+    RealVector p0_init_vec((max_radial_level+1)*nr_fine);
+    p0_init.toVector(p0_init_vec);
+
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -380,7 +383,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
             initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
                      BL_TO_FORTRAN_FAB(scal[mfi]),
                      BL_TO_FORTRAN_FAB(vel[mfi]),
-                     s0_init.dataPtr(), p0_init.dataPtr(),
+                     s0_init.dataPtr(), p0_init_vec.dataPtr(),
                      ZFILL(dx));
         } else {
             init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi), 
@@ -391,7 +394,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
             initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
                           BL_TO_FORTRAN_FAB(scal[mfi]),
                           BL_TO_FORTRAN_FAB(vel[mfi]),
-                          s0_init.dataPtr(), p0_init.dataPtr(),
+                          s0_init.dataPtr(), p0_init_vec.dataPtr(),
                           ZFILL(dx),
                           r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));

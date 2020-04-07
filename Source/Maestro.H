@@ -2016,7 +2016,7 @@ public:
     // vectors store the multilevel 1D states as one very long array.
     // these are cell-centered
     RealVector s0_init;
-    RealVector p0_init;
+    BaseState<amrex::Real> p0_init;
     RealVector rho0_old;
     RealVector rho0_new;
     BaseState<amrex::Real> rhoh0_old;

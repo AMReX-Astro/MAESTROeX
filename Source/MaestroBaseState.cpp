@@ -81,7 +81,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
         spec_above_cutoff[comp] = s0_init[n+max_lev*nr_fine*(FirstSpec+comp)];
     } 
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
-    Real p_above_cutoff = p0_init[n];
+    Real p_above_cutoff = p0_init(n,0);
 
     for (auto r = 0; r < nr(n); ++r) {
 
@@ -100,7 +100,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = spec_above_cutoff[comp];
             }
-            p0_init[n+max_lev*r] = p_above_cutoff;
+            p0_init(n,r) = p_above_cutoff;
             s0_init[n+max_lev*(r+nr_fine*Temp)] = temp_above_cutoff;
 
         } else {
@@ -142,7 +142,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
                 s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
                     d_ambient * xn_ambient[comp];
             }
-            p0_init[n+max_lev*r] = eos_state.p; // p_ambient !
+            p0_init(n,r) = eos_state.p; // p_ambient !
             s0_init[n+max_lev*(r+nr_fine*Temp)] = t_ambient;
 
             // keep track of the height where we drop below the cutoff density
@@ -162,7 +162,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
                         s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))];
                 }
                 temp_above_cutoff = s0_init[n+max_lev*(r+nr_fine*Temp)];
-                p_above_cutoff = p0_init[n+max_lev*r];
+                p_above_cutoff = p0_init(n,r);
             }
         }
     }
@@ -173,7 +173,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
         tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
         tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init[lev+max_lev*i];
+        p0(lev,i) = p0_init(lev,i);
     }
 
     // check whether we are in HSE
@@ -225,13 +225,13 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
             Real rhog = 0.0;
             if (use_exact_base_state) {
                 Real dr_irreg = r_cc_loc_b(n,r) - r_cc_loc_b(n,r-1);
-                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr_irreg;
+                dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr_irreg;
 
                 Real rfrac = (r_edge_loc_b(n,r) - r_cc_loc_b(n,r-1)) / dr_irreg; 
                 rhog = ((1.0-rfrac) * s0_init[n+max_lev*(r+nr_fine*Rho)] +  
                         rfrac * s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
             } else {
-                dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr(n);
+                dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr(n);
                 rhog = 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] +  
                               s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
             }
