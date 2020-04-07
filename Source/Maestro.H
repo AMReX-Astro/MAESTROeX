@@ -1117,7 +1117,7 @@ public:
     
     void MakePsiSphr(const BaseState<amrex::Real>& gamma1bar, 
                      const BaseState<amrex::Real>& p0_avg,
-                     const RealVector& Sbar_in);
+                     const BaseState<amrex::Real>& Sbar_in);
 
     void MakePsiIrreg(const BaseState<amrex::Real>& grav_cell);
 
@@ -1144,7 +1144,7 @@ public:
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
-                               const RealVector& Sbar,
+                               const BaseState<amrex::Real>& Sbar,
                                const BaseState<amrex::Real>& beta0,
                                const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
 
@@ -1152,7 +1152,7 @@ public:
     void MakeRHCCforMacProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                          const RealVector& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
-                             const RealVector& Sbar,
+                             const BaseState<amrex::Real>& Sbar,
                              const BaseState<amrex::Real>& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const BaseState<amrex::Real>& gamma1bar,
@@ -1193,7 +1193,7 @@ public:
 
     void Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
-                const RealVector& Sbar_in, 
+                const BaseState<amrex::Real>& Sbar_in, 
                 const RealVector& rho0_old_in,
                 const RealVector& rho0_new_in,
                 const BaseState<amrex::Real>& p0_old_in,
@@ -1206,7 +1206,7 @@ public:
 
     void Makew0PlanarVarg(const RealVector& w0_old, 
                         RealVector& w0_force, 
-                        const RealVector& Sbar_in, 
+                        const BaseState<amrex::Real>& Sbar_in, 
                         const RealVector& rho0_old_in,
                         const RealVector& rho0_new_in,
                         const BaseState<amrex::Real>& p0_old_in,
@@ -1219,7 +1219,7 @@ public:
 
     void Makew0Planar(const RealVector& w0_old, 
                     RealVector& w0_force, 
-                    const RealVector& Sbar_in, 
+                    const BaseState<amrex::Real>& Sbar_in, 
                     const RealVector& rho0_old_in,
                     const RealVector& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,
@@ -1233,7 +1233,7 @@ public:
 
     void Makew0SphrIrreg(const RealVector& w0_old, 
                     RealVector& w0_force, 
-                    const RealVector& Sbar_in, 
+                    const BaseState<amrex::Real>& Sbar_in, 
                     const RealVector& rho0_old_in,
                     const RealVector& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,
@@ -1246,7 +1246,7 @@ public:
 
     void Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
-                    const RealVector& Sbar_in, 
+                    const BaseState<amrex::Real>& Sbar_in, 
                     const RealVector& rho0_old_in,
                     const RealVector& rho0_new_in,
                     const BaseState<amrex::Real>& p0_old_in,

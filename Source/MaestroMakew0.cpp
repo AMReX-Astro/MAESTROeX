@@ -6,7 +6,7 @@ using namespace amrex;
 void 
 Maestro::Makew0(const RealVector& w0_old, 
                 RealVector& w0_force, 
-                const RealVector& Sbar_in, 
+                const BaseState<Real>& Sbar_in, 
                 const RealVector& rho0_old_in,
                 const RealVector& rho0_new_in,
                 const BaseState<Real>& p0_old_in,
@@ -75,7 +75,7 @@ Maestro::Makew0(const RealVector& w0_old,
 void 
 Maestro::Makew0Planar(const RealVector& w0_old, 
                       RealVector& w0_force, 
-                      const RealVector& Sbar_in, 
+                      const BaseState<Real>& Sbar_in, 
                       const RealVector& rho0_old_in,
                       const RealVector& rho0_new_in,
                       const BaseState<Real>& p0_old_in,
@@ -177,7 +177,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                 }
 
                 w0[n+max_lev*r] = w0[n+max_lev*(r-1)]
-                    + Sbar_in[n+max_lev*(r-1)] * dr_lev
+                    + Sbar_in(n,r-1) * dr_lev
                     - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
                     - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
             }
@@ -276,7 +276,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 void 
 Maestro::Makew0PlanarVarg(const RealVector& w0_old, 
                           RealVector& w0_force, 
-                          const RealVector& Sbar_in, 
+                          const BaseState<Real>& Sbar_in, 
                           const RealVector& rho0_old_in,
                           const RealVector& rho0_new_in,
                           const BaseState<Real>& p0_old_in,
@@ -524,7 +524,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
 void 
 Maestro::Makew0Sphr(const RealVector& w0_old, 
                     RealVector& w0_force, 
-                    const RealVector& Sbar_in, 
+                    const BaseState<Real>& Sbar_in, 
                     const RealVector& rho0_old_in,
                     const RealVector& rho0_new_in,
                     const BaseState<Real>& p0_old_in,
@@ -589,7 +589,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
             dpdt_factor_loc * p0_minus_peosbar(0,r-1)/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr0 * Sbar_in[max_lev*(r-1)] * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1);
+            dr0 * Sbar_in(0,r-1) * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1);
         if (volume_discrepancy != 0.0) {
             w0_from_Sbar(r) -= dr0 * volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
@@ -701,7 +701,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 void 
 Maestro::Makew0SphrIrreg(const RealVector& w0_old, 
                         RealVector& w0_force, 
-                        const RealVector& Sbar_in, 
+                        const BaseState<Real>& Sbar_in, 
                         const RealVector& rho0_old_in,
                         const RealVector& rho0_new_in,
                         const BaseState<Real>& p0_old_in,
@@ -765,7 +765,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
         Real dr1 = r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1);
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr1 * Sbar_in[max_lev*(r-1)] * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) - 
+            dr1 * Sbar_in(0,r-1) * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) - 
             dr1* volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
     }

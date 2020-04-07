@@ -116,6 +116,7 @@ public:
     /// scalar division of the whole base state 
     template <class U>
     friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
+    BaseState<T> operator/ (const T val);
     BaseState<T>& operator/= (const T val);
 
     /// element-wise division 
@@ -516,6 +517,15 @@ BaseState<T>
 operator/ (const T val, const BaseState<T>& p) {
     // make a deep copy
     BaseState<T> s(p);
+    s /= val;
+    return s;
+}
+
+template <class T>
+BaseState<T>
+BaseState<T>::operator/ (const T val) {
+    // make a deep copy
+    BaseState<T> s(*this);
     s /= val;
     return s;
 }

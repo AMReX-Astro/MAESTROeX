@@ -266,7 +266,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 void
 Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<MultiFab>& S_cc,
-                               const RealVector& Sbar,
+                               const BaseState<Real>& Sbar,
                                const BaseState<Real>& beta0,
                                const Vector<MultiFab>& delta_gamma1_term)
 {
@@ -402,7 +402,7 @@ void
 Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const RealVector& rho0,
                              const Vector<MultiFab>& S_cc,
-                             const RealVector& Sbar,
+                             const BaseState<Real>& Sbar,
                              const BaseState<Real>& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
                              const BaseState<Real>& gamma1bar,

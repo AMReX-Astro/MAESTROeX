@@ -30,7 +30,7 @@ Maestro::MakePsiPlanar()
 void 
 Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar, 
                      const BaseState<Real>& p0_avg,
-                     const RealVector& Sbar_in) 
+                     const BaseState<Real>& Sbar_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiSphr()", MakePsiSphr);
@@ -44,7 +44,6 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     auto &psi_p = psi;
 
     const auto npts = base_cutoff_density_coord(0);
@@ -55,7 +54,7 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
              r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * 
              w0_p[max_lev*r]) / dr0;
         psi_p(0,r) = gamma1bar(0,r) * p0_avg(0,r) * 
-            (Sbar_p[max_lev*r] - div_w0_sph);
+            (Sbar_in(0,r) - div_w0_sph);
     });
 }
 

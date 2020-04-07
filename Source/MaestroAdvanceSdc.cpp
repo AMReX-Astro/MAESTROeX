@@ -80,7 +80,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector     w0_force_dummy   ( (max_radial_level+1)*nr_fine );
-    RealVector     Sbar             ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real>     beta0_nph   (max_radial_level+1, nr_fine);
     BaseState<Real>    gamma1bar_nph    (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
@@ -95,7 +95,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // make sure C++ is as efficient as possible with memory usage
     rho0_nph.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
-    Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
@@ -217,7 +216,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 #endif
 
     // initialize to zero
-    std::fill(Sbar.begin(), Sbar.end(), 0.);
+    Sbar.setVal(0.);
     std::fill(w0.begin()  , w0.end()  , 0.);
 
     // set dummy variables to zero
@@ -315,20 +314,16 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     if (evolve_base_state && !split_projection) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (int r = 0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old(l,r)) * (p0_old(l,r) - p0_nm1(l,r))/dtold;
-            }
-        }
+        Sbar.copy(1.0/(gamma1bar_old*p0_old) * (p0_old - p0_nm1)/dtold);
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
-                       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+    MakeRHCCforMacProj(macrhs, rho0_old, S_cc_nph, Sbar, beta0_old, delta_gamma1_term,
+                       gamma1bar_old, p0_old, delta_p_term, delta_chi, is_predictor);
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // subtract w0mac from umac
-        Addw0(umac,w0mac,-1.);
+        Addw0(umac, w0mac, -1.);
     }
 
     // wallclock time
@@ -731,7 +726,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             if (evolve_base_state) {
-                
                 if (split_projection) {
                     
                     // compute Sbar = average(S_cc_nph)
@@ -739,8 +733,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute Sbar = Sbar + delta_gamma1_termbar
                     if (use_delta_gamma1_term) {
-                        for(int i=0; i<Sbar.size(); ++i) {
-                            Sbar[i] += delta_gamma1_termbar[i];
+                        for (auto l = 0; l <= max_radial_level; ++l) {
+                            for (auto r = 0; r < nr_fine; ++r) {
+                                Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                            }
                         }
                     }
                     
@@ -763,11 +759,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
             if (evolve_base_state && !split_projection) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_nph(l,r)*p0_nph(l,r)) * (p0_nph(l,r) - p0_old(l,r))/dt;
-                    }
-                }
+                Sbar.copy(1.0/(gamma1bar_nph*p0_nph) * (p0_nph - p0_old)/dt);
             }
 
             // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -1115,12 +1107,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (split_projection) {
 
             // compute Sbar = average(S_cc_new)
-            Average(S_cc_new,Sbar,0);
+            Average(S_cc_new, Sbar, 0);
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for(int i=0; i<Sbar.size(); ++i) {
-                    Sbar[i] += delta_gamma1_termbar[i];
+                for (auto l = 0; l <= max_radial_level; ++l) {
+                    for (auto r = 0; r < nr_fine; ++r) {
+                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                    }
                 }
             }
 
@@ -1164,11 +1158,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     if (evolve_base_state && !split_projection) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (p0_new(l,r) - p0_old(l,r))/(dt*gamma1bar_new(l,r)*p0_new(l,r));
-            }
-        }
+        Sbar.copy((p0_new - p0_old)/(dt*gamma1bar_new*p0_new));
     }
 
     int proj_type;
@@ -1187,7 +1177,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             MultiFab::Copy(rhcc_for_nodalproj_old[lev], rhcc_for_nodalproj[lev], 0, 0, 1, 1);
         }
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph,delta_gamma1_term);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_new, Sbar, beta0_nph, delta_gamma1_term);
 
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
@@ -1198,7 +1188,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         proj_type = regular_timestep_comp;
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph,delta_gamma1_term);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_new, Sbar, beta0_nph, delta_gamma1_term);
 
         // compute delta_p_term = peos_new - p0_new (for RHS of projection)
         if (dpdt_factor > 0.) {
