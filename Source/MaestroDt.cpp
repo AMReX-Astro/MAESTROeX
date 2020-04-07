@@ -142,7 +142,7 @@ Maestro::EstDt ()
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
-		const Array4<Real> spd = tmp.array(mfi);
+                const Array4<Real> spd = tmp.array(mfi);
 
                 if (spherical == 0) {
 
