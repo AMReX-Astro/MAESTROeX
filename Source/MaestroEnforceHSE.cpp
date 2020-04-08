@@ -152,7 +152,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                 // subtract the offset for all values at and above this point
                 if (r_end_coord[n+max_lev*i] != nr[n]-1) {
                     for (auto l = n-1; l >= 0; --l) {
-                        for (int r = (r_end_coord[n+max_lev*i]+1)/pow(2, n-l); 
+                        for (int r = round( (r_end_coord[n+max_lev*i]+1)/pow(2, n-l) ); 
                              r <= nr[l]-1; ++r) {
                             p0[l+max_lev*r] -= offset;
                         }

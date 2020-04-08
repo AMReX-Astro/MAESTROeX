@@ -203,7 +203,7 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                     for (auto i = n-1; i >= 0; --i) {
 
-                        int refrat = pow(2, n-i);
+                        int refrat = round(pow(2, n-i));
 
                         // Offset the centered beta on level i above this point so the total 
                         // integral is consistent

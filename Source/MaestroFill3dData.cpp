@@ -118,7 +118,7 @@ Maestro::Put1dArrayOnCart (const int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = cc_to_r(i,j,k);
+                        int index = round(cc_to_r(i,j,k));
 
                         Real rfac;
                         if (index < nr_fine) {
@@ -186,7 +186,7 @@ Maestro::Put1dArrayOnCart (const int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = cc_to_r(i,j,k);
+                        int index = round(cc_to_r(i,j,k));
 
                         Real s0_cart_val = s0_p[index*max_lev];
                         

@@ -267,7 +267,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // choose which level to interpolate from
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
-        const int dr0 = dr[0];
+        const Real dr0 = dr[0];
         const int nrf = nr_fine;
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {
