@@ -15,12 +15,12 @@
 #include <AMReX_PlotFileUtil.H>
 #include <network.H>
 #include <eos.H>
+#include <BaseState.H>
 
 #include <state_indices.H>
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
-// #include <MaestroInletBCs.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
