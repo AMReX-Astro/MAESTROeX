@@ -81,8 +81,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector     w0_force_dummy   ( (max_radial_level+1)*nr_fine );
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real>     beta0_nph   (max_radial_level+1, nr_fine);
-    BaseState<Real>    gamma1bar_nph    (max_radial_level+1, nr_fine);
+    BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
     RealVector     delta_rhoh0      ( (max_radial_level+1)*nr_fine );
@@ -404,7 +404,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state) {
         // correct the base state density by "averaging"
         Average(shat, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -537,7 +536,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     if (evolve_base_state) {
         // update base state density and pressure
         Average(snew, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
         
         if (use_etarho) {
@@ -816,7 +814,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             // correct the base state density by "averaging"
             Average(shat, rho0_new, Rho);
-            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 
@@ -956,7 +953,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         if (evolve_base_state) {
             // update base state density and pressure
             Average(snew, rho0_new, Rho);
-            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
 
             if (use_etarho) {
@@ -1104,7 +1100,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
               rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar);
 
     if (evolve_base_state) {
-
         if (split_projection) {
 
             // compute Sbar = average(S_cc_new)
@@ -1251,5 +1246,4 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
     }
-
 }

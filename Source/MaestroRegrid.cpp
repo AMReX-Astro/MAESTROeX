@@ -92,7 +92,6 @@ Maestro::Regrid ()
     }
 
     // compute cutoff coordinates
-    // compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
 
     // make gravity

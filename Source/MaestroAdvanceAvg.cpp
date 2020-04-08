@@ -65,19 +65,19 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // these are cell-centered
     BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
     BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_nph          (max_radial_level+1, nr_fine);
+    BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
-    BaseState<Real>   gamma1bar_nph   (max_radial_level+1, nr_fine);
+    BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
     RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    RealVector   w0_old ( (max_radial_level+1)*(nr_fine+1) );
     BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
@@ -392,7 +392,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -524,7 +523,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
     }
 
@@ -676,7 +674,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 

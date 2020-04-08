@@ -58,7 +58,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac_dummy(finest_level+1);
 
-
     // end spherical-only MultiFabs
     ////////////////////////
 
@@ -68,11 +67,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real>   peosbar (max_radial_level+1, nr_fine);
+    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
     RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
-    BaseState<Real>   gamma1bar_nph   (max_radial_level+1, nr_fine);
+    BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
+    BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
     RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
 
@@ -385,7 +384,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -514,7 +512,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
     }
 
@@ -659,7 +656,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // correct the base state density by "averaging"
     if (evolve_base_state) {
         Average(s2, rho0_new, Rho);
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 

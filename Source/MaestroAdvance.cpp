@@ -98,7 +98,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    RealVector w0_old ( (max_radial_level+1)*(nr_fine+1) );
     BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
@@ -376,7 +376,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     } else {
         rho0_new.copy(rho0_old);
@@ -432,7 +431,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
-            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 
@@ -610,7 +608,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
     }
 
@@ -751,7 +748,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        // compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
     }
 
@@ -793,7 +789,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
-            // compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
         }
 

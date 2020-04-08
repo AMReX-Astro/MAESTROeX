@@ -107,7 +107,6 @@ Maestro::Init ()
     init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
-    // compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
 
     if (spherical) {
@@ -273,13 +272,11 @@ Maestro::InitData ()
 
     if (fix_base_state) {
         // compute cutoff coordinates
-        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
 
         // first compute cutoff coordinates using initial density profile
-        // compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
 
         if (do_smallscale) {
@@ -289,7 +286,6 @@ Maestro::InitData ()
         } else {
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
-            // compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
 
             // compute gravity
