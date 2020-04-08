@@ -361,10 +361,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     MultiFab& vel = uold[lev];
     MultiFab& cc_to_r = cell_cc_to_r[lev];
 
-    // convert p0_init to a vector to pass to the Fortran 
-    RealVector p0_init_vec((max_radial_level+1)*nr_fine);
-    p0_init.toVector(p0_init_vec);
-
     if (!spherical) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -380,10 +376,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
             const Array4<Real> scal_arr = scal.array(mfi);
             const Array4<Real> vel_arr = vel.array(mfi);
 
-            const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-            const Real * AMREX_RESTRICT p0_p = p0_init_vec.dataPtr();
-
-            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
         }
     } else {
 #if (AMREX_SPACEDIM == 3)

@@ -5,9 +5,7 @@ using namespace amrex;
 // initializes data on a specific level
 void
 Maestro::InitLevelData(const int lev, const Real time, 
-                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_init, 
-                       const Real* p0_init)
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -25,15 +23,18 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& p0_p = p0_init;
+
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_init[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_init[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_init[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
+        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
+        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -58,13 +59,13 @@ Maestro::InitLevelData(const int lev, const Real time,
 
         const Real rho0 = s0_init[lev+max_lev*(r+nrf*Rho)];
 	
-	// This seems to work ok with sealed box?
-	// Real rho_local = rho0 * (1.0 + 
-	// 			    pert_amp_loc * std::exp(-y/(2.0 * scale_height_loc)) * 
-	// 			    std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]) ) * 
-	// 			    sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]) ) );
+        // This seems to work ok with sealed box?
+        // Real rho_local = rho0 * (1.0 + 
+        // 			    pert_amp_loc * std::exp(-y/(2.0 * scale_height_loc)) * 
+        // 			    std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]) ) * 
+        // 			    sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]) ) );
 
-	// What about this ?
+        // What about this ?
      
         const Real rho_base = pres_base_loc / scale_height_loc / grav_const_loc;
 
@@ -81,8 +82,8 @@ Maestro::InitLevelData(const int lev, const Real time,
         eos_t eos_state;
 
         eos_state.rho = rho_local;
-        eos_state.p = p0_init[lev+max_lev*r];
-        eos_state.T = s0_init[lev+max_lev*(r+nrf*Temp)];
+        eos_state.p = p0_p(lev,r);
+        eos_state.T = s0_p[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = 1.0; // single fluid
         }

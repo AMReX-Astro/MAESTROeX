@@ -5,9 +5,7 @@ using namespace amrex;
 // initializes data on a specific level
 void
 Maestro::InitLevelData(const int lev, const Real time, 
-                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_p, 
-                       const Real* p0_p)
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);

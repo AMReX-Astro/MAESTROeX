@@ -99,7 +99,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	const auto center_p = center;
 	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-	Real * AMREX_RESTRICT p0_p = p0_old.dataPtr();
+	auto& p0_p = p0_old;
 
 	const int max_lev = max_radial_level + 1;
 	const auto nrf = nr_fine;
@@ -184,7 +184,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				scal(i,j,k,FirstSpec+comp) = eos_state.xn[comp] * eos_state.rho;
 			}
 
-			p0_p[lev+max_lev*r] = eos_state.p;
+			p0_p(lev,r) = eos_state.p;
 		}); 
 	}
 }

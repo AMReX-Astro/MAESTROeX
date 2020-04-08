@@ -5,7 +5,7 @@ using namespace amrex;
 // prototype for pertubation function to be called on the 
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
-void Perturb(const Real p0_init, 
+void Perturb(const Real p0, 
              const Real* s0_init,
              Real* perturbations,  
              const GpuArray<Real,AMREX_SPACEDIM> prob_lo,
@@ -19,9 +19,7 @@ void Perturb(const Real p0_init,
 void
 Maestro::InitLevelData(const int lev, const Real time, 
                        const MFIter& mfi, 
-                       const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_init, 
-                       const Real* p0_init)
+                       const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitData()", InitData);
@@ -35,15 +33,18 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& p0_p = p0_init;
+
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_init[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_init[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_init[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
+        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
+        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -71,10 +72,10 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_init[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
             }
 
-            Perturb(p0_init[lev+max_lev*r], s0, perturbations, 
+            Perturb(p0_p(lev,r), s0, perturbations, 
                     prob_lo, prob_hi,
                     x, y,
                     y_pert_center_loc, 
@@ -103,7 +104,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 #endif
 }
 
-void Perturb(const Real p0_init, 
+void Perturb(const Real p0, 
              const Real* s0_init,
              Real* perturbations,  
              const GpuArray<Real,AMREX_SPACEDIM> prob_lo,
@@ -174,7 +175,7 @@ void Perturb(const Real p0_init,
     // Use the EOS to make this temperature perturbation occur at constant
     // pressure
     eos_state.T     = 10000.0; // guess
-    eos_state.p     = p0_init;
+    eos_state.p     = p0;
 
     eos(eos_input_rp, eos_state);
 

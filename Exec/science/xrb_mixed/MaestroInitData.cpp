@@ -5,9 +5,7 @@ using namespace amrex;
 // initializes data on a specific level
 void
 Maestro::InitLevelData(const int lev, const Real time, 
-                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_p, 
-                       const Real* p0_p)
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -20,6 +18,8 @@ Maestro::InitLevelData(const int lev, const Real time,
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
+
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -49,7 +49,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         const bool perturb_temp_true = xrb_pert_type == 1;
 
         const auto xrb_pert_factor_loc = xrb_pert_factor;
-	const auto rad_pert_loc = rad_pert;
+        const auto rad_pert_loc = rad_pert;
 
         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
             int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -65,24 +65,24 @@ Maestro::InitLevelData(const int lev, const Real time,
             auto eos_input_flag = eos_input_tp;
 
             if (perturb_temp_true) {
-                Real t0 = s0_init[lev+max_lev*(r + nr_fine*Temp)];
+                Real t0 = s0_p[lev+max_lev*(r + nr_fine*Temp)];
                 temp = t0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                dens = s0_init[lev+max_lev*(r + nr_fine*Rho)];
+                dens = s0_p[lev+max_lev*(r + nr_fine*Rho)];
                 eos_input_flag = eos_input_tp;
             } else {
-                Real d0 = s0_init[lev+max_lev*(r + nr_fine*Rho)];
+                Real d0 = s0_p[lev+max_lev*(r + nr_fine*Rho)];
                 dens = d0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                temp = s0_init[lev+max_lev*(r + nr_fine*Temp)];
+                temp = s0_p[lev+max_lev*(r + nr_fine*Temp)];
                 eos_input_flag = eos_input_rp;
             }
 
             eos_t eos_state;
 
             eos_state.T = temp;
-            eos_state.p = p0_init[lev+max_lev*r];
+            eos_state.p = p0_init(lev,r);
             eos_state.rho = dens;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_init[lev+max_lev*(r+nr_fine*(FirstSpec+comp))] / s0_init[lev+max_lev*(r + nr_fine*Rho)];
+                eos_state.xn[comp] = s0_p[lev+max_lev*(r+nr_fine*(FirstSpec+comp))] / s0_p[lev+max_lev*(r + nr_fine*Rho)];
             }
 
             eos(eos_input_flag, eos_state);

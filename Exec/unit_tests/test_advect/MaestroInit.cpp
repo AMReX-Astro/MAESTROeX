@@ -119,34 +119,12 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
 
-	const Real* dx = geom[lev].CellSize();
-
-	MultiFab& scal = sold[lev];
-	MultiFab& vel = uold[lev];
-
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+	for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
 	{
-		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
-
-		const Array4<Real> scal_arr = scal.array(mfi);
-		const Array4<Real> vel_arr = vel.array(mfi);
-
-		const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-		const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
-
-		InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
-		// initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-		//          BL_TO_FORTRAN_FAB(scal[mfi]),
-		//          BL_TO_FORTRAN_FAB(vel[mfi]),
-		//          s0_init.dataPtr(), p0_init.dataPtr(),
-		//          ZFILL(dx));
-
+		InitLevelData(lev, t_old, mfi, sold[lev].array(mfi), uold[lev].array(mfi));
 	}
-
 }

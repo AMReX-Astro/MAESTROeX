@@ -5,9 +5,7 @@ using namespace amrex;
 // initializes data on a specific level
 void
 Maestro::InitLevelData(const int lev, const Real time, 
-                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_init, 
-                       const Real* p0_init)
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -26,6 +24,9 @@ Maestro::InitLevelData(const int lev, const Real time,
     const auto dx = geom[lev].CellSizeArray();
 
     const auto rho0_loc = rho_0;
+
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& p0_p = p0_init;
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         const int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -48,10 +49,10 @@ Maestro::InitLevelData(const int lev, const Real time,
 
         eos_t eos_state;
         
-        eos_state.rho = s0_init[lev+max_lev*(r+nrf*Rho)] + rhopert;
-        eos_state.p = p0_init[lev+max_lev*r];
+        eos_state.rho = s0_p[lev+max_lev*(r+nrf*Rho)] + rhopert;
+        eos_state.p = p0_p(lev,r);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            eos_state.xn[comp] = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))] / eos_state.rho;
+            eos_state.xn[comp] = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))] / eos_state.rho;
         }
 
         eos(eos_input_rp, eos_state);

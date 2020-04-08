@@ -852,9 +852,7 @@ public:
                        const amrex::Real time, 
                        const amrex::MFIter& mfi, 
                        const amrex::Array4<amrex::Real> scal, 
-                       const amrex::Array4<amrex::Real> vel, 
-                       const Real* s0_p, 
-                       const Real* p0_p);
+                       const amrex::Array4<amrex::Real> vel);
 
     void InitLevelDataSphr(const int lev,
                            const amrex::Real time, 
