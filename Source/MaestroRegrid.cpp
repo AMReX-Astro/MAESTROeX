@@ -90,7 +90,7 @@ Maestro::Regrid ()
     } else {
         for (auto lev = 0; lev <= max_radial_level+1; ++lev) {
             for (auto r = 0; r < nr_fine; ++r) {
-                rho0_old[lev + (max_radial_level+1)*r] = rho0_temp[r + nr_fine*lev];
+                rho0_old[lev + (max_radial_level+1)*r] = rho0_temp[lev + (max_radial_level+1)*r];
             }
         }
     }
