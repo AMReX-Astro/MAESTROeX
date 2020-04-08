@@ -190,7 +190,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
                 for (auto i = n-1; i >= 0; --i) {
 
-                    int refrat = pow(2, n-i);
+                    int refrat = round(pow(2, n-i));
 
                     // Restrict w0 from level n to level i
                     for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j)+1; ++r) {

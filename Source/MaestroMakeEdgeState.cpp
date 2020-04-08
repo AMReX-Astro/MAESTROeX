@@ -385,6 +385,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
                     int pm = n + max_lev*(r-1);
 
                     Real dxscr[3];
+                    for (int k = 0; k < 3; ++k) dxscr[k] = 0.0;
 
                     if (slope_order_loc == 0) {
                         slope = 0.0;

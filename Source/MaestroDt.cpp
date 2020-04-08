@@ -149,7 +149,6 @@ Maestro::EstDt ()
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
                     const Real eps = 1.e-8;
-                    const auto ng = 0;
 
                     Real spdx = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);                 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 1); 
@@ -261,9 +260,6 @@ Maestro::EstDt ()
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
                     const Real eps = 1.e-8;
-                    const auto ng = 0;
-
-                    const Array4<Real> spd = tmp.array(mfi);
 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 3);
 
@@ -505,7 +501,6 @@ Maestro::FirstDt ()
 
                 const Real eps = 1.e-8;
                 const Real rho_min = 1.e-20;
-                const int ng = 0;
 
                 FArrayBox spd(tileBox);
                 Elixir e_s = spd.elixir();

@@ -440,9 +440,11 @@ public:
     ////////////////////////
     // MaestroDebug.cpp functions
 
+    /// Print out the contents of the base state
+    void PrintBase (const RealVector& base, const bool is_cell_centered=true);
+
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
-
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
@@ -652,10 +654,10 @@ public:
     /// @param sbccomp      start boundary conditions component
     void Put1dArrayOnCart (const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0, int variable_type=0);
+                           const int sbccomp = 0, int variable_type=0);
 
     void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
@@ -673,10 +675,26 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (int level, const RealVector& s0,
+    void Put1dArrayOnCart (const int level, const RealVector& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
+
+       /// Maps 1d arrays onto multi-D cartesian MultiFabs
+    ///
+    /// @param level        AMR level to perform calculation on
+    /// @param s0           1d base state
+    /// @param s0_cart      base state mapped to multi-d cartesian MultiFab
+    /// @param is_input_edge_centered   is the input edge-centered?
+    /// @param is_output_a_vector       is the output a vector?
+    /// @param bcs          boundary conditions
+    /// @param sbccomp      start boundary conditions component
+    void Put1dArrayOnCart (const int level, const RealVector& s0,
+                           amrex::MultiFab& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
 
@@ -815,9 +833,27 @@ public:
     ////////////
 
     ////////////
+    // MaestroInitData.cpp functions
+
+    void InitLevelData(const int lev, 
+                       const amrex::Real time, 
+                       const amrex::MFIter& mfi, 
+                       const amrex::Array4<amrex::Real> scal, 
+                       const amrex::Array4<amrex::Real> vel, 
+                       const Real* s0_p, 
+                       const Real* p0_p);
+
+    void InitLevelDataSphr(const int lev,
+                           const amrex::Real time, 
+                           amrex::MultiFab& scal, 
+                           amrex::MultiFab& vel);
+
+    // end MaestroInitData.cpp functions
+    ////////////
+
+    ////////////
     // MaestroInletBC.cpp functions
 
-    /// Calculate the horizontal average of \f$\Gamma_1\f$
     void SetInletBCs();
 
     // end InletBC.cpp functions
@@ -1481,6 +1517,13 @@ public:
     /// Set tagging array to include buffer zones for multilevel
     void TagArray ();
 
+    /// Regrid base state variables (ex. psi, etarho, rho0, etc.)
+    ///
+    /// We copy the coarsest level only, interpolate to all
+    /// the other levels and then copy the valid data from
+    /// the old arrays onto the new.
+    void RegridBaseState(RealVector& base, const bool is_edge=false);
+
     /// Tag all cells for refinement
     ///
     /// Overrides the pure virtual function in `AmrCore`
@@ -1633,6 +1676,23 @@ public:
     void SpongeInit(const RealVector& rho0);
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
+    ////////////
+
+    ////////////
+    // MaestroTagging.cpp functions
+
+    void RetagArray(const amrex::Box& bx,
+                    const int lev, IntVector& tag_array);
+
+    void TagBoxes(amrex::TagBoxArray& tags, 
+                  const amrex::MFIter& mfi,
+                  const int lev, IntVector& tag_array,
+                  const amrex::Real time) ;
+
+    void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
+                   const amrex::MFIter& mfi,
+                   const int lev, IntVector& tag_array,
+                   const amrex::Real time);              
     ////////////
 
     ////////////////////////

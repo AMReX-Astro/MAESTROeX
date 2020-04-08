@@ -31,7 +31,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // calculate gradp0
     RealVector gradp0((max_radial_level+1)*nr_fine);
 
-    if (spherical == 1) {
+    const auto max_lev = max_radial_level + 1;
+
+    if (spherical) {
         if (use_delta_gamma1_term) {
             Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
             gradp0[0] = (p0[1] - p0[0]) / dr_loc;
@@ -52,16 +54,14 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     } else {
         if (use_delta_gamma1_term) {
             for (int lev=0; lev<=finest_level; ++lev) {
-                int index;
                 const Real* dx = geom[lev].CellSize();
 
                 // bottom and top edge cases for planar
-                gradp0[lev*nr_fine] = (p0[lev*nr_fine+1] - p0[lev*nr_fine]) / dx[AMREX_SPACEDIM-1];
-                gradp0[(lev+1)*nr_fine-1] = (p0[(lev+1)*nr_fine-1] - p0[(lev+1)*nr_fine-2]) / dx[AMREX_SPACEDIM-1];
+                gradp0[lev] = (p0[lev+max_lev] - p0[lev]) / dx[AMREX_SPACEDIM-1];
+                gradp0[lev+max_lev*(nr_fine-1)] = (p0[lev+max_lev*(nr_fine-1)] - p0[lev+max_lev*(nr_fine-2)]) / dx[AMREX_SPACEDIM-1];
                 
                 for (int r=1; r<nr_fine-1; r++) {
-                    index = lev*nr_fine + r;
-                    gradp0[index] = (p0[index+1] - p0[index-1]) / (2.0*dx[AMREX_SPACEDIM-1]);
+                    gradp0[lev+max_lev*r] = (p0[lev+max_lev*(r+1)] - p0[lev+max_lev*(r-1)]) / (2.0*dx[AMREX_SPACEDIM-1]);
                 }
             }
         }
