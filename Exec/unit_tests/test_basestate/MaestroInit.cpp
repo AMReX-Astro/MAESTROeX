@@ -184,33 +184,53 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+	for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
 	{
 		const Box& tilebox = mfi.tilebox();
 		const int* lo  = tilebox.loVect();
 		const int* hi  = tilebox.hiVect();
 
 		if (spherical == 0) {
-			initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			         BL_TO_FORTRAN_FAB(scal[mfi]),
-			         BL_TO_FORTRAN_FAB(vel[mfi]),
-			         s0_init.dataPtr(), p0_init.dataPtr(),
-			         ZFILL(dx));
+		        const Array4<Real> scal_arr = scal.array(mfi);
+			const Array4<Real> vel_arr = vel.array(mfi);
+
+			const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+			const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
+		    
+		        InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
+			// initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+			//          BL_TO_FORTRAN_FAB(scal[mfi]),
+			//          BL_TO_FORTRAN_FAB(vel[mfi]),
+			//          s0_init.dataPtr(), p0_init.dataPtr(),
+			//          ZFILL(dx));
 		} else {
+#if (AMREX_SPACEDIM == 3)
+		        const auto dx_fine_vec = geom[max_level].CellSizeArray();
+			const auto dx_lev = geom[lev].CellSizeArray();
+		    
 		        init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi),
 						 BL_TO_FORTRAN_3D(cc_to_r[mfi]),
 			                         ZFILL(dx_fine),
 			                         ZFILL(dx));
 
-			initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			              BL_TO_FORTRAN_FAB(scal[mfi]),
-			              BL_TO_FORTRAN_FAB(vel[mfi]),
-			              s0_init.dataPtr(), p0_init.dataPtr(),
-			              ZFILL(dx),
-			              r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-			              BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+			InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
+			
+			// initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
+			// 	      BL_TO_FORTRAN_FAB(scal[mfi]),
+			// 	      BL_TO_FORTRAN_FAB(vel[mfi]),
+			// 	      s0_init.dataPtr(), p0_init.dataPtr(),
+			// 	      ZFILL(dx),
+			// 	      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
+			// 	      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+#endif
 		}
 	}
+
+#if (AMREX_SPACEDIM == 3)
+	if (spherical) {
+	    InitLevelDataSphr(lev, t_old, scal, vel);
+	}
+#endif
 }
 
 

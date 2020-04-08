@@ -54,7 +54,7 @@ maestro.sponge_kappa = 10.0e0
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = omp    # root name of plot file
+maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   =  1000     # number of timesteps between plot files
 maestro.plot_deltat = 1.0e-4
 
