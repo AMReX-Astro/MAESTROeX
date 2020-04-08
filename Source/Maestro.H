@@ -706,6 +706,12 @@ public:
                            const int is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
+    void Put1dArrayOnCart (const int level, const BaseState<amrex::Real>& s0,
+                           amrex::MultiFab& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);
 
     void Put1dArrayOnCart (int level, const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
