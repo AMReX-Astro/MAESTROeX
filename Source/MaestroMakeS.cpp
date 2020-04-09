@@ -17,7 +17,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& thermal,
                     const BaseState<Real>& p0,
                     const BaseState<Real>& gamma1bar,
-                    RealVector& delta_gamma1_termbar)
+                    BaseState<Real>& delta_gamma1_termbar)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
@@ -233,7 +233,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     if (use_delta_gamma1_term) {
 
         // horizontal average of delta_gamma1_term
-        Average(delta_gamma1_term,delta_gamma1_termbar,0);
+        Average(delta_gamma1_term, delta_gamma1_termbar, 0);
 
         for (int lev=0; lev<=finest_level; ++lev) {
 

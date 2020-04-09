@@ -93,7 +93,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_temp1 (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_temp2 (max_radial_level+1, nr_fine);
-    RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -101,7 +101,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
 
     int is_predictor;
@@ -619,14 +618,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute S at cell-centers
-    Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal2,p0_old,gamma1bar_new,delta_gamma1_termbar);
+    Make_S_cc(S_cc_new, delta_gamma1_term,  delta_gamma1,snew, uold, rho_omegadot, rho_Hnuc,
+              rho_Hext, thermal2, p0_old, gamma1bar_new, delta_gamma1_termbar);
 
     // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
     }
-    AverageDown(S_cc_nph,0,1);
+    AverageDown(S_cc_nph, 0, 1);
 
     // compute p0_minus_peosbar = p0_new - peosbar (for making w0)
     // and delta_p_term = peos_new - peosbar_cart (for RHS of projection)
@@ -662,11 +661,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
 
         base_time_start = ParallelDescriptor::second();
@@ -966,11 +961,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
     }
 

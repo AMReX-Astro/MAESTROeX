@@ -72,7 +72,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
-    RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -80,7 +80,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
 
     int is_predictor;
@@ -566,11 +565,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
 
         // compute w0, w0_force
@@ -788,11 +783,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
 
         // compute w0, w0_force

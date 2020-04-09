@@ -426,8 +426,7 @@ void Maestro::InitProj ()
     Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
-    delta_gamma1_termbar.shrink_to_fit();
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
@@ -467,8 +466,8 @@ void Maestro::InitProj ()
     }
 
     // compute S at cell-centers
-    Make_S_cc(S_cc_old,delta_gamma1_term,delta_gamma1,sold,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,thermal,p0_old,gamma1bar_old,delta_gamma1_termbar);
+    Make_S_cc(S_cc_old, delta_gamma1_term, delta_gamma1, sold, uold, rho_omegadot, rho_Hnuc,
+              rho_Hext, thermal, p0_old, gamma1bar_old, delta_gamma1_termbar);
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
@@ -513,9 +512,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> w0_force (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
-
-    delta_gamma1_termbar.shrink_to_fit();
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
 
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
@@ -523,7 +520,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
     p0_minus_peosbar.setVal(0.);
-    std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+    delta_gamma1_termbar.setVal(0.);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -567,21 +564,13 @@ void Maestro::DivuIter (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         } else {
             Average(S_cc_old, Sbar, 0);
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                    }
-                }
+                Sbar += delta_gamma1_termbar;
             }
 
             int is_predictor = 1;
@@ -656,9 +645,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> w0_force (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_pthermbar (max_radial_level+1, nr_fine);
-    RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
-    
-    delta_gamma1_termbar.shrink_to_fit();
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
     
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
@@ -666,7 +653,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
     p0_minus_pthermbar.setVal(0.);
-    std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
+    delta_gamma1_termbar.setVal(0.);
     
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -710,21 +697,13 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         } else {
             Average(S_cc_old, Sbar, 0);
             
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                    }
-                }
+                Sbar += delta_gamma1_termbar;
             }
             
             int is_predictor = 1;

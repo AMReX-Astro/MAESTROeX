@@ -83,7 +83,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
-    RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
     RealVector     delta_rhoh0      ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
@@ -92,7 +92,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_rhoh0.shrink_to_fit();
 
@@ -728,11 +727,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute Sbar = Sbar + delta_gamma1_termbar
                     if (use_delta_gamma1_term) {
-                        for (auto l = 0; l <= max_radial_level; ++l) {
-                            for (auto r = 0; r < nr_fine; ++r) {
-                                Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                            }
-                        }
+                        Sbar += delta_gamma1_termbar;
                     }
                     
                     // compute w0, w0_force
@@ -1090,10 +1085,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "<<< STEP 5 : Advance velocity and dynamic pressure >>>" << std::endl;
     }
 
-    MakeReactionRates(rho_omegadot,rho_Hnuc,snew); 
+    MakeReactionRates(rho_omegadot, rho_Hnuc, snew); 
     
-    Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar);
+    Make_S_cc(S_cc_new, delta_gamma1_term, delta_gamma1, snew, uold, rho_omegadot, rho_Hnuc,
+              rho_Hext, diff_new, p0_new, gamma1bar_new,delta_gamma1_termbar);
 
     if (evolve_base_state) {
         if (split_projection) {
@@ -1103,11 +1098,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
-                    }
-                }
+                Sbar += delta_gamma1_termbar;
             }
 
             // compute w0, w0_force

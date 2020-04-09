@@ -1176,7 +1176,7 @@ public:
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const BaseState<amrex::Real>& p0,
                     const BaseState<amrex::Real>& gamma1bar,
-                    RealVector& delta_gamma1_termbar);
+                    BaseState<amrex::Real>& delta_gamma1_termbar);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
