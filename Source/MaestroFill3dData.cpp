@@ -1949,15 +1949,9 @@ Maestro::MakeNormal ()
     // or
     //    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
 
-<<<<<<< HEAD
-    const auto center_p = center;
+    const auto& center_p = center;
 
     if (spherical) {
-=======
-    if (spherical == 1) {
->>>>>>> 5ab78b2d32ba4b470aed51d006c0fca4d8331cc3
-
-        const auto center_p = center;
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
