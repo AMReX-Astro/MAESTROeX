@@ -1238,7 +1238,6 @@ public:
                 const BaseState<amrex::Real>& gamma1bar_old_in,
                 const BaseState<amrex::Real>& gamma1bar_new_in,
                 const BaseState<amrex::Real>& p0_minus_peosbar, 
-                RealVector& delta_chi_w0, 
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
 
     void Makew0PlanarVarg(const RealVector& w0_old, 
@@ -1251,7 +1250,6 @@ public:
                         const BaseState<amrex::Real>& gamma1bar_old_in,
                         const BaseState<amrex::Real>& gamma1bar_new_in,
                         const BaseState<amrex::Real>& p0_minus_peosbar,
-                        RealVector& delta_chi_w0, 
                         const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Planar(const RealVector& w0_old, 
@@ -1264,7 +1262,6 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
                     const bool is_predictor);
 
@@ -1278,7 +1275,6 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Sphr(const RealVector& w0_old, 
@@ -1291,7 +1287,6 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 

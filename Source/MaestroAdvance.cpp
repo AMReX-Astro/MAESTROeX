@@ -94,7 +94,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> gamma1bar_temp1 (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_temp2 (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
-    RealVector delta_chi_w0    ( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
@@ -103,7 +102,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // make sure C++ is as efficient as possible with memory usage
     delta_gamma1_termbar.shrink_to_fit();
-    delta_chi_w0.shrink_to_fit();
     w0_old.shrink_to_fit();
 
     int is_predictor;
@@ -290,11 +288,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         ComputeCutoffCoords(rho0_old);
 
-        // compute w0, w0_force, and delta_chi_w0
+        // compute w0, w0_force
         is_predictor = 1;
         Makew0(w0_old, w0_force, Sbar, rho0_old, rho0_old, 
                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-               p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+               p0_minus_peosbar, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
         
@@ -675,11 +673,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         ComputeCutoffCoords(rho0_old);
 
-        // compute w0, w0_force, and delta_chi_w0
+        // compute w0, w0_force
         is_predictor = 0;
         Makew0(w0_old, w0_force, Sbar, rho0_old, rho0_new, 
                 p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
-                p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+                p0_minus_peosbar, dt, dtold, is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
 

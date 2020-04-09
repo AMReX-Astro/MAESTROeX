@@ -14,7 +14,6 @@ Maestro::Makew0(const RealVector& w0_old,
                 const BaseState<Real>& gamma1bar_old_in,
                 const BaseState<Real>& gamma1bar_new_in,
                 const BaseState<Real>& p0_minus_peosbar, 
-                RealVector& delta_chi_w0, 
                 const Real dt_in, const Real dtold_in, 
                 const bool is_predictor) 
 {
@@ -32,14 +31,14 @@ Maestro::Makew0(const RealVector& w0_old,
                              p0_old_in, p0_new_in, 
                              gamma1bar_old_in, gamma1bar_new_in, 
                              p0_minus_peosbar, 
-                             delta_chi_w0, dt_in, dtold_in);
+                             dt_in, dtold_in);
         } else {
             Makew0Planar(w0_old, w0_force, Sbar_in, 
                          rho0_old_in, rho0_new_in,
                          p0_old_in, p0_new_in, 
                          gamma1bar_old_in, gamma1bar_new_in, 
                          p0_minus_peosbar, 
-                         delta_chi_w0, dt_in, dtold_in,
+                         dt_in, dtold_in,
                          is_predictor);
         }
     } else {
@@ -49,14 +48,14 @@ Maestro::Makew0(const RealVector& w0_old,
                             p0_old_in, p0_new_in, 
                             gamma1bar_old_in, gamma1bar_new_in, 
                             p0_minus_peosbar, 
-                            delta_chi_w0, dt_in, dtold_in);
+                            dt_in, dtold_in);
         } else {
             Makew0Sphr(w0_old, w0_force, Sbar_in, 
                        rho0_old_in, rho0_new_in,
                        p0_old_in, p0_new_in, 
                        gamma1bar_old_in, gamma1bar_new_in, 
                        p0_minus_peosbar, 
-                       delta_chi_w0, dt_in, dtold_in);
+                       dt_in, dtold_in);
         }
     }
 
@@ -83,7 +82,6 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                       const BaseState<Real>& gamma1bar_old_in,
                       const BaseState<Real>& gamma1bar_new_in,
                       const BaseState<Real>& p0_minus_peosbar,  
-                      RealVector& delta_chi_w0, 
                       const Real dt_in, const Real dtold_in, 
                       const bool is_predictor) 
 {
@@ -158,26 +156,26 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     (p0_old_in(n,r-1) + 
                     p0_new_in(n,r-1))/4.0;
 
+                Real delta_chi_w0 = 0.0;
+
                 if (r < base_cutoff_density_coord_loc) {
                     if (is_predictor) {
-                        delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor_loc * 
+                        delta_chi_w0 = dpdt_factor_loc * 
                             p0_minus_peosbar(n,r-1) / 
                             (gamma1bar_old_in(n,r-1)*
                             p0_old_in(n,r-1)*dt_loc);
                     } else {
-                        delta_chi_w0[n+max_lev*(r-1)] += dpdt_factor_loc *
+                        delta_chi_w0 += dpdt_factor_loc *
                             p0_minus_peosbar(n,r-1) / 
                             (gamma1bar_new_in(n,r-1)*
                             p0_new_in(n,r-1)*dt_loc);
                     }
-                } else {
-                    delta_chi_w0[n+max_lev*(r-1)] = 0.0;
-                }
+                } 
 
                 w0[n+max_lev*r] = w0[n+max_lev*(r-1)]
                     + Sbar_in(n,r-1) * dr_lev
                     - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
-                    - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
+                    - delta_chi_w0 * dr_lev;
             }
 
             if (n > 0) {
@@ -282,7 +280,6 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                           const BaseState<Real>& gamma1bar_old_in,
                           const BaseState<Real>& gamma1bar_new_in,
                           const BaseState<Real>& p0_minus_peosbar,  
-                          RealVector& delta_chi_w0, 
                           const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
@@ -528,7 +525,6 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
                     const BaseState<Real>& gamma1bar_old_in,
                     const BaseState<Real>& gamma1bar_new_in,
                     const BaseState<Real>& p0_minus_peosbar,  
-                    RealVector& delta_chi_w0, 
                     const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
@@ -701,7 +697,6 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
                         const BaseState<Real>& gamma1bar_old_in,
                         const BaseState<Real>& gamma1bar_new_in,
                         const BaseState<Real>& p0_minus_peosbar,  
-                        RealVector& delta_chi_w0, 
                         const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling

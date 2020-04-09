@@ -512,11 +512,9 @@ void Maestro::DivuIter (int istep_divu_iter)
 
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> w0_force (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_peosbar      (max_radial_level+1, nr_fine);
-    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
-    delta_chi_w0.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
     Sbar.setVal(0.);
@@ -589,7 +587,7 @@ void Maestro::DivuIter (int istep_divu_iter)
             int is_predictor = 1;
             Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-                   p0_minus_peosbar, delta_chi_w0, dt, dt, is_predictor);
+                   p0_minus_peosbar, dt, dt, is_predictor);
 
             // put w0 on Cartesian cell-centers
             Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
@@ -657,12 +655,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> w0_force (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_pthermbar  (max_radial_level+1, nr_fine);
+    BaseState<Real> p0_minus_pthermbar (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
-    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     
     delta_gamma1_termbar.shrink_to_fit();
-    delta_chi_w0.shrink_to_fit();
     
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
@@ -671,7 +667,6 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     etarho_cc.setVal(0.0);
     p0_minus_pthermbar.setVal(0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
-    std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
     
     for (int lev=0; lev<=finest_level; ++lev) {
         stemp             [lev].define(grids[lev], dmap[lev],   Nscal, 0);
@@ -735,7 +730,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
             int is_predictor = 1;
             Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-                   p0_minus_pthermbar, delta_chi_w0, dt, dt, is_predictor);
+                   p0_minus_pthermbar, dt, dt, is_predictor);
         }
     }
 
