@@ -84,16 +84,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
     BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
-    RealVector     delta_rhoh0      ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> delta_rhoh0 (max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
+    BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
     BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
-
-    // make sure C++ is as efficient as possible with memory usage
-    w0_old.shrink_to_fit();
-    delta_rhoh0.shrink_to_fit();
 
     int is_predictor;
 
@@ -281,7 +277,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             Average(S_cc_nph, Sbar, 0);
 
             // save old-time value
-            w0_old = w0;
+            w0_old.copy(w0);
 
             // compute w0, w0_force
             is_predictor = 1;
@@ -452,11 +448,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Average(shat, rhoh0_new, RhoH);
 
         // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt;
-            }
-        }
+        delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt);
     }
 
     // extract aofs = (shat - sold) / dt - intra
@@ -561,11 +553,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
         //                       - (rhoh0_hat - rhoh0_old)/dt
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt - delta_rhoh0[l+(max_radial_level+1)*r];
-            }
-        }
+        delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
         Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
     }
 
@@ -850,11 +838,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             Average(shat, rhoh0_new, RhoH);
 
             // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt;
-                }
-            }
+            delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt);
         }
 
         // extract aofs = (shat - sold) / dt - intra
@@ -974,11 +958,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             
             // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
             //                       - (rhoh0_hat - rhoh0_old)/dt
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    delta_rhoh0[l+(max_radial_level+1)*r] = (rhoh0_new(l,r) - rhoh0_old(l,r))/dt - delta_rhoh0[l+(max_radial_level+1)*r];
-                }
-            }
+            delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
             Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
         }
 
@@ -1128,7 +1108,11 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        w0 = w0_old;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r <= nr_fine; ++r) {
+                w0[l+(max_radial_level+1)*r] = w0_old(l,r);
+            }
+        }
     }
 
     if (spherical == 1 && evolve_base_state && split_projection) {

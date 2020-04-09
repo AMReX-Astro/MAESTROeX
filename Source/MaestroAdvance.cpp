@@ -97,11 +97,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector w0_old ( (max_radial_level+1)*(nr_fine+1) );
-    BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
-
-    // make sure C++ is as efficient as possible with memory usage
-    w0_old.shrink_to_fit();
+    BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
+    BaseState<Real> rho0_predicted_edge (max_radial_level+1, nr_fine+1);
 
     int is_predictor;
 
@@ -281,7 +278,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Average(S_cc_nph, Sbar, 0);
 
         // save old-time value
-        w0_old = w0;
+        w0_old.copy(w0);
 
         base_time_start = ParallelDescriptor::second();
 
@@ -998,7 +995,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        w0 = w0_old;
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r <= nr_fine; ++r) {
+                w0[l+(max_radial_level+1)*r] = w0_old(l,r);
+            }
+        }
     }
 
     int proj_type;

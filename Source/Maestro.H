@@ -1289,6 +1289,69 @@ public:
                     const BaseState<amrex::Real>& p0_minus_peosbar,
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
+    
+
+    void Makew0(const BaseState<amrex::Real>& w0_old, 
+                BaseState<amrex::Real>& w0_force, 
+                const BaseState<amrex::Real>& Sbar_in, 
+                const BaseState<amrex::Real>& rho0_old_in,
+                const BaseState<amrex::Real>& rho0_new_in,
+                const BaseState<amrex::Real>& p0_old_in,
+                const BaseState<amrex::Real>& p0_new_in,
+                const BaseState<amrex::Real>& gamma1bar_old_in,
+                const BaseState<amrex::Real>& gamma1bar_new_in,
+                const BaseState<amrex::Real>& p0_minus_peosbar, 
+                const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
+
+    void Makew0PlanarVarg(const BaseState<amrex::Real>& w0_old, 
+                        BaseState<amrex::Real>& w0_force, 
+                        const BaseState<amrex::Real>& Sbar_in, 
+                        const BaseState<amrex::Real>& rho0_old_in,
+                        const BaseState<amrex::Real>& rho0_new_in,
+                        const BaseState<amrex::Real>& p0_old_in,
+                        const BaseState<amrex::Real>& p0_new_in,
+                        const BaseState<amrex::Real>& gamma1bar_old_in,
+                        const BaseState<amrex::Real>& gamma1bar_new_in,
+                        const BaseState<amrex::Real>& p0_minus_peosbar,
+                        const amrex::Real dt_in, const amrex::Real dtold_in);
+
+    void Makew0Planar(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
+                    const BaseState<amrex::Real>& Sbar_in, 
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
+                    const BaseState<amrex::Real>& p0_old_in,
+                    const BaseState<amrex::Real>& p0_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& p0_minus_peosbar,
+                    const amrex::Real dt_in, const amrex::Real dtold_in,  
+                    const bool is_predictor);
+
+    void Makew0SphrIrreg(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
+                    const BaseState<amrex::Real>& Sbar_in, 
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
+                    const BaseState<amrex::Real>& p0_old_in,
+                    const BaseState<amrex::Real>& p0_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& p0_minus_peosbar,
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
+
+    void Makew0Sphr(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
+                    const BaseState<amrex::Real>& Sbar_in, 
+                    const BaseState<amrex::Real>& rho0_old_in,
+                    const BaseState<amrex::Real>& rho0_new_in,
+                    const BaseState<amrex::Real>& p0_old_in,
+                    const BaseState<amrex::Real>& p0_new_in,
+                    const BaseState<amrex::Real>& gamma1bar_old_in,
+                    const BaseState<amrex::Real>& gamma1bar_new_in,
+                    const BaseState<amrex::Real>& p0_minus_peosbar,
+                    const amrex::Real dt_in, const amrex::Real dtold_in);
+
     void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 
                  const BaseState<amrex::Real>& c, const BaseState<amrex::Real>& r, 
                  BaseState<amrex::Real>& u, const int n);
