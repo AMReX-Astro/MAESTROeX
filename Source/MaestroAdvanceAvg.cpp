@@ -293,7 +293,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 1;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+            Makew0(w0, w0_force_dummy, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
                    is_predictor);
@@ -615,7 +615,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
+            Makew0(w0, w0_force_dummy, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
                    is_predictor);
@@ -854,7 +854,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
             // compute w0, w0_force, and delta_chi_w0
             is_predictor = 0;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
+            Makew0(w0, w0_force_dummy, Sbar, rho0_new, rho0_new, 
                     p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
                     p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, 
                     is_predictor);
