@@ -9,7 +9,6 @@ using namespace amrex;
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const RealVector& w0_force,
                         const Vector<MultiFab>& w0_force_cart)
 {
     // timer for profiling

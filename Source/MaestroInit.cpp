@@ -511,18 +511,17 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    RealVector w0_force              ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar      (max_radial_level+1, nr_fine);
     RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
 
-    w0_force.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
-    std::fill(w0_force.begin(),             w0_force.end(),             0.);
+    w0_force.setVal(0.0);
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
     p0_minus_peosbar.setVal(0.);
@@ -657,18 +656,17 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Vector<MultiFab> sdc_source        (finest_level+1);
     
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    RealVector w0_force              ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_pthermbar  (max_radial_level+1, nr_fine);
     RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
     RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
     
-    w0_force.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
-    std::fill(w0_force.begin(),             w0_force.end(),             0.);
+    w0_force.setVal(0.0);
     psi.setVal(0.0);
     etarho_cc.setVal(0.0);
     p0_minus_pthermbar.setVal(0.);

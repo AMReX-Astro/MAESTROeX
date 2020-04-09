@@ -5,7 +5,7 @@ using namespace amrex;
 
 void 
 Maestro::Makew0(const RealVector& w0_old, 
-                RealVector& w0_force, 
+                BaseState<Real>& w0_force, 
                 const BaseState<Real>& Sbar_in, 
                 const BaseState<Real>& rho0_old_in,
                 const BaseState<Real>& rho0_new_in,
@@ -21,7 +21,7 @@ Maestro::Makew0(const RealVector& w0_old,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Makew0()", Makew0);
 
-    std::fill(w0_force.begin(), w0_force.end(), 0.);
+    w0_force.setVal(0.);
 
     const int max_lev = max_radial_level+1;
     
@@ -74,7 +74,7 @@ Maestro::Makew0(const RealVector& w0_old,
 
 void 
 Maestro::Makew0Planar(const RealVector& w0_old, 
-                      RealVector& w0_force, 
+                      BaseState<Real>& w0_force, 
                       const BaseState<Real>& Sbar_in, 
                       const BaseState<Real>& rho0_old_in,
                       const BaseState<Real>& rho0_new_in,
@@ -117,7 +117,6 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     const auto& etarho_cc_p = etarho_cc;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     const Real dt_loc = dt;
     const Real grav_const_loc = grav_const;
@@ -262,7 +261,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                 Real div_avg = 0.5 * (dt_in *(w0_old_p[n+max_lev*(r+1)]
                     - w0_old_p[n+max_lev*r]) + dtold_in * (w0_p[n+max_lev*(r+1)] 
                     - w0_p[n+max_lev*r])) / dt_avg;
-                w0_force_p[n+max_lev*r] = (w0_new_cen - w0_old_cen)/dt_avg 
+                w0_force(n,r) = (w0_new_cen - w0_old_cen)/dt_avg 
                     + w0_avg*div_avg/dr_lev;
             });
         }
@@ -274,7 +273,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
 void 
 Maestro::Makew0PlanarVarg(const RealVector& w0_old, 
-                          RealVector& w0_force, 
+                          BaseState<Real>& w0_force, 
                           const BaseState<Real>& Sbar_in, 
                           const BaseState<Real>& rho0_old_in,
                           const BaseState<Real>& rho0_new_in,
@@ -297,7 +296,6 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
 
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     const auto r_edge_loc_p = r_edge_loc_b;
 
@@ -510,7 +508,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                 Real w0_avg = 0.5 * (dt_in * w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
                 Real div_avg = 0.5 * (dt_in * (w0_old_p[n+max_lev*(r+1)]-w0_old_p[n+max_lev*r]) + 
                     dtold_in * (w0_p[n+max_lev*(r+1)]-w0_p[n+max_lev*r])) / dt_avg;
-                w0_force_p[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
+                w0_force(n,r) = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
             });
         }
     }
@@ -521,7 +519,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
 
 void 
 Maestro::Makew0Sphr(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+                    BaseState<Real>& w0_force, 
                     const BaseState<Real>& Sbar_in, 
                     const BaseState<Real>& rho0_old_in,
                     const BaseState<Real>& rho0_new_in,
@@ -557,7 +555,6 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const auto& etarho_ec_p = etarho_ec;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
@@ -689,13 +686,13 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         Real w0_new_cen = 0.5 * (w0_p[max_lev*r] + w0_p[max_lev*(r+1)]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
         Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
-        w0_force_p[max_lev*r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
+        w0_force(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
     });
 }
 
 void 
 Maestro::Makew0SphrIrreg(const RealVector& w0_old, 
-                        RealVector& w0_force, 
+                        BaseState<Real>& w0_force, 
                         const BaseState<Real>& Sbar_in, 
                         const BaseState<Real>& rho0_old_in,
                         const BaseState<Real>& rho0_new_in,
@@ -731,7 +728,6 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const auto& etarho_ec_p = etarho_ec;
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
@@ -860,7 +856,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         Real w0_new_cen = 0.5 * (w0_p[max_lev*r] + w0_p[max_lev*(r+1)]);
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
         Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
-        w0_force_p[max_lev*r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
+        w0_force(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
     });
 }
 

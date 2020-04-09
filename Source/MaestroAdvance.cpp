@@ -88,7 +88,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
-    RealVector w0_force        ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_temp1 (max_radial_level+1, nr_fine);
@@ -102,7 +102,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    w0_force.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -314,8 +313,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     } else {
         // these should have no effect if evolve_base_state = false
         Sbar.setVal(0.);
-        std::fill(w0_force.begin(), w0_force.end(), 0.);
-
+        w0_force.setVal(0.);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -328,7 +326,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 1;
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    AdvancePremac(umac, w0mac, w0_force_cart);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -689,13 +687,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        if (spherical == 1) {
+        if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
 
         // // put w0_force on Cartesian cells
-        Put1dArrayOnCart(w0_force,w0_force_cart,0,1,bcs_f,0);
+        Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -708,7 +706,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 0;
-    AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
+    AdvancePremac(umac, w0mac, w0_force_cart);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
@@ -1005,7 +1003,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
-    VelocityAdvance(rhohalf, umac, w0mac, w0_force,
+    VelocityAdvance(rhohalf, umac, w0mac, 
         w0_force_cart, rho0_nph, grav_cell_nph, sponge);
 
 

@@ -17,11 +17,6 @@ Maestro::EstDt ()
 
     dt = 1.e20;
 
-    // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
-    w0_force_dummy.shrink_to_fit();
-    std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
-
     // build dummy w0_force_cart and set equal to zero
     Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -400,11 +395,6 @@ Maestro::FirstDt ()
     BL_PROFILE_VAR("Maestro::FirstDt()", FirstDt);
 
     dt = 1.e20;
-
-    // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
-    w0_force_dummy.shrink_to_fit();
-    std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
     // build dummy w0_force_cart and set equal to zero
     Vector<MultiFab> w0_force_cart_dummy(finest_level+1);

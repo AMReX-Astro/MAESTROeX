@@ -139,7 +139,6 @@ public:
     /// @param w0_force_cart    base-state-velocity force on cartesian grid
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                         const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const RealVector& w0_force,
                         const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     /// Calculate `rhoX` flux
@@ -1230,7 +1229,7 @@ public:
     // MaestroMakew0.cpp functions
 
     void Makew0(const RealVector& w0_old, 
-                RealVector& w0_force, 
+                BaseState<amrex::Real>& w0_force, 
                 const BaseState<amrex::Real>& Sbar_in, 
                 const BaseState<amrex::Real>& rho0_old_in,
                 const BaseState<amrex::Real>& rho0_new_in,
@@ -1243,7 +1242,7 @@ public:
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
 
     void Makew0PlanarVarg(const RealVector& w0_old, 
-                        RealVector& w0_force, 
+                        BaseState<amrex::Real>& w0_force, 
                         const BaseState<amrex::Real>& Sbar_in, 
                         const BaseState<amrex::Real>& rho0_old_in,
                         const BaseState<amrex::Real>& rho0_new_in,
@@ -1256,7 +1255,7 @@ public:
                         const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Planar(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1270,7 +1269,7 @@ public:
                     const bool is_predictor);
 
     void Makew0SphrIrreg(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1283,7 +1282,7 @@ public:
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
     void Makew0Sphr(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1803,7 +1802,6 @@ public:
     void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                           const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const RealVector& w0_force,
                           const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const BaseState<amrex::Real>& rho0_nph,
                           const BaseState<amrex::Real>& grav_cell_nph,
@@ -2080,6 +2078,7 @@ public:
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
     RealVector w0;
+    BaseState<Real> w0_b;
     BaseState<amrex::Real> etarho_ec;
     RealVector r_edge_loc;
     BaseState<amrex::Real> r_edge_loc_b;

@@ -68,7 +68,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
     BaseState<Real> peosbar (max_radial_level+1, nr_fine);
-    RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> w0_force_dummy (max_radial_level+1, nr_fine);
     BaseState<Real> Sbar (max_radial_level+1, nr_fine);
     BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
     BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
@@ -81,7 +81,6 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    w0_force_dummy.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
     delta_chi_w0_dummy.shrink_to_fit();
@@ -188,7 +187,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Sbar.setVal(0.);
 
     // set dummy variables to zero
-    std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
+    w0_force_dummy.setVal(0.);
     rho0_pred_edge_dummy.setVal(0.0);
     std::fill(w0.begin(), w0.end(), 0.);
 
@@ -301,7 +300,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 1;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -601,7 +600,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     // compute unprojected MAC velocities
     is_predictor = 0;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
@@ -819,8 +818,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
-    VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
-                    rho0_nph,grav_cell_nph,sponge);
+    VelocityAdvance(rhohalf, umac, w0mac_dummy, w0_force_cart_dummy,
+                    rho0_nph, grav_cell_nph, sponge);
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old

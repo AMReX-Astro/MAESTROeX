@@ -145,6 +145,7 @@ Maestro::Setup ()
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
     r_edge_loc_b.resize(max_radial_level+1, nr_fine+1);
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
+    w0_b.resize(max_radial_level+1, nr_fine+1);
     etarho_ec.resize(max_radial_level+1, nr_fine+1);
 
     // tagged box array for multilevel (planar)
