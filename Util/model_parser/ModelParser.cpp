@@ -32,7 +32,7 @@ ModelParser::ReadFile(const std::string model_file_name)
     for (auto i = 0; i < nvars_model_file; ++i) {
         std::getline(model_file, line);
         ipos = line.find('#') + 1;
-        varnames_stored[i] = trim(line.substr(ipos));
+        varnames_stored[i] = maestro::trim(line.substr(ipos));
     }
 
     // alocate storage for the model data 
@@ -100,7 +100,7 @@ ModelParser::ReadFile(const std::string model_file_name)
             // is the current variable from the model file one that we
             // care about?
             if (!found_model && i == 0) {
-                Print() << "WARNING: variable not found: " << trim(varnames_stored[j]) << std::endl;
+                Print() << "WARNING: variable not found: " << maestro::trim(varnames_stored[j]) << std::endl;
             }
         }
 
@@ -117,7 +117,7 @@ ModelParser::ReadFile(const std::string model_file_name)
             }
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 if (!found_spec[comp]) {
-                    Print() << "WARNING: " << trim(spec_names_cxx[comp]) << " not provided in inputs file" << std::endl;
+                    Print() << "WARNING: " << maestro::trim(spec_names_cxx[comp]) << " not provided in inputs file" << std::endl;
                 }
             }
         }        
