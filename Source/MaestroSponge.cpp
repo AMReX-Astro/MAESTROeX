@@ -170,7 +170,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
                     // Inner sponge: damps velocities at edge of star
                     if (r >= r_sp_loc) {
-                        Real smdamp = 1.0;
+                        smdamp = 1.0;
                         if (r < r_tp_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_loc) / (r_tp_loc - r_sp_loc)));
                         }
@@ -179,7 +179,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
                     // Outer sponge: damps velocities in the corners of the domain
                     if (r >= r_sp_outer_loc) {
-                        Real smdamp = 1.0;
+                        smdamp = 1.0;
                         if (r < r_tp_outer_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_outer_loc) / (r_tp_outer_loc - r_sp_outer_loc)));
                         } 
