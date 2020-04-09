@@ -9,8 +9,6 @@ Maestro::MakePsiPlanar()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiPlanar()", MakePsiPlanar);
 
-    const int max_lev = max_radial_level + 1;
-
     psi.setVal(0.0);
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
@@ -35,24 +33,22 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiSphr()", MakePsiSphr);
 
-    const int max_lev = max_radial_level + 1;
-
     psi.setVal(0.0);
 
     Real dr0 = dr(0);
 
     const auto& r_cc_loc_p = r_cc_loc_b;
     const auto& r_edge_loc_p = r_edge_loc_b;
-    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    auto &psi_p = psi;
+    const auto& w0_p = w0;
+    auto& psi_p = psi;
 
     const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
         Real div_w0_sph = 1.0 / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) *
-             w0_p[max_lev*(r+1)] - 
+             w0_p(0,r+1) - 
              r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * 
-             w0_p[max_lev*r]) / dr0;
+             w0_p(0,r)) / dr0;
         psi_p(0,r) = gamma1bar(0,r) * p0_avg(0,r) * 
             (Sbar_in(0,r) - div_w0_sph);
     });
@@ -63,8 +59,6 @@ Maestro::MakePsiIrreg(const BaseState<Real>& grav_cell)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiIrreg()", MakePsiIrreg);
-
-    const int max_lev = max_radial_level+1;
 
     psi.setVal(0.0);
 

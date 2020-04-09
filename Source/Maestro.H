@@ -1226,70 +1226,7 @@ public:
     ////////////
 
     ////////////
-    // MaestroMakew0.cpp functions
-
-    void Makew0(const RealVector& w0_old, 
-                BaseState<amrex::Real>& w0_force, 
-                const BaseState<amrex::Real>& Sbar_in, 
-                const BaseState<amrex::Real>& rho0_old_in,
-                const BaseState<amrex::Real>& rho0_new_in,
-                const BaseState<amrex::Real>& p0_old_in,
-                const BaseState<amrex::Real>& p0_new_in,
-                const BaseState<amrex::Real>& gamma1bar_old_in,
-                const BaseState<amrex::Real>& gamma1bar_new_in,
-                const BaseState<amrex::Real>& p0_minus_peosbar, 
-                const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
-
-    void Makew0PlanarVarg(const RealVector& w0_old, 
-                        BaseState<amrex::Real>& w0_force, 
-                        const BaseState<amrex::Real>& Sbar_in, 
-                        const BaseState<amrex::Real>& rho0_old_in,
-                        const BaseState<amrex::Real>& rho0_new_in,
-                        const BaseState<amrex::Real>& p0_old_in,
-                        const BaseState<amrex::Real>& p0_new_in,
-                        const BaseState<amrex::Real>& gamma1bar_old_in,
-                        const BaseState<amrex::Real>& gamma1bar_new_in,
-                        const BaseState<amrex::Real>& p0_minus_peosbar,
-                        const amrex::Real dt_in, const amrex::Real dtold_in);
-
-    void Makew0Planar(const RealVector& w0_old, 
-                    BaseState<amrex::Real>& w0_force, 
-                    const BaseState<amrex::Real>& Sbar_in, 
-                    const BaseState<amrex::Real>& rho0_old_in,
-                    const BaseState<amrex::Real>& rho0_new_in,
-                    const BaseState<amrex::Real>& p0_old_in,
-                    const BaseState<amrex::Real>& p0_new_in,
-                    const BaseState<amrex::Real>& gamma1bar_old_in,
-                    const BaseState<amrex::Real>& gamma1bar_new_in,
-                    const BaseState<amrex::Real>& p0_minus_peosbar,
-                    const amrex::Real dt_in, const amrex::Real dtold_in,  
-                    const bool is_predictor);
-
-    void Makew0SphrIrreg(const RealVector& w0_old, 
-                    BaseState<amrex::Real>& w0_force, 
-                    const BaseState<amrex::Real>& Sbar_in, 
-                    const BaseState<amrex::Real>& rho0_old_in,
-                    const BaseState<amrex::Real>& rho0_new_in,
-                    const BaseState<amrex::Real>& p0_old_in,
-                    const BaseState<amrex::Real>& p0_new_in,
-                    const BaseState<amrex::Real>& gamma1bar_old_in,
-                    const BaseState<amrex::Real>& gamma1bar_new_in,
-                    const BaseState<amrex::Real>& p0_minus_peosbar,
-                    const amrex::Real dt_in, const amrex::Real dtold_in);
-
-    void Makew0Sphr(const RealVector& w0_old, 
-                    BaseState<amrex::Real>& w0_force, 
-                    const BaseState<amrex::Real>& Sbar_in, 
-                    const BaseState<amrex::Real>& rho0_old_in,
-                    const BaseState<amrex::Real>& rho0_new_in,
-                    const BaseState<amrex::Real>& p0_old_in,
-                    const BaseState<amrex::Real>& p0_new_in,
-                    const BaseState<amrex::Real>& gamma1bar_old_in,
-                    const BaseState<amrex::Real>& gamma1bar_new_in,
-                    const BaseState<amrex::Real>& p0_minus_peosbar,
-                    const amrex::Real dt_in, const amrex::Real dtold_in);
-
-    
+    // MaestroMakew0.cpp functions    
 
     void Makew0(const BaseState<amrex::Real>& w0_old, 
                 BaseState<amrex::Real>& w0_force, 
@@ -2135,8 +2072,7 @@ public:
 
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
-    RealVector w0;
-    BaseState<Real> w0_b;
+    BaseState<Real> w0;
     BaseState<amrex::Real> etarho_ec;
     RealVector r_edge_loc;
     BaseState<amrex::Real> r_edge_loc_b;

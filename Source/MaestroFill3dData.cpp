@@ -699,10 +699,10 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Real& mult)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
+    BL_PROFILE_VAR("Maestro::Addw0()", Addw0);
 
     const int max_lev = max_radial_level+1;
-    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+    const auto& w0_p = w0;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -726,13 +726,13 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                    vedge(i,j,k) += mult * w0_p[lev+j*max_lev];
+                    vedge(i,j,k) += mult * w0_p(lev,j);
                 });
 #else
                 const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
 
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) += mult * w0_p[lev+k*max_lev];
+                    wedge(i,j,k) += mult * w0_p(lev,k);
                 });
 #endif
             } else {
@@ -789,7 +789,7 @@ void
 Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeW0mac()",MakeW0mac);
+    BL_PROFILE_VAR("Maestro::MakeW0mac()", MakeW0mac);
 
     if (spherical == 0) {
         Abort("Error: only call MakeW0mac for spherical");
@@ -811,9 +811,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     const int max_lev = max_radial_level+1;
     const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real drf = dr_fine;
-    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const auto r_edge_loc_p = r_edge_loc_b;
-    const auto center_p = center;
+    const auto& w0_p = w0;
+    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
@@ -829,7 +829,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& gntbx = mfi.grownnodaltilebox(-1, 1);
@@ -847,9 +847,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
                     Real w0_cart_val;
                     if (index < nr_fine_loc) {
-                        w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                        w0_cart_val = rfac * w0_p(0,index+1) + (1.0-rfac) * w0_p(0,index);
                     } else {
-                        w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                        w0_cart_val = w0_p(0,nr_fine_loc);
                     }
 
                     if (radius == 0.0) {
@@ -868,7 +868,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             const Box& xbx = mfi.grownnodaltilebox(0, 1);
             const Box& ybx = mfi.grownnodaltilebox(1, 1);
@@ -910,9 +910,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
 
                         if (index < nr_fine_loc) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_p(0,index+1) + (1.0-rfac) * w0_p(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p(nr_fine_loc);
                         }
                     } else {
                         if (index <= 0) {
@@ -927,9 +927,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc_p(0,index),
                                     r_edge_loc_p(0,index+1), 
                                     r_edge_loc_p(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_p(0,index),
+                                    w0_p(0,index+1),
+                                    w0_p(0,index+2));
                     }
 
                     w0macx(i,j,k) = w0_cart_val * x / radius;
@@ -949,9 +949,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
 
                         if (index < nr_fine_loc) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_p(0,index+1) + (1.0-rfac) * w0_p(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p(0,nr_fine_loc);
                         }
                     } else { 
                         if (index <= 0) {
@@ -966,9 +966,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc_p(0,index),
                                     r_edge_loc_p(0,index+1), 
                                     r_edge_loc_p(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_p(0,index),
+                                    w0_p(0,index+1),
+                                    w0_p(0,index+2));
                     }
 
                     w0macy(i,j,k) = w0_cart_val * y / radius;
@@ -988,9 +988,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
                         
                         if (index < nr_fine_loc) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_p(0,index+1) + (1.0-rfac) * w0_p(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p(0,nr_fine_loc);
                         }
                     } else {
 
@@ -1006,9 +1006,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc_p(0,index),
                                     r_edge_loc_p(0,index+1), 
                                     r_edge_loc_p(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_p(0,index),
+                                    w0_p(0,index+1),
+                                    w0_p(0,index+2));
                     }
 
                     w0macz(i,j,k) = w0_cart_val * z / radius;

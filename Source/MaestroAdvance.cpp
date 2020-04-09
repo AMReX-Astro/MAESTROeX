@@ -100,7 +100,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
     BaseState<Real> rho0_predicted_edge (max_radial_level+1, nr_fine+1);
 
-    int is_predictor;
+    bool is_predictor;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
@@ -285,7 +285,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ComputeCutoffCoords(rho0_old);
 
         // compute w0, w0_force
-        is_predictor = 1;
+        is_predictor = true;
         Makew0(w0_old, w0_force, Sbar, rho0_old, rho0_old, 
                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                p0_minus_peosbar, dt, dtold, is_predictor);
@@ -319,7 +319,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    is_predictor = 1;
+    is_predictor = true;
     AdvancePremac(umac, w0mac, w0_force_cart);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -406,10 +406,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     Addw0(umac, w0mac, 1.);
     
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    DensityAdvance(1, s1, s2, sedge, sflux, scal_force, etarhoflux, umac, w0mac, rho0_predicted_edge);
 
     // subtract w0mac from umac
-    Addw0(umac,  w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
     
     if (evolve_base_state) {
 
@@ -489,12 +489,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // need full UMAC velocities for EnthalpyAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
     
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
     
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
@@ -666,7 +666,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ComputeCutoffCoords(rho0_old);
 
         // compute w0, w0_force
-        is_predictor = 0;
+        is_predictor = false;
         Makew0(w0_old, w0_force, Sbar, rho0_old, rho0_new, 
                 p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
                 p0_minus_peosbar, dt, dtold, is_predictor);
@@ -695,7 +695,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    is_predictor = 0;
+    is_predictor = false;
     AdvancePremac(umac, w0mac, w0_force_cart);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -756,10 +756,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // need full UMAC velocities for DensityAdvance
-    Addw0(umac, w0mac,1.);
+    Addw0(umac, w0mac, 1.);
     
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
+    DensityAdvance(2, s1, s2, sedge, sflux, scal_force, etarhoflux, umac, w0mac, rho0_predicted_edge);
 
     // subtract w0mac from umac
     Addw0(umac, w0mac, -1.);
@@ -843,12 +843,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // need full UMAC velocities for EnthalpyAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
     
-    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
     
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
@@ -995,11 +995,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r <= nr_fine; ++r) {
-                w0[l+(max_radial_level+1)*r] = w0_old(l,r);
-            }
-        }
+        w0.copy(w0_old);
     }
 
     int proj_type;

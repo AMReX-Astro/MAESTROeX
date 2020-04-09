@@ -91,8 +91,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
     BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
 
-    int is_predictor;
-
+    bool is_predictor;
     bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
@@ -208,7 +207,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // initialize to zero
     Sbar.setVal(0.);
-    std::fill(w0.begin()  , w0.end()  , 0.);
+    w0.setVal(0.0);
 
     // set dummy variables to zero
     w0_force_dummy.setVal(0.0);
@@ -280,7 +279,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             w0_old.copy(w0);
 
             // compute w0, w0_force
-            is_predictor = 1;
+            is_predictor = true;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                    rho0_old, p0_old, p0_old, gamma1bar_old, 
                    gamma1bar_old, p0_minus_peosbar, 
@@ -294,7 +293,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    is_predictor = 1;
+    is_predictor = true;
     AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -321,18 +320,17 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_old, is_predictor);
 
     // wallclock time
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
     
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // add w0mac back to umac
-        Addw0(umac,w0mac,1.);
+        Addw0(umac, w0mac, 1.);
     }
-
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- Predictor
@@ -440,7 +438,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac,diff_old);
+    EnthalpyAdvanceSDC(1, sold, shat, sedge, sflux, scal_force, umac, w0mac,diff_old);
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -530,7 +528,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             if (!spherical) {
                 MakeEtarho(etarhoflux_dummy);
             } else {
-                MakeEtarhoSphr(sold,snew,umac,w0mac_dummy);
+                MakeEtarhoSphr(sold, snew, umac, w0mac_dummy);
             }
         }
 
@@ -719,7 +717,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     }
                     
                     // compute w0, w0_force
-                    is_predictor = 0;
+                    is_predictor = false;
                     Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                             rho0_new, p0_old, p0_new, gamma1bar_old, 
                             gamma1bar_new, p0_minus_peosbar, 
@@ -733,7 +731,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             // compute unprojected MAC velocities
-            is_predictor = 0;
+            is_predictor = false;
             AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
             if (evolve_base_state && !split_projection) {
@@ -744,7 +742,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
                                 gamma1bar_new, p0_new,delta_p_term, delta_chi,is_predictor);
 
-            if (spherical == 1 && evolve_base_state && split_projection) {
+            if (spherical && evolve_base_state && split_projection) {
                 // subtract w0mac from umac
                 Addw0(umac,w0mac,-1.);
             }
@@ -754,14 +752,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // MAC projection
             // includes spherical option in C++ function
-            MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
+            MacProj(umac, macphi, macrhs, beta0_nph, is_predictor);
 
             // wallclock time
             Real end_total_macproj_corrector = ParallelDescriptor::second() - start_total_macproj_corrector;
             ParallelDescriptor::ReduceRealMax(end_total_macproj_corrector,ParallelDescriptor::IOProcessorNumber());
 
 
-            if (spherical == 1 && evolve_base_state && split_projection) {
+            if (spherical && evolve_base_state && split_projection) {
                 // add w0mac back to umac
                 Addw0(umac,w0mac,1.);
             }
@@ -1082,7 +1080,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             }
 
             // compute w0, w0_force
-            is_predictor = 0;
+            is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, 
                    rho0_new, p0_new, p0_new, gamma1bar_new, 
                    gamma1bar_new, p0_minus_peosbar, 
@@ -1108,14 +1106,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r <= nr_fine; ++r) {
-                w0[l+(max_radial_level+1)*r] = w0_old(l,r);
-            }
-        }
+        w0.copy(w0_old);
     }
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -1189,7 +1183,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);

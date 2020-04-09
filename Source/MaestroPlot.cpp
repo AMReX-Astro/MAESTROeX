@@ -192,7 +192,7 @@ Maestro::WritePlotFile (const int step,
 
             for (int i = 0; i <= nr(lev); ++i) {
                 BaseFCFile << r_edge_loc_b(lev,i) << " "
-                           << w0[lev+(max_radial_level+1)*i] << "\n";
+                           << w0(lev,i) << "\n";
             }
         }
     }
@@ -529,7 +529,7 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> w0r_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        if (spherical == 1) {
+        if (spherical) {
             // w0mac will contain an edge-centered w0 on a Cartesian grid,
             // for use in computing divergences.
             AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -547,11 +547,11 @@ Maestro::PlotFileMF (const int nPlot,
         w0r_cart[lev].setVal(0.);
     }
 
-    if (evolve_base_state == 1) {
-        if (spherical == 1) {
+    if (evolve_base_state) {
+        if (spherical) {
             MakeW0mac(w0mac);
         }
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0);
+        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0);
     }
 
     // Mach number
@@ -694,7 +694,7 @@ Maestro::PlotFileMF (const int nPlot,
     dest_comp++;
 
     // radial and circular velocities
-    if (spherical == 1) {
+    if (spherical) {
         MakeVelrc(u_in, w0r_cart, tempmf, tempmf_scalar1);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
@@ -818,7 +818,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
     if (plot_ad_excess) (*nPlot)++;
     if (plot_pidivu) (*nPlot)++;
     if (plot_processors) (*nPlot)++;
-    if (spherical == 1) (*nPlot) += 2; // radial_velocity, circ_velocity
+    if (spherical) (*nPlot) += 2; // radial_velocity, circ_velocity
     if (do_sponge) (*nPlot)++;
 
     Vector<std::string> names(*nPlot);
@@ -965,7 +965,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
     names[cnt++] = "thermal";
     names[cnt++] = "conductivity";
 
-    if (spherical == 1) {
+    if (spherical) {
         names[cnt++] = "radial_velocity";
         names[cnt++] = "circ_velocity";
     }
@@ -1370,7 +1370,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
@@ -2171,8 +2171,8 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     }
 
     // average down and fill ghost cells
-    AverageDown(divw0,0,1);
-    FillPatch(t_old,divw0,divw0,divw0,0,0,1,0,bcs_f);
+    AverageDown(divw0, 0, 1);
+    FillPatch(t_old, divw0, divw0, divw0, 0, 0, 1, 0, bcs_f);
 }
 
 void

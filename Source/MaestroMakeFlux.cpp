@@ -83,7 +83,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
 
-            Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+            const auto& w0_p = w0;
             const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
             const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
             const Real * AMREX_RESTRICT rho0_edge_old_p = r0_edge_old.dataPtr();
@@ -157,7 +157,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     }
 
                     if (comp==spec_comp+nspec-1) {
-                        etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge_p[lev+j*(max_lev+1)];
+                        etarhoflux_arr(i,j,k) -= w0_p(lev,j)*rho0_predicted_edge_p[lev+j*(max_lev+1)];
                     }
                 } 
 
@@ -264,7 +264,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         }
 
                         if (comp == spec_comp+nspec-1) {
-                            etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge_p[lev+k*(max_lev+1)];
+                            etarhoflux_arr(i,j,k) -= w0_p(lev,k)*rho0_predicted_edge_p[lev+k*(max_lev+1)];
                         }
                     } 
 
@@ -488,7 +488,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
 
-            Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+            const auto& w0_p = w0;
 
 #if (AMREX_SPACEDIM == 2)
 
@@ -557,7 +557,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     }
 
                     if (comp==spec_comp+nspec-1) {
-                        etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge(lev,j);
+                        etarhoflux_arr(i,j,k) -= w0_p(lev,j)*rho0_predicted_edge(lev,j);
                     }
                 } 
 
@@ -664,7 +664,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         }
 
                         if (comp == spec_comp+nspec-1) {
-                            etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge(lev,k);
+                            etarhoflux_arr(i,j,k) -= w0_p(lev,k)*rho0_predicted_edge(lev,k);
                         }
                     } 
 

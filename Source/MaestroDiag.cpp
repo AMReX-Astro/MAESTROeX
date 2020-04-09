@@ -245,11 +245,11 @@ Maestro::DiagFile (const int step,
                     } else {
                         // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
-                        Real vert_vel = u(i,j,k,1) + 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                        Real vert_vel = u(i,j,k,1) + 0.5*(w0(lev,j) + w0(lev,j+1));
                         vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     vert_vel*vert_vel);
 #else
-                        Real vert_vel = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                        Real vert_vel = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
                         vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     u(i,j,k,1)*u(i,j,k,1) + vert_vel*vert_vel);
 #endif
@@ -265,9 +265,9 @@ Maestro::DiagFile (const int step,
                             vel_Tmax_local[0]   = u(i,j,k,0);
                             vel_Tmax_local[1]   = u(i,j,k,1);
 #if (AMREX_SPACEDIM == 2)
-                            vel_Tmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                            vel_Tmax_local[1] += 0.5*(w0(lev,j) + w0(lev,j+1));
 #else
-                            vel_Tmax_local[2] = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_Tmax_local[2] = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
 #endif
                         }
 
@@ -282,9 +282,9 @@ Maestro::DiagFile (const int step,
                             vel_enucmax_local[0]   = u(i,j,k,0);
                             vel_enucmax_local[1]   = u(i,j,k,1);
 #if (AMREX_SPACEDIM == 2)
-                            vel_enucmax_local[1] += 0.5*(w0[lev+max_lev*j] + w0[lev+max_lev*(j+1)]);
+                            vel_enucmax_local[1] += 0.5*(w0(lev,j) + w0(lev,j+1));
 #else
-                            vel_enucmax_local[2] = u(i,j,k,2) + 0.5*(w0[lev+max_lev*k] + w0[lev+max_lev*(k+1)]);
+                            vel_enucmax_local[2] = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
 #endif
                         }
                     }

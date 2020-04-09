@@ -41,17 +41,17 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
         rho0_cart[lev].setVal(0.);
     }
 
-    BaseState<Real> gradw0(max_radial_level+1,nr_fine);
+    BaseState<Real> gradw0(max_radial_level+1, nr_fine);
     gradw0.setVal(0.0);
 
-    Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
+    const auto& w0_p = w0;
     const Real dr0 = dr_fine;
 
     if ( !(use_exact_base_state || average_base_state) ) {
         for (auto l = 0; l <= max_radial_level; ++l) {
-            AMREX_PARALLEL_FOR_1D (nr_fine, i,
+            AMREX_PARALLEL_FOR_1D (nr_fine, r,
             {       
-                gradw0(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
+                gradw0(l,r) = (w0_p(l,r+1) - w0_p(l,r))/dr0;
             });
         }
     }
@@ -219,8 +219,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
-                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0[r+1]
-                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0(0,r+1)
+                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0(0,r)) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
             }
         }
 
@@ -410,8 +410,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
-                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0[r+1]
-                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0(0,r+1)
+                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0(0,r)) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
             }
         }
 

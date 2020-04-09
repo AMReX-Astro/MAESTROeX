@@ -706,7 +706,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
                 Sbar += delta_gamma1_termbar;
             }
             
-            int is_predictor = 1;
+            auto is_predictor = true;
             Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, 
                    p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
                    p0_minus_pthermbar, dt, dt, is_predictor);
