@@ -10,10 +10,10 @@ using namespace amrex;
 void
 Maestro::Put1dArrayOnCart (const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp, int variable_type)
+                           const int sbccomp, int variable_type)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
@@ -41,19 +41,28 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 }
 
 void
-Maestro::Put1dArrayOnCart (int lev,
+Maestro::Put1dArrayOnCart (const int lev,
                            const RealVector& s0,
                            Vector<MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp)
+                           const int sbccomp)
+{
+    Put1dArrayOnCart(lev, s0, s0_cart[lev], is_input_edge_centered, is_output_a_vector, bcs, sbccomp);
+}
+
+void
+Maestro::Put1dArrayOnCart (const int lev,
+                           const RealVector& s0,
+                           MultiFab& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const Vector<BCRec>& bcs,
+                           const int sbccomp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()", Put1dArrayOnCart);
-
-    // get references to the MultiFabs at level lev
-    MultiFab& s0_cart_mf = s0_cart[lev];
 
     const auto dx = geom[lev].CellSizeArray();
     const auto prob_lo = geom[lev].ProbLoArray();
@@ -71,12 +80,12 @@ Maestro::Put1dArrayOnCart (int lev,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for (MFIter mfi(s0_cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+    for ( MFIter mfi(s0_cart, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
         // Get the index space of the valid region
         const Box& tileBox = mfi.tilebox();
 
-        const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
+        const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
 
         if (spherical == 0) {
 
@@ -109,7 +118,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = cc_to_r(i,j,k);
+                        int index = round(cc_to_r(i,j,k));
 
                         Real rfac;
                         if (index < nr_fine) {
@@ -122,7 +131,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 - r_cc_loc_p[(index-1)*max_lev]);
                         }
 
-                        Real s0_cart_val;
+                        Real s0_cart_val = s0_p[index*max_lev];
 
                         if (w0_interp_type_loc == 1) {
 
@@ -177,7 +186,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = cc_to_r(i,j,k);
+                        int index = round(cc_to_r(i,j,k));
 
                         Real s0_cart_val = s0_p[index*max_lev];
                         
@@ -1165,8 +1174,6 @@ Maestro::MakeNormal ()
     //    e_r = sin(theta)cos(phi) e_x + sin(theta)sin(phi) e_y + cos(theta) e_z
     // or
     //    e_r = (x/R) e_x + (y/R) e_y + (z/R) e_z
-
-    const auto center_p = center;
 
     if (spherical == 1) {
 

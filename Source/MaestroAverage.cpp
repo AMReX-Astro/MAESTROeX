@@ -46,9 +46,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
             }
 
-            // get references to the MultiFabs at level lev
-            const MultiFab& phi_mf = phi[lev];
-        
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel if (!system::regtest_reduction)
@@ -231,7 +228,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                         Real radius = sqrt(x*x + y*y + z*z);
 
                         // figure out which radii index this point maps into
-                        int index = ((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0;
+                        int index = std::round( ((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0 );
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg_loc) {
@@ -270,7 +267,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // choose which level to interpolate from
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
-        const int dr0 = dr[0];
+        const Real dr0 = dr[0];
         const int nrf = nr_fine;
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {

@@ -2,7 +2,6 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 #include <AMReX_VisMF.H>
-#include <Problem_F.H>
 using namespace amrex;
 
 
@@ -73,7 +72,6 @@ Maestro::InitData ()
 	std::swap(p0_swap,p0_init);
 
     p0_new = p0_old;
-
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -96,24 +94,97 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	snew              [lev].setVal(0.);
 	S_cc_old          [lev].setVal(0.);
 
-	const Real* dx = geom[lev].CellSize();
+	const auto prob_lo = geom[lev].ProbLoArray();
+	const auto dx = geom[lev].CellSizeArray();
 
-	MultiFab& scal = sold[lev];
+	const auto center_p = center;
+	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+	Real * AMREX_RESTRICT p0_p = p0_old.dataPtr();
+
+	const int max_lev = max_radial_level + 1;
+	const auto nrf = nr_fine;
+
+	const auto peak_h_loc = peak_h;
+	const auto ambient_h_loc = ambient_h;
+	const auto diff_coeff = diffusion_coefficient;
+	const auto t0_loc = t0;
+
+	// convergence parameters
+	const auto max_iter = 50;
+	const auto tol = 1.e-12;
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, true); mfi.isValid(); ++mfi)
+	for (MFIter mfi(sold[lev], true); mfi.isValid(); ++mfi)
 	{
-		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
+		const Box& tileBox = mfi.tilebox();
 
-		initscaldata(ARLIM_3D(lo), ARLIM_3D(hi),
-		         BL_TO_FORTRAN_FAB(scal[mfi]),
-		         s0_init.dataPtr(), p0_old.dataPtr(),
-		         ZFILL(dx));
+		const Array4<Real> scal = sold[lev].array(mfi);
+
+		// set scalars to zero 
+		AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+			scal(i,j,k,n) = 0.0;
+		});
+
+		AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+			const auto r = j;
+
+			const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
+			const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
+
+			// apply the guassian enthalpy pulse at constant density
+			const auto dist2 = x*x + y*y;
+
+			const auto h_zone = (peak_h_loc - ambient_h_loc) * std::exp(-dist2 / (4.0 * diff_coeff * t0_loc)) + ambient_h_loc;
+
+			auto temp_zone = s0_p[lev+max_lev*(r+nrf*Temp)];
+
+			eos_t eos_state;
+
+			for (auto comp = 0; comp < NumSpec; ++comp) {
+				eos_state.xn[comp] = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))] / s0_p[lev+max_lev*(r+nrf*Rho)];
+			}
+
+			eos_state.rho = s0_p[lev+max_lev*(r+nrf*Rho)];
+
+			auto converged = false;
+
+			for (auto iter = 0; iter < max_iter; ++iter) {
+				eos_state.T = temp_zone;
+
+				eos(eos_input_rt, eos_state);
+
+				const auto dhdt = eos_state.cv + eos_state.dpdT / eos_state.rho;
+
+				const auto del_temp = -(eos_state.h - h_zone) / dhdt;
+
+				temp_zone += del_temp;
+
+				if (fabs(del_temp) < tol*temp_zone) {
+					converged = true;
+					break;
+				}
+			}
+
+			if (!converged) {
+				Abort("Iters did not converge in InitLevelData.");
+			}
+
+			// call eos one last time
+			eos_state.T = temp_zone;
+
+			eos(eos_input_rt, eos_state);
+			
+			scal(i,j,k,Rho) = eos_state.rho;
+			scal(i,j,k,RhoH) = eos_state.rho * eos_state.h;
+			scal(i,j,k,Temp) = eos_state.T;
+			for (auto comp = 0; comp < NumSpec; ++comp) {
+				scal(i,j,k,FirstSpec+comp) = eos_state.xn[comp] * eos_state.rho;
+			}
+
+			p0_p[lev+max_lev*r] = eos_state.p;
+		}); 
 	}
-
 }
