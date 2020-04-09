@@ -119,12 +119,12 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-            const auto center_p = center;
-
-            Real smdamp = 1.0;
-            int smdamp_idx = -1;
+            const auto& center_p = center;
 
             if (!spherical) {
+                Real smdamp = 1.0;
+                int smdamp_idx = -1;
+                
                 const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
                 const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -169,9 +169,12 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
                     Real r = std::sqrt(x*x + y*y + z*z);
 
+                    Real smdamp = 1.0;
+                    int smdamp_idx = -1;
+
                     // Inner sponge: damps velocities at edge of star
                     if (r >= r_sp_loc) {
-                        Real smdamp = 1.0;
+                        smdamp = 1.0;
                         if (r < r_tp_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_loc) / (r_tp_loc - r_sp_loc)));
                         }
@@ -180,7 +183,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 
                     // Outer sponge: damps velocities in the corners of the domain
                     if (r >= r_sp_outer_loc) {
-                        Real smdamp = 1.0;
+                        smdamp = 1.0;
                         if (r < r_tp_outer_loc) {
                             smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_outer_loc) / (r_tp_outer_loc - r_sp_outer_loc)));
                         } 

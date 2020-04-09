@@ -7,6 +7,7 @@ module initdata_module
   use base_state_geometry_module, only: nr_fine, max_radial_level
   use meth_params_module, only: nscal, rho_comp, rhoh_comp, temp_comp, spec_comp, pi_comp
   use eos_module
+  use amrex_error_module, only: amrex_error
   use eos_type_module
 
   implicit none
@@ -42,7 +43,7 @@ contains
     end if
 
     ! abort program
-    call amrex_error()
+    call amrex_error("")
 
     ! set velocity to zero
     vel(vel_lo(1):vel_hi(1),vel_lo(2):vel_hi(2),vel_lo(3):vel_hi(3),1:nc_v) = 0.d0
@@ -111,67 +112,13 @@ contains
     end if
 
     ! abort program
-    call amrex_error()
+    call amrex_error("")
 
     ! set velocity to zero
     vel(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_v) = 0.d0
 
     ! initialize the domain with the base state
     scal(lo(1):hi(1),lo(2):hi(2),lo(3):hi(3),1:nc_s) = 0.d0
-
-    ! if we are spherical, we want to make sure that p0 is good, since that is
-    ! what is needed for HSE.  Therefore, we will put p0 onto a cart array and
-    ! then initialize h from rho, X, and p0.
-    call bl_allocate(p0_cart,lo,hi,1)
-
-    ! initialize temp
-    call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,temp_comp),scal_lo,scal_hi,1, &
-         s0_init(0,:,temp_comp),dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-
-    ! initialize p0_cart
-    call put_1d_array_on_cart_sphr(lo,hi,p0_cart,lo,hi,1,p0_init,dx,0,0,r_cc_loc,r_edge_loc, &
-         cc_to_r,ccr_lo,ccr_hi)
-
-    ! initialize species
-    do comp = spec_comp, spec_comp+nspec-1
-       call put_1d_array_on_cart_sphr(lo,hi,scal(:,:,:,comp),scal_lo,scal_hi,1, &
-            s0_init(0,:,comp),dx,0,0,r_cc_loc,r_edge_loc, &
-            cc_to_r,ccr_lo,ccr_hi)
-    end do
-
-    ! initialize rho as sum of partial densities rho*X_i
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-             scal(i,j,k,rho_comp) = 0.d0
-             do comp = spec_comp, spec_comp+nspec-1
-                scal(i,j,k,rho_comp) = scal(i,j,k,rho_comp) + scal(i,j,k,comp)
-             enddo
-          enddo
-       enddo
-    enddo
-
-    ! initialize (rho h) and T using the EOS
-    do k = lo(3), hi(3)
-       do j = lo(2), hi(2)
-          do i = lo(1), hi(1)
-
-             eos_state%T     = scal(i,j,k,temp_comp)
-             eos_state%p     = p0_cart(i,j,k,1)
-             eos_state%rho   = scal(i,j,k,rho_comp)
-             eos_state%xn(:) = scal(i,j,k,spec_comp:spec_comp+nspec-1)/eos_state%rho
-
-             call eos(eos_input_rp, eos_state)
-
-             scal(i,j,k,rhoh_comp) = eos_state%rho*eos_state%h
-             scal(i,j,k,temp_comp) = eos_state%T
-
-          enddo
-       enddo
-    enddo
-
-    call bl_deallocate(p0_cart)
 
   end subroutine initdata_sphr
 
