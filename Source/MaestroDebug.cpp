@@ -10,9 +10,9 @@ Maestro::PrintBase(const RealVector& base, const bool is_cell_centered)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
 
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
+    get_numdisjointchunks(&numdisjointchunks(0));
+    get_r_start_coord(&r_start_coord(0));
+    get_r_end_coord(&r_end_coord(0));
     get_finest_radial_level(&finest_radial_level);
 
     const int max_lev = max_radial_level + 1;
