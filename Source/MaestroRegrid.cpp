@@ -370,10 +370,6 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
 
-    get_numdisjointchunks(&numdisjointchunks(0));
-    get_r_start_coord(&r_start_coord(0));
-    get_r_end_coord(&r_end_coord(0));
-
     const int max_lev = max_radial_level + 1;
 
     const int nrf = is_edge ? nr_fine+1 : nr_fine;
