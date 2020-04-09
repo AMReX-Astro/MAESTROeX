@@ -119,12 +119,12 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-            const auto center_p = center;
-
-            Real smdamp = 1.0;
-            int smdamp_idx = -1;
+            const auto& center_p = center;
 
             if (!spherical) {
+                Real smdamp = 1.0;
+                int smdamp_idx = -1;
+                
                 const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
                 const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -168,6 +168,9 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                     Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                     Real r = std::sqrt(x*x + y*y + z*z);
+
+                    Real smdamp = 1.0;
+                    int smdamp_idx = -1;
 
                     // Inner sponge: damps velocities at edge of star
                     if (r >= r_sp_loc) {
