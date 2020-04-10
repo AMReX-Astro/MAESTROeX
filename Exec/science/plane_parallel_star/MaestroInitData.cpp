@@ -23,7 +23,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& s0_p = s0_init;
     const auto& p0_p = p0_init;
     
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -31,12 +31,11 @@ Maestro::InitLevelData(const int lev, const Real time,
 
         // set the scalars using s0
         // initialize rho as sum of partial densities rho*X_i
-        scal(i,j,k,Rho) = 0.0;
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_p(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_p(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-	    scal(i,j,k,Rho) += s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;

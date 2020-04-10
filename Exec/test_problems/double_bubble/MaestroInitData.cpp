@@ -6,7 +6,7 @@ using namespace amrex;
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
 void Perturb(const Real p0, 
-             const Real* s0_init,
+             const Real* s0,
              Real* perturbations,  
              const GpuArray<Real,AMREX_SPACEDIM> prob_lo,
              const GpuArray<Real,AMREX_SPACEDIM> prob_hi,
@@ -33,18 +33,18 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& s0_p = s0_init;
     const auto& p0_p = p0_init;
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_p(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_p(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -72,7 +72,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_p(lev,r,n);
             }
 
             Perturb(p0_p(lev,r), s0, perturbations, 
@@ -105,7 +105,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 }
 
 void Perturb(const Real p0, 
-             const Real* s0_init,
+             const Real* s0,
              Real* perturbations,  
              const GpuArray<Real,AMREX_SPACEDIM> prob_lo,
              const GpuArray<Real,AMREX_SPACEDIM> prob_hi,
@@ -133,21 +133,21 @@ void Perturb(const Real p0,
         Real r2 = std::sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2)) / pert_width;
 
         if (r1 < 2.0) {
-            eos_state.rho = s0_init[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r1))));
+            eos_state.rho = s0[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r1))));
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] = 0.0;
             }
             eos_state.xn[1] = 1.0;
         } else if (r2 < 2.0) {
-            eos_state.rho = s0_init[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r2))));
+            eos_state.rho = s0[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r2))));
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] = 0.0;
             }
             eos_state.xn[2] = 1.0;
         } else {
-            eos_state.rho = s0_init[Rho];
+            eos_state.rho = s0[Rho];
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_init[FirstSpec+comp]/s0_init[Rho];
+                eos_state.xn[comp] = s0[FirstSpec+comp]/s0[Rho];
             }
         } 
     } else {
@@ -159,15 +159,15 @@ void Perturb(const Real p0,
         Real r1 = std::sqrt((x-x1)*(x-x1)+(y-y1)*(y-y1)) / pert_width;
 
         if (r1 < 2.0) {
-            eos_state.rho = s0_init[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r1))));
+            eos_state.rho = s0[Rho] * (1.0 - (pert_factor * (1.0 + std::tanh(2.0-r1))));
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] = 0.0;
             }
             eos_state.xn[1] = 1.0;
         } else {
-            eos_state.rho = s0_init[Rho];
+            eos_state.rho = s0[Rho];
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_init[FirstSpec+comp]/s0_init[Rho];
+                eos_state.xn[comp] = s0[FirstSpec+comp]/s0[Rho];
             }
         } 
     }

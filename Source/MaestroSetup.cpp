@@ -117,7 +117,7 @@ Maestro::Setup ()
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     // base states are stored
-    s0_init      .resize( (max_radial_level+1)*nr_fine*Nscal );
+    s0_init      .resize(max_radial_level+1, nr_fine, Nscal);
     p0_init      .resize(max_radial_level+1, nr_fine);
     rho0_old     .resize(max_radial_level+1, nr_fine);
     rho0_new     .resize(max_radial_level+1, nr_fine);
@@ -159,7 +159,6 @@ Maestro::Setup ()
     diagfile3_data.resize(diag_buf_size*10);
 
     // make sure C++ is as efficient as possible with memory usage
-    s0_init      .shrink_to_fit();
     r_cc_loc     .shrink_to_fit();
     r_edge_loc   .shrink_to_fit();
     tag_array    .shrink_to_fit();

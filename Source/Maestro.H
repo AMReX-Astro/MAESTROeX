@@ -773,15 +773,6 @@ public:
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
                          const amrex::Vector<amrex::MultiFab>& state,
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0_edge,
-                         const amrex::Vector<amrex::MultiFab>& s0_cart,
-                         int comp,
-                         const amrex::Vector<amrex::BCRec>& bcs,
-                         int fullform);
-
-    void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
-                         const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const BaseState<amrex::Real>& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
@@ -2046,7 +2037,7 @@ public:
 
     // vectors store the multilevel 1D states as one very long array.
     // these are cell-centered
-    RealVector s0_init;
+    BaseState<amrex::Real> s0_init;
     BaseState<amrex::Real> p0_init;
     BaseState<amrex::Real> rho0_old;
     BaseState<amrex::Real> rho0_new;

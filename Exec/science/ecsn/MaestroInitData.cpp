@@ -46,12 +46,12 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     // make a temporary MultiFab and RealVector to hold the cartesian data then copy it back to scal 
     MultiFab temp_mf(scal.boxArray(), scal.DistributionMap(), 1, 0);
 
-    RealVector temp_vec(max_lev*nr_fine);
+    BaseState<Real> temp_vec(max_radial_level+1, nr_fine)
 
     // initialize temperature 
-    for (auto l = 0; l < max_lev; ++l) {
-        for (auto n = 0; n < nr_fine; ++n) {
-            temp_vec[l+max_lev*n] = s0_init[l+max_lev*(n+nr_fine*Temp)];
+    for (auto l = 0; l <= max_radial_level; ++l) {
+        for (auto r = 0; r < nr_fine; ++r) {
+            temp_vec(l,r) = s0_init(lev,r,Temp);
         }
     }
 
@@ -63,9 +63,9 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        for (auto l = 0; l < max_lev; ++l) {
-            for (auto n = 0; n < nr_fine; ++n) {
-                temp_vec[l+max_lev*n] = s0_init[l+max_lev*(n+nr_fine*(FirstSpec+comp))];
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++n) {
+                temp_vec(l,r) = s0_init(l,r,FirstSpec+comp);
             }
         }
         Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);

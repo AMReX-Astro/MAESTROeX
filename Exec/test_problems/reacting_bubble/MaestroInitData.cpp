@@ -25,26 +25,24 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = max_radial_level + 1;
-    const int nrf = nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto& s0_p = s0_init;
     const auto& p0_p = p0_init;
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_p(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_p(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -71,7 +69,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_p(lev,r,n);
             }
 
             Perturb(p0_p(lev,r), s0, perturbations, 
@@ -131,12 +129,15 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         temp_mf[i].define(grids[lev], dmap[lev], 1, ng_s);
     }
 
-    RealVector temp_vec(max_lev*nr_fine);
+    BaseState<Real> temp_vec(max_radial_level+1, nr_fine);
 
     // initialize temperature 
-    for (auto i = 0; i < max_lev*nr_fine; ++i) {
-        temp_vec[i] = s0_init[i*Temp];
+    for (auto l = 0; l <= max_radial_level; ++l) {
+        for (auto r = 0; r < nr_fine; ++r) {
+            temp_vec(l,r) = s0_init(lev,r,Temp);
+        }
     }
+
     Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, Temp);
     MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
     
@@ -145,8 +146,10 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        for (auto i = 0; i < max_lev*nr_fine; ++i) {
-            temp_vec[i] = s0_init[i*(FirstSpec+comp)];
+        for (auto l = 0; l <= max_radial_level; ++l) {
+            for (auto r = 0; r < nr_fine; ++r) {
+                temp_vec(l,r) = s0_init(l,r,FirstSpec+comp);
+            }
         }
         Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);
         MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
@@ -222,7 +225,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 }
 
 void Perturb(const Real p0_init, 
-             const Real* s0_init,
+             const Real* s0,
              Real* perturbations,  
              const Real x, const Real y, const Real z,
              const Real pert_rad_factor,
@@ -230,7 +233,7 @@ void Perturb(const Real p0_init,
              const bool do_small_domain,
              bool spherical)
 {
-    Real t0 = s0_init[Temp];
+    Real t0 = s0[Temp];
 
 #if (AMREX_SPACEDIM == 2)
 
@@ -298,9 +301,9 @@ void Perturb(const Real p0_init,
     // pressure
     eos_state.T     = temp;
     eos_state.p     = p0_init;
-    eos_state.rho   = s0_init[Rho];
+    eos_state.rho   = s0[Rho];
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        eos_state.xn[comp] = s0_init[FirstSpec+comp]/s0_init[Rho];
+        eos_state.xn[comp] = s0[FirstSpec+comp]/s0[Rho];
     }
 
     eos(eos_input_tp, eos_state);
