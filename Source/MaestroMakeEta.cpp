@@ -9,7 +9,7 @@ void
 Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEtarho()",MakeEtarho);
+    BL_PROFILE_VAR("Maestro::MakeEtarho()", MakeEtarho);
 
 #ifdef AMREX_USE_CUDA
     bool launched;
@@ -22,11 +22,11 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
     // Local variables
     const int max_lev = max_radial_level + 1;
-    RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0);
-    etarhosum.shrink_to_fit();
+    BaseState<Real> etarhosum(max_radial_level+1, nr_fine+1);
+    etarhosum.setVal(0.0);
 
     // this stores how many cells there are laterally at each level
-    RealVector ncell(max_radial_level+1);
+    BaseState<int> ncell(max_radial_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -35,10 +35,9 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
         // compute number of cells at any given height for each level
         if (AMREX_SPACEDIM==2) {
-            ncell[lev] = domainBox.bigEnd(0)+1;
-        }
-        else if (AMREX_SPACEDIM==3) {
-            ncell[lev] = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
+            ncell(lev) = domainBox.bigEnd(0)+1;
+        } else if (AMREX_SPACEDIM==3) {
+            ncell(lev) = (domainBox.bigEnd(0)+1)*(domainBox.bigEnd(1)+1);
         }
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -51,13 +50,12 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             const Box& tilebox = mfi.tilebox();
 
             const Array4<const Real> etarhoflux_arr = etarho_flux[lev].array(mfi);
-            Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
 
 #if (AMREX_SPACEDIM == 2)
             int zlo = tilebox.loVect3d()[2];
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
-                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*j]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum(lev,j)), etarhoflux_arr(i,j,k));
                 }
             });
             
@@ -79,12 +77,12 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
                     int i = n + lo;
-                    amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*j]), etarhoflux_arr(i,j,k));
+                    amrex::HostDevice::Atomic::Add(&(etarhosum(lev,j)), etarhoflux_arr(i,j,k));
                 });
             }
 #else 
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-                amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*k]), etarhoflux_arr(i,j,k));
+                amrex::HostDevice::Atomic::Add(&(etarhosum(lev,k)), etarhoflux_arr(i,j,k));
             });
 
             // we only add the contribution at the top edge if we are at the top of the domain
@@ -102,7 +100,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
                 int zhi = zbx.hiVect3d()[2];
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
-                        amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*k]), etarhoflux_arr(i,j,k));
+                        amrex::HostDevice::Atomic::Add(&(etarhosum(lev,k)), etarhoflux_arr(i,j,k));
                     }
                 });
             }
@@ -116,17 +114,15 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
     etarho_cc.setVal(0.0);
 
     auto& etarho_ec_p = etarho_ec;
-    const Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
     auto& etarho_cc_p = etarho_cc;
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            Real ncell_lev = ncell[n];
             const int lo = r_start_coord(n,i);
             const int hi = r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_ec_p(n,r) = etarhosum_p[n+max_lev*r] / ncell_lev;
+                etarho_ec_p(n,r) = etarhosum(n,r) / Real(ncell(n));
             });
         }
     }

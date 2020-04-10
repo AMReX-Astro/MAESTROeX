@@ -610,8 +610,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
                 // interpolate s to radial edges
 
                 // need a vector to store intermediate values
-                RealVector sedget_vec(nr_fine+1);
-                Real * AMREX_RESTRICT sedget = sedget_vec.dataPtr();
+                BaseState<Real> sedget(nr_fine+1);
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
                     int r = j + lo;
@@ -649,22 +648,22 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
 
                     if (r == 0) {
                         // 2nd order interpolation to boundary face
-                        sedget[r] = s(n,r) - 0.5*dsvr;
+                        sedget(r) = s(n,r) - 0.5*dsvr;
                     } else if (r == nr_lev) {
                         // 2nd order interpolation to boundary face
-                        sedget[r] = s(n,r-1) + 0.5*dsvr;
+                        sedget(r) = s(n,r-1) + 0.5*dsvr;
                     } else if (r > 0 && r < nr_lev) {
                         // 4th order interpolation of s to radial faces
-                        sedget[r] = 0.5*(s(n,r)+s(n,r-1)) - (dsvr-dsvl)/6.0;
+                        sedget(r) = 0.5*(s(n,r)+s(n,r-1)) - (dsvr-dsvl)/6.0;
                         if (r >= 2 && r <= nr_lev-2) {
                             // limit sedge
-                            if ((sedget[r]-s(n,r-1))*(s(n,r)-sedget[r]) < 0.0) {
-                                Real D2  = 3.0*(s(n,r-1)-2.0*sedget[r]+s(n,r));
+                            if ((sedget(r)-s(n,r-1))*(s(n,r)-sedget(r)) < 0.0) {
+                                Real D2  = 3.0*(s(n,r-1)-2.0*sedget(r)+s(n,r));
                                 Real D2L = s(n,r-2) - 2.0*s(n,r-1) + s(n,r);
                                 Real D2R = s(n,r-1) - 2.0*s(n,r) + s(n,r+1);
                                 Real sgn = copysign(1.0,D2);
                                 Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                                sedget[r] = 0.5*(s(n,r-1)+s(n,r)) - D2LIM/6.0;
+                                sedget(r) = 0.5*(s(n,r-1)+s(n,r)) - D2LIM/6.0;
                             }
                         }
                     }
@@ -687,8 +686,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
 
                     if (r >= 2 && r <= nr_lev-3) {
 
-                        Real alphap = sedget[r+1] - s(n,r);
-                        Real alpham = sedget[r] - s(n,r);
+                        Real alphap = sedget(r+1) - s(n,r);
+                        Real alpham = sedget(r) - s(n,r);
                         bool bigp = fabs(alphap) > 2.0*fabs(alpham);
                         bool bigm = fabs(alpham) > 2.0*fabs(alphap);
                         bool extremum = false;
@@ -700,8 +699,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
                             // centered values for a change in copysign in the differences adjacent to
                             // the cell. We use the pair of differences whose minimum magnitude is
                             // the largest, and thus least susceptible to sensitivity to roundoff.
-                            Real dafacem = sedget[r] - sedget[r-1];
-                            Real dafacep = sedget[r+2] - sedget[r+1];
+                            Real dafacem = sedget(r) - sedget(r-1);
+                            Real dafacep = sedget(r+2) - sedget(r+1);
                             Real dabarm = s(n,r) - s(n,r-1);
                             Real dabarp = s(n,r+1) - s(n,r);
                             Real dafacemin = min(fabs(dafacem), fabs(dafacep));
@@ -759,8 +758,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
                         sp = s(n,r) + alphap;
 
                     } else {
-                        sp = sedget[r+1];
-                        sm = sedget[r];
+                        sp = sedget(r+1);
+                        sm = sedget(r);
                     } // test (r >= 2 && r <= nr-3)
 
                     // compute Ip and Im
