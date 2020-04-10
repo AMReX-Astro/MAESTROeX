@@ -6,6 +6,7 @@
 #include <MaestroUtil.H>
 #include <state_indices.H>
 #include <network_properties.H>
+#include <BaseState.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.

@@ -912,7 +912,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         if (index < nr_fine_loc) {
                             w0_cart_val = rfac * w0_p(0,index+1) + (1.0-rfac) * w0_p(0,index);
                         } else {
-                            w0_cart_val = w0_p(nr_fine_loc);
+                            w0_cart_val = w0_p(0,nr_fine_loc);
                         }
                     } else {
                         if (index <= 0) {

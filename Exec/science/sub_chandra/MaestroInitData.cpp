@@ -79,7 +79,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     // initialize temperature 
     for (auto l = 0; l <= max_radial_level; ++l) {
         for (auto r = 0; r < nr_fine; ++r) {
-            temp_vec(l,r) = s0_init(lev,r,Temp);
+            temp_vec(l,r) = s0_init(l,r,Temp);
         }
     }
 
@@ -92,7 +92,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
         for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++n) {
+            for (auto r = 0; r < nr_fine; ++r) {
                 temp_vec(l,r) = s0_init(l,r,FirstSpec+comp);
             }
         }

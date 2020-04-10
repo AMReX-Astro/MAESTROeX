@@ -179,8 +179,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge,
             Real Im = w0_p(0,i) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // // compute sedgel and sedger
-            sedgel(i+1) = Ip + dth*force(r);
-            sedger(i) = Im + dth*force(r);
+            sedgel(i+1) = Ip + dth*force(i);
+            sedger(i) = Im + dth*force(i);
         });
     } else if (ppm_type == 2) {
 
@@ -294,8 +294,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge,
             Real Im = w0_p(0,r) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s[r];
 
             // // compute sedgel and sedger
-            sedgel(r+1) = Ip + dth*force(r);
-            sedger(r) = Im + dth*force(r);
+            sedgel(r+1) = Ip + dth*force(i);
+            sedger(r) = Im + dth*force(i);
         });
     }
 
@@ -1030,13 +1030,12 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real Im = w0_p(0,r) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
 
             // // compute sedgel and sedger
-            sedgel(i+1) = Ip + dth*force(r);
-            sedger(i) = Im + dth*force(r);
+            sedgel(i+1) = Ip + dth*force(i);
+            sedger(i) = Im + dth*force(i);
         });
     } else if (ppm_type == 2) {
 
         AMREX_PARALLEL_FOR_1D(nr_fine, i, {
-            int r = i * max_lev;
             // interpolate s to radial edges, store these temporary values into sedgel
 
             // this will hold values at r-1, r, r+1 and r+2
@@ -1136,17 +1135,17 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real sp = s_ghost(g) + alphap;
 
             // compute Ip and Im
-            Real sigmap = fabs(w0_p(0,r+1))*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0_p(0,r))*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
-            Real s6 = 6.0*s(0,r) - 3.0*(sm+sp);
+            Real sigmap = fabs(w0_p(0,i+1))*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p(0,i))*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real s6 = 6.0*s(0,i) - 3.0*(sm+sp);
             
-            Real Ip = w0_p(0,r+1) > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
+            Real Ip = w0_p(0,i+1) > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,i);
 
-            Real Im = w0_p(0,r) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
+            Real Im = w0_p(0,i) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,i);
 
             // // compute sedgel and sedger
-            sedgel(r+1) = Ip + dth*force(r);
-            sedger(r) = Im + dth*force(r);
+            sedgel(i+1) = Ip + dth*force(i);
+            sedger(i) = Im + dth*force(i);
         });
     }
 

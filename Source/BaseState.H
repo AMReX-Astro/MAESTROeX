@@ -206,7 +206,7 @@ BaseState<T>::define(const int num_levs, const int length, const int ncomp)
     len = length;
     nvar = ncomp;
 
-    base_data.resize(nlev*len*nvar);
+    base_data.resize(nlev*length*nvar);
     base_data.shrink_to_fit();
     dptr = base_data.dataPtr();
 }

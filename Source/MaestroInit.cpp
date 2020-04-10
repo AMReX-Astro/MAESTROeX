@@ -236,6 +236,9 @@ Maestro::InitData ()
     Print() << "initdata model_File = " << model_file << std::endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
+    s0_init.setVal(0.0);
+    p0_init.setVal(0.0);
+
     for (auto lev = 0; lev <= max_radial_level; ++lev) {
         InitBaseState(rho0_old, rhoh0_old, 
                       p0_old, lev);
@@ -352,24 +355,16 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     const Real* dx = geom[lev].CellSize();
     const Real* dx_fine = geom[max_level].CellSize();
 
-    MultiFab& scal = sold[lev];
-    MultiFab& vel = uold[lev];
-    MultiFab& cc_to_r = cell_cc_to_r[lev];
-
     if (!spherical) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
-            const Box& tilebox = mfi.tilebox();
-            const int* lo  = tilebox.loVect();
-            const int* hi  = tilebox.hiVect();
-
-            const Array4<Real> scal_arr = scal.array(mfi);
-            const Array4<Real> vel_arr = vel.array(mfi);
+            const Array4<Real> scal_arr = sold[lev].array(mfi);
+            const Array4<Real> vel_arr = uold[lev].array(mfi);
 
             InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
         }
@@ -380,7 +375,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+        for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
             const Box& tilebox = mfi.tilebox();
             const int* lo  = tilebox.loVect();
@@ -393,7 +388,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
             InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
         }
 
-        InitLevelDataSphr(lev, t_old, scal, vel);
+        InitLevelDataSphr(lev, t_old, sold[lev], uold[lev]);
 #endif        
     }
 
