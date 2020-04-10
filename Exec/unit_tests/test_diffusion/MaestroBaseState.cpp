@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -54,10 +54,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < nr_fine; ++i) {
         rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
+        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
         tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
         tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+        p0(lev,) = p0_init[lev+max_lev*i];
     }
 
     // initialize any inlet BC parameters

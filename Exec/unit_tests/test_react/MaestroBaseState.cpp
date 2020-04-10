@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -18,10 +18,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             s0_init[lev+max_lev*(i+nr_fine*n)] = 0.0;
         }
         rho0[lev+max_lev*i] = 0.0;
-        rhoh0[lev+max_lev*i] = 0.0;
+        rhoh0(lev,i) = 0.0;
         tempbar[lev+max_lev*i] = 0.0;
         tempbar_init[lev+max_lev*i] = 0.0;
-        p0[lev+max_lev*i] = 0.0;
+        p0(lev,i) = 0.0;
         p0_init[lev+max_lev*i] = 0.0;
     }
 
