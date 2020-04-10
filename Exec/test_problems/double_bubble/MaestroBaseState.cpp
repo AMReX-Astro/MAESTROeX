@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -46,7 +46,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     Real gamma_const = pres_base / (dens_base * eos_state.e) + 1.0;
 
-    p0_init[lev] = pres_base;
+    p0_init(lev,0) = pres_base;
     s0_init[lev+max_lev*nr_fine*Rho] = dens_base;
     s0_init[lev+max_lev*nr_fine*RhoH] = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -80,14 +80,14 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         s0_init[lev+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init[lev+max_lev*r] = p0_init[lev+max_lev*(r-1)] - dr[n] * 0.5 *
+        p0_init(lev,r) = p0_init(lev,r-1) - dr[n] * 0.5 *
             (s0_init[lev+max_lev*(r+nr_fine*Rho)] + 
              s0_init[lev+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.T     = temp_zone;
         eos_state.rho   = dens_zone;
-        eos_state.p     = p0_init[lev+max_lev*r];
+        eos_state.p     = p0_init(lev,r);
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = xn_zone[comp];
         }
@@ -106,11 +106,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
+        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
+        tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        p0(lev,i) = p0_init(lev,i);
     }
 
     Real min_temp = 1.e99;
@@ -132,7 +132,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
         Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr[n];
 
-        Real dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)]) / dr[n];
+        Real dpdr = (p0_init(n,r) - p0_init(n,r-1)) / dr[n];
         Real rhog = 0.5*(s0_init[n+max_lev*(r+nr_fine*Rho)] + 
                          s0_init[n+max_lev*(r-1+nr_fine*Rho)])*grav_const;
 

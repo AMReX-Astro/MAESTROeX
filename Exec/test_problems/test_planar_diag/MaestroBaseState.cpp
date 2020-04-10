@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -41,13 +41,13 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     const Real z0 = 0.5*dr[n]; // generic "z", actually 2d/3d agnostic
 
     // set p0 and rho0 based on analytical value at the cc coord
-    p0_init[n] = pres_base * exp(-z0/H);
+    p0_init(n,0) = pres_base * exp(-z0/H);
     s0_init[n+max_lev*nr_fine*Rho] = dens_base * exp(-z0/H);
 
     eos_t eos_state;
 
     // use eos call to be consistent
-    eos_state.p = p0_init[n];
+    eos_state.p = p0_init(n,0);
     eos_state.rho = s0_init[n+max_lev*nr_fine*Rho];
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = xn_zone[comp];
@@ -73,11 +73,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - dr[n] * 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
+        p0_init(n,r) = p0_init(n,r-1) - dr[n] * 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.rho   = dens_zone;
-        eos_state.p     = p0_init[n+max_lev*r];
+        eos_state.p     = p0_init(n,r);
         eos_state.T     = 1000.0; // guess
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = xn_zone[comp];
@@ -96,11 +96,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
+        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
+        tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        p0(lev,i) = p0_init(lev,i);
     }
 
     // initialize any inlet BC parameters
