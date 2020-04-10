@@ -68,11 +68,8 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         for (auto n = 0; n <= max_radial_level; ++n) {
             for (auto i = 0; i < nr(n); ++i) {
                 r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
-
-                r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
             }
             for (auto i = 0; i <= nr(n); ++i) {
-                r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
                 r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
             }
         }
@@ -85,21 +82,16 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
             // nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
                 r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
-                r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
             }
             r_edge_loc_b(0,0) = 0.0;
-            r_edge_loc_b(0,0) = 0.0;
             for (auto i = 0; i < nr_fine; ++i) {
-                r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
                 r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
             }
         } else {
             for (auto i = 0; i < nr_fine; ++i) {
                 r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
-                r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
             }
             for (auto i = 0; i <= nr_fine; ++i) {
-                r_edge_loc_b(0,i) = Real(i)*dr(0);
                 r_edge_loc_b(0,i) = Real(i)*dr(0);
             }
         }
@@ -363,7 +355,7 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
         for (auto r = 0; r < nr(n-1); ++r) {
             if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
                 chunk_start = true;
-                nchunks++;
+                nchunks += 1;
             } else if (tag_array[n-1 + max_lev*r] == 0 && chunk_start) {
                 chunk_start = false;
             }
@@ -392,9 +384,9 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
             for (auto r = 0; r < nr(n-1); ++r) {
                 if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
                     chunk_start = true;
-                    numdisjointchunks(n)++;
+                    numdisjointchunks(n) += 1;
                     r_start_coord(n,numdisjointchunks(n)) = 2*r;
-                } else if (tag_array[n-1+max_lev*r]==0 && chunk_start) {
+                } else if (tag_array[n-1+max_lev*r] == 0 && chunk_start) {
                     r_end_coord(n, numdisjointchunks(n)) = 2*r-1;
                     chunk_start = false;
                 } else if (r==nr(n-1)-1 && chunk_start) {
