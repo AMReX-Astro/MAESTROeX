@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -46,13 +46,13 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     Real gamma_const = pres_base / (dens_base * eos_state.e) + 1.0;
 
-    p0_init[lev] = pres_base;
-    s0_init[lev+max_lev*nr_fine*Rho] = dens_base;
-    s0_init[lev+max_lev*nr_fine*RhoH] = dens_base * eos_state.h;
+    p0_init(lev,0) = pres_base;
+    s0_init(lev,0,Rho) = dens_base;
+    s0_init(lev,0,RhoH) = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        s0_init[lev+max_lev*nr_fine*(FirstSpec+comp)] = dens_base * xn_zone[comp];
+        s0_init(n,0,FirstSpec+comp) = dens_base * xn_zone[comp];
     }
-    s0_init[lev+max_lev*nr_fine*Temp] = eos_state.T;
+    s0_init(n,0,Temp) = eos_state.T;
 
     Real z0 = 0.5 * dr[n];
 
@@ -80,14 +80,14 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         s0_init[lev+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init[lev+max_lev*r] = p0_init[lev+max_lev*(r-1)] - dr[n] * 0.5 *
-            (s0_init[lev+max_lev*(r+nr_fine*Rho)] + 
-             s0_init[lev+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
+        p0_init(lev,r) = p0_init(lev,r-1) - dr[n] * 0.5 *
+            (s0_init(n,r,Rho) + 
+             s0_init(n,r-1,Rho)) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.T     = temp_zone;
         eos_state.rho   = dens_zone;
-        eos_state.p     = p0_init[lev+max_lev*r];
+        eos_state.p     = p0_init(lev,r);
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = xn_zone[comp];
         }
@@ -95,27 +95,27 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = dens_zone * eos_state.h;
+        s0_init(lev,r,Rho) = dens_zone;
+        s0_init(lev,r,RhoH) = dens_zone * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init(n,r,FirstSpec+comp) = 
                 dens_zone * xn_zone[comp];
         }
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init(lev,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+    for (auto r = 0; r < nr_fine; ++r) {
+        rho0(lev,r) = s0_init(lev,r,Rho);
+        rhoh0(lev,r) = s0_init(lev,r,RhoH);
+        tempbar(lev,r) = s0_init(lev,r,Temp);
+        tempbar_init(lev,r) = s0_init(lev,r,Temp);
+        p0(lev,r) = p0_init(lev,r);
     }
 
     Real min_temp = 1.e99;
-    for (auto i = 0; i < nr_fine; ++i) {
-        min_temp = min(min_temp, s0_init[lev+max_lev*(i+nr_fine*Temp)]);
+    for (auto r = 0; r < nr_fine; ++r) {
+        min_temp = min(min_temp, s0_init(lev,r,Temp));
     }
 
     if (min_temp < small_temp) {
@@ -132,9 +132,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
         Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr[n];
 
-        Real dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)]) / dr[n];
-        Real rhog = 0.5*(s0_init[n+max_lev*(r+nr_fine*Rho)] + 
-                         s0_init[n+max_lev*(r-1+nr_fine*Rho)])*grav_const;
+        Real dpdr = (p0_init(n,r) - p0_init(n,r-1)) / dr[n];
+        Real rhog = 0.5*(s0_init(lev,r,Rho) + 
+                         s0_init(lev,r-1,Rho))*grav_const;
 
         max_hse_error = max(max_hse_error, fabs(dpdr - rhog)/fabs(dpdr));
     }

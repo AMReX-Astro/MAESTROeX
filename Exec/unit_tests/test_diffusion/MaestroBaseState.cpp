@@ -4,14 +4,13 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
-
-    const int max_lev = max_radial_level + 1;
+    
     const int n = lev;
     
     // get species indices
@@ -41,23 +40,23 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
    
     for (auto r = 0; r < nr[n]; ++r) {
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
+        s0_init(n,r,Rho)= eos_state.rho;
+        s0_init(n,r,RhoH) = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init(n,r,FirstSpec+comp) = 
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init[n+max_lev*r] = eos_state.p;
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        p0_init(n,r) = eos_state.p;
+        s0_init(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+    for (auto r = 0; r < nr_fine; ++r) {
+        rho0(lev,r) = s0_init(lev,r,Rho);
+        rhoh0(lev,r) = s0_init(lev,r,RhoH);
+        tempbar(lev,r) = s0_init(lev,r,Temp);
+        tempbar_init(lev,r) = s0_init(lev,r,Temp);
+        p0(lev,r) = p0_init(lev,r);
     }
 
     // initialize any inlet BC parameters

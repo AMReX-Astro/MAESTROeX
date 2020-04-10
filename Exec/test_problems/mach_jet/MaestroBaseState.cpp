@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -15,7 +15,6 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         Abort("ERROR: mach_jet base_state is not valid for spherical");
     }
 
-    const int max_lev = max_radial_level + 1;
     const int n = lev;
 
     Print() << "cutoff densities:" << std::endl;
@@ -38,7 +37,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         RealVector xn_zone(NumSpec, 0.0);
         xn_zone[0] = 1.0;
 
-        p0_init[n] = pres_zone;
+        p0_init(n,0) = pres_zone;
 
         // H = pres_base / dens_base / abs(grav_const)
         Real H = 1.e6 / 1.e-3 / fabs(grav_const);
@@ -61,19 +60,19 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
                 dens_zone = 1.e-3 * exp(-z/H);
             }
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
+            s0_init(n,r,Rho) = dens_zone;
 
             if (r == 0) {
-                p0_init[n+max_lev*r] -= dr[n] * 0.5 * 
-                    s0_init[n+max_lev*(r+nr_fine*Rho)] * fabs(grav_const);
+                p0_init(n,r) -= dr[n] * 0.5 * 
+                    s0_init(n,r,Rho) * fabs(grav_const);
             } else {
-                p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - dr[n] * 
-                    0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + 
-                           s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * 
+                p0_init(n,r) = p0_init(n,r-1) - dr[n] * 
+                    0.5 * (s0_init(n,r,Rho) + 
+                           s0_init(n,r-1,Rho)) * 
                     fabs(grav_const);
             }
 
-            pres_zone = p0_init[n+max_lev*r];
+            pres_zone = p0_init(n,r);
 
             // use the EOS to make the state consistent
             eos_state.T     = temp_zone;
@@ -86,15 +85,14 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             // (rho,p) --> T, h
             eos(eos_input_rp, eos_state);
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
-            s0_init[n+max_lev*(r+nr_fine*RhoH)] = dens_zone * eos_state.h;
-            for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 0.0;
+            s0_init(n,r,Rho) = dens_zone;
+            s0_init(n,r,RhoH) = dens_zone * eos_state.h;
+            for (auto comp = 1; comp < NumSpec; ++comp) {
+                s0_init(n,r,FirstSpec+comp) = 0.0;
             }
-            s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = dens_zone;
-            s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+            s0_init(n,r,FirstSpec) = dens_zone;
+            s0_init(n,r,Temp) = eos_state.T;
         }
-
     } else {
         eos_t eos_state;
         
@@ -110,22 +108,22 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
         for (auto r = 0; r < nr[n]; ++r) {
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-            s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
-	    s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = eos_state.rho;
-            s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+            s0_init(lev,r,Rho)= eos_state.rho;
+            s0_init(lev,r,RhoH) = eos_state.rho * eos_state.h;
+            s0_init(n,r,FirstSpec) = eos_state.rho;
+            s0_init(n,r,Temp) = eos_state.T;
 
-            p0_init[n+max_lev*r] = eos_state.p;
+            p0_init(n,r) = eos_state.p;
         }
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+    for (auto r = 0; r < nr_fine; ++r) {
+        rho0(lev,r) = s0_init(lev,r,Rho);
+        rhoh0(lev,r) = s0_init(lev,r,RhoH);
+        tempbar(lev,r) = s0_init(lev,r,Temp);
+        tempbar_init(lev,r) = s0_init(lev,r,Temp);
+        p0(lev,r) = p0_init(lev,r);
     }
 
     // initialize any inlet BC parameters

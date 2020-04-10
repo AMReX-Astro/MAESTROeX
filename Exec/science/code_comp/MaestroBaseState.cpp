@@ -9,8 +9,8 @@ auto set_species(Real y);
 auto grav_zone(Real y);
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -149,11 +149,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init(n,i,Rho);
-        rhoh0[lev+max_lev*i] = s0_init(n,i,RhoH);
-        tempbar[lev+max_lev*i] = s0_init(n,i,Temp);
-        tempbar_init[lev+max_lev*i] = s0_init(n,i,Temp);
-        p0[lev+max_lev*i] = p0_init(lev,i);
+        rho0(lev,i) = s0_init(lev,i,Rho);
+        rhoh0(lev,i) = s0_init(lev,i,RhoH);
+        tempbar(lev,i) = s0_init(lev,i,Temp);
+        tempbar_init(lev,i) = s0_init(lev,i,Temp);
+        p0(lev,i) = p0_init(lev,i);
     }
 
     // initialize any inlet BC parameters
