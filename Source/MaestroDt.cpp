@@ -80,16 +80,15 @@ Maestro::EstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
-    gp0.shrink_to_fit();
-    std::fill(gp0.begin(),gp0.end(), 0.);
+    BaseState<Real> gp0(max_radial_level+1, nr_fine+1);
+    gp0.setVal(0.);
 
     // divU constraint
     if (spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
       
-    Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
+    Put1dArrayOnCart (gp0, gp0_cart, 1, 1,  bcs_f,0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -435,16 +434,15 @@ Maestro::FirstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
-    gp0.shrink_to_fit();
-    std::fill(gp0.begin(),gp0.end(), 0.);
+    BaseState<Real> gp0(max_radial_level+1, nr_fine+1);
+    gp0.setVal(0.);
 
     // divU constraint
     if (use_divu_firstdt && spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
-    Put1dArrayOnCart(gp0,gp0_cart,1,1,bcs_f,0);
+    Put1dArrayOnCart(gp0, gp0_cart, 1, 1, bcs_f, 0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -682,12 +680,9 @@ Maestro::FirstDt ()
 
 
 void
-Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0, 
+Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0, 
                     const BaseState<Real>& gamma1bar)
 {
-    const int max_lev = max_radial_level + 1;
-
-    Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
     const auto& r_cc_loc_p = r_cc_loc;
 
     // spherical divU constraint
@@ -697,7 +692,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
 
-            gp0[max_lev*r] = (p0(0,r) - p0(0,r-1)) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
+            gp0(0,r) = (p0(0,r) - p0(0,r-1)) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
         const auto dr0 = dr[0];
@@ -706,10 +701,10 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
 
-            gp0[max_lev*r] = (p0(0,r) - p0(0,r-1)) / dr0 / gamma1bar_p_avg;
+            gp0(0,r) = (p0(0,r) - p0(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
 
-    gp0_vec[max_lev*nr_fine] = gp0_vec[max_lev*(nr_fine-1)];
-    gp0_vec[0] = gp0_vec[max_lev];
+    gp0(0,nr_fine) = gp0(0,nr_fine-1);
+    gp0(0,0) = gp0(0,1);
 }

@@ -136,12 +136,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             }           
         }
 
-        RestrictBase(phisum, true);
-        FillGhostBase(phisum, true);
-
-        // swap pointers so phibar contains the computed average
         BaseState<Real> phisum_b(max_radial_level+1, nr_fine);
         phisum_b.copy(phisum);
+        RestrictBase(phisum_b, true);
+        FillGhostBase(phisum_b, true);
+
+        // swap pointers so phibar contains the computed average
         phisum_b.swap(phibar);
     } else {
         // spherical case with even base state spacing

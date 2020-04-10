@@ -343,12 +343,6 @@ public:
     ////////////
     // MaestroCelltoEdge.cpp functions
 
-    void CelltoEdge(const RealVector& s0_cell_vec, 
-                    RealVector& s0_edge_vec);
-
-    void CelltoEdge(const RealVector& s0_cell_vec, 
-                    BaseState<amrex::Real>& s0_edge);
-
     void CelltoEdge(const BaseState<amrex::Real>& s0_cell_vec, 
                     BaseState<amrex::Real>& s0_edge);
 
@@ -380,11 +374,6 @@ public:
     /// @param bcs_in   boundary conditions
     /// @param flag     determines whether base state is subtracted (true) or added (false)
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
-                        const RealVector& s0,
-                        int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
-                        bool flag);
-    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
@@ -402,11 +391,6 @@ public:
     /// @param bccomp   component of `bcs_in` to use to enforce boundary conditions
     /// @param bcs_in   boundary conditions
     /// @param flag     determines whether base state is subtracted (true) or added (false)
-    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
-                        const RealVector& s0,
-                        int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
-                        bool flag);
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
@@ -499,7 +483,8 @@ public:
     ////////////
 
     ////////////
-    // Time step computation in `MaestroDt.cpp`
+    // MaestroDt.cpp functions
+    // Time step computation 
 
     /// Compute the time step
     void EstDt ();
@@ -507,7 +492,7 @@ public:
     /// Compute initial time step
     void FirstDt ();
 
-    void EstDt_Divu(RealVector& gp0_vec, const BaseState<amrex::Real>& p0, 
+    void EstDt_Divu(BaseState<amrex::Real>& gp0_vec, const BaseState<amrex::Real>& p0, 
                     const BaseState<amrex::Real>& gamma1bar);
 
     // end MaestroDt.cpp functions
@@ -639,13 +624,6 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const RealVector& s0,
-                           amrex::Vector<amrex::MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           const int sbccomp = 0, int variable_type=0);
-
     void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -662,28 +640,6 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const int level, const RealVector& s0,
-                           amrex::Vector<amrex::MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
-
-       /// Maps 1d arrays onto multi-D cartesian MultiFabs
-    ///
-    /// @param level        AMR level to perform calculation on
-    /// @param s0           1d base state
-    /// @param s0_cart      base state mapped to multi-d cartesian MultiFab
-    /// @param is_input_edge_centered   is the input edge-centered?
-    /// @param is_output_a_vector       is the output a vector?
-    /// @param bcs          boundary conditions
-    /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const int level, const RealVector& s0,
-                           amrex::MultiFab& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
     void Put1dArrayOnCart (const int level, const BaseState<amrex::Real>& s0,
                            amrex::MultiFab& s0_cart,
                            const int is_input_edge_centered,
@@ -719,9 +675,6 @@ public:
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
     /// MAC-project the base state scalar `s0`
-    void MakeS0mac (const RealVector& s0,
-                    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
-
     void MakeS0mac (const BaseState<amrex::Real>& s0,
                     amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
@@ -1062,14 +1015,6 @@ public:
 
     ////////////
     // MaestroMakeEdgeState.cpp functions
-    void MakeEdgeState1d(RealVector& s, BaseState<amrex::Real>& sedge, 
-                         BaseState<amrex::Real>& force);
-
-    void MakeEdgeState1dSphr(RealVector& s, BaseState<amrex::Real>& sedge, 
-                             BaseState<amrex::Real>& force);
-
-    void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
-                               BaseState<amrex::Real>& force);
     void MakeEdgeState1d(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
                          BaseState<amrex::Real>& force);
 
