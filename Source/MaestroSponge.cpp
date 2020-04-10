@@ -29,7 +29,7 @@ Maestro::SpongeInit(const BaseState<Real>& rho0)
     if (!use_exact_base_state) {
         r_top += Real(r_end_coord(0,1)+1) * dr[0];
     } else {
-        r_top += r_edge_loc_b(0,nr_fine);
+        r_top += r_edge_loc(0,nr_fine);
     }
     r_sp = r_top;
 
@@ -56,7 +56,7 @@ Maestro::SpongeInit(const BaseState<Real>& rho0)
         // set r_sp;
         for (auto r = 0; r < nr_fine; ++r) {
             if (rho0(0,r) < sponge_start_density) {
-                r_sp = prob_lo_r + r_cc_loc_b(0,r);
+                r_sp = prob_lo_r + r_cc_loc(0,r);
                 break;
             }
         }
@@ -65,7 +65,7 @@ Maestro::SpongeInit(const BaseState<Real>& rho0)
         r_md = r_top;
         for (auto r = 0; r < nr_fine; ++r) {
             if (rho0(0,r) < sponge_center_density) {
-                r_md = prob_lo_r +r_cc_loc_b(0,r);
+                r_md = prob_lo_r +r_cc_loc(0,r);
                 break;
             }
         }
@@ -80,7 +80,7 @@ Maestro::SpongeInit(const BaseState<Real>& rho0)
         if (!use_exact_base_state) {
             r_tp_outer = r_sp_outer + 4.0 * drdxfac * dr[0];
         } else {
-            r_tp_outer = r_sp_outer + 4.0 * 2.0/std::sqrt(3) * r_cc_loc_b(0,0);
+            r_tp_outer = r_sp_outer + 4.0 * 2.0/std::sqrt(3) * r_cc_loc(0,0);
         }
     }
 

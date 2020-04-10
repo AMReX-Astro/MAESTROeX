@@ -45,10 +45,10 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // convert Utilde^* to beta0*Utilde^*
     int mult_or_div;
-    if (spherical == 0) {
+    if (!spherical) {
         mult_or_div = 1;
         MultFacesByBeta0(umac, beta0, beta0_edge, mult_or_div);
-    } else {     // spherical == 1
+    } else {     // spherical
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
                 MultiFab::Multiply(umac[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);
@@ -104,13 +104,13 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     AverageDownFaces(face_bcoef);
 
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
-    if (spherical == 0) {
+    if (!spherical) {
         mult_or_div = 1;
         MultFacesByBeta0(face_bcoef, beta0, beta0_edge, mult_or_div);
         if (use_alt_energy_fix) {
             MultFacesByBeta0(face_bcoef,  beta0,beta0_edge, mult_or_div);
         }
-    } else {     //spherical == 1
+    } else {     //spherical
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
                 MultiFab::Multiply(face_bcoef[lev][idim],beta0_cart_edge[lev][idim],0,0,1,0);

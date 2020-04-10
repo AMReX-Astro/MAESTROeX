@@ -39,8 +39,8 @@ Maestro::EnforceHSE(const BaseState<Real>& rho0,
     if (use_exact_base_state && spherical) {
         for (auto r = 1; r <= min(r_end_coord(0,1),base_cutoff_density_coord(0)); ++r) {
             // uneven grid spacing
-            Real dr1 = r_edge_loc_b(0,r)-r_cc_loc_b(0,r-1);
-            Real dr2 = r_cc_loc_b(0,r)-r_edge_loc_b(0,r);
+            Real dr1 = r_edge_loc(0,r)-r_cc_loc(0,r-1);
+            Real dr2 = r_cc_loc(0,r)-r_edge_loc(0,r);
             p0(0,r) = p0(0,r-1) + (dr1*rho0(0,r-1) + 
                 dr2*rho0(0,r))*grav_edge(0,r);
         }

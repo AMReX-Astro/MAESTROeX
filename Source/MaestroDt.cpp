@@ -40,7 +40,7 @@ Maestro::EstDt ()
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
@@ -85,7 +85,7 @@ Maestro::EstDt ()
     std::fill(gp0.begin(),gp0.end(), 0.);
 
     // divU constraint
-    if (spherical == 1) {
+    if (spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
       
@@ -139,7 +139,7 @@ Maestro::EstDt ()
 
                 const Array4<Real> spd = tmp.array(mfi);
 
-                if (spherical == 0) {
+                if (!spherical) {
 
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
@@ -688,7 +688,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
     const int max_lev = max_radial_level + 1;
 
     Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
-    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
 
     // spherical divU constraint
     if (use_exact_base_state) {

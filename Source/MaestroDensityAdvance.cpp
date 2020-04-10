@@ -22,7 +22,7 @@ Maestro::DensityAdvance (int which_step,
     BaseState<Real> rho0_edge_old(max_radial_level+1,nr_fine+1);
     BaseState<Real> rho0_edge_new(max_radial_level+1,nr_fine+1);
 
-    if (spherical == 0) {
+    if (!spherical) {
         // create edge-centered base state quantities.
         // Note: rho0_edge_{old,new}
         // contains edge-centered quantities created via spatial interpolation.
@@ -166,7 +166,7 @@ Maestro::DensityAdvance (int which_step,
     if (which_step == 1) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
                              rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
@@ -186,7 +186,7 @@ Maestro::DensityAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_new(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
                              rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
@@ -252,7 +252,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     BaseState<Real> rho0_edge_old(max_radial_level+1,nr_fine+1);
     BaseState<Real> rho0_edge_new(max_radial_level+1,nr_fine+1);
 
-    if (spherical == 0) {
+    if (!spherical) {
         // create edge-centered base state quantities.
         // Note: rho0_edge_{old,new}
         // contains edge-centered quantities created via spatial interpolation.
@@ -403,7 +403,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     if (which_step == 1) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
 
-        if (spherical == 1) {
+        if (spherical) {
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
                              rho0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,

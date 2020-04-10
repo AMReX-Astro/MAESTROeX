@@ -113,8 +113,8 @@ Maestro::Put1dArrayOnCart (const int lev,
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto center_p = center;
 
-    const auto r_edge_loc_p = r_edge_loc_b;
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto r_edge_loc_p = r_edge_loc;
+    const auto r_cc_loc_p = r_cc_loc;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
 
     const int max_lev = max_radial_level+1;
@@ -132,7 +132,7 @@ Maestro::Put1dArrayOnCart (const int lev,
 
         const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
 
-        if (spherical == 0) {
+        if (!spherical) {
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
 
@@ -403,8 +403,8 @@ Maestro::Put1dArrayOnCart (int lev,
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto& center_p = center;
 
-    const auto& r_edge_loc_p = r_edge_loc_b;
-    const auto& r_cc_loc_p = r_cc_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc;
+    const auto& r_cc_loc_p = r_cc_loc;
 
     const int max_lev = max_radial_level+1;
     const int nr_fine_loc = nr_fine;
@@ -721,7 +721,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
             const Array4<Real> wedge = u_edge[lev][2].array(mfi);
 #endif
             
-            if (spherical == 0) {
+            if (!spherical) {
 #if (AMREX_SPACEDIM == 2)
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
 
@@ -791,7 +791,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeW0mac()", MakeW0mac);
 
-    if (spherical == 0) {
+    if (!spherical) {
         Abort("Error: only call MakeW0mac for spherical");
     }
 
@@ -812,7 +812,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real drf = dr_fine;
     const auto& w0_p = w0;
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_edge_loc_p = r_edge_loc;
     const auto& center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -1046,7 +1046,7 @@ Maestro::MakeS0mac (const RealVector& s0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
 
-    if (spherical == 0) {
+    if (!spherical) {
         Abort("Error: only call MakeS0mac for spherical");
     }
 
@@ -1069,7 +1069,7 @@ Maestro::MakeS0mac (const RealVector& s0,
     const int max_lev = max_radial_level+1;
     const Real drf = dr_fine;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto r_cc_loc_p = r_cc_loc;
     const auto center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -1502,7 +1502,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
 
-    if (spherical == 0) {
+    if (!spherical) {
         Abort("Error: only call MakeS0mac for spherical");
     }
 
@@ -1524,7 +1524,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
     const int nr_fine_loc = nr_fine;
     const int max_lev = max_radial_level+1;
     const Real drf = dr_fine;
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto r_cc_loc_p = r_cc_loc;
     const auto center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {

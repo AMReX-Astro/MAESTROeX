@@ -14,7 +14,7 @@ Maestro::Evolve ()
     Print() << "Calling Evolve()" << std::endl;
 
     // check to make sure spherical is only used for 3d
-    if (spherical == 1 && AMREX_SPACEDIM != 3) {
+    if (spherical && AMREX_SPACEDIM != 3) {
         Abort ("spherical = 1 and dm != 3");
     }
 

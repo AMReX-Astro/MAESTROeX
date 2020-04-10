@@ -183,21 +183,6 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
-                       const RealVector& r0_edge_old,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
-                       const RealVector& r0_edge_new,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const RealVector& r0_predicted_edge,
-                       int start_comp, int num_comp);
-
-    void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
-                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                       amrex::Vector<amrex::MultiFab>& etarhoflux,
-                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                        const BaseState<amrex::Real>& r0_old,
                        const BaseState<amrex::Real>& rho0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
@@ -291,9 +276,6 @@ public:
     /// @param phibar   Averaged quantity
     /// @param comp     Index of component of `mf` to average
     void Average (const amrex::Vector<amrex::MultiFab>& mf,
-                  RealVector& phibar,
-                  int comp);
-    void Average (const amrex::Vector<amrex::MultiFab>& mf,
                   BaseState<amrex::Real>& phibar,
                   int comp);
 
@@ -325,9 +307,6 @@ public:
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
     void InitMultilevel(const int finest_radial_level_in);
-                               
-    void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
-    void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
     void RestrictBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
     void FillGhostBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
@@ -1126,12 +1105,6 @@ public:
     void MakeGravCell(BaseState<amrex::Real>& grav_cell, 
                       const BaseState<amrex::Real>& rho0);
 
-    void MakeGravEdge(RealVector& grav_edge, 
-                      const RealVector& rho0);
-
-    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
-                      const RealVector& rho0);
-
     void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
                       const BaseState<amrex::Real>& rho0);
 
@@ -1283,10 +1256,6 @@ public:
     void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 
                  const BaseState<amrex::Real>& c, const BaseState<amrex::Real>& r, 
                  BaseState<amrex::Real>& u, const int n);
-
-    void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
-
-    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<amrex::Real>& base_fine);
 
     void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
@@ -1524,9 +1493,6 @@ public:
     /// We copy the coarsest level only, interpolate to all
     /// the other levels and then copy the valid data from
     /// the old arrays onto the new.
-    void RegridBaseState(RealVector& base, const bool is_edge=false);
-
-
     void RegridBaseState(BaseState<amrex::Real>& base, const bool is_edge=false);
 
     /// Tag all cells for refinement
@@ -2055,18 +2021,16 @@ public:
     BaseState<amrex::Real> psi;
     BaseState<amrex::Real> grav_cell_old;
     BaseState<amrex::Real> grav_cell_new;
-    RealVector r_cc_loc;
-    BaseState<amrex::Real> r_cc_loc_b;
+    BaseState<amrex::Real> r_cc_loc;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     BaseState<amrex::Real> p0_nm1;
     BaseState<amrex::Real> beta0_nm1;
 
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
-    BaseState<Real> w0;
+    BaseState<amrex::Real> w0;
     BaseState<amrex::Real> etarho_ec;
-    RealVector r_edge_loc;
-    BaseState<amrex::Real> r_edge_loc_b;
+    BaseState<amrex::Real> r_edge_loc;
 
     // Information for the base state.
     // We also store these (except for the large arrays)

@@ -38,7 +38,7 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
     // compute center(:)
     if (octant) {
         for (auto i = 0; i < 3; ++i) {
-            if (!(spherical == 1 && AMREX_SPACEDIM == 3 && 
+            if (!(spherical && AMREX_SPACEDIM == 3 && 
                     probLo[i] == 0.0 ) ) {
                 Abort("ERROR: octant requires spherical with prob_lo = 0.0");
             }
@@ -55,7 +55,7 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
     dr(max_radial_level) = dr_fine;
 
     // computes dr, nr, r_cc_loc, r_edge_loc
-    if (spherical == 0) {
+    if (!spherical) {
         // cartesian case
 
         // compute nr(:) and dr(:) assuming refinement ratio = 2
@@ -67,13 +67,13 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
         // compute r_cc_loc, r_edge_loc
         for (auto n = 0; n <= max_radial_level; ++n) {
             for (auto i = 0; i < nr(n); ++i) {
-                r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
+                r_cc_loc(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
 
-                r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
+                r_cc_loc(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
             }
             for (auto i = 0; i <= nr(n); ++i) {
-                r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
-                r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
+                r_edge_loc(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
+                r_edge_loc(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
             }
         }
     } else {
@@ -84,23 +84,23 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
             const Real* dx_fine = geom[max_level].CellSize();
             // nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
-                r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
+                r_cc_loc(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
+                r_cc_loc(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
             }
-            r_edge_loc_b(0,0) = 0.0;
-            r_edge_loc_b(0,0) = 0.0;
+            r_edge_loc(0,0) = 0.0;
+            r_edge_loc(0,0) = 0.0;
             for (auto i = 0; i < nr_fine; ++i) {
-                r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
-                r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
+                r_edge_loc(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
+                r_edge_loc(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
             }
         } else {
             for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
-                r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
+                r_cc_loc(0,i) = (Real(i)+0.5)*dr(0);
+                r_cc_loc(0,i) = (Real(i)+0.5)*dr(0);
             }
             for (auto i = 0; i <= nr_fine; ++i) {
-                r_edge_loc_b(0,i) = Real(i)*dr(0);
-                r_edge_loc_b(0,i) = Real(i)*dr(0);
+                r_edge_loc(0,i) = Real(i)*dr(0);
+                r_edge_loc(0,i) = Real(i)*dr(0);
             }
         }
     }

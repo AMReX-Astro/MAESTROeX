@@ -92,8 +92,8 @@ Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge)
     const auto& rho0_old_p = rho0_old; 
     auto& rho0_new_p = rho0_new;
     const auto& w0_p = w0; 
-    const auto r_cc_loc_p = r_cc_loc_b;
-    const auto r_edge_loc_p = r_edge_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
+    const auto& r_edge_loc_p = r_edge_loc;
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         force(r) = -rho0_old_p(0,r) * (w0_p(0,r+1) - w0_p(0,r)) / dr0 - 
@@ -203,8 +203,8 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge)
     const auto& rhoh0_old_p = rhoh0_old; 
     auto& rhoh0_new_p = rhoh0_new;
     const auto& w0_p = w0; 
-    const auto& r_cc_loc_p = r_cc_loc_b;
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
+    const auto& r_edge_loc_p = r_edge_loc;
     const auto& psi_p = psi; 
 
     AMREX_PARALLEL_FOR_1D(nr_fine, r, {

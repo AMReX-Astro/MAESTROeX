@@ -33,14 +33,14 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     if (spherical) {
         if (use_delta_gamma1_term) {
-            Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
+            Real dr_loc = r_cc_loc(0,1) - r_cc_loc(0,0);
             gradp0(0,0) = (p0(0,1) - p0(0,0)) / dr_loc;
 
-            dr_loc = r_cc_loc_b(0,nr_fine-1) - r_cc_loc_b(0,nr_fine-2);
+            dr_loc = r_cc_loc(0,nr_fine-1) - r_cc_loc(0,nr_fine-2);
             gradp0(0,nr_fine-1) = (p0(0,nr_fine-1) - p0(0,nr_fine-2)) / dr_loc;
 
             for (int r=1; r < nr_fine-1; r++) {
-                dr_loc = r_cc_loc_b(0,r+1) - r_cc_loc_b(0,r-1);
+                dr_loc = r_cc_loc(0,r+1) - r_cc_loc(0,r-1);
                 gradp0(0,r) = (p0(0,r+1) - p0(0,r-1)) / dr_loc;
             }
         }

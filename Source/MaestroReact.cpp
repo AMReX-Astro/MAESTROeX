@@ -233,7 +233,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
             // lo/hi coordinates (including ghost cells), and/or the # of components
             // We will also pass "validBox", which specifies the "valid" region.
-            if (spherical == 1) {
+            if (spherical) {
 #pragma gpu box(tileBox)
                 burner_loop_sphr(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                                  BL_TO_FORTRAN_ANYD(s_in_mf[mfi]),

@@ -104,7 +104,6 @@ Maestro::Init ()
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
     ComputeCutoffCoords(rho0_old);
@@ -259,7 +258,6 @@ Maestro::InitData ()
 
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
     // average down data and fill ghost cells
@@ -352,9 +350,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         cell_cc_to_r[lev].define(ba, dm, 1, 0);
     }
 
-    const Real* dx = geom[lev].CellSize();
-    const Real* dx_fine = geom[max_level].CellSize();
-
     if (!spherical) {
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -377,14 +372,6 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #endif
         for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
         {
-            const Box& tilebox = mfi.tilebox();
-            const int* lo  = tilebox.loVect();
-            const int* hi  = tilebox.hiVect();
-            init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi), 
-                                     BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-                                     ZFILL(dx_fine),
-                                     ZFILL(dx));
-
             InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
         }
 

@@ -279,7 +279,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
             const Array4<const Real> sponge_arr = sponge[lev].array(mfi);
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
-            if (spherical == 0) {
+            if (!spherical) {
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     // create cell-centered Utilde

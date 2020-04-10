@@ -160,7 +160,7 @@ Maestro::WritePlotFile (const int step,
             BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
 
             for (int i=0; i<nr(lev); ++i) {
-                BaseCCFile << r_cc_loc_b(lev,i) << " "
+                BaseCCFile << r_cc_loc(lev,i) << " "
                            << rho0_in(lev,i) << " "
                            << rhoh0_in(lev,i) << " "
                            << p0_in(lev,i) << " "
@@ -191,7 +191,7 @@ Maestro::WritePlotFile (const int step,
             BaseFCFile << "r_edge  w0 \n";
 
             for (int i = 0; i <= nr(lev); ++i) {
-                BaseFCFile << r_edge_loc_b(lev,i) << " "
+                BaseFCFile << r_edge_loc(lev,i) << " "
                            << w0(lev,i) << "\n";
             }
         }
@@ -248,9 +248,8 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> tempmf(finest_level+1);
     Vector<MultiFab> tempmf_scalar1(finest_level+1);
     Vector<MultiFab> tempmf_scalar2(finest_level+1);
-    RealVector tempbar_plot ((max_radial_level+1)*nr_fine);
-    tempbar_plot.shrink_to_fit();
-    std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
+    BaseState<Real> tempbar_plot (max_radial_level+1, nr_fine);
+    tempbar_plot.setVal(0.);
 
     int dest_comp = 0;
 
@@ -497,7 +496,7 @@ Maestro::PlotFileMF (const int nPlot,
     // tpert
     {
         Average(s_in, tempbar_plot, Temp);
-        Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -584,7 +583,7 @@ Maestro::PlotFileMF (const int nPlot,
         }
 
         Average(tempmf, tempbar_plot, 0);
-        Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
@@ -1551,7 +1550,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
             const auto lo = tileBox.loVect3d();
             const auto hi = tileBox.hiVect3d();
 
-            if (spherical == 0) {
+            if (!spherical) {
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     Real nabla = 0.0;
 
@@ -2120,7 +2119,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        if (spherical == 0) {
+        if (!spherical) {
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP

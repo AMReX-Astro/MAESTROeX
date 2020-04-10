@@ -37,8 +37,8 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
 
     Real dr0 = dr(0);
 
-    const auto& r_cc_loc_p = r_cc_loc_b;
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
+    const auto& r_edge_loc_p = r_edge_loc;
     const auto& w0_p = w0;
     auto& psi_p = psi;
 

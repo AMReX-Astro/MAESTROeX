@@ -291,7 +291,7 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
 
     auto& w0_p = w0;
-    const auto r_edge_loc_p = r_edge_loc_b;
+    const auto r_edge_loc_p = r_edge_loc;
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.
@@ -542,8 +542,8 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
 
     const auto& p0_old_p = p0_old_in;
     const auto& p0_new_p = p0_new_in;
-    const auto& r_cc_loc_p = r_cc_loc_b;
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
+    const auto& r_edge_loc_p = r_edge_loc;
     const auto& etarho_cc_p = etarho_cc;
     const auto& etarho_ec_p = etarho_ec;
     auto& w0_p = w0;
@@ -573,9 +573,9 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
             dpdt_factor_loc * p0_minus_peosbar(0,r-1)/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr0 * Sbar_in(0,r-1) * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1);
+            dr0 * Sbar_in(0,r-1) * r_cc_loc(0,r-1)*r_cc_loc(0,r-1);
         if (volume_discrepancy != 0.0) {
-            w0_from_Sbar(r) -= dr0 * volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
+            w0_from_Sbar(r) -= dr0 * volume_discrepancy * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
         }
     }
@@ -713,8 +713,8 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
 
     const auto& p0_old_p = p0_old_in;
     const auto& p0_new_p = p0_new_in;
-    const auto& r_cc_loc_p = r_cc_loc_b;
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_cc_loc_p = r_cc_loc;
+    const auto& r_edge_loc_p = r_edge_loc;
     const auto& etarho_cc_p = etarho_cc;
     const auto& etarho_ec_p = etarho_ec;
     auto& w0_p = w0;
@@ -741,15 +741,15 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
         Real volume_discrepancy = rho0_old_in(0,r-1) > base_cutoff_dens ? 
             dpdt_factor_loc * p0_minus_peosbar(0,r-1)/dt_in : 0.0;
 
-        Real dr1 = r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1);
+        Real dr1 = r_edge_loc(0,r) - r_edge_loc(0,r-1);
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr1 * Sbar_in(0,r-1) * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) - 
-            dr1* volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
+            dr1 * Sbar_in(0,r-1) * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) - 
+            dr1* volume_discrepancy * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
     }
 
     for (auto r = 1; r <= nr_fine; ++r) {
-        w0_from_Sbar(r) /= (r_edge_loc_b(0,r)*r_edge_loc_b(0,r));
+        w0_from_Sbar(r) /= (r_edge_loc(0,r)*r_edge_loc(0,r));
     }
 
     // make the edge-centered gravity
@@ -872,87 +872,6 @@ Maestro::Tridiag(const BaseState<Real>& a, const BaseState<Real>& b,
 
     for (auto j = n-2; j >= 0; --j) {
         u[j] -= gam[j+1] * u[j+1];
-    }
-}
-
-void
-Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
-                              RealVector& base_fine)
-
-{
-    // the mask array will keep track of whether we've filled in data
-    // in a corresponding radial bin.  .false. indicates that we've
-    // already output there.
-    IntVector imask_fine(nr_fine);
-    std::fill(imask_fine.begin(), imask_fine.end(), 1);
-
-    // r1 is the factor between the current level grid spacing and the
-    // FINEST level
-    int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
-
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                // sum up mask to see if there are any elements set to true 
-                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
-                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml[n+max_lev*r];
-                        imask_fine[i] = 0;
-                    }
-                }
-            }
-        }
-        // update r1 for the next coarsest level -- assume a jump by
-        // factor of 2
-        r1 *= 2;
-    }
-    
-    // check to make sure that no mask values are still true
-    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
-        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
-    }
-}
-
-
-void
-Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
-                              BaseState<Real>& base_fine)
-
-{
-    // the mask array will keep track of whether we've filled in data
-    // in a corresponding radial bin.  .false. indicates that we've
-    // already output there.
-    IntVector imask_fine(nr_fine);
-    std::fill(imask_fine.begin(), imask_fine.end(), 1);
-
-    // r1 is the factor between the current level grid spacing and the
-    // FINEST level
-    int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
-
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                // sum up mask to see if there are any elements set to true 
-                if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
-                    for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml[n+max_lev*r];
-                        imask_fine[i] = 0;
-                    }
-                }
-            }
-        }
-        // update r1 for the next coarsest level -- assume a jump by
-        // factor of 2
-        r1 *= 2;
-    }
-    
-    // check to make sure that no mask values are still true
-    if (std::accumulate(imask_fine.begin(), imask_fine.end(), 0) > 0) {
-        Abort("ERROR: unfilled cells in prolong_base_to_uniform");
     }
 }
 

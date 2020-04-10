@@ -135,15 +135,13 @@ Maestro::Setup ()
     gamma1bar_new.resize(max_radial_level+1, nr_fine);
     grav_cell_old.resize(max_radial_level+1, nr_fine);
     grav_cell_new.resize(max_radial_level+1, nr_fine);
-    r_cc_loc     .resize((max_radial_level+1)*nr_fine);
-    r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
+    r_cc_loc     .resize(max_radial_level+1, nr_fine);
     etarho_cc    .resize(max_radial_level+1, nr_fine);
     psi          .resize(max_radial_level+1, nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
-    r_edge_loc_b.resize(max_radial_level+1, nr_fine+1);
+    r_edge_loc.resize(max_radial_level+1, nr_fine+1);
     w0.resize(max_radial_level+1, nr_fine+1);
     etarho_ec.resize(max_radial_level+1, nr_fine+1);
 
@@ -159,16 +157,18 @@ Maestro::Setup ()
     diagfile3_data.resize(diag_buf_size*10);
 
     // make sure C++ is as efficient as possible with memory usage
-    r_cc_loc     .shrink_to_fit();
-    r_edge_loc   .shrink_to_fit();
     tag_array    .shrink_to_fit();
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
+    RealVector r_cc_loc_vec((max_radial_level+1)*nr_fine);
+    RealVector r_edge_loc_vec((max_radial_level+1)*(nr_fine+1));
+    r_cc_loc.toVector(r_cc_loc_vec);
+    r_edge_loc.toVector(r_edge_loc_vec);
     init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
-                             r_cc_loc.dataPtr(),
-                             r_edge_loc.dataPtr(),
+                             r_cc_loc_vec.dataPtr(),
+                             r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(),
                              &nr_irreg);
     InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);

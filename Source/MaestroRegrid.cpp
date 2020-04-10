@@ -38,7 +38,7 @@ Maestro::Regrid ()
             RegridBaseState(w0, true);
 
         } else {
-            // evolve_base_state == F and spherical == 0
+            // evolve_base_state == F and !spherical
 
             // Here we want to fill in the rho0 array so there is
             // valid data in any new grid locations that are created
@@ -68,7 +68,6 @@ Maestro::Regrid ()
     if (!spherical) {
         TagArray();
     }
-    init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
 
     if (spherical) {
@@ -195,7 +194,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
             // tag all cells at a given height if any cells at that height were tagged
             TagBoxes(tags, mfi, lev, tag_array, time);
         }
-    } // if (spherical == 0)
+    } // if (!spherical)
 
     // convert back to full temperature states
     if (use_tpert_in_tagging) {
@@ -353,76 +352,6 @@ Maestro::ClearLevel (int lev)
     }
 
     flux_reg_s[lev].reset(nullptr);
-}
-
-
-void
-Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
-
-    const int max_lev = max_radial_level + 1;
-
-    const int nrf = is_edge ? nr_fine+1 : nr_fine;
-    RealVector state_temp_vec(max_lev*nrf);
-
-    Real * AMREX_RESTRICT base = base_vec.dataPtr();
-    Real * AMREX_RESTRICT state_temp = state_temp_vec.dataPtr();
-
-    //copy the coarsest level of the real arrays into the
-    // temp arrays
-    AMREX_PARALLEL_FOR_1D(nrf, r,
-    {
-        state_temp[max_lev*r] = base[max_lev*r];
-    });
-
-    // piecewise linear interpolation to fill the cc temp arrays
-    for (auto n = 1; n < max_lev; ++n) {
-        if (is_edge) {
-            const auto nrn = nr[n] + 1;
-            AMREX_PARALLEL_FOR_1D(nrn, r,
-            {
-                if (r % 2 == 0) {
-                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*r/2];
-                } else {
-                    state_temp[n+max_lev*r] = 0.5 * (state_temp[n-1+max_lev*r/2] + 0.25 * state_temp[n-1+max_lev*(r/2+1)]);
-                }
-            });
-        } else {
-            const auto nrn = nr[n];
-            AMREX_PARALLEL_FOR_1D(nrn, r,
-            {
-                if (r == 0 || r == nrn-1) {
-                    state_temp[n+max_lev*r] = state_temp[n-1+max_lev*(r/2)];
-                } else {
-                    if (r % 2 == 0) {
-                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*(r/2)] + 0.25 * state_temp[n-1+max_lev*(r/2-1)];
-                    } else {
-                        state_temp[n+max_lev*r] = 0.75 * state_temp[n-1+max_lev*(r/2)] + 0.25 * state_temp[n-1+max_lev*(r/2+1)];
-                    }
-                }
-            });
-        }
-    }
-
-    // copy valid data into temp
-    for (auto n = 1; n < max_lev; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            const auto lo = r_start_coord(n,i);
-            const auto hi = is_edge ? r_end_coord(n,i)+1 : r_end_coord(n,i);
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
-            {
-                int r = k + lo;
-                state_temp[n+max_lev*r] = base[n+max_lev*r];
-            });
-        }
-    }
-
-    // copy temp array back into the real thing
-    AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
-        base[r] = state_temp[r];
-    })
 }
 
 void

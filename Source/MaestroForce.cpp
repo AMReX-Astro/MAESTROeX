@@ -101,7 +101,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             const int domhi = domainBox.hiVect()[AMREX_SPACEDIM-1];
             
             // offload to GPU
-            if (spherical == 0) {
+            if (!spherical) {
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
@@ -205,7 +205,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         s0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    if (spherical == 0) {
+    if (!spherical) {
         Put1dArrayOnCart(s0_edge, s0_edge_cart, 0, 0, bcs_f, 0);
     }
 
@@ -218,9 +218,9 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
-                Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
-                divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0(0,r+1)
-                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0(0,r)) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
+                divw0[r] = (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * w0(0,r+1)
+                           - r_edge_loc(0,r)*r_edge_loc(0,r) * w0(0,r)) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
             }
         }
 
