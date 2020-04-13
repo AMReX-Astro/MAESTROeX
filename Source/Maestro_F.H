@@ -22,7 +22,7 @@ extern "C"
     void average_sphr_irreg(const int* lev, const int* lo, const int* hi,
                             const amrex::Real* phi, const int* p_lo, const int* p_hi,
                             amrex::Real* phisum, int* ncell,
-                            const amrex::Real* cc_to_r, const int* ccr_lo, const int* ccr_hi);
+                            const int* cc_to_r, const int* ccr_lo, const int* ccr_hi);
 
     void divide_phisum_by_ncell_irreg(amrex::Real* phisum, int* ncell, const int lev);
 
@@ -53,7 +53,7 @@ extern "C"
                                   int* nr_irreg_in);
 
     void init_base_state_map_sphr(const int* lo, const int* hi,
-                  amrex::Real* cc_to_r, const int* c_lo, const int* c_hi,
+                  int* cc_to_r, const int* c_lo, const int* c_hi,
                                   const amrex::Real* dx_fine,
                                   const amrex::Real* dx_lev);
 

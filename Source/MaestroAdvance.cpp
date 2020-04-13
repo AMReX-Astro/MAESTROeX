@@ -223,15 +223,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],0.5,S_cc_old[lev],0,0.5,S_cc_new[lev],0,0,1,0);
         }
-    }
-    else {
+    } else {
         // set S_cc_nph = S_cc_old + (dt/2) * dSdt
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::LinComb(S_cc_nph[lev],1.0,S_cc_old[lev],0,0.5*dt,dSdt[lev],0,0,1,0);
         }
     }
     // no ghost cells for S_cc_nph
-    AverageDown(S_cc_nph,0,1);
+    AverageDown(S_cc_nph, 0, 1);
 
     // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
     // compute delta_p_term = peos_old - peosbar_cart (for RHS of projections)
@@ -511,7 +510,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff1,Xkcoeff1,pcoeff1);
+        ThermalConduct(s1, s2, hcoeff1, Xkcoeff1, pcoeff1, hcoeff1, Xkcoeff1, pcoeff1);
     }
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
@@ -615,7 +614,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute S at cell-centers
-    Make_S_cc(S_cc_new, delta_gamma1_term,  delta_gamma1,snew, uold, rho_omegadot, rho_Hnuc,
+    Make_S_cc(S_cc_new, delta_gamma1_term, delta_gamma1,snew, uold, rho_omegadot, rho_Hnuc,
               rho_Hext, thermal2, p0_old, gamma1bar_new, delta_gamma1_termbar);
 
     // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
@@ -865,9 +864,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     if (use_thermal_diffusion) {
-        MakeThermalCoeffs(s2star,Tcoeff,hcoeff2,Xkcoeff2,pcoeff2);
+        MakeThermalCoeffs(s2star, Tcoeff, hcoeff2, Xkcoeff2, pcoeff2);
 
-        ThermalConduct(s1,s2,hcoeff1,Xkcoeff1,pcoeff1,hcoeff2,Xkcoeff2,pcoeff2);
+        ThermalConduct(s1, s2, hcoeff1, Xkcoeff1, pcoeff1, hcoeff2, Xkcoeff2, pcoeff2);
     }
 
     thermal_time += ParallelDescriptor::second() - thermal_time_start;
@@ -1038,7 +1037,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
         if (dpdt_factor > 0.) {
             // peos_new now holds the thermodynamic p computed from snew(rho h X)
-            PfromRhoH(snew,snew,delta_p_term);
+            PfromRhoH(snew, snew, delta_p_term);
 
             // compute peosbar = Avg(peos_new)
             Average(delta_p_term, peosbar, 0);

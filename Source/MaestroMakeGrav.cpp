@@ -10,8 +10,6 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
 
-    const int max_lev = max_radial_level+1;
-
     if (!spherical) {
         if (do_planar_invsq_grav)  {
             const auto r_cc_loc_p = r_cc_loc;
@@ -35,9 +33,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
             grav_cell(0,0) = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
 
-            int nr_lev = nr(0);
-
-            for (auto r = 1; r < nr_lev; ++r) {
+            for (auto r = 1; r < nr(0); ++r) {
 
                 // the mass is defined at the cell-centers, so to compute
                 // the mass at the current center, we need to add the
@@ -198,8 +194,6 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()", MakeGravEdge);
-
-    const int max_lev = max_radial_level+1;
 
     get_base_cutoff_density(&base_cutoff_density);
 

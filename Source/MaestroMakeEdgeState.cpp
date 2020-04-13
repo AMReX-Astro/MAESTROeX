@@ -34,7 +34,6 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
     const Real dr0 = dr(0);
     const Real dtdr = dt / dr0;
 
-    const int max_lev = max_radial_level+1;
     const int slope_order_loc = slope_order;
 
     BaseState<Real> sedgel(nr_fine+1);
@@ -100,21 +99,20 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             // compute sedgel and sedger
             Real u = 0.5*(w0_p(0,r)+w0_p(0,r+1));
             Real ubardth = dth*u/dr0;  // NOTE: ubardth=0 for use_exact_base_state case
-            sedgel(r+1)= s(0,r) + (0.5-ubardth)*slope + dth*force(r);
-            sedger(r) = s(0,r) - (0.5+ubardth)*slope + dth*force(r);
+            sedgel(r+1)= s(0,r) + (0.5-ubardth)*slope + dth*force(0,r);
+            sedger(r) = s(0,r) - (0.5+ubardth)*slope + dth*force(0,r);
         });
 
     } else if (ppm_type == 1) {
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, i, {
-            int r = max_lev*i;
+        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
 
             // interpolate s to radial edges
 
             // sm
 
             // right side
-            int g = i + ng; 
+            int g = r + ng; 
             // compute van Leer slopes
             Real del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
             Real dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
@@ -122,7 +120,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real dsscrr = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // left side 
-            g = i + ng - 1;
+            g = r + ng - 1;
             // compute van Leer slopes
             del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
             dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
@@ -130,7 +128,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real dsscrl = dmin*dpls  >  0.0 ? copysign(1.0,del)*min(fabs(del),fabs(dmin),fabs(dpls)) : 0.0;
 
             // sm
-            g = i + ng;
+            g = r + ng;
             // 4th order interpolation of s to radial faces
             Real sm = 0.5*(s_ghost(g)+s_ghost(g-1))-(dsscrr-dsscrl) / 6.0;
             // make sure sm lies in between adjacent cell-centered values
@@ -143,7 +141,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             dsscrl = dsscrr;
 
             // right side
-            g = i + ng + 1; 
+            g = r + ng + 1; 
             // compute van Leer slopes
             del  = 0.5 * (s_ghost(g+1) - s_ghost(g-1));
             dmin = 2.0  * (s_ghost(g) - s_ghost(g-1));
@@ -160,8 +158,8 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
 
             // modify using quadratic limiters
             if ((sp-s(0,r))*(s(0,r)-sm) <= 0.0) {
-                sp = s[r];
-                sm = s[r];
+                sp = s(0,r);
+                sm = s(0,r);
             } else if (fabs(sp-s(0,r)) >= 2.0*fabs(sm-s(0,r))) {
                 sp = 3.0*s(0,r) - 2.0*sm;
             } else if (fabs(sm-s(0,r)) >= 2.0*fabs(sp-s(0,r))) {
@@ -178,19 +176,19 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real Im = w0_p(0,r) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
 
             // // compute sedgel and sedger
-            sedgel(i+1) = Ip + dth*force(i);
-            sedger(i) = Im + dth*force(i);
+            sedgel(r+1) = Ip + dth*force(0,r);
+            sedger(r) = Im + dth*force(0,r);
         });
     } else if (ppm_type == 2) {
 
-        AMREX_PARALLEL_FOR_1D(nr_fine, i, {
+        AMREX_PARALLEL_FOR_1D(nr_fine, r, {
             // interpolate s to radial edges, store these temporary values into sedgel
 
             // this will hold values at r-1, r, r+1 and r+2
             Real sedget[4];
 
             for (int j = 0; j < 4; j++) {
-                int g = i + ng - 1 + j;
+                int g = r + ng - 1 + j;
 
                 sedget[j] = (7.0/12.0)*(s_ghost(g-1)+s_ghost(g)) 
                         - (1.0/12.0)*(s_ghost(g-2)+s_ghost(g+1));
@@ -206,7 +204,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
                 }
             }
 
-            int g = i + ng;
+            int g = r + ng;
 
             // use Colella 2008 limiters
             // This is a new version of the algorithm
@@ -283,38 +281,38 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s, BaseState<Real>& sedge,
             Real sp = s_ghost(g) + alphap;
 
             // compute Ip and Im
-            Real sigmap = fabs(w0_p(0,i+1))*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
-            Real sigmam = fabs(w0_p(0,i))*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
-            Real s6 = 6.0*s(0,i) - 3.0*(sm+sp);
+            Real sigmap = fabs(w0_p(0,r+1))*dtdr;  // NOTE: sigmap=0 for use_exact_base_state case
+            Real sigmam = fabs(w0_p(0,r))*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
+            Real s6 = 6.0*s(0,r) - 3.0*(sm+sp);
             
-            Real Ip = w0_p(0,i+1) > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,i);
+            Real Ip = w0_p(0,r+1) > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
 
-            Real Im = w0_p(0,i) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,i);
+            Real Im = w0_p(0,r) < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
 
             // // compute sedgel and sedger
-            sedgel(i+1) = Ip + dth*force(i);
-            sedger(i) = Im + dth*force(i);
+            sedgel(r+1) = Ip + dth*force(0,r);
+            sedger(r) = Im + dth*force(0,r);
         });
     }
 
     const int nr_fine_loc = nr_fine;
 
-    AMREX_PARALLEL_FOR_1D(nr_fine+1, i, {
-        int r = i * max_lev;
+    AMREX_PARALLEL_FOR_1D(nr_fine+1, r, {
+
         // Fix center and edge of star by reflecting the extrapolated state.
         // An alternate way would be to compute these values using the entire algorithm,
         // but that would require more ghost cells at several stages.
         // By symmetry arguments, this would make no difference at the center of the star
         // and the accuracy at the edge of the star is not important here
-        if (i == 0) {
-            sedgel(i) = sedger(i);
-        } else if (i == nr_fine_loc) {
-            sedger(i) = sedgel(i);
+        if (r == 0) {
+            sedgel(r) = sedger(r);
+        } else if (r == nr_fine_loc) {
+            sedger(r) = sedgel(r);
         }
 
         // solve Riemann problem to get final edge state
-        sedge(0,i) = w0_p(0,r) > 0.0 ? sedgel(i) : sedger(i);
-        sedge(0,i) = fabs(w0_p(0,r))<rel_eps ? 0.5*(sedger(i)+sedgel(i)) : sedge[r];
+        sedge(0,r) = w0_p(0,r) > 0.0 ? sedgel(r) : sedger(r);
+        sedge(0,r) = fabs(w0_p(0,r))<rel_eps ? 0.5*(sedger(r)+sedgel(r)) : sedge(0,r);
     });
 
 }
@@ -333,8 +331,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
     const int cen = 0;
     const int lim = 1;
     const int flag = 2;
-
-    const int max_lev = max_radial_level+1;
+    
     const int slope_order_loc = slope_order;
 
     BaseState<Real> sedgel(max_radial_level+1,nr_fine+1);
@@ -372,10 +369,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
 
                     Real slope = 0.0;
                     int r = j + lo;
-                    int p = n + max_lev*r;
-
-                    int pp = n + max_lev*(r+1);
-                    int pm = n + max_lev*(r-1);
 
                     Real dxscr[3];
 
@@ -481,9 +474,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
 
                     int r = j + lo;
-                    int p = n + max_lev*r;
-                    int pp = n + max_lev*(r+1);
-                    int pm = n + max_lev*(r-1);
 
                     // calculate sm
 
@@ -614,11 +604,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
                     int r = j + lo;
-                    int p = n + max_lev*r;
-
-                    int pp = n + max_lev*(r+1);
-                    int pm = n + max_lev*(r-1);
-                    int pmm = n + max_lev*(r-2);
 
                     // left side 
                     Real dsvl = 0.0;
@@ -671,12 +656,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
-                    int p = n + max_lev*r;
-
-                    int pp = n + max_lev*(r+1);
-                    int ppp = n + max_lev*(r+2);
-                    int pm = n + max_lev*(r-1);
-                    int pmm = n + max_lev*(r-2);
         
                     // use Colella 2008 limiters
                     // This is a new version of the algorithm
@@ -823,7 +802,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s, BaseState<Real>& sedge,
             // solve Riemann problem to get final edge state
             AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
                 int r = j + lo;
-                int p = n + max_lev*r;
 
                 if (r == 0) {
                     // pick interior state at lo domain boundary

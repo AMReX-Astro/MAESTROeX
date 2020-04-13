@@ -102,9 +102,9 @@ Maestro::Init ()
         }
     }
 
-    // set finest_radial_level in fortran
+    // set finest_radial_level 
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    InitMultilevel(finest_level);
+    InitMultilevel();
 
     ComputeCutoffCoords(rho0_old);
 
@@ -181,7 +181,7 @@ Maestro::Init ()
         }
 
         if (stop_time >= 0. && t_old+dt > stop_time) {
-            dt = std::min(dt,stop_time-t_old);
+            dt = std::min(dt, stop_time-t_old);
             Print() << "Stop time limits dt = " << dt << std::endl;
         }
 
@@ -190,7 +190,7 @@ Maestro::Init ()
 
         // copy S_cc_old into S_cc_new for the pressure iterations
         for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(S_cc_new[lev],S_cc_old[lev],0,0,1,0);
+            MultiFab::Copy(S_cc_new[lev], S_cc_old[lev], 0, 0, 1, 0);
         }
 
         // initial (pressure) iters
@@ -228,7 +228,7 @@ void
 Maestro::InitData ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitData()",InitData);
+    BL_PROFILE_VAR("Maestro::InitData()", InitData);
 
     Print() << "Calling InitData()" << std::endl;
 
@@ -239,8 +239,7 @@ Maestro::InitData ()
     p0_init.setVal(0.0);
 
     for (auto lev = 0; lev <= max_radial_level; ++lev) {
-        InitBaseState(rho0_old, rhoh0_old, 
-                      p0_old, lev);
+        InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
     }
 
     if (use_exact_base_state) {
@@ -256,15 +255,15 @@ Maestro::InitData ()
         TagArray();
     }
 
-    // set finest_radial_level in fortran
+    // set finest_radial_level 
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    InitMultilevel(finest_level);
+    InitMultilevel();
 
     // average down data and fill ghost cells
     AverageDown(sold, 0, Nscal);
-    FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
+    FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
     AverageDown(uold, 0, AMREX_SPACEDIM);
-    FillPatch(t_old,uold,uold,uold,0,0,AMREX_SPACEDIM,0,bcs_u,1);
+    FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
     if (fix_base_state) {
         // compute cutoff coordinates
@@ -460,9 +459,9 @@ void Maestro::InitProj ()
 
     // perform a nodal projection
 #ifndef SDC
-    NodalProj(initial_projection_comp,rhcc_for_nodalproj);
+    NodalProj(initial_projection_comp, rhcc_for_nodalproj);
 #else
-    NodalProj(initial_projection_comp,rhcc_for_nodalproj,false);
+    NodalProj(initial_projection_comp, rhcc_for_nodalproj,false);
 #endif
     
 }
@@ -524,7 +523,7 @@ void Maestro::DivuIter (int istep_divu_iter)
     // Abort();
     
     if (use_thermal_diffusion) {
-        MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+        MakeThermalCoeffs(sold, Tcoeff, hcoeff, Xkcoeff, pcoeff);
 
         MakeExplicitThermal(thermal, sold, Tcoeff, hcoeff,Xkcoeff, pcoeff, p0_old,
                             temp_diffusion_formulation);
@@ -587,7 +586,7 @@ void Maestro::DivuIter (int istep_divu_iter)
             Print() << "Ignoring this new dt since it's larger than the previous dt = "
                     << dt_hold << std::endl;
         }
-        dt = std::min(dt_hold,dt);
+        dt = std::min(dt_hold, dt);
     }
 
     if (fixed_dt != -1.0) {
@@ -655,7 +654,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     ReactSDC(sold, stemp, rho_Hext, p0_old, 0.5*dt, t_old, sdc_source);
     
     if (use_thermal_diffusion) {
-        MakeThermalCoeffs(sold,Tcoeff,hcoeff,Xkcoeff,pcoeff);
+        MakeThermalCoeffs(sold, Tcoeff, hcoeff, Xkcoeff, pcoeff);
         
         MakeExplicitThermal(thermal, sold, Tcoeff, hcoeff, Xkcoeff, pcoeff, p0_old,
                             temp_diffusion_formulation);
@@ -695,7 +694,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
         beta0_old, delta_gamma1_term);
     
     // perform a nodal projection
-    NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter,false);
+    NodalProj(divu_iters_comp, rhcc_for_nodalproj, istep_divu_iter, false);
     
     Real dt_hold = dt;
     
@@ -732,7 +731,7 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
 void Maestro::InitIter ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitIter()",InitIter);
+    BL_PROFILE_VAR("Maestro::InitIter()", InitIter);
 
     // wallclock time
     Real start_total = ParallelDescriptor::second();
@@ -758,6 +757,6 @@ void Maestro::InitIter ()
 
     // copy pi from snew to sold
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::Copy(sold[lev],snew[lev],Pi,Pi,1,ng_s);
+        MultiFab::Copy(sold[lev], snew[lev], Pi, Pi, 1, ng_s);
     }
 }

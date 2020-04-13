@@ -306,7 +306,7 @@ public:
 #endif
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
-    void InitMultilevel(const int finest_radial_level_in);
+    void InitMultilevel();
 
     void RestrictBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
     void FillGhostBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
@@ -343,7 +343,7 @@ public:
     ////////////
     // MaestroCelltoEdge.cpp functions
 
-    void CelltoEdge(const BaseState<amrex::Real>& s0_cell_vec, 
+    void CelltoEdge(const BaseState<amrex::Real>& s0_cell, 
                     BaseState<amrex::Real>& s0_edge);
 
     // end MaestroCelltoEdge.cpp functions
@@ -492,7 +492,7 @@ public:
     /// Compute initial time step
     void FirstDt ();
 
-    void EstDt_Divu(BaseState<amrex::Real>& gp0_vec, const BaseState<amrex::Real>& p0, 
+    void EstDt_Divu(BaseState<amrex::Real>& gp0, const BaseState<amrex::Real>& p0, 
                     const BaseState<amrex::Real>& gamma1bar);
 
     // end MaestroDt.cpp functions
@@ -1932,7 +1932,7 @@ public:
     /// we make this persistent in that we only have to rebuild and
     /// fill this after regridding
     amrex::Vector<amrex::MultiFab> normal;
-    amrex::Vector<amrex::MultiFab> cell_cc_to_r;
+    amrex::Vector<amrex::iMultiFab> cell_cc_to_r;
 
     /// stores domain boundary conditions.
     /// These muse be vectors (rather than arrays) so we can ParmParse them

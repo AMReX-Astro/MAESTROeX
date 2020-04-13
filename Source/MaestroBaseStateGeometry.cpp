@@ -33,8 +33,6 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
     burning_cutoff_density_lo_coord.resize(max_radial_level+1);
     burning_cutoff_density_hi_coord.resize(max_radial_level+1);
 
-    const int max_lev = max_radial_level+1;
-
     // compute center(:)
     if (octant) {
         for (auto i = 0; i < 3; ++i) {
@@ -121,7 +119,7 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
     if (use_exact_base_state) {
 
         const Box& tilebox = mfi.tilebox();
-        const Array4<Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
+        const Array4<int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
         const auto probLo = geom[0].ProbLoArray();
 
@@ -144,7 +142,6 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
-    const int max_lev = max_radial_level + 1;
     int which_lev = 0;
 
     // find the finest level containing the anelastic cutoff density,
@@ -328,7 +325,7 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0)
 }
 
 void 
-Maestro::InitMultilevel(const int finest_radial_level_in) {
+Maestro::InitMultilevel() {
     // compute numdisjointchunks, r_start_coord, r_end_coord
     // FIXME - right now there is one chunk at each level that spans the domain
 
@@ -344,7 +341,7 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
     if (spherical) {
        finest_radial_level = 0;
     } else {
-       finest_radial_level = finest_radial_level_in;
+       finest_radial_level = finest_level;
     }
 
     numdisjointchunks.resize(finest_radial_level+1);
@@ -416,8 +413,6 @@ Maestro::RestrictBase(BaseState<Real>& s0, bool is_cell_centered)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
 
-    const int max_lev = max_radial_level + 1;
-
     for (int n = finest_radial_level; n >= 1; --n) {        
         for (int i = 1; i <= numdisjointchunks(n); ++i) {
             if (is_cell_centered) {
@@ -440,8 +435,6 @@ Maestro::FillGhostBase(BaseState<Real>& s0, bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
-
-    const int max_lev = max_radial_level + 1;
 
     for (int n = finest_radial_level; n >= 1; --n) {
         for (int i = 1; i <= numdisjointchunks(n); ++i) {

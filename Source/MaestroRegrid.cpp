@@ -68,7 +68,7 @@ Maestro::Regrid ()
     if (!spherical) {
         TagArray();
     }
-    InitMultilevel(finest_level);
+    InitMultilevel();
 
     if (spherical) {
         MakeNormal();
@@ -165,7 +165,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 
     // convert temperature to perturbation values
     if (use_tpert_in_tagging) {
-        PutInPertForm(lev,sold,tempbar,Temp,Temp,bcs_s,true);
+        PutInPertForm(lev, sold, tempbar, Temp, Temp, bcs_s, true);
     }
 
     // if you add openMP here, make sure to collect tag_array across threads
@@ -268,9 +268,9 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
         const int ng_n = normal[lev].nGrow();
         const int ng_c = cell_cc_to_r[lev].nGrow();
         MultiFab normal_state(ba, dm, 3, ng_n);
-        MultiFab cell_cc_to_r_state(ba, dm, 1, ng_c);
-        std::swap(      normal_state,      normal[lev]);
-        std::swap(cell_cc_to_r_state,cell_cc_to_r[lev]);
+        iMultiFab cell_cc_to_r_state(ba, dm, 1, ng_c);
+        std::swap(normal_state, normal[lev]);
+        std::swap(cell_cc_to_r_state, cell_cc_to_r[lev]);
     }
 
     if (lev > 0 && reflux_type == 2) {
@@ -365,7 +365,7 @@ Maestro::RegridBaseState(BaseState<Real>& base, const bool is_edge)
     const int nrf = is_edge ? nr_fine+1 : nr_fine;
     BaseState<Real> state_temp(max_lev, nrf);
 
-    //copy the coarsest level of the real arrays into the
+    // copy the coarsest level of the real arrays into the
     // temp arrays
     AMREX_PARALLEL_FOR_1D(nrf, r,
     {
@@ -415,8 +415,5 @@ Maestro::RegridBaseState(BaseState<Real>& base, const bool is_edge)
     }
 
     // copy temp array back into the real thing
-    // AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
-    //     base[r] = state_temp[r];
-    // });
     base.copy(state_temp);
 }

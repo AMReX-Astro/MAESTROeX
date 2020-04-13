@@ -22,9 +22,9 @@ public:
     BaseState(const int num_levs, const int length=1, const int ncomp=1);
     
     /// create a BaseState object from an existing Fortran-friendly base state
-    BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length, const int ncomp=1);
+    BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length=1, const int ncomp=1);
 
-    BaseState(const amrex::Vector<T>& src, const int num_levs, const int length, const int ncomp=1);
+    BaseState(const amrex::Vector<T>& src, const int num_levs, const int length=1, const int ncomp=1);
 
     /// copy constructor. This makes a deep copy of the src.
     BaseState(const BaseState<T>& src);
@@ -139,8 +139,8 @@ protected:
     T*  dptr;
 
     int nlev;
-    int nvar;
-    int len;    
+    int len; 
+    int nvar; 
 };
 
 template <class T>

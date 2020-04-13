@@ -25,9 +25,7 @@ Maestro::DiagFile (const int step,
 
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DiagFile()", DiagFile);
-
-    const int max_lev = max_radial_level + 1;
-
+    
     // -- w0mac will contain an edge-centered w0 on a Cartesian grid,
     // -- for use in computing divergences.
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);

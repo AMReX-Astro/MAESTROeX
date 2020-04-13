@@ -21,8 +21,6 @@ Maestro::Makew0(const BaseState<Real>& w0_old,
     BL_PROFILE_VAR("Maestro::Makew0()", Makew0);
 
     w0_force.setVal(0.);
-
-    const int max_lev = max_radial_level+1;
     
     if (!spherical) {
         if (do_planar_invsq_grav || do_2d_planar_octant) {
@@ -106,8 +104,6 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     w0.setVal(0.0);
-
-    const int max_lev = max_radial_level+1;
 
     // local variables 
     BaseState<Real> psi_planar(nr_fine);
@@ -281,11 +277,10 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
                           const Real dt_in, const Real dtold_in) 
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()",Makew0PlanarVarg);
+    BL_PROFILE_VAR("Maestro::Makew0PlanarVarg()", Makew0PlanarVarg);
 
     int fine_base_density_cutoff_coord = base_cutoff_density_coord(finest_radial_level);
 
-    const int max_lev = max_radial_level+1;
     const int nr_finest = nr(finest_radial_level);
     const Real dr_finest = dr(finest_radial_level);
     const Real dpdt_factor_loc = dpdt_factor;
@@ -889,8 +884,6 @@ Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml,
     // r1 is the factor between the current level grid spacing and the
     // FINEST level
     int r1 = 1;
-
-    const int max_lev = max_radial_level+1;
 
     for (auto n = finest_radial_level; n >= 0; --n) {
         for (auto j = 1; j < numdisjointchunks(n); ++j) {

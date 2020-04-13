@@ -24,7 +24,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseDensPlanar()", AdvectBaseDensPlanar); 
 
-    BaseState<Real> force(max_radial_level+1,nr_fine);
+    BaseState<Real> force(max_radial_level+1, nr_fine);
 
     // zero the new density so we don't leave a non-zero density in fine radial
     // regions that no longer have a corresponding full state

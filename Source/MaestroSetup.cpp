@@ -14,7 +14,7 @@ void
 Maestro::Setup ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Setup()",Setup);
+    BL_PROFILE_VAR("Maestro::Setup()", Setup);
 
     Print() << "Calling Setup()" << std::endl;
 
@@ -61,7 +61,7 @@ Maestro::Setup ()
 
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(ZFILL(probLo),ZFILL(probHi));
+    set_method_params(ZFILL(probLo), ZFILL(probHi));
 
     // set up BCRec definitions for BC types
     BCSetup();
@@ -69,7 +69,7 @@ Maestro::Setup ()
     const Box domainBoxFine = geom[max_level].Domain();
     const Real* dxFine = geom[max_level].CellSize();
 
-    if (spherical ) {
+    if (spherical) {
 #if (AMREX_SPACEDIM == 3)
         // compute max_radial_level
         max_radial_level = 0;
@@ -80,9 +80,9 @@ Maestro::Setup ()
         // compute nr_irreg
         int domhi = domainBoxFine.bigEnd(0)+1;
         if (!octant) {
-            nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
+            nr_irreg = round((3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0);
         } else {
-            nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
+            nr_irreg = round((3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0);
         }
 
             // compute nr_fine
@@ -234,7 +234,7 @@ void
 Maestro::ReadParameters ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ReadParameters()",ReadParameters);
+    BL_PROFILE_VAR("Maestro::ReadParameters()", ReadParameters);
 
     Print() << "Calling ReadParameters()" << std::endl;
 
@@ -247,8 +247,8 @@ Maestro::ReadParameters ()
     // read in boundary conditions
     Vector<int> lo_bc(AMREX_SPACEDIM);
     Vector<int> hi_bc(AMREX_SPACEDIM);
-    pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
-    pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
+    pp.getarr("lo_bc", lo_bc, 0, AMREX_SPACEDIM);
+    pp.getarr("hi_bc", hi_bc, 0, AMREX_SPACEDIM);
 
     // storey boundary conditions in a single array
     // order shall be
@@ -307,23 +307,18 @@ Maestro::BCSetup()
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
     //
-    if (Geom(0).isAnyPeriodic())
-    {
+    if (Geom(0).isAnyPeriodic()) {
         //
         // Do idiot check.  Periodic means interior in those directions.
         //
-        for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
-        {
-            if (Geom(0).isPeriodic(dir))
-            {
-                if (phys_bc[dir] != Interior)
-                {
+        for (int dir = 0; dir<AMREX_SPACEDIM; dir++) {
+            if (Geom(0).isPeriodic(dir)) {
+                if (phys_bc[dir] != Interior) {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but low BC is not Interior\n";
                     Error();
                 }
-                if (phys_bc[AMREX_SPACEDIM+dir] != Interior)
-                {
+                if (phys_bc[AMREX_SPACEDIM+dir] != Interior) {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but high BC is not Interior\n";
                     Error();
@@ -334,16 +329,13 @@ Maestro::BCSetup()
         //
         // Do idiot check.  If not periodic, should be no interior.
         //
-        for (int dir=0; dir<AMREX_SPACEDIM; dir++)
-        {
-            if (phys_bc[dir] == Interior)
-            {
+        for (int dir=0; dir<AMREX_SPACEDIM; dir++) {
+            if (phys_bc[dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
             }
-            if (phys_bc[AMREX_SPACEDIM+dir] == Interior)
-            {
+            if (phys_bc[AMREX_SPACEDIM+dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
@@ -352,8 +344,7 @@ Maestro::BCSetup()
     }
 
     // set up boundary conditions for Fillpatch operations
-    for (int dir = 0; dir < AMREX_SPACEDIM; ++dir)
-    {
+    for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
 
         // lo-side bcs
         if (phys_bc[dir] == Interior) {

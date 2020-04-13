@@ -250,8 +250,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             const Array4<Real> wedge = edge[lev][2].array(mfi);
 #endif  
 
-            int max_lev = max_radial_level+1;
-
             if (mult_or_div == 1) {
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
 #if (AMREX_SPACEDIM == 2)

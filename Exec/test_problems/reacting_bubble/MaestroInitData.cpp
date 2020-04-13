@@ -94,7 +94,6 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = max_radial_level + 1;
     
 #ifdef _OPENMP
 #pragma omp parallel

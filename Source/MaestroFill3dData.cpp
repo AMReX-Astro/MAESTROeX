@@ -71,7 +71,6 @@ Maestro::Put1dArrayOnCart (int lev,
     const auto& r_edge_loc_p = r_edge_loc;
     const auto& r_cc_loc_p = r_cc_loc;
 
-    const int max_lev = max_radial_level+1;
     const int nr_fine_loc = nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
 
@@ -100,7 +99,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
         } else {
 
-            const Array4<const Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
+            const Array4<const int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
             if (use_exact_base_state) {
                 if (is_input_edge_centered) {
@@ -366,7 +365,6 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Addw0()", Addw0);
 
-    const int max_lev = max_radial_level+1;
     const auto& w0_p = w0;
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -473,7 +471,6 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 
     const int nr_fine_loc = nr_fine;
-    const int max_lev = max_radial_level+1;
     const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real drf = dr_fine;
     const auto& w0_p = w0;
@@ -730,7 +727,6 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
     }
 
     const int nr_fine_loc = nr_fine;
-    const int max_lev = max_radial_level+1;
     const Real drf = dr_fine;
     const auto r_cc_loc_p = r_cc_loc;
     const auto center_p = center;
@@ -1303,7 +1299,7 @@ Maestro::MakeCCtoRadii ()
         const Real* dx = geom[lev].CellSize();
         const Real* dx_fine = geom[max_level].CellSize();
 
-        MultiFab& cc_to_r = cell_cc_to_r[lev];
+        iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP

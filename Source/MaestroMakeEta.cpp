@@ -21,7 +21,6 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 #endif
 
     // Local variables
-    const int max_lev = max_radial_level + 1;
     BaseState<Real> etarhosum(max_radial_level+1, nr_fine+1);
     etarhosum.setVal(0.0);
 

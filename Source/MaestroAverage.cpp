@@ -101,7 +101,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // get references to the MultiFabs at level lev
             const MultiFab& phi_mf = phi[lev];
-            const MultiFab& cc_to_r = cell_cc_to_r[lev];
+            const iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
             for (MFIter mfi(phi_mf); mfi.isValid(); ++mfi) {
@@ -221,7 +221,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                         Real radius = sqrt(x*x + y*y + z*z);
 
                         // figure out which radii index this point maps into
-                        int index = ((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0;
+                        int index = round(((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0);
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg_loc) {

@@ -11,8 +11,6 @@ Maestro::EnforceHSE(const BaseState<Real>& rho0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
 
-    const int max_lev = max_radial_level+1;
-
     BaseState<Real> grav_edge(max_radial_level+1, nr_fine+1);
     BaseState<Real> p0old(max_radial_level+1, nr_fine);
 
