@@ -25,8 +25,6 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
 
     dr.resize(max_radial_level+1);
     nr.resize(max_radial_level+1);
-    dr.resize(max_radial_level+1);
-    nr.resize(max_radial_level+1);
 
     base_cutoff_density_coord.resize(max_radial_level+1);
     anelastic_cutoff_density_coord.resize(max_radial_level+1);

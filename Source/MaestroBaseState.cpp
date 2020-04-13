@@ -72,7 +72,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         }
     }
 
-    Real starting_rad = spherical ? 0.0 : geom[lev].ProbLo(AMREX_SPACEDIM-1);
+    Real starting_rad = spherical ? 0.0 : geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     Real rho_above_cutoff = s0_init[n+max_lev*nr_fine*Rho];
     Real rhoh_above_cutoff = s0_init[n+max_lev*nr_fine*RhoH];
