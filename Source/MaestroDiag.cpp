@@ -516,8 +516,8 @@ Maestro::DiagFile (const int step,
                 term1 = 4.0/3.0*M_PI*rho0[max_lev*(r-1)] * 
                     (r_edge_loc_b(0,r) - r_cc_loc_b(0,r-1)) * 
                     (r_edge_loc_b(0,r)*r_edge_loc_b[0,r] + 
-		     r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) + 
-		     r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1));
+                     r_edge_loc_b(0,r)*r_cc_loc_b(0,r-1) + 
+                     r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1));
             } 
 
             Real term2 = 0.0;
@@ -525,8 +525,8 @@ Maestro::DiagFile (const int step,
                 term2 = 4.0/3.0*M_PI*rho0[max_lev*r]*
                     (r_cc_loc_b(0,r) - r_edge_loc_b(0,r)) * 
                     (r_cc_loc_b(0,r)*r_cc_loc_b(0,r) + 
-		     r_cc_loc_b(0,r)*r_edge_loc_b(0,r) + 
-		     r_edge_loc_b(0,r)*r_edge_loc_b(0,r));      
+                     r_cc_loc_b(0,r)*r_edge_loc_b(0,r) + 
+                     r_edge_loc_b(0,r)*r_edge_loc_b(0,r));      
             } 
 
             m[r] = m[r-1] + term1 + term2;
