@@ -22,6 +22,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
 
+    const auto max_lev = max_radial_level + 1;
+
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
