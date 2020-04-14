@@ -24,10 +24,10 @@ SimpleLog::Log(const std::string str)
     }
 
     // output to the screen
-    Print() << MAESTROeX::trim(str) << std::endl;
+    Print() << maestro::trim(str) << std::endl;
 
     // and store in the log
-    log_data[log_lines] = MAESTROeX::trim(str);
+    log_data[log_lines] = maestro::trim(str);
     log_lines++;
 }
 
