@@ -245,7 +245,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
 
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
-    Vector<Real> etarho_cc_vec((max_radial_level+1)*nr_fine);
+    RealVector etarho_cc_vec((max_radial_level+1)*nr_fine);
     etarho_cc.toVector(etarho_cc_vec);
     Average(eta_cart, etarho_cc_vec, 0);
     etarho_cc.copy(etarho_cc_vec);
