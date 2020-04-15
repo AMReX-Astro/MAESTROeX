@@ -95,15 +95,15 @@ Maestro::Init ()
             // reset tagging array to include buffer zones
             TagArray();
         }
+
+        // set finest_radial_level in fortran
+        // compute numdisjointchunks, r_start_coord, r_end_coord
+        init_multilevel(tag_array.dataPtr(),&finest_level);
+        InitMultilevel(finest_level);
+
+        compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
     }
-
-    // set finest_radial_level in fortran
-    // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(),&finest_level);
-    InitMultilevel(finest_level);
-
-    compute_cutoff_coords(rho0_old.dataPtr());
-    ComputeCutoffCoords(rho0_old);
 
     if (spherical) {
         MakeNormal();

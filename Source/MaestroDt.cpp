@@ -192,7 +192,7 @@ Maestro::EstDt ()
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
-                    const auto nr_lev = nr[lev];
+                    const auto nr_lev = nr(lev);
 
                     tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 1, 1);
 
@@ -284,7 +284,7 @@ Maestro::EstDt ()
                     if (spdx > eps) dt_temp = amrex::min(dt_temp, dx[0] / spdx);
                     if (spdy > eps) dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     if (spdz > eps) dt_temp = amrex::min(dt_temp, dx[2] / spdz);
-                    if (spdr > eps) dt_temp = amrex::min(dt_temp, dr[0] / spdr);
+                    if (spdr > eps) dt_temp = amrex::min(dt_temp, dr(0) / spdr);
 
                     dt_temp *= cfl;
 
@@ -578,7 +578,7 @@ Maestro::FirstDt ()
                     tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 0, 1);
 
                     if (!spherical) {
-                        const auto nr_lev = nr[lev];
+                        const auto nr_lev = nr(lev);
 
                         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             Real gradp0 = 0.0;
@@ -712,7 +712,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
             gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
-        const auto dr0 = dr[0];
+        const auto dr0 = dr(0);
         AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
             int r = i + 1;
 
