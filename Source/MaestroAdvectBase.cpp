@@ -251,6 +251,8 @@ Maestro::AdvectBaseDens(BaseState<Real>& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseDens()", AdvectBaseDens); 
+    
+    rho0_predicted_edge.setVal(0.0);
 
     if (spherical == 0) {
         AdvectBaseDensPlanar(rho0_predicted_edge);
@@ -366,6 +368,8 @@ Maestro::AdvectBaseEnthalpy(BaseState<Real>& rhoh0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvectBaseEnthalpy()", AdvectBaseEnthalpy); 
+    
+    rhoh0_predicted_edge.setVal(0.0);
 
     if (spherical == 0) {
         AdvectBaseEnthalpyPlanar(rhoh0_predicted_edge);
