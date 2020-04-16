@@ -385,7 +385,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
-            const auto nrn = nr[n] + 1;
+            const auto nrn = nr(n) + 1;
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r % 2 == 0) {
@@ -395,7 +395,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         } else {
-            const auto nrn = nr[n];
+            const auto nrn = nr(n);
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r == 0 || r == nrn-1) {

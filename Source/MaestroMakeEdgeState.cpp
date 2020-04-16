@@ -316,7 +316,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge,
 
         // solve Riemann problem to get final edge state
         sedge(0,i) = w0_p[r] > 0.0 ? sedgel(i) : sedger(i);
-        sedge(0,i) = fabs(w0_p[r])<rel_eps ? 0.5*(sedger(i)+sedgel(i)) : sedge[r];
+        sedge(0,i) = fabs(w0_p[r])<rel_eps ? 0.5*(sedger(i)+sedgel(i)) : sedge(0,i);
     });
 
 }
