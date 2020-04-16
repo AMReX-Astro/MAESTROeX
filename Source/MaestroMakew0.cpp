@@ -624,7 +624,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
         }
     }
-	
+        
     for (auto r = 1; r <= nr_fine; ++r) {
     // lo = 1; 
     // hi = nr_fine;
@@ -663,7 +663,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         B[r] = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1))
                 + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) ) 
                 / (dr0*dr0);
-	
+        
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr0;
 
         B[r] -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
