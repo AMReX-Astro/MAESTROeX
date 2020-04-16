@@ -145,15 +145,18 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             // compute psi for level n
             int lo = r_start_coord(n,j); 
             int hi = r_end_coord(n,j);
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
-                int r = k + lo;
-                if (r < base_cutoff_density_coord_loc) {
-                    psi_planar(r) = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
-                }
-            });
+            // AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+            //     int r = k + lo;
+            //     if (r < base_cutoff_density_coord_loc) {
+            //         psi_planar(r) = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
+            //     }
+            // });
 
             for (auto r = r_start_coord(n,j)+1; 
                 r <= r_end_coord(n,j)+1; ++r) {
+                if (r < base_cutoff_density_coord_loc) {
+                    psi_planar(r) = etarho_cc_p[n+max_lev*r] * fabs(grav_const_loc);
+                }
 
                 Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
                     + gamma1bar_new_in[n+max_lev*(r-1)]) *
@@ -435,16 +438,16 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A(0) = 0.0;
+    B(0) = 1.0;
+    C(0) = 0.0;
+    F(0) = 0.0;
 
     // Upper boundary
-    A[fine_base_density_cutoff_coord+1] = -1.0;
-    B[fine_base_density_cutoff_coord+1] = 1.0;
-    C[fine_base_density_cutoff_coord+1] = 0.0;
-    F[fine_base_density_cutoff_coord+1] = 0.0;
+    A(fine_base_density_cutoff_coord+1) = -1.0;
+    B(fine_base_density_cutoff_coord+1) = 1.0;
+    C(fine_base_density_cutoff_coord+1) = 0.0;
+    F(fine_base_density_cutoff_coord+1) = 0.0;
 
     // need to synchronize gpu values with updated host values
     Gpu::synchronize();
@@ -559,15 +562,20 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const int max_lev = max_radial_level + 1;
     BaseState<Real> gamma1bar_nph(nr_fine);
     BaseState<Real> p0_nph(nr_fine);
-    BaseState<Real> A(nr_fine+1);
-    BaseState<Real> B(nr_fine+1);
-    BaseState<Real> C(nr_fine+1);
     BaseState<Real> u(nr_fine+1);
-    BaseState<Real> F(nr_fine+1);
     BaseState<Real> w0_from_Sbar(nr_fine+1);
     BaseState<Real> rho0_nph(max_lev,nr_fine);
     BaseState<Real> grav_edge(max_lev, nr_fine+1);
 
+    RealVector A_vec(nr_fine+1);
+    RealVector B_vec(nr_fine+1);
+    RealVector C_vec(nr_fine+1);
+    RealVector F_vec(nr_fine+1);
+    Real * AMREX_RESTRICT A = A_vec.dataPtr();
+    Real * AMREX_RESTRICT B = B_vec.dataPtr();
+    Real * AMREX_RESTRICT C = C_vec.dataPtr();
+    Real * AMREX_RESTRICT F = F_vec.dataPtr();
+    
     const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
     const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
@@ -590,14 +598,16 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real dr0 = dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
+    int lo, hi;
+    
     // create time-centered base-state quantities
-    // for (auto r = 0; r < nr_fine; ++r) {
-    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+    for (auto r = 0; r < nr_fine; ++r) {
+    //AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
         rho0_nph(0,r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
-    });
-
+    }//);
+    
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
@@ -614,14 +624,14 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
         }
     }
-
-    // for (auto r = 1; r <= nr_fine; ++r) {
-    int lo = 1; 
-    int hi = nr_fine;
-    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
-        int r = j + lo;
+	
+    for (auto r = 1; r <= nr_fine; ++r) {
+    // lo = 1; 
+    // hi = nr_fine;
+    // AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+    //     int r = j + lo;
         w0_from_Sbar(r) /= (r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
-    });
+    }//);
 
     // make the edge-centered gravity
     MakeGravEdge(grav_edge, rho0_nph);
@@ -631,11 +641,11 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     // A_j (r^2 dw_0)_{j-3/2} +
     // B_j (r^2 dw_0)_{j-1/2} +
     // C_j (r^2 dw_0)_{j+1/2} = F_j
-    A.setVal(0.0);
-    B.setVal(0.0);
-    C.setVal(0.0);
-    F.setVal(0.0);
     u.setVal(0.0);
+    std::fill(A_vec.begin(), A_vec.end(), 0.);
+    std::fill(B_vec.begin(), B_vec.end(), 0.);
+    std::fill(C_vec.begin(), C_vec.end(), 0.);
+    std::fill(F_vec.begin(), F_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
@@ -644,23 +654,24 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     // for (auto r = 1; r <= max_cutoff; ++r) {
     lo = 1; 
     hi = max_cutoff;
-    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+    //AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+    amrex::ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j) noexcept {
         int r = j + lo;
-        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
-        A(r) /= dr0*dr0;
+        A[r] = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
+        A[r] /= dr0*dr0;
 
-        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1))
+        B[r] = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1))
                 + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) ) 
                 / (dr0*dr0);
-
+	
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr0;
 
-        B(r) -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
+        B[r] -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
 
-        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
-        C(r) /= dr0*dr0;
+        C[r] = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
+        C[r] /= dr0*dr0;
 
-        F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
+        F[r] = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
                 grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
                 r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
                 (dr0 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
@@ -669,22 +680,22 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A_vec[0] = 0.0;
+    B_vec[0] = 1.0;
+    C_vec[0] = 0.0;
+    F_vec[0] = 0.0;
 
     // Upper boundary
-    A[max_cutoff+1] = -1.0;
-    B[max_cutoff+1] = 1.0;
-    C[max_cutoff+1] = 0.0;
-    F[max_cutoff+1] = 0.0;
+    A_vec[max_cutoff+1] = -1.0;
+    B_vec[max_cutoff+1] = 1.0;
+    C_vec[max_cutoff+1] = 0.0;
+    F_vec[max_cutoff+1] = 0.0;
 
     // need to synchronize gpu values with updated host values
     Gpu::synchronize();
-    
+
     // Call the tridiagonal solver
-    Tridiag(A, B, C, F, u, max_cutoff+2);
+    Tridiag(A_vec, B_vec, C_vec, F_vec, u, max_cutoff+2);
 
     w0[0] = w0_from_Sbar(0);
 
@@ -738,14 +749,19 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const int max_lev = max_radial_level+1;
     BaseState<Real> gamma1bar_nph(nr_fine);
     BaseState<Real> p0_nph(nr_fine);
-    BaseState<Real> A(nr_fine+1);
-    BaseState<Real> B(nr_fine+1);
-    BaseState<Real> C(nr_fine+1);
     BaseState<Real> u(nr_fine+1);
-    BaseState<Real> F(nr_fine+1);
     BaseState<Real> w0_from_Sbar(nr_fine+1);
     BaseState<Real> rho0_nph(max_lev,nr_fine);
     BaseState<Real> grav_edge(max_lev,nr_fine+1);
+
+    RealVector A_vec(nr_fine+1);
+    RealVector B_vec(nr_fine+1);
+    RealVector C_vec(nr_fine+1);
+    RealVector F_vec(nr_fine+1);
+    Real * AMREX_RESTRICT A = A_vec.dataPtr();
+    Real * AMREX_RESTRICT B = B_vec.dataPtr();
+    Real * AMREX_RESTRICT C = C_vec.dataPtr();
+    Real * AMREX_RESTRICT F = F_vec.dataPtr();
 
     const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
     const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
@@ -768,12 +784,12 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
-    // for (auto r = 0; r < nr_fine; ++r) {
-    AMREX_PARALLEL_FOR_1D(nr_fine, r, {
+    for (auto r = 0; r < nr_fine; ++r) {
+    //AMREX_PARALLEL_FOR_1D(nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
         rho0_nph(r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
-    });
+    }//);
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
@@ -803,11 +819,11 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     // A_j (r^2 dw_0)_{j-3/2} +
     // B_j (r^2 dw_0)_{j-1/2} +
     // C_j (r^2 dw_0)_{j+1/2} = F_j
-    A.setVal(0.0);
-    B.setVal(0.0);
-    C.setVal(0.0);
     u.setVal(0.0);
-    F.setVal(0.0);
+    std::fill(A_vec.begin(), A_vec.end(), 0.);
+    std::fill(B_vec.begin(), B_vec.end(), 0.);
+    std::fill(C_vec.begin(), C_vec.end(), 0.);
+    std::fill(F_vec.begin(), F_vec.end(), 0.);
 
     // Note that we are solving for (r^2 delta w0), not just w0.
     int max_cutoff = base_cutoff_density_coord_loc;
@@ -821,21 +837,21 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         Real dr2 = r_edge_loc_p(0,r+1) - r_edge_loc_p(0,r);
         Real dr3 = r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1);
 
-        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
-        A(r) /= dr1*dr3;
+        A[r] = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
+        A[r] /= dr1*dr3;
 
-        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1)*dr1) 
+        B[r] = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1)*dr1) 
                 + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)*dr2) ) 
                 / dr3;
 
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr3;
 
-        B(r) -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
+        B[r] -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
 
-        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
-        C(r) /= dr2*dr3;
+        C[r] = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
+        C[r] /= dr2*dr3;
 
-        F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
+        F[r] = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
                 grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
                 r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
                 (dr3 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
@@ -844,22 +860,22 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A_vec[0] = 0.0;
+    B_vec[0] = 1.0;
+    C_vec[0] = 0.0;
+    F_vec[0] = 0.0;
 
     // Upper boundary
-    A[max_cutoff+1] = -1.0;
-    B[max_cutoff+1] = 1.0;
-    C[max_cutoff+1] = 0.0;
-    F[max_cutoff+1] = 0.0;
+    A_vec[max_cutoff+1] = -1.0;
+    B_vec[max_cutoff+1] = 1.0;
+    C_vec[max_cutoff+1] = 0.0;
+    F_vec[max_cutoff+1] = 0.0;
     
     // need to synchronize gpu values with updated host values
     Gpu::synchronize();
     
     // Call the tridiagonal solver
-    Tridiag(A, B, C, F, u, max_cutoff+2);
+    Tridiag(A_vec, B_vec, C_vec, F_vec, u, max_cutoff+2);
 
     w0_p[0] = w0_from_Sbar(0);
 
@@ -900,20 +916,44 @@ Maestro::Tridiag(const BaseState<Real>& a, const BaseState<Real>& b,
 {
     BaseState<Real> gam(n);
 
+    if (b(0) == 0) Abort("tridiag: CANT HAVE B[0] = 0.0");
+
+    Real bet = b(0);
+    u(0) = r(0) / bet;
+
+    for (auto j = 1; j < n; j++) {
+        gam(j) = c(j-1) / bet;
+        bet = b(j) - a(j) * gam(j);
+        if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
+        u(j) = (r(j) - a(j) * u(j-1)) / bet;
+    }
+
+    for (auto j = n-2; j >= 0; --j) {
+        u(j) -= gam(j+1) * u(j+1);
+    }
+}
+
+void
+Maestro::Tridiag(const RealVector& a, const RealVector& b, 
+                 const RealVector& c, const RealVector& r, 
+                 BaseState<Real>& u, const int n)
+{
+    RealVector gam(n);
+
     if (b[0] == 0) Abort("tridiag: CANT HAVE B[0] = 0.0");
 
     Real bet = b[0];
-    u[0] = r[0] / bet;
+    u(0) = r[0] / bet;
 
     for (auto j = 1; j < n; j++) {
         gam[j] = c[j-1] / bet;
         bet = b[j] - a[j] * gam[j];
         if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
-        u[j] = (r[j] - a[j] * u[j-1]) / bet;
+        u(j) = (r[j] - a[j] * u(j-1)) / bet;
     }
 
     for (auto j = n-2; j >= 0; --j) {
-        u[j] -= gam[j+1] * u[j+1];
+        u(j) -= gam[j+1] * u(j+1);
     }
 }
 

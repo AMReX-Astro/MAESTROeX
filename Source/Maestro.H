@@ -1286,6 +1286,10 @@ public:
                  const BaseState<Real>& c, const BaseState<Real>& r, 
                  BaseState<Real>& u, const int n);
 
+    void Tridiag(const RealVector& a, const RealVector& b, 
+                 const RealVector& c, const RealVector& r, 
+                 BaseState<Real>& u, const int n);
+
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
     // end MaestroMakew0.cpp functions
