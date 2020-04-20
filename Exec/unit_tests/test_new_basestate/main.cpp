@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
         base_state.setVal(1.0);
 
-        Print() << "print an element: " << base_state(0,0) << std::endl;
+        Print() << "print an element: " << base_state.array()(0,0) << std::endl;
 
         Print() << "defining another base state" << std::endl;
 
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 
         deep_copy.setVal(1, 0.0);
 
-        Print() << "print an element: " << deep_copy(0,0,1) << std::endl;
+        Print() << "print an element: " << deep_copy.array()(0,0,1) << std::endl;
 
         Print() << "are the two base states equal? " << (base_state == deep_copy) << std::endl;
 
@@ -62,21 +62,28 @@ int main(int argc, char* argv[])
 
         BaseState<Real> c_base(f_base, nlevs, len, ncomp);
 
-        Print() << "let's iterate over the base state" << std::endl;
+        Print() << "let's iterate over the base state using a BaseStateArray" << std::endl;
+        BaseStateArray<Real> base_arr = base_state.array();
         for (auto l = 0; l < nlevs; ++l) {
-            AMREX_PARALLEL_FOR_1D(base_state.length(), n, {
-                base_state(l,n) = 0.5;
+            AMREX_PARALLEL_FOR_1D(len, n, {
+                base_arr(l,n) = 0.5;
             });
         }
+        Gpu::synchronize();
+
+        Print() << "base_state = " << base_arr(0,0) << std::endl;
 
         Print() << "we can also iterate over the components" << std::endl;
         for (auto l = 0; l < nlevs; ++l) {
-            AMREX_PARALLEL_FOR_1D(base_state.length(), n, {
-                for (auto comp = 0; comp < base_state.nComp(); ++comp) {
-                    base_state(l,n,comp) = Real(comp);
+            AMREX_PARALLEL_FOR_1D(len, n, {
+                for (auto comp = 0; comp < ncomp; ++comp) {
+                    base_arr(l,n,comp) = Real(comp);
                 }
             });
         }
+        Gpu::synchronize();
+
+        Print() << "base_state = " << base_arr(0,0,0) << std::endl;
 
         Print() << "multiply by scalar" << std::endl;
 
