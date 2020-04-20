@@ -17,6 +17,7 @@ struct BaseStateArray
     int len;
     int nvar;
 
+    /// default constructor
     AMREX_GPU_HOST_DEVICE
     constexpr BaseStateArray () noexcept 
         : dptr(nullptr), nlev(0), len(0), nvar(0) {}
@@ -27,6 +28,7 @@ struct BaseStateArray
         : dptr(rhs.dptr), nlev(rhs.nlev), len(rhs.len), nvar(rhs.nvar) 
         {}
 
+    /// initialize from pointer 
     AMREX_GPU_HOST_DEVICE
     constexpr BaseStateArray(T* ptr, const int num_levs=1, const int length=1, const int ncomp=1) noexcept
         : dptr(ptr), nlev(num_levs), len(length), nvar(ncomp)
@@ -35,6 +37,7 @@ struct BaseStateArray
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
 
+    /// access elements. If only 2 arguments are passed in, component is set to 0
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator() (const int lev, const int i, const int n=0) const noexcept {
         AMREX_ASSERT(lev >= 0);
@@ -44,6 +47,7 @@ struct BaseStateArray
         return dptr[(lev*len + i)*nvar + n];
     }
 
+    /// if access using only one index, then this ignores the underlying data structure. Useful for e.g. applying the same operation to all data.
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator() (const int i) const noexcept {
         return dptr[i];
@@ -75,13 +79,16 @@ struct BaseStateArray
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
     int nLevels() const noexcept { return nlev; }
 
+    /// number of cells in base
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int length() const noexcept { return len; }
 
+    /// number of componenets
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const noexcept { return nvar; }
 };
 
+/// create a BaseStateArray
 template <typename T>
 AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
 BaseStateArray<T>
@@ -111,15 +118,16 @@ public:
     /// copy constructor. This makes a deep copy of the src.
     BaseState(const BaseState<T>& src);
 
-    // /// destructor
-    // ~BaseState () { };
-
+    /// return a BaseStateArray object to allow for accessing 
+    /// the underlying data
     AMREX_FORCE_INLINE
     BaseStateArray<T const> array () const noexcept 
     {
         return makeBaseStateArray<T const>(base_data.dataPtr(), nlev, len, nvar);
     } 
 
+    /// return a BaseStateArray object to allow for accessing 
+    /// the underlying data
     AMREX_FORCE_INLINE
     BaseStateArray<T> array () noexcept 
     {
@@ -139,9 +147,11 @@ public:
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
     int nLevels() const { return nlev; };
 
+    /// number of cells in base
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int length() const { return len; };
 
+    /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
 

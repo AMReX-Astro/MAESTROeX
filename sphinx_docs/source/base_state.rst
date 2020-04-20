@@ -59,7 +59,7 @@ Note here that we **must** call ``Gpu::synchronize()`` after the GPU kernel. For
 
 If performing simple arithmetic with ``BaseState``s, then this can be done straightforwardly using the built in member functions. ``BaseState``s can be added, subtracted, multiplied and divided by scalars and element-wise by other ``BaseState``s.
 
-.. code-block::
+.. code-block:: cpp
 
    const int nlevs = 5;
    const int ncells = 20;
