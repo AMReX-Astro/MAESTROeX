@@ -16,6 +16,7 @@
 #include <network.H>
 #include <eos.H>
 #include <BaseState.H>
+#include <BaseStateGeometry.H>
 
 #include <state_indices.H>
 #include <ModelParser.H>

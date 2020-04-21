@@ -35,6 +35,21 @@ struct BaseStateArray
         {}
 
     AMREX_GPU_HOST_DEVICE
+    void init(T* ptr, const int num_levs=1, const int length=1, const int ncomp=1) noexcept {
+        dptr = ptr;
+        nlev = num_levs;
+        len = length;
+        nvar = ncomp;
+    }
+
+    void init(BaseState<T> base_state) noexcept {
+        dptr = base_state.dataPtr();
+        nlev = base_state.nlev;
+        len = base_state.len;
+        nvar = base_state.ncomp;
+    }
+
+    AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
 
     /// access elements. If only 2 arguments are passed in, component is set to 0
