@@ -79,8 +79,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     const int n = lev;
 
     // allocate arrays
-    RealVector pres(nr[n]);
-    RealVector dens(nr[n]);
+    RealVector pres(nr.array()(n));
+    RealVector dens(nr.array()(n));
 
     RealVector U_old(2);
     RealVector U_new(2);
@@ -93,15 +93,15 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     U_old[0] = log(rho_0);
     U_old[1] = log(p_0);
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < nr.array()(n); ++r) {
 
         // height above the bottom of the domain
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr.array()(n);
 
         // do HSE using RK2
 
         // out intergration starts at y - h
-        Real h = r == 0 ? dr[n] * 0.5 : dr[n];
+        Real h = r == 0 ? dr.array()(n) * 0.5 : dr.array()(n);
 
         auto k = dUdy(y - h, U_old);
 
@@ -124,9 +124,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         }
     }
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < nr.array()(n); ++r) {
 
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr.array()(n);
 	RealVector xn = set_species(y);
 	
         eos_state.rho = dens[r];

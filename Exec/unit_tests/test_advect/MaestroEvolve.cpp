@@ -18,12 +18,10 @@ Maestro::Evolve ()
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > sedge(finest_level+1);
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > sflux(finest_level+1);
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-	Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+	BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
 
 	Vector<Real> abs_norm(finest_level+1);
 	Vector<Real> rel_norm(finest_level+1);
-
-	rho0_predicted_edge.shrink_to_fit();
 
 	for (int lev=0; lev<=finest_level; ++lev) {
 		dens_orig[lev].define(grids[lev], dmap[lev],   1, ng_s);
@@ -123,7 +121,7 @@ Maestro::Evolve ()
 			std::fill(p0_old.begin(),     p0_old.end(),     0.);
 			std::fill(p0_new.begin(),     p0_new.end(),     0.);
 			std::fill(w0.begin(),         w0.end(),         0.);
-			std::fill(rho0_predicted_edge.begin(), rho0_predicted_edge.end(), 0.);
+			rho0_predicted_edge.setVal(0.);
 
 			// initialize the velocity field -- it is unity in the
 			// direction of propagation, a negative itest_dir indicates

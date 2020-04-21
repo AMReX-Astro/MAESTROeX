@@ -66,7 +66,7 @@ Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     int * AMREX_RESTRICT tag_array_p = tag_array.dataPtr();
     const int max_lev = max_radial_level + 1;
 
-    const Real dr_lev = dr[lev];
+    const Real dr_lev = dr.array()(lev);
 
     if (use_tpert_in_tagging) {
         // Tag on regions with largest temperature perturbation

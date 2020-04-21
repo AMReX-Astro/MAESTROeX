@@ -14,9 +14,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     const int max_lev = max_radial_level + 1;
     const int n = lev;
 
-    for (auto r = 0; r< nr[n]; ++r) {
+    for (auto r = 0; r< nr.array()(n); ++r) {
         // height above the bottom of the domain
-        Real dist = (Real(r) + 0.5) * dr[n];
+        Real dist = (Real(r) + 0.5) * dr.array()(n);
 
         s0_init[n+max_lev*(r+nr_fine*Rho)] = exp(-dist*dist/0.1);
 
