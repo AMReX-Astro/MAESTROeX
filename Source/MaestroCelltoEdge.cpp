@@ -20,10 +20,10 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
     Real * AMREX_RESTRICT s0_edge = s0_edge_vec.dataPtr();
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            Real nr_lev = nr(n);
-            const int lo = r_start_coord(n,i);
-            const int hi = r_end_coord(n,i)+1;
+        for (auto i = 1; i <= numdisjointchunks.array()(n); ++i) {
+            Real nr_lev = nr.array()(n);
+            const int lo = r_start_coord.array()(n,i);
+            const int hi = r_end_coord.array()(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
              
@@ -72,36 +72,37 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
     const int max_lev = max_radial_level+1;
 
     const Real * AMREX_RESTRICT s0_cell = s0_cell_vec.dataPtr();
-
+    auto s0_edge_arr = s0_edge.array();
+    
     for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            Real nr_lev = nr(n);
-            const int lo = r_start_coord(n,i);
-            const int hi = r_end_coord(n,i)+1;
+        for (auto i = 1; i <= numdisjointchunks.array()(n); ++i) {
+            Real nr_lev = nr.array()(n);
+            const int lo = r_start_coord.array()(n,i);
+            const int hi = r_end_coord.array()(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
              
                 if (r == 0) {
                     // if we are at lower domain boundary
-                    s0_edge(n,r) = s0_cell[n+max_lev*r];
+                    s0_edge_arr(n,r) = s0_cell[n+max_lev*r];
                 } else if (r == 1 || r == lo) {
                     // if we are at lower domain boundary+1 OR
                     // if we are at bottom of coarse-fine interface that is not a domain boundary
-                    s0_edge(n,r) = 0.5*(s0_cell[n+max_lev*(r-1)]+s0_cell[n+max_lev*r]);
+                    s0_edge_arr(n,r) = 0.5*(s0_cell[n+max_lev*(r-1)]+s0_cell[n+max_lev*r]);
                 } else if (r == nr_lev) {
                     // if we are at upper domain boundary
-                    s0_edge(n,r) = s0_cell[n+max_lev*(r-1)];
+                    s0_edge_arr(n,r) = s0_cell[n+max_lev*(r-1)];
                 } else if (r == nr_lev-1 || r == hi) {
                     // if we are at upper domain boundary-1 OR
                     // if we are at top of coarse-fine interface that is not a domain boundary
-                    s0_edge(n,r) = 0.5*(s0_cell[n+max_lev*r]+s0_cell[n+max_lev*(r-1)]);
+                    s0_edge_arr(n,r) = 0.5*(s0_cell[n+max_lev*r]+s0_cell[n+max_lev*(r-1)]);
                 } else {
                     // fourth order
                     Real tmp = 7.0/12.0 * (s0_cell[n+max_lev*r] + s0_cell[n+max_lev*(r-1)]) 
                         -1.0/12.0 * (s0_cell[n+max_lev*(r+1)] + s0_cell[n+max_lev*(r-2)]);
                     Real s0min = min(s0_cell[n+max_lev*r],s0_cell[n+max_lev*(r-1)]);
                     Real s0max = max(s0_cell[n+max_lev*r],s0_cell[n+max_lev*(r-1)]);
-                    s0_edge(n,r) = min(max(tmp,s0min),s0max);
+                    s0_edge_arr(n,r) = min(max(tmp,s0min),s0max);
                 }
             });
         }

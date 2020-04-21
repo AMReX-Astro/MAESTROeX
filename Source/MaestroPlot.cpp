@@ -159,8 +159,8 @@ Maestro::WritePlotFile (const int step,
 
             BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
 
-            for (int i=0; i<nr(lev); ++i) {
-                BaseCCFile << r_cc_loc_b(lev,i) << " "
+            for (int i=0; i<nr.array()(lev); ++i) {
+                BaseCCFile << r_cc_loc_b.array()(lev,i) << " "
                            << rho0_in[lev+(max_radial_level+1)*i] << " "
                            << rhoh0_in[lev+(max_radial_level+1)*i] << " "
                            << p0_in[lev+(max_radial_level+1)*i] << " "
@@ -190,8 +190,8 @@ Maestro::WritePlotFile (const int step,
 
             BaseFCFile << "r_edge  w0 \n";
 
-            for (int i = 0; i <= nr(lev); ++i) {
-                BaseFCFile << r_edge_loc_b(lev,i) << " "
+            for (int i = 0; i <= nr.array()(lev); ++i) {
+                BaseFCFile << r_edge_loc_b.array()(lev,i) << " "
                            << w0[lev+(max_radial_level+1)*i] << "\n";
             }
         }

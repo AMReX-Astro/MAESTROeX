@@ -72,9 +72,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto i = 1; i <= numdisjointchunks(lev); ++i) { 
-                const int lo = r_start_coord(lev,i);
-                const int hi = r_end_coord(lev,i);
+            for (auto i = 1; i <= numdisjointchunks.array()(lev); ++i) { 
+                const int lo = r_start_coord.array()(lev,i);
+                const int hi = r_end_coord.array()(lev,i);
                 Real ncell_lev = ncell[lev];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
@@ -262,7 +262,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // choose which level to interpolate from
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
-        const Real dr0 = dr(0);
+        const Real dr0 = dr.array()(0);
         const int nrf = nr_fine;
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {

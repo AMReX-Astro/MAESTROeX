@@ -491,7 +491,11 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             Real * AMREX_RESTRICT w0_p = w0.dataPtr();
             const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
             const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
-
+	    
+	    auto rho0_edge_old_arr = rho0_edge_old.array();
+	    auto rho0_edge_new_arr = rho0_edge_new.array();
+	    auto rho0_predicted_edge_arr = rho0_predicted_edge.array();
+	    
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
@@ -534,7 +538,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     sfluxy(i,j,k,0) = 0.0;
                 }
 
-                Real rho0_edge = 0.5*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j));
+                Real rho0_edge = 0.5*(rho0_edge_old_arr(lev,j)+rho0_edge_new_arr(lev,j));
 
                 if (species_pred_type_loc == pred_rhoprime_and_X) {
                     //   ! edge states are rho' and X.  To make the (rho X) flux,
@@ -559,7 +563,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     }
 
                     if (comp==spec_comp+nspec-1) {
-                        etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge(lev,j);
+                        etarhoflux_arr(i,j,k) -= w0_p[lev+j*(max_lev+1)]*rho0_predicted_edge_arr(lev,j);
                     }
                 } 
 
@@ -641,7 +645,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxz(i,j,k,0) = 0.0;
                     }
 
-                    Real rho0_edge = 0.5*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k));
+                    Real rho0_edge = 0.5*(rho0_edge_old_arr(lev,k)+rho0_edge_new_arr(lev,k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         //   ! edge states are rho' and X.  To make the (rho X) flux,
@@ -666,7 +670,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         }
 
                         if (comp == spec_comp+nspec-1) {
-                            etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge(lev,k);
+                            etarhoflux_arr(i,j,k) -= w0_p[lev+k*(max_lev+1)]*rho0_predicted_edge_arr(lev,k);
                         }
                     } 
 

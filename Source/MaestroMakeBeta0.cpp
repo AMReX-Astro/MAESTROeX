@@ -19,7 +19,8 @@ Maestro::MakeBeta0(RealVector& beta0,
     const Real rel_eps = c_rel_eps;
 
     BaseState<Real> beta0_edge(finest_radial_level+1, nr_fine+1);
-
+    BaseStateArray<Real> beta0_edge_arr = beta0_edge.array();
+    
     std::fill(beta0.begin(), beta0.end(), 0.);
 
     Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
@@ -48,38 +49,38 @@ Maestro::MakeBeta0(RealVector& beta0,
         //////////////////////////////////////////////////////////////////////
 
         for (auto n = 0; n <= finest_radial_level; ++n) {
-            for (auto j = 1; j <= numdisjointchunks(n); ++j) {
+            for (auto j = 1; j <= numdisjointchunks.array()(n); ++j) {
                 // Compute beta0 on edges and centers at level n
                 if (n == 0) {
-                    beta0_edge(0,0) = rho0[0];
+                    beta0_edge_arr(0,0) = rho0[0];
                 } else {
                     // Obtain the starting value of beta0_edge_lo from the coarser grid
-                    beta0_edge(n,r_start_coord(n,j)) = beta0_edge(n-1,r_start_coord(n,j)/2);
+                    beta0_edge_arr(n,r_start_coord.array()(n,j)) = beta0_edge_arr(n-1,r_start_coord.array()(n,j)/2);
                 }
 
                 // NOTE: the integral here prevents this from being done in parallel
-                for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+                for (auto r = r_start_coord.array()(n,j); r <= r_end_coord.array()(n,j); ++r) {
                     Real lambda = 0.0;
                     Real mu = 0.0;
                     Real nu = 0.0;
 
-                    if (r < anelastic_cutoff_density_coord(n)) {
+                    if (r < anelastic_cutoff_density_coord.array()(n)) {
 
                         Real drp = is_irreg ? 
-                            r_edge_loc_b(n,r+1) - r_edge_loc_b(n,r) : dr(n);
-                        Real drm = dr(n);
+                            r_edge_loc_b.array()(n,r+1) - r_edge_loc_b.array()(n,r) : dr.array()(n);
+                        Real drm = dr.array()(n);
                         if (is_irreg) {
                             drm = r > 0 ? 
-                                r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1) : drp;
+                                r_edge_loc_b.array()(n,r) - r_edge_loc_b.array()(n,r-1) : drp;
                         }
 
-                        if (r == 0 || r == nr(n)-1) {
+                        if (r == 0 || r == nr.array()(n)-1) {
                             // lambda = 0.0;
                             // mu = 0.0;
                             // nu = 0.0;
                         } else {
                             Real drc = is_irreg ? 
-                                r_cc_loc_b(n,r+1) - r_cc_loc_b(n,r-1) : dr(n);
+                                r_cc_loc_b.array()(n,r+1) - r_cc_loc_b.array()(n,r-1) : dr.array()(n);
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
@@ -114,8 +115,8 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                         if (is_irreg) {
                             // edge-to-cell-center spacings 
-                            drp = 2.0 * (r_edge_loc_b(n,r+1) - r_cc_loc_b(n,r));
-                            drm = 2.0 * (r_cc_loc_b(n,r) - r_edge_loc_b(n,r));
+                            drp = 2.0 * (r_edge_loc_b.array()(n,r+1) - r_cc_loc_b.array()(n,r));
+                            drm = 2.0 * (r_cc_loc_b.array()(n,r) - r_edge_loc_b.array()(n,r));
                         }
 
                         Real integral = 0.0;
@@ -135,9 +136,9 @@ Maestro::MakeBeta0(RealVector& beta0,
                             if (use_linear_grav_in_beta0 && !is_irreg) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
-                                Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/dr(n);
-                                Real dpls = 2.0 * (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*r])/dr(n);
-                                Real dmin = 2.0 * (grav_cell[n+max_lev*r] - grav_cell[n+max_lev*(r-1)])/dr(n);
+                                Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/dr.array()(n);
+                                Real dpls = 2.0 * (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*r])/dr.array()(n);
+                                Real dmin = 2.0 * (grav_cell[n+max_lev*r] - grav_cell[n+max_lev*(r-1)])/dr.array()(n);
                                 Real slim = min(fabs(dpls), fabs(dmin));
                                 slim = dpls * dmin > 0.0 ? slim : 0.0;
                                 Real sflag = copysign(1.0, del);
@@ -153,11 +154,11 @@ Maestro::MakeBeta0(RealVector& beta0,
                                 Real coeff3 = kappa*lambda / (mu*nu);
                                 
                                 integral = 
-                                    coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*dr(n))/
-                                                (gamma1bar[n+max_lev*r] - 0.5*mu*dr(n)) ) +
-                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*dr(n))/
-                                                (p0[n+max_lev*r] - 0.5*nu*dr(n)) ) -
-                                    coeff3*dr(n);
+                                    coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*dr.array()(n))/
+                                                (gamma1bar[n+max_lev*r] - 0.5*mu*dr.array()(n)) ) +
+                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*dr.array()(n))/
+                                                (p0[n+max_lev*r] - 0.5*nu*dr.array()(n)) ) -
+                                    coeff3*dr.array()(n);
 
                             } else {
                                 // paper III, equation C2
@@ -173,9 +174,9 @@ Maestro::MakeBeta0(RealVector& beta0,
                             }
                         }
 
-                        beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral);
-                        beta0[n+max_lev*r] = 0.5*(beta0_edge(n,r) + 
-                            beta0_edge(n,r+1));
+                        beta0_edge_arr(n,r+1) = beta0_edge_arr(n,r) * exp(-integral);
+                        beta0[n+max_lev*r] = 0.5*(beta0_edge_arr(n,r) + 
+                            beta0_edge_arr(n,r+1));
 
                     } else {// r >= anelastic_cutoff_density
 
@@ -185,16 +186,16 @@ Maestro::MakeBeta0(RealVector& beta0,
                         } else {
                             beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)];
                         }
-                        beta0_edge(n,r+1) = 2.0*beta0[n+max_lev*r] - 
-                            beta0_edge(n,r);
+                        beta0_edge_arr(n,r+1) = 2.0*beta0[n+max_lev*r] - 
+                            beta0_edge_arr(n,r);
                     }
                 }
 
                 if (n  >  0) {
                     // Compare the difference between beta0 at the top of level n to the 
                     // corresponding point on level n-1
-                    Real offset = beta0_edge(n,r_end_coord(n,j)+1)
-                        - beta0_edge(n-1,(r_end_coord(n,j)+1)/2);
+                    Real offset = beta0_edge_arr(n,r_end_coord.array()(n,j)+1)
+                        - beta0_edge_arr(n-1,(r_end_coord.array()(n,j)+1)/2);
 
                     for (auto i = n-1; i >= 0; --i) {
 
@@ -202,12 +203,12 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                         // Offset the centered beta on level i above this point so the total 
                         // integral is consistent
-                        for (auto r = r_end_coord(n,j)/refrat+1; r <= nr(i); ++r) {
+                        for (auto r = r_end_coord.array()(n,j)/refrat+1; r <= nr.array()(i); ++r) {
                             beta0[i+max_lev*r] += offset;
                         }
 
                         // Redo the anelastic cutoff part
-                        for (auto r = anelastic_cutoff_density_coord(i); r <= nr(i); ++r) {
+                        for (auto r = anelastic_cutoff_density_coord.array()(i); r <= nr.array()(i); ++r) {
                             if (rho0[i+max_lev*(r-1)] != 0.0) {
                                 beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
                                     (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
@@ -219,15 +220,15 @@ Maestro::MakeBeta0(RealVector& beta0,
                         // level i+1 to level i in the region between the anelastic cutoff and 
                         // the top of grid n.  Then recompute beta0 at level i above the top 
                         // of grid n.
-                        if (r_end_coord(n,j) >= anelastic_cutoff_density_coord(n)) {
-                            for (auto r = anelastic_cutoff_density_coord(i); 
-                                 r <= (r_end_coord(n,j)+1)/refrat-1; ++r) {
+                        if (r_end_coord.array()(n,j) >= anelastic_cutoff_density_coord.array()(n)) {
+                            for (auto r = anelastic_cutoff_density_coord.array()(i); 
+                                 r <= (r_end_coord.array()(n,j)+1)/refrat-1; ++r) {
                                 beta0[i+max_lev*r] = 0.5*(beta0[i+1+max_lev*2*r] + 
                                     beta0[i+1+max_lev*(2*r+1)]);
                             }
 
-                            for (auto r = (r_end_coord(n,j)+1)/refrat; 
-                                 r <= nr(i); ++r) {
+                            for (auto r = (r_end_coord.array()(n,j)+1)/refrat; 
+                                 r <= nr.array()(i); ++r) {
                                 if (rho0[i+max_lev*(r-1)] != 0.0) {
                                     beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
                                         (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
@@ -241,13 +242,13 @@ Maestro::MakeBeta0(RealVector& beta0,
 
         // 0.0 the beta0 where there is no corresponding full state array
         for (auto n = 1; n <= finest_radial_level; ++n) {
-            for (auto j = 1; j <= numdisjointchunks(n); ++j) {
-                if (j == numdisjointchunks(n)) {
-                    for (auto r = r_end_coord(n,j)+1; r < nr(n); ++r) {
+            for (auto j = 1; j <= numdisjointchunks.array()(n); ++j) {
+                if (j == numdisjointchunks.array()(n)) {
+                    for (auto r = r_end_coord.array()(n,j)+1; r < nr.array()(n); ++r) {
                         beta0[n+max_lev*r] = 0.0;
                     }
                 } else {
-                    for (auto r = r_end_coord(n,j)+1; r < r_start_coord(n,j+1); ++r) {
+                    for (auto r = r_end_coord.array()(n,j)+1; r < r_start_coord.array()(n,j+1); ++r) {
                         beta0[n+max_lev*r] = 0.0;
                     }
                 }
@@ -256,10 +257,10 @@ Maestro::MakeBeta0(RealVector& beta0,
     } else if (beta0_type == 2) {
         // beta_0 = rho_0
         for (auto n = 0; n <= finest_radial_level; ++n) {
-            for (auto j = 1; j <= numdisjointchunks(n); ++j) {
+            for (auto j = 1; j <= numdisjointchunks.array()(n); ++j) {
                 // for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                int lo = r_start_coord(n,j);
-                int hi = r_end_coord(n,j);
+                int lo = r_start_coord.array()(n,j);
+                int hi = r_end_coord.array()(n,j);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     beta0_p[n+max_lev*r] = rho0_p[n+max_lev*r];
@@ -269,10 +270,10 @@ Maestro::MakeBeta0(RealVector& beta0,
     } else if (beta0_type == 3) {
         // beta_0 = 1.0
         for (auto n = 0; n <= finest_radial_level; ++n) {
-            for (auto j = 1; j <= numdisjointchunks(n); ++j) {
+            for (auto j = 1; j <= numdisjointchunks.array()(n); ++j) {
                 // for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
-                int lo = r_start_coord(n,j);
-                int hi = r_end_coord(n,j);
+                int lo = r_start_coord.array()(n,j);
+                int hi = r_end_coord.array()(n,j);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     beta0_p[n+max_lev*r] = 1.0;

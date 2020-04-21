@@ -32,17 +32,18 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     RealVector gradp0((max_radial_level+1)*nr_fine);
 
     const auto max_lev = max_radial_level + 1;
+    const auto r_cc_loc_p = r_cc_loc_b.array();
 
     if (spherical) {
         if (use_delta_gamma1_term) {
-            Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
+            Real dr_loc = r_cc_loc_p(0,1) - r_cc_loc_p(0,0);
             gradp0[0] = (p0[1] - p0[0]) / dr_loc;
 
-            dr_loc = r_cc_loc_b(0,nr_fine-1) - r_cc_loc_b(0,nr_fine-2);
+            dr_loc = r_cc_loc_p(0,nr_fine-1) - r_cc_loc_p(0,nr_fine-2);
             gradp0[nr_fine-1] = (p0[nr_fine-1] - p0[nr_fine-2]) / dr_loc;
 
             for (int r=1; r < nr_fine-1; r++) {
-                dr_loc = r_cc_loc_b(0,r+1) - r_cc_loc_b(0,r-1);
+                dr_loc = r_cc_loc_p(0,r+1) - r_cc_loc_p(0,r-1);
                 gradp0[r] = (p0[r+1] - p0[r-1]) / dr_loc;
             }
         }
@@ -175,7 +176,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 });
 #endif
             } else {
-                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord(lev);
+                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord.array()(lev);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;

@@ -388,7 +388,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
-            const auto nrn = nr(n) + 1;
+            const auto nrn = nr.array()(n) + 1;
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r % 2 == 0) {
@@ -398,7 +398,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         } else {
-            const auto nrn = nr(n);
+            const auto nrn = nr.array()(n);
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r == 0 || r == nrn-1) {
@@ -416,9 +416,9 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
 
     // copy valid data into temp
     for (auto n = 1; n < max_lev; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            const auto lo = r_start_coord(n,i);
-            const auto hi = is_edge ? r_end_coord(n,i)+1 : r_end_coord(n,i);
+        for (auto i = 1; i <= numdisjointchunks.array()(n); ++i) {
+            const auto lo = r_start_coord.array()(n,i);
+            const auto hi = is_edge ? r_end_coord.array()(n,i)+1 : r_end_coord.array()(n,i);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
             {
                 int r = k + lo;

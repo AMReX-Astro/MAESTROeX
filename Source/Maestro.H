@@ -1282,13 +1282,9 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseState<Real>& a, const BaseState<Real>& b, 
-                 const BaseState<Real>& c, const BaseState<Real>& r, 
-                 BaseState<Real>& u, const int n);
-
-    void Tridiag(const RealVector& a, const RealVector& b, 
-                 const RealVector& c, const RealVector& r, 
-                 BaseState<Real>& u, const int n);
+    void Tridiag(const BaseStateArray<Real>& a, const BaseStateArray<Real>& b, 
+                 const BaseStateArray<Real>& c, const BaseStateArray<Real>& r, 
+                 BaseStateArray<Real>& u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
