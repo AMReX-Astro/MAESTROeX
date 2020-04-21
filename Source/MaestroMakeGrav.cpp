@@ -32,7 +32,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
         } else if (do_2d_planar_octant) {
             //   compute gravity as in the spherical case
             BaseState<Real> m_base(finest_radial_level+1, nr_fine);
-	    auto m = m_base.array();
+            auto m = m_base.array();
 
             // level = 0
             m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_p(0,0)*r_cc_loc_p(0,0)*r_cc_loc_p(0,0);
@@ -157,7 +157,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
     } else { // spherical = 1
 
         BaseState<Real> m_base(1, nr_fine);
-	auto m = m_base.array();
+        auto m = m_base.array();
 
         m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc_p(0,0)*r_cc_loc_p(0,0)*r_cc_loc_p(0,0);
         grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc_p(0,0)*r_cc_loc_p(0,0));
@@ -228,7 +228,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // compute gravity as in spherical geometry
 
             BaseState<Real> m_base(finest_radial_level+1, nr_fine+1);
-	    auto m = m_base.array();
+            auto m = m_base.array();
 
             grav_edge[0] = 0.0;
             m(0,0) = 0.0;
@@ -317,7 +317,7 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge,
 
     const int max_lev = max_radial_level+1;
     const auto r_edge_loc_p = r_edge_loc_b.array();
-	    
+            
     const auto rho0_arr = rho0.array();
     auto grav_edge_arr = grav_edge.array();
 
@@ -342,8 +342,8 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge,
             // compute gravity as in spherical geometry
 
             BaseState<Real> m_base(finest_radial_level+1, nr_fine+1);
-	    auto m = m_base.array();
-	    
+            auto m = m_base.array();
+            
             grav_edge_arr(0,0) = 0.0;
             m(0,0) = 0.0;
 

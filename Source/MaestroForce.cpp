@@ -213,7 +213,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     if (spherical) {
         divw0.define(nr_fine);
         divw0.setVal(0.0);
-	auto divw0_arr = divw0.array();
+        auto divw0_arr = divw0.array();
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {
@@ -406,7 +406,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     if (spherical) {
         divw0.define(nr_fine);
         divw0.setVal(0.0);
-	auto divw0_arr = divw0.array();
+        auto divw0_arr = divw0.array();
 
         if (!use_exact_base_state) {
             for (int r=0; r<nr_fine-1; ++r) {

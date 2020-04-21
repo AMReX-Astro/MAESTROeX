@@ -491,11 +491,11 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             Real * AMREX_RESTRICT w0_p = w0.dataPtr();
             const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
             const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
-	    
-	    auto rho0_edge_old_arr = rho0_edge_old.array();
-	    auto rho0_edge_new_arr = rho0_edge_new.array();
-	    auto rho0_predicted_edge_arr = rho0_predicted_edge.array();
-	    
+            
+            auto rho0_edge_old_arr = rho0_edge_old.array();
+            auto rho0_edge_new_arr = rho0_edge_new.array();
+            auto rho0_predicted_edge_arr = rho0_predicted_edge.array();
+            
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction

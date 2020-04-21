@@ -492,7 +492,7 @@ Maestro::DiagFile (const int step,
 
     // compute the graviational potential energy too
     Real grav_ener = 0.0;
-	
+        
     if (spherical) {
 #if (AMREX_SPACEDIM == 3)
         const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();

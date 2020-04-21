@@ -127,8 +127,8 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     for (auto n = 0; n <= max_radial_level; ++n) {
 
         psi_planar_base.setVal(0.0);
-	auto psi_planar = psi_planar_base.array();
-	
+        auto psi_planar = psi_planar_base.array();
+        
         int base_cutoff_density_coord_loc = 0;
         get_base_cutoff_density_coord(n, &base_cutoff_density_coord_loc);
 

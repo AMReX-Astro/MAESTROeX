@@ -408,8 +408,8 @@ Maestro::Put1dArrayOnCart (int lev,
         const Box& tileBox = mfi.tilebox();
 
         const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
-	const auto s0_arr = s0.array();
-	
+        const auto s0_arr = s0.array();
+        
         if (!spherical) {
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
@@ -1536,7 +1536,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
             const Array4<Real> s0macy = s0mac[lev][1].array(mfi);
             const Array4<Real> s0macz = s0mac[lev][2].array(mfi);
             const Array4<const Real> s0_cart_arr = s0_cart[lev].array(mfi);
-	    const auto s0_arr = s0.array();
+            const auto s0_arr = s0.array();
 
             if (use_exact_base_state) {
                 // we currently have three different ideas for computing s0mac
