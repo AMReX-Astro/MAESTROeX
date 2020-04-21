@@ -304,6 +304,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
@@ -392,6 +393,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
+        // base_geom.ComputeCutoffCoords(rho0_new.array());
     }
     else {
         rho0_new = rho0_old;
@@ -450,6 +452,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             Average(s2, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
+            // base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new
@@ -635,6 +638,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         // reset cutoff coordinates to old time value
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (use_thermal_diffusion) {
@@ -704,6 +708,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
@@ -778,6 +783,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
+        // base_geom.ComputeCutoffCoords(rho0_new.array());
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -820,6 +826,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             Average(s2, rho0_new, Rho);
             compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
+            // base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph

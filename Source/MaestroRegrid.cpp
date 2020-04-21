@@ -74,6 +74,7 @@ Maestro::Regrid ()
         TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
+    // base_geom.InitMultiLevel(finest_level, tag_array.array());
 
     if (spherical == 1) {
         MakeNormal();
@@ -100,6 +101,7 @@ Maestro::Regrid ()
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
+    // base_geom.ComputeCutoffCoords(rho0_old.array());
 
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);

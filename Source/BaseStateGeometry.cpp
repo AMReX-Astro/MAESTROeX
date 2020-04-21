@@ -105,7 +105,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
                 r_cc_loc(0,i) = (Real(i)+0.5)*dr(0);
             }
             for (auto i = 0; i <= nr_fine; ++i) {
-                r_edge_loc(0,i) = (Real(i))*dr(0);
+                r_edge_loc(0,i) = Real(i)*dr(0);
             }
         }
     }
@@ -356,8 +356,8 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
 
         // coarsest grid always has 1 chunk of data
         numdisjointchunks(0) = 1;
-        r_start_coord(0) = 0;
-        r_end_coord(0) = nr(0)-1;
+        r_start_coord(0,1) = 0;
+        r_end_coord(0,1) = nr(0)-1;
 
         // for > 1 chunks (multilevel)
         for (auto n = 1; n <= finest_radial_level; ++n) {
@@ -383,7 +383,7 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
         }
     } else {
         numdisjointchunks(0) = 1;
-        r_start_coord(0) = 0;
-        r_end_coord(0) = nr(0)-1;
+        r_start_coord(0,1) = 0;
+        r_end_coord(0,1) = nr(0)-1;
     }
 }

@@ -203,6 +203,7 @@ Maestro::Setup ()
                              geom[max_level].CellSize(),
                              &nr_irreg);
     InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);
+    base_geom.Init(max_radial_level, nr_fine, dr_fine, nr_irreg, geom, max_level, center);
 
     if (use_exact_base_state) average_base_state = 1;
 
