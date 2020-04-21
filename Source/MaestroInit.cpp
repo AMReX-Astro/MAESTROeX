@@ -100,9 +100,11 @@ Maestro::Init ()
         // compute numdisjointchunks, r_start_coord, r_end_coord
         init_multilevel(tag_array.dataPtr(),&finest_level);
         InitMultilevel(finest_level);
+        // base_geom.InitMultiLevel(finest_level, tag_array.array());
 
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (spherical) {
@@ -246,6 +248,7 @@ Maestro::InitData ()
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
+    // base_geom.InitMultiLevel(finest_level, tag_array.array());
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
@@ -263,6 +266,7 @@ Maestro::InitData ()
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
         MakeGravCell(grav_cell_old, rho0_old);
     }
     else {
@@ -270,6 +274,7 @@ Maestro::InitData ()
         // first compute cutoff coordinates using initial density profile
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
+        // base_geom.ComputeCutoffCoords(rho0_old.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
@@ -281,6 +286,7 @@ Maestro::InitData ()
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
+            // base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);

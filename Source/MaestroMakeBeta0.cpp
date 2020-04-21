@@ -17,6 +17,7 @@ Maestro::MakeBeta0(RealVector& beta0,
     const int max_lev = max_radial_level+1;
 
     const Real rel_eps = c_rel_eps;
+    const auto& dr = base_geom.dr;
 
     BaseState<Real> beta0_edge(finest_radial_level+1, nr_fine+1);
 
@@ -73,13 +74,13 @@ Maestro::MakeBeta0(RealVector& beta0,
                                 r_edge_loc_b(n,r) - r_edge_loc_b(n,r-1) : drp;
                         }
 
-                        if (r == 0 || r == nr(n)-1) {
+                        if (r == 0 || r == base_geom.nr(n)-1) {
                             // lambda = 0.0;
                             // mu = 0.0;
                             // nu = 0.0;
                         } else {
                             Real drc = is_irreg ? 
-                                r_cc_loc_b(n,r+1) - r_cc_loc_b(n,r-1) : dr(n);
+                                base_geom.r_cc_loc(n,r+1) - base_geom.r_cc_loc(n,r-1) : dr(n);
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
@@ -114,8 +115,8 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                         if (is_irreg) {
                             // edge-to-cell-center spacings 
-                            drp = 2.0 * (r_edge_loc_b(n,r+1) - r_cc_loc_b(n,r));
-                            drm = 2.0 * (r_cc_loc_b(n,r) - r_edge_loc_b(n,r));
+                            drp = 2.0 * (r_edge_loc_b(n,r+1) - base_geom.r_cc_loc(n,r));
+                            drm = 2.0 * (base_geom.r_cc_loc(n,r) - r_edge_loc_b(n,r));
                         }
 
                         Real integral = 0.0;
@@ -202,12 +203,12 @@ Maestro::MakeBeta0(RealVector& beta0,
 
                         // Offset the centered beta on level i above this point so the total 
                         // integral is consistent
-                        for (auto r = r_end_coord(n,j)/refrat+1; r <= nr(i); ++r) {
+                        for (auto r = r_end_coord(n,j)/refrat+1; r <= base_geom.nr(i); ++r) {
                             beta0[i+max_lev*r] += offset;
                         }
 
                         // Redo the anelastic cutoff part
-                        for (auto r = anelastic_cutoff_density_coord(i); r <= nr(i); ++r) {
+                        for (auto r = anelastic_cutoff_density_coord(i); r <= base_geom.nr(i); ++r) {
                             if (rho0[i+max_lev*(r-1)] != 0.0) {
                                 beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
                                     (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
@@ -227,7 +228,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                             }
 
                             for (auto r = (r_end_coord(n,j)+1)/refrat; 
-                                 r <= nr(i); ++r) {
+                                 r <= base_geom.nr(i); ++r) {
                                 if (rho0[i+max_lev*(r-1)] != 0.0) {
                                     beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
                                         (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
@@ -243,7 +244,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         for (auto n = 1; n <= finest_radial_level; ++n) {
             for (auto j = 1; j <= numdisjointchunks(n); ++j) {
                 if (j == numdisjointchunks(n)) {
-                    for (auto r = r_end_coord(n,j)+1; r < nr(n); ++r) {
+                    for (auto r = r_end_coord(n,j)+1; r < base_geom.nr(n); ++r) {
                         beta0[n+max_lev*r] = 0.0;
                     }
                 } else {

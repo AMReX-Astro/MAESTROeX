@@ -24,6 +24,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     const Real TINY = 1.e-10;
     const int max_lev = max_radial_level + 1;
     const int n = lev;
+    const auto& dr = base_geom.dr;
 
     Real base_cutoff_density_loc = 1.e99;
     Real model_dr = (input_model.model_r[npts_model-1] - input_model.model_r[0]) / Real(npts_model - 1);
@@ -83,7 +84,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     Real temp_above_cutoff = s0_init[n+max_lev*nr_fine*Temp];
     Real p_above_cutoff = p0_init[n];
 
-    for (auto r = 0; r < nr(n); ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         Real rloc = starting_rad + (Real(r) + 0.5)*dr(n);
 
@@ -194,7 +195,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     Real max_hse_error = -1.e30;
 
-    for (auto r = 1; r < nr(n); ++r) {
+    for (auto r = 1; r < base_geom.nr(n); ++r) {
 
         Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
         rloc = min(rloc, rmax);

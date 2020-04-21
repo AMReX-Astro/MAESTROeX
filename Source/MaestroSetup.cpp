@@ -138,14 +138,12 @@ Maestro::Setup ()
     grav_cell_old.resize( (max_radial_level+1)*nr_fine );
     grav_cell_new.resize( (max_radial_level+1)*nr_fine );
     r_cc_loc     .resize( (max_radial_level+1)*nr_fine );
-    r_cc_loc_b   .resize(max_radial_level+1, nr_fine);
     etarho_cc    .resize( (max_radial_level+1)*nr_fine );
     psi          .resize( (max_radial_level+1)*nr_fine );
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     r_edge_loc.resize( (max_radial_level+1)*(nr_fine+1) );
-    r_edge_loc_b.resize(max_radial_level+1, nr_fine+1);
     w0        .resize( (max_radial_level+1)*(nr_fine+1) );
     etarho_ec .resize( (max_radial_level+1)*(nr_fine+1) );
 
@@ -195,7 +193,8 @@ Maestro::Setup ()
                              r_edge_loc.dataPtr(),
                              geom[max_level].CellSize(),
                              &nr_irreg);
-    InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);
+    // InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);
+    base_geom.Init(max_radial_level, nr_fine, dr_fine, nr_irreg, geom, max_level, center);
 
     if (use_exact_base_state) average_base_state = 1;
 

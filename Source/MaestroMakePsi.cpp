@@ -42,7 +42,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
 
     Real dr0 = dr(0);
 
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto r_edge_loc_p = r_edge_loc_b;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
@@ -52,7 +52,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
 
     const auto npts = base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
-        Real div_w0_sph = 1.0 / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) * 
+        Real div_w0_sph = 1.0 / (r_cc_loc(0,r)*r_cc_loc(0,r)) * 
             (r_edge_loc_p(0,r+1)*r_edge_loc_p(0,r+1) *
              w0_p[max_lev*(r+1)] - 
              r_edge_loc_p(0,r)*r_edge_loc_p(0,r) * 

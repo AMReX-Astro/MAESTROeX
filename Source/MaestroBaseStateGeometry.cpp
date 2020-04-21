@@ -3,103 +3,106 @@
 
 using namespace amrex;
 
-void 
-Maestro::InitBaseStateGeometry(const int max_radial_level_in, 
-                               const int nr_fine_in,
-                               const Real dr_fine_in,
-                               const int nr_irreg_in)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitBaseStateGeometry()", InitBaseStateGeometry); 
+// void 
+// Maestro::InitBaseStateGeometry(const int max_radial_level_in, 
+//                                const int nr_fine_in,
+//                                const Real dr_fine_in,
+//                                const int nr_irreg_in)
+// {
+//     // timer for profiling
+//     BL_PROFILE_VAR("Maestro::InitBaseStateGeometry()", InitBaseStateGeometry); 
 
-    Print() << "Calling InitBaseStateGeometry()" << std::endl;
+//     Print() << "Calling InitBaseStateGeometry()" << std::endl;
 
-    const auto probLo = geom[0].ProbLoArray();
-    const auto probHi = geom[0].ProbHiArray();
+//     const auto probLo = geom[0].ProbLoArray();
+//     const auto probHi = geom[0].ProbHiArray();
 
-    max_radial_level = max_radial_level_in;
-    finest_radial_level = max_radial_level_in; // FIXME - we want to set this after regridding
-    nr_fine = nr_fine_in;
-    dr_fine = dr_fine_in;
-    nr_irreg = nr_irreg_in;
+//     max_radial_level = max_radial_level_in;
+//     finest_radial_level = max_radial_level_in; // FIXME - we want to set this after regridding
+//     nr_fine = nr_fine_in;
+//     dr_fine = dr_fine_in;
+//     nr_irreg = nr_irreg_in;
 
-    dr.resize(max_radial_level+1);
-    nr.resize(max_radial_level+1);
+//     dr.resize(max_radial_level+1);
+//     nr.resize(max_radial_level+1);
 
-    base_cutoff_density_coord.resize(max_radial_level+1);
-    anelastic_cutoff_density_coord.resize(max_radial_level+1);
-    burning_cutoff_density_lo_coord.resize(max_radial_level+1);
-    burning_cutoff_density_hi_coord.resize(max_radial_level+1);
+//     base_cutoff_density_coord.resize(max_radial_level+1);
+//     anelastic_cutoff_density_coord.resize(max_radial_level+1);
+//     burning_cutoff_density_lo_coord.resize(max_radial_level+1);
+//     burning_cutoff_density_hi_coord.resize(max_radial_level+1);
 
-    const int max_lev = max_radial_level+1;
+//     const int max_lev = max_radial_level+1;
 
-    // compute center(:)
-    if (octant) {
-        for (auto i = 0; i < 3; ++i) {
-            if (!(spherical == 1 && AMREX_SPACEDIM == 3 && 
-                    probLo[i] == 0.0 ) ) {
-                Abort("ERROR: octant requires spherical with prob_lo = 0.0");
-            }
-            center[i] = 0.0;
-        }
-    } else {
-        for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
-            center[i] = 0.5*(probLo[i] + probHi[i]);
-        }
-    }
+//     // compute center(:)
+//     if (octant) {
+//         for (auto i = 0; i < 3; ++i) {
+//             if (!(spherical == 1 && AMREX_SPACEDIM == 3 && 
+//                     probLo[i] == 0.0 ) ) {
+//                 Abort("ERROR: octant requires spherical with prob_lo = 0.0");
+//             }
+//             center[i] = 0.0;
+//         }
+//     } else {
+//         for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
+//             center[i] = 0.5*(probLo[i] + probHi[i]);
+//         }
+//     }
 
-    // compute nr(:) and dr(:)
-    nr(max_radial_level) = nr_fine;
-    dr(max_radial_level) = dr_fine;
+//     // compute nr(:) and dr(:)
+//     nr(max_radial_level) = nr_fine;
+//     dr(max_radial_level) = dr_fine;
 
-    // computes dr, nr, r_cc_loc, r_edge_loc
-    if (spherical == 0) {
-        // cartesian case
+//     // computes dr, nr, r_cc_loc, r_edge_loc
+//     if (spherical == 0) {
+//         // cartesian case
 
-        // compute nr(:) and dr(:) assuming refinement ratio = 2
-        for (auto n = max_radial_level-1; n >= 0; --n) {
-          nr(n) = nr(n+1) / 2;
-          dr(n) = dr(n+1) * 2.0;
-        }
+//         // compute nr(:) and dr(:) assuming refinement ratio = 2
+//         for (auto n = max_radial_level-1; n >= 0; --n) {
+//           nr(n) = nr(n+1) / 2;
+//           dr(n) = dr(n+1) * 2.0;
+//         }
 
-        // compute r_cc_loc, r_edge_loc
-        for (auto n = 0; n <= max_radial_level; ++n) {
-            for (auto i = 0; i < nr(n); ++i) {
-                r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
-            }
-            for (auto i = 0; i <= nr(n); ++i) {
-                r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
-            }
-        }
-    } else {
+//         // compute r_cc_loc, r_edge_loc
+//         for (auto n = 0; n <= max_radial_level; ++n) {
+//             for (auto i = 0; i < nr(n); ++i) {
+//                 r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
+//             }
+//             for (auto i = 0; i <= nr(n); ++i) {
+//                 r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
+//             }
+//         }
+//     } else {
 
-        // spherical case
-        // compute r_cc_loc, r_edge_loc
-        if (use_exact_base_state) {
-            const Real* dx_fine = geom[max_level].CellSize();
-            // nr_fine = nr_irreg + 1
-            for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
-            }
-            r_edge_loc_b(0,0) = 0.0;
-            for (auto i = 0; i < nr_fine; ++i) {
-                r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
-            }
-        } else {
-            for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
-            }
-            for (auto i = 0; i <= nr_fine; ++i) {
-                r_edge_loc_b(0,i) = Real(i)*dr(0);
-            }
-        }
-    }
-}
+//         // spherical case
+//         // compute r_cc_loc, r_edge_loc
+//         if (use_exact_base_state) {
+//             const Real* dx_fine = geom[max_level].CellSize();
+//             // nr_fine = nr_irreg + 1
+//             for (auto i = 0; i < nr_fine; ++i) {
+//                 r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
+//             }
+//             r_edge_loc_b(0,0) = 0.0;
+//             for (auto i = 0; i < nr_fine; ++i) {
+//                 r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
+//             }
+//         } else {
+//             for (auto i = 0; i < nr_fine; ++i) {
+//                 r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
+//             }
+//             for (auto i = 0; i <= nr_fine; ++i) {
+//                 r_edge_loc_b(0,i) = Real(i)*dr(0);
+//             }
+//         }
+//     }
+// }
 
 #if (AMREX_SPACEDIM == 3)
 void 
 Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi, 
-                              const GpuArray<Real,AMREX_SPACEDIM> dx_fine, const GpuArray<Real,AMREX_SPACEDIM> dx_lev) 
+                              const GpuArray<Real,
+                              AMREX_SPACEDIM> dx_fine, 
+                              const GpuArray<Real,
+                              AMREX_SPACEDIM> dx_lev) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseStateMapSphr()", InitBaseStateMapSphr); 
@@ -332,9 +335,9 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
     const int max_lev = max_radial_level+1;
 
     if (spherical) {
-       finest_radial_level = 0;
+        finest_radial_level = 0;
     } else {
-       finest_radial_level = finest_radial_level_in;
+        finest_radial_level = finest_radial_level_in;
     }
 
     numdisjointchunks.resize(finest_radial_level+1);

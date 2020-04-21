@@ -31,7 +31,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, RealVector& sedge_vec,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr0 = dr(0);
+    const Real dr0 = base_geom.dr(0);
     const Real dtdr = dt / dr0;
 
     const int max_lev = max_radial_level+1;
@@ -351,8 +351,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
     for (int n = 0; n <= finest_radial_level; ++n) {
 
-        const int nr_lev = nr(n);
-        const Real dr_lev = dr(n);
+        const int nr_lev = base_geom.nr(n);
+        const Real dr_lev = base_geom.dr(n);
         const Real dtdr = dt / dr_lev;
 
         for (int i = 1; i <= numdisjointchunks(n); ++i) {
@@ -822,7 +822,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, RealVector& sedge_vec,
 
     for (int n = 0; n <= finest_radial_level; ++n) {
 
-        const int nr_lev = nr(n);
+        const int nr_lev = base_geom.nr(n);
 
         for (int i = 1; i <= numdisjointchunks(n); ++i) {
 
@@ -879,7 +879,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge,
     const int lim = 1;
     const int flag = 2;
     const int fromm = 3;
-    const Real dr0 = dr(0);
+    const Real dr0 = base_geom.dr(0);
     const Real dtdr = dt / dr0;
 
     const int max_lev = max_radial_level+1;
@@ -1197,8 +1197,8 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge,
 
     for (int n = 0; n <= finest_radial_level; ++n) {
 
-        const int nr_lev = nr(n);
-        const Real dr_lev = dr(n);
+        const int nr_lev = base_geom.nr(n);
+        const Real dr_lev = base_geom.dr(n);
         const Real dtdr = dt / dr_lev;
 
         for (int i = 1; i <= numdisjointchunks(n); ++i) {
@@ -1667,7 +1667,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge,
 
     for (int n = 0; n <= finest_radial_level; ++n) {
 
-        const int nr_lev = nr(n);
+        const int nr_lev = base_geom.nr(n);
 
         for (int i = 1; i <= numdisjointchunks(n); ++i) {
 

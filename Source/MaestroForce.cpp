@@ -209,6 +209,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
     BaseState<Real> divw0;
     Vector<MultiFab> divu_cart(finest_level+1);
+    const auto& r_cc_loc = base_geom.r_cc_loc;
 
     if (spherical) {
         divw0.define(nr_fine);
@@ -218,7 +219,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             for (int r=0; r<nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
                 divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0[r+1]
-                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
             }
         }
 
@@ -401,6 +402,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 
     BaseState<Real> divw0;
     Vector<MultiFab> divu_cart(finest_level+1);
+    const auto r_cc_loc = base_geom.r_cc_loc;
 
     if (spherical) {
         divw0.define(nr_fine);
@@ -410,7 +412,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             for (int r=0; r<nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc_b(0,r+1) - r_edge_loc_b(0,r);
                 divw0[r] = (r_edge_loc_b(0,r+1)*r_edge_loc_b(0,r+1) * w0[r+1]
-                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc_b(0,r)*r_cc_loc_b(0,r));
+                           - r_edge_loc_b(0,r)*r_edge_loc_b(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
             }
         }
 

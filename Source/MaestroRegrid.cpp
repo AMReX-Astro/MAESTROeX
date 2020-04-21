@@ -75,6 +75,7 @@ Maestro::Regrid ()
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
     InitMultilevel(finest_level);
+    // base_geom.InitMultiLevel(finest_level, tag_array.array());
 
     if (spherical == 1) {
         MakeNormal();
@@ -101,6 +102,7 @@ Maestro::Regrid ()
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
+    // base_geom.ComputeCutoffCoords(rho0_old.array());
 
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);
@@ -388,7 +390,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
-            const auto nrn = nr(n) + 1;
+            const auto nrn = base_geom.nr(n) + 1;
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r % 2 == 0) {
@@ -398,7 +400,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         } else {
-            const auto nrn = nr(n);
+            const auto nrn = base_geom.nr(n);
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r == 0 || r == nrn-1) {

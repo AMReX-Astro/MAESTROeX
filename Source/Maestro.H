@@ -16,6 +16,7 @@
 #include <network.H>
 #include <eos.H>
 #include <BaseState.H>
+#include <BaseStateGeometry.H>
 
 #include <state_indices.H>
 #include <ModelParser.H>
@@ -319,10 +320,10 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
-    void InitBaseStateGeometry(const int max_radial_level_in, 
-                               const int nr_fine_in,
-                               const amrex::Real dr_fine_in,
-                               const int nr_irreg_in);
+    // void InitBaseStateGeometry(const int max_radial_level_in, 
+    //                            const int nr_fine_in,
+    //                            const amrex::Real dr_fine_in,
+    //                            const int nr_irreg_in);
 #if (AMREX_SPACEDIM == 3)
     void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
@@ -2075,24 +2076,27 @@ public:
     int nr_fine;
     amrex::Real dr_fine;
     int nr_irreg;
-    BaseState<int> nr;
-    BaseState<Real> dr;
+    // BaseState<int> nr;
+    // BaseState<Real> dr;
 
-    BaseState<int> base_cutoff_density_coord;
-    BaseState<int> anelastic_cutoff_density_coord;
-    BaseState<int> burning_cutoff_density_lo_coord;
-    BaseState<int> burning_cutoff_density_hi_coord;
+    // BaseState<int> base_cutoff_density_coord;
+    // BaseState<int> anelastic_cutoff_density_coord;
+    // BaseState<int> burning_cutoff_density_lo_coord;
+    // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
     amrex::Real c_rel_eps;
 
     // these provide information about the multilevel base state configuration
-    BaseState<int> numdisjointchunks;
-    BaseState<int> r_start_coord;
-    BaseState<int> r_end_coord;
+    // BaseState<int> numdisjointchunks;
+    // BaseState<int> r_start_coord;
+    // BaseState<int> r_end_coord;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+
+    /// contains base state geometry variables
+    BaseStateGeometry base_geom;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile1_data;
@@ -2137,25 +2141,5 @@ public:
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
-
-// namespace amrex{
-//     namespace HostDevice { namespace Atomic {
-
-//     template <class T>
-//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-//     void Max (T* max, T value) noexcept
-//     {
-// #if AMREX_DEVICE_COMPILE
-//         Gpu::Atomic::Max(sum,value);
-// #else
-// #ifdef _OPENMP
-// #pragma omp atomic update
-// #endif
-//         *sum += value;
-// #endif
-//     }
-
-// }}}
-
 
 #endif

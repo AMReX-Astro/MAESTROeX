@@ -12,6 +12,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
 
     const int max_lev = max_radial_level+1;
+    const auto& dr = base_geom.dr;
 
     RealVector grav_edge((finest_radial_level+1)*(nr_fine+1));
     RealVector p0old((finest_radial_level+1)*(nr_fine+1));
@@ -40,8 +41,8 @@ Maestro::EnforceHSE(const RealVector& rho0,
     if (use_exact_base_state && spherical) {
         for (auto r = 1; r <= min(r_end_coord(0,1),base_cutoff_density_coord(0)); ++r) {
             // uneven grid spacing
-            Real dr1 = r_edge_loc_b(0,r)-r_cc_loc_b(0,r-1);
-            Real dr2 = r_cc_loc_b(0,r)-r_edge_loc_b(0,r);
+            Real dr1 = r_edge_loc_b(0,r)-base_geom.r_cc_loc(0,r-1);
+            Real dr2 = base_geom.r_cc_loc(0,r)-r_edge_loc_b(0,r);
             p0[max_lev*r] = p0[max_lev*(r-1)] + (dr1*rho0[max_lev*(r-1)] + 
                 dr2*rho0[max_lev*r])*grav_edge[max_lev*r];
         }
@@ -113,7 +114,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
                 // first, compute the value of the pressure in the coarse
                 // cell above the disjointchunk.
-                if (r_end_coord(n,i) == nr(n)-1) {
+                if (r_end_coord(n,i) == base_geom.nr(n)-1) {
                     // for (auto nothing - we are at the top of the domain
                     offset = 0.0;
                 } else if (r_end_coord(n,i) <= base_cutoff_density_coord(n)) {
@@ -146,10 +147,10 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
                 // if we are not at the top of the domain, we need to
                 // subtract the offset for all values at and above this point
-                if (r_end_coord(n,i) != nr(n)-1) {
+                if (r_end_coord(n,i) != base_geom.nr(n)-1) {
                     for (auto l = n-1; l >= 0; --l) {
                         for (int r = round( (r_end_coord(n,i)+1)/pow(2, n-l) ); 
-                             r <= nr(l)-1; ++r) {
+                             r <= base_geom.nr(l)-1; ++r) {
                             p0[l+max_lev*r] -= offset;
                         }
                     }
@@ -161,7 +162,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     // now compare pressure in the last cell and offset to make sure we
     // are integrating "from the top"
     // we use the coarsest level as the reference point
-    offset = p0[max_lev*(nr(0)-1)] - p0old[max_lev*(nr(0)-1)];
+    offset = p0[max_lev*(base_geom.nr(0)-1)] - p0old[max_lev*(base_geom.nr(0)-1)];
 
     // offset level 0
     for (auto r = 0; r < nr_fine; ++r) {
@@ -181,7 +182,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     for (auto n = 1; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= numdisjointchunks(n); ++i) {
             if (i == numdisjointchunks(n)) {
-                for (auto r = r_end_coord(n,i)+1; r < nr(n); ++r) {
+                for (auto r = r_end_coord(n,i)+1; r < base_geom.nr(n); ++r) {
                     p0[n+max_lev*r] = 0.0;
                 }
             } else {

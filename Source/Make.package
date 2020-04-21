@@ -1,5 +1,6 @@
 CEXE_sources += main.cpp
 CEXE_sources += BaseState.cpp
+CEXE_sources += BaseStateGeometry.cpp
 CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvanceIrreg.cpp
@@ -60,6 +61,7 @@ ifeq ($(USE_ROTATION), TRUE)
 endif
 
 CEXE_headers += BaseState.H
+CEXE_headers += BaseStateGeometry.H
 CEXE_headers += Maestro.H
 CEXE_headers += MaestroBCThreads.H
 CEXE_headers += MaestroInletBCs.H

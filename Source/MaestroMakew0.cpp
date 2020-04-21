@@ -66,7 +66,7 @@ Maestro::Makew0(const RealVector& w0_old,
             for (auto r = r_start_coord(n,1); r <= r_end_coord(n,1)+1; ++r) {
                 max_w0 = max(max_w0, fabs(w0[n+max_lev*r]));
             }
-            Print() << "... max CFL of w0: " << max_w0 * dt_in / dr(n) << std::endl;
+            Print() << "... max CFL of w0: " << max_w0 * dt_in / base_geom.dr(n) << std::endl;
         }
         Print() << std::endl;
     }
@@ -130,7 +130,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
         int base_cutoff_density_coord_loc = 0;
         get_base_cutoff_density_coord(n, &base_cutoff_density_coord_loc);
 
-        const Real dr_lev = dr(n);
+        const Real dr_lev = base_geom.dr(n);
 
         for (auto j = 1; j <= numdisjointchunks(n); ++j) {
 
@@ -193,16 +193,15 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     int refrat = round(pow(2, n-i));
 
                     // Restrict w0 from level n to level i
-                    for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j)+1; ++r) {
+                    for (auto r = base_geom.r_start_coord(n,j); r <= base_geom.r_end_coord(n,j)+1; ++r) {
                         if (r % refrat == 0) {
                             w0[n+max_lev*r/refrat] = w0[n+max_lev*r];
                         }
                     }
 
                     // Offset the w0 on level i above the top of level n
-                    // for (auto r = (r_end_coord(n,j)+1)/refrat+1; r <= nr(i); ++r) {
-                    lo = (r_end_coord(n,j)+1)/refrat+1; 
-                    hi = nr(i);
+                    lo = (base_geom.r_end_coord(n,j)+1)/refrat+1; 
+                    hi = base_geom.nr(i);
                     AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                         int r = k + lo;
                         w0_p[i+max_lev*r] += offset;
@@ -214,21 +213,17 @@ Maestro::Makew0Planar(const RealVector& w0_old,
 
     // zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= max_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks(n); ++j) {
-            if (j == numdisjointchunks(n)) {
-                // for (auto r = r_end_coord(n,j)+2; 
-                //      r <= nr(n); ++r) {
-                const int lo = r_end_coord(n,j)+2; 
-                const int hi = nr(n);
+        for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+            if (j == base_geom.numdisjointchunks(n)) {
+                const int lo = base_geom.r_end_coord(n,j)+2; 
+                const int hi = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
                 });
             } else {
-                // for (auto r = r_end_coord(n,j)+2; 
-                //      r <= r_start_coord(n,j+1)-1; ++r) {
-                const int lo = r_end_coord(n,j)+2; 
-                const int hi = r_start_coord(n,j+1)-1;
+                const int lo = base_geom.r_end_coord(n,j)+2; 
+                const int hi = base_geom.r_start_coord(n,j+1)-1;
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -246,7 +241,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
-            const Real dr_lev = dr(n);
+            const Real dr_lev = base_geom.dr(n);
 
             // for (auto r = r_start_coord(n,j); 
             //      r <= r_end_coord(n,j); ++r) {
@@ -294,8 +289,8 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     get_base_cutoff_density_coord(finest_radial_level, &fine_base_density_cutoff_coord);
 
     const int max_lev = max_radial_level+1;
-    const int nr_finest = nr(finest_radial_level);
-    const Real dr_finest = dr(finest_radial_level);
+    const int nr_finest = base_geom.nr(finest_radial_level);
+    const Real dr_finest = base_geom.dr(finest_radial_level);
     const Real dpdt_factor_loc = dpdt_factor;
 
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
@@ -479,18 +474,17 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     // just solved for.  Here, we make the coarse edge underneath equal
     // to the fine edge value.
     for (auto n = finest_radial_level; n >= 1; --n) {
-        for (auto r = 0; r <= nr(n); n+=2) {
+        for (auto r = 0; r <= base_geom.nr(n); n+=2) {
             w0[n-1+max_lev*r/2] = w0[n+max_lev*r];
         }
     }
 
     // 8) zero w0 where there is no corresponding full state array
     for (auto n = 1; n <= finest_radial_level; ++n) {
-        for (auto j = 1; j <= numdisjointchunks(n); ++j) {
-            if (j == numdisjointchunks(n)) {
-                // for (auto r = r_end_coord(n,j)+2; r <= nr(n); ++r) {
-                lo = r_end_coord(n,j)+2; 
-                hi = nr(n);
+        for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+            if (j == base_geom.numdisjointchunks(n)) {
+                lo = base_geom.r_end_coord(n,j)+2; 
+                hi = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
                     w0_p[n+max_lev*r] = 0.0;
@@ -517,7 +511,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
             // Compute the forcing term in the base state velocity
             // equation, - 1/rho0 grad pi0
             const Real dt_avg = 0.5 * (dt_in + dtold_in);
-            const Real dr_lev = dr(n);
+            const Real dr_lev = base_geom.dr(n);
 
             // for (auto r = r_start_coord(n,j); r <=r_end_coord(n,j); ++r) {
             lo = r_start_coord(n,j); 
@@ -574,7 +568,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto r_edge_loc_p = r_edge_loc_b;
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
     const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
@@ -587,7 +581,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     int base_cutoff_density_coord_loc = 0;
     get_base_cutoff_density_coord(0, &base_cutoff_density_coord_loc);
 
-    const Real dr0 = dr(0);
+    const Real dr0 = base_geom.dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
@@ -608,9 +602,9 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
             dpdt_factor_loc * p0_minus_peosbar[max_lev*(r-1)]/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr0 * Sbar_in[max_lev*(r-1)] * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1);
+            dr0 * Sbar_in[max_lev*(r-1)] * r_cc_loc(0,r-1)*r_cc_loc(0,r-1);
         if (volume_discrepancy != 0.0) {
-            w0_from_Sbar(r) -= dr0 * volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
+            w0_from_Sbar(r) -= dr0 * volume_discrepancy * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
         }
     }
@@ -646,23 +640,23 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     hi = max_cutoff;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
+        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1));
         A(r) /= dr0*dr0;
 
-        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1))
-                + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)) ) 
+        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1))
+                + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc(0,r)*r_cc_loc(0,r)) ) 
                 / (dr0*dr0);
 
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr0;
 
         B(r) -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
 
-        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
+        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
         C(r) /= dr0*dr0;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
-                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
-                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
+                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_p[max_lev*r] - 
+                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
                 (dr0 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
                 (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p[max_lev*r];
@@ -753,7 +747,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
-    const auto r_cc_loc_p = r_cc_loc_b;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto r_edge_loc_p = r_edge_loc_b;
     const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
     const Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
@@ -786,8 +780,8 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
         Real dr1 = r_edge_loc_b(0,r) - r_edge_loc_b(0,r-1);
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
-            dr1 * Sbar_in[max_lev*(r-1)] * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) - 
-            dr1* volume_discrepancy * r_cc_loc_b(0,r-1)*r_cc_loc_b(0,r-1) 
+            dr1 * Sbar_in[max_lev*(r-1)] * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) - 
+            dr1* volume_discrepancy * r_cc_loc(0,r-1)*r_cc_loc(0,r-1) 
             / (gamma1bar_nph(r-1)*p0_nph(r-1));
     }
 
@@ -819,25 +813,25 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         int r = j + lo;
         Real dr1 = r_edge_loc_p(0,r) - r_edge_loc_p(0,r-1);
         Real dr2 = r_edge_loc_p(0,r+1) - r_edge_loc_p(0,r);
-        Real dr3 = r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1);
+        Real dr3 = r_cc_loc(0,r) - r_cc_loc(0,r-1);
 
-        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1));
+        A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1));
         A(r) /= dr1*dr3;
 
-        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1)*dr1) 
-                + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r)*dr2) ) 
+        B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1)*dr1) 
+                + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc(0,r)*r_cc_loc(0,r)*dr2) ) 
                 / dr3;
 
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr3;
 
         B(r) -= 4.0 * dpdr / (r_edge_loc_p(0,r)*r_edge_loc_p(0,r)*r_edge_loc_p(0,r));
 
-        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc_p(0,r)*r_cc_loc_p(0,r));
+        C(r) = gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
         C(r) /= dr2*dr3;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc_p(0,r) - 
-                grav_edge(0,r) * (r_cc_loc_p(0,r)*r_cc_loc_p(0,r) * etarho_cc_p[max_lev*r] - 
-                r_cc_loc_p(0,r-1)*r_cc_loc_p(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
+                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_p[max_lev*r] - 
+                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_p[max_lev*(r-1)]) / 
                 (dr3 * r_edge_loc_p(0,r)*r_edge_loc_p(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
                 (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p[max_lev*r];
