@@ -295,7 +295,7 @@ Maestro::ReadCheckPoint ()
         std::istringstream is(fileCharPtrString, std::istringstream::in);
 
         // read in cell-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
@@ -340,7 +340,7 @@ Maestro::ReadCheckPoint ()
 
 
         // read in face-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine+1; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine+1; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;

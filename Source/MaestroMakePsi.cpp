@@ -9,11 +9,11 @@ Maestro::MakePsiPlanar()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiPlanar()", MakePsiPlanar);
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
-    for (auto n = 0; n <= finest_radial_level; ++n) {
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i){
             for (auto r = base_geom.r_start_coord(n,i); 
                  r<= base_geom.r_end_coord(n,i); ++r) {
@@ -36,7 +36,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiSphr()", MakePsiSphr);
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
@@ -69,7 +69,7 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiIrreg()", MakePsiIrreg);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
 
     std::fill(psi.begin(), psi.end(), 0.0);
 
@@ -82,7 +82,7 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
         psi_p[max_lev*r] = etarho_cc_p[max_lev*r] * grav_cell_p[max_lev*r];
     });
 
-    for (auto r = base_geom.base_cutoff_density_coord(0)+1; r < nr_fine; ++r) {
+    for (auto r = base_geom.base_cutoff_density_coord(0)+1; r < base_geom.nr_fine; ++r) {
         psi[max_lev*r] = psi[max_lev*(r-1)];
     }
 

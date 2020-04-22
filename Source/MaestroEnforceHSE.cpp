@@ -11,13 +11,13 @@ Maestro::EnforceHSE(const RealVector& rho0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     const auto& dr = base_geom.dr;
     const auto& r_start_coord = base_geom.r_start_coord;
     const auto& r_end_coord = base_geom.r_end_coord;
 
-    RealVector grav_edge((finest_radial_level+1)*(nr_fine+1));
-    RealVector p0old((finest_radial_level+1)*(nr_fine+1));
+    RealVector grav_edge((base_geom.finest_radial_level+1)*(base_geom.nr_fine+1));
+    RealVector p0old((base_geom.finest_radial_level+1)*(base_geom.nr_fine+1));
 
     Real offset = 0.0;
 
@@ -61,7 +61,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
     if (!spherical) {
 
-        for (auto n = 1; n <= finest_radial_level; ++n) {
+        for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
             for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
                 // get pressure in the bottom cell of this disjointchunk
@@ -167,12 +167,12 @@ Maestro::EnforceHSE(const RealVector& rho0,
     offset = p0[max_lev*(base_geom.nr(0)-1)] - p0old[max_lev*(base_geom.nr(0)-1)];
 
     // offset level 0
-    for (auto r = 0; r < nr_fine; ++r) {
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
         p0[max_lev*r] -= offset;
     }
 
     // offset remaining levels
-    for (auto n = 1; n <= finest_radial_level; ++n) {
+    for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             for (auto r = r_start_coord(n,i); r <= r_end_coord(n,i); ++r) {
                 p0[n+max_lev*r] -= offset;
@@ -181,7 +181,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     }
 
     // zero p0 where there is no corresponding full state array
-    for (auto n = 1; n <= finest_radial_level; ++n) {
+    for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             if (i == base_geom.numdisjointchunks(n)) {
                 for (auto r = r_end_coord(n,i)+1; r < base_geom.nr(n); ++r) {

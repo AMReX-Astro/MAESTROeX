@@ -14,12 +14,12 @@ Maestro::MakeBeta0(RealVector& beta0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeBeta0()", MakeBeta0);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
 
     const Real rel_eps = c_rel_eps;
     const auto& dr = base_geom.dr;
 
-    BaseState<Real> beta0_edge_state(finest_radial_level+1, nr_fine+1);
+    BaseState<Real> beta0_edge_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
     auto beta0_edge = beta0_edge_state.array();
 
     std::fill(beta0.begin(), beta0.end(), 0.);
@@ -35,7 +35,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         //
         // First, compute beta0 on edges and centers at level 0 only
         // Obtain the starting value from rho0 at the bottom of the domain.
-        // do n=1,finest_radial_level
+        // do n=1,base_geom.finest_radial_level
         //   Compute beta0 on edges and centers at level n
         //   Obtain the starting value of beta0_edge_lo from the coarser grid
         //   if n>0, compare the difference between beta0 at the top of level n to the
@@ -49,7 +49,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         // call restrict_base and fill_ghost_base
         //////////////////////////////////////////////////////////////////////
 
-        for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
             for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 // Compute beta0 on edges and centers at level n
                 if (n == 0) {
@@ -239,7 +239,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         } // end loop over levels
 
         // 0.0 the beta0 where there is no corresponding full state array
-        for (auto n = 1; n <= finest_radial_level; ++n) {
+        for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
             for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 if (j == base_geom.numdisjointchunks(n)) {
                     for (auto r = base_geom.r_end_coord(n,j)+1; r < base_geom.nr(n); ++r) {
@@ -254,7 +254,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         }
     } else if (beta0_type == 2) {
         // beta_0 = rho_0
-        for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
             for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);
@@ -266,7 +266,7 @@ Maestro::MakeBeta0(RealVector& beta0,
         }
     } else if (beta0_type == 3) {
         // beta_0 = 1.0
-        for (auto n = 0; n <= finest_radial_level; ++n) {
+        for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
             for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);

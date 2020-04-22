@@ -10,7 +10,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()",MakeGravCell);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
 
@@ -22,7 +22,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             // gravitational acceleration.  The mass is assumed to be
             // at the origin.  The mass in the computational domain
             // does not contribute to the gravitational acceleration.
-            for (auto n = 0; n <= finest_radial_level; ++n) {
+            for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc(n,r)*r_cc_loc(n,r));
@@ -30,7 +30,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             }
         } else if (do_2d_planar_octant) {
             //   compute gravity as in the spherical case
-            BaseState<Real> m_state(finest_radial_level+1, nr_fine);
+            BaseState<Real> m_state(base_geom.finest_radial_level+1, base_geom.nr_fine);
             auto m = m_state.array();
 
             // level = 0
@@ -73,7 +73,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
             // level > 0
 
-            for (auto n = 1; n <= finest_radial_level; ++n) {
+            for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
                 for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
                     if (base_geom.r_start_coord(n,i) == 0) {
@@ -155,13 +155,13 @@ Maestro::MakeGravCell(RealVector& grav_cell,
         }
     } else { // spherical = 1
 
-        BaseState<Real> m_state(1, nr_fine);
+        BaseState<Real> m_state(1, base_geom.nr_fine);
         auto m = m_state.array();
 
         m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
         grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
 
-        for (auto r = 1; r < nr_fine; ++r) {
+        for (auto r = 1; r < base_geom.nr_fine; ++r) {
 
             // the mass is defined at the cell-centers, so to compute
             // the mass at the current center, we need to add the
@@ -202,7 +202,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()",MakeGravEdge);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     const auto& r_edge_loc = base_geom.r_edge_loc;
 
     get_base_cutoff_density(&base_cutoff_density);
@@ -216,7 +216,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
             // at the origin.  The mass in the computational domain
             // does not contribute to the gravitational acceleration.
             //   
-            for (auto n = 0; n <= finest_radial_level; ++n) {
+            for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc(n,r)*r_edge_loc(n,r));
@@ -225,7 +225,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
         } else if (do_2d_planar_octant) {
             // compute gravity as in spherical geometry
 
-            BaseState<Real> m_state(finest_radial_level+1, nr_fine+1);
+            BaseState<Real> m_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
             auto m = m_state.array();
 
             grav_edge[0] = 0.0;
@@ -248,7 +248,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 grav_edge[max_lev*r] = -Gconst * m(0,r) / (r_edge_loc(0,r)*r_edge_loc(0,r));
             }
 
-            for (auto n = 1; n <= finest_radial_level; ++n) {
+            for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
                 for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
                     if (base_geom.r_start_coord(n,i) == 0) {
@@ -289,7 +289,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
         grav_edge[0] = 0.0;
         Real mencl = 0.0;
 
-        for (auto r = 1; r <= nr_fine; ++r) {
+        for (auto r = 1; r <= base_geom.nr_fine; ++r) {
 
             // only add to the enclosed mass if the density is
             // > base_cutoff_density
@@ -327,7 +327,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()", MakeGravEdge);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     const auto& r_edge_loc = base_geom.r_edge_loc;
 
     get_base_cutoff_density(&base_cutoff_density);
@@ -340,7 +340,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
             // at the origin.  The mass in the computational domain
             // does not contribute to the gravitational acceleration.
             //   
-            for (auto n = 0; n <= finest_radial_level; ++n) {
+            for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_edge(n,r) = -Gconst*planar_invsq_mass_loc / (r_edge_loc(n,r)*r_edge_loc(n,r));
@@ -349,7 +349,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
         } else if (do_2d_planar_octant) {
             // compute gravity as in spherical geometry
 
-            BaseState<Real> m_state(finest_radial_level+1, nr_fine+1);
+            BaseState<Real> m_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
             auto m = m_state.array();
 
             grav_edge(0,0) = 0.0;
@@ -372,7 +372,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
                 grav_edge(0,r) = -Gconst * m(0,r) / (r_edge_loc(0,r)*r_edge_loc(0,r));
             }
 
-            for (auto n = 1; n <= finest_radial_level; ++n) {
+            for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
                 for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
                     if (base_geom.r_start_coord(n,i) == 0) {
@@ -414,7 +414,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
         grav_edge(0,0) = 0.0;
         Real mencl = 0.0;
 
-        for (auto r = 1; r <= nr_fine; ++r) {
+        for (auto r = 1; r <= base_geom.nr_fine; ++r) {
 
             // only add to the enclosed mass if the density is
             // > base_cutoff_density

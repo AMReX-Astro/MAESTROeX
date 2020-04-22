@@ -105,8 +105,8 @@ Maestro::Put1dArrayOnCart (const int lev,
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
 
-    const int max_lev = max_radial_level+1;
-    const int nr_fine_loc = nr_fine;
+    const int max_lev = base_geom.max_radial_level+1;
+    const int nr_fine = base_geom.nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -173,18 +173,18 @@ Maestro::Put1dArrayOnCart (const int lev,
 
                         } else if (w0_interp_type_loc == 2) {
                             
-                            if (index < nr_fine_loc) {
+                            if (index < nr_fine) {
                                 s0_cart_val = rfac * s0_p[(index+1)*max_lev] 
                                     + (1.0-rfac) * s0_p[index*max_lev];
                             } else {
-                                s0_cart_val = s0_p[nr_fine_loc*max_lev];
+                                s0_cart_val = s0_p[nr_fine*max_lev];
                             }
 
                         } else if (w0_interp_type_loc == 3) {
                             if (index <= 0) {
                                 index = 0;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc - 2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine - 2;
                             } else if (radius-r_edge_loc(0,index) 
                                     < r_edge_loc(0,index+1)) {
                                 index--;
@@ -235,7 +235,7 @@ Maestro::Put1dArrayOnCart (const int lev,
 
             } else { // use_exact_base_state = 0
 
-                const Real drf = dr_fine;
+                const Real drf = base_geom.dr_fine;
 
                 if (is_input_edge_centered) {
                     // we implemented three different ideas for computing s0_cart,
@@ -263,18 +263,18 @@ Maestro::Put1dArrayOnCart (const int lev,
 
                         } else if (w0_interp_type_loc == 2) {
                             
-                            if (index < nr_fine_loc) {
+                            if (index < nr_fine) {
                                 s0_cart_val = rfac * s0_p[(index+1)*max_lev] + (1.0-rfac) * s0_p[index*max_lev];
                             } else {
-                                s0_cart_val = s0_p[nr_fine_loc*max_lev];
+                                s0_cart_val = s0_p[nr_fine*max_lev];
                             }
 
                         } else if (w0_interp_type_loc == 3) {
                             
                             if (index <= 0) {
                                 index = 0;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc - 2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine - 2;
                             } else if (radius-r_edge_loc(0,index) 
                                     < r_edge_loc(0,index+1)) {
                                 index--;
@@ -325,8 +325,8 @@ Maestro::Put1dArrayOnCart (const int lev,
                         } else if (s0_interp_type_loc == 2) {
 
                             if (radius >= r_cc_loc(0,index)) {
-                                if (index >= nr_fine_loc-1) {
-                                    s0_cart_val = s0_p[(nr_fine_loc-1)*max_lev];
+                                if (index >= nr_fine-1) {
+                                    s0_cart_val = s0_p[(nr_fine-1)*max_lev];
                                 } else {
                                     s0_cart_val = s0_p[(index+1)*max_lev] 
                                         * (radius-r_cc_loc(0,index))/drf 
@@ -336,8 +336,8 @@ Maestro::Put1dArrayOnCart (const int lev,
                             } else {
                                 if (index == 0) {
                                     s0_cart_val = s0_p[index*max_lev];
-                                } else if (index > nr_fine_loc-1) {
-                                    s0_cart_val = s0_p[(nr_fine_loc-1)*max_lev];
+                                } else if (index > nr_fine-1) {
+                                    s0_cart_val = s0_p[(nr_fine-1)*max_lev];
                                 } else {
                                     s0_cart_val = s0_p[index*max_lev] 
                                         * (radius-r_cc_loc(0,index-1))/drf 
@@ -348,8 +348,8 @@ Maestro::Put1dArrayOnCart (const int lev,
                         } else if (s0_interp_type_loc == 3) {
                             if (index == 0) {
                                 index = 1;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc-2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine-2;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
@@ -394,8 +394,8 @@ Maestro::Put1dArrayOnCart (int lev,
     const auto& r_edge_loc = base_geom.r_edge_loc;
     const auto& r_cc_loc = base_geom.r_cc_loc;
 
-    const int max_lev = max_radial_level+1;
-    const int nr_fine_loc = nr_fine;
+    const int max_lev = base_geom.max_radial_level+1;
+    const int nr_fine = base_geom.nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
 
     const auto s0 = s0_state.array();
@@ -445,7 +445,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         int index = cc_to_r(i,j,k);
 
                         Real rfac;
-                        if (index < nr_fine) {
+                        if (index < base_geom.nr_fine) {
                             rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index));
@@ -464,18 +464,18 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         } else if (w0_interp_type_loc == 2) {
                             
-                            if (index < nr_fine_loc) {
+                            if (index < nr_fine) {
                                 s0_cart_val = rfac * s0(0,index+1) 
                                     + (1.0-rfac) * s0(0,index);
                             } else {
-                                s0_cart_val = s0(0,nr_fine_loc);
+                                s0_cart_val = s0(0,nr_fine);
                             }
 
                         } else if (w0_interp_type_loc == 3) {
                             if (index <= 0) {
                                 index = 0;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc - 2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine - 2;
                             } else if (radius-r_edge_loc(0,index) 
                                     < r_edge_loc(0,index+1)) {
                                 index--;
@@ -526,7 +526,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
             } else { // use_exact_base_state = 0
 
-                const Real drf = dr_fine;
+                const Real drf = base_geom.dr_fine;
 
                 if (is_input_edge_centered) {
                     // we implemented three different ideas for computing s0_cart,
@@ -554,18 +554,18 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         } else if (w0_interp_type_loc == 2) {
                             
-                            if (index < nr_fine_loc) {
+                            if (index < nr_fine) {
                                 s0_cart_val = rfac * s0(0,index+1) + (1.0-rfac) * s0(0,index);
                             } else {
-                                s0_cart_val = s0(0,nr_fine_loc);
+                                s0_cart_val = s0(0,nr_fine);
                             }
 
                         } else if (w0_interp_type_loc == 3) {
                             
                             if (index <= 0) {
                                 index = 0;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc - 2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine - 2;
                             } else if (radius-r_edge_loc(0,index) 
                                     < r_edge_loc(0,index+1)) {
                                 index--;
@@ -616,8 +616,8 @@ Maestro::Put1dArrayOnCart (int lev,
                         } else if (s0_interp_type_loc == 2) {
 
                             if (radius >= r_cc_loc(0,index)) {
-                                if (index >= nr_fine_loc-1) {
-                                    s0_cart_val = s0(0,nr_fine_loc-1);
+                                if (index >= nr_fine-1) {
+                                    s0_cart_val = s0(0,nr_fine-1);
                                 } else {
                                     s0_cart_val = s0(0,index+1) 
                                         * (radius-r_cc_loc(0,index))/drf 
@@ -627,8 +627,8 @@ Maestro::Put1dArrayOnCart (int lev,
                             } else {
                                 if (index == 0) {
                                     s0_cart_val = s0(0,index);
-                                } else if (index > nr_fine_loc-1) {
-                                    s0_cart_val = s0(0,nr_fine_loc-1);
+                                } else if (index > nr_fine-1) {
+                                    s0_cart_val = s0(0,nr_fine-1);
                                 } else {
                                     s0_cart_val = s0(0,index) 
                                         * (radius-r_cc_loc(0,index-1))/drf 
@@ -639,8 +639,8 @@ Maestro::Put1dArrayOnCart (int lev,
                         } else if (s0_interp_type_loc == 3) {
                             if (index == 0) {
                                 index = 1;
-                            } else if (index >= nr_fine_loc-1) {
-                                index = nr_fine_loc-2;
+                            } else if (index >= nr_fine-1) {
+                                index = nr_fine-2;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
@@ -691,7 +691,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -797,10 +797,10 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
         w0_nodal[lev].setVal(0.);
     }
 
-    const int nr_fine_loc = nr_fine;
-    const int max_lev = max_radial_level+1;
+    const int nr_fine = base_geom.nr_fine;
+    const int max_lev = base_geom.max_radial_level+1;
     const int w0mac_interp_type_loc = w0mac_interp_type;
-    const Real drf = dr_fine;
+    const Real drf = base_geom.dr_fine;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const auto& r_edge_loc = base_geom.r_edge_loc;
     const auto& center_p = center;
@@ -836,10 +836,10 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real rfac = (radius - Real(index) * drf) / drf;
 
                     Real w0_cart_val;
-                    if (index < nr_fine_loc) {
+                    if (index < nr_fine) {
                         w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
                     } else {
-                        w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                        w0_cart_val = w0_p[nr_fine*max_lev];
                     }
 
                     if (radius == 0.0) {
@@ -899,16 +899,16 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
                         Real rfac = (radius - Real(index)*drf) / drf;
 
-                        if (index < nr_fine_loc) {
+                        if (index < nr_fine) {
                             w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p[nr_fine*max_lev];
                         }
                     } else {
                         if (index <= 0) {
                             index = 0;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
@@ -938,16 +938,16 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
                         Real rfac = (radius - Real(index)*drf) / drf;
 
-                        if (index < nr_fine_loc) {
+                        if (index < nr_fine) {
                             w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p[nr_fine*max_lev];
                         }
                     } else { 
                         if (index <= 0) {
                             index = 0;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
@@ -977,17 +977,17 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
                         Real rfac = (radius - Real(index)*drf) / drf;
                         
-                        if (index < nr_fine_loc) {
+                        if (index < nr_fine) {
                             w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
                         } else {
-                            w0_cart_val = w0_p[nr_fine_loc*max_lev];
+                            w0_cart_val = w0_p[nr_fine*max_lev];
                         }
                     } else {
 
                         if (index <= 0) {
                             index = 0;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
@@ -1055,9 +1055,9 @@ Maestro::MakeS0mac (const RealVector& s0,
         Abort("Error: MakeS0mac assumes one ghost cell");
     }
 
-    const int nr_fine_loc = nr_fine;
-    const int max_lev = max_radial_level+1;
-    const Real drf = dr_fine;
+    const int nr_fine = base_geom.nr_fine;
+    const int max_lev = base_geom.max_radial_level+1;
+    const Real drf = base_geom.dr_fine;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto center_p = center;
@@ -1121,8 +1121,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macx(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1134,8 +1134,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macx(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macx(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1157,8 +1157,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macy(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1170,8 +1170,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macy(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macy(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1193,8 +1193,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macz(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1206,8 +1206,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macz(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macz(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1232,8 +1232,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macx(i,j,k) = QuadInterp(radius, 
@@ -1258,8 +1258,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macy(i,j,k) = QuadInterp(radius, 
@@ -1284,8 +1284,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macz(i,j,k) = QuadInterp(radius, 
@@ -1325,8 +1325,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macx(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1336,8 +1336,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         } else {
                             if (index == 0) {
                                 s0macx(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macx(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1356,8 +1356,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macy(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1367,8 +1367,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         } else {
                             if (index == 0) {
                                 s0macy(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macy(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1387,8 +1387,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            if (index >= nr_fine-1) {
+                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macz(i,j,k) = s0_p[(index+1)*max_lev] 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1398,8 +1398,8 @@ Maestro::MakeS0mac (const RealVector& s0,
                         } else {
                             if (index == 0) {
                                 s0macz(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0_p[(nr_fine-1)*max_lev];
+                            } else if (index > nr_fine-1) {
+                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
                             } else {
                                 s0macz(i,j,k) = s0_p[index*max_lev] 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1421,8 +1421,8 @@ Maestro::MakeS0mac (const RealVector& s0,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macx(i,j,k) = QuadInterp(radius, 
@@ -1444,8 +1444,8 @@ Maestro::MakeS0mac (const RealVector& s0,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macy(i,j,k) = QuadInterp(radius, 
@@ -1467,8 +1467,8 @@ Maestro::MakeS0mac (const RealVector& s0,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macz(i,j,k) = QuadInterp(radius, 
@@ -1511,9 +1511,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
         Abort("Error: MakeS0mac assumes one ghost cell");
     }
 
-    const int nr_fine_loc = nr_fine;
-    const int max_lev = max_radial_level+1;
-    const Real drf = dr_fine;
+    const int nr_fine = base_geom.nr_fine;
+    const int max_lev = base_geom.max_radial_level+1;
+    const Real drf = base_geom.dr_fine;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto center_p = center;
     const auto s0 = s0_state.array();
@@ -1574,8 +1574,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macx(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1587,8 +1587,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macx(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macx(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1610,8 +1610,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macy(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1623,8 +1623,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macy(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macy(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1646,8 +1646,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         if (radius >= r_cc_loc(0,index)) {
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
-                            if (index >= nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macz(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
@@ -1659,8 +1659,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
                                 s0macz(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macz(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
@@ -1685,8 +1685,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macx(i,j,k) = QuadInterp(radius, 
@@ -1711,8 +1711,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macy(i,j,k) = QuadInterp(radius, 
@@ -1737,8 +1737,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         // we need to modify this if we're too close to the edge
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macz(i,j,k) = QuadInterp(radius, 
@@ -1778,8 +1778,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macx(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1789,8 +1789,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         } else {
                             if (index == 0) {
                                 s0macx(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macx(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macx(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1809,8 +1809,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macy(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1820,8 +1820,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         } else {
                             if (index == 0) {
                                 s0macy(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macy(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macy(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1840,8 +1840,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         int index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0(0,nr_fine-1);
+                            if (index >= nr_fine-1) {
+                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macz(i,j,k) = s0(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
@@ -1851,8 +1851,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         } else {
                             if (index == 0) {
                                 s0macz(i,j,k) = s0(0,index);
-                            } else if (index > nr_fine_loc-1) {
-                                s0macz(i,j,k) = s0(0,nr_fine-1);
+                            } else if (index > nr_fine-1) {
+                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
                             } else {
                                 s0macz(i,j,k) = s0(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
@@ -1874,8 +1874,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macx(i,j,k) = QuadInterp(radius, 
@@ -1897,8 +1897,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macy(i,j,k) = QuadInterp(radius, 
@@ -1920,8 +1920,8 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (index == 0) {
                             index = 1;
-                        } else if (index >= nr_fine_loc-1) {
-                            index = nr_fine_loc-2;
+                        } else if (index >= nr_fine-1) {
+                            index = nr_fine-2;
                         }
 
                         s0macz(i,j,k) = QuadInterp(radius, 

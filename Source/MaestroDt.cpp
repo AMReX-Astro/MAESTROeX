@@ -18,7 +18,7 @@ Maestro::EstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -85,7 +85,7 @@ Maestro::EstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
+    RealVector gp0( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
     gp0.shrink_to_fit();
     std::fill(gp0.begin(),gp0.end(), 0.);
 
@@ -402,7 +402,7 @@ Maestro::FirstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
+    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -445,7 +445,7 @@ Maestro::FirstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (max_radial_level+1)*(nr_fine+1) );
+    RealVector gp0( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
     gp0.shrink_to_fit();
     std::fill(gp0.begin(),gp0.end(), 0.);
 
@@ -695,7 +695,7 @@ void
 Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
                     const RealVector& gamma1bar_vec)
 {
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
     const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
@@ -704,7 +704,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
 
     // spherical divU constraint
     if (use_exact_base_state) {
-        AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
+        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
@@ -713,7 +713,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
         });
     } else {
         const auto dr0 = base_geom.dr(0);
-        AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
+        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
@@ -722,6 +722,6 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
         });
     }
 
-    gp0_vec[max_lev*nr_fine] = gp0_vec[max_lev*(nr_fine-1)];
+    gp0_vec[max_lev*base_geom.nr_fine] = gp0_vec[max_lev*(base_geom.nr_fine-1)];
     gp0_vec[0] = gp0_vec[max_lev];
 }

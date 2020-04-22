@@ -26,7 +26,7 @@ Maestro::DiagFile (const int step,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DiagFile()",DiagFile);
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     // -- w0mac will contain an edge-centered w0 on a Cartesian grid,
     // -- for use in computing divergences.
@@ -499,13 +499,13 @@ Maestro::DiagFile (const int step,
         const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();
 
         // m(r) will contain mass enclosed by the center
-        RealVector m(nr_fine);
+        RealVector m(base_geom.nr_fine);
         m[0] = 4.0/3.0 * M_PI * rho0[0] * r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
 
         // dU = - G M dM / r;  dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
         grav_ener = -4.0 * M_PI * Gconst * m[0] * r_cc_loc(0,0) * rho0[0] * (r_edge_loc(0,1) - r_edge_loc(0,0));
 
-        for (auto r = 1; r < nr_fine; ++r) {
+        for (auto r = 1; r < base_geom.nr_fine; ++r) {
             // the mass is defined at the cell-centers, so to compute the
             // mass at the current center, we need to add the contribution
             // of the upper half of the zone below us and the lower half of
@@ -540,7 +540,7 @@ Maestro::DiagFile (const int step,
 #endif
     } else {
         // diag_grav_energy(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
-        for (auto r = 0; r < nr_fine; ++r) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
             Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
             grav_ener -= rho0_in[max_lev*r] * r_cc_loc(0,r) * grav_const * dr_loc;
         }

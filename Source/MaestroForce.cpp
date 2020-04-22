@@ -39,12 +39,12 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     }
 
-    RealVector gradw0( (max_radial_level+1)*nr_fine , 0.0);
+    RealVector gradw0( (base_geom.max_radial_level+1)*base_geom.nr_fine , 0.0);
     gradw0.shrink_to_fit();
 
     Real* AMREX_RESTRICT p_gradw0 = gradw0.dataPtr();
     Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
-    const Real dr0 = dr_fine;
+    const Real dr0 = base_geom.dr_fine;
 
     if ( !(use_exact_base_state || average_base_state) ) {
         AMREX_PARALLEL_FOR_1D (gradw0.size(), i,
@@ -213,12 +213,12 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     const auto& r_edge_loc = base_geom.r_edge_loc;
 
     if (spherical) {
-        BaseState<Real> divw0(nr_fine);
+        BaseState<Real> divw0(base_geom.nr_fine);
         divw0.setVal(0.0);
         auto divw0_arr = divw0.array();
 
         if (!use_exact_base_state) {
-            for (int r=0; r<nr_fine-1; ++r) {
+            for (int r=0; r<base_geom.nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
                 divw0_arr(r) = (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * w0[r+1]
                            - r_edge_loc(0,r)*r_edge_loc(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
@@ -407,12 +407,12 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     const auto& r_edge_loc = base_geom.r_edge_loc;
 
     if (spherical) {
-        BaseState<Real> divw0(nr_fine);
+        BaseState<Real> divw0(base_geom.nr_fine);
         divw0.setVal(0.0);
         auto divw0_arr = divw0.array();
 
         if (!use_exact_base_state) {
-            for (int r=0; r<nr_fine-1; ++r) {
+            for (int r=0; r<base_geom.nr_fine-1; ++r) {
                 Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
                 divw0_arr(r) = (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * w0[r+1]
                            - r_edge_loc(0,r)*r_edge_loc(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
@@ -591,9 +591,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         Abort("ERROR: should only call mkrhohforce when predicting rhoh', h, or rhoh");
     }
 
-    RealVector rho0( (max_radial_level+1)*nr_fine );
-    RealVector   p0( (max_radial_level+1)*nr_fine );
-    RealVector grav( (max_radial_level+1)*nr_fine );
+    RealVector rho0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector   p0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector grav( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     rho0.shrink_to_fit();
     p0.shrink_to_fit();
     grav.shrink_to_fit();

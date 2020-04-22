@@ -2064,7 +2064,7 @@ public:
     RealVector psi;
     RealVector grav_cell_old;
     RealVector grav_cell_new;
-    RealVector r_cc_loc;
+    // RealVector r_cc_loc;
     BaseState<Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
@@ -2074,17 +2074,17 @@ public:
     // These are edge-centered
     RealVector w0;
     RealVector etarho_ec;
-    RealVector r_edge_loc;
+    // RealVector r_edge_loc;
     BaseState<Real> r_edge_loc_b;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
     // in `base_state.f90` in a fortran module for convenience
-    int max_radial_level;
-    int finest_radial_level;
-    int nr_fine;
-    amrex::Real dr_fine;
-    int nr_irreg;
+    // int max_radial_level;
+    // int finest_radial_level;
+    // int nr_fine;
+    // amrex::Real dr_fine;
+    // int nr_irreg;
     // BaseState<int> nr;
     // BaseState<Real> dr;
 

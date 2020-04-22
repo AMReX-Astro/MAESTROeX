@@ -21,7 +21,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     //
     // The top of the sponge is then 2 * r_md - r_tp
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     Real prob_lo_r = spherical ? 0.0 : geom[0].ProbLo(AMREX_SPACEDIM-1);
 
@@ -29,7 +29,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     if (!use_exact_base_state) {
         r_top += Real(base_geom.r_end_coord(0,1)+1) * base_geom.dr(0);
     } else {
-        r_top += base_geom.r_edge_loc(0,nr_fine);
+        r_top += base_geom.r_edge_loc(0,base_geom.nr_fine);
     }
     r_sp = r_top;
 
@@ -54,7 +54,7 @@ Maestro::SpongeInit(const RealVector& rho0)
         }
     } else {
         // set r_sp;
-        for (auto r = 0; r < nr_fine; ++r) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
             if (rho0[max_lev*r] < sponge_start_density) {
                 r_sp = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;
@@ -63,7 +63,7 @@ Maestro::SpongeInit(const RealVector& rho0)
 
         // set r_md
         r_md = r_top;
-        for (auto r = 0; r < nr_fine; ++r) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
             if (rho0[max_lev*r] < sponge_center_density) {
                 r_md = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;

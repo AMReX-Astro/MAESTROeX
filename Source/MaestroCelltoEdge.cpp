@@ -14,12 +14,12 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
         Abort("Calling CelltoEdge with spherical == true");
     }
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
 
     const Real * AMREX_RESTRICT s0_cell = s0_cell_vec.dataPtr();
     Real * AMREX_RESTRICT s0_edge = s0_edge_vec.dataPtr();
 
-    for (auto n = 0; n <= finest_radial_level; ++n) {
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             Real nr_lev = base_geom.nr(n);
             const int lo = base_geom.r_start_coord(n,i);
@@ -69,12 +69,12 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
         Abort("Calling CelltoEdge with spherical == true");
     }
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
 
     const Real * AMREX_RESTRICT s0_cell = s0_cell_vec.dataPtr();
     auto s0_edge = s0_edge_state.array();
 
-    for (auto n = 0; n <= finest_radial_level; ++n) {
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             Real nr_lev = base_geom.nr(n);
             const int lo = base_geom.r_start_coord(n,i);

@@ -37,7 +37,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int rho_comp = Rho;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
@@ -442,7 +442,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int rho_comp = Rho;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
@@ -860,7 +860,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
     const int rho_comp = Rho;
     const int rhoh_comp = RhoH;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const int enthalpy_pred_type_loc = enthalpy_pred_type;
 

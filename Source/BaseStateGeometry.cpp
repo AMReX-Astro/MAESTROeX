@@ -339,15 +339,16 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
             if (tag_array(n-1,r) > 0 && !chunk_start) {
                 chunk_start = true;
                 nchunks++;
-            } else if (tag_array(n-1,r)==0 && chunk_start) {
+            } else if (tag_array(n-1,r) == 0 && chunk_start) {
                 chunk_start = false;
             }
         }
         maxchunks = max(nchunks, maxchunks);
     }
 
-    r_start_coord_d.define(finest_radial_level+1, maxchunks);
-    r_end_coord_d.define(finest_radial_level+1, maxchunks);
+    // maxchunks+1 here because we will be using indices 1:maxchunks
+    r_start_coord_d.define(finest_radial_level+1, maxchunks+1);
+    r_end_coord_d.define(finest_radial_level+1, maxchunks+1);
 
     r_start_coord.init(r_start_coord_d);
     r_end_coord.init(r_end_coord_d);
