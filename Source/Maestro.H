@@ -331,13 +331,16 @@ public:
 #endif
     void ComputeCutoffCoords(const RealVector& rho0);
 
-    void InitMultilevel(const int finest_radial_level_in);
+    // void InitMultilevel(const int finest_radial_level_in);
                                
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
     void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+
     void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -1133,6 +1136,12 @@ public:
 
     void MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0);
+    
+    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
+                      BaseStateArray<Real> rho0);
+    
+    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
+                      const BaseStateArray<const Real> rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1283,9 +1292,9 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseState<Real>& a, const BaseState<Real>& b, 
-                 const BaseState<Real>& c, const BaseState<Real>& r, 
-                 BaseState<Real>& u, const int n);
+    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
+                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
+                 BaseStateArray<Real> u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
@@ -2094,6 +2103,7 @@ public:
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+    // BaseState<int> tag_array_b;
 
     /// contains base state geometry variables
     BaseStateGeometry base_geom;

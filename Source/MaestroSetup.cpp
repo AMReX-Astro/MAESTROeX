@@ -149,9 +149,7 @@ Maestro::Setup ()
 
     // tagged box array for multilevel (planar)
     tag_array .resize( (max_radial_level+1)*nr_fine );
-    numdisjointchunks.resize(max_radial_level+1);
-    r_start_coord.resize(max_radial_level+1, nr_fine+1);
-    r_end_coord.resize(max_radial_level+1, nr_fine+1);
+    // tag_array_b.resize(max_radial_level+1,nr_fine);
 
     // diag file data arrays
     diagfile1_data.resize(diag_buf_size*11);
@@ -241,6 +239,7 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
+    // tag_array_b.setVal(0);
 
     // if do_smallscale check other parameters for consistency
 

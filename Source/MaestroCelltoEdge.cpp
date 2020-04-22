@@ -60,7 +60,7 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
 
 void 
 Maestro::CelltoEdge(const RealVector& s0_cell_vec, 
-                    BaseState<Real>& s0_edge) 
+                    BaseState<Real>& s0_edge_state) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::CelltoEdge()", CelltoEdge);
@@ -72,6 +72,7 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
     const int max_lev = max_radial_level+1;
 
     const Real * AMREX_RESTRICT s0_cell = s0_cell_vec.dataPtr();
+    auto s0_edge = s0_edge_state.array();
 
     for (auto n = 0; n <= finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
@@ -108,5 +109,5 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
     }
 
     // make the edge values synchronous across levels
-    RestrictBase(s0_edge, false);
+    RestrictBase(s0_edge_state, false);
 }

@@ -303,7 +303,7 @@ BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<const Real>& rho0)
 
 void 
 BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
-                       const BaseStateArray<const bool>& tag_array)
+                       const BaseStateArray<int>& tag_array)
 {
     // compute numdisjointchunks, r_start_coord, r_end_coord
     // FIXME - right now there is one chunk at each level that spans the domain

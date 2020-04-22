@@ -191,7 +191,7 @@ Maestro::WritePlotFile (const int step,
             BaseFCFile << "r_edge  w0 \n";
 
             for (int i = 0; i <= base_geom.nr(lev); ++i) {
-                BaseFCFile << r_edge_loc_b(lev,i) << " "
+                BaseFCFile << base_geom.r_edge_loc(lev,i) << " "
                            << w0[lev+(max_radial_level+1)*i] << "\n";
             }
         }

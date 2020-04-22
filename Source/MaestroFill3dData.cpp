@@ -101,7 +101,7 @@ Maestro::Put1dArrayOnCart (const int lev,
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto center_p = center;
 
-    const auto r_edge_loc_p = r_edge_loc_b;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
 
@@ -155,11 +155,11 @@ Maestro::Put1dArrayOnCart (const int lev,
 
                         Real rfac;
                         if (index < nr_fine) {
-                            rfac = (radius - r_edge_loc_p(0,index+1)) 
+                            rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index));
                         } else {
-                            rfac = (radius - r_edge_loc_p(0,index+1)) 
+                            rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1));
                         }
@@ -185,15 +185,15 @@ Maestro::Put1dArrayOnCart (const int lev,
                                 index = 0;
                             } else if (index >= nr_fine_loc-1) {
                                 index = nr_fine_loc - 2;
-                            } else if (radius-r_edge_loc_p(0,index) 
-                                    < r_edge_loc_p(0,index+1)) {
+                            } else if (radius-r_edge_loc(0,index) 
+                                    < r_edge_loc(0,index+1)) {
                                 index--;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc_p(0,index),
-                                r_edge_loc_p(0,index+1), 
-                                r_edge_loc_p(0,index+2), 
+                                r_edge_loc(0,index),
+                                r_edge_loc(0,index+1), 
+                                r_edge_loc(0,index+2), 
                                 s0_p[index*max_lev],
                                 s0_p[(index+1)*max_lev],
                                 s0_p[(index+2)*max_lev]);
@@ -275,15 +275,15 @@ Maestro::Put1dArrayOnCart (const int lev,
                                 index = 0;
                             } else if (index >= nr_fine_loc-1) {
                                 index = nr_fine_loc - 2;
-                            } else if (radius-r_edge_loc_p(0,index) 
-                                    < r_edge_loc_p(0,index+1)) {
+                            } else if (radius-r_edge_loc(0,index) 
+                                    < r_edge_loc(0,index+1)) {
                                 index--;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc_p(0,index),
-                                r_edge_loc_p(0,index+1), 
-                                r_edge_loc_p(0,index+2), 
+                                r_edge_loc(0,index),
+                                r_edge_loc(0,index+1), 
+                                r_edge_loc(0,index+2), 
                                 s0_p[index*max_lev],
                                 s0_p[(index+1)*max_lev],
                                 s0_p[(index+2)*max_lev]);
@@ -377,7 +377,7 @@ Maestro::Put1dArrayOnCart (const int lev,
 
 void
 Maestro::Put1dArrayOnCart (int lev,
-                           const BaseState<Real>& s0,
+                           const BaseState<Real>& s0_state,
                            Vector<MultiFab>& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -391,12 +391,14 @@ Maestro::Put1dArrayOnCart (int lev,
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto& center_p = center;
 
-    const auto& r_edge_loc_p = r_edge_loc_b;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
     const auto& r_cc_loc = base_geom.r_cc_loc;
 
     const int max_lev = max_radial_level+1;
     const int nr_fine_loc = nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
+
+    const auto s0 = s0_state.array();
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -444,11 +446,11 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         Real rfac;
                         if (index < nr_fine) {
-                            rfac = (radius - r_edge_loc_p(0,index+1)) 
+                            rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index));
                         } else {
-                            rfac = (radius - r_edge_loc_p(0,index+1)) 
+                            rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1));
                         }
@@ -474,15 +476,15 @@ Maestro::Put1dArrayOnCart (int lev,
                                 index = 0;
                             } else if (index >= nr_fine_loc-1) {
                                 index = nr_fine_loc - 2;
-                            } else if (radius-r_edge_loc_p(0,index) 
-                                    < r_edge_loc_p(0,index+1)) {
+                            } else if (radius-r_edge_loc(0,index) 
+                                    < r_edge_loc(0,index+1)) {
                                 index--;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc_p(0,index),
-                                r_edge_loc_p(0,index+1), 
-                                r_edge_loc_p(0,index+2), 
+                                r_edge_loc(0,index),
+                                r_edge_loc(0,index+1), 
+                                r_edge_loc(0,index+2), 
                                 s0(0,index),
                                 s0(0,index+1),
                                 s0(0,index+2));
@@ -564,15 +566,15 @@ Maestro::Put1dArrayOnCart (int lev,
                                 index = 0;
                             } else if (index >= nr_fine_loc-1) {
                                 index = nr_fine_loc - 2;
-                            } else if (radius-r_edge_loc_p(0,index) 
-                                    < r_edge_loc_p(0,index+1)) {
+                            } else if (radius-r_edge_loc(0,index) 
+                                    < r_edge_loc(0,index+1)) {
                                 index--;
                             }
 
                             s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc_p(0,index),
-                                r_edge_loc_p(0,index+1), 
-                                r_edge_loc_p(0,index+2), 
+                                r_edge_loc(0,index),
+                                r_edge_loc(0,index+1), 
+                                r_edge_loc(0,index+2), 
                                 s0(0,index),
                                 s0(0,index+1),
                                 s0(0,index+2));
@@ -800,8 +802,8 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real drf = dr_fine;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const auto r_edge_loc_p = r_edge_loc_b;
-    const auto center_p = center;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
+    const auto& center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
@@ -907,14 +909,14 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                             index = 0;
                         } else if (index >= nr_fine_loc-1) {
                             index = nr_fine_loc-2;
-                        } else if (radius - r_edge_loc_p(0,index) < r_edge_loc_p(0,index+1)) {
+                        } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
 
                         w0_cart_val = QuadInterp(radius, 
-                                    r_edge_loc_p(0,index),
-                                    r_edge_loc_p(0,index+1), 
-                                    r_edge_loc_p(0,index+2), 
+                                    r_edge_loc(0,index),
+                                    r_edge_loc(0,index+1), 
+                                    r_edge_loc(0,index+2), 
                                     w0_p[index*max_lev],
                                     w0_p[(index+1)*max_lev],
                                     w0_p[(index+2)*max_lev]);
@@ -946,14 +948,14 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                             index = 0;
                         } else if (index >= nr_fine_loc-1) {
                             index = nr_fine_loc-2;
-                        } else if (radius - r_edge_loc_p(0,index) < r_edge_loc_p(0,index+1)) {
+                        } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
 
                         w0_cart_val = QuadInterp(radius, 
-                                    r_edge_loc_p(0,index),
-                                    r_edge_loc_p(0,index+1), 
-                                    r_edge_loc_p(0,index+2), 
+                                    r_edge_loc(0,index),
+                                    r_edge_loc(0,index+1), 
+                                    r_edge_loc(0,index+2), 
                                     w0_p[index*max_lev],
                                     w0_p[(index+1)*max_lev],
                                     w0_p[(index+2)*max_lev]);
@@ -986,14 +988,14 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                             index = 0;
                         } else if (index >= nr_fine_loc-1) {
                             index = nr_fine_loc-2;
-                        } else if (radius - r_edge_loc_p(0,index) < r_edge_loc_p(0,index+1)) {
+                        } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
 
                         w0_cart_val = QuadInterp(radius, 
-                                    r_edge_loc_p(0,index),
-                                    r_edge_loc_p(0,index+1), 
-                                    r_edge_loc_p(0,index+2), 
+                                    r_edge_loc(0,index),
+                                    r_edge_loc(0,index+1), 
+                                    r_edge_loc(0,index+2), 
                                     w0_p[index*max_lev],
                                     w0_p[(index+1)*max_lev],
                                     w0_p[(index+2)*max_lev]);
@@ -1484,7 +1486,7 @@ Maestro::MakeS0mac (const RealVector& s0,
 }
 
 void
-Maestro::MakeS0mac (const BaseState<Real>& s0,
+Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
     // timer for profiling
@@ -1502,7 +1504,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
     }
 
     if (s0mac_interp_type == 1) {
-        Put1dArrayOnCart(s0, s0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(s0_state, s0_cart, 0, 0, bcs_f, 0);
     }
 
     if (s0mac[0][0].nGrow() != 1) {
@@ -1512,8 +1514,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
     const int nr_fine_loc = nr_fine;
     const int max_lev = max_radial_level+1;
     const Real drf = dr_fine;
-    const auto& r_cc_loc = base_geom.r_cc_loc_b;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto center_p = center;
+    const auto s0 = s0_state.array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
     

@@ -74,8 +74,9 @@ Maestro::Regrid ()
         TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
-    InitMultilevel(finest_level);
-    // base_geom.InitMultiLevel(finest_level, tag_array.array());
+    // InitMultilevel(finest_level);
+    BaseState<int> tag_array_b(tag_array, max_radial_level+1, nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     if (spherical == 1) {
         MakeNormal();
@@ -418,9 +419,9 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
 
     // copy valid data into temp
     for (auto n = 1; n < max_lev; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            const auto lo = r_start_coord(n,i);
-            const auto hi = is_edge ? r_end_coord(n,i)+1 : r_end_coord(n,i);
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
+            const auto lo = base_geom.r_start_coord(n,i);
+            const auto hi = is_edge ? base_geom.r_end_coord(n,i)+1 : base_geom.r_end_coord(n,i);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
             {
                 int r = k + lo;

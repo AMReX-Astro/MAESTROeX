@@ -13,9 +13,9 @@ Maestro::PrintBase(const RealVector& base, const bool is_cell_centered)
     const int max_lev = max_radial_level + 1;
 
     for (auto lev = 0; lev <= finest_radial_level; ++lev) {
-        for (auto i = 0; i <= numdisjointchunks(lev,0); ++i) {
-            auto lo = r_start_coord(lev,i);
-            auto hi = is_cell_centered ? r_end_coord(lev,i) : r_end_coord(lev,i)+1;
+        for (auto i = 0; i <= base_geom.numdisjointchunks(lev,0); ++i) {
+            auto lo = base_geom.r_start_coord(lev,i);
+            auto hi = is_cell_centered ? base_geom.r_end_coord(lev,i) : base_geom.r_end_coord(lev,i)+1;
             for (auto r = lo; r <= hi; ++r) {
                 Print() << "base lev, r " << lev << ", " << r << ", " << base[lev+max_lev*r] << std::endl;
             }

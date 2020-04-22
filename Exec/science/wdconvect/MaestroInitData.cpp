@@ -184,7 +184,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                         const int n = ii-1 + 3 * (jj-1 + 3 * (kk-1));
                         // compute cosines and sines
                         Real cx = std::cos(2.0 * M_PI * Real(ii) * (x+center_p[0]) / velpert_scale_loc + phix[n]);
-			Real cy = std::cos(2.0 * M_PI * Real(jj) * (y+center_p[1]) / velpert_scale_loc + phiy[n]);
+                        Real cy = std::cos(2.0 * M_PI * Real(jj) * (y+center_p[1]) / velpert_scale_loc + phiy[n]);
                         Real cz = std::cos(2.0 * M_PI * Real(kk) * (z+center_p[2]) / velpert_scale_loc + phiz[n]);
 
                         Real sx = std::sin(2.0 * M_PI * Real(ii) * (x+center_p[0]) / velpert_scale_loc + phix[n]);

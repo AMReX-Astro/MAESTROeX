@@ -99,8 +99,9 @@ Maestro::Init ()
         // set finest_radial_level in fortran
         // compute numdisjointchunks, r_start_coord, r_end_coord
         init_multilevel(tag_array.dataPtr(),&finest_level);
-        InitMultilevel(finest_level);
-        // base_geom.InitMultiLevel(finest_level, tag_array.array());
+        // InitMultilevel(finest_level);
+        BaseState<int> tag_array_b(tag_array, max_radial_level+1, nr_fine);
+        base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
@@ -247,8 +248,9 @@ Maestro::InitData ()
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
-    InitMultilevel(finest_level);
-    // base_geom.InitMultiLevel(finest_level, tag_array.array());
+    // InitMultilevel(finest_level);
+    BaseState<int> tag_array_b(tag_array, max_radial_level+1, nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);

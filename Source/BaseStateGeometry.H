@@ -22,7 +22,7 @@ public:
     void ComputeCutoffCoords(const BaseStateArray<const amrex::Real>& rho0);
 
     void InitMultiLevel(const int finest_radial_level_in,
-                        const BaseStateArray<const bool>& tag_array);
+                        const BaseStateArray<int>& tag_array);
 
     int max_radial_level;
     int finest_radial_level;

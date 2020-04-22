@@ -27,9 +27,9 @@ Maestro::SpongeInit(const RealVector& rho0)
 
     Real r_top = prob_lo_r;
     if (!use_exact_base_state) {
-        r_top += Real(r_end_coord(0,1)+1) * base_geom.dr(0);
+        r_top += Real(base_geom.r_end_coord(0,1)+1) * base_geom.dr(0);
     } else {
-        r_top += r_edge_loc_b(0,nr_fine);
+        r_top += base_geom.r_edge_loc(0,nr_fine);
     }
     r_sp = r_top;
 
@@ -37,7 +37,7 @@ Maestro::SpongeInit(const RealVector& rho0)
 
     if (!use_exact_base_state) {
         // set r_sp;
-        for (auto r = 0; r <= r_end_coord(0,1); ++r) {
+        for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
             if (rho0[max_lev*r] < sponge_start_density) {
                 r_sp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;
@@ -46,7 +46,7 @@ Maestro::SpongeInit(const RealVector& rho0)
 
         // set r_md
         r_md = r_top;
-        for (auto r = 0; r <= r_end_coord(0,1); ++r) {
+        for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
             if (rho0[max_lev*r] < sponge_center_density) {
                 r_md = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;

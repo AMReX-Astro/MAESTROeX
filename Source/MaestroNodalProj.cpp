@@ -182,6 +182,10 @@ Maestro::NodalProj (int proj_type,
     info.setConsolidation(true);
     info.setMetricTerm(false);
 
+    for (auto i = 0; i < grids.size(); ++i) {
+        Print() << "grids size = " << grids[i][0].size() << std::endl;
+    }
+
     MLNodeLaplacian mlndlap(geom, grids, dmap, info);
     mlndlap.setGaussSeidel(true);
     mlndlap.setHarmonicAverage(false);

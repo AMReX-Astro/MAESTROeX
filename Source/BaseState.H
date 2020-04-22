@@ -51,6 +51,14 @@ struct BaseStateArray
         nvar = base_state.nComp();
     }
 
+    /// set to some scalar value 
+    void setVal(const T val) noexcept {
+        AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
+            dptr[i] = val;
+        });
+        amrex::Gpu::synchronize();
+    }
+
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
 
@@ -150,6 +158,14 @@ public:
     {
         return makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
     } 
+
+    /// return ith element of underlying data array
+    AMREX_FORCE_INLINE
+    T array (const int i) noexcept 
+    {
+        BaseStateArray<T> arr = makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
+        return arr(i);
+    }
 
     /// allocate memory for the BaseState
     void define(const int num_levs, const int length=1, const int ncomp=1);

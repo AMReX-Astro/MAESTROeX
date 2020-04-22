@@ -55,7 +55,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
         Real mod_dr = 0.0;
         if (use_exact_base_state) {
-            mod_dr = r_cc_loc_b(lev,0) < model_dr_irreg[0] ? remainder(model_dr_irreg[0], r_cc_loc_b(lev,0)) : remainder(r_cc_loc_b(lev,0), model_dr_irreg[0]);
+            mod_dr = base_geom.r_cc_loc(lev,0) < model_dr_irreg[0] ? remainder(model_dr_irreg[0], base_geom.r_cc_loc(lev,0)) : remainder(base_geom.r_cc_loc(lev,0), model_dr_irreg[0]);
         } else {
             mod_dr = dr(n) < model_dr ? 
                 remainder(model_dr, dr(n)) : remainder(dr(n), model_dr);
@@ -182,7 +182,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     Real mencl = 0.0;
 
     if (use_exact_base_state) {
-        Real dr_irreg = r_edge_loc_b(n,1) - r_edge_loc_b(n,0); // edge-to-edge
+        Real dr_irreg = base_geom.r_edge_loc(n,1) - base_geom.r_edge_loc(n,0); // edge-to-edge
 
         if (spherical || do_2d_planar_octant) {
             mencl = 4.0/3.0 * M_PI * dr_irreg*dr_irreg*dr_irreg * s0_init[n+max_lev*nr_fine*Rho];
@@ -203,9 +203,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         if (rloc < base_cutoff_density_loc) {
 
             Real r_r = starting_rad;
-            r_r += use_exact_base_state ? r_edge_loc_b(n,r+1) : Real(r+1) * dr(n);
+            r_r += use_exact_base_state ? base_geom.r_edge_loc(n,r+1) : Real(r+1) * dr(n);
             Real r_l = starting_rad;
-            r_l += use_exact_base_state ? r_edge_loc_b(n,r) : Real(r) * dr(n);
+            r_l += use_exact_base_state ? base_geom.r_edge_loc(n,r) : Real(r) * dr(n);
 
             Real g = 0.0;
 
@@ -225,10 +225,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             Real dpdr = 0.0;
             Real rhog = 0.0;
             if (use_exact_base_state) {
-                Real dr_irreg = r_cc_loc_b(n,r) - r_cc_loc_b(n,r-1);
+                Real dr_irreg = base_geom.r_cc_loc(n,r) - base_geom.r_cc_loc(n,r-1);
                 dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)])/dr_irreg;
 
-                Real rfrac = (r_edge_loc_b(n,r) - r_cc_loc_b(n,r-1)) / dr_irreg; 
+                Real rfrac = (base_geom.r_edge_loc(n,r) - base_geom.r_cc_loc(n,r-1)) / dr_irreg; 
                 rhog = ((1.0-rfrac) * s0_init[n+max_lev*(r+nr_fine*Rho)] +  
                         rfrac * s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * g;
             } else {
