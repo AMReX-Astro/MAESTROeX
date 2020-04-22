@@ -18,6 +18,8 @@
 #include <BaseState.H>
 
 #include <state_indices.H>
+#include <maestro_params.H>
+using namespace maestro;
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
@@ -1872,7 +1874,6 @@ public:
     ////////////////
     // static data members defined in `_cpp_parameters`
     // this file is in Source/param_includes/
-#include <maestro_params.H>
     ////////////////
 
     // these are defined in `VariableSetup()`

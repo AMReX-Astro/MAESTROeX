@@ -11,7 +11,7 @@
 # in the inputs file, b is the variable name in the C++ class.
 
 
-@namespace: maestro Maestro static
+@namespace: maestro Maestro
 
 #-----------------------------------------------------------------------------
 # category: synchronization
