@@ -1,6 +1,5 @@
 
 #include <BaseStateGeometry.H>
-#include <maestro_params.H>
 
 using namespace amrex;
 
@@ -26,6 +25,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
     nr_fine = nr_fine_in;
     dr_fine = dr_fine_in;
     nr_irreg = nr_irreg_in;
+    spherical = spherical_in;
 
     dr_d.define(max_radial_level+1);
     nr_d.define(max_radial_level+1);
@@ -315,11 +315,7 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::InitMultiLevel", InitMultilevel); 
 
-    if (spherical) {
-        finest_radial_level = 0;
-    } else {
-        finest_radial_level = finest_radial_level_in;
-    }
+    finest_radial_level = spherical ? 0: finest_radial_level_in;
 
     numdisjointchunks_d.define(finest_radial_level+1);
     numdisjointchunks.init(numdisjointchunks_d);
@@ -327,23 +323,29 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
     // loop through tag_array first to determine the maximum number of chunks
     // to use for allocating r_start_coord and r_end_coord
     int maxchunks = 1;
-    for (auto n = 1; n <= finest_radial_level; ++n) {
 
-        // initialize variables
-        bool chunk_start = false;
-        int nchunks = 0;
+    if (!spherical) {
+        for (auto n = 1; n <= finest_radial_level; ++n) {
 
-        // increment nchunks at beginning of each chunk
-        // (ex. when the tagging index changes from 0 to 1)
-        for (auto r = 0; r < nr(n-1); ++r) {
-            if (tag_array(n-1,r) > 0 && !chunk_start) {
-                chunk_start = true;
-                nchunks++;
-            } else if (tag_array(n-1,r) == 0 && chunk_start) {
-                chunk_start = false;
+            Print() << "n = " << n << ", nr(n-1) = " << nr(n-1) << std::endl;
+
+            // initialize variables
+            bool chunk_start = false;
+            int nchunks = 0;
+
+            // increment nchunks at beginning of each chunk
+            // (ex. when the tagging index changes from 0 to 1)
+            for (auto r = 0; r < nr(n-1); ++r) {
+                // Print() << "r = " << r << ", len = " << tag_array.length() << ", nr = " << nr(n-1) << ", nr_fine = " << nr_fine << std::endl;
+                if (tag_array(n-1,r) > 0 && !chunk_start) {
+                    chunk_start = true;
+                    nchunks++;
+                } else if (tag_array(n-1,r) == 0 && chunk_start) {
+                    chunk_start = false;
+                }
             }
+            maxchunks = max(nchunks, maxchunks);
         }
-        maxchunks = max(nchunks, maxchunks);
     }
 
     // maxchunks+1 here because we will be using indices 1:maxchunks

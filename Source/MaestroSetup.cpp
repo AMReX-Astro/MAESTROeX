@@ -104,8 +104,7 @@ Maestro::Setup ()
             base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
         }
 #endif
-    }
-    else {
+    } else {
         // compute base_geom.max_radial_level
         base_geom.max_radial_level = max_level;
 
