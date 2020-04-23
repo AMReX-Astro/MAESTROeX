@@ -38,10 +38,8 @@ from __future__ import print_function
 #
 #    @namespace: sets the namespace that these will be under (see below)
 #      it also gives the C++ class name.
-#      if we include the keyword "static" after the name, then the parameters
-#      will be defined as static member variables in C++
 #
-#      e.g. @namespace maestro Maestro static
+#      e.g. @namespace maestro Maestro
 #
 # Note: categories listed in the input file aren't used for code generation
 # but are used for the documentation generation
@@ -50,13 +48,17 @@ from __future__ import print_function
 # For a namespace, name, we write out:
 #
 #   -- name_params.H  (for maestro, included in Maestro.H):
-#      declares the static variables of the Maestro class
+#      sets up the namespace and extern parameters
 #
-#   -- name_defaults.H  (for maestro, included in Maestro.cpp):
-#      sets the defaults of the runtime parameters
+#   -- name_declares.H  (for maestro, included in Maestro.cpp):
+#      declares the runtime parameters
 #
 #   -- name_queries.H  (for maestro, included in Maestro.cpp):
 #      does the parmparse query to override the default in C++
+#
+#  -- name_job_info_tests.H
+#     this tests the current value against the default and outputs
+#     into a file
 #
 # we write out a single copy of:
 #
@@ -94,7 +96,7 @@ class Param(object):
 
     def __init__(self, name, dtype, default,
                  cpp_var_name=None,
-                 namespace=None, cpp_class=None, static=None,
+                 namespace=None, cpp_class=None, 
                  debug_default=None,
                  in_fortran=0, f90_name=None, f90_dtype=None,
                  ifdef=None):
@@ -106,11 +108,6 @@ class Param(object):
 
         self.namespace = namespace
         self.cpp_class = cpp_class
-
-        if static is None:
-            self.static = 0
-        else:
-            self.static = static
 
         self.debug_default = debug_default
         self.in_fortran = in_fortran
@@ -130,20 +127,26 @@ class Param(object):
         else:
             self.f90_dtype = f90_dtype
 
-    def get_default_string(self):
-        # this is the line that goes into maestro_defaults.H included
+    def get_declare_string(self):
+        # this is the line that goes into maestro_declares.H included
         # into Maestro.cpp
 
         if self.dtype == "int":
-            tstr = "int         {}::{}".format(self.cpp_class, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED int {}::{}".format(self.namespace, self.cpp_var_name)
         elif self.dtype == "Real":
-            tstr = "amrex::Real {}::{}".format(self.cpp_class, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED amrex::Real {}::{}".format(self.namespace, self.cpp_var_name)
         elif self.dtype == "bool":
-            tstr = "bool        {}::{}".format(self.cpp_class, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED bool {}::{}".format(self.namespace, self.cpp_var_name)
         elif self.dtype == "string":
-            tstr = "std::string {}::{}".format(self.cpp_class, self.cpp_var_name)
+            tstr = "std::string {}::{}".format(self.namespace, self.cpp_var_name)
         else:
             sys.exit("invalid data type for parameter {}".format(self.name))
+
+        return "{};\n".format(tstr)
+
+    def get_default_string(self):
+        # this is the line that goes into maestro_declares.H included
+        # into Maestro.cpp
 
         ostr = ""
 
@@ -152,12 +155,12 @@ class Param(object):
 
         if not self.debug_default is None:
             ostr += "#ifdef AMREX_DEBUG\n"
-            ostr += "{} = {};\n".format(tstr, self.debug_default)
+            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.debug_default)
             ostr += "#else\n"
-            ostr += "{} = {};\n".format(tstr, self.default)
+            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.default)
             ostr += "#endif\n"
         else:
-            ostr += "{} = {};\n".format(tstr, self.default)
+            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.default)
 
         if not self.ifdef is None:
             ostr += "#endif\n"
@@ -228,7 +231,7 @@ class Param(object):
             ostr += "#ifdef {}\n".format(self.ifdef)
 
         if language == "C++":
-            ostr += "pp.query(\"{}\", {});\n".format(self.name, self.cpp_var_name)
+            ostr += "pp.query(\"{}\", {}::{});\n".format(self.name, self.namespace, self.cpp_var_name)
         elif language == "F90":
             ostr += "    call pp%query(\"{}\", {})\n".format(self.name, self.f90_name)
         else:
@@ -243,18 +246,14 @@ class Param(object):
         # this is the line that goes into maestro_params.H included
         # into Maestro.H
 
-        static = ""
-        if self.static:
-            static = "static"
-
         if self.dtype == "int":
-            tstr = "{} int         {};\n".format(static, self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED int {};\n".format(self.cpp_var_name)
         elif self.dtype == "Real":
-            tstr = "{} amrex::Real {};\n".format(static, self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED amrex::Real {};\n".format(self.cpp_var_name)
         elif self.dtype == "bool":
-            tstr = "{} bool        {};\n".format(static, self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED bool {};\n".format(self.cpp_var_name)
         elif self.dtype == "string":
-            tstr = "{} std::string {};\n".format(static, self.cpp_var_name)
+            tstr = "extern std::string {};\n".format(self.cpp_var_name)
         else:
             sys.exit("invalid data type for parameter {}".format(self.name))
 
@@ -433,7 +432,6 @@ def parse_params(infile, meth_template):
 
     namespace = None
     cpp_class = None
-    static = None
 
     try: f = open(infile)
     except:
@@ -454,15 +452,6 @@ def parse_params(infile, meth_template):
                 fields = value.split()
                 namespace = fields[0]
                 cpp_class = fields[1]
-
-                try: static = fields[2]
-                except: static = ""
-
-                # do we have the static keyword?
-                if "static" in static:
-                    static = 1
-                else:
-                    static = 0
 
             else:
                 sys.exit("invalid command")
@@ -511,7 +500,6 @@ def parse_params(infile, meth_template):
                             cpp_var_name=cpp_var_name,
                             namespace=namespace,
                             cpp_class=cpp_class,
-                            static=static,
                             debug_default=debug_default,
                             in_fortran=in_fortran, f90_name=f90_name, f90_dtype=f90_dtype,
                             ifdef=ifdef))
@@ -527,28 +515,39 @@ def parse_params(infile, meth_template):
 
         params_nm = [q for q in params if q.namespace == nm]
 
-        # write name_defaults.H
-        try: cd = open("{}/{}_defaults.H".format(param_include_dir, nm), "w")
+        # write name_declares.H
+        try: cd = open("{}/{}_declares.H".format(param_include_dir, nm), "w")
         except:
-            sys.exit("unable to open {}_defaults.H for writing".format(nm))
+            sys.exit("unable to open {}_declares.H for writing".format(nm))
 
         cd.write(CWARNING)
+        cd.write("#ifndef _{}_DECLARES_H_\n".format(nm.upper()))
+        cd.write("#define _{}_DECLARES_H_\n".format(nm.upper()))
 
         for p in params_nm:
-            cd.write(p.get_default_string())
+            cd.write(p.get_declare_string())
 
+        cd.write("#endif\n")
         cd.close()
 
         # write name_params.H
-        try: cp = open("{}/{}_params.H".format(param_include_dir, nm), "w")
+        try: 
+            cp = open("{}/{}_params.H".format(param_include_dir, nm), "w")
         except:
             sys.exit("unable to open {}_params.H for writing".format(nm))
 
         cp.write(CWARNING)
+        cp.write("#ifndef _{}_PARAMS_H_\n".format(nm.upper()))
+        cp.write("#define _{}_PARAMS_H_\n".format(nm.upper()))
+
+        cp.write("\n")
+        cp.write("namespace {} {{\n".format(nm))
 
         for p in params_nm:
             cp.write(p.get_decl_string())
 
+        cp.write("};\n\n")
+        cp.write("#endif\n")
         cp.close()
 
         # write maestro_queries.H
@@ -559,7 +558,9 @@ def parse_params(infile, meth_template):
         cq.write(CWARNING)
 
         for p in params_nm:
+            cq.write(p.get_default_string())
             cq.write(p.get_query_string("C++"))
+            cq.write("\n")
 
         cq.close()
 

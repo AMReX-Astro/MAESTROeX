@@ -1,7 +1,9 @@
+CEXE_headers += maestro_declares.H
 CEXE_headers += maestro_params.H
 CEXE_headers += maestro_queries.H
-CEXE_headers += maestro_defaults.H
 CEXE_headers += state_indices.H
+
+CEXE_sources += runparams_defaults.cpp
 
 F90EXE_sources += meth_params.F90
 F90EXE_sources += state_indices_nd.F90

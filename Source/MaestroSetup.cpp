@@ -261,6 +261,8 @@ Maestro::ReadParameters ()
 
     ParmParse pp("maestro");
 
+    using namespace maestro;
+
 #include <maestro_queries.H>
 
     // now read in vectors for ParmParse
