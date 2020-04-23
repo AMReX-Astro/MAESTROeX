@@ -434,16 +434,16 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     });
 
     // Lower boundary
-    A[0] = 0.0;
-    B[0] = 1.0;
-    C[0] = 0.0;
-    F[0] = 0.0;
+    A(0) = 0.0;
+    B(0) = 1.0;
+    C(0) = 0.0;
+    F(0) = 0.0;
 
     // Upper boundary
-    A[fine_base_density_cutoff_coord+1] = -1.0;
-    B[fine_base_density_cutoff_coord+1] = 1.0;
-    C[fine_base_density_cutoff_coord+1] = 0.0;
-    F[fine_base_density_cutoff_coord+1] = 0.0;
+    A(fine_base_density_cutoff_coord+1) = -1.0;
+    B(fine_base_density_cutoff_coord+1) = 1.0;
+    C(fine_base_density_cutoff_coord+1) = 0.0;
+    F(fine_base_density_cutoff_coord+1) = 0.0;
 
     // need to synchronize gpu values with updated host values
     Gpu::synchronize();
@@ -595,7 +595,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     const Real dr0 = base_geom.dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
-
+    
     // create time-centered base-state quantities
     // for (auto r = 0; r < base_geom.nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
@@ -603,7 +603,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         rho0_nph(0,r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
         gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
     });
-
+    
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
     //      (r^2 Sbar).  Then we will solve for the update, delta w0.
@@ -650,7 +650,8 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     // for (auto r = 1; r <= max_cutoff; ++r) {
     lo = 1; 
     hi = max_cutoff;
-    AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+    //AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+    amrex::ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j) noexcept {
         int r = j + lo;
         A(r) = gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1));
         A(r) /= dr0*dr0;
@@ -658,7 +659,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         B(r) = -( gamma1bar_nph(r-1) * p0_nph(r-1) / (r_cc_loc(0,r-1)*r_cc_loc(0,r-1))
                 + gamma1bar_nph(r) * p0_nph(r) / (r_cc_loc(0,r)*r_cc_loc(0,r)) ) 
                 / (dr0*dr0);
-
+        
         Real dpdr = (p0_nph(r) - p0_nph(r-1)) / dr0;
 
         B(r) -= 4.0 * dpdr / (r_edge_loc(0,r)*r_edge_loc(0,r)*r_edge_loc(0,r));
@@ -688,7 +689,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     // need to synchronize gpu values with updated host values
     Gpu::synchronize();
-    
+
     // Call the tridiagonal solver
     Tridiag(A, B, C, F, u, max_cutoff+2);
 

@@ -412,7 +412,7 @@ Maestro::Put1dArrayOnCart (int lev,
         const Box& tileBox = mfi.tilebox();
 
         const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
-
+        
         if (!spherical) {
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;

@@ -40,7 +40,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     Real diffusion_coefficient = const_conductivity / (eos_state.cp * ambient_dens);
    
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < nr.array()(n); ++r) {
 
         s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
         s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;

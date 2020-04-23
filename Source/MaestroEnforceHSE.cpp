@@ -51,7 +51,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     } else {
         for (auto r = 1; r <= min(r_end_coord(0,1),base_geom.base_cutoff_density_coord(0)); r++) {
             // assume even grid spacing
-            p0[max_lev*r] = p0[max_lev*(r-1)] + 0.5*dr(0)*
+            p0[max_lev*r] = p0[max_lev*(r-1)] + 0.5*base_geom.dr(0)*
                 (rho0[max_lev*(r-1)] + rho0[max_lev*r])*grav_edge[max_lev*r];
         }
     }
@@ -76,12 +76,12 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     if (do_planar_invsq_grav || do_2d_planar_octant) {
                         // we have variable gravity
                         p0[n+max_lev*r_start_coord(n,i)] = p0[n-1+max_lev*(r_start_coord(n,i)/2-1)]
-                                + (dr(n)/4.0)* 
+                                + (base_geom.dr(n)/4.0)* 
                                 (2.0*rho0[n+max_lev*r_start_coord(n,i)]/3.0 + 
                                 4.0*rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]/3.0)* 
                                 (grav_edge[n+max_lev*r_start_coord(n,i)] + 
                                 grav_cell[n-1+max_lev*(r_start_coord(n,i)/2-1)])  
-                                + (dr(n)/8.0)* 
+                                + (base_geom.dr(n)/8.0)* 
                                 (5.0*rho0[n+max_lev*r_start_coord(n,i)]/3.0 + 
                                 1.0*rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]/3.0)* 
                                 (grav_edge[n+max_lev*r_start_coord(n,i)] + 
@@ -89,7 +89,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     } else {
                         // assuming constant g here
                         p0[n+max_lev*r_start_coord(n,i)] = p0[n-1+max_lev*(r_start_coord(n,i)/2-1)] 
-                                + (3.0*grav_cell[1]*dr(n)/4.0)* 
+                                + (3.0*grav_cell[1]*base_geom.dr(n)/4.0)* 
                                 (rho0[n-1+max_lev*(r_start_coord(n,i)/2-1)]+rho0[n+max_lev*r_start_coord(n,i)]);
                     }
                 } else {
@@ -124,12 +124,12 @@ Maestro::EnforceHSE(const RealVector& rho0,
                     if (do_planar_invsq_grav || do_2d_planar_octant) {
                         // we have variable gravity
                         Real temp = p0[n+max_lev*r_end_coord(n,i)] 
-                                + (dr(n)/4.0)* 
+                                + (base_geom.dr(n)/4.0)* 
                                 (2.0*rho0[n+max_lev*r_end_coord(n,i)]/3.0 + 
                                 4.0*rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]/3.0)* 
                                 (grav_edge[n-1+max_lev*(r_end_coord(n,i)+1)/2] + 
                                 grav_cell[n-1+max_lev*(r_end_coord(n,i)+1)/2]) 
-                                + (dr(n)/8.0)* 
+                                + (base_geom.dr(n)/8.0)* 
                                 (5.0*rho0[n+max_lev*r_end_coord(n,i)]/3.0 + 
                                 1.0*rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]/3.0)* 
                                 (grav_cell[n+max_lev*r_end_coord(n,i)] + 
@@ -137,7 +137,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
                         offset = p0[n-1+max_lev*(r_end_coord(n,i)+1)/2] - temp;
                     } else {
                         // assuming constant g here
-                        Real temp = p0[n+max_lev*r_end_coord(n,i)] + (3.0*grav_cell[1]*dr(n)/4.0)* 
+                        Real temp = p0[n+max_lev*r_end_coord(n,i)] + (3.0*grav_cell[1]*base_geom.dr(n)/4.0)* 
                                 (rho0[n+max_lev*r_end_coord(n,i)]+rho0[n-1+max_lev*(r_end_coord(n,i)+1)/2]);
                         offset = p0[n-1+max_lev*(r_end_coord(n,i)+1)/2] - temp;
                     }

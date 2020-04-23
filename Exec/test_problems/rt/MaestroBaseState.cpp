@@ -73,10 +73,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     // set a guess for the temperature for the EOS calls
     Real t_guess = 1.e-8;
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < nr.array()(n); ++r) {
 
         // height above the bottom of the domain
-        Real rloc = (Real(r) + 0.5) * dr[n];
+        Real rloc = (Real(r) + 0.5) * dr.array()(n);
 
         Real d_ambient = 0.0;
         Real p_ambient = 0.0;
@@ -148,11 +148,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     Real max_hse_error = -1.e30;
 
-    for (auto r = 1; r < nr[n]; ++r) {
+    for (auto r = 1; r < nr.array()(n); ++r) {
 
-        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr[n];
+        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr.array()(n);
 
-        Real dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)]) / dr[n];
+        Real dpdr = (p0_init[n+max_lev*r] - p0_init[n+max_lev*(r-1)]) / dr.array()(n);
         Real rhog = 0.5*(s0_init[n+max_lev*(r+nr_fine*Rho)] + 
                          s0_init[n+max_lev*(r-1+nr_fine*Rho)])*grav_const;
 

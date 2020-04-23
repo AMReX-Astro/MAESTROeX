@@ -497,6 +497,8 @@ Maestro::DiagFile (const int step,
     if (spherical) {
 #if (AMREX_SPACEDIM == 3)
         const Real * AMREX_RESTRICT rho0 = rho0_in.dataPtr();
+        const auto r_cc_loc_p = r_cc_loc_b.array();
+        const auto r_edge_loc_p = r_edge_loc_b.array();
 
         // m(r) will contain mass enclosed by the center
         RealVector m(base_geom.nr_fine);

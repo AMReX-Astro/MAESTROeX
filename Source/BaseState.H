@@ -195,7 +195,7 @@ public:
     /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
-
+    
     void toVector(amrex::Vector<T>& vec);
     void toVector(amrex::Gpu::ManagedVector<T>& vec);
 
