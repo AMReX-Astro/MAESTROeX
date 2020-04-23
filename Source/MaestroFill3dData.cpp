@@ -307,8 +307,10 @@ Maestro::Put1dArrayOnCart (const int lev,
                     // 1.  Piecewise constant
                     // 2.  Piecewise linear
                     // 3.  Quadratic
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-
+                    // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, 
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k)
+                    {
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -598,8 +600,10 @@ Maestro::Put1dArrayOnCart (int lev,
                     // 1.  Piecewise constant
                     // 2.  Piecewise linear
                     // 3.  Quadratic
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-
+                    // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, 
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k)
+                    {
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];

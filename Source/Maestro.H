@@ -1139,8 +1139,8 @@ public:
     void MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0);
     
-    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
-                      BaseStateArray<Real> rho0);
+    // void MakeGravEdge(BaseStateArray<Real>& grav_edge, 
+    //                   BaseStateArray<Real>& rho0);
     
     void MakeGravEdge(BaseStateArray<Real> grav_edge, 
                       const BaseStateArray<const Real> rho0);
@@ -2095,7 +2095,7 @@ public:
     // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
-    amrex::Real c_rel_eps;
+    amrex::Real rel_eps;
 
     // these provide information about the multilevel base state configuration
     // BaseState<int> numdisjointchunks;

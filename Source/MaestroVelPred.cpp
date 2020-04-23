@@ -395,8 +395,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
-    const Real rel_eps = c_rel_eps;
-
     const Real dt2 = 0.5 * dt;
 
     const Real hx = dx[0];
@@ -629,8 +627,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
 
-    const Real rel_eps = c_rel_eps;
-
     const Real dt2 = 0.5 * dt;
     const Real dt4 = 0.25 * dt;
 
@@ -812,8 +808,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
     const Box& mzbx = amrex::growLo(obx,2, -1);
-
-    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
 
@@ -1174,8 +1168,6 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     //////////////////////////////////////
     // Create u_{\i-\half\e_y}^{y|z}, etc.
     //////////////////////////////////////
-
-    const Real rel_eps = c_rel_eps;
 
     const Real dt6 = dt / 6.0;
 
@@ -1590,8 +1582,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
     const Box& zbx = mfi.nodaltilebox(2);
-
-    const Real rel_eps = c_rel_eps;
 
     const Real dt2 = 0.5 * dt;
     const Real dt4 = 0.25 * dt;

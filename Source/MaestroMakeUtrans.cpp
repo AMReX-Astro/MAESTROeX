@@ -19,8 +19,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Box& domainBox = geom[lev].Domain();
         const auto dx = geom[lev].CellSizeArray();
 
-        const Real rel_eps = c_rel_eps;
-
         const Real dt2 = 0.5 * dt;
 
         const auto domlo = domainBox.loVect3d();

@@ -1,7 +1,9 @@
 
 #include <BaseStateGeometry.H>
+#include <maestro_params.H>
 
 using namespace amrex;
+using namespace maestro;
 
 void
 BaseStateGeometry::Init(const int max_radial_level_in, 
@@ -10,7 +12,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
                         const int nr_irreg_in,
                         const Vector<Geometry> geom,
                         const int max_level,
-                        GpuArray<Real,3> center)
+                        GpuArray<Real,3>& center)
 {
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::Init()", Init); 
@@ -25,7 +27,6 @@ BaseStateGeometry::Init(const int max_radial_level_in,
     nr_fine = nr_fine_in;
     dr_fine = dr_fine_in;
     nr_irreg = nr_irreg_in;
-    spherical = spherical_in;
 
     dr_d.define(max_radial_level+1);
     nr_d.define(max_radial_level+1);
@@ -112,7 +113,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
 }
 
 void 
-BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<const Real>& rho0)
+BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<Real>& rho0)
 {
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::ComputeCutoffCoords", ComputeCutoffCoords); 
@@ -327,8 +328,6 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
     if (!spherical) {
         for (auto n = 1; n <= finest_radial_level; ++n) {
 
-            Print() << "n = " << n << ", nr(n-1) = " << nr(n-1) << std::endl;
-
             // initialize variables
             bool chunk_start = false;
             int nchunks = 0;
@@ -336,7 +335,6 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
             // increment nchunks at beginning of each chunk
             // (ex. when the tagging index changes from 0 to 1)
             for (auto r = 0; r < nr(n-1); ++r) {
-                // Print() << "r = " << r << ", len = " << tag_array.length() << ", nr = " << nr(n-1) << ", nr_fine = " << nr_fine << std::endl;
                 if (tag_array(n-1,r) > 0 && !chunk_start) {
                     chunk_start = true;
                     nchunks++;

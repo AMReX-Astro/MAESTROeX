@@ -387,8 +387,6 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     const Box& mxbx = amrex::growLo(obx, 0, -1);
     const Box& mybx = amrex::growLo(obx, 1, -1);
 
-    const Real rel_eps = c_rel_eps;
-
     // loop over appropriate x-faces
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -547,8 +545,6 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
 
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
-
-    const Real rel_eps = c_rel_eps;
 
     // x-direction
     int bclo = bcs[bccomp].lo()[0];
@@ -977,8 +973,6 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
-
-    const Real rel_eps = c_rel_eps;
 
     // simhxy
     Box imhbox = amrex::grow(mfi.tilebox(), 2, 1);
@@ -1498,8 +1492,6 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     const Box& xbx = mfi.nodaltilebox(0);
     const Box& ybx = mfi.nodaltilebox(1);
     const Box& zbx = mfi.nodaltilebox(2);
-
-    const Real rel_eps = c_rel_eps;
 
     // x-direction
     int bclo = bcs[bccomp].lo()[0];

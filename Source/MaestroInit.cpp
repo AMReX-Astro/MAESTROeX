@@ -105,7 +105,8 @@ Maestro::Init ()
 
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        // base_geom.ComputeCutoffCoords(rho0_old.array());
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
     }
 
     if (spherical) {
@@ -123,7 +124,7 @@ Maestro::Init ()
     if (restart_file == "") {
 
         // compute gamma1bar
-        MakeGamma1bar(sold,gamma1bar_old,p0_old);
+        MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
         // compute beta0
         MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
@@ -268,27 +269,28 @@ Maestro::InitData ()
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        // base_geom.ComputeCutoffCoords(rho0_old.array());
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
         MakeGravCell(grav_cell_old, rho0_old);
-    }
-    else {
+    } else {
 
         // first compute cutoff coordinates using initial density profile
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        // base_geom.ComputeCutoffCoords(rho0_old.array());
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
             std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
-        }
-        else {
+        } else {
             // set rho0 to be the average
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
-            // base_geom.ComputeCutoffCoords(rho0_old.array());
+            BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+            base_geom.ComputeCutoffCoords(rho0_state.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);
@@ -530,7 +532,7 @@ void Maestro::InitProj ()
 void Maestro::DivuIter (int istep_divu_iter)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
+    BL_PROFILE_VAR("Maestro::DivuIter()", DivuIter);
 
     Vector<MultiFab> stemp             (finest_level+1);
     Vector<MultiFab> rho_Hext          (finest_level+1);
