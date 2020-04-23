@@ -78,8 +78,7 @@ Maestro::WriteCheckPoint (int step) {
         HeaderFile << t_old << "\n";
 
         // write out rel_eps
-        get_rel_eps(&c_rel_eps);
-        HeaderFile << c_rel_eps << "\n";
+        HeaderFile << rel_eps << "\n";
 
         // write the BoxArray at each level
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -217,9 +216,9 @@ Maestro::ReadCheckPoint ()
         t_new = t_old + dt;
 
         // read in rel_eps
-        is >> c_rel_eps;
+        is >> rel_eps;
         GotoNextLine(is);
-        set_rel_eps(&c_rel_eps);
+        set_rel_eps(&rel_eps);
 
         for (int lev = 0; lev <= finest_level; ++lev) {
 
@@ -295,7 +294,7 @@ Maestro::ReadCheckPoint ()
         std::istringstream is(fileCharPtrString, std::istringstream::in);
 
         // read in cell-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
@@ -340,7 +339,7 @@ Maestro::ReadCheckPoint ()
 
 
         // read in face-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine+1; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine+1; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;

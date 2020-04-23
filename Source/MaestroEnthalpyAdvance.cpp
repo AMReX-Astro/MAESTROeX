@@ -19,18 +19,18 @@ Maestro::EnthalpyAdvance (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
     // Create cell-centered base state quantity
-    RealVector h0_old( (max_radial_level+1)*nr_fine );
-    RealVector h0_new( (max_radial_level+1)*nr_fine );
+    RealVector h0_old( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector h0_new( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     h0_old.shrink_to_fit();
     h0_new.shrink_to_fit();
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    RealVector  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
+    RealVector  rho0_edge_old( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector  rho0_edge_new( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector rhoh0_edge_old( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector rhoh0_edge_new( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
     rho0_edge_old.shrink_to_fit();
     rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();
@@ -330,18 +330,18 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
 
     // Create cell-centered base state quantity
-    RealVector h0_old( (max_radial_level+1)*nr_fine );
-    RealVector h0_new( (max_radial_level+1)*nr_fine );
+    RealVector h0_old( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector h0_new( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     h0_old.shrink_to_fit();
     h0_new.shrink_to_fit();
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    RealVector  rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector  rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rhoh0_edge_new( (max_radial_level+1)*(nr_fine+1) );
+    RealVector  rho0_edge_old( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector  rho0_edge_new( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector rhoh0_edge_old( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    RealVector rhoh0_edge_new( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
     rho0_edge_old.shrink_to_fit();
     rho0_edge_new.shrink_to_fit();
     rhoh0_edge_old.shrink_to_fit();

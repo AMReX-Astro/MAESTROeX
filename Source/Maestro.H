@@ -16,8 +16,11 @@
 #include <network.H>
 #include <eos.H>
 #include <BaseState.H>
+#include <BaseStateGeometry.H>
 
 #include <state_indices.H>
+#include <maestro_params.H>
+using namespace maestro;
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
@@ -311,10 +314,10 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
-    void InitBaseStateGeometry(const int max_radial_level_in, 
-                               const int nr_fine_in,
-                               const amrex::Real dr_fine_in,
-                               const int nr_irreg_in);
+    // void InitBaseStateGeometry(const int max_radial_level_in, 
+    //                            const int nr_fine_in,
+    //                            const amrex::Real dr_fine_in,
+    //                            const int nr_irreg_in);
 #if (AMREX_SPACEDIM == 3)
     void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
@@ -322,13 +325,16 @@ public:
 #endif
     void ComputeCutoffCoords(const RealVector& rho0);
 
-    void InitMultilevel(const int finest_radial_level_in);
+    // void InitMultilevel(const int finest_radial_level_in);
                                
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
 
-    void RestrictBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
-    void FillGhostBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+
+    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -1115,11 +1121,14 @@ public:
     void MakeGravEdge(RealVector& grav_edge, 
                       const RealVector& rho0);
 
-    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
-                      const RealVector& rho0);
-
-    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
-                      const BaseState<amrex::Real>& rho0);
+    void MakeGravEdge(BaseState<Real>& grav_edge, 
+                      const BaseState<Real>& rho0);
+    
+    // void MakeGravEdge(BaseStateArray<Real>& grav_edge, 
+    //                   BaseStateArray<Real>& rho0);
+    
+    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
+                      const BaseStateArray<const Real> rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1270,9 +1279,9 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 
-                 const BaseState<amrex::Real>& c, const BaseState<amrex::Real>& r, 
-                 BaseState<amrex::Real>& u, const int n);
+    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
+                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
+                 BaseStateArray<Real> u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
 
@@ -1936,7 +1945,6 @@ public:
     ////////////////
     // static data members defined in `_cpp_parameters`
     // this file is in Source/param_includes/
-#include <maestro_params.H>
     ////////////////
 
     // these are defined in `VariableSetup()`
@@ -2049,7 +2057,7 @@ public:
     BaseState<amrex::Real> psi;
     RealVector grav_cell_old;
     RealVector grav_cell_new;
-    RealVector r_cc_loc;
+    // RealVector r_cc_loc;
     BaseState<amrex::Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
@@ -2059,35 +2067,39 @@ public:
     // These are edge-centered
     RealVector w0;
     BaseState<amrex::Real> etarho_ec;
-    RealVector r_edge_loc;
+    // RealVector r_edge_loc;
     BaseState<amrex::Real> r_edge_loc_b;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
     // in `base_state.f90` in a fortran module for convenience
-    int max_radial_level;
-    int finest_radial_level;
-    int nr_fine;
-    amrex::Real dr_fine;
-    int nr_irreg;
-    BaseState<int> nr;
-    BaseState<amrex::Real> dr;
+    // int max_radial_level;
+    // int finest_radial_level;
+    // int nr_fine;
+    // amrex::Real dr_fine;
+    // int nr_irreg;
+    // BaseState<int> nr;
+    // BaseState<Real> dr;
 
-    BaseState<int> base_cutoff_density_coord;
-    BaseState<int> anelastic_cutoff_density_coord;
-    BaseState<int> burning_cutoff_density_lo_coord;
-    BaseState<int> burning_cutoff_density_hi_coord;
+    // BaseState<int> base_cutoff_density_coord;
+    // BaseState<int> anelastic_cutoff_density_coord;
+    // BaseState<int> burning_cutoff_density_lo_coord;
+    // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
-    amrex::Real c_rel_eps;
+    amrex::Real rel_eps;
 
     // these provide information about the multilevel base state configuration
-    BaseState<int> numdisjointchunks;
-    BaseState<int> r_start_coord;
-    BaseState<int> r_end_coord;
+    // BaseState<int> numdisjointchunks;
+    // BaseState<int> r_start_coord;
+    // BaseState<int> r_end_coord;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+    // BaseState<int> tag_array_b;
+
+    /// contains base state geometry variables
+    BaseStateGeometry base_geom;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile1_data;
@@ -2132,25 +2144,5 @@ public:
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
-
-// namespace amrex{
-//     namespace HostDevice { namespace Atomic {
-
-//     template <class T>
-//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-//     void Max (T* max, T value) noexcept
-//     {
-// #if AMREX_DEVICE_COMPILE
-//         Gpu::Atomic::Max(sum,value);
-// #else
-// #ifdef _OPENMP
-// #pragma omp atomic update
-// #endif
-//         *sum += value;
-// #endif
-//     }
-
-// }}}
-
 
 #endif

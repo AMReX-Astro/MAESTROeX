@@ -4,10 +4,6 @@
 
 using namespace amrex;
 
-// default values for class data members listed in _cpp_parameters
-// that are declared in maestro_params.H
-#include <maestro_defaults.H>
-
 // default values are overwritten in VariableSetup()
 // int Maestro::Rho       = -1;
 // int Maestro::RhoH      = -1;

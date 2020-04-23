@@ -31,18 +31,21 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Vector<MultiFab> psi_cart(finest_level+1);
 
     // calculate gradp0
-    RealVector gradp0((max_radial_level+1)*nr_fine);
+    RealVector gradp0((base_geom.max_radial_level+1)*base_geom.nr_fine);
+
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
 
     if (spherical) {
         if (use_delta_gamma1_term) {
-            Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
+            Real dr_loc = r_cc_loc(0,1) - r_cc_loc(0,0);
             gradp0[0] = (p0[1] - p0[0]) / dr_loc;
 
-            dr_loc = r_cc_loc_b(0,nr_fine-1) - r_cc_loc_b(0,nr_fine-2);
-            gradp0[nr_fine-1] = (p0[nr_fine-1] - p0[nr_fine-2]) / dr_loc;
+            dr_loc = r_cc_loc(0,base_geom.nr_fine-1) - r_cc_loc(0,base_geom.nr_fine-2);
+            gradp0[base_geom.nr_fine-1] = (p0[base_geom.nr_fine-1] - p0[base_geom.nr_fine-2]) / dr_loc;
 
-            for (int r=1; r < nr_fine-1; r++) {
-                dr_loc = r_cc_loc_b(0,r+1) - r_cc_loc_b(0,r-1);
+            for (int r=1; r < base_geom.nr_fine-1; r++) {
+                dr_loc = r_cc_loc(0,r+1) - r_cc_loc(0,r-1);
                 gradp0[r] = (p0[r+1] - p0[r-1]) / dr_loc;
             }
         }
@@ -58,9 +61,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
                 // bottom and top edge cases for planar
                 gradp0[lev] = (p0[lev+max_lev] - p0[lev]) / dx[AMREX_SPACEDIM-1];
-                gradp0[lev+max_lev*(nr_fine-1)] = (p0[lev+max_lev*(nr_fine-1)] - p0[lev+max_lev*(nr_fine-2)]) / dx[AMREX_SPACEDIM-1];
+                gradp0[lev+max_lev*(base_geom.nr_fine-1)] = (p0[lev+max_lev*(base_geom.nr_fine-1)] - p0[lev+max_lev*(base_geom.nr_fine-2)]) / dx[AMREX_SPACEDIM-1];
                 
-                for (int r=1; r<nr_fine-1; r++) {
+                for (int r=1; r<base_geom.nr_fine-1; r++) {
                     gradp0[lev+max_lev*r] = (p0[lev+max_lev*(r+1)] - p0[lev+max_lev*(r-1)]) / (2.0*dx[AMREX_SPACEDIM-1]);
                 }
             }
@@ -175,7 +178,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 });
 #endif
             } else {
-                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord(lev);
+                const auto anelastic_cutoff_density_coord_lev = base_geom.anelastic_cutoff_density_coord(lev);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;

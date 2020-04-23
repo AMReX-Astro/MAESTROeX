@@ -37,7 +37,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int rho_comp = Rho;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
@@ -428,12 +428,12 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                        const RealVector& r0_old,
-                       const BaseState<Real>& rho0_edge_old,
+                       const BaseState<Real>& rho0_edge_old_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
                        const RealVector& r0_new,
-                       const BaseState<Real>& rho0_edge_new,
+                       const BaseState<Real>& rho0_edge_new_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const BaseState<Real>& rho0_predicted_edge,
+                       const BaseState<Real>& rho0_predicted_edge_state,
                        int start_comp, int num_comp)
 {
     // timer for profiling
@@ -442,10 +442,14 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int rho_comp = Rho;
     const int spec_comp = FirstSpec;
     const int nspec = NumSpec;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
+
+    auto rho0_edge_old = rho0_edge_old_state.array();
+    auto rho0_edge_new = rho0_edge_new_state.array();
+    auto rho0_predicted_edge = rho0_predicted_edge_state.array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
    
@@ -856,7 +860,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 
     const int rho_comp = Rho;
     const int rhoh_comp = RhoH;
-    const int max_lev = max_radial_level;
+    const int max_lev = base_geom.max_radial_level;
     const int species_pred_type_loc = species_pred_type;
     const int enthalpy_pred_type_loc = enthalpy_pred_type;
 
