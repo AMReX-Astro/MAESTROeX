@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="File maestro_queries.H" href="maestro__queries_8H.html" />
-    <link rel="prev" title="File maestro_defaults.H" href="maestro__defaults_8H.html" /> 
+    <link rel="prev" title="File maestro_declares.H" href="maestro__declares_8H.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -153,7 +153,7 @@
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../param_includes_files.html">Param_includes</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__declares_8H.html">File maestro_declares.H</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">File maestro_params.H</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro__queries_8H.html">File maestro_queries.H</a></li>
 <li class="toctree-l3"><a class="reference internal" href="meth_params_f.html">meth_params.F90</a></li>
@@ -238,789 +238,794 @@
             
   <div class="section" id="file-maestro-params-h">
 <h1>File maestro_params.H<a class="headerlink" href="#file-maestro-params-h" title="Permalink to this headline">¶</a></h1>
-<div class="breathe-sectiondef docutils container">
+<dl class="cpp type">
+<dt id="_CPPv47maestro">
+<span id="_CPPv37maestro"></span><span id="_CPPv27maestro"></span><span id="maestro"></span><span class="target" id="namespacemaestro"></span><em class="property">namespace </em><code class="sig-name descname">maestro</code><a class="headerlink" href="#_CPPv47maestro" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Variables</p>
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11reflux_typeE">
-<span id="_CPPv3N7Maestro11reflux_typeE"></span><span id="_CPPv2N7Maestro11reflux_typeE"></span><span id="Maestro::reflux_type__i"></span><span class="target" id="maestro__params_8H_1a85ac301d80b1ac12e64817f7ba64d7d8"></span>int <code class="sig-name descname">reflux_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro11reflux_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a3810709a3b4d4275ca15f8fe17a51795"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::reflux_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15maestro_verboseE">
-<span id="_CPPv3N7Maestro15maestro_verboseE"></span><span id="_CPPv2N7Maestro15maestro_verboseE"></span><span id="Maestro::maestro_verbose__i"></span><span class="target" id="maestro__params_8H_1af0a85db21c87ce8d4cd1f8b2c95889c3"></span>int <code class="sig-name descname">maestro_verbose</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro15maestro_verboseE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1acc603069995925c6108f66d398d7e66a"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::maestro_verbose</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10model_fileE">
-<span id="_CPPv3N7Maestro10model_fileE"></span><span id="_CPPv2N7Maestro10model_fileE"></span><span id="Maestro::model_file__ss"></span><span class="target" id="maestro__params_8H_1a6ebcf1808601e0cd73682129bed61d8e"></span>string <code class="sig-name descname">model_file</code> = &quot;&quot;<a class="headerlink" href="#_CPPv4N7Maestro10model_fileE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro10model_fileE">
+<span id="_CPPv3N7maestro10model_fileE"></span><span id="_CPPv2N7maestro10model_fileE"></span><span id="maestro::model_file__ss"></span><span class="target" id="namespacemaestro_1aa849cf7f520884bc94ef358bb7430268"></span>string <code class="sig-name descname">model_file</code><a class="headerlink" href="#_CPPv4N7maestro10model_fileE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13perturb_modelE">
-<span id="_CPPv3N7Maestro13perturb_modelE"></span><span id="_CPPv2N7Maestro13perturb_modelE"></span><span id="Maestro::perturb_model__b"></span><span class="target" id="maestro__params_8H_1a4c4b1b77aa056eb7f0398f269feb64e1"></span>bool <code class="sig-name descname">perturb_model</code> = false<a class="headerlink" href="#_CPPv4N7Maestro13perturb_modelE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a9cdb9f4afd3572e01d73b70238c46471"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::perturb_model</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19print_init_hse_diagE">
-<span id="_CPPv3N7Maestro19print_init_hse_diagE"></span><span id="_CPPv2N7Maestro19print_init_hse_diagE"></span><span id="Maestro::print_init_hse_diag__b"></span><span class="target" id="maestro__params_8H_1a6dfff2da7bb930d4ffa1d278c8be7f9b"></span>bool <code class="sig-name descname">print_init_hse_diag</code> = false<a class="headerlink" href="#_CPPv4N7Maestro19print_init_hse_diagE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa829cf1cf5a73642692827b22661383b"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::print_init_hse_diag</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9stop_timeE">
-<span id="_CPPv3N7Maestro9stop_timeE"></span><span id="_CPPv2N7Maestro9stop_timeE"></span><span id="Maestro::stop_time__Real"></span><span class="target" id="maestro__params_8H_1abbcbfe56043e7c22a56e677abb3c590b"></span>Real <code class="sig-name descname">stop_time</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro9stop_timeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa218f357d053947143eee20068b7a379"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::stop_time</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8max_stepE">
-<span id="_CPPv3N7Maestro8max_stepE"></span><span id="_CPPv2N7Maestro8max_stepE"></span><span id="Maestro::max_step__i"></span><span class="target" id="maestro__params_8H_1afa1af93595c01ef52949cfd5614313aa"></span>int <code class="sig-name descname">max_step</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro8max_stepE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a8fd500a13e6960814c4cbfa04d3ff907"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::max_step</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro3cflE">
-<span id="_CPPv3N7Maestro3cflE"></span><span id="_CPPv2N7Maestro3cflE"></span><span id="Maestro::cfl__Real"></span><span class="target" id="maestro__params_8H_1a773cf877532cc122dc31a1de0415fc8b"></span>Real <code class="sig-name descname">cfl</code> = 0.5<a class="headerlink" href="#_CPPv4N7Maestro3cflE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adc1b467071938467777c58ca460ac9c4"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::cfl</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11init_shrinkE">
-<span id="_CPPv3N7Maestro11init_shrinkE"></span><span id="_CPPv2N7Maestro11init_shrinkE"></span><span id="Maestro::init_shrink__Real"></span><span class="target" id="maestro__params_8H_1aed30ce5bbfd200b17a39103632b74afa"></span>Real <code class="sig-name descname">init_shrink</code> = 1.0<a class="headerlink" href="#_CPPv4N7Maestro11init_shrinkE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a6fdcd773a139271b3ec00f68eca7e642"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::init_shrink</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8small_dtE">
-<span id="_CPPv3N7Maestro8small_dtE"></span><span id="_CPPv2N7Maestro8small_dtE"></span><span id="Maestro::small_dt__Real"></span><span class="target" id="maestro__params_8H_1a79ad10a1d19ee2d513e42c2400c28ee4"></span>Real <code class="sig-name descname">small_dt</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro8small_dtE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ae0fe607e0a32f3b50fcaa3f24380e7d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::small_dt</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13max_dt_growthE">
-<span id="_CPPv3N7Maestro13max_dt_growthE"></span><span id="_CPPv2N7Maestro13max_dt_growthE"></span><span id="Maestro::max_dt_growth__Real"></span><span class="target" id="maestro__params_8H_1adf4e34d097057cb73b5062f01e6cc6b5"></span>Real <code class="sig-name descname">max_dt_growth</code> = 1.1<a class="headerlink" href="#_CPPv4N7Maestro13max_dt_growthE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a24c3bf20b91df2e7c6efcc2672c181d3"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::max_dt_growth</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro6max_dtE">
-<span id="_CPPv3N7Maestro6max_dtE"></span><span id="_CPPv2N7Maestro6max_dtE"></span><span id="Maestro::max_dt__Real"></span><span class="target" id="maestro__params_8H_1a5795cd9897c334111d06468ae58c657c"></span>Real <code class="sig-name descname">max_dt</code> = 1.e33<a class="headerlink" href="#_CPPv4N7Maestro6max_dtE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ae0e59c0445cd6024f360c5d20e99aa19"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::max_dt</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8fixed_dtE">
-<span id="_CPPv3N7Maestro8fixed_dtE"></span><span id="_CPPv2N7Maestro8fixed_dtE"></span><span id="Maestro::fixed_dt__Real"></span><span class="target" id="maestro__params_8H_1ab3be4c16cc9491bebe8382415d56f24b"></span>Real <code class="sig-name descname">fixed_dt</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro8fixed_dtE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad0ee667f8ee826046f4e6c87cf2c41a0"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::fixed_dt</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14nuclear_dt_facE">
-<span id="_CPPv3N7Maestro14nuclear_dt_facE"></span><span id="_CPPv2N7Maestro14nuclear_dt_facE"></span><span id="Maestro::nuclear_dt_fac__Real"></span><span class="target" id="maestro__params_8H_1a21dfd096f853774bad6d5c3b401f2fa1"></span>Real <code class="sig-name descname">nuclear_dt_fac</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro14nuclear_dt_facE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a758fabe295d091b9eaf838fc3c3d169e"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::nuclear_dt_fac</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22use_soundspeed_firstdtE">
-<span id="_CPPv3N7Maestro22use_soundspeed_firstdtE"></span><span id="_CPPv2N7Maestro22use_soundspeed_firstdtE"></span><span id="Maestro::use_soundspeed_firstdt__b"></span><span class="target" id="maestro__params_8H_1ae3f936d12c307b93fd3d5cef6e404cd5"></span>bool <code class="sig-name descname">use_soundspeed_firstdt</code> = false<a class="headerlink" href="#_CPPv4N7Maestro22use_soundspeed_firstdtE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a5da1c16c414c7958c542d3d2e27afc0f"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_soundspeed_firstdt</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16use_divu_firstdtE">
-<span id="_CPPv3N7Maestro16use_divu_firstdtE"></span><span id="_CPPv2N7Maestro16use_divu_firstdtE"></span><span id="Maestro::use_divu_firstdt__b"></span><span class="target" id="maestro__params_8H_1a9398191b6edbc227f4d874d41f15eec2"></span>bool <code class="sig-name descname">use_divu_firstdt</code> = false<a class="headerlink" href="#_CPPv4N7Maestro16use_divu_firstdtE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a64f4bd2407734f9bcfd9574a23681c8a"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_divu_firstdt</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9sphericalE">
-<span id="_CPPv3N7Maestro9sphericalE"></span><span id="_CPPv2N7Maestro9sphericalE"></span><span id="Maestro::spherical__i"></span><span class="target" id="maestro__params_8H_1ab13baca77c74e7a272e34d84ba16e9b7"></span>int <code class="sig-name descname">spherical</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro9sphericalE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad1ee11ccb62c823258e654a801ceb798"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::spherical</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro6octantE">
-<span id="_CPPv3N7Maestro6octantE"></span><span id="_CPPv2N7Maestro6octantE"></span><span id="Maestro::octant__b"></span><span class="target" id="maestro__params_8H_1a2db46111aff1a504f063a2b1d65d5435"></span>bool <code class="sig-name descname">octant</code> = false<a class="headerlink" href="#_CPPv4N7Maestro6octantE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a4d2c4105c03f391835a552684021f29e"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::octant</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19do_2d_planar_octantE">
-<span id="_CPPv3N7Maestro19do_2d_planar_octantE"></span><span id="_CPPv2N7Maestro19do_2d_planar_octantE"></span><span id="Maestro::do_2d_planar_octant__i"></span><span class="target" id="maestro__params_8H_1a4cf8f440daf9cbe5e718cbf2a4683dd3"></span>int <code class="sig-name descname">do_2d_planar_octant</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro19do_2d_planar_octantE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a8cc270f37f34508fafee42321178aa6e"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::do_2d_planar_octant</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10regrid_intE">
-<span id="_CPPv3N7Maestro10regrid_intE"></span><span id="_CPPv2N7Maestro10regrid_intE"></span><span id="Maestro::regrid_int__i"></span><span class="target" id="maestro__params_8H_1aa1bf4731d92be7a4b934049c3958eac9"></span>int <code class="sig-name descname">regrid_int</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro10regrid_intE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aaf94aafbec98327f563081bebfa6bbea"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::regrid_int</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13amr_buf_widthE">
-<span id="_CPPv3N7Maestro13amr_buf_widthE"></span><span id="_CPPv2N7Maestro13amr_buf_widthE"></span><span id="Maestro::amr_buf_width__i"></span><span class="target" id="maestro__params_8H_1a59a2c1596f646bc09909005b2534a53e"></span>int <code class="sig-name descname">amr_buf_width</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro13amr_buf_widthE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ab288a0cf52ec330e4729875bbfc1e3d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::amr_buf_width</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7drdxfacE">
-<span id="_CPPv3N7Maestro7drdxfacE"></span><span id="_CPPv2N7Maestro7drdxfacE"></span><span id="Maestro::drdxfac__i"></span><span class="target" id="maestro__params_8H_1aa275b137e91f4b9591c37635a9e3578a"></span>int <code class="sig-name descname">drdxfac</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro7drdxfacE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a63e8bbff249e6021914bc647e663056b"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::drdxfac</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8minwidthE">
-<span id="_CPPv3N7Maestro8minwidthE"></span><span id="_CPPv2N7Maestro8minwidthE"></span><span id="Maestro::minwidth__i"></span><span class="target" id="maestro__params_8H_1ad33df10223d18c63b6c1b4dc552a4a55"></span>int <code class="sig-name descname">minwidth</code> = 8<a class="headerlink" href="#_CPPv4N7Maestro8minwidthE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1add9cefa08eebf18dc0cb87f6b204a8fb"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::minwidth</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7min_effE">
-<span id="_CPPv3N7Maestro7min_effE"></span><span id="_CPPv2N7Maestro7min_effE"></span><span id="Maestro::min_eff__Real"></span><span class="target" id="maestro__params_8H_1a7245a5f4cacc3be5aacf5f9de0a07a53"></span>Real <code class="sig-name descname">min_eff</code> = 0.9<a class="headerlink" href="#_CPPv4N7Maestro7min_effE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad5702cdc9373cf6f8adb1a17ae76dc9c"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::min_eff</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20use_tpert_in_taggingE">
-<span id="_CPPv3N7Maestro20use_tpert_in_taggingE"></span><span id="_CPPv2N7Maestro20use_tpert_in_taggingE"></span><span id="Maestro::use_tpert_in_tagging__b"></span><span class="target" id="maestro__params_8H_1a25f5593095d970cf7e709d53f155c5e1"></span>bool <code class="sig-name descname">use_tpert_in_tagging</code> = false<a class="headerlink" href="#_CPPv4N7Maestro20use_tpert_in_taggingE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a2f92585d0e26c813dfa6cdfd74e42aa6"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_tpert_in_tagging</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8plot_intE">
-<span id="_CPPv3N7Maestro8plot_intE"></span><span id="_CPPv2N7Maestro8plot_intE"></span><span id="Maestro::plot_int__i"></span><span class="target" id="maestro__params_8H_1ae0c2c6a0bd2aa1501fa51ca4ee7d0a18"></span>int <code class="sig-name descname">plot_int</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro8plot_intE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7fd0c376a63f6966e2ba27be60e2dd7a"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::plot_int</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14small_plot_intE">
-<span id="_CPPv3N7Maestro14small_plot_intE"></span><span id="_CPPv2N7Maestro14small_plot_intE"></span><span id="Maestro::small_plot_int__i"></span><span class="target" id="maestro__params_8H_1a8f39baebb97056d117cb30297b4b252f"></span>int <code class="sig-name descname">small_plot_int</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro14small_plot_intE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1abd831179cd5cead99b796c34c762383c"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::small_plot_int</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11plot_deltatE">
-<span id="_CPPv3N7Maestro11plot_deltatE"></span><span id="_CPPv2N7Maestro11plot_deltatE"></span><span id="Maestro::plot_deltat__Real"></span><span class="target" id="maestro__params_8H_1a953154b82f447433fbc260a13e859bf8"></span>Real <code class="sig-name descname">plot_deltat</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro11plot_deltatE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a02d43c9d6490650a54c3d455416c3f61"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::plot_deltat</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17small_plot_deltatE">
-<span id="_CPPv3N7Maestro17small_plot_deltatE"></span><span id="_CPPv2N7Maestro17small_plot_deltatE"></span><span id="Maestro::small_plot_deltat__Real"></span><span class="target" id="maestro__params_8H_1afce77f5473d9fe3160990ce1049d1d98"></span>Real <code class="sig-name descname">small_plot_deltat</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro17small_plot_deltatE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1af06745b53c94cef1ce71fd4554bedeb6"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::small_plot_deltat</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7chk_intE">
-<span id="_CPPv3N7Maestro7chk_intE"></span><span id="_CPPv2N7Maestro7chk_intE"></span><span id="Maestro::chk_int__i"></span><span class="target" id="maestro__params_8H_1a3c0a4d6a4e69216492691d5ba47807ef"></span>int <code class="sig-name descname">chk_int</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro7chk_intE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7f67d3bd03c32ab82b38e18a01c8939c"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::chk_int</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10chk_deltatE">
-<span id="_CPPv3N7Maestro10chk_deltatE"></span><span id="_CPPv2N7Maestro10chk_deltatE"></span><span id="Maestro::chk_deltat__Real"></span><span class="target" id="maestro__params_8H_1a00c3f6c0f6660714cbac0a20ea66c6e1"></span>Real <code class="sig-name descname">chk_deltat</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro10chk_deltatE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a69ca1fa2e4e3de12f71e55afc5b625f5"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::chk_deltat</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22plot_h_with_use_tfrompE">
-<span id="_CPPv3N7Maestro22plot_h_with_use_tfrompE"></span><span id="_CPPv2N7Maestro22plot_h_with_use_tfrompE"></span><span id="Maestro::plot_h_with_use_tfromp__b"></span><span class="target" id="maestro__params_8H_1aba89c9789bfe52e7fcb237498b49a2fc"></span>bool <code class="sig-name descname">plot_h_with_use_tfromp</code> = true<a class="headerlink" href="#_CPPv4N7Maestro22plot_h_with_use_tfrompE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a38eccee8848fb7dc9f2d43e5f76e7a0d"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_h_with_use_tfromp</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9plot_specE">
-<span id="_CPPv3N7Maestro9plot_specE"></span><span id="_CPPv2N7Maestro9plot_specE"></span><span id="Maestro::plot_spec__b"></span><span class="target" id="maestro__params_8H_1aff7d21b44150752cade5b91ee31c19b9"></span>bool <code class="sig-name descname">plot_spec</code> = true<a class="headerlink" href="#_CPPv4N7Maestro9plot_specE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a6407daf3f7ea256bd2a0437e8125d338"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_spec</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13plot_omegadotE">
-<span id="_CPPv3N7Maestro13plot_omegadotE"></span><span id="_CPPv2N7Maestro13plot_omegadotE"></span><span id="Maestro::plot_omegadot__b"></span><span class="target" id="maestro__params_8H_1aaf102c1cebb1e8a737e0fbcefcf7b919"></span>bool <code class="sig-name descname">plot_omegadot</code> = true<a class="headerlink" href="#_CPPv4N7Maestro13plot_omegadotE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a3955230d506f1a457de3d44b1c53bbf8"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_omegadot</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9plot_HextE">
-<span id="_CPPv3N7Maestro9plot_HextE"></span><span id="_CPPv2N7Maestro9plot_HextE"></span><span id="Maestro::plot_Hext__b"></span><span class="target" id="maestro__params_8H_1a2a62ac2d2bd548a99a35903c09ac7166"></span>bool <code class="sig-name descname">plot_Hext</code> = false<a class="headerlink" href="#_CPPv4N7Maestro9plot_HextE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a01c67a7e539416b6c0c16ef902a436f7"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_Hext</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9plot_HnucE">
-<span id="_CPPv3N7Maestro9plot_HnucE"></span><span id="_CPPv2N7Maestro9plot_HnucE"></span><span id="Maestro::plot_Hnuc__b"></span><span class="target" id="maestro__params_8H_1a5079023e974372392e07c42a57798c90"></span>bool <code class="sig-name descname">plot_Hnuc</code> = true<a class="headerlink" href="#_CPPv4N7Maestro9plot_HnucE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a709d0077d4a665b45e7f40bc88d354d5"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_Hnuc</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8plot_etaE">
-<span id="_CPPv3N7Maestro8plot_etaE"></span><span id="_CPPv2N7Maestro8plot_etaE"></span><span id="Maestro::plot_eta__b"></span><span class="target" id="maestro__params_8H_1a357c300c00bc6bd99209b1856101fb46"></span>bool <code class="sig-name descname">plot_eta</code> = false<a class="headerlink" href="#_CPPv4N7Maestro8plot_etaE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a3d2daf5f81e7a38f3ae82e0f5444474a"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_eta</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9plot_tracE">
-<span id="_CPPv3N7Maestro9plot_tracE"></span><span id="_CPPv2N7Maestro9plot_tracE"></span><span id="Maestro::plot_trac__b"></span><span class="target" id="maestro__params_8H_1a9119b70a675852e3d573303c14961f4c"></span>bool <code class="sig-name descname">plot_trac</code> = false<a class="headerlink" href="#_CPPv4N7Maestro9plot_tracE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a50ff6dd23fffb7d285e72a992ecff251"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_trac</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15plot_base_stateE">
-<span id="_CPPv3N7Maestro15plot_base_stateE"></span><span id="_CPPv2N7Maestro15plot_base_stateE"></span><span id="Maestro::plot_base_state__b"></span><span class="target" id="maestro__params_8H_1a875a1e0d4a2e3c308b317d087c00b85d"></span>bool <code class="sig-name descname">plot_base_state</code> = true<a class="headerlink" href="#_CPPv4N7Maestro15plot_base_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aaf60eabcf485da9e31d514f3823605b2"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_base_state</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8plot_gpiE">
-<span id="_CPPv3N7Maestro8plot_gpiE"></span><span id="_CPPv2N7Maestro8plot_gpiE"></span><span id="Maestro::plot_gpi__b"></span><span class="target" id="maestro__params_8H_1a01e5f04a327da5e6d9c2d9100f185c32"></span>bool <code class="sig-name descname">plot_gpi</code> = true<a class="headerlink" href="#_CPPv4N7Maestro8plot_gpiE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1abae495b36b73e08fd0bf747e24ee53c8"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_gpi</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7plot_csE">
-<span id="_CPPv3N7Maestro7plot_csE"></span><span id="_CPPv2N7Maestro7plot_csE"></span><span id="Maestro::plot_cs__b"></span><span class="target" id="maestro__params_8H_1acd197142c326dd376af5b5776cde77dc"></span>bool <code class="sig-name descname">plot_cs</code> = false<a class="headerlink" href="#_CPPv4N7Maestro7plot_csE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a4fb1ede059140450042e5076d6cd27d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_cs</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9plot_gravE">
-<span id="_CPPv3N7Maestro9plot_gravE"></span><span id="_CPPv2N7Maestro9plot_gravE"></span><span id="Maestro::plot_grav__b"></span><span class="target" id="maestro__params_8H_1a30cbe15048f000485387a9595b13b847"></span>bool <code class="sig-name descname">plot_grav</code> = false<a class="headerlink" href="#_CPPv4N7Maestro9plot_gravE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aca15bc7ae9ad6700b41631ac230eb275"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_grav</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14plot_base_nameE">
-<span id="_CPPv3N7Maestro14plot_base_nameE"></span><span id="_CPPv2N7Maestro14plot_base_nameE"></span><span id="Maestro::plot_base_name__ss"></span><span class="target" id="maestro__params_8H_1acfde070211794ef0d8f2d8f14a249712"></span>string <code class="sig-name descname">plot_base_name</code> = &quot;plt&quot;<a class="headerlink" href="#_CPPv4N7Maestro14plot_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro14plot_base_nameE">
+<span id="_CPPv3N7maestro14plot_base_nameE"></span><span id="_CPPv2N7maestro14plot_base_nameE"></span><span id="maestro::plot_base_name__ss"></span><span class="target" id="namespacemaestro_1a20936a227807ffd36f90449e356e58a9"></span>string <code class="sig-name descname">plot_base_name</code><a class="headerlink" href="#_CPPv4N7maestro14plot_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20small_plot_base_nameE">
-<span id="_CPPv3N7Maestro20small_plot_base_nameE"></span><span id="_CPPv2N7Maestro20small_plot_base_nameE"></span><span id="Maestro::small_plot_base_name__ss"></span><span class="target" id="maestro__params_8H_1a57c9e71b8bf69aabe6930c4a8a73cf84"></span>string <code class="sig-name descname">small_plot_base_name</code> = &quot;smallplt&quot;<a class="headerlink" href="#_CPPv4N7Maestro20small_plot_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro20small_plot_base_nameE">
+<span id="_CPPv3N7maestro20small_plot_base_nameE"></span><span id="_CPPv2N7maestro20small_plot_base_nameE"></span><span id="maestro::small_plot_base_name__ss"></span><span class="target" id="namespacemaestro_1a5800e156eb0c6acd14cac09155af608d"></span>string <code class="sig-name descname">small_plot_base_name</code><a class="headerlink" href="#_CPPv4N7maestro20small_plot_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15check_base_nameE">
-<span id="_CPPv3N7Maestro15check_base_nameE"></span><span id="_CPPv2N7Maestro15check_base_nameE"></span><span id="Maestro::check_base_name__ss"></span><span class="target" id="maestro__params_8H_1a776faa48d6f9258edd305d510ead5d26"></span>string <code class="sig-name descname">check_base_name</code> = &quot;chk&quot;<a class="headerlink" href="#_CPPv4N7Maestro15check_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro15check_base_nameE">
+<span id="_CPPv3N7maestro15check_base_nameE"></span><span id="_CPPv2N7maestro15check_base_nameE"></span><span id="maestro::check_base_name__ss"></span><span class="target" id="namespacemaestro_1a89fb055111095e8514f381d08f9352f2"></span>string <code class="sig-name descname">check_base_name</code><a class="headerlink" href="#_CPPv4N7maestro15check_base_nameE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13diag_buf_sizeE">
-<span id="_CPPv3N7Maestro13diag_buf_sizeE"></span><span id="_CPPv2N7Maestro13diag_buf_sizeE"></span><span id="Maestro::diag_buf_size__i"></span><span class="target" id="maestro__params_8H_1a5414f51005a0247e2ce3a69785e11cfa"></span>int <code class="sig-name descname">diag_buf_size</code> = 10<a class="headerlink" href="#_CPPv4N7Maestro13diag_buf_sizeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1afaec6a870b973e334d461a3276bd3046"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::diag_buf_size</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14plot_ad_excessE">
-<span id="_CPPv3N7Maestro14plot_ad_excessE"></span><span id="_CPPv2N7Maestro14plot_ad_excessE"></span><span id="Maestro::plot_ad_excess__b"></span><span class="target" id="maestro__params_8H_1a861ff64d42db61bd373d47e957675f5b"></span>bool <code class="sig-name descname">plot_ad_excess</code> = false<a class="headerlink" href="#_CPPv4N7Maestro14plot_ad_excessE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a438c51d825b0a2b3c454e438231b1a03"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_ad_excess</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15plot_processorsE">
-<span id="_CPPv3N7Maestro15plot_processorsE"></span><span id="_CPPv2N7Maestro15plot_processorsE"></span><span id="Maestro::plot_processors__b"></span><span class="target" id="maestro__params_8H_1aea9725cc302db37cf75bfc51ac2776b5"></span>bool <code class="sig-name descname">plot_processors</code> = false<a class="headerlink" href="#_CPPv4N7Maestro15plot_processorsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aedca20703929cdc03615714eb6f7070f"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_processors</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11plot_pidivuE">
-<span id="_CPPv3N7Maestro11plot_pidivuE"></span><span id="_CPPv2N7Maestro11plot_pidivuE"></span><span id="Maestro::plot_pidivu__b"></span><span class="target" id="maestro__params_8H_1a5f1824eddcd77165fc5bbc1fcb47afb8"></span>bool <code class="sig-name descname">plot_pidivu</code> = false<a class="headerlink" href="#_CPPv4N7Maestro11plot_pidivuE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ae225a65ad97a3d4160c56f8bf9899f8c"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_pidivu</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15small_plot_varsE">
-<span id="_CPPv3N7Maestro15small_plot_varsE"></span><span id="_CPPv2N7Maestro15small_plot_varsE"></span><span id="Maestro::small_plot_vars__ss"></span><span class="target" id="maestro__params_8H_1ada58d90be4e2d42f08ce442dadab93d4"></span>string <code class="sig-name descname">small_plot_vars</code> = &quot;rho p0 magvel&quot;<a class="headerlink" href="#_CPPv4N7Maestro15small_plot_varsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro15small_plot_varsE">
+<span id="_CPPv3N7maestro15small_plot_varsE"></span><span id="_CPPv2N7maestro15small_plot_varsE"></span><span id="maestro::small_plot_vars__ss"></span><span class="target" id="namespacemaestro_1a0c2840d2eb2833fe8a0894b9e72bddeb"></span>string <code class="sig-name descname">small_plot_vars</code><a class="headerlink" href="#_CPPv4N7maestro15small_plot_varsE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9init_iterE">
-<span id="_CPPv3N7Maestro9init_iterE"></span><span id="_CPPv2N7Maestro9init_iterE"></span><span id="Maestro::init_iter__i"></span><span class="target" id="maestro__params_8H_1a658ff04e9a7b89be8b56684c55619b71"></span>int <code class="sig-name descname">init_iter</code> = 4<a class="headerlink" href="#_CPPv4N7Maestro9init_iterE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1afb0b4c465819afd9ce13d590ffd050ea"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::init_iter</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14init_divu_iterE">
-<span id="_CPPv3N7Maestro14init_divu_iterE"></span><span id="_CPPv2N7Maestro14init_divu_iterE"></span><span id="Maestro::init_divu_iter__i"></span><span class="target" id="maestro__params_8H_1a04e3b073c4abe268d90ea23ae02e15cf"></span>int <code class="sig-name descname">init_divu_iter</code> = 4<a class="headerlink" href="#_CPPv4N7Maestro14init_divu_iterE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7dcacffd829b2fc44cb6d373e758e3f8"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::init_divu_iter</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro12restart_fileE">
-<span id="_CPPv3N7Maestro12restart_fileE"></span><span id="_CPPv2N7Maestro12restart_fileE"></span><span id="Maestro::restart_file__ss"></span><span class="target" id="maestro__params_8H_1ae09db7ea1226a0449a3a410dd76cffb8"></span>string <code class="sig-name descname">restart_file</code> = &quot;&quot;<a class="headerlink" href="#_CPPv4N7Maestro12restart_fileE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro12restart_fileE">
+<span id="_CPPv3N7maestro12restart_fileE"></span><span id="_CPPv2N7maestro12restart_fileE"></span><span id="maestro::restart_file__ss"></span><span class="target" id="namespacemaestro_1a0f3da6a7cd03dc9182f515bf10f9849e"></span>string <code class="sig-name descname">restart_file</code><a class="headerlink" href="#_CPPv4N7maestro12restart_fileE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18restart_into_finerE">
-<span id="_CPPv3N7Maestro18restart_into_finerE"></span><span id="_CPPv2N7Maestro18restart_into_finerE"></span><span id="Maestro::restart_into_finer__b"></span><span class="target" id="maestro__params_8H_1a680122a87736adc90ce28a075c0c247d"></span>bool <code class="sig-name descname">restart_into_finer</code> = false<a class="headerlink" href="#_CPPv4N7Maestro18restart_into_finerE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a0aa092e53b6acd2a91abb811e69ed89f"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::restart_into_finer</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21do_initial_projectionE">
-<span id="_CPPv3N7Maestro21do_initial_projectionE"></span><span id="_CPPv2N7Maestro21do_initial_projectionE"></span><span id="Maestro::do_initial_projection__b"></span><span class="target" id="maestro__params_8H_1ac2cbd3bcd55e45dea9ebac51724a5fff"></span>bool <code class="sig-name descname">do_initial_projection</code> = true<a class="headerlink" href="#_CPPv4N7Maestro21do_initial_projectionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a9f07bcb0498f9d004d56689fe1370fe4"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_initial_projection</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10mg_verboseE">
-<span id="_CPPv3N7Maestro10mg_verboseE"></span><span id="_CPPv2N7Maestro10mg_verboseE"></span><span id="Maestro::mg_verbose__i"></span><span class="target" id="maestro__params_8H_1a44fc026b3cbe5299ead81f3d74c505c6"></span>int <code class="sig-name descname">mg_verbose</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro10mg_verboseE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adf38c683b08308bbf9f5b032b978265d"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_verbose</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10cg_verboseE">
-<span id="_CPPv3N7Maestro10cg_verboseE"></span><span id="_CPPv2N7Maestro10cg_verboseE"></span><span id="Maestro::cg_verbose__i"></span><span class="target" id="maestro__params_8H_1a22100e3b20ba78add75b133d7568522d"></span>int <code class="sig-name descname">cg_verbose</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro10cg_verboseE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ac0e9e61769fe8e3f694716b6c9b72c60"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::cg_verbose</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13mg_cycle_typeE">
-<span id="_CPPv3N7Maestro13mg_cycle_typeE"></span><span id="_CPPv2N7Maestro13mg_cycle_typeE"></span><span id="Maestro::mg_cycle_type__i"></span><span class="target" id="maestro__params_8H_1a3d72c4bbd242f0d6b82a0ca378b2643a"></span>int <code class="sig-name descname">mg_cycle_type</code> = 3<a class="headerlink" href="#_CPPv4N7Maestro13mg_cycle_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a547a08ec5e4845ae890a5e65e7e700d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_cycle_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13hg_cycle_typeE">
-<span id="_CPPv3N7Maestro13hg_cycle_typeE"></span><span id="_CPPv2N7Maestro13hg_cycle_typeE"></span><span id="Maestro::hg_cycle_type__i"></span><span class="target" id="maestro__params_8H_1aa12b982412f972bcf40dc7fa1af6176e"></span>int <code class="sig-name descname">hg_cycle_type</code> = 3<a class="headerlink" href="#_CPPv4N7Maestro13hg_cycle_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a98aff462483053ed573e898af743824d"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::hg_cycle_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16hg_bottom_solverE">
-<span id="_CPPv3N7Maestro16hg_bottom_solverE"></span><span id="_CPPv2N7Maestro16hg_bottom_solverE"></span><span id="Maestro::hg_bottom_solver__i"></span><span class="target" id="maestro__params_8H_1a4696a8826ac1b4904810ccaf223e4647"></span>int <code class="sig-name descname">hg_bottom_solver</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro16hg_bottom_solverE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a4bc717dfe9b75787ac0285d6e35b2d87"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::hg_bottom_solver</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16mg_bottom_solverE">
-<span id="_CPPv3N7Maestro16mg_bottom_solverE"></span><span id="_CPPv2N7Maestro16mg_bottom_solverE"></span><span id="Maestro::mg_bottom_solver__i"></span><span class="target" id="maestro__params_8H_1af4993a20f47dd78ebe5658ea617e2cbd"></span>int <code class="sig-name descname">mg_bottom_solver</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro16mg_bottom_solverE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a8100c2ff1eaa6d3e21cfdd44ac964881"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_bottom_solver</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21max_mg_bottom_nlevelsE">
-<span id="_CPPv3N7Maestro21max_mg_bottom_nlevelsE"></span><span id="_CPPv2N7Maestro21max_mg_bottom_nlevelsE"></span><span id="Maestro::max_mg_bottom_nlevels__i"></span><span class="target" id="maestro__params_8H_1ab163ed81077a5676189630086df28b70"></span>int <code class="sig-name descname">max_mg_bottom_nlevels</code> = 1000<a class="headerlink" href="#_CPPv4N7Maestro21max_mg_bottom_nlevelsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7d835e096cb3a6c6ec9038ad5fd4b7e7"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::max_mg_bottom_nlevels</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro12mg_bottom_nuE">
-<span id="_CPPv3N7Maestro12mg_bottom_nuE"></span><span id="_CPPv2N7Maestro12mg_bottom_nuE"></span><span id="Maestro::mg_bottom_nu__i"></span><span class="target" id="maestro__params_8H_1aba1bc79b4074e2de1e0793ee16293b8e"></span>int <code class="sig-name descname">mg_bottom_nu</code> = 10<a class="headerlink" href="#_CPPv4N7Maestro12mg_bottom_nuE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ab6e72c72bfe9e0651b2e45bb9a6b6790"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_bottom_nu</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7mg_nu_1E">
-<span id="_CPPv3N7Maestro7mg_nu_1E"></span><span id="_CPPv2N7Maestro7mg_nu_1E"></span><span id="Maestro::mg_nu_1__i"></span><span class="target" id="maestro__params_8H_1a10ecd84e77f216d2b8ab14ca0fc5b597"></span>int <code class="sig-name descname">mg_nu_1</code> = 2<a class="headerlink" href="#_CPPv4N7Maestro7mg_nu_1E" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1afe412fd7a328441c747d90082f26e95f"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_nu_1</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7mg_nu_2E">
-<span id="_CPPv3N7Maestro7mg_nu_2E"></span><span id="_CPPv2N7Maestro7mg_nu_2E"></span><span id="Maestro::mg_nu_2__i"></span><span class="target" id="maestro__params_8H_1a2a8d8073d6ba1304a212132df3261337"></span>int <code class="sig-name descname">mg_nu_2</code> = 2<a class="headerlink" href="#_CPPv4N7Maestro7mg_nu_2E" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1acb1669eb64e05b2271028f757c5d9f5d"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::mg_nu_2</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16hg_dense_stencilE">
-<span id="_CPPv3N7Maestro16hg_dense_stencilE"></span><span id="_CPPv2N7Maestro16hg_dense_stencilE"></span><span id="Maestro::hg_dense_stencil__b"></span><span class="target" id="maestro__params_8H_1a88825deae112f66e25a83bb1edb9a344"></span>bool <code class="sig-name descname">hg_dense_stencil</code> = true<a class="headerlink" href="#_CPPv4N7Maestro16hg_dense_stencilE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ac32f036a1a2e74e9b4611b007a052b5c"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::hg_dense_stencil</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9do_spongeE">
-<span id="_CPPv3N7Maestro9do_spongeE"></span><span id="_CPPv2N7Maestro9do_spongeE"></span><span id="Maestro::do_sponge__b"></span><span class="target" id="maestro__params_8H_1af94512c48887f680271fe498002db712"></span>bool <code class="sig-name descname">do_sponge</code> = false<a class="headerlink" href="#_CPPv4N7Maestro9do_spongeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1acfd0a1d20f875ebe0ceffbbce165fd3a"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_sponge</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro12sponge_kappaE">
-<span id="_CPPv3N7Maestro12sponge_kappaE"></span><span id="_CPPv2N7Maestro12sponge_kappaE"></span><span id="Maestro::sponge_kappa__Real"></span><span class="target" id="maestro__params_8H_1a8162bd488c544d1592f80aefaf466cdb"></span>Real <code class="sig-name descname">sponge_kappa</code> = 10.e0<a class="headerlink" href="#_CPPv4N7Maestro12sponge_kappaE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a912abe7e33976510f8e17089a7acf467"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::sponge_kappa</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21sponge_center_densityE">
-<span id="_CPPv3N7Maestro21sponge_center_densityE"></span><span id="_CPPv2N7Maestro21sponge_center_densityE"></span><span id="Maestro::sponge_center_density__Real"></span><span class="target" id="maestro__params_8H_1aef7e22538f3b2f73a6b567c65ab38710"></span>Real <code class="sig-name descname">sponge_center_density</code> = 3.e6<a class="headerlink" href="#_CPPv4N7Maestro21sponge_center_densityE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a66798eda6db0f6ead0ec6e5a9dbd6572"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::sponge_center_density</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19sponge_start_factorE">
-<span id="_CPPv3N7Maestro19sponge_start_factorE"></span><span id="_CPPv2N7Maestro19sponge_start_factorE"></span><span id="Maestro::sponge_start_factor__Real"></span><span class="target" id="maestro__params_8H_1af6dc949c45fe01f68f95fc20a4e63847"></span>Real <code class="sig-name descname">sponge_start_factor</code> = 3.333e0<a class="headerlink" href="#_CPPv4N7Maestro19sponge_start_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aeb22382ba89c7b9534c7d8aa11317ee8"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::sponge_start_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17plot_sponge_fdampE">
-<span id="_CPPv3N7Maestro17plot_sponge_fdampE"></span><span id="_CPPv2N7Maestro17plot_sponge_fdampE"></span><span id="Maestro::plot_sponge_fdamp__b"></span><span class="target" id="maestro__params_8H_1a20f53eb8e4c7d2d65c0ffa3ec76285bc"></span>bool <code class="sig-name descname">plot_sponge_fdamp</code> = false<a class="headerlink" href="#_CPPv4N7Maestro17plot_sponge_fdampE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1af438b77abf803022b35ea29a1a609a96"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::plot_sponge_fdamp</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro24anelastic_cutoff_densityE">
-<span id="_CPPv3N7Maestro24anelastic_cutoff_densityE"></span><span id="_CPPv2N7Maestro24anelastic_cutoff_densityE"></span><span id="Maestro::anelastic_cutoff_density__Real"></span><span class="target" id="maestro__params_8H_1a0721fc084d1ff21cd04e0e37dc73cc51"></span>Real <code class="sig-name descname">anelastic_cutoff_density</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro24anelastic_cutoff_densityE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad4d069e851a7a4f6adeda43238563a5c"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::anelastic_cutoff_density</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19base_cutoff_densityE">
-<span id="_CPPv3N7Maestro19base_cutoff_densityE"></span><span id="_CPPv2N7Maestro19base_cutoff_densityE"></span><span id="Maestro::base_cutoff_density__Real"></span><span class="target" id="maestro__params_8H_1ae0cdfa5e5b24da5c3b2c3f0237027139"></span>Real <code class="sig-name descname">base_cutoff_density</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro19base_cutoff_densityE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1af4da58d3b1c219a2e988730ee5b12430"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::base_cutoff_density</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro25burning_cutoff_density_loE">
-<span id="_CPPv3N7Maestro25burning_cutoff_density_loE"></span><span id="_CPPv2N7Maestro25burning_cutoff_density_loE"></span><span id="Maestro::burning_cutoff_density_lo__Real"></span><span class="target" id="maestro__params_8H_1a9689806535aefb662c20b31b1762b8df"></span>Real <code class="sig-name descname">burning_cutoff_density_lo</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro25burning_cutoff_density_loE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a0c08612b585864d3e3f716f34b9cff1b"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::burning_cutoff_density_lo</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro25burning_cutoff_density_hiE">
-<span id="_CPPv3N7Maestro25burning_cutoff_density_hiE"></span><span id="_CPPv2N7Maestro25burning_cutoff_density_hiE"></span><span id="Maestro::burning_cutoff_density_hi__Real"></span><span class="target" id="maestro__params_8H_1a051c322f973e9efdfd09bbb6b422d192"></span>Real <code class="sig-name descname">burning_cutoff_density_hi</code> = 1.e100<a class="headerlink" href="#_CPPv4N7Maestro25burning_cutoff_density_hiE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7ac39edf1412bbc4f736fce976dcdc46"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::burning_cutoff_density_hi</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro25heating_cutoff_density_loE">
-<span id="_CPPv3N7Maestro25heating_cutoff_density_loE"></span><span id="_CPPv2N7Maestro25heating_cutoff_density_loE"></span><span id="Maestro::heating_cutoff_density_lo__Real"></span><span class="target" id="maestro__params_8H_1ae6fd826931791ec12e8f6253e59d7ee5"></span>Real <code class="sig-name descname">heating_cutoff_density_lo</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro25heating_cutoff_density_loE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a751ad58abd60b62f50af10e63eeb45d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::heating_cutoff_density_lo</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro25heating_cutoff_density_hiE">
-<span id="_CPPv3N7Maestro25heating_cutoff_density_hiE"></span><span id="_CPPv2N7Maestro25heating_cutoff_density_hiE"></span><span id="Maestro::heating_cutoff_density_hi__Real"></span><span class="target" id="maestro__params_8H_1a4879c10b7e008652d1f87d64d50512aa"></span>Real <code class="sig-name descname">heating_cutoff_density_hi</code> = 1.e100<a class="headerlink" href="#_CPPv4N7Maestro25heating_cutoff_density_hiE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a268690058a4e942da476b958831ab127"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::heating_cutoff_density_hi</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22buoyancy_cutoff_factorE">
-<span id="_CPPv3N7Maestro22buoyancy_cutoff_factorE"></span><span id="_CPPv2N7Maestro22buoyancy_cutoff_factorE"></span><span id="Maestro::buoyancy_cutoff_factor__Real"></span><span class="target" id="maestro__params_8H_1ad481aacdaffe5781f875dbccd7777387"></span>Real <code class="sig-name descname">buoyancy_cutoff_factor</code> = 5.0<a class="headerlink" href="#_CPPv4N7Maestro22buoyancy_cutoff_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a15d6656231fea960e4253240f0484a67"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::buoyancy_cutoff_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11dpdt_factorE">
-<span id="_CPPv3N7Maestro11dpdt_factorE"></span><span id="_CPPv2N7Maestro11dpdt_factorE"></span><span id="Maestro::dpdt_factor__Real"></span><span class="target" id="maestro__params_8H_1a141e2d4ab29b83ad94493b1e1fad0749"></span>Real <code class="sig-name descname">dpdt_factor</code> = 0.0<a class="headerlink" href="#_CPPv4N7Maestro11dpdt_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ade3f24d631e2cbb99ca7eeff58e04f53"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::dpdt_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20do_planar_invsq_gravE">
-<span id="_CPPv3N7Maestro20do_planar_invsq_gravE"></span><span id="_CPPv2N7Maestro20do_planar_invsq_gravE"></span><span id="Maestro::do_planar_invsq_grav__b"></span><span class="target" id="maestro__params_8H_1a5fa72c07e872922281f8979098d3d976"></span>bool <code class="sig-name descname">do_planar_invsq_grav</code> = false<a class="headerlink" href="#_CPPv4N7Maestro20do_planar_invsq_gravE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa384b406b0a626f0358add2264cccea9"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_planar_invsq_grav</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17planar_invsq_massE">
-<span id="_CPPv3N7Maestro17planar_invsq_massE"></span><span id="_CPPv2N7Maestro17planar_invsq_massE"></span><span id="Maestro::planar_invsq_mass__Real"></span><span class="target" id="maestro__params_8H_1a7fbe5ae7d69e8fefa44955a90558623d"></span>Real <code class="sig-name descname">planar_invsq_mass</code> = 0.0<a class="headerlink" href="#_CPPv4N7Maestro17planar_invsq_massE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a137e1d358f42b4f0bf87891788c45c53"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::planar_invsq_mass</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17evolve_base_stateE">
-<span id="_CPPv3N7Maestro17evolve_base_stateE"></span><span id="_CPPv2N7Maestro17evolve_base_stateE"></span><span id="Maestro::evolve_base_state__b"></span><span class="target" id="maestro__params_8H_1a77c8e9383fee5fdcf3a97faf92d3624d"></span>bool <code class="sig-name descname">evolve_base_state</code> = true<a class="headerlink" href="#_CPPv4N7Maestro17evolve_base_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a258cb201fdd51d8174d1e59ca7e49b74"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::evolve_base_state</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20use_exact_base_stateE">
-<span id="_CPPv3N7Maestro20use_exact_base_stateE"></span><span id="_CPPv2N7Maestro20use_exact_base_stateE"></span><span id="Maestro::use_exact_base_state__b"></span><span class="target" id="maestro__params_8H_1a35c1c771894feeaa1fbd31b7703e288d"></span>bool <code class="sig-name descname">use_exact_base_state</code> = false<a class="headerlink" href="#_CPPv4N7Maestro20use_exact_base_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a51c8f6c08f2d4b3173b8d2f5385eda79"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_exact_base_state</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14fix_base_stateE">
-<span id="_CPPv3N7Maestro14fix_base_stateE"></span><span id="_CPPv2N7Maestro14fix_base_stateE"></span><span id="Maestro::fix_base_state__b"></span><span class="target" id="maestro__params_8H_1a7f850159bca187dd2cc9894bbb958d1d"></span>bool <code class="sig-name descname">fix_base_state</code> = false<a class="headerlink" href="#_CPPv4N7Maestro14fix_base_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a56ac2b91d0ed57c01a6a327bafdd87aa"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::fix_base_state</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18average_base_stateE">
-<span id="_CPPv3N7Maestro18average_base_stateE"></span><span id="_CPPv2N7Maestro18average_base_stateE"></span><span id="Maestro::average_base_state__b"></span><span class="target" id="maestro__params_8H_1a8845950d545c4a31fc774cdeea33fd31"></span>bool <code class="sig-name descname">average_base_state</code> = false<a class="headerlink" href="#_CPPv4N7Maestro18average_base_stateE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a91535a127f3ae2c8a59144ba6eef6039"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::average_base_state</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13do_smallscaleE">
-<span id="_CPPv3N7Maestro13do_smallscaleE"></span><span id="_CPPv2N7Maestro13do_smallscaleE"></span><span id="Maestro::do_smallscale__b"></span><span class="target" id="maestro__params_8H_1ae627fa951ddefa972f1d3d5b1f96429b"></span>bool <code class="sig-name descname">do_smallscale</code> = false<a class="headerlink" href="#_CPPv4N7Maestro13do_smallscaleE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a080ddc6b67f5fc225ea72ba4c02779c3"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_smallscale</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21do_eos_h_above_cutoffE">
-<span id="_CPPv3N7Maestro21do_eos_h_above_cutoffE"></span><span id="_CPPv2N7Maestro21do_eos_h_above_cutoffE"></span><span id="Maestro::do_eos_h_above_cutoff__b"></span><span class="target" id="maestro__params_8H_1a7dea79ed2d894c815b1b64f4d8e06c35"></span>bool <code class="sig-name descname">do_eos_h_above_cutoff</code> = true<a class="headerlink" href="#_CPPv4N7Maestro21do_eos_h_above_cutoffE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a167744e8e473d5646a5f2a2dc8186416"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_eos_h_above_cutoff</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18enthalpy_pred_typeE">
-<span id="_CPPv3N7Maestro18enthalpy_pred_typeE"></span><span id="_CPPv2N7Maestro18enthalpy_pred_typeE"></span><span id="Maestro::enthalpy_pred_type__i"></span><span class="target" id="maestro__params_8H_1afda46b7b48716cbb371a4c39c0c88490"></span>int <code class="sig-name descname">enthalpy_pred_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro18enthalpy_pred_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a47df98657cc14c37e28a5d6af6ee4c59"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::enthalpy_pred_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17species_pred_typeE">
-<span id="_CPPv3N7Maestro17species_pred_typeE"></span><span id="_CPPv2N7Maestro17species_pred_typeE"></span><span id="Maestro::species_pred_type__i"></span><span class="target" id="maestro__params_8H_1adea5d24896393903187b2d11243f53de"></span>int <code class="sig-name descname">species_pred_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro17species_pred_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a80cc25a4bc3362fafb0938b7f689a7e4"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::species_pred_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21use_delta_gamma1_termE">
-<span id="_CPPv3N7Maestro21use_delta_gamma1_termE"></span><span id="_CPPv2N7Maestro21use_delta_gamma1_termE"></span><span id="Maestro::use_delta_gamma1_term__b"></span><span class="target" id="maestro__params_8H_1a728d091d83e78449552f59d91881e8f0"></span>bool <code class="sig-name descname">use_delta_gamma1_term</code> = true<a class="headerlink" href="#_CPPv4N7Maestro21use_delta_gamma1_termE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a822ca9d93cf8a2d2d0c3071e38af95a2"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_delta_gamma1_term</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10use_etarhoE">
-<span id="_CPPv3N7Maestro10use_etarhoE"></span><span id="_CPPv2N7Maestro10use_etarhoE"></span><span id="Maestro::use_etarho__b"></span><span class="target" id="maestro__params_8H_1a60efc4be2670e8f1c9d75d2d6a57f5da"></span>bool <code class="sig-name descname">use_etarho</code> = true<a class="headerlink" href="#_CPPv4N7Maestro10use_etarhoE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a0a84a74a77a6d230bdabc5d5c05a537d"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_etarho</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11slope_orderE">
-<span id="_CPPv3N7Maestro11slope_orderE"></span><span id="_CPPv2N7Maestro11slope_orderE"></span><span id="Maestro::slope_order__i"></span><span class="target" id="maestro__params_8H_1a8152cb0588c21a7f7104d7cd8d78e12e"></span>int <code class="sig-name descname">slope_order</code> = 4<a class="headerlink" href="#_CPPv4N7Maestro11slope_orderE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a01fcd3d1594c4101457a4d0aff073556"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::slope_order</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10grav_constE">
-<span id="_CPPv3N7Maestro10grav_constE"></span><span id="_CPPv2N7Maestro10grav_constE"></span><span id="Maestro::grav_const__Real"></span><span class="target" id="maestro__params_8H_1aad88665b1850d9d23979736b210e5d17"></span>Real <code class="sig-name descname">grav_const</code> = -1.5e10<a class="headerlink" href="#_CPPv4N7Maestro10grav_constE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa1cf9430e7fc8bc3cc26d4dbfc1cfdc9"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::grav_const</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8ppm_typeE">
-<span id="_CPPv3N7Maestro8ppm_typeE"></span><span id="_CPPv2N7Maestro8ppm_typeE"></span><span id="Maestro::ppm_type__i"></span><span class="target" id="maestro__params_8H_1ab95adbd9cc0b7991a96bc2cd56c699ec"></span>int <code class="sig-name descname">ppm_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro8ppm_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a935442fb0c4502b4bd42e3c458cff35f"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::ppm_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8bds_typeE">
-<span id="_CPPv3N7Maestro8bds_typeE"></span><span id="_CPPv2N7Maestro8bds_typeE"></span><span id="Maestro::bds_type__i"></span><span class="target" id="maestro__params_8H_1a7b66bd1d5893a89c99dd07ab41c2917a"></span>int <code class="sig-name descname">bds_type</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro8bds_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a6cacae717f69db77fe3a5fa9644a4483"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::bds_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16ppm_trace_forcesE">
-<span id="_CPPv3N7Maestro16ppm_trace_forcesE"></span><span id="_CPPv2N7Maestro16ppm_trace_forcesE"></span><span id="Maestro::ppm_trace_forces__i"></span><span class="target" id="maestro__params_8H_1afdec531bd5045b1984b5262fe0a4efd6"></span>int <code class="sig-name descname">ppm_trace_forces</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro16ppm_trace_forcesE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa300be1ad7ba9636c690d79b5ec183b8"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::ppm_trace_forces</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10beta0_typeE">
-<span id="_CPPv3N7Maestro10beta0_typeE"></span><span id="_CPPv2N7Maestro10beta0_typeE"></span><span id="Maestro::beta0_type__i"></span><span class="target" id="maestro__params_8H_1a67d9c47de6b44a63015ee787d38631b4"></span>int <code class="sig-name descname">beta0_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro10beta0_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a850a66c06928e1a38f63569be9820656"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::beta0_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro24use_linear_grav_in_beta0E">
-<span id="_CPPv3N7Maestro24use_linear_grav_in_beta0E"></span><span id="_CPPv2N7Maestro24use_linear_grav_in_beta0E"></span><span id="Maestro::use_linear_grav_in_beta0__b"></span><span class="target" id="maestro__params_8H_1ac35551685348b188167adc8676a5e0f8"></span>bool <code class="sig-name descname">use_linear_grav_in_beta0</code> = false<a class="headerlink" href="#_CPPv4N7Maestro24use_linear_grav_in_beta0E" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a13a4b0679c68a0dc6bf368e409e9e381"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_linear_grav_in_beta0</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20rotational_frequencyE">
-<span id="_CPPv3N7Maestro20rotational_frequencyE"></span><span id="_CPPv2N7Maestro20rotational_frequencyE"></span><span id="Maestro::rotational_frequency__Real"></span><span class="target" id="maestro__params_8H_1a5a1f25b8a353dcfa285cbe44831451f2"></span>Real <code class="sig-name descname">rotational_frequency</code> = 0.0<a class="headerlink" href="#_CPPv4N7Maestro20rotational_frequencyE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a00fdf73cbb0f582a3d99269a3386d174"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::rotational_frequency</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11co_latitudeE">
-<span id="_CPPv3N7Maestro11co_latitudeE"></span><span id="_CPPv2N7Maestro11co_latitudeE"></span><span id="Maestro::co_latitude__Real"></span><span class="target" id="maestro__params_8H_1a3d984821c115a8dc8e46dd788c4b818c"></span>Real <code class="sig-name descname">co_latitude</code> = 0.0<a class="headerlink" href="#_CPPv4N7Maestro11co_latitudeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aead3e9cd030b926823642c778ff51f49"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::co_latitude</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15rotation_radiusE">
-<span id="_CPPv3N7Maestro15rotation_radiusE"></span><span id="_CPPv2N7Maestro15rotation_radiusE"></span><span id="Maestro::rotation_radius__Real"></span><span class="target" id="maestro__params_8H_1a43fb424f7ebafa12a0b4944ae35cf41e"></span>Real <code class="sig-name descname">rotation_radius</code> = 1.0e6<a class="headerlink" href="#_CPPv4N7Maestro15rotation_radiusE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ab1eb4f5b12314a4039be2ccab828f6d6"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::rotation_radius</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14mach_max_abortE">
-<span id="_CPPv3N7Maestro14mach_max_abortE"></span><span id="_CPPv2N7Maestro14mach_max_abortE"></span><span id="Maestro::mach_max_abort__Real"></span><span class="target" id="maestro__params_8H_1a2ed8ce7a5f07688f619b62dee1ee644b"></span>Real <code class="sig-name descname">mach_max_abort</code> = -1.0<a class="headerlink" href="#_CPPv4N7Maestro14mach_max_abortE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad58db538dfb11801ef4019e629608a0c"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::mach_max_abort</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro24drive_initial_convectionE">
-<span id="_CPPv3N7Maestro24drive_initial_convectionE"></span><span id="_CPPv2N7Maestro24drive_initial_convectionE"></span><span id="Maestro::drive_initial_convection__b"></span><span class="target" id="maestro__params_8H_1afa4d61fab4b9431a221105506362dfde"></span>bool <code class="sig-name descname">drive_initial_convection</code> = false<a class="headerlink" href="#_CPPv4N7Maestro24drive_initial_convectionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1addeee8e4dab1ef7ab02b7ad8ba83524a"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::drive_initial_convection</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro23stop_initial_convectionE">
-<span id="_CPPv3N7Maestro23stop_initial_convectionE"></span><span id="_CPPv2N7Maestro23stop_initial_convectionE"></span><span id="Maestro::stop_initial_convection__i"></span><span class="target" id="maestro__params_8H_1a9d2604565801c5ce8f22546efa512149"></span>int <code class="sig-name descname">stop_initial_convection</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro23stop_initial_convectionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad93b1bc2db7bdfc21aad9bf9d3b931ad"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::stop_initial_convection</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22restart_with_vel_fieldE">
-<span id="_CPPv3N7Maestro22restart_with_vel_fieldE"></span><span id="_CPPv2N7Maestro22restart_with_vel_fieldE"></span><span id="Maestro::restart_with_vel_field__b"></span><span class="target" id="maestro__params_8H_1a016a51ae043e54a888a32adbed0cd3e4"></span>bool <code class="sig-name descname">restart_with_vel_field</code> = false<a class="headerlink" href="#_CPPv4N7Maestro22restart_with_vel_fieldE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa43aaefbc089b06e731997ad80173c2a"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::restart_with_vel_field</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18use_alt_energy_fixE">
-<span id="_CPPv3N7Maestro18use_alt_energy_fixE"></span><span id="_CPPv2N7Maestro18use_alt_energy_fixE"></span><span id="Maestro::use_alt_energy_fix__b"></span><span class="target" id="maestro__params_8H_1a0792fc2caa5f727bc0f7936e01cd30a6"></span>bool <code class="sig-name descname">use_alt_energy_fix</code> = true<a class="headerlink" href="#_CPPv4N7Maestro18use_alt_energy_fixE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ac873d437982a45c7978ece4a97aba080"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_alt_energy_fix</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro23use_omegadot_terms_in_SE">
-<span id="_CPPv3N7Maestro23use_omegadot_terms_in_SE"></span><span id="_CPPv2N7Maestro23use_omegadot_terms_in_SE"></span><span id="Maestro::use_omegadot_terms_in_S__b"></span><span class="target" id="maestro__params_8H_1a9303c8b8c100ef1ebf5dc9ef3b1c3669"></span>bool <code class="sig-name descname">use_omegadot_terms_in_S</code> = true<a class="headerlink" href="#_CPPv4N7Maestro23use_omegadot_terms_in_SE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a95cac22101d41b1e7b7ff086679486d8"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_omegadot_terms_in_S</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21use_thermal_diffusionE">
-<span id="_CPPv3N7Maestro21use_thermal_diffusionE"></span><span id="_CPPv2N7Maestro21use_thermal_diffusionE"></span><span id="Maestro::use_thermal_diffusion__b"></span><span class="target" id="maestro__params_8H_1a836b6c4d4188bcaafc665bcc8b225931"></span>bool <code class="sig-name descname">use_thermal_diffusion</code> = false<a class="headerlink" href="#_CPPv4N7Maestro21use_thermal_diffusionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a6d505496b8ebd9d3a53e0347cf02d99e"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_thermal_diffusion</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro26temp_diffusion_formulationE">
-<span id="_CPPv3N7Maestro26temp_diffusion_formulationE"></span><span id="_CPPv2N7Maestro26temp_diffusion_formulationE"></span><span id="Maestro::temp_diffusion_formulation__i"></span><span class="target" id="maestro__params_8H_1a49da2c3823889ec4df52efdb594c091f"></span>int <code class="sig-name descname">temp_diffusion_formulation</code> = 2<a class="headerlink" href="#_CPPv4N7Maestro26temp_diffusion_formulationE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a1b9582e91a3bd1ac28452b8f0929817a"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::temp_diffusion_formulation</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22thermal_diffusion_typeE">
-<span id="_CPPv3N7Maestro22thermal_diffusion_typeE"></span><span id="_CPPv2N7Maestro22thermal_diffusion_typeE"></span><span id="Maestro::thermal_diffusion_type__i"></span><span class="target" id="maestro__params_8H_1a3c50613f170a2695442876aa5eab6e81"></span>int <code class="sig-name descname">thermal_diffusion_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro22thermal_diffusion_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a87a30b644c93f6ae4efdf5f67e19db8c"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::thermal_diffusion_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18limit_conductivityE">
-<span id="_CPPv3N7Maestro18limit_conductivityE"></span><span id="_CPPv2N7Maestro18limit_conductivityE"></span><span id="Maestro::limit_conductivity__b"></span><span class="target" id="maestro__params_8H_1aca345060f3be1f1d24d05f2003fe977f"></span>bool <code class="sig-name descname">limit_conductivity</code> = false<a class="headerlink" href="#_CPPv4N7Maestro18limit_conductivityE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a4e3c7ef5a47d9ff733e394f22b632b95"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::limit_conductivity</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10do_burningE">
-<span id="_CPPv3N7Maestro10do_burningE"></span><span id="_CPPv2N7Maestro10do_burningE"></span><span id="Maestro::do_burning__b"></span><span class="target" id="maestro__params_8H_1a60715253055e04182b3df4b636373569"></span>bool <code class="sig-name descname">do_burning</code> = true<a class="headerlink" href="#_CPPv4N7Maestro10do_burningE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad03f14409473e15b5e7671910a1a00d0"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_burning</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro24burner_threshold_speciesE">
-<span id="_CPPv3N7Maestro24burner_threshold_speciesE"></span><span id="_CPPv2N7Maestro24burner_threshold_speciesE"></span><span id="Maestro::burner_threshold_species__ss"></span><span class="target" id="maestro__params_8H_1a68f007f4b56390bc6c572b090f99448c"></span>string <code class="sig-name descname">burner_threshold_species</code> = &quot;&quot;<a class="headerlink" href="#_CPPv4N7Maestro24burner_threshold_speciesE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro24burner_threshold_speciesE">
+<span id="_CPPv3N7maestro24burner_threshold_speciesE"></span><span id="_CPPv2N7maestro24burner_threshold_speciesE"></span><span id="maestro::burner_threshold_species__ss"></span><span class="target" id="namespacemaestro_1ac6ff35ef0b0759ad010271e635b127b1"></span>string <code class="sig-name descname">burner_threshold_species</code><a class="headerlink" href="#_CPPv4N7maestro24burner_threshold_speciesE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro23burner_threshold_cutoffE">
-<span id="_CPPv3N7Maestro23burner_threshold_cutoffE"></span><span id="_CPPv2N7Maestro23burner_threshold_cutoffE"></span><span id="Maestro::burner_threshold_cutoff__Real"></span><span class="target" id="maestro__params_8H_1a52f3be99a79e9f2c01ba0bdd4fd89670"></span>Real <code class="sig-name descname">burner_threshold_cutoff</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro23burner_threshold_cutoffE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa783d32d2a8276fbbf2fb0933780eeed"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::burner_threshold_cutoff</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18do_subgrid_burningE">
-<span id="_CPPv3N7Maestro18do_subgrid_burningE"></span><span id="_CPPv2N7Maestro18do_subgrid_burningE"></span><span id="Maestro::do_subgrid_burning__b"></span><span class="target" id="maestro__params_8H_1a841171be1f9e1ef89a9d3277d24bbf49"></span>bool <code class="sig-name descname">do_subgrid_burning</code> = false<a class="headerlink" href="#_CPPv4N7Maestro18do_subgrid_burningE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a185403dd1cc034d9fbc2c90ac2ecb5db"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_subgrid_burning</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16reaction_sum_tolE">
-<span id="_CPPv3N7Maestro16reaction_sum_tolE"></span><span id="_CPPv2N7Maestro16reaction_sum_tolE"></span><span id="Maestro::reaction_sum_tol__Real"></span><span class="target" id="maestro__params_8H_1afcc582bf4e5d6690e3a3f6c208b118c1"></span>Real <code class="sig-name descname">reaction_sum_tol</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro16reaction_sum_tolE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a92ec6b06a3cf97518473e4804f09cd8b"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::reaction_sum_tol</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10small_tempE">
-<span id="_CPPv3N7Maestro10small_tempE"></span><span id="_CPPv2N7Maestro10small_tempE"></span><span id="Maestro::small_temp__Real"></span><span class="target" id="maestro__params_8H_1a116354c012a78542750fba70f21782cb"></span>Real <code class="sig-name descname">small_temp</code> = 5.e6<a class="headerlink" href="#_CPPv4N7Maestro10small_tempE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aae386ef5b99d3a3cc4f9cf9d7487ae9b"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::small_temp</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10small_densE">
-<span id="_CPPv3N7Maestro10small_densE"></span><span id="_CPPv2N7Maestro10small_densE"></span><span id="Maestro::small_dens__Real"></span><span class="target" id="maestro__params_8H_1a8209708c4c4a96b5e65af0f8e4bbc912"></span>Real <code class="sig-name descname">small_dens</code> = 1.e-5<a class="headerlink" href="#_CPPv4N7Maestro10small_densE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adb0f21f7ffa092ab6db3cbc9864cf986"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::small_dens</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10use_tfrompE">
-<span id="_CPPv3N7Maestro10use_tfrompE"></span><span id="_CPPv2N7Maestro10use_tfrompE"></span><span id="Maestro::use_tfromp__b"></span><span class="target" id="maestro__params_8H_1ac490519f08be8ec58cbf4478c6491fe1"></span>bool <code class="sig-name descname">use_tfromp</code> = false<a class="headerlink" href="#_CPPv4N7Maestro10use_tfrompE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a770a398e6554336e4de20b07d4456093"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_tfromp</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22use_eos_e_instead_of_hE">
-<span id="_CPPv3N7Maestro22use_eos_e_instead_of_hE"></span><span id="_CPPv2N7Maestro22use_eos_e_instead_of_hE"></span><span id="Maestro::use_eos_e_instead_of_h__b"></span><span class="target" id="maestro__params_8H_1a1b3dd2148906c9802009ab4bd181cb5d"></span>bool <code class="sig-name descname">use_eos_e_instead_of_h</code> = false<a class="headerlink" href="#_CPPv4N7Maestro22use_eos_e_instead_of_hE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa18fe22eafb2a5e30b9d19953d24645d"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_eos_e_instead_of_h</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20use_pprime_in_tfrompE">
-<span id="_CPPv3N7Maestro20use_pprime_in_tfrompE"></span><span id="_CPPv2N7Maestro20use_pprime_in_tfrompE"></span><span id="Maestro::use_pprime_in_tfromp__b"></span><span class="target" id="maestro__params_8H_1a5b57a0442e946eb93705b1767369c876"></span>bool <code class="sig-name descname">use_pprime_in_tfromp</code> = false<a class="headerlink" href="#_CPPv4N7Maestro20use_pprime_in_tfrompE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a52231d5caf4e9b48a55072eafa033d10"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_pprime_in_tfromp</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14s0_interp_typeE">
-<span id="_CPPv3N7Maestro14s0_interp_typeE"></span><span id="_CPPv2N7Maestro14s0_interp_typeE"></span><span id="Maestro::s0_interp_type__i"></span><span class="target" id="maestro__params_8H_1a626e6a4dd0ab99d17695dc59bf3e6340"></span>int <code class="sig-name descname">s0_interp_type</code> = 3<a class="headerlink" href="#_CPPv4N7Maestro14s0_interp_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1abe08d9836b4fbe06e07402580d6ee6ea"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::s0_interp_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14w0_interp_typeE">
-<span id="_CPPv3N7Maestro14w0_interp_typeE"></span><span id="_CPPv2N7Maestro14w0_interp_typeE"></span><span id="Maestro::w0_interp_type__i"></span><span class="target" id="maestro__params_8H_1a411644b940a46aeb0d81eac76ad23288"></span>int <code class="sig-name descname">w0_interp_type</code> = 2<a class="headerlink" href="#_CPPv4N7Maestro14w0_interp_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a0d1fab348ad58bf4ab451041ae45427f"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::w0_interp_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17s0mac_interp_typeE">
-<span id="_CPPv3N7Maestro17s0mac_interp_typeE"></span><span id="_CPPv2N7Maestro17s0mac_interp_typeE"></span><span id="Maestro::s0mac_interp_type__i"></span><span class="target" id="maestro__params_8H_1a61f68c67c1064ea34302e13a355cc91e"></span>int <code class="sig-name descname">s0mac_interp_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro17s0mac_interp_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a1daed032841d0cd019df7ecdad154c04"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::s0mac_interp_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17w0mac_interp_typeE">
-<span id="_CPPv3N7Maestro17w0mac_interp_typeE"></span><span id="_CPPv2N7Maestro17w0mac_interp_typeE"></span><span id="Maestro::w0mac_interp_type__i"></span><span class="target" id="maestro__params_8H_1a2e8d41b22cffb90b682217802d29bccf"></span>int <code class="sig-name descname">w0mac_interp_type</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro17w0mac_interp_typeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ac50f08c3000ba9182f5bed2ad3d86cb1"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::w0mac_interp_type</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro22print_fortran_warningsE">
-<span id="_CPPv3N7Maestro22print_fortran_warningsE"></span><span id="_CPPv2N7Maestro22print_fortran_warningsE"></span><span id="Maestro::print_fortran_warnings__i"></span><span class="target" id="maestro__params_8H_1a6f98430e0f958482964ccfd4fbdb0a9c"></span>int <code class="sig-name descname">print_fortran_warnings</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro22print_fortran_warningsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7e725e1d0272b650688589cd25bf1034"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::print_fortran_warnings</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro24print_update_diagnosticsE">
-<span id="_CPPv3N7Maestro24print_update_diagnosticsE"></span><span id="_CPPv2N7Maestro24print_update_diagnosticsE"></span><span id="Maestro::print_update_diagnostics__i"></span><span class="target" id="maestro__params_8H_1afbaafa09618ac19436bf2f7b0f445f88"></span>int <code class="sig-name descname">print_update_diagnostics</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro24print_update_diagnosticsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ad33b34355d74beefacbc642f1b3a9283"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::print_update_diagnostics</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17track_grid_lossesE">
-<span id="_CPPv3N7Maestro17track_grid_lossesE"></span><span id="_CPPv2N7Maestro17track_grid_lossesE"></span><span id="Maestro::track_grid_losses__i"></span><span class="target" id="maestro__params_8H_1a5373e1a7b03894e1a5ae93fce326b3f5"></span>int <code class="sig-name descname">track_grid_losses</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro17track_grid_lossesE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a3e33280edfbd60a38744661523d01c6f"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::track_grid_losses</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro12sum_intervalE">
-<span id="_CPPv3N7Maestro12sum_intervalE"></span><span id="_CPPv2N7Maestro12sum_intervalE"></span><span id="Maestro::sum_interval__i"></span><span class="target" id="maestro__params_8H_1ac9eabde90bc5a3edcb2a7a57bcf8c090"></span>int <code class="sig-name descname">sum_interval</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro12sum_intervalE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7a705017e30d21e69694b2fb1e0fc109"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::sum_interval</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7sum_perE">
-<span id="_CPPv3N7Maestro7sum_perE"></span><span id="_CPPv2N7Maestro7sum_perE"></span><span id="Maestro::sum_per__Real"></span><span class="target" id="maestro__params_8H_1a1439106f89bd55f96282e638b7779576"></span>Real <code class="sig-name descname">sum_per</code> = -1.0e0<a class="headerlink" href="#_CPPv4N7Maestro7sum_perE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a526fa99f14e54b3d32b3e5d77aa54531"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::sum_per</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19show_center_of_massE">
-<span id="_CPPv3N7Maestro19show_center_of_massE"></span><span id="_CPPv2N7Maestro19show_center_of_massE"></span><span id="Maestro::show_center_of_mass__i"></span><span class="target" id="maestro__params_8H_1a4c6738bbcfade79c1faf381bb12e962f"></span>int <code class="sig-name descname">show_center_of_mass</code> = 0<a class="headerlink" href="#_CPPv4N7Maestro19show_center_of_massE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a12501beed7943583c10b3a9cb9729dd7"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::show_center_of_mass</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14hard_cfl_limitE">
-<span id="_CPPv3N7Maestro14hard_cfl_limitE"></span><span id="_CPPv2N7Maestro14hard_cfl_limitE"></span><span id="Maestro::hard_cfl_limit__i"></span><span class="target" id="maestro__params_8H_1a006a72ee94ed299f55a55b6f3f2e1521"></span>int <code class="sig-name descname">hard_cfl_limit</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro14hard_cfl_limitE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a24128edc96e7ab614c34bfe093790d1d"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::hard_cfl_limit</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro8job_nameE">
-<span id="_CPPv3N7Maestro8job_nameE"></span><span id="_CPPv2N7Maestro8job_nameE"></span><span id="Maestro::job_name__ss"></span><span class="target" id="maestro__params_8H_1a96a78599e085a3e601894edb02c0b1f0"></span>string <code class="sig-name descname">job_name</code> = &quot;&quot;<a class="headerlink" href="#_CPPv4N7Maestro8job_nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dt id="_CPPv4N7maestro8job_nameE">
+<span id="_CPPv3N7maestro8job_nameE"></span><span id="_CPPv2N7maestro8job_nameE"></span><span id="maestro::job_name__ss"></span><span class="target" id="namespacemaestro_1aba25bf5c2dd84574d1aacc182b03dd24"></span>string <code class="sig-name descname">job_name</code><a class="headerlink" href="#_CPPv4N7maestro8job_nameE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro20output_at_completionE">
-<span id="_CPPv3N7Maestro20output_at_completionE"></span><span id="_CPPv2N7Maestro20output_at_completionE"></span><span id="Maestro::output_at_completion__i"></span><span class="target" id="maestro__params_8H_1a234d68b6ac63709b47661d80291c9b9a"></span>int <code class="sig-name descname">output_at_completion</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro20output_at_completionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a1b90114b3187511686a6e8f71ad7c1eb"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::output_at_completion</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21reset_checkpoint_timeE">
-<span id="_CPPv3N7Maestro21reset_checkpoint_timeE"></span><span id="_CPPv2N7Maestro21reset_checkpoint_timeE"></span><span id="Maestro::reset_checkpoint_time__Real"></span><span class="target" id="maestro__params_8H_1a0313184072f675efa2d07287abb7b7a1"></span>Real <code class="sig-name descname">reset_checkpoint_time</code> = -1.e200<a class="headerlink" href="#_CPPv4N7Maestro21reset_checkpoint_timeE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1afe86a8ba52fd11797bf863195eb58e83"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::reset_checkpoint_time</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro21reset_checkpoint_stepE">
-<span id="_CPPv3N7Maestro21reset_checkpoint_stepE"></span><span id="_CPPv2N7Maestro21reset_checkpoint_stepE"></span><span id="Maestro::reset_checkpoint_step__i"></span><span class="target" id="maestro__params_8H_1a93680e4970ceed3738c91b75ac39c3ed"></span>int <code class="sig-name descname">reset_checkpoint_step</code> = -1<a class="headerlink" href="#_CPPv4N7Maestro21reset_checkpoint_stepE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a4631371fc4ea1df6e2682d16f125ccea"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::reset_checkpoint_step</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13use_particlesE">
-<span id="_CPPv3N7Maestro13use_particlesE"></span><span id="_CPPv2N7Maestro13use_particlesE"></span><span id="Maestro::use_particles__b"></span><span class="target" id="maestro__params_8H_1a3d26149da322394273f12887cac4eb7b"></span>bool <code class="sig-name descname">use_particles</code> = false<a class="headerlink" href="#_CPPv4N7Maestro13use_particlesE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ae884d9e7a16a81395261d107c351cddc"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::use_particles</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro19store_particle_velsE">
-<span id="_CPPv3N7Maestro19store_particle_velsE"></span><span id="_CPPv2N7Maestro19store_particle_velsE"></span><span id="Maestro::store_particle_vels__b"></span><span class="target" id="maestro__params_8H_1a979f3d3c156b36c1023d80956aab72a3"></span>bool <code class="sig-name descname">store_particle_vels</code> = false<a class="headerlink" href="#_CPPv4N7Maestro19store_particle_velsE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1acaf89e3508d8c16f8db8896803673521"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::store_particle_vels</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10do_heatingE">
-<span id="_CPPv3N7Maestro10do_heatingE"></span><span id="_CPPv2N7Maestro10do_heatingE"></span><span id="Maestro::do_heating__b"></span><span class="target" id="maestro__params_8H_1a93b43cba2adc3fefc517d4965b13feef"></span>bool <code class="sig-name descname">do_heating</code> = false<a class="headerlink" href="#_CPPv4N7Maestro10do_heatingE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a70e7d643379e1ce38267f044db893599"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::do_heating</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro9sdc_itersE">
-<span id="_CPPv3N7Maestro9sdc_itersE"></span><span id="_CPPv2N7Maestro9sdc_itersE"></span><span id="Maestro::sdc_iters__i"></span><span class="target" id="maestro__params_8H_1a51d98438e9deed33fb829843e1983ea5"></span>int <code class="sig-name descname">sdc_iters</code> = 1<a class="headerlink" href="#_CPPv4N7Maestro9sdc_itersE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a9b75d13eb816e632136ac48db8e9f13e"></span><code class="sig-name descname">AMREX_GPU_MANAGED int maestro::sdc_iters</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro23sdc_couple_mac_velocityE">
-<span id="_CPPv3N7Maestro23sdc_couple_mac_velocityE"></span><span id="_CPPv2N7Maestro23sdc_couple_mac_velocityE"></span><span id="Maestro::sdc_couple_mac_velocity__b"></span><span class="target" id="maestro__params_8H_1a630c8dadd4216fd878310e266d869499"></span>bool <code class="sig-name descname">sdc_couple_mac_velocity</code> = false<a class="headerlink" href="#_CPPv4N7Maestro23sdc_couple_mac_velocityE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1aa83a60726b021449e8af837fc8852a52"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::sdc_couple_mac_velocity</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro25deterministic_nodal_solveE">
-<span id="_CPPv3N7Maestro25deterministic_nodal_solveE"></span><span id="_CPPv2N7Maestro25deterministic_nodal_solveE"></span><span id="Maestro::deterministic_nodal_solve__b"></span><span class="target" id="maestro__params_8H_1afd4da50edb2afc18f64ae596b0229fbb"></span>bool <code class="sig-name descname">deterministic_nodal_solve</code> = false<a class="headerlink" href="#_CPPv4N7Maestro25deterministic_nodal_solveE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adeece89d68a73db847ebcc6439d9c411"></span><code class="sig-name descname">AMREX_GPU_MANAGED bool maestro::deterministic_nodal_solve</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro18eps_init_proj_cartE">
-<span id="_CPPv3N7Maestro18eps_init_proj_cartE"></span><span id="_CPPv2N7Maestro18eps_init_proj_cartE"></span><span id="Maestro::eps_init_proj_cart__Real"></span><span class="target" id="maestro__params_8H_1a84207d9c89b5c26141b0f71f083ef3ec"></span>Real <code class="sig-name descname">eps_init_proj_cart</code> = 1.e-12<a class="headerlink" href="#_CPPv4N7Maestro18eps_init_proj_cartE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a5231eddc45e3171b0c7a6998eb1de2ff"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_init_proj_cart</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17eps_init_proj_sphE">
-<span id="_CPPv3N7Maestro17eps_init_proj_sphE"></span><span id="_CPPv2N7Maestro17eps_init_proj_sphE"></span><span id="Maestro::eps_init_proj_sph__Real"></span><span class="target" id="maestro__params_8H_1a028bcf2efc46e70e70a49918f8716c54"></span>Real <code class="sig-name descname">eps_init_proj_sph</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro17eps_init_proj_sphE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a64f71a9ac6c888ad2cc77b79ae4bd7c7"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_init_proj_sph</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13eps_divu_cartE">
-<span id="_CPPv3N7Maestro13eps_divu_cartE"></span><span id="_CPPv2N7Maestro13eps_divu_cartE"></span><span id="Maestro::eps_divu_cart__Real"></span><span class="target" id="maestro__params_8H_1ab36d15673c73e36508d67c6766950571"></span>Real <code class="sig-name descname">eps_divu_cart</code> = 1.e-12<a class="headerlink" href="#_CPPv4N7Maestro13eps_divu_cartE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a9e060a471c7013cce2b1701ddbc44e39"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_divu_cart</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro12eps_divu_sphE">
-<span id="_CPPv3N7Maestro12eps_divu_sphE"></span><span id="_CPPv2N7Maestro12eps_divu_sphE"></span><span id="Maestro::eps_divu_sph__Real"></span><span class="target" id="maestro__params_8H_1acf261901653c6b95cab5085f20e59937"></span>Real <code class="sig-name descname">eps_divu_sph</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro12eps_divu_sphE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1ae60da40c7244a96147c3a7e17d600678"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_divu_sph</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16divu_iter_factorE">
-<span id="_CPPv3N7Maestro16divu_iter_factorE"></span><span id="_CPPv2N7Maestro16divu_iter_factorE"></span><span id="Maestro::divu_iter_factor__Real"></span><span class="target" id="maestro__params_8H_1a7631c6a19972951827e03cb070cd96a1"></span>Real <code class="sig-name descname">divu_iter_factor</code> = 100.<a class="headerlink" href="#_CPPv4N7Maestro16divu_iter_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a8abb87bb105bccd9d959db6e83dc4052"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::divu_iter_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro17divu_level_factorE">
-<span id="_CPPv3N7Maestro17divu_level_factorE"></span><span id="_CPPv2N7Maestro17divu_level_factorE"></span><span id="Maestro::divu_level_factor__Real"></span><span class="target" id="maestro__params_8H_1a0fd0a8f813f1f34f2abb5a2eb39c9d2a"></span>Real <code class="sig-name descname">divu_level_factor</code> = 10.<a class="headerlink" href="#_CPPv4N7Maestro17divu_level_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a602797f58ac15f20f48687af56da1e84"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::divu_level_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro7eps_macE">
-<span id="_CPPv3N7Maestro7eps_macE"></span><span id="_CPPv2N7Maestro7eps_macE"></span><span id="Maestro::eps_mac__Real"></span><span class="target" id="maestro__params_8H_1a70e426b9f2902a64fb40b332a24b5b2c"></span>Real <code class="sig-name descname">eps_mac</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro7eps_macE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adf5a34640c1b6922d77798a871b6c311"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_mac</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro11eps_mac_maxE">
-<span id="_CPPv3N7Maestro11eps_mac_maxE"></span><span id="_CPPv2N7Maestro11eps_mac_maxE"></span><span id="Maestro::eps_mac_max__Real"></span><span class="target" id="maestro__params_8H_1ab705205d2c74c8b4e3755cfab1ed0d63"></span>Real <code class="sig-name descname">eps_mac_max</code> = 1.e-8<a class="headerlink" href="#_CPPv4N7Maestro11eps_mac_maxE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a34b48565aabb3694691a8fcef13c8e7f"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_mac_max</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro16mac_level_factorE">
-<span id="_CPPv3N7Maestro16mac_level_factorE"></span><span id="_CPPv2N7Maestro16mac_level_factorE"></span><span id="Maestro::mac_level_factor__Real"></span><span class="target" id="maestro__params_8H_1ac17a0687d1aaa355562e2ccf276afffd"></span>Real <code class="sig-name descname">mac_level_factor</code> = 10.<a class="headerlink" href="#_CPPv4N7Maestro16mac_level_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1adff642d80d6e7922653afd5f6294a796"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::mac_level_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro14eps_mac_bottomE">
-<span id="_CPPv3N7Maestro14eps_mac_bottomE"></span><span id="_CPPv2N7Maestro14eps_mac_bottomE"></span><span id="Maestro::eps_mac_bottom__Real"></span><span class="target" id="maestro__params_8H_1a42d899b7cd8043eb26198f317b88c63d"></span>Real <code class="sig-name descname">eps_mac_bottom</code> = 1.e-3<a class="headerlink" href="#_CPPv4N7Maestro14eps_mac_bottomE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a193223487e93876096e339af13e2b330"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_mac_bottom</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro6eps_hgE">
-<span id="_CPPv3N7Maestro6eps_hgE"></span><span id="_CPPv2N7Maestro6eps_hgE"></span><span id="Maestro::eps_hg__Real"></span><span class="target" id="maestro__params_8H_1a720ff494011d61c22d7f14ac833db7a8"></span>Real <code class="sig-name descname">eps_hg</code> = 1.e-12<a class="headerlink" href="#_CPPv4N7Maestro6eps_hgE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a9391cdf15a863a24b5429c3e45f1501f"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_hg</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro10eps_hg_maxE">
-<span id="_CPPv3N7Maestro10eps_hg_maxE"></span><span id="_CPPv2N7Maestro10eps_hg_maxE"></span><span id="Maestro::eps_hg_max__Real"></span><span class="target" id="maestro__params_8H_1a0533d7d30e6bb74f4c6cb90322017f4c"></span>Real <code class="sig-name descname">eps_hg_max</code> = 1.e-10<a class="headerlink" href="#_CPPv4N7Maestro10eps_hg_maxE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1acc7eb4d8f9237223675a301bac22e40e"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_hg_max</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro15hg_level_factorE">
-<span id="_CPPv3N7Maestro15hg_level_factorE"></span><span id="_CPPv2N7Maestro15hg_level_factorE"></span><span id="Maestro::hg_level_factor__Real"></span><span class="target" id="maestro__params_8H_1ac4dcc16356c121dec76c908a9a0abea6"></span>Real <code class="sig-name descname">hg_level_factor</code> = 10.<a class="headerlink" href="#_CPPv4N7Maestro15hg_level_factorE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a20d14d28f726b460d707dfae7bbd5bc6"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::hg_level_factor</code></dt>
 <dd></dd></dl>
 
 <dl class="cpp member">
-<dt id="_CPPv4N7Maestro13eps_hg_bottomE">
-<span id="_CPPv3N7Maestro13eps_hg_bottomE"></span><span id="_CPPv2N7Maestro13eps_hg_bottomE"></span><span id="Maestro::eps_hg_bottom__Real"></span><span class="target" id="maestro__params_8H_1a63784d80b13f3183432fe186c18e98b0"></span>Real <code class="sig-name descname">eps_hg_bottom</code> = 1.e-4<a class="headerlink" href="#_CPPv4N7Maestro13eps_hg_bottomE" title="Permalink to this definition">¶</a><br /></dt>
+<dt>
+<span class="target" id="namespacemaestro_1a7fbfac494882f215a8c87503bd92fd67"></span><code class="sig-name descname">AMREX_GPU_MANAGED Real maestro::eps_hg_bottom</code></dt>
 <dd></dd></dl>
 
 </div>
+</dd></dl>
+
 </div>
 
 
@@ -1034,7 +1039,7 @@
         <a href="maestro__queries_8H.html" class="btn btn-neutral float-right" title="File maestro_queries.H" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="maestro__defaults_8H.html" class="btn btn-neutral float-left" title="File maestro_defaults.H" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="maestro__declares_8H.html" class="btn btn-neutral float-left" title="File maestro_declares.H" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
