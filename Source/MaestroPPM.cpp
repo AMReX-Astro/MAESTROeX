@@ -24,10 +24,9 @@ Maestro::PPM (const Box& bx,
 
     // constant used in Colella 2008
     const Real C = 1.25;
-
-    const int n = comp;
-
-    const Real dt_local = dt;
+    const auto n = comp;
+    const auto dt_local = dt;
+    const auto rel_eps_local = rel_eps;
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -207,14 +206,14 @@ Maestro::PPM (const Box& bx,
 
                 // u is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(u(i+1,j,k)) * dt_local / dx[0];
-                if (u(i+1,j,k) > rel_eps) {
+                if (u(i+1,j,k) > rel_eps_local) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
                 sigma = fabs(u(i,j,k)) * dt_local / dx[0];
-                if (u(i,j,k) < -rel_eps) {
+                if (u(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
@@ -223,14 +222,14 @@ Maestro::PPM (const Box& bx,
             } else {
 
                 Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
-                if (u(i,j,k) > rel_eps) {
+                if (u(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
                 }
 
                 sigma = fabs(u(i,j,k))*dt_local/dx[0];
-                if (u(i,j,k) < -rel_eps) {
+                if (u(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
@@ -626,7 +625,7 @@ Maestro::PPM (const Box& bx,
                 // u is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(u(i+1,j,k))*dt_local/dx[0];
                 
-                if (u(i+1,j,k) > rel_eps) {
+                if (u(i+1,j,k) > rel_eps_local) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
@@ -634,7 +633,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
-                if (u(i,j,k) < -rel_eps) {
+                if (u(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
@@ -643,7 +642,7 @@ Maestro::PPM (const Box& bx,
 
                 Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
-                if (u(i,j,k) > rel_eps) {
+                if (u(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,0) = s(i,j,k,n);
@@ -651,7 +650,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(u(i,j,k))*dt_local/dx[0];
 
-                if (u(i,j,k) < -rel_eps) {
+                if (u(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,0) = s(i,j,k,n);
@@ -835,14 +834,14 @@ Maestro::PPM (const Box& bx,
 
                 // v is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
-                if (v(i,j+1,k) > rel_eps) {
+                if (v(i,j+1,k) > rel_eps_local) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps) {
+                if (v(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,1) = s(i,j,k,n);
@@ -851,14 +850,14 @@ Maestro::PPM (const Box& bx,
             } else {
 
                 Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) > rel_eps) {
+                if (v(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps) {
+                if (v(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,1) = s(i,j,k,n);
@@ -1252,14 +1251,14 @@ Maestro::PPM (const Box& bx,
 
                 // v is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
-                if (v(i,j+1,k) > rel_eps) {
+                if (v(i,j+1,k) > rel_eps_local) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps) {
+                if (v(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,1) = s(i,j,k,n);
@@ -1268,14 +1267,14 @@ Maestro::PPM (const Box& bx,
             } else {
 
                 Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) > rel_eps) {
+                if (v(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Ip(i,j,k,1) = s(i,j,k,n);
                 }
 
                 sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps) {
+                if (v(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
                     Im(i,j,k,1) = s(i,j,k,n);
@@ -1461,7 +1460,7 @@ Maestro::PPM (const Box& bx,
                 // w is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
                 
-                if (w(i,j,k+1) > rel_eps) {
+                if (w(i,j,k+1) > rel_eps_local) {
                     Ip(i,j,k,2) = sp - 
                         0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1470,7 +1469,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(w(i,j,k))*dt_local/dx[2];
 
-                if (w(i,j,k) < -rel_eps) {
+                if (w(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,2) = sm + 
                         0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1480,7 +1479,7 @@ Maestro::PPM (const Box& bx,
 
                 Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
-                if (w(i,j,k) > rel_eps) {
+                if (w(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,2) = sp - 
                         0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1489,7 +1488,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
-                if (w(i,j,k) < -rel_eps) {
+                if (w(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,2) = sm + 
                         0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1887,7 +1886,7 @@ Maestro::PPM (const Box& bx,
                 // w is MAC velocity -- use edge-based indexing
                 Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
                 
-                if (w(i,j,k+1) > rel_eps) {
+                if (w(i,j,k+1) > rel_eps_local) {
                     Ip(i,j,k,2) = sp - 
                         0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1896,7 +1895,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
-                if (w(i,j,k) < -rel_eps) {
+                if (w(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,2) = sm + 
                         0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1905,7 +1904,7 @@ Maestro::PPM (const Box& bx,
             } else {
                 Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
-                if (w(i,j,k) > rel_eps) {
+                if (w(i,j,k) > rel_eps_local) {
                     Ip(i,j,k,2) = sp - 
                         0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
                 } else {
@@ -1914,7 +1913,7 @@ Maestro::PPM (const Box& bx,
 
                 sigma = fabs(w(i,j,k))*dt_local/dx[2];
                 
-                if (w(i,j,k) < -rel_eps) {
+                if (w(i,j,k) < -rel_eps_local) {
                     Im(i,j,k,2) = sm + 
                         0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
                 } else {

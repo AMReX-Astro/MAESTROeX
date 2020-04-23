@@ -376,11 +376,12 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
     // Create s_{\i-\half\e_x}^x, etc.
     ///////////////////////////////////////
 
-    Real ppm_type_local = ppm_type;
-    Real hx = dx[0];
-    Real hy = dx[1];
+    const Real ppm_type_local = ppm_type;
+    const Real hx = dx[0];
+    const Real hy = dx[1];
 
-    Real dt2 = 0.5 * dt;
+    const Real dt2 = 0.5 * dt;
+    const auto rel_eps_local = rel_eps;
 
     // Get the index space of the valid region
     const Box& obx = mfi.growntilebox(1);
@@ -441,7 +442,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
 
         // make simhx by solving Riemann problem
         simhx(i,j,k) = (umac(i,j,k) > 0.0) ? slx(i,j,k) : srx(i,j,k);
-        simhx(i,j,k) = (fabs(umac(i,j,k)) > rel_eps) ? 
+        simhx(i,j,k) = (fabs(umac(i,j,k)) > rel_eps_local) ? 
             simhx(i,j,k) : 0.5*(slx(i,j,k)+srx(i,j,k));
 
     });
@@ -499,7 +500,7 @@ void Maestro::MakeEdgeScalPredictor(const MFIter& mfi,
 
         // make simhy by solving Riemann problem
         simhy(i,j,k) = (vmac(i,j,k) > 0.0) ? sly(i,j,k) : sry(i,j,k);
-        simhy(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ? 
+        simhy(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps_local) ? 
             simhy(i,j,k) : 0.5*(sly(i,j,k)+sry(i,j,k));
     });
 }
@@ -532,13 +533,15 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     // Create sedgelx, etc.
     ///////////////////////////////////////////////
 
-    int ppm_trace_forces_local = ppm_trace_forces;
+    const auto ppm_trace_forces_local = ppm_trace_forces;
 
     Real dt2 = 0.5 * dt;
     Real dt4 = 0.25 * dt;
 
     Real hx = dx[0];
     Real hy = dx[1];
+
+    const auto rel_eps_local = rel_eps;
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -584,7 +587,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgex(i,j,k,comp) = (umac(i,j,k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i,j,k,comp) = (fabs(umac(i,j,k)) > rel_eps) ? 
+        sedgex(i,j,k,comp) = (fabs(umac(i,j,k)) > rel_eps_local) ? 
             sedgex(i,j,k,comp) : 0.5*(sedgelx+sedgerx);
 
         // impose lo side bc's
@@ -656,7 +659,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgey(i,j,k,comp) = (vmac(i,j,k) > 0.0) ? sedgely : sedgery;
-        sedgey(i,j,k,comp) = (fabs(vmac(i,j,k)) > rel_eps) ? 
+        sedgey(i,j,k,comp) = (fabs(vmac(i,j,k)) > rel_eps_local) ? 
             sedgey(i,j,k,comp): 0.5*(sedgely+sedgery);
 
         // impose lo side bc's
@@ -964,12 +967,14 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
     // Create transverse terms, s_{\i-\half\e_x}^{x|y}, etc.
     ////////////////////////////////////////////////////////
 
-    Real dt3 = dt / 3.0;
-    Real dt6 = dt / 6.0;
+    const Real dt3 = dt / 3.0;
+    const Real dt6 = dt / 6.0;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
-    Real hz = dx[2];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
+
+    const auto rel_eps_local = rel_eps;
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -1048,7 +1053,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhxy by solving Riemann problem
         simhxy(i,j,k) = (umac(i,j,k) > 0.0) ?
             slxy : srxy;
-        simhxy(i,j,k) = (fabs(umac(i,j,k)) > rel_eps) ?
+        simhxy(i,j,k) = (fabs(umac(i,j,k)) > rel_eps_local) ?
             simhxy(i,j,k) : 0.5 * (slxy + srxy);
 
     });
@@ -1125,7 +1130,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhxy by solving Riemann problem
         simhxz(i,j,k) = (umac(i,j,k) > 0.0) ?
             slxz : srxz;
-        simhxz(i,j,k) = (fabs(umac(i,j,k)) > rel_eps) ?
+        simhxz(i,j,k) = (fabs(umac(i,j,k)) > rel_eps_local) ?
             simhxz(i,j,k) : 0.5 * (slxz + srxz);
 
     });
@@ -1205,7 +1210,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhxy by solving Riemann problem
         simhyx(i,j,k) = (vmac(i,j,k) > 0.0) ?
             slyx : sryx;
-        simhyx(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ?
+        simhyx(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps_local) ?
             simhyx(i,j,k) : 0.5 * (slyx + sryx);
     });
 
@@ -1281,7 +1286,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhyz by solving Riemann problem
         simhyz(i,j,k) = (vmac(i,j,k) > 0.0) ?
             slyz : sryz;
-        simhyz(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps) ?
+        simhyz(i,j,k) = (fabs(vmac(i,j,k)) > rel_eps_local) ?
             simhyz(i,j,k) : 0.5 * (slyz + sryz);
     });
 
@@ -1360,7 +1365,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhzx by solving Riemann problem
         simhzx(i,j,k) = (wmac(i,j,k) > 0.0) ?
             slzx : srzx;
-        simhzx(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps) ?
+        simhzx(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps_local) ?
             simhzx(i,j,k) : 0.5 * (slzx + srzx);
     });
 
@@ -1436,7 +1441,7 @@ void Maestro::MakeEdgeScalTransverse(const MFIter& mfi,
         // make simhzy by solving Riemann problem
         simhzy(i,j,k) = (wmac(i,j,k) > 0.0) ?
             slzy : srzy;
-        simhzy(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps) ?
+        simhzy(i,j,k) = (fabs(wmac(i,j,k)) > rel_eps_local) ?
             simhzy(i,j,k) : 0.5 * (slzy + srzy);
     });
 }
@@ -1477,14 +1482,16 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
     // Create sedgelx, etc.
     ///////////////////////////////////////////////
 
-    int ppm_trace_forces_local = ppm_trace_forces;
+    const auto ppm_trace_forces_local = ppm_trace_forces;
 
-    Real dt2 = 0.5 * dt;
-    Real dt4 = 0.25 * dt;
+    const Real dt2 = 0.5 * dt;
+    const Real dt4 = 0.25 * dt;
 
-    Real hx = dx[0];
-    Real hy = dx[1];
-    Real hz = dx[2];
+    const Real hx = dx[0];
+    const Real hy = dx[1];
+    const Real hz = dx[2];
+
+    const auto rel_eps_local = rel_eps;
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -1543,7 +1550,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         // boundary conditions enforced outside of i,j,k loop
         sedgex(i,j,k,comp) = (umac(i,j,k) > 0.0) ? 
             sedgelx : sedgerx;
-        sedgex(i,j,k,comp) = (fabs(umac(i,j,k))  > rel_eps) ? 
+        sedgex(i,j,k,comp) = (fabs(umac(i,j,k))  > rel_eps_local) ? 
             sedgex(i,j,k,comp) : 0.5*(sedgelx+sedgerx);
 
         // impose lo side bc's
@@ -1630,7 +1637,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         // boundary conditions enforced outside of i,j,k loop
         sedgey(i,j,k,comp) = (vmac(i,j,k) > 0.0) ? 
             sedgely : sedgery;
-        sedgey(i,j,k,comp) = (fabs(vmac(i,j,k))  > rel_eps) ? 
+        sedgey(i,j,k,comp) = (fabs(vmac(i,j,k))  > rel_eps_local) ? 
             sedgey(i,j,k,comp) : 0.5*(sedgely+sedgery);
 
         // impose lo side bc's
@@ -1717,7 +1724,7 @@ void Maestro::MakeEdgeScalEdges(const MFIter& mfi,
         // boundary conditions enforced outside of i,j,k loop
         sedgez(i,j,k,comp) = (wmac(i,j,k) > 0.0) ? 
             sedgelz : sedgerz;
-        sedgez(i,j,k,comp) = (fabs(wmac(i,j,k))  > rel_eps) ? 
+        sedgez(i,j,k,comp) = (fabs(wmac(i,j,k))  > rel_eps_local) ? 
             sedgez(i,j,k,comp) : 0.5*(sedgelz+sedgerz);
 
         // impose lo side bc's

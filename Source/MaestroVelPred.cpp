@@ -401,6 +401,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hy = dx[1];
 
     const int ppm_type_local = ppm_type;
+    const auto rel_eps_local = rel_eps;
 
     // x-direction
     const auto domlo = domainBox.loVect3d();
@@ -496,7 +497,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         // upwind using full velocity to get transverse component of uimhx
         // Note: utrans already contains w0
         uimhx(i,j,k,1) = utrans(i,j,k) > 0.0 ? ulx(i,j,k,1) : urx(i,j,k,1);
-        uimhx(i,j,k,1) = fabs(utrans(i,j,k)) < rel_eps ? 
+        uimhx(i,j,k,1) = fabs(utrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulx(i,j,k,1)+urx(i,j,k,1)) : uimhx(i,j,k,1);
     });
 
@@ -590,7 +591,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
         // upwind using full velocity to get transverse component of uimhy
         // Note: utrans already contains w0
         uimhy(i,j,k,0) = vtrans(i,j,k) > 0.0 ? uly(i,j,k,0) : ury(i,j,k,0);
-        uimhy(i,j,k,0) = fabs(vtrans(i,j,k)) < rel_eps ? 
+        uimhy(i,j,k,0) = fabs(vtrans(i,j,k)) < rel_eps_local ? 
             0.5*(uly(i,j,k,0)+ury(i,j,k,0)) : uimhy(i,j,k,0);
     });
 }
@@ -634,6 +635,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hy = dx[1];
 
     const int ppm_trace_forces_local = ppm_trace_forces;
+    const auto rel_eps_local = rel_eps;
 
     // x-direction
     const auto domlo = domainBox.loVect3d();
@@ -658,7 +660,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
 
         // solve Riemann problem using full velocity
         umac(i,j,k) = 0.5*(umacl+umacr) > 0.0 ? umacl : umacr; 
-        umac(i,j,k) = (umacl <= 0.0 && umacr >= 0.0) || (fabs(umacl+umacr) < rel_eps) ? 
+        umac(i,j,k) = (umacl <= 0.0 && umacr >= 0.0) || (fabs(umacl+umacr) < rel_eps_local) ? 
             0.0 : umac(i,j,k);
 
         // impose lo side bc's
@@ -720,7 +722,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         // solve Riemann problem using full velocity
         bool test = (vmacl+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) <= 0.0 && 
                      vmacr+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) >= 0.0) || 
-                    (fabs(vmacl+vmacr+2*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+                    (fabs(vmacl+vmacr+2*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps_local);
         vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) > 0.0 ? 
                       vmacl : vmacr;
         vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
@@ -815,7 +817,8 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hy = dx[1];
     const Real hz = dx[2];
 
-    int ppm_type_local = ppm_type;
+    const int ppm_type_local = ppm_type;
+    const auto rel_eps_local = rel_eps;
 
     // x-direction
     const auto domlo = domainBox.loVect3d();
@@ -917,11 +920,11 @@ Maestro::VelPredInterface(const MFIter& mfi,
         // upwind using full velocity to get transverse components of uimhx
         // Note: utrans already contains w0
         uimhx(i,j,k,1) = utrans(i,j,k) > 0.0 ? ulx(i,j,k,1) : urx(i,j,k,1);
-        uimhx(i,j,k,1) = fabs(utrans(i,j,k)) < rel_eps ? 
+        uimhx(i,j,k,1) = fabs(utrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulx(i,j,k,1)+urx(i,j,k,1)) : uimhx(i,j,k,1);
 
         uimhx(i,j,k,2) = utrans(i,j,k) > 0.0 ? ulx(i,j,k,2) : urx(i,j,k,2);
-        uimhx(i,j,k,2) = fabs(utrans(i,j,k)) < rel_eps ? 
+        uimhx(i,j,k,2) = fabs(utrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulx(i,j,k,2)+urx(i,j,k,2)) : uimhx(i,j,k,2);
     });
 
@@ -1023,11 +1026,11 @@ Maestro::VelPredInterface(const MFIter& mfi,
         // upwind using full velocity to get transverse components of uimhy
         // Note: vtrans already contains w0
         uimhy(i,j,k,0) = vtrans(i,j,k) > 0.0 ? uly(i,j,k,0) : ury(i,j,k,0);
-        uimhy(i,j,k,0) = fabs(vtrans(i,j,k)) < rel_eps ? 
+        uimhy(i,j,k,0) = fabs(vtrans(i,j,k)) < rel_eps_local ? 
             0.5*(uly(i,j,k,0)+ury(i,j,k,0)) : uimhy(i,j,k,0);
 
         uimhy(i,j,k,2) = vtrans(i,j,k) > 0.0 ? uly(i,j,k,2) : ury(i,j,k,2);
-        uimhy(i,j,k,2) = fabs(vtrans(i,j,k)) < rel_eps ? 
+        uimhy(i,j,k,2) = fabs(vtrans(i,j,k)) < rel_eps_local ? 
             0.5*(uly(i,j,k,2)+ury(i,j,k,2)) : uimhy(i,j,k,2);
     });
 
@@ -1129,11 +1132,11 @@ Maestro::VelPredInterface(const MFIter& mfi,
         // upwind using full velocity to get transverse components of uimhz
         // Note: wtrans already contains w0
         uimhz(i,j,k,0) = wtrans(i,j,k) > 0.0 ? ulz(i,j,k,0) : urz(i,j,k,0);
-        uimhz(i,j,k,0) = fabs(wtrans(i,j,k)) < rel_eps ? 
+        uimhz(i,j,k,0) = fabs(wtrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulz(i,j,k,0)+urz(i,j,k,0)) : uimhz(i,j,k,0);
 
         uimhz(i,j,k,1) = wtrans(i,j,k) > 0.0 ? ulz(i,j,k,1) : urz(i,j,k,1);
-        uimhz(i,j,k,1) = fabs(wtrans(i,j,k)) < rel_eps ? 
+        uimhz(i,j,k,1) = fabs(wtrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulz(i,j,k,1)+urz(i,j,k,1)) : uimhz(i,j,k,1);
     });
 }
@@ -1176,6 +1179,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
     const Real hz = dx[2];
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
+    const auto rel_eps_local = rel_eps;
 
     GpuArray<int,AMREX_SPACEDIM*2> physbc;
     for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
@@ -1237,7 +1241,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         uimhyz(i,j,k) = vtrans(i,j,k) > 0.0 ? ulyz : uryz;
-        uimhyz(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps ? 
+        uimhyz(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulyz+uryz) : uimhyz(i,j,k);    
     });
 
@@ -1296,7 +1300,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         uimhzy(i,j,k) = wtrans(i,j,k) > 0.0 ? ulzy : urzy;
-        uimhzy(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps ? 
+        uimhzy(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps_local ? 
             0.5*(ulzy+urzy) : uimhzy(i,j,k);
     });
 
@@ -1355,7 +1359,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         vimhxz(i,j,k) = utrans(i,j,k) > 0.0 ? vlxz : vrxz;
-        vimhxz(i,j,k) = fabs(utrans(i,j,k)) < rel_eps ? 
+        vimhxz(i,j,k) = fabs(utrans(i,j,k)) < rel_eps_local ? 
             0.5*(vlxz+vrxz) : vimhxz(i,j,k);
     });
 
@@ -1414,7 +1418,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         vimhzx(i,j,k) = wtrans(i,j,k) > 0.0 ? vlzx : vrzx;
-        vimhzx(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps ?
+        vimhzx(i,j,k) = fabs(wtrans(i,j,k)) < rel_eps_local ?
             0.5*(vlzx+vrzx) : vimhzx(i,j,k);
     });
 
@@ -1473,7 +1477,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         wimhxy(i,j,k) = utrans(i,j,k) > 0.0 ? wlxy : wrxy;
-        wimhxy(i,j,k) = fabs(utrans(i,j,k)) < rel_eps ? 
+        wimhxy(i,j,k) = fabs(utrans(i,j,k)) < rel_eps_local ? 
             0.5*(wlxy+wrxy) : wimhxy(i,j,k);
     });
 
@@ -1532,7 +1536,7 @@ Maestro::VelPredTransverse(const MFIter& mfi,
 
         // upwind using full velocity
         wimhyx(i,j,k) = vtrans(i,j,k) > 0.0 ? wlyx : wryx;
-        wimhyx(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps ? 
+        wimhyx(i,j,k) = fabs(vtrans(i,j,k)) < rel_eps_local ? 
             0.5*(wlyx+wryx) : wimhyx(i,j,k);
     });
 }
@@ -1590,6 +1594,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hy = dx[1];
     const Real hz = dx[2];
 
+    const auto rel_eps_local = rel_eps;
+
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
     
@@ -1626,13 +1632,13 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (umacl+w0macx(i,j,k) <= 0.0 &&
                          umacr+w0macx(i,j,k) >= 0.0) ||
-                        (fabs(umacl+umacr+2.0*w0macx(i,j,k)) < rel_eps);
+                        (fabs(umacl+umacr+2.0*w0macx(i,j,k)) < rel_eps_local);
             umac(i,j,k) = 0.5*(umacl+umacr)+w0macx(i,j,k) > 0.0 ? umacl : umacr;
             umac(i,j,k) = test ? 0.0 : umac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
             bool test = (umacl <= 0.0 && umacr >= 0.0) || 
-                        (fabs(umacl+umacr) < rel_eps);
+                        (fabs(umacl+umacr) < rel_eps_local);
             umac(i,j,k) = 0.5*(umacl+umacr) > 0.0 ? umacl : umacr;
             umac(i,j,k) = test ? 0.0 : umac(i,j,k);
         }
@@ -1700,13 +1706,13 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (vmacl+w0macy(i,j,k) <= 0.0 &&
                          vmacr+w0macy(i,j,k) >= 0.0) ||
-                        (fabs(vmacl+vmacr+2.0*w0macy(i,j,k)) < rel_eps);
+                        (fabs(vmacl+vmacr+2.0*w0macy(i,j,k)) < rel_eps_local);
             vmac(i,j,k) = 0.5*(vmacl+vmacr)+w0macy(i,j,k) > 0.0 ? vmacl : vmacr;
             vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
             bool test = (vmacl <= 0.0 && vmacr >= 0.0) ||
-                        (fabs(vmacl+vmacr) < rel_eps);
+                        (fabs(vmacl+vmacr) < rel_eps_local);
             vmac(i,j,k) = 0.5*(vmacl+vmacr) > 0.0 ? vmacl : vmacr;
             vmac(i,j,k) = test ? 0.0 : vmac(i,j,k);
         }
@@ -1774,14 +1780,14 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
                          wmacr+w0macz(i,j,k) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2.0*w0macz(i,j,k)) < rel_eps);
+                        (fabs(wmacl+wmacr+2.0*w0macz(i,j,k)) < rel_eps_local);
             wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0macz(i,j,k) > 0.0 ? wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
         } else {
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) <= 0.0 &&
                          wmacr+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) >= 0.0) ||
-                        (fabs(wmacl+wmacr+2.0*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+                        (fabs(wmacl+wmacr+2.0*w0_cart_in(i,j,k,AMREX_SPACEDIM-1)) < rel_eps_local);
             wmac(i,j,k) = 0.5*(wmacl+wmacr)+w0_cart_in(i,j,k,AMREX_SPACEDIM-1) > 0.0 ?
                 wmacl : wmacr;
             wmac(i,j,k) = test ? 0.0 : wmac(i,j,k);
