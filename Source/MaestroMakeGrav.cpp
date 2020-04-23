@@ -310,15 +310,15 @@ void
 Maestro::MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0)
 {
-    MakeGravEdge(grav_edge.array(), rho0.array());
+    MakeGravEdge(grav_edge.array(), rho0.const_array());
 }
 
-void
-Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge, 
-                      BaseStateArray<Real> rho0)
-{
-    MakeGravEdge(grav_edge, rho0);
-}
+// void
+// Maestro::MakeGravEdge(BaseStateArray<Real>& grav_edge, 
+//                       BaseStateArray<Real>& rho0)
+// {
+//     MakeGravEdge(grav_edge, rho0);
+// }
 
 void
 Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge, 

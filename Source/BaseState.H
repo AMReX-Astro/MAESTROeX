@@ -159,6 +159,12 @@ public:
         return makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
     } 
 
+    AMREX_FORCE_INLINE
+    BaseStateArray<const T> const_array () const noexcept
+    {
+        return makeBaseStateArray<const T>(base_data.dataPtr(), nlev, len, nvar);
+    }
+
     /// return ith element of underlying data array
     AMREX_FORCE_INLINE
     T array (const int i) noexcept 

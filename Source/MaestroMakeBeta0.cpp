@@ -16,7 +16,6 @@ Maestro::MakeBeta0(RealVector& beta0,
 
     const int max_lev = base_geom.max_radial_level+1;
 
-    const Real rel_eps = c_rel_eps;
     const auto& dr = base_geom.dr;
 
     BaseState<Real> beta0_edge_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
@@ -179,8 +178,8 @@ Maestro::MakeBeta0(RealVector& beta0,
                     } else {// r >= anelastic_cutoff_density
 
                         if (fabs(rho0[n+max_lev*(r-1)]) > rel_eps) {
-                        beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)] * 
-                            (rho0[n+max_lev*r]/rho0[n+max_lev*(r-1)]);
+                            beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)] * 
+                                (rho0[n+max_lev*r]/rho0[n+max_lev*(r-1)]);
                         } else {
                             beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)];
                         }

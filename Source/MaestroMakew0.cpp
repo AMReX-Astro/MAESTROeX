@@ -630,7 +630,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     });
 
     // make the edge-centered gravity
-    MakeGravEdge(grav_edge_base, rho0_nph_base);
+    MakeGravEdge(grav_edge_s, rho0_nph_s);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
     // this takes the form of a tri-diagonal matrix:
@@ -813,7 +813,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     }
 
     // make the edge-centered gravity
-    MakeGravEdge(grav_edge_base, rho0_nph_base);
+    MakeGravEdge(grav_edge_s, rho0_nph_s);
 
     // NOTE:  now we solve for the remainder, (r^2 * delta w0)
     // this takes the form of a tri-diagonal matrix:

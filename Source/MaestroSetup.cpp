@@ -69,7 +69,7 @@ Maestro::Setup ()
     const Box domainBoxFine = geom[max_level].Domain();
     const Real* dxFine = geom[max_level].CellSize();
 
-    if (spherical == 1) {
+    if (spherical) {
 #if (AMREX_SPACEDIM == 3)
         // compute base_geom.max_radial_level
         base_geom.max_radial_level = 0;
@@ -230,8 +230,7 @@ Maestro::Setup ()
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
         ng_adv = 4;
-    }
-    else {
+    } else {
         ng_adv = 3;
     }
 
@@ -247,7 +246,6 @@ Maestro::Setup ()
       std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
       Error();
     }
-
 }
 
 // read in some parameters from inputs file
@@ -260,6 +258,8 @@ Maestro::ReadParameters ()
     Print() << "Calling ReadParameters()" << std::endl;
 
     ParmParse pp("maestro");
+
+    using namespace maestro;
 
 #include <maestro_queries.H>
 

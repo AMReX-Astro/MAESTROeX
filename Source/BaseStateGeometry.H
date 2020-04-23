@@ -17,9 +17,9 @@ public:
               const int nr_irreg_in,
               const amrex::Vector<amrex::Geometry> geom,
               const int max_level,
-              amrex::GpuArray<amrex::Real,3> center);
+              amrex::GpuArray<amrex::Real,3>& center);
 
-    void ComputeCutoffCoords(const BaseStateArray<const amrex::Real>& rho0);
+    void ComputeCutoffCoords(const BaseStateArray<amrex::Real>& rho0);
 
     void InitMultiLevel(const int finest_radial_level_in,
                         const BaseStateArray<int>& tag_array);
@@ -39,9 +39,6 @@ public:
     BaseStateArray<int> anelastic_cutoff_density_coord;
     BaseStateArray<int> burning_cutoff_density_lo_coord;
     BaseStateArray<int> burning_cutoff_density_hi_coord;
-
-    /// relative error needed for base state computations
-    amrex::Real c_rel_eps;
 
     ///these provide information about the multilevel base state configuration
     BaseStateArray<int> numdisjointchunks;

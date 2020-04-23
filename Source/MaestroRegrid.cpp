@@ -103,7 +103,8 @@ Maestro::Regrid ()
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
-    // base_geom.ComputeCutoffCoords(rho0_old.array());
+    BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+    base_geom.ComputeCutoffCoords(rho0_state.array());
 
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);

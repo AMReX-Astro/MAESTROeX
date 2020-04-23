@@ -19,6 +19,8 @@
 #include <BaseStateGeometry.H>
 
 #include <state_indices.H>
+#include <maestro_params.H>
+using namespace maestro;
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
@@ -1137,8 +1139,8 @@ public:
     void MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0);
     
-    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
-                      BaseStateArray<Real> rho0);
+    // void MakeGravEdge(BaseStateArray<Real>& grav_edge, 
+    //                   BaseStateArray<Real>& rho0);
     
     void MakeGravEdge(BaseStateArray<Real> grav_edge, 
                       const BaseStateArray<const Real> rho0);
@@ -1951,7 +1953,6 @@ public:
     ////////////////
     // static data members defined in `_cpp_parameters`
     // this file is in Source/param_includes/
-#include <maestro_params.H>
     ////////////////
 
     // these are defined in `VariableSetup()`
@@ -2094,7 +2095,7 @@ public:
     // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
-    amrex::Real c_rel_eps;
+    amrex::Real rel_eps;
 
     // these provide information about the multilevel base state configuration
     // BaseState<int> numdisjointchunks;
