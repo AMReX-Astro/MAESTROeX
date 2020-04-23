@@ -39,7 +39,7 @@
   <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Class BndryFuncArrayMaestro" href="classBndryFuncArrayMaestro.html" />
+    <link rel="next" title="Class BaseStateGeometry" href="classBaseStateGeometry.html" />
     <link rel="prev" title="Class list" href="../classlist.html" /> 
 </head>
 
@@ -147,6 +147,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../filelist.html">File list</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../classlist.html">Class list</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Class BaseState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classBaseStateGeometry.html">Class BaseStateGeometry</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classBndryFuncArrayMaestro.html">Class BndryFuncArrayMaestro</a></li>
 <li class="toctree-l2"><a class="reference internal" href="classMaestro.html">Class Maestro</a></li>
 </ul>
@@ -241,7 +242,7 @@
 <dl class="cpp function">
 <dt id="_CPPv4N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi">
 <span id="_CPPv3N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi"></span><span id="_CPPv2N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi"></span><span id="BaseState::BaseState__Gpu::ManagedVector:T:CR.iC.iC.iC"></span><span class="target" id="classBaseState_1a2a13baa1ea6e6e67c287e06b136f841a"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><em class="property">const</em> Gpu::ManagedVector&lt;T&gt; &amp;<em>src</em>, <em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em>, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>create a <a class="reference internal" href="../file/BaseState_8H.html#classBaseState"><span class="std std-ref">BaseState</span></a> object from an existing Fortran-friendly base state </p>
+<dd><p>create a <a class="reference internal" href="#classBaseState"><span class="std std-ref">BaseState</span></a> object from an existing Fortran-friendly base state </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -269,8 +270,8 @@
 
 <dl class="cpp function">
 <dt id="_CPPv4N9BaseState6defineEKiKiKi">
-<span id="_CPPv3N9BaseState6defineEKiKiKi"></span><span id="_CPPv2N9BaseState6defineEKiKiKi"></span><span id="BaseState::define__iC.iC.iC"></span><span class="target" id="classBaseState_1aee732f7fb4ed8a27092d21d04b93d439"></span>void <code class="sig-name descname">define</code><span class="sig-paren">(</span><em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em>, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6defineEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>allocate memory for the <a class="reference internal" href="../file/BaseState_8H.html#classBaseState"><span class="std std-ref">BaseState</span></a> </p>
+<span id="_CPPv3N9BaseState6defineEKiKiKi"></span><span id="_CPPv2N9BaseState6defineEKiKiKi"></span><span id="BaseState::define__iC.iC.iC"></span><span class="target" id="classBaseState_1ad2cd46c33d59f5d395729143b466c5d9"></span>void <code class="sig-name descname">define</code><span class="sig-paren">(</span><em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em> = 1, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6defineEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>allocate memory for the <a class="reference internal" href="#classBaseState"><span class="std std-ref">BaseState</span></a> </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -302,6 +303,11 @@
 <span class="target" id="classBaseState_1a26a730a6186ef755d4540ca67370e7ef"></span><code class="sig-name descname">AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int BaseState::nComp() const</code></dt>
 <dd><p>number of components </p>
 </dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState7dataPtrEv">
+<span id="_CPPv3N9BaseState7dataPtrEv"></span><span id="_CPPv2N9BaseState7dataPtrEv"></span><span id="BaseState::dataPtr"></span><span class="target" id="classBaseState_1a5f899ca57c77e9cf63c19835519aa775"></span>T *<code class="sig-name descname">dataPtr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState7dataPtrEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp function">
 <dt id="_CPPv4N9BaseStatepLEK1T">
@@ -442,7 +448,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="classBndryFuncArrayMaestro.html" class="btn btn-neutral float-right" title="Class BndryFuncArrayMaestro" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="classBaseStateGeometry.html" class="btn btn-neutral float-right" title="Class BaseStateGeometry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../classlist.html" class="btn btn-neutral float-left" title="Class list" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
