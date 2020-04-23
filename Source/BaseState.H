@@ -8,6 +8,8 @@
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFab.H>
 
+template <class T> class BaseState;
+
 template <typename T>
 struct BaseStateArray
 {
@@ -35,13 +37,36 @@ struct BaseStateArray
         {}
 
     AMREX_GPU_HOST_DEVICE
+    void init(T* ptr, const int num_levs=1, const int length=1, const int ncomp=1) noexcept {
+        dptr = ptr;
+        nlev = num_levs;
+        len = length;
+        nvar = ncomp;
+    }
+
+    void init(BaseState<T>& base_state) noexcept {
+        dptr = base_state.dataPtr();
+        nlev = base_state.nLevels();
+        len = base_state.length();
+        nvar = base_state.nComp();
+    }
+
+    /// set to some scalar value 
+    void setVal(const T val) noexcept {
+        AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
+            dptr[i] = val;
+        });
+        amrex::Gpu::synchronize();
+    }
+
+    AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
 
     /// access elements. If only 2 arguments are passed in, component is set to 0
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     T& operator() (const int lev, const int i, const int n=0) const noexcept {
         AMREX_ASSERT(lev >= 0);
-        AMREX_ASSERT((i < this->len && i >= 0) || (lev == 0 && i < nlev*len));
+        AMREX_ASSERT(i < this->len && i >= 0);
         AMREX_ASSERT(n < this->nvar && n >= 0);
 
         return dptr[(lev*len + i)*nvar + n];
@@ -73,7 +98,7 @@ struct BaseStateArray
     }
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    T* dataPtr () const noexcept { return this->dptr; } 
+    T* dataPtr () noexcept { return this->dptr; } 
 
     /// number of levels in base 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
@@ -134,6 +159,14 @@ public:
         return makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
     } 
 
+    /// return ith element of underlying data array
+    AMREX_FORCE_INLINE
+    T array (const int i) noexcept 
+    {
+        BaseStateArray<T> arr = makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
+        return arr(i);
+    }
+
     /// allocate memory for the BaseState
     void define(const int num_levs, const int length=1, const int ncomp=1);
 
@@ -156,6 +189,11 @@ public:
     /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
+    
+    void toVector(amrex::Vector<T>& vec);
+    void toVector(amrex::Gpu::ManagedVector<T>& vec);
+
+    T* dataPtr () noexcept { return base_data.dataPtr(); };
 
     /// scalar addition to the whole base state 
     template <class U>
@@ -317,6 +355,31 @@ BaseState<T>::setVal(const int comp, const T val)
     amrex::Gpu::synchronize();
 }
 
+template <class T>
+void
+BaseState<T>::toVector(amrex::Vector<T>& vec)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                vec[l + nlev*(r + len*comp)] = base_data[comp+nvar*(r + len*l)];
+            }
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                vec[l + nlev*(r + len*comp)] = base_data[comp+nvar*(r + len*l)];
+            }
+        }
+    }
+}
 
 template <class T>
 BaseState<T>

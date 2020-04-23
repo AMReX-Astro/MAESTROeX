@@ -9,16 +9,16 @@ void
 Maestro::Regrid ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Regrid()",Regrid);
+    BL_PROFILE_VAR("Maestro::Regrid()", Regrid);
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
     
-    RealVector rho0_temp((max_radial_level+1)*nr_fine);
+    RealVector rho0_temp((base_geom.max_radial_level+1)*base_geom.nr_fine);
     rho0_temp.shrink_to_fit();
 
     if (!spherical) {
-        finest_radial_level = finest_level;
+        base_geom.finest_radial_level = finest_level;
 
         // look at MAESTRO/Source/varden.f90:750-1060
         // Regrid psi, etarho_cc, etarho_ec, and w0.
@@ -74,7 +74,9 @@ Maestro::Regrid ()
         TagArray();
     }
     init_multilevel(tag_array.dataPtr(),&finest_level);
-    InitMultilevel(finest_level);
+    // InitMultilevel(finest_level);
+    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     if (spherical == 1) {
         MakeNormal();
@@ -101,6 +103,7 @@ Maestro::Regrid ()
     // compute cutoff coordinates
     compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
+    // base_geom.ComputeCutoffCoords(rho0_old.array());
 
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);
@@ -149,7 +152,7 @@ Maestro::TagArray ()
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 
-    for (int lev = 1; lev <= max_radial_level; ++lev) {
+    for (int lev = 1; lev <= base_geom.max_radial_level; ++lev) {
 
         for (MFIter mfi(sold[lev], false); mfi.isValid(); ++mfi) {
             const Box& validBox = mfi.validbox();
@@ -158,7 +161,7 @@ Maestro::TagArray ()
             RetagArray(validBox, lev, tag_array);
         }
     }
-    ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
+    ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 }
 
 // tag all cells for refinement
@@ -193,7 +196,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
     // height
     if (!spherical) {
         
-        ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(max_radial_level+1)*nr_fine);
+        ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // NOTE: adding OpenMP breaks the code - not exactly sure why
 #ifdef _OPENMP
@@ -370,9 +373,9 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
-    const int nrf = is_edge ? nr_fine+1 : nr_fine;
+    const int nrf = is_edge ? base_geom.nr_fine+1 : base_geom.nr_fine;
     RealVector state_temp_vec(max_lev*nrf);
 
     Real * AMREX_RESTRICT base = base_vec.dataPtr();
@@ -388,7 +391,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
-            const auto nrn = nr.array()(n) + 1;
+            const auto nrn = base_geom.nr(n) + 1;
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r % 2 == 0) {
@@ -398,7 +401,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         } else {
-            const auto nrn = nr.array()(n);
+            const auto nrn = base_geom.nr(n);
             AMREX_PARALLEL_FOR_1D(nrn, r,
             {
                 if (r == 0 || r == nrn-1) {
@@ -416,9 +419,9 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
 
     // copy valid data into temp
     for (auto n = 1; n < max_lev; ++n) {
-        for (auto i = 1; i <= numdisjointchunks.array()(n); ++i) {
-            const auto lo = r_start_coord.array()(n,i);
-            const auto hi = is_edge ? r_end_coord.array()(n,i)+1 : r_end_coord.array()(n,i);
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
+            const auto lo = base_geom.r_start_coord(n,i);
+            const auto hi = is_edge ? base_geom.r_end_coord(n,i)+1 : base_geom.r_end_coord(n,i);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
             {
                 int r = k + lo;

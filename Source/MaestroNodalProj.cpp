@@ -94,7 +94,7 @@ Maestro::NodalProj (int proj_type,
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
         Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
     } else {
-        RealVector beta0_nph( (max_radial_level+1)*nr_fine );
+        RealVector beta0_nph( (base_geom.max_radial_level+1)*base_geom.nr_fine );
         beta0_nph.shrink_to_fit();
         for(int i=0; i<beta0_nph.size(); ++i) {
             beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);

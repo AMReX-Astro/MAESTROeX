@@ -17,7 +17,7 @@ Maestro::RetagArray(const Box& bx,
     // Tag on regions including buffer cells
     auto lo = bx.loVect3d()[AMREX_SPACEDIM-1];
     auto hi = bx.hiVect3d()[AMREX_SPACEDIM-1];
-    const auto max_lev = max_radial_level + 1;
+    const auto max_lev = base_geom.max_radial_level + 1;
 
     for (auto r = lo; r <= hi; ++r) {
        tag_array[lev-1+max_lev*(r/2)] = TagBox::SET;
@@ -37,7 +37,7 @@ Maestro::TagBoxes(TagBoxArray& tags,
 
     const Array4<TagBox::TagType> tag = tags.array(mfi);
     const int * AMREX_RESTRICT tag_array_p = tag_array.dataPtr();
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
     const Box& tilebox  = mfi.tilebox();
 
@@ -64,9 +64,9 @@ Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     const auto tag = tags.array(mfi);
     const Array4<const Real> state = state_mf.array(mfi);
     int * AMREX_RESTRICT tag_array_p = tag_array.dataPtr();
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
 
-    const Real dr_lev = dr.array()(lev);
+    const Real dr_lev = base_geom.dr(lev);
 
     if (use_tpert_in_tagging) {
         // Tag on regions with largest temperature perturbation
