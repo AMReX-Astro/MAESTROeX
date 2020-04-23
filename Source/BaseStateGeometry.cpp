@@ -3,6 +3,7 @@
 #include <maestro_params.H>
 
 using namespace amrex;
+using namespace maestro;
 
 void
 BaseStateGeometry::Init(const int max_radial_level_in, 
@@ -11,7 +12,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
                         const int nr_irreg_in,
                         const Vector<Geometry> geom,
                         const int max_level,
-                        GpuArray<Real,3> center)
+                        GpuArray<Real,3>& center)
 {
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::Init()", Init); 
@@ -112,7 +113,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
 }
 
 void 
-BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<const Real>& rho0)
+BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<Real>& rho0)
 {
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::ComputeCutoffCoords", ComputeCutoffCoords); 
@@ -303,7 +304,7 @@ BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<const Real>& rho0)
 
 void 
 BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
-                       const BaseStateArray<const bool>& tag_array)
+                       const BaseStateArray<int>& tag_array)
 {
     // compute numdisjointchunks, r_start_coord, r_end_coord
     // FIXME - right now there is one chunk at each level that spans the domain
@@ -315,11 +316,7 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::InitMultiLevel", InitMultilevel); 
 
-    if (spherical) {
-        finest_radial_level = 0;
-    } else {
-        finest_radial_level = finest_radial_level_in;
-    }
+    finest_radial_level = spherical ? 0: finest_radial_level_in;
 
     numdisjointchunks_d.define(finest_radial_level+1);
     numdisjointchunks.init(numdisjointchunks_d);
@@ -327,27 +324,31 @@ BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
     // loop through tag_array first to determine the maximum number of chunks
     // to use for allocating r_start_coord and r_end_coord
     int maxchunks = 1;
-    for (auto n = 1; n <= finest_radial_level; ++n) {
 
-        // initialize variables
-        bool chunk_start = false;
-        int nchunks = 0;
+    if (!spherical) {
+        for (auto n = 1; n <= finest_radial_level; ++n) {
 
-        // increment nchunks at beginning of each chunk
-        // (ex. when the tagging index changes from 0 to 1)
-        for (auto r = 0; r < nr(n-1); ++r) {
-            if (tag_array(n-1,r) > 0 && !chunk_start) {
-                chunk_start = true;
-                nchunks++;
-            } else if (tag_array(n-1,r)==0 && chunk_start) {
-                chunk_start = false;
+            // initialize variables
+            bool chunk_start = false;
+            int nchunks = 0;
+
+            // increment nchunks at beginning of each chunk
+            // (ex. when the tagging index changes from 0 to 1)
+            for (auto r = 0; r < nr(n-1); ++r) {
+                if (tag_array(n-1,r) > 0 && !chunk_start) {
+                    chunk_start = true;
+                    nchunks++;
+                } else if (tag_array(n-1,r) == 0 && chunk_start) {
+                    chunk_start = false;
+                }
             }
+            maxchunks = max(nchunks, maxchunks);
         }
-        maxchunks = max(nchunks, maxchunks);
     }
 
-    r_start_coord_d.define(finest_radial_level+1, maxchunks);
-    r_end_coord_d.define(finest_radial_level+1, maxchunks);
+    // maxchunks+1 here because we will be using indices 1:maxchunks
+    r_start_coord_d.define(finest_radial_level+1, maxchunks+1);
+    r_end_coord_d.define(finest_radial_level+1, maxchunks+1);
 
     r_start_coord.init(r_start_coord_d);
     r_end_coord.init(r_end_coord_d);
