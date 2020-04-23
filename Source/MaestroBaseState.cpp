@@ -48,7 +48,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             log_file.Log("model file mapping (spherical base state)");
         }
 
-        log_file.Log("dr of MAESTRO base state =                            ", dr.array()(n));
+        log_file.Log("dr of MAESTRO base state =                            ", dr(n));
         log_file.Log("dr of input file data =                               ", model_dr);
         log_file.Log(" ");
         log_file.Log("maximum radius (cell-centered) of input model =       ", rmax);
@@ -57,8 +57,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         if (use_exact_base_state) {
             mod_dr = base_geom.r_cc_loc(lev,0) < model_dr_irreg[0] ? remainder(model_dr_irreg[0], base_geom.r_cc_loc(lev,0)) : remainder(base_geom.r_cc_loc(lev,0), model_dr_irreg[0]);
         } else {
-            mod_dr = dr.array()(n) < model_dr ? 
-                remainder(model_dr, dr.array()(n)) : remainder(dr.array()(n), model_dr);
+            mod_dr = dr(n) < model_dr ? 
+                remainder(model_dr, dr(n)) : remainder(dr(n), model_dr);
         }
 
         if (mod_dr > TINY) {
@@ -86,7 +86,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        Real rloc = starting_rad + (Real(r) + 0.5)*dr.array()(n);
+        Real rloc = starting_rad + (Real(r) + 0.5)*dr(n);
 
         // here we account for r > rmax of the model.hse array, assuming
         // that the state stays constant beyond rmax
@@ -197,7 +197,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
 
-        Real rloc = starting_rad + (Real(r) + 0.5) * dr.array()(n);
+        Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
         rloc = min(rloc, rmax);
 
         if (rloc < base_cutoff_density_loc) {
@@ -211,7 +211,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
             if (spherical || do_2d_planar_octant) {
                 g = -Gconst * mencl / (r_l*r_l);
-                mencl += 4.0/3.0 * M_PI * dr.array()(n) * 
+                mencl += 4.0/3.0 * M_PI * dr(n) * 
                     (r_l*r_l+r_l*r_r+r_r*r_r) * 
                     s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)];
             } else {

@@ -432,8 +432,6 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         Real * AMREX_RESTRICT psi_p = psi.dataPtr();
         
-        const BaseStateArray<Real> rhoh0_predicted_edge_arr = rhoh0_predicted_edge.array();
-
         const Real dr_lev = base_geom.dr(n);
         const Real dt_loc = dt;
 
@@ -447,7 +445,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
                 int r = j + lo;
                 int p = n+max_lev*r;
                 rhoh0_new_p[p] = rhoh0_old_p[p] 
-                    - dt_loc/dr_lev * (rhoh0_predicted_edge_arr(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge_arr(n,r)*w0_p[p]) + dt_loc * psi_p[p];
+                    - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge(n,r)*w0_p[p]) + dt_loc * psi_p[p];
             });
         }
     }
