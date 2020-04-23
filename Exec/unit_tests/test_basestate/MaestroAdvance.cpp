@@ -15,6 +15,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
 
+    const auto nr_fine = base_geom.nr_fine;
+    const auto max_radial_level = base_geom.max_radial_level;
+
 	// vectors store the multilevel 1D states as one very long array
 	// these are cell-centered
 	Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );

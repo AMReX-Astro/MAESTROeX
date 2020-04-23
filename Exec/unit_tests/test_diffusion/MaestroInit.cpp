@@ -101,8 +101,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 	Real * AMREX_RESTRICT p0_p = p0_old.dataPtr();
 
-	const int max_lev = max_radial_level + 1;
-	const auto nrf = nr_fine;
+	const int max_lev = base_geom.max_radial_level + 1;
+	const auto nrf = base_geom.nr_fine;
 
 	const auto peak_h_loc = peak_h;
 	const auto ambient_h_loc = ambient_h;

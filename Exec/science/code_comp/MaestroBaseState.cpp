@@ -54,13 +54,13 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     auto dUdy = [this, &fv, &set_species, &grav_zone](Real y, RealVector U) 
     {
         eos_t eos_state;
-	RealVector xn = set_species(y);
+        RealVector xn = set_species(y);
 
         eos_state.rho = U[0];
         eos_state.p = U[1];
-	for (auto comp = 0; comp < NumSpec; ++comp) {
-	    eos_state.xn[comp] = xn[comp];
-	}
+        for (auto comp = 0; comp < NumSpec; ++comp) {
+            eos_state.xn[comp] = xn[comp];
+        }
 
         eos(eos_input_rp, eos_state);
 
@@ -75,7 +75,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         return dU;
     };
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
 
     // allocate arrays
@@ -127,32 +127,32 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     for (auto r = 0; r < nr[n]; ++r) {
 
         Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
-	RealVector xn = set_species(y);
+        RealVector xn = set_species(y);
 	
         eos_state.rho = dens[r];
         eos_state.p = pres[r];
-	for (auto comp = 0; comp < NumSpec; ++comp) {
-	    eos_state.xn[comp] = xn[comp];
-	}
+        for (auto comp = 0; comp < NumSpec; ++comp) {
+            eos_state.xn[comp] = xn[comp];
+        }
 
         eos(eos_input_rp, eos_state);
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] = eos_state.rho;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*RhoH)] = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
             s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
                 eos_state.rho * eos_state.xn[comp];
         }
         p0_init[n+max_lev*r] = eos_state.p;
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
+        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
+        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
+        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
         p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
     }
 

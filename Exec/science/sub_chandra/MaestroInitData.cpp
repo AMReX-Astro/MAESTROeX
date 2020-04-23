@@ -13,12 +13,12 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
     
     const auto tileBox = mfi.tilebox();
-    const auto max_lev = max_radial_level + 1;
-    const auto nrf = nr_fine;
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
-	vel(i,j,k,n) = 0.0;
+        vel(i,j,k,n) = 0.0;
     });
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
@@ -42,7 +42,8 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
 
 #ifdef _OPENMP
 #pragma omp parallel

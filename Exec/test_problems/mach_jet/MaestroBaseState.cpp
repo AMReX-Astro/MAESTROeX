@@ -15,7 +15,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         Abort("ERROR: mach_jet base_state is not valid for spherical");
     }
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     Print() << "cutoff densities:" << std::endl;

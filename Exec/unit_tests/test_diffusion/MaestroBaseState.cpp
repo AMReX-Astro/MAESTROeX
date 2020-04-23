@@ -11,7 +11,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
     
     // get species indices

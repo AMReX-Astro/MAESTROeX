@@ -11,11 +11,11 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     
-    for (auto i = 0; i < nr_fine; ++i) {
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
         for (auto n = 0; n < Nscal; ++n) {
-            s0_init[lev+max_lev*(i+nr_fine*n)] = 0.0;
+            s0_init[lev+max_lev*(i+base_geom.nr_fine*n)] = 0.0;
         }
         rho0[lev+max_lev*i] = 0.0;
         rhoh0[lev+max_lev*i] = 0.0;

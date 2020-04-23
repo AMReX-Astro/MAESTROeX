@@ -110,8 +110,8 @@ Maestro::InitData ()
 		p0_nm1[i] = p0_old[i];
 	}
 
-    rhoX0_old.resize( (max_radial_level+1)*nr_fine*NumSpec);
-    rhoX0_new.resize( (max_radial_level+1)*nr_fine*NumSpec);
+    rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
+    rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
 	rhoX0_old.shrink_to_fit();
 	rhoX0_new.shrink_to_fit();
 
@@ -191,37 +191,24 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* hi  = tilebox.hiVect();
 
 		if (spherical == 0) {
-		        const Array4<Real> scal_arr = scal.array(mfi);
+            const Array4<Real> scal_arr = scal.array(mfi);
 			const Array4<Real> vel_arr = vel.array(mfi);
 
 			const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 			const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
 		    
-		        InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
-			// initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			//          BL_TO_FORTRAN_FAB(scal[mfi]),
-			//          BL_TO_FORTRAN_FAB(vel[mfi]),
-			//          s0_init.dataPtr(), p0_init.dataPtr(),
-			//          ZFILL(dx));
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
 		} else {
 #if (AMREX_SPACEDIM == 3)
-		        const auto dx_fine_vec = geom[max_level].CellSizeArray();
+            const auto dx_fine_vec = geom[max_level].CellSizeArray();
 			const auto dx_lev = geom[lev].CellSizeArray();
 		    
-		        init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi),
-						 BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-			                         ZFILL(dx_fine),
-			                         ZFILL(dx));
+            init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi),
+                        BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+                                    ZFILL(dx_fine),
+                                    ZFILL(dx));
 
 			InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
-			
-			// initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-			// 	      BL_TO_FORTRAN_FAB(scal[mfi]),
-			// 	      BL_TO_FORTRAN_FAB(vel[mfi]),
-			// 	      s0_init.dataPtr(), p0_init.dataPtr(),
-			// 	      ZFILL(dx),
-			// 	      r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-			// 	      BL_TO_FORTRAN_3D(cc_to_r[mfi]));
 #endif
 		}
 	}
@@ -242,7 +229,5 @@ void Maestro::InitIter ()
 
 	// advance the solution by dt
 
-		AdvanceTimeStep(true);
-
-
+    AdvanceTimeStep(true);
 }

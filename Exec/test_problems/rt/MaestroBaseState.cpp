@@ -17,7 +17,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     Print() << "cutoff densities:" << std::endl;

@@ -8,10 +8,11 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
-        for (auto lev = 0; lev <= max_radial_level; ++lev) {
-	        InitBaseState(rho0_old, rhoh0_old,
-			      p0_old, lev);
+    for (auto lev = 0; lev <= max_radial_level; ++lev) {
+        InitBaseState(rho0_old, rhoh0_old,
+                p0_old, lev);
 	}
+    const auto nr_fine = base_geom.nr_fine;
 	
 	InitFromScratch(0.0);
 
@@ -50,7 +51,5 @@ Maestro::Evolve ()
 
 			Print() << "\tPhi = " << phi_exact[idx] << ",   Abs norm = " << abs_norm << ",  Rel norm = " << rel_norm << std::endl;
 		}
-
 	}
-
 }
