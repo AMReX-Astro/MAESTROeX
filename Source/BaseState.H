@@ -383,7 +383,7 @@ BaseState<T>::copy(const BaseState<T>& src)
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
             for (auto comp = 0; comp < nvar; ++comp) {
-                base_data[comp + nvar*(r + len*l)] = src[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
+                base_data[comp + nvar*(r + len*l)] = src.base_data[comp + nvar*(r + len*l)];
             } 
         }
     }
@@ -449,12 +449,13 @@ BaseState<T>::swap(BaseState<T>& src)
     AMREX_ASSERT(nvar == src.nvar);
     AMREX_ASSERT(len == src.len);
 
-    T * AMREX_RESTRICT ptr = dptr;
-    T * AMREX_RESTRICT src_ptr = src.dptr;
+    auto arr = this->array();
+    auto src_arr = src.array();
+
     AMREX_PARALLEL_FOR_1D(len*nlev*nvar, i, {
-        T temp = ptr[i];
-        ptr[i] = src_ptr[i];
-        src_ptr[i] = temp;
+        T temp = arr(i);
+        arr(i) = src_arr(i);
+        src_arr(i) = temp;
     });
 
     amrex::Gpu::synchronize();

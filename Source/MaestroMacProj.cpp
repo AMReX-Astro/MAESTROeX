@@ -221,12 +221,15 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
-                                const BaseState<Real>& beta0,
-                                const BaseState<Real>& beta0_edge,
+                                const BaseState<Real>& beta0_s,
+                                const BaseState<Real>& beta0_edge_s,
                                 const int& mult_or_div)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MultFacesByBeta0()", MultFacesByBeta0);
+
+    const auto beta0 = beta0_s.const_array();
+    const auto beta0_edge = beta0_edge_s.const_array();
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)

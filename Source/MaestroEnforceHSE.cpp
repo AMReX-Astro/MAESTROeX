@@ -16,16 +16,19 @@ Maestro::EnforceHSE(const RealVector& rho0,
     const auto& r_start_coord = base_geom.r_start_coord;
     const auto& r_end_coord = base_geom.r_end_coord;
 
-    BaseState<Real> grav_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
-    BaseState<Real> p0old(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> grav_edge_s(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> p0old_s(base_geom.max_radial_level+1, base_geom.nr_fine);
+    auto grav_edge = grav_edge_s.array();
+    auto p0old = p0old_s.array();
 
     Real offset = 0.0;
 
-    MakeGravEdge(grav_edge, rho0);
+    BaseState<Real> rho0_b(rho0, base_geom.max_radial_level+1, base_geom.nr_fine);
+    MakeGravEdge(grav_edge_s, rho0_b);
 
     // create a copy of the input pressure to help us with initial
     // conditions
-    p0old.copy(p0);
+    p0old_s.copy(p0);
 
     // zero the new pressure so we don't leave a non-zero pressure in
     // fine radial regions that no longer have a corresponding full
@@ -34,7 +37,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
     // integrate all of level 1 first
     // use the old pressure at r=0 as a reference point
-    p0[0] = p0old[0];
+    p0[0] = p0old(0);
 
     // now integrate upwards from the bottom later, we will offset the
     // entire pressure so we have effectively integrated from the "top"

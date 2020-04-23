@@ -115,7 +115,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     BaseState<Real> psi_planar_state(base_geom.nr_fine);
     auto psi_planar = psi_planar_state.array();
 
-    const auto& etarho_cc_p = etarho_cc;
+    const auto etarho_cc_arr = etarho_cc.const_array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -148,7 +148,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord) {
-                    psi_planar(r) = etarho_cc_p(n,r) * fabs(grav_const_loc);
+                    psi_planar(r) = etarho_cc_arr(n,r) * fabs(grav_const_loc);
                 }
             });
 
@@ -294,7 +294,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    const auto& r_edge_loc = base_geom.r_edge_loc;
+    const auto r_edge_loc = base_geom.r_edge_loc;
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.
@@ -331,32 +331,50 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     ProlongBasetoUniform(etarho_cc, etarho_cc_fine);
     ProlongBasetoUniform(Sbar_in, Sbar_in_fine);
 
+    auto p0_old_fine_arr = p0_old_fine.array();
+    auto p0_new_fine_arr = p0_new_fine.array();
+    auto p0_nph_fine_arr = p0_nph_fine.array();
+    auto rho0_old_fine_arr = rho0_old_fine.array();
+    auto rho0_new_fine_arr = rho0_new_fine.array();
+    auto rho0_nph_fine_arr = rho0_nph_fine.array();
+    auto w0_fine_arr = w0_fine.array();
+    auto deltaw0_fine_arr = deltaw0_fine.array();
+    auto w0bar_fine_arr = w0bar_fine.array();
+    auto gamma1bar_old_fine_arr = gamma1bar_old_fine.array();
+    auto gamma1bar_new_fine_arr = gamma1bar_new_fine.array();
+    auto gamma1bar_nph_fine_arr = gamma1bar_nph_fine.array();
+    auto p0_minus_peosbar_fine_arr = p0_minus_peosbar_fine.array();
+    auto etarho_cc_fine_arr = etarho_cc_fine.array();
+    auto Sbar_in_fine_arr = Sbar_in_fine.array();
+    auto grav_edge_fine_arr = grav_edge_fine.array();
+
     // create time-centered base-state quantities
     // for (auto r = 0; r < nr_finest; ++r) {
-    AMREX_PARALLEL_FOR_1D(nr_finest, r, {
-        p0_nph_fine(r) = 0.5*(p0_old_fine(r)+ p0_new_fine(r));
-        rho0_nph_fine(r) = 0.5*(rho0_old_fine(r) + rho0_new_fine(r));
-        gamma1bar_nph_fine(r) = 0.5*(gamma1bar_old_fine(r) + gamma1bar_new_fine(r));
-    });
+    // AMREX_PARALLEL_FOR_1D(nr_finest, r, {
+    p0_nph_fine.copy(0.5*(p0_old_fine+ p0_new_fine));
+    rho0_nph_fine.copy(0.5*(rho0_old_fine + rho0_new_fine));
+    gamma1bar_nph_fine.copy(0.5*(gamma1bar_old_fine + gamma1bar_new_fine));
+    // });
 
 
     // 3) solve to w0bar -- here we just take into account the Sbar and
     //    volume discrepancy terms
     // lower boundary condition
-    w0bar_fine[0] = 0.0;
+
+    w0bar_fine_arr(0) = 0.0;
 
     // for (auto r = 1; r <= nr_finest; ++r) {
     int lo = 1; 
     int hi = nr_finest;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        Real gamma1bar_p0_avg = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1);
+        Real gamma1bar_p0_avg = gamma1bar_nph_fine_arr(r-1) * p0_nph_fine_arr(r-1);
 
         Real volume_discrepancy = (r-1 < fine_base_density_cutoff_coord) ? 
-            dpdt_factor_loc * p0_minus_peosbar_fine(r-1)/dt_in : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_fine_arr(r-1)/dt_in : 0.0;
 
-        w0bar_fine(r) =  w0bar_fine(r-1) + 
-            Sbar_in_fine(r-1) * dr_finest 
+        w0bar_fine_arr(r) =  w0bar_fine_arr(r-1) + 
+            Sbar_in_fine_arr(r-1) * dr_finest 
             - (volume_discrepancy / gamma1bar_p0_avg ) * dr_finest;
     });
 
@@ -397,22 +415,22 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     hi = fine_base_density_cutoff_coord;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        A(r) = gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1);
+        A(r) = gamma1bar_nph_fine_arr(r-1) * p0_nph_fine_arr(r-1);
         A(r) /= dr_finest*dr_finest;
 
-        Real dpdr = (p0_nph_fine(r)-p0_nph_fine(r-1))/dr_finest;
+        Real dpdr = (p0_nph_fine_arr(r)-p0_nph_fine_arr(r-1))/dr_finest;
 
-        B(r) = -(gamma1bar_nph_fine(r-1) * p0_nph_fine(r-1) + 
-            gamma1bar_nph_fine(r) * p0_nph_fine(r)) 
+        B(r) = -(gamma1bar_nph_fine_arr(r-1) * p0_nph_fine_arr(r-1) + 
+            gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r)) 
             / (dr_finest*dr_finest);
         B(r) -= 2.0 * dpdr / (r_edge_loc(base_geom.finest_radial_level,r));
 
-        C(r) = gamma1bar_nph_fine(r) * p0_nph_fine(r);
+        C(r) = gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r);
         C(r) /= dr_finest*dr_finest;
 
-        F(r) = 2.0 * dpdr * w0bar_fine(r) / 
-            r_edge_loc_p(base_geom.finest_radial_level,r) -
-            grav_edge_fine(r) * (etarho_cc_fine(r) - etarho_cc_fine(r-1)) / 
+        F(r) = 2.0 * dpdr * w0bar_fine_arr(r) / 
+            r_edge_loc(base_geom.finest_radial_level,r) -
+            grav_edge_fine_arr(r) * (etarho_cc_fine_arr(r) - etarho_cc_fine_arr(r-1)) / 
             dr_finest;
     });
 
@@ -439,7 +457,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     hi = fine_base_density_cutoff_coord+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        deltaw0_fine(r) = u(r);
+        deltaw0_fine_arr(r) = u(r);
     });
 
     // for (auto r = fine_base_density_cutoff_coord+2; r <= nr_finest; ++r) {
@@ -447,14 +465,14 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     hi = nr_finest;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
         int r = j + lo;
-        deltaw0_fine(r) = deltaw0_fine(fine_base_density_cutoff_coord+1);
+        deltaw0_fine_arr(r) = deltaw0_fine_arr(fine_base_density_cutoff_coord+1);
     });
 
     // 6) compute w0 = w0bar + deltaw0
     // for (auto r = 0; r < w0_fine.size(); ++r) {
     AMREX_PARALLEL_FOR_1D(nr_finest+1, r, {
-        w0_fine(r) = w0bar_fine(r) + deltaw0_fine(r);
-        w0_p[base_geom.finest_radial_level+max_lev*r] = w0_fine(r);
+        w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
+        w0_p[base_geom.finest_radial_level+max_lev*r] = w0_fine_arr(r);
     });
 
     // 7) fill the multilevel w0 array from the uniformly-gridded w0 we
@@ -566,8 +584,8 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto etarho_cc_p = etarho_cc.array();
-    const auto etarho_ec_p = etarho_ec.array();
+    const auto etarho_cc_arr = etarho_cc.array();
+    const auto etarho_ec_arr = etarho_ec.array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -650,11 +668,11 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         C(r) /= dr0*dr0;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc(0,r) - 
-                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_p(0,r) - 
-                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_p(0,r-1)) / 
+                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_arr(0,r) - 
+                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_arr(0,r-1)) / 
                 (dr0 * r_edge_loc(0,r)*r_edge_loc(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p(0,r);
+                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_arr(0,r);
     });
 
     // Lower boundary
@@ -755,7 +773,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto etarho_cc_p = etarho_cc.array();
+    const auto etarho_cc_arr = etarho_cc.array();
     const auto etarho_ec_p = etarho_ec.array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
@@ -835,8 +853,8 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         C(r) /= dr2*dr3;
 
         F(r) = 4.0 * dpdr * w0_from_Sbar(r) / r_edge_loc(0,r) - 
-                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_p(0,r) - 
-                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_p(0,r-1)) / 
+                grav_edge(0,r) * (r_cc_loc(0,r)*r_cc_loc(0,r) * etarho_cc_arr(0,r) - 
+                r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_arr(0,r-1)) / 
                 (dr3 * r_edge_loc(0,r)*r_edge_loc(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
                 (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p(0,r);
@@ -960,28 +978,30 @@ Maestro::ProlongBasetoUniform(const RealVector& base_ml,
 
 void
 Maestro::ProlongBasetoUniform(const RealVector& base_ml, 
-                              BaseState<Real>& base_fine)
+                              BaseState<Real>& base_fine_s)
 
 {
     // the mask array will keep track of whether we've filled in data
     // in a corresponding radial bin.  .false. indicates that we've
     // already output there.
-    IntVector imask_fine(nr_fine);
+    IntVector imask_fine(base_geom.nr_fine);
     std::fill(imask_fine.begin(), imask_fine.end(), 1);
+
+    auto base_fine = base_fine_s.array();
 
     // r1 is the factor between the current level grid spacing and the
     // FINEST level
     int r1 = 1;
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
 
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+    for (auto n = base_geom.finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < base_geom.numdisjointchunks(n); ++j) {
+            for (auto r = base_geom.r_start_coord(n,j); r <= base_geom.r_end_coord(n,j); ++r) {
                 // sum up mask to see if there are any elements set to true 
                 if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
                     for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml[n+max_lev*r];
+                        base_fine(i) = base_ml[n+max_lev*r];
                         imask_fine[i] = 0;
                     }
                 }
@@ -999,29 +1019,31 @@ Maestro::ProlongBasetoUniform(const RealVector& base_ml,
 }
 
 void
-Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml, 
-                              BaseState<Real>& base_fine)
+Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml_s, 
+                              BaseState<Real>& base_fine_s)
 
 {
     // the mask array will keep track of whether we've filled in data
     // in a corresponding radial bin.  .false. indicates that we've
     // already output there.
-    IntVector imask_fine(nr_fine);
+    IntVector imask_fine(base_geom.nr_fine);
     std::fill(imask_fine.begin(), imask_fine.end(), 1);
 
     // r1 is the factor between the current level grid spacing and the
     // FINEST level
     int r1 = 1;
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
+    const auto base_ml = base_ml_s.const_array();
+    auto base_fine = base_fine_s.array();
 
-    for (auto n = finest_radial_level; n >= 0; --n) {
-        for (auto j = 1; j < numdisjointchunks(n); ++j) {
-            for (auto r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
+    for (auto n = base_geom.finest_radial_level; n >= 0; --n) {
+        for (auto j = 1; j < base_geom.numdisjointchunks(n); ++j) {
+            for (auto r = base_geom.r_start_coord(n,j); r <= base_geom.r_end_coord(n,j); ++r) {
                 // sum up mask to see if there are any elements set to true 
                 if (std::accumulate(imask_fine.begin()+r*r1-1, imask_fine.begin()+(r+1)*r1-1, 0) > 0) {
                     for (auto i = r*r1-1; i < (r+1)*r1-1; ++r) {
-                        base_fine[i] = base_ml(n,r);
+                        base_fine(i) = base_ml(n,r);
                         imask_fine[i] = 0;
                     }
                 }

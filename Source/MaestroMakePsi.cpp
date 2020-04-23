@@ -50,7 +50,7 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
     const Real * AMREX_RESTRICT p0_avg_p = p0_avg.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
-    auto psi_p = psi.array();
+    auto psi_arr = psi.array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {

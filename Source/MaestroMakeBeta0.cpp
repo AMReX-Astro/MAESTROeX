@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::MakeBeta0(BaseState<Real>& beta0, 
+Maestro::MakeBeta0(BaseState<Real>& beta0_s, 
                    const RealVector& rho0,
                    const RealVector& p0,
                    const RealVector& gamma1bar,
@@ -21,9 +21,10 @@ Maestro::MakeBeta0(BaseState<Real>& beta0,
     BaseState<Real> beta0_edge_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
     auto beta0_edge = beta0_edge_state.array();
 
-    beta0.setVal(0.0);
+    beta0_s.setVal(0.0);
 
     const Real * AMREX_RESTRICT rho0_p = rho0.dataPtr();
+    auto beta0 = beta0_s.array();
 
     if (beta0_type == 1) {
         ///////////////////////////////////////////////////////////////////////

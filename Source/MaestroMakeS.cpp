@@ -22,7 +22,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
 
-    const auto max_lev = max_radial_level + 1;
+    const auto max_lev = base_geom.max_radial_level + 1;
 
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
@@ -32,8 +32,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     // calculate gradp0
     RealVector gradp0((base_geom.max_radial_level+1)*base_geom.nr_fine);
-
-    const auto max_lev = base_geom.max_radial_level + 1;
+    
     const auto& r_cc_loc = base_geom.r_cc_loc;
 
     if (spherical) {

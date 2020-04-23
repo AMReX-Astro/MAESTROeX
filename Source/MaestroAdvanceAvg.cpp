@@ -429,14 +429,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+        auto psi_arr = psi.array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                psi_arr(l,r) = (p0_new[l+(base_geom.max_radial_level+1)*r] - p0_old[l+(base_geom.max_radial_level+1)*r])/dt;
             }
         }
-
-    }
-    else {
+    } else {
         p0_new = p0_old;
     }
 
@@ -732,9 +731,10 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new[l+(max_radial_level+1)*r] - p0_old[l+(max_radial_level+1)*r])/dt;
+        auto psi_arr = psi.array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                psi_arr(l,r) = (p0_new[l+(base_geom.max_radial_level+1)*r] - p0_old[l+(base_geom.max_radial_level+1)*r])/dt;
             }
         }
     }

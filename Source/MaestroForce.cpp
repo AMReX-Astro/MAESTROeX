@@ -20,8 +20,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
-    const auto max_lev = max_radial_level + 1;
-    const auto nrf = nr_fine;
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
 
     // constants in Fortran
     Real base_cutoff_density = 0.0; 
@@ -50,8 +50,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     auto gradw0_arr = gradw0.array();
 
     if ( !(use_exact_base_state || average_base_state) ) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            AMREX_PARALLEL_FOR_1D (nr_fine, i,
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, i,
             {       
                 gradw0_arr(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
             });
