@@ -16,6 +16,7 @@
 #include <network.H>
 #include <eos.H>
 #include <BaseState.H>
+#include <BaseStateGeometry.H>
 
 #include <state_indices.H>
 #include <maestro_params.H>
@@ -2012,7 +2013,6 @@ public:
     IntVector burning_cutoff_density_lo_coord;
     IntVector burning_cutoff_density_hi_coord;
 
-
     // relative error needed for base state computations
     amrex::Real c_rel_eps;
 
@@ -2023,6 +2023,9 @@ public:
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+
+    /// contains base state geometry variables
+    BaseStateGeometry base_geom;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile1_data;
@@ -2067,25 +2070,5 @@ public:
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
-
-// namespace amrex{
-//     namespace HostDevice { namespace Atomic {
-
-//     template <class T>
-//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-//     void Max (T* max, T value) noexcept
-//     {
-// #if AMREX_DEVICE_COMPILE
-//         Gpu::Atomic::Max(sum,value);
-// #else
-// #ifdef _OPENMP
-// #pragma omp atomic update
-// #endif
-//         *sum += value;
-// #endif
-//     }
-
-// }}}
-
 
 #endif

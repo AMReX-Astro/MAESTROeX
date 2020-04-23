@@ -98,7 +98,10 @@ Maestro::InitBaseStateGeometry(const int max_radial_level_in,
 #if (AMREX_SPACEDIM == 3)
 void 
 Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi, 
-                              const GpuArray<Real,AMREX_SPACEDIM> dx_fine, const GpuArray<Real,AMREX_SPACEDIM> dx_lev) 
+                              const GpuArray<Real,
+                              AMREX_SPACEDIM> dx_fine, 
+                              const GpuArray<Real,
+                              AMREX_SPACEDIM> dx_lev) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseStateMapSphr()", InitBaseStateMapSphr); 
@@ -334,9 +337,9 @@ Maestro::InitMultilevel(const int finest_radial_level_in) {
     const int max_lev = max_radial_level+1;
 
     if (spherical) {
-       finest_radial_level = 0;
+        finest_radial_level = 0;
     } else {
-       finest_radial_level = finest_radial_level_in;
+        finest_radial_level = finest_radial_level_in;
     }
 
     numdisjointchunks.resize(finest_radial_level+1);

@@ -8,6 +8,8 @@
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFab.H>
 
+template <class T> class BaseState;
+
 template <typename T>
 struct BaseStateArray
 {
@@ -33,6 +35,21 @@ struct BaseStateArray
     constexpr BaseStateArray(T* ptr, const int num_levs=1, const int length=1, const int ncomp=1) noexcept
         : dptr(ptr), nlev(num_levs), len(length), nvar(ncomp)
         {}
+
+    AMREX_GPU_HOST_DEVICE
+    void init(T* ptr, const int num_levs=1, const int length=1, const int ncomp=1) noexcept {
+        dptr = ptr;
+        nlev = num_levs;
+        len = length;
+        nvar = ncomp;
+    }
+
+    void init(BaseState<T>& base_state) noexcept {
+        dptr = base_state.dataPtr();
+        nlev = base_state.nLevels();
+        len = base_state.length();
+        nvar = base_state.nComp();
+    }
 
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
@@ -73,7 +90,7 @@ struct BaseStateArray
     }
 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    T* dataPtr () const noexcept { return this->dptr; } 
+    T* dataPtr () noexcept { return this->dptr; } 
 
     /// number of levels in base 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
@@ -135,7 +152,7 @@ public:
     } 
 
     /// allocate memory for the BaseState
-    void define(const int num_levs, const int length, const int ncomp=1);
+    void define(const int num_levs, const int length=1, const int ncomp=1);
 
     /// set to some scalar value 
     void setVal(const T val);
@@ -154,6 +171,8 @@ public:
     /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
+
+    T* dataPtr () noexcept { return base_data.dataPtr(); };
 
     /// scalar addition to the whole base state 
     template <class U>
