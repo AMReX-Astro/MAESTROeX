@@ -7,10 +7,13 @@ using namespace amrex;
 void
 Maestro::EstDt ()
 {
-        // timer for profiling
-        BL_PROFILE_VAR("Maestro::EstDt()", EstDt);
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::EstDt()", EstDt);
 
 	dt = 1.e20;
+
+    const auto nr_fine = base_geom.nr_fine;
+    const auto max_radial_level = base_geom.max_radial_level;
 
 	// allocate a dummy w0_force and set equal to zero
 	RealVector w0_force_dummy( (max_radial_level+1)*nr_fine );
@@ -20,14 +23,14 @@ Maestro::EstDt ()
 	// build dummy w0_force_cart and set equal to zero
 	Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-	        w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], 3, 1);
+        w0_force_cart_dummy[lev].define(grids[lev], dmap[lev], 3, 1);
 		w0_force_cart_dummy[lev].setVal(0.);
 	}
 
 	// build a dummy umac and set equal to zero
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > umac_dummy(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-	        umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+        umac_dummy[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
 		umac_dummy[lev][0].setVal(0.);
 		umac_dummy[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
 		umac_dummy[lev][1].setVal(0.);
@@ -48,7 +51,7 @@ Maestro::EstDt ()
 	Vector<MultiFab> p0_cart(finest_level+1);
 	Vector<MultiFab> gamma1bar_cart(finest_level+1);
 	for (int lev=0; lev<=finest_level; ++lev) {
-	        p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 		gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
 	}
 
@@ -56,7 +59,7 @@ Maestro::EstDt ()
 
 	for (int lev = 0; lev <= finest_level; ++lev) {
 
-	        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel reduction(min:dt_lev) 
 #endif
@@ -66,12 +69,12 @@ Maestro::EstDt ()
 		
 		for (MFIter mfi(uold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
-		        // Get the spacing of the valid region
-		        const auto dx = geom[lev].CellSizeArray();
+            // Get the spacing of the valid region
+            const auto dx = geom[lev].CellSizeArray();
 
 			// calculate the timestep
 			for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
-			        dt_grid = std::min(dt_grid, dx[i]*dx[i] / diffusion_coefficient);
+                dt_grid = std::min(dt_grid, dx[i]*dx[i] / diffusion_coefficient);
 			}	
 		}
 	    

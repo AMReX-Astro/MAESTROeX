@@ -122,8 +122,6 @@ Maestro::PlotFileMF (const int nPlot,
 	}
 
 	return plot_mf;
-
-
 }
 
 // set plotfile variable names

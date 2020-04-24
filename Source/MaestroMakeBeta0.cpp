@@ -67,7 +67,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                     if (r < base_geom.anelastic_cutoff_density_coord(n)) {
 
                         Real drp = is_irreg ? 
-                            base_geom.r_edge_loc(n,r+1) - base_geom.r_edge_loc(n,r) : base_geom.dr(n);
+                            base_geom.r_edge_loc(n,r+1) - base_geom.r_edge_loc(n,r) : dr(n);
                         Real drm = dr(n);
                         if (is_irreg) {
                             drm = r > 0 ? 
@@ -80,7 +80,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                             // nu = 0.0;
                         } else {
                             Real drc = is_irreg ? 
-                                base_geom.r_cc_loc(n,r+1) - base_geom.r_cc_loc(n,r-1) : base_geom.dr(n);
+                                base_geom.r_cc_loc(n,r+1) - base_geom.r_cc_loc(n,r-1) : dr(n);
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
