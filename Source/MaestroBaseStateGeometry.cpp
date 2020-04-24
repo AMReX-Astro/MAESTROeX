@@ -142,7 +142,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
 
     // find the finest level containing the anelastic cutoff density,
     // and set the anelastic cutoff coord for this level
-    for (auto n=base_geom.finest_radial_level; n >= 0; --n) {
+    for (auto n = base_geom.finest_radial_level; n >= 0; --n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             if (!found) {
                 int lo = base_geom.r_start_coord(n,i);
@@ -187,7 +187,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
 
     // find the finest level containing the base cutoff density,
     // and set the base cutoff coord for this level
-    for (auto n=base_geom.finest_radial_level; n >= 0; --n) {
+    for (auto n = base_geom.finest_radial_level; n >= 0; --n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             if (!found) {
                 int lo = base_geom.r_start_coord(n,i);
@@ -234,7 +234,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
 
     // find the finest level containing the burning cutoff density,
     // and set the burning cutoff coord for this level
-    for (auto n=base_geom.finest_radial_level; n >= 0; --n) {
+    for (auto n = base_geom.finest_radial_level; n >= 0; --n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             if (!found) {
                 int lo = base_geom.r_start_coord(n,i);

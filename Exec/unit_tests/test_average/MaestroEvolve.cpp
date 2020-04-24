@@ -8,16 +8,17 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
-        for (auto lev = 0; lev <= max_radial_level; ++lev) {
-	        InitBaseState(rho0_old, rhoh0_old,
-			      p0_old, lev);
+    for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+        InitBaseState(rho0_old, rhoh0_old,
+                p0_old, lev);
 	}
+    const auto nr_fine = base_geom.nr_fine;
 	
 	InitFromScratch(0.0);
 
 	Vector<MultiFab> phi(finest_level+1);
-	Vector<Real> phi_exact((max_radial_level+1)*nr_fine);
-	Vector<Real> phi_avg((max_radial_level+1)*nr_fine);
+	Vector<Real> phi_exact((base_geom.max_radial_level+1)*nr_fine);
+	Vector<Real> phi_avg((base_geom.max_radial_level+1)*nr_fine);
 
 	Vector<Real> error(nr_fine);
 
@@ -39,7 +40,7 @@ Maestro::Evolve ()
 	Average(phi, phi_avg, 0);
 
 	// Compare the initial and final phi
-	for (int lev=0; lev<=max_radial_level; ++lev) {
+	for (int lev=0; lev<=base_geom.max_radial_level; ++lev) {
 		for (int r=0; r < nr_fine; ++r) {
 			int idx = lev*nr_fine + r;
 			error[r] = phi_exact[idx] - phi_avg[idx];
@@ -50,7 +51,5 @@ Maestro::Evolve ()
 
 			Print() << "\tPhi = " << phi_exact[idx] << ",   Abs norm = " << abs_norm << ",  Rel norm = " << rel_norm << std::endl;
 		}
-
 	}
-
 }
