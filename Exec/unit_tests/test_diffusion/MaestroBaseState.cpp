@@ -11,7 +11,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
     
     // get species indices
@@ -39,7 +40,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
 
     Real diffusion_coefficient = const_conductivity / (eos_state.cp * ambient_dens);
    
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
         s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;

@@ -63,22 +63,22 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    BaseState<Real> grav_cell_nph   (max_radial_level+1, nr_fine);
-    RealVector   rho0_nph        ( (max_radial_level+1)*nr_fine );
-    BaseState<Real> p0_nph          (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
-    RealVector   w0_force_dummy  ( (max_radial_level+1)*nr_fine );
-    RealVector   Sbar            ( (max_radial_level+1)*nr_fine );
-    BaseState<Real>   beta0_nph  (max_radial_level+1, nr_fine);
-    BaseState<Real>   gamma1bar_nph   (max_radial_level+1, nr_fine);
-    RealVector   delta_gamma1_termbar ( (max_radial_level+1)*nr_fine );
-    RealVector delta_chi_w0_dummy   ( (max_radial_level+1)*nr_fine );
+    BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    RealVector rho0_nph        ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector Sbar            ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> gamma1bar_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    RealVector delta_gamma1_termbar ((base_geom.max_radial_level+1)*base_geom.nr_fine);
+    RealVector delta_chi_w0_dummy   ((base_geom.max_radial_level+1)*base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-    BaseState<Real> rho0_pred_edge_dummy(max_radial_level+1, nr_fine+1);
+    RealVector   w0_old             ( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    BaseState<Real> rho0_pred_edge_dummy(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
     rho0_nph.shrink_to_fit();
@@ -316,9 +316,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
 
     if (evolve_base_state && !split_projection) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = 1.0/(gamma1bar_old(l,r)*p0_old(l,r)) * (p0_old(l,r) - p0_nm1(l,r))/dtold;
+        const auto gamma1bar_old_arr = gamma1bar_old.const_array();
+        const auto p0_old_arr = p0_old.const_array();
+        const auto p0_nm1_arr = p0_nm1.const_array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (int r=0; r < base_geom.nr_fine; ++r) {
+                Sbar[l+(base_geom.max_radial_level+1)*r] = 1.0/(gamma1bar_old_arr(l,r)*p0_old_arr(l,r)) * (p0_old_arr(l,r) - p0_nm1_arr(l,r))/dtold;
             }
         }
     }
@@ -421,11 +424,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-            }
-        }
+        psi.copy((p0_new - p0_old)/dt);
     } else {
         p0_new.copy(p0_old);
     }
@@ -624,9 +623,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
 
     if (evolve_base_state && !split_projection) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (1.0/(gamma1bar_nph(l,r)*p0_nph(l,r)))*(p0_new(l,r) - p0_old(l,r))/dt;
+        const auto gamma1bar_nph_arr = gamma1bar_nph.const_array();
+        const auto p0_old_arr = p0_old.const_array();
+        const auto p0_nph_arr = p0_nph.const_array();
+        const auto p0_new_arr = p0_new.const_array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (int r=0; r < base_geom.nr_fine; ++r) {
+                Sbar[l+(base_geom.max_radial_level+1)*r] = (1.0/(gamma1bar_nph_arr(l,r)*p0_nph_arr(l,r)))*(p0_new_arr(l,r) - p0_old_arr(l,r))/dt;
             }
         }
     }
@@ -714,11 +717,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-            }
-        }
+        psi.copy((p0_new - p0_old)/dt);
     }
 
     // base state enthalpy averaging
@@ -872,9 +871,12 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
     }
     if (evolve_base_state && !split_projection) {
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (int r=0; r < nr_fine; ++r) {
-                Sbar[l+(max_radial_level+1)*r] = (p0_new(l,r) - p0_old(l,r))/(dt*gamma1bar_new(l,r)*p0_new(l,r));
+        const auto gamma1bar_new_arr = gamma1bar_new.const_array();
+        const auto p0_old_arr = p0_old.const_array();
+        const auto p0_new_arr = p0_new.const_array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (int r=0; r < base_geom.nr_fine; ++r) {
+                Sbar[l+(base_geom.max_radial_level+1)*r] = (p0_new_arr(l,r) - p0_old_arr(l,r))/(dt*gamma1bar_new_arr(l,r)*p0_new_arr(l,r));
             }
         }
     }

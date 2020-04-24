@@ -28,7 +28,7 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // we also need beta0 at edges
     // allocate AND compute it here
-    BaseState<Real> beta0_edge(max_radial_level+1, nr_fine+1);
+    BaseState<Real> beta0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -221,12 +221,15 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
-                                const BaseState<Real>& beta0,
-                                const BaseState<Real>& beta0_edge,
+                                const BaseState<Real>& beta0_s,
+                                const BaseState<Real>& beta0_edge_s,
                                 const int& mult_or_div)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MultFacesByBeta0()", MultFacesByBeta0);
+
+    const auto beta0 = beta0_s.const_array();
+    const auto beta0_edge = beta0_edge_s.const_array();
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
@@ -250,7 +253,7 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
             const Array4<Real> wedge = edge[lev][2].array(mfi);
 #endif  
 
-            int max_lev = max_radial_level+1;
+            int max_lev = base_geom.max_radial_level+1;
 
             if (mult_or_div == 1) {
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {

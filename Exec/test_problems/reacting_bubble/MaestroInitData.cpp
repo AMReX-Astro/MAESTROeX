@@ -27,8 +27,8 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = max_radial_level + 1;
-    const int nrf = nr_fine;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const int nrf = base_geom.nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
@@ -95,7 +95,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     
     #ifdef _OPENMP
     #pragma omp parallel
@@ -130,10 +130,10 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         temp_mf[i].define(grids[lev], dmap[lev], 1, ng_s);
     }
 
-    RealVector temp_vec(max_lev*nr_fine);
+    RealVector temp_vec(max_lev*base_geom.nr_fine);
 
     // initialize temperature 
-    for (auto i = 0; i < max_lev*nr_fine; ++i) {
+    for (auto i = 0; i < max_lev*base_geom.nr_fine; ++i) {
         temp_vec[i] = s0_init[i*Temp];
     }
     Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, Temp);
@@ -144,7 +144,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        for (auto i = 0; i < max_lev*nr_fine; ++i) {
+        for (auto i = 0; i < max_lev*base_geom.nr_fine; ++i) {
             temp_vec[i] = s0_init[i*(FirstSpec+comp)];
         }
         Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);

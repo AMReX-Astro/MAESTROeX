@@ -15,7 +15,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
         Abort("ERROR: base_state is not valid for spherical");
     }
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const int nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     // calculate H or dens_base, as necessary
@@ -38,7 +39,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
 
     // Set the state in the first cell in the vertical direction
     // ("the bottom")
-    const Real z0 = 0.5*dr[n]; // generic "z", actually 2d/3d agnostic
+    const Real z0 = 0.5*base_geom.dr(n); // generic "z", actually 2d/3d agnostic
 
     // set p0 and rho0 based on analytical value at the cc coord
     p0_init[n] = pres_base * exp(-z0/H);
@@ -62,10 +63,10 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     }
     s0_init[n+max_lev*nr_fine*Temp] = eos_state.T;
 
-    for (auto r = 1; r < nr[n]; ++r) {
+    for (auto r = 1; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real z = (Real(r) + 0.5) * dr[n];
+        Real z = (Real(r) + 0.5) * base_geom.dr(n);
 
         // set rho analytically  
         Real dens_zone = dens_base * exp(-z/H);
@@ -73,7 +74,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
         s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - dr[n] * 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
+        p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - base_geom.dr(n) * 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.rho   = dens_zone;

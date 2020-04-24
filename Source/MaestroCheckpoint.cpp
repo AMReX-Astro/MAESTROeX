@@ -78,8 +78,7 @@ Maestro::WriteCheckPoint (int step) {
         HeaderFile << t_old << "\n";
 
         // write out rel_eps
-        get_rel_eps(&c_rel_eps);
-        HeaderFile << c_rel_eps << "\n";
+        HeaderFile << rel_eps << "\n";
 
         // write the BoxArray at each level
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -133,16 +132,16 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<rho0_new.size(); ++i) {
             BaseCCFile << rho0_new[i] << " "
-                       << p0_new[i] << " "
-                       << gamma1bar_new[i] << " "
-                       << rhoh0_new[i] << " "
-                       << beta0_new[i] << " "
-                       << psi[i] << " "
+                       << p0_new.array(i) << " "
+                       << gamma1bar_new.array(i) << " "
+                       << rhoh0_new.array(i) << " "
+                       << beta0_new.array(i) << " "
+                       << psi.array(i) << " "
                        << tempbar[i] << " "
-                       << etarho_cc[i] << " "
+                       << etarho_cc.array(i) << " "
                        << tempbar_init[i] << " "
-                       << p0_old[i] << " "
-                       << beta0_nm1[i] << "\n";
+                       << p0_old.array(i) << " "
+                       << beta0_nm1.array(i) << "\n";
         }
     }
 
@@ -163,7 +162,7 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<w0.size(); ++i) {
             BaseFCFile << w0[i] << " "
-                       << etarho_ec[i] << "\n";
+                       << etarho_ec.array(i) << "\n";
         }
     }
 
@@ -217,9 +216,9 @@ Maestro::ReadCheckPoint ()
         t_new = t_old + dt;
 
         // read in rel_eps
-        is >> c_rel_eps;
+        is >> rel_eps;
         GotoNextLine(is);
-        set_rel_eps(&c_rel_eps);
+        set_rel_eps(&rel_eps);
 
         for (int lev = 0; lev <= finest_level; ++lev) {
 
@@ -295,31 +294,31 @@ Maestro::ReadCheckPoint ()
         std::istringstream is(fileCharPtrString, std::istringstream::in);
 
         // read in cell-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
             rho0_old[i] = std::stod(word);
             lis >> word;
-            p0_old[i] = std::stod(word);
+            p0_old.array()(i) = std::stod(word);
             lis >> word;
-            gamma1bar_old[i] = std::stod(word);
+            gamma1bar_old.array()(i) = std::stod(word);
             lis >> word;
-            rhoh0_old[i] = std::stod(word);
+            rhoh0_old.array()(i) = std::stod(word);
             lis >> word;
-            beta0_old[i] = std::stod(word);
+            beta0_old.array()(i) = std::stod(word);
             lis >> word;
-            psi[i] = std::stod(word);
+            psi.array()(i) = std::stod(word);
             lis >> word;
             tempbar[i] = std::stod(word);
             lis >> word;
-            etarho_cc[i] = std::stod(word);
+            etarho_cc.array()(i) = std::stod(word);
             lis >> word;
             tempbar_init[i] = std::stod(word);
             lis >> word;
-            p0_nm1[i] = std::stod(word);
+            p0_nm1.array()(i) = std::stod(word);
             lis >> word;
-            beta0_nm1[i] = std::stod(word);
+            beta0_nm1.array()(i) = std::stod(word);
         }
     }
 
@@ -340,13 +339,13 @@ Maestro::ReadCheckPoint ()
 
 
         // read in face-centered base state
-        for (int i=0; i<(max_radial_level+1)*nr_fine+1; ++i) {
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine+1; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
             w0[i] = std::stod(word);
             lis >> word;
-            etarho_ec[i] = std::stod(word);
+            etarho_ec.array()(i) = std::stod(word);
         }
     }
 

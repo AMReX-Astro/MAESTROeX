@@ -11,15 +11,15 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
 
-    for (auto r = 0; r< nr[n]; ++r) {
+    for (auto r = 0; r< base_geom.nr(n); ++r) {
         // height above the bottom of the domain
-        Real dist = (Real(r) + 0.5) * dr[n];
+        Real dist = (Real(r) + 0.5) * base_geom.dr(n);
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = exp(-dist*dist/0.1);
+        s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] = exp(-dist*dist/0.1);
 
-        p0_init[n+max_lev*r] = s0_init[n+max_lev*(r+nr_fine*Rho)];
+        p0_init[n+max_lev*r] = s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)];
     }
 }

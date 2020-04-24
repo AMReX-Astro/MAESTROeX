@@ -15,12 +15,14 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hnuc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
-                    const BaseState<Real>& p0,
-                    const BaseState<Real>& gamma1bar,
+                    const BaseState<Real>& p0_s,
+                    const BaseState<Real>& gamma1bar_s,
                     RealVector& delta_gamma1_termbar)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
+
+    const auto max_lev = base_geom.max_radial_level + 1;
 
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
@@ -28,20 +30,26 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Vector<MultiFab> gradp0_cart(finest_level+1);
     Vector<MultiFab> psi_cart(finest_level+1);
 
+    auto nr_fine = base_geom.nr_fine;
+    const auto r_cc_loc = base_geom.r_cc_loc;
+
     // calculate gradp0
-    BaseState<Real> gradp0(max_radial_level+1, nr_fine);
+    BaseState<Real> gradp0(base_geom.max_radial_level+1, nr_fine);
+    auto gradp0_arr = gradp0.array();
+    const auto p0 = p0_s.const_array();
+    const auto gamma1bar = gamma1bar_s.const_array();
 
     if (spherical) {
         if (use_delta_gamma1_term) {
-            Real dr_loc = r_cc_loc_b(0,1) - r_cc_loc_b(0,0);
-            gradp0(0,0) = (p0(0,1) - p0(0,0)) / dr_loc;
+            Real dr_loc = r_cc_loc(0,1) - r_cc_loc(0,0);
+            gradp0_arr(0,0) = (p0(0,1) - p0(0,0)) / dr_loc;
 
-            dr_loc = r_cc_loc_b(0,nr_fine-1) - r_cc_loc_b(0,nr_fine-2);
-            gradp0(0,nr_fine-1) = (p0(0,nr_fine-1) - p0(0,nr_fine-2)) / dr_loc;
+            dr_loc = r_cc_loc(0,nr_fine-1) - r_cc_loc(0,nr_fine-2);
+            gradp0_arr(0,nr_fine-1) = (p0(0,nr_fine-1) - p0(0,nr_fine-2)) / dr_loc;
 
             for (int r=1; r < nr_fine-1; r++) {
-                dr_loc = r_cc_loc_b(0,r+1) - r_cc_loc_b(0,r-1);
-                gradp0(0,r) = (p0(0,r+1) - p0(0,r-1)) / dr_loc;
+                dr_loc = r_cc_loc(0,r+1) - r_cc_loc(0,r-1);
+                gradp0_arr(0,r) = (p0(0,r+1) - p0(0,r-1)) / dr_loc;
             }
         }
 
@@ -55,11 +63,11 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 const auto dx = geom[lev].CellSizeArray();
 
                 // bottom and top edge cases for planar
-                gradp0(lev,0) = (p0(lev,1) - p0(lev,0)) / dx[AMREX_SPACEDIM-1];
-                gradp0(lev,nr_fine-1) = (p0(lev,nr_fine-1) - p0(lev,nr_fine-2)) / dx[AMREX_SPACEDIM-1];
+                gradp0_arr(lev,0) = (p0(lev,1) - p0(lev,0)) / dx[AMREX_SPACEDIM-1];
+                gradp0_arr(lev,nr_fine-1) = (p0(lev,nr_fine-1) - p0(lev,nr_fine-2)) / dx[AMREX_SPACEDIM-1];
                 
                 for (int r=1; r<nr_fine-1; r++) {
-                    gradp0(lev,r) = (p0(lev,r+1) - p0(lev,r-1)) / (2.0*dx[AMREX_SPACEDIM-1]);
+                    gradp0_arr(lev,r) = (p0(lev,r+1) - p0(lev,r-1)) / (2.0*dx[AMREX_SPACEDIM-1]);
                 }
             }
         }
@@ -85,8 +93,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
-        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(gamma1bar_s, gamma1bar_cart ,0, 0, bcs_f, 0);
+        Put1dArrayOnCart(p0_s, p0_cart, 0, 0, bcs_f, 0);
         Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     }
 
@@ -173,7 +181,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 });
 #endif
             } else {
-                const auto anelastic_cutoff_density_coord_lev = anelastic_cutoff_density_coord(lev);
+                const auto anelastic_cutoff_density_coord_lev = base_geom.anelastic_cutoff_density_coord(lev);
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     eos_t eos_state;

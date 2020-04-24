@@ -19,16 +19,16 @@ Maestro::EnthalpyAdvance (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
     // Create cell-centered base state quantity
-    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
-    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_old(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> h0_new(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    BaseState<Real>  rho0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real>  rho0_edge_new(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real>  rho0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real>  rho0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical ) {
         CelltoEdge(rho0_old, rho0_edge_old);
@@ -185,12 +185,11 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            // for (int i=0; i<h0_old.size(); ++i) {
-            //     h0_old[i] = rhoh0_old[i] / rho0_old[i];
-            // }
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+            auto h0_old_arr = h0_old.array();
+            const auto rhoh0_old_arr = rhoh0_old.const_array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
                 }
             }
 
@@ -229,10 +228,14 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
-                    h0_new(l,r) = rhoh0_new(l,r) / rho0_new[l+(max_radial_level+1)*r];
+            auto h0_old_arr = h0_old.array();
+            const auto rhoh0_old_arr = rhoh0_old.const_array();
+            auto h0_new_arr = h0_new.array();
+            const auto rhoh0_new_arr = rhoh0_new.const_array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
+                    h0_new_arr(l,r) = rhoh0_new_arr(l,r) / rho0_new[l+(base_geom.max_radial_level+1)*r];
                 }
             }
 
@@ -332,16 +335,16 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
 
     // Create cell-centered base state quantity
-    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
-    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_old(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> h0_new(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    BaseState<Real> rho0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rho0_edge_new(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(rho0_old, rho0_edge_old);
@@ -509,9 +512,11 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
+            auto h0_old_arr = h0_old.array();
+            const auto rhoh0_old_arr = rhoh0_old.const_array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
                 }
             }
 
@@ -550,10 +555,14 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    h0_old(l,r) = rhoh0_old(l,r) / rho0_old[l+(max_radial_level+1)*r];
-                    h0_new(l,r) = rhoh0_new(l,r) / rho0_new[l+(max_radial_level+1)*r];
+            auto h0_old_arr = h0_old.array();
+            const auto rhoh0_old_arr = rhoh0_old.const_array();
+            auto h0_new_arr = h0_new.array();
+            const auto rhoh0_new_arr = rhoh0_new.const_array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
+                    h0_new_arr(l,r) = rhoh0_new_arr(l,r) / rho0_new[l+(base_geom.max_radial_level+1)*r];
                 }
             }
 
