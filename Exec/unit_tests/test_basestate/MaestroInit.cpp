@@ -45,8 +45,8 @@ Maestro::Init ()
 	// make gravity
 	make_grav_cell(grav_cell_old.dataPtr(),
 	               rho0_old.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	               base_geom.r_cc_loc.dataPtr(),
+	               base_geom.r_edge_loc.dataPtr());
 
 	// compute initial time step
 	FirstDt();
@@ -73,7 +73,7 @@ Maestro::InitData ()
 
 	// read in model file and fill in s0_init and p0_init for all levels
 
-	for (auto lev = 0; lev <= max_radial_level; ++lev) {
+	for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
 	    InitBaseState(rho0_old, rhoh0_old,
 			  p0_old, lev);
 	}
@@ -95,15 +95,15 @@ Maestro::InitData ()
 	// compute gravity
 	make_grav_cell(grav_cell_old.dataPtr(),
 	               rho0_old.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	               base_geom.r_cc_loc.dataPtr(),
+	               base_geom.r_edge_loc.dataPtr());
 
 	// compute p0 with HSE
 	enforce_HSE(rho0_old.dataPtr(),
 	            p0_old.dataPtr(),
 	            grav_cell_old.dataPtr(),
-	            r_cc_loc.dataPtr(),
-	            r_edge_loc.dataPtr());
+	            base_geom.r_cc_loc.dataPtr(),
+	            base_geom.r_edge_loc.dataPtr());
 
 	// set p0^{-1} = p0_old
 	for (int i=0; i<p0_old.size(); ++i) {

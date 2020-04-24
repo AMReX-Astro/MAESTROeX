@@ -52,9 +52,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
         Real eos_gamma = eos_state.gam1;
 
-        for (auto r = 0; r < nr.array()(n); ++r) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-            Real z = (Real(r) + 0.5) * dr.array()(n);
+            Real z = (Real(r) + 0.5) * base_geom.dr(n);
 
             if (do_isentropic) {
                 dens_zone = 1.e-3 * pow(grav_const*1.e-3*(eos_gamma - 1.0)*z / (eos_gamma*1.e6) + 1.0, 1.0/(eos_gamma-1.0));
@@ -65,10 +65,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
             s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
             if (r == 0) {
-                p0_init[n+max_lev*r] -= dr.array()(n) * 0.5 * 
+                p0_init[n+max_lev*r] -= base_geom.dr(n) * 0.5 * 
                     s0_init[n+max_lev*(r+nr_fine*Rho)] * fabs(grav_const);
             } else {
-                p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - dr.array()(n) * 
+                p0_init[n+max_lev*r] = p0_init[n+max_lev*(r-1)] - base_geom.dr(n) * 
                     0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + 
                            s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * 
                     fabs(grav_const);
@@ -109,7 +109,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        for (auto r = 0; r < nr.array()(n); ++r) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
 
             s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
             s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;

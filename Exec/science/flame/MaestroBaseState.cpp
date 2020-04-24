@@ -107,10 +107,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     Real dens_ash = eos_state.rho;
     Real rhoh_ash = dens_ash * eos_state.h;
 
-    for (auto r = 0; r < nr.array()(n); ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr.array()(n);
+        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
 
         if (rloc < geom[lev].ProbLo(AMREX_SPACEDIM-1) + interface_pos_frac*rlen) {
             // fuel 

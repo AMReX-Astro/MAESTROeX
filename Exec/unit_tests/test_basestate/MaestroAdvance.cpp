@@ -63,7 +63,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	get_heating(Hext_bar.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
-	            rhoX0_old.dataPtr(), t_old, dt, r_cc_loc.dataPtr());
+	            rhoX0_old.dataPtr(), t_old, dt, base_geom.r_cc_loc.dataPtr());
 
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -110,7 +110,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-	               r_edge_loc.dataPtr(), r_cc_loc.dataPtr(), dt);
+	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update pressure
@@ -196,7 +196,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-	               r_edge_loc.dataPtr(), r_cc_loc.dataPtr(), dt);
+	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

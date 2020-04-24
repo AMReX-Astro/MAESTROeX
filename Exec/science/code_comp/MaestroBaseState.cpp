@@ -79,8 +79,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     const int n = lev;
 
     // allocate arrays
-    RealVector pres(nr.array()(n));
-    RealVector dens(nr.array()(n));
+    RealVector pres(base_geom.nr(n));
+    RealVector dens(base_geom.nr(n));
 
     RealVector U_old(2);
     RealVector U_new(2);
@@ -93,15 +93,15 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     U_old[0] = log(rho_0);
     U_old[1] = log(p_0);
 
-    for (auto r = 0; r < nr.array()(n); ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr.array()(n);
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
 
         // do HSE using RK2
 
         // out intergration starts at y - h
-        Real h = r == 0 ? dr.array()(n) * 0.5 : dr.array()(n);
+        Real h = r == 0 ? base_geom.dr(n) * 0.5 : base_geom.dr(n);
 
         auto k = dUdy(y - h, U_old);
 
@@ -124,15 +124,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         }
     }
 
-    for (auto r = 0; r < nr.array()(n); ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-<<<<<<< HEAD
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
-        RealVector xn = set_species(y);
-=======
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr.array()(n);
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
 	RealVector xn = set_species(y);
->>>>>>> 5fd329a5f0e6b0975afb581bfe2ada710cad983d
 	
         eos_state.rho = dens[r];
         eos_state.p = pres[r];
@@ -145,7 +140,7 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
         s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] = eos_state.rho;
         s0_init[n+max_lev*(r+base_geom.nr_fine*RhoH)] = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = 
                 eos_state.rho * eos_state.xn[comp];
         }
         p0_init[n+max_lev*r] = eos_state.p;

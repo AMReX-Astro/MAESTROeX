@@ -18,7 +18,7 @@ Maestro::Evolve ()
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > sedge(finest_level+1);
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > sflux(finest_level+1);
 	Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
-	BaseState<Real> rho0_predicted_edge(max_radial_level+1, nr_fine+1);
+	BaseState<Real> rho0_predicted_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
 	Vector<Real> abs_norm(finest_level+1);
 	Vector<Real> rel_norm(finest_level+1);

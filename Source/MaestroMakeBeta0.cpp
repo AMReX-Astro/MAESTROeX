@@ -67,7 +67,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                     if (r < base_geom.anelastic_cutoff_density_coord(n)) {
 
                         Real drp = is_irreg ? 
-                            base_geom.r_edge_loc(n,r+1) - base_geom.r_edge_loc(n,r) : base_geom.dr(n);
+                            base_geom.r_edge_loc(n,r+1) - base_geom.r_edge_loc(n,r) : dr(n);
                         Real drm = dr(n);
                         if (is_irreg) {
                             drm = r > 0 ? 
@@ -80,7 +80,7 @@ Maestro::MakeBeta0(RealVector& beta0,
                             // nu = 0.0;
                         } else {
                             Real drc = is_irreg ? 
-                                base_geom.r_cc_loc(n,r+1) - base_geom.r_cc_loc(n,r-1) : base_geom.dr(n);
+                                base_geom.r_cc_loc(n,r+1) - base_geom.r_cc_loc(n,r-1) : dr(n);
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
@@ -133,9 +133,9 @@ Maestro::MakeBeta0(RealVector& beta0,
                             if (use_linear_grav_in_beta0 && !is_irreg) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
-                                Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/base_geom.dr(n);
-                                Real dpls = 2.0 * (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*r])/base_geom.dr(n);
-                                Real dmin = 2.0 * (grav_cell[n+max_lev*r] - grav_cell[n+max_lev*(r-1)])/base_geom.dr(n);
+                                Real del = 0.5* (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*(r-1)])/dr(n);
+                                Real dpls = 2.0 * (grav_cell[n+max_lev*(r+1)] - grav_cell[n+max_lev*r])/dr(n);
+                                Real dmin = 2.0 * (grav_cell[n+max_lev*r] - grav_cell[n+max_lev*(r-1)])/dr(n);
                                 Real slim = min(fabs(dpls), fabs(dmin));
                                 slim = dpls * dmin > 0.0 ? slim : 0.0;
                                 Real sflag = copysign(1.0, del);
@@ -151,11 +151,11 @@ Maestro::MakeBeta0(RealVector& beta0,
                                 Real coeff3 = kappa*lambda / (mu*nu);
                                 
                                 integral = 
-                                    coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*base_geom.dr(n))/
-                                                (gamma1bar[n+max_lev*r] - 0.5*mu*base_geom.dr(n)) ) +
-                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*base_geom.dr(n))/
-                                                (p0[n+max_lev*r] - 0.5*nu*base_geom.dr(n)) ) -
-                                    coeff3*base_geom.dr(n);
+                                    coeff1*log( (gamma1bar[n+max_lev*r] + 0.5*mu*dr(n))/
+                                                (gamma1bar[n+max_lev*r] - 0.5*mu*dr(n)) ) +
+                                    coeff2*log( (p0[n+max_lev*r] + 0.5*nu*dr(n))/
+                                                (p0[n+max_lev*r] - 0.5*nu*dr(n)) ) -
+                                    coeff3*dr(n);
 
                             } else {
                                 // paper III, equation C2

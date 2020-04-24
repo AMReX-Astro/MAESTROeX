@@ -105,14 +105,14 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     Real velpert_r_outer;
     for (auto i = 0; i < nr_fine; ++i) {
         if (s0_init[max_lev*(i+nr_fine*Rho)] < sponge_start_factor*sponge_center_density) {
-            velpert_r_outer = r_cc_loc[max_lev*i];
+            velpert_r_outer = base_geom.r_cc_loc(0,i);
         }
     }
 
     Real velpert_r_inner;
     for (auto i = 0; i < nr_fine; ++i) {
         if (s0_init[max_lev*(i+nr_fine*(FirstSpec+ihe4))]/s0_init[max_lev*(i+nr_fine*Rho)] > 0.9) {
-            velpert_r_inner = r_cc_loc[max_lev*i];
+            velpert_r_inner = base_geom.r_cc_loc(0,i);
         }
     }
     
