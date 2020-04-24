@@ -307,31 +307,19 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
 }
 
 void
-Maestro::MakeGravEdge(BaseState<Real>& grav_edge, 
-                      const BaseState<Real>& rho0)
-{
-    MakeGravEdge(grav_edge.array(), rho0.const_array());
-}
-
-// void
-// Maestro::MakeGravEdge(BaseStateArray<Real>& grav_edge, 
-//                       BaseStateArray<Real>& rho0)
-// {
-//     MakeGravEdge(grav_edge, rho0);
-// }
-
-void
-Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge, 
-                      const BaseStateArray<const Real> rho0)
+Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state, 
+                      const BaseState<Real>& rho0_state)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()", MakeGravEdge);
 
     const int max_lev = base_geom.max_radial_level+1;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-
+    auto grav_edge = grav_edge_state.array();
+    const auto rho0 = rho0_state.const_array();
+    
     get_base_cutoff_density(&base_cutoff_density);
-
+    
     if (!spherical) {
         if (do_planar_invsq_grav)  {
             const Real planar_invsq_mass_loc = planar_invsq_mass;
@@ -406,7 +394,7 @@ Maestro::MakeGravEdge(BaseStateArray<Real> grav_edge,
         } else {
             // constant gravity
             // std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
-            grav_edge.setVal(grav_const);
+            grav_edge_state.setVal(grav_const);
         }
         
     } else {

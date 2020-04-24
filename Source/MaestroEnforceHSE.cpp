@@ -23,7 +23,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
 
     Real offset = 0.0;
 
-    BaseState<Real> rho0_b(rho0, base_geom.max_radial_level+1, base_geom.nr_fine);
+    const BaseState<Real> rho0_b(rho0, base_geom.max_radial_level+1, base_geom.nr_fine);
     MakeGravEdge(grav_edge_s, rho0_b);
 
     // create a copy of the input pressure to help us with initial

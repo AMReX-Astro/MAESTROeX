@@ -1123,12 +1123,6 @@ public:
 
     void MakeGravEdge(BaseState<Real>& grav_edge, 
                       const BaseState<Real>& rho0);
-    
-    // void MakeGravEdge(BaseStateArray<Real>& grav_edge, 
-    //                   BaseStateArray<Real>& rho0);
-    
-    void MakeGravEdge(BaseStateArray<Real> grav_edge, 
-                      const BaseStateArray<const Real> rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
