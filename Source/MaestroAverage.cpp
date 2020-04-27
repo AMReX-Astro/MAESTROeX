@@ -15,7 +15,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()",Average);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
     
     std::fill(phibar.begin(), phibar.end(), 0.0);
 
@@ -23,14 +23,14 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // planar case
 
-        // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
+        // phibar is dimensioned to "base_geom.max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((max_radial_level+1)*nr_fine, 0.0);
+        RealVector phisum((base_geom.max_radial_level+1)*base_geom.nr_fine, 0.0);
         phisum.shrink_to_fit();
         Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
 
         // this stores how many cells there are laterally at each level
-        IntVector ncell(max_radial_level+1);
+        IntVector ncell(base_geom.max_radial_level+1);
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -68,18 +68,19 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         }
         
         // reduction over boxes to get sum
-        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto i = 1; i <= numdisjointchunks(lev); ++i) { 
-                const int lo = r_start_coord(lev,i);
-                const int hi = r_end_coord(lev,i);
+            for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) { 
+                const int lo = base_geom.r_start_coord(lev,i);
+                const int hi = base_geom.r_end_coord(lev,i);
                 Real ncell_lev = ncell[lev];
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
                     phisum_p[lev+max_lev*r] /= ncell_lev;
                 });
+                Gpu::synchronize();
             }
         }
 
@@ -92,12 +93,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     } else if (spherical == 1 && use_exact_base_state) {
         // spherical case with uneven base state spacing
 
-        // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
+        // phibar is dimensioned to "base_geom.max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((max_radial_level+1)*nr_fine,0.0);
+        RealVector phisum((base_geom.max_radial_level+1)*base_geom.nr_fine,0.0);
 
         // this stores how many cells there are at each level
-        Vector<int> ncell((max_radial_level+1)*nr_fine,0);
+        Vector<int> ncell((base_geom.max_radial_level+1)*base_geom.nr_fine,0);
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -124,12 +125,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         }
 
         // reduction over boxes to get sum
-        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
-        ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*nr_fine);
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
+        ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto r = 0; r < nr_fine; ++r) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
                 if (ncell[lev+max_lev*r] > 0) {
                     phisum[lev+max_lev*r] /= ncell[lev+max_lev*r];
                 } else {
@@ -150,9 +151,9 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // For spherical, we construct a 1D array at each level, phisum, that has space
         // allocated for every possible radius that a cell-center at each level can
         // map into.  The radial locations have been precomputed and stored in radii.
-        RealVector phisum((finest_level+1)*(nr_irreg+2), 0.0);
-        RealVector radii((finest_level+1)*(nr_irreg+3));
-        IntVector ncell((finest_level+1)*(nr_irreg+2), 0);
+        RealVector phisum((finest_level+1)*(base_geom.nr_irreg+2), 0.0);
+        RealVector radii((finest_level+1)*(base_geom.nr_irreg+3));
+        IntVector ncell((finest_level+1)*(base_geom.nr_irreg+2), 0);
 
         Real * AMREX_RESTRICT radii_p = radii.dataPtr();
         Real * AMREX_RESTRICT phisum_p = phisum.dataPtr();
@@ -160,7 +161,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         const auto center_p = center;
 
         const int fine_lev = finest_level + 1;
-        const int nr_irreg_loc = nr_irreg;
+        const int nr_irreg = base_geom.nr_irreg;
 
         // radii contains every possible distance that a cell-center at the finest
         // level can map into
@@ -172,6 +173,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
                 radii_p[lev+fine_lev*(r+1)] = std::sqrt(0.75+2.0*Real(r)) * dx[0];
             });
+            Gpu::synchronize();
 
             radii[lev+fine_lev*(nr_irreg+2)] = 1.e99;
             radii[lev] = 0.0;
@@ -226,7 +228,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                         int index = std::round( ((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0 );
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
-                        if (index < nr_irreg_loc) {
+                        if (index < nr_irreg) {
                             if (fabs(radius-radii_p[lev+fine_lev*(index+1)]) > fabs(radius-radii_p[lev+fine_lev*(index+2)])) {
                                 index++;
                             }
@@ -252,7 +254,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             }
         }
 
-        IntVector which_lev(nr_fine);
+        IntVector which_lev(base_geom.nr_fine);
         IntVector max_rcoord(fine_lev);
 
         // compute center point for the finest level
@@ -262,8 +264,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // choose which level to interpolate from
         int * AMREX_RESTRICT which_lev_p = which_lev.dataPtr();
-        const Real dr0 = dr[0];
-        const int nrf = nr_fine;
+        const Real dr0 = base_geom.dr(0);
+        const int nrf = base_geom.nr_fine;
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {
 
@@ -278,7 +280,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
-                for (auto j = rcoord_p[n]; j <= nr_irreg_loc; ++j) {
+                for (auto j = rcoord_p[n]; j <= nr_irreg; ++j) {
                     if (fabs(radius-radii_p[n+fine_lev*(j+1)]) < fabs(radius-radii_p[n+fine_lev*(j+2)])) {
                         rcoord_p[n] = j;
                         break;
@@ -291,7 +293,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 rcoord_p[n] = max(rcoord_p[n],1);
             }
             for (auto n = 0; n < fine_lev; ++n) {
-                rcoord_p[n] = min(rcoord_p[n],nr_irreg_loc-1);
+                rcoord_p[n] = min(rcoord_p[n],nr_irreg-1);
             }
 
             // choose the level with the largest min over the ncell interpolation points
@@ -319,7 +321,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 j++;
                 for (auto n = 0; n < fine_lev; ++n) {
                     int min_lev = max(ncell_p[n+fine_lev*(max(1,rcoord_p[n]-j)+1)], 
-                        ncell_p[n+fine_lev*(min(rcoord_p[n]+j,nr_irreg_loc-1)+1)]);
+                        ncell_p[n+fine_lev*(min(rcoord_p[n]+j,nr_irreg-1)+1)]);
                     if (min_lev != 0) {
                         which_lev_p[r] = n;
                         min_all = min_lev;
@@ -328,6 +330,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 }
             }
         });
+        Gpu::synchronize();
 
         // squish the list at each level down to exclude points with no contribution
         for (auto n = 0; n <= finest_level; ++n) {
@@ -397,6 +400,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+1)], 
                     phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+2)], limit);
         });
+        Gpu::synchronize();
     }
 }
 
@@ -413,7 +417,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()", Average);
 
-    const int max_lev = max_radial_level+1;
+    const int max_lev = base_geom.max_radial_level+1;
+    const auto nr_irreg = base_geom.nr_irreg;
     
     phibar.setVal(0.0);
 
@@ -423,11 +428,13 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        BaseState<Real> phisum(max_radial_level+1, nr_fine);
+        BaseState<Real> phisum(base_geom.max_radial_level+1, base_geom.nr_fine);
         phisum.setVal(0.0);
+        auto phisum_arr = phisum.array();
 
         // this stores how many cells there are laterally at each level
-        BaseState<int> ncell(max_radial_level+1);
+        BaseState<int> ncell_s(base_geom.max_radial_level+1);
+        auto ncell = ncell_s.array();
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -458,23 +465,24 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 #if (AMREX_SPACEDIM == 2)
                     if (k == 0)
 #endif
-                        amrex::HostDevice::Atomic::Add(&(phisum(lev,r)), phi_arr(i, j, k));
+                        amrex::HostDevice::Atomic::Add(&(phisum_arr(lev,r)), phi_arr(i, j, k));
                 });
             }
         }
         
         // reduction over boxes to get sum
-        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto i = 1; i <= numdisjointchunks(lev); ++i) { 
-                const int lo = r_start_coord(lev,i);
-                const int hi = r_end_coord(lev,i);
+            for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) { 
+                const int lo = base_geom.r_start_coord(lev,i);
+                const int hi = base_geom.r_end_coord(lev,i);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
-                    phisum(lev,r) /= ncell(lev);
+                    phisum_arr(lev,r) /= ncell(lev);
                 });
+                Gpu::synchronize();
             }
         }
 
@@ -489,10 +497,10 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((max_radial_level+1)*nr_fine,0.0);
+        RealVector phisum((base_geom.max_radial_level+1)*base_geom.nr_fine,0.0);
 
         // this stores how many cells there are at each level
-        Vector<int> ncell((max_radial_level+1)*nr_fine,0);
+        Vector<int> ncell((base_geom.max_radial_level+1)*base_geom.nr_fine,0);
 
         // loop is over the existing levels (up to finest_level)
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -519,12 +527,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         }
 
         // reduction over boxes to get sum
-        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(max_radial_level+1)*nr_fine);
-        ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(max_radial_level+1)*nr_fine);
+        ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
+        ParallelDescriptor::ReduceIntSum(ncell.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto r = 0; r < nr_fine; ++r) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
                 if (ncell[lev+max_lev*r] > 0) {
                     phisum[lev+max_lev*r] /= ncell[lev+max_lev*r];
                 } else {
@@ -538,7 +546,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         FillGhostBase(phisum, true);
 
         // swap pointers so phibar contains the computed average
-        BaseState<Real> phisum_b(max_radial_level+1, nr_fine);
+        BaseState<Real> phisum_b(base_geom.max_radial_level+1, base_geom.nr_fine);
         phisum_b.copy(phisum);
         phisum_b.swap(phibar);
     } else {
@@ -547,16 +555,18 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // For spherical, we construct a 1D array at each level, phisum, that has space
         // allocated for every possible radius that a cell-center at each level can
         // map into.  The radial locations have been precomputed and stored in radii.
-        BaseState<Real> phisum(finest_level+1, nr_irreg+2);
-        phisum.setVal(0.0);
-        BaseState<Real> radii(finest_level+1, nr_irreg+3);
-        BaseState<int> ncell(finest_level+1, nr_irreg+2);
-        ncell.setVal(0);
+        BaseState<Real> phisum_s(finest_level+1, nr_irreg+2);
+        auto phisum = phisum_s.array();
+        phisum_s.setVal(0.0);
+        BaseState<Real> radii_s(finest_level+1, nr_irreg+3);
+        auto radii = radii_s.array();
+        BaseState<int> ncell_s(finest_level+1, nr_irreg+2);
+        auto ncell = ncell_s.array();
+        ncell_s.setVal(0);
 
         const auto& center_p = center;
 
         const int fine_lev = finest_level + 1;
-        const int nr_irreg_loc = nr_irreg;
 
         // radii contains every possible distance that a cell-center at the finest
         // level can map into
@@ -568,6 +578,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
                 radii(lev,r+1) = std::sqrt(0.75+2.0*Real(r)) * dx[0];
             });
+            Gpu::synchronize();
 
             radii(lev,nr_irreg+2) = 1.e99;
             radii(lev,0) = 0.0;
@@ -622,7 +633,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                         int index = ((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0;
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
-                        if (index < nr_irreg_loc) {
+                        if (index < nr_irreg) {
                             if (fabs(radius-radii(lev,index+1)) > fabs(radius-radii(lev,index+2))) {
                                 index++;
                             }
@@ -648,8 +659,10 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             }
         }
 
-        BaseState<int> which_lev(nr_fine);
-        BaseState<int> max_rcoord(fine_lev);
+        BaseState<int> which_lev_s(base_geom.nr_fine);
+        auto which_lev = which_lev_s.array();
+        BaseState<int> max_rcoord_s(fine_lev);
+        auto max_rcoord = max_rcoord_s.array();
 
         // compute center point for the finest level
         phisum(finest_level,0) = (11.0/8.0) * phisum(finest_level,1)
@@ -657,8 +670,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         ncell(finest_level,0) = 1;
 
         // choose which level to interpolate from
-        const auto dr0 = dr[0];
-        const auto nrf = nr_fine;
+        const auto dr0 = base_geom.dr(0);
+        const auto nrf = base_geom.nr_fine;
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {
 
@@ -673,7 +686,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
-                for (auto j = rcoord_p[n]; j <= nr_irreg_loc; ++j) {
+                for (auto j = rcoord_p[n]; j <= nr_irreg; ++j) {
                     if (fabs(radius-radii(n,j+1)) < fabs(radius-radii(n,j+2))) {
                         rcoord_p[n] = j;
                         break;
@@ -686,7 +699,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 rcoord_p[n] = max(rcoord_p[n],1);
             }
             for (auto n = 0; n < fine_lev; ++n) {
-                rcoord_p[n] = min(rcoord_p[n],nr_irreg_loc-1);
+                rcoord_p[n] = min(rcoord_p[n],nr_irreg-1);
             }
 
             // choose the level with the largest min over the ncell interpolation points
@@ -714,7 +727,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 j++;
                 for (auto n = 0; n < fine_lev; ++n) {
                     int min_lev = max(ncell(n,max(1,rcoord_p[n]-j)+1), 
-                        ncell(n,min(rcoord_p[n]+j,nr_irreg_loc-1)+1));
+                        ncell(n,min(rcoord_p[n]+j,nr_irreg-1)+1));
                     if (min_lev != 0) {
                         which_lev(r) = n;
                         min_all = min_lev;
@@ -723,6 +736,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 }
             }
         });
+        Gpu::synchronize();
 
         // squish the list at each level down to exclude points with no contribution
         for (auto n = 0; n <= finest_level; ++n) {
@@ -757,6 +771,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // compute phibar
         const Real drdxfac_loc = drdxfac;
+        auto phibar_arr = phibar.array();
 
         AMREX_PARALLEL_FOR_1D(nrf, r, {
 
@@ -781,7 +796,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             bool limit = (r > nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2))) ? false : true;
 
-            phibar(0,r) = QuadInterp(radius, 
+            phibar_arr(0,r) = QuadInterp(radius, 
                     radii(which_lev(r),stencil_coord), 
                     radii(which_lev(r),stencil_coord+1), 
                     radii(which_lev(r),stencil_coord+2), 
@@ -789,5 +804,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     phisum(which_lev(r),stencil_coord+1), 
                     phisum(which_lev(r),stencil_coord+2), limit);
         });
+        Gpu::synchronize();
     }
 }

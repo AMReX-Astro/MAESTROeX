@@ -45,7 +45,7 @@ Maestro::InitData ()
 	Print() << "Calling InitData()" << std::endl;
 
 	// read in model file and fill in s0_init and p0_init for all levels
-	for (auto lev = 0; lev <= max_radial_level; ++lev) {
+	for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
 	        InitBaseState(rho0_old, rhoh0_old,
 			      p0_old, lev);
 	}
@@ -101,8 +101,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 	auto& p0_p = p0_old;
 
-	const int max_lev = max_radial_level + 1;
-	const auto nrf = nr_fine;
+	const int max_lev = base_geom.max_radial_level + 1;
+	const auto nrf = base_geom.nr_fine;
 
 	const auto peak_h_loc = peak_h;
 	const auto ambient_h_loc = ambient_h;

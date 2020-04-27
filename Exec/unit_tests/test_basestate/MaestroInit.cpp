@@ -45,8 +45,8 @@ Maestro::Init ()
 	// make gravity
 	make_grav_cell(grav_cell_old.dataPtr(),
 	               rho0_old.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	               base_geom.r_cc_loc.dataPtr(),
+	               base_geom.r_edge_loc.dataPtr());
 
 	// compute initial time step
 	FirstDt();
@@ -73,7 +73,7 @@ Maestro::InitData ()
 
 	// read in model file and fill in s0_init and p0_init for all levels
 
-	for (auto lev = 0; lev <= max_radial_level; ++lev) {
+	for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
 	    InitBaseState(rho0_old, rhoh0_old,
 			  p0_old, lev);
 	}
@@ -95,23 +95,23 @@ Maestro::InitData ()
 	// compute gravity
 	make_grav_cell(grav_cell_old.dataPtr(),
 	               rho0_old.dataPtr(),
-	               r_cc_loc.dataPtr(),
-	               r_edge_loc.dataPtr());
+	               base_geom.r_cc_loc.dataPtr(),
+	               base_geom.r_edge_loc.dataPtr());
 
 	// compute p0 with HSE
 	enforce_HSE(rho0_old.dataPtr(),
 	            p0_old.dataPtr(),
 	            grav_cell_old.dataPtr(),
-	            r_cc_loc.dataPtr(),
-	            r_edge_loc.dataPtr());
+	            base_geom.r_cc_loc.dataPtr(),
+	            base_geom.r_edge_loc.dataPtr());
 
 	// set p0^{-1} = p0_old
 	for (int i=0; i<p0_old.size(); ++i) {
 		p0_nm1[i] = p0_old[i];
 	}
 
-    rhoX0_old.resize( (max_radial_level+1)*nr_fine*NumSpec);
-    rhoX0_new.resize( (max_radial_level+1)*nr_fine*NumSpec);
+    rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
+    rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
 	rhoX0_old.shrink_to_fit();
 	rhoX0_new.shrink_to_fit();
 
@@ -189,7 +189,13 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* hi  = tilebox.hiVect();
 
 		if (!spherical) {
-            InitLevelData(lev, t_old, mfi, sold[lev].array(mfi), uold[lev].array(mfi));
+            const Array4<Real> scal_arr = scal.array(mfi);
+			const Array4<Real> vel_arr = vel.array(mfi);
+
+			const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+			const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
+		    
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
 
 		} else {
 #if (AMREX_SPACEDIM == 3)
@@ -222,7 +228,5 @@ void Maestro::InitIter ()
 
 	// advance the solution by dt
 
-		AdvanceTimeStep(true);
-
-
+    AdvanceTimeStep(true);
 }

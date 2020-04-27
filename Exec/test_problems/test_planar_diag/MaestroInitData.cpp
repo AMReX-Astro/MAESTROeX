@@ -11,8 +11,8 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = max_radial_level + 1;
-    const auto nrf = nr_fine;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
 
     if (AMREX_SPACEDIM != 2) {
         Abort("Error: InitLevelData only implemented for 2d.");

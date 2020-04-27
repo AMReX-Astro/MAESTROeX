@@ -55,5 +55,5 @@ Maestro::SetInletBCs()
     InletBCs::INLET_RHOH = eos_state.rho * eos_state.h;
     InletBCs::INLET_TEMP = eos_state.T;
 
-    InletBCs::INLET_dr_fine = dr_fine;
+    InletBCs::INLET_dr_fine = base_geom.dr_fine;
 }

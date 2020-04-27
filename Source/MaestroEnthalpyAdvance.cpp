@@ -19,16 +19,16 @@ Maestro::EnthalpyAdvance (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvance()",EnthalpyAdvance);
 
     // Create cell-centered base state quantity
-    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
-    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_old(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> h0_new(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    BaseState<Real>  rho0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real>  rho0_edge_new(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real>  rho0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real>  rho0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical ) {
         CelltoEdge(rho0_old, rho0_edge_old);
@@ -324,16 +324,16 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     BL_PROFILE_VAR("Maestro::EnthalpyAdvanceSDC()",EnthalpyAdvanceSDC);
 
     // Create cell-centered base state quantity
-    BaseState<Real> h0_old(max_radial_level+1, nr_fine);
-    BaseState<Real> h0_new(max_radial_level+1, nr_fine);
+    BaseState<Real> h0_old(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> h0_new(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // Create edge-centered base state quantities.
     // Note: rho0_edge_{old,new} and rhoh0_edge_{old,new}
     // contain edge-centered quantities created via spatial interpolation.
-    BaseState<Real> rho0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rho0_edge_new(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_old(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge_new(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_old(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge_new(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(rho0_old, rho0_edge_old);

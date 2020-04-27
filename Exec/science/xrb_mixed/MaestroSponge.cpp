@@ -18,48 +18,47 @@ Maestro::SpongeInit(const RealVector& rho0)
     // The start of the top sponge is r_sp_outer = topsponge_lo_r, and
     // the end of the top sponge is r_tp_outer = topsponge_hi_r.
 
-    const int max_lev = max_radial_level + 1;
-    get_r_end_coord(r_end_coord.dataPtr());
+    const int max_lev = base_geom.max_radial_level + 1;
 
     Real prob_lo_r = geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     // Top sponge
-    Real r_top = prob_lo_r + r_edge_loc[max_lev*nr_fine];
+    Real r_top = prob_lo_r + base_geom.r_edge_loc(0,1);
     r_sp_outer = r_top;
 
     sponge_start_density = sponge_start_factor * sponge_center_density;
 
     // set topsponge_lo_r = r_sp_outer;
-    for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
+    for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
 	if (rho0[max_lev*r] < sponge_start_density) {
-	    r_sp_outer = prob_lo_r + (Real(r) + 0.5) * dr[0];
+	    r_sp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
 	    break;
 	}
     }
 
     // set topsponge_hi_r = r_tp_outer;
     r_tp_outer = r_top;
-    for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
-	if (rho0[max_lev*r] < anelastic_cutoff_density) {
-	    r_tp_outer = prob_lo_r + (Real(r) + 0.5) * dr[0];
-	    break;
-	}
+    for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
+        if (rho0[max_lev*r] < anelastic_cutoff_density) {
+            r_tp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            break;
+        }
     }
     
     // set botsponge_lo_r = r_sp;
-    for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
-	if (rho0[max_lev*r] < 6.0e7) {
-	    r_sp = prob_lo_r + (Real(r) + 0.5) * dr[0];
-	    break;
-	}
+    for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
+        if (rho0[max_lev*r] < 6.0e7) {
+            r_sp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            break;
+        }
     }
 
     // set botsponge_hi_r = r_tp;
-    for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
-	if (rho0[max_lev*r] < 5.0e7) {
-	    r_tp = prob_lo_r + (Real(r) + 0.5) * dr[0];
-	    break;
-	}
+    for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
+        if (rho0[max_lev*r] < 5.0e7) {
+            r_tp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            break;
+        }
     }
     
     if (maestro_verbose >= 1) {
@@ -85,7 +84,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
     const Real sponge_min_loc = sponge_min;
 
     if (AMREX_SPACEDIM != 2) {
-	Abort("ERROR: sponge only supported for 2d in xrb_mixed");
+        Abort("ERROR: sponge only supported for 2d in xrb_mixed");
     }
     
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -102,12 +101,12 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-	    Real smdamp = 1.0;
-	    
-	    const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
-	    const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
+            Real smdamp = 1.0;
+            
+            const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
+            const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
 
-	    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                 sponge_arr(i,j,k) = 1.0;
             });
 		
@@ -117,65 +116,65 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                     int j = lo + n;
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
                     if (y <= botsponge_lo_r) {
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = sponge_min_loc;
+                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            if (jj == j)
+                            sponge_arr(ii,jj,kk) = sponge_min_loc;
                         });
                     } else if (y <= botsponge_hi_r) {
-			smdamp = -0.5 * (1.0 - sponge_min_loc)
-			    * std::cos(M_PI*(y-botsponge_lo_r)/(botsponge_hi_r-botsponge_lo_r)) 
-			    + 0.5*(1.0 + sponge_min_loc);
-			
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = smdamp;
+                        smdamp = -0.5 * (1.0 - sponge_min_loc)
+                            * std::cos(M_PI*(y-botsponge_lo_r)/(botsponge_hi_r-botsponge_lo_r)) 
+                            + 0.5*(1.0 + sponge_min_loc);
+                        
+                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            if (jj == j)
+                            sponge_arr(ii,jj,kk) = smdamp;
+                                    });
+                    } else if (y <= topsponge_lo_r) {
+                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            if (jj == j)
+                            sponge_arr(ii,jj,kk) = 1.0;
+                                    });
+                    } else if (y <= topsponge_hi_r) {
+                        smdamp = 0.5 * (1.0 - sponge_min_loc)
+                            * std::cos(M_PI*(y-topsponge_lo_r)/(topsponge_hi_r-topsponge_lo_r)) 
+                            + 0.5*(1.0 + sponge_min_loc);
+                            
+                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            if (jj == j)
+                            sponge_arr(ii,jj,kk) = smdamp;
+                                    });
+                    } else {
+                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            if (jj == j)
+                            sponge_arr(ii,jj,kk) = sponge_min_loc;
                         });
-		    } else if (y <= topsponge_lo_r) {
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = 1.0;
-                        });
-		    } else if (y <= topsponge_hi_r) {
-			smdamp = 0.5 * (1.0 - sponge_min_loc)
-			    * std::cos(M_PI*(y-topsponge_lo_r)/(topsponge_hi_r-topsponge_lo_r)) 
-			    + 0.5*(1.0 + sponge_min_loc);
-			    
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = smdamp;
-                        });
-		    } else {
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = sponge_min_loc;
-                        });
-		    }
+                    }
                 }
             } else {
 
                 for (int n = 0; n <= hi-lo; ++n) {
                     int j = lo + n;
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
-		    if (y <= topsponge_lo_r) {
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = 1.0;
-                        });
-		    } else if (y <= topsponge_hi_r) {
-			smdamp = 0.5 * (1.0 - sponge_min_loc)
-			    * std::cos(M_PI*(y-topsponge_lo_r)/(topsponge_hi_r-topsponge_lo_r)) 
-			    + 0.5*(1.0 + sponge_min_loc);
-			    
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = smdamp;
-                        });
-		    } else {
-			AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-			    if (jj == j)
-				sponge_arr(ii,jj,kk) = sponge_min_loc;
-                        });
-		    }
+                    if (y <= topsponge_lo_r) {
+                    AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                        if (jj == j)
+                        sponge_arr(ii,jj,kk) = 1.0;
+                                });
+                    } else if (y <= topsponge_hi_r) {
+                    smdamp = 0.5 * (1.0 - sponge_min_loc)
+                        * std::cos(M_PI*(y-topsponge_lo_r)/(topsponge_hi_r-topsponge_lo_r)) 
+                        + 0.5*(1.0 + sponge_min_loc);
+                        
+                    AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                        if (jj == j)
+                        sponge_arr(ii,jj,kk) = smdamp;
+                                });
+                    } else {
+                    AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                        if (jj == j)
+                        sponge_arr(ii,jj,kk) = sponge_min_loc;
+                                });
+                    }
                 }
             }
         }

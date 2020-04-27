@@ -19,16 +19,12 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
         const Box& domainBox = geom[lev].Domain();
         const auto dx = geom[lev].CellSizeArray();
 
-        const Real rel_eps = c_rel_eps;
-
         const Real dt2 = 0.5 * dt;
 
         const auto domlo = domainBox.loVect3d();
         const auto domhi = domainBox.hiVect3d();
-#if (AMREX_SPACEDIM == 3)
-        const int spherical_local = spherical;
-#endif
         const int ppm_type_local = ppm_type;
+        const auto rel_eps_local = rel_eps;
         
         // get references to the MultiFabs at level lev
         MultiFab Ip, Im;
@@ -110,9 +106,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
 
                     ulx = utilde_arr(i-1,j,k,0) 
-                        + (0.5-(dt2/dx[0])*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
+                        + (0.5-(dt2/dx[0])*amrex::max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
                     urx = utilde_arr(i  ,j,k,0) 
-                        - (0.5+(dt2/dx[0])*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
+                        - (0.5+(dt2/dx[0])*amrex::min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -134,7 +130,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = min(urx,0.0);
+                            ulx = amrex::min(urx,0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -155,7 +151,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = max(ulx,0.0);
+                            ulx = amrex::max(ulx,0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -165,7 +161,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 
                 // solve Riemann problem using full velocity
                 bool test = (ulx <= 0.0 && urx >= 0.0) || 
-                            (fabs(ulx+urx) < rel_eps);
+                            (fabs(ulx+urx) < rel_eps_local);
                 utrans_arr(i,j,k) = 0.5*(ulx+urx) > 0.0 ? ulx : urx;
                 utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
             });
@@ -214,9 +210,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/dx[1])*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
+                        + (0.5-(dt2/dx[1])*amrex::max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/dx[1])*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
+                        - (0.5+(dt2/dx[1])*amrex::min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -238,7 +234,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = min(vry,0.0);
+                            vly = amrex::min(vry,0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -259,7 +255,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = max(vly,0.0);
+                            vly = amrex::max(vly,0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -270,7 +266,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 // solve Riemann problem using full velocity
                 bool test = (vly+w0_arr(i,j,k,AMREX_SPACEDIM-1) <= 0.0 && 
                             vry+w0_arr(i,j,k,AMREX_SPACEDIM-1) >= 0.0) || 
-                            (fabs(vly+vry+2.0*w0_arr(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+                            (fabs(vly+vry+2.0*w0_arr(i,j,k,AMREX_SPACEDIM-1)) < rel_eps_local);
                 vtrans_arr(i,j,k) = 0.5*(vly+vry)+w0_arr(i,j,k,AMREX_SPACEDIM-1) > 0.0 ? 
                     vly : vry;
                 vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
@@ -283,6 +279,8 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
 #pragma omp parallel
 #endif
         for ( MFIter mfi(utilde[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            Gpu::synchronize();
 
             // Get the index space of the valid region
             const Box& obx = amrex::grow(mfi.tilebox(), 1);
@@ -324,9 +322,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     ulx = utilde_arr(i-1,j,k,0) 
-                        + (0.5-(dt2/dx[0])*max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
+                        + (0.5-(dt2/dx[0])*amrex::max(0.0,ufull_arr(i-1,j,k,0)))*Ip_arr(i-1,j,k,0);
                     urx = utilde_arr(i  ,j,k,0) 
-                        - (0.5+(dt2/dx[0])*min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
+                        - (0.5+(dt2/dx[0])*amrex::min(0.0,ufull_arr(i  ,j,k,0)))*Ip_arr(i  ,j,k,0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
                     ulx = Ip_arr(i-1,j,k,0);
@@ -347,7 +345,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = min(urx,0.0);
+                            ulx = amrex::min(urx,0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -368,7 +366,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = max(ulx,0.0);
+                            ulx = amrex::max(ulx,0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -376,18 +374,18 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local) {
+                if (spherical) {
                     // solve Riemann problem using full velocity
                     bool test = (ulx+w0macx(i,j,k) <= 0.0 && 
                                 urx+w0macx(i,j,k) >= 0.0) || 
-                                (fabs(ulx+urx+2.0*w0macx(i,j,k)) < rel_eps);
+                                (fabs(ulx+urx+2.0*w0macx(i,j,k)) < rel_eps_local);
                     utrans_arr(i,j,k) = 0.5*(ulx+urx)+w0macx(i,j,k) > 0.0 ? ulx : urx;
                     utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
 
                 } else {
                     // solve Riemann problem using full velocity
                     bool test = (ulx <= 0.0 && urx >= 0.0) || 
-                                (fabs(ulx+urx) < rel_eps);
+                                (fabs(ulx+urx) < rel_eps_local);
                     utrans_arr(i,j,k) = 0.5*(ulx+urx) > 0.0 ? ulx : urx;
                     utrans_arr(i,j,k) = test ? 0.0 : utrans_arr(i,j,k);
                 }
@@ -439,9 +437,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     vly = utilde_arr(i,j-1,k,1) 
-                        + (0.5-(dt2/dx[1])*max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
+                        + (0.5-(dt2/dx[1])*amrex::max(0.0,ufull_arr(i,j-1,k,1)))*Ip_arr(i,j-1,k,0);
                     vry = utilde_arr(i,j  ,k,1) 
-                        - (0.5+(dt2/dx[1])*min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
+                        - (0.5+(dt2/dx[1])*amrex::min(0.0,ufull_arr(i,j  ,k,1)))*Ip_arr(i,j  ,k,0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -463,7 +461,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = min(vry,0.0);
+                            vly = amrex::min(vry,0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -484,7 +482,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = max(vly,0.0);
+                            vly = amrex::max(vly,0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -492,18 +490,18 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local) {
+                if (spherical) {
                     // solve Riemann problem using full velocity
                     bool test = (vly+w0macy(i,j,k) <= 0.0 && 
                                 vry+w0macy(i,j,k) >= 0.0) || 
-                                (fabs(vly+vry+2.0*w0macy(i,j,k)) < rel_eps);
+                                (fabs(vly+vry+2.0*w0macy(i,j,k)) < rel_eps_local);
                     vtrans_arr(i,j,k) = 0.5*(vly+vry)+w0macy(i,j,k) > 0.0 ? 
                                     vly : vry;
                     vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
                 } else {
                     // solve Riemann problem using full velocity
                     bool test = (vly <= 0.0 && vry >= 0.0) || 
-                                (fabs(vly+vry) < rel_eps);
+                                (fabs(vly+vry) < rel_eps_local);
                     vtrans_arr(i,j,k) = 0.5*(vly+vry) > 0.0 ? vly : vry;
                     vtrans_arr(i,j,k) = test ? 0.0 : vtrans_arr(i,j,k);
                 }
@@ -555,9 +553,9 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
                     wlz = utilde_arr(i,j,k-1,2) 
-                        + (0.5-(dt2/dx[2])*max(0.0,ufull_arr(i,j,k-1,2)))*Ip_arr(i,j,k-1,0);
+                        + (0.5-(dt2/dx[2])*amrex::max(0.0,ufull_arr(i,j,k-1,2)))*Ip_arr(i,j,k-1,0);
                     wrz = utilde_arr(i,j,k  ,2) 
-                        - (0.5+(dt2/dx[2])*min(0.0,ufull_arr(i,j,k  ,2)))*Ip_arr(i,j,k  ,0);
+                        - (0.5+(dt2/dx[2])*amrex::min(0.0,ufull_arr(i,j,k  ,2)))*Ip_arr(i,j,k  ,0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
                     wlz = Ip_arr(i,j,k-1,2);
@@ -578,7 +576,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             wrz = 0.0;
                             break;
                         case Outflow:
-                            wlz = min(wrz,0.0);
+                            wlz = amrex::min(wrz,0.0);
                             wrz = wlz;
                             break;
                         case Interior:
@@ -599,7 +597,7 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                             wrz = 0.0;
                             break;
                         case Outflow:
-                            wlz = max(wlz,0.0);
+                            wlz = amrex::max(wlz,0.0);
                             wrz = wlz;
                             break;
                         case Interior:
@@ -607,18 +605,18 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
                     }
                 }
 
-                if (spherical_local) {
+                if (spherical) {
                     // solve Riemann problem using full velocity
                     bool test = (wlz+w0macz(i,j,k) <= 0.0 && 
                                 wrz+w0macz(i,j,k) >= 0.0) || 
-                                (fabs(wlz+wrz+2.0*w0macz(i,j,k)) < rel_eps);
+                                (fabs(wlz+wrz+2.0*w0macz(i,j,k)) < rel_eps_local);
                     wtrans_arr(i,j,k) = 0.5*(wlz+wrz)+w0macz(i,j,k) > 0.0 ? wlz : wrz;
                     wtrans_arr(i,j,k) = test ? 0.0 : wtrans_arr(i,j,k);
                 } else {
                     // solve Riemann problem using full velocity
                     bool test = (wlz+w0_arr(i,j,k,AMREX_SPACEDIM-1)<=0.0 && 
                                 wrz+w0_arr(i,j,k,AMREX_SPACEDIM-1)>=0.0) || 
-                                (fabs(wlz+wrz+2.0*w0_arr(i,j,k,AMREX_SPACEDIM-1)) < rel_eps);
+                                (fabs(wlz+wrz+2.0*w0_arr(i,j,k,AMREX_SPACEDIM-1)) < rel_eps_local);
                     wtrans_arr(i,j,k) = 0.5*(wlz+wrz)+w0_arr(i,j,k,AMREX_SPACEDIM-1) > 0.0 ? wlz : wrz;
                     wtrans_arr(i,j,k) = test ? 0.0 : wtrans_arr(i,j,k);
                 }

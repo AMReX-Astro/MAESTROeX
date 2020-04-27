@@ -54,13 +54,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     auto dUdy = [this, &fv, &set_species, &grav_zone](Real y, RealVector U) 
     {
         eos_t eos_state;
-	RealVector xn = set_species(y);
+        RealVector xn = set_species(y);
 
         eos_state.rho = U[0];
         eos_state.p = U[1];
-	for (auto comp = 0; comp < NumSpec; ++comp) {
-	    eos_state.xn[comp] = xn[comp];
-	}
+        for (auto comp = 0; comp < NumSpec; ++comp) {
+            eos_state.xn[comp] = xn[comp];
+        }
 
         eos(eos_input_rp, eos_state);
 
@@ -75,12 +75,12 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         return dU;
     };
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
 
     // allocate arrays
-    RealVector pres(nr[n]);
-    RealVector dens(nr[n]);
+    RealVector pres(base_geom.nr(n));
+    RealVector dens(base_geom.nr(n));
 
     RealVector U_old(2);
     RealVector U_new(2);
@@ -93,15 +93,15 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     U_old[0] = log(rho_0);
     U_old[1] = log(p_0);
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
 
         // do HSE using RK2
 
         // out intergration starts at y - h
-        Real h = r == 0 ? dr[n] * 0.5 : dr[n];
+        Real h = r == 0 ? base_geom.dr(n) * 0.5 : base_geom.dr(n);
 
         auto k = dUdy(y - h, U_old);
 
@@ -124,9 +124,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         }
     }
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr[n];
         RealVector xn = set_species(y);
 	
         eos_state.rho = dens[r];
@@ -137,23 +137,23 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         eos(eos_input_rp, eos_state);
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] = eos_state.rho;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*RhoH)] = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = 
                 eos_state.rho * eos_state.xn[comp];
         }
         p0_init(n,r) = eos_state.p;
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init(lev,i);
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
+        rho0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
+        rhoh0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
+        tempbar(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        p0(lev,i) = p0_init[lev+max_lev*i];
     }
 
     // initialize any inlet BC parameters

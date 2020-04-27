@@ -19,8 +19,8 @@ Maestro::DensityAdvance (int which_step,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
 
-    BaseState<Real> rho0_edge_old(max_radial_level+1,nr_fine+1);
-    BaseState<Real> rho0_edge_new(max_radial_level+1,nr_fine+1);
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1,base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1,base_geom.nr_fine+1);
 
     if (spherical == 0) {
         // create edge-centered base state quantities.
@@ -249,8 +249,8 @@ Maestro::DensityAdvanceSDC (int which_step,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvanceSDC()",DensityAdvanceSDC);
 
-    BaseState<Real> rho0_edge_old(max_radial_level+1,nr_fine+1);
-    BaseState<Real> rho0_edge_new(max_radial_level+1,nr_fine+1);
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1,base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1,base_geom.nr_fine+1);
 
     if (spherical == 0) {
         // create edge-centered base state quantities.

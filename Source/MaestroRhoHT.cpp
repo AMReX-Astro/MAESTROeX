@@ -356,8 +356,8 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         tempbar_cart[lev].setVal(0.);
     }
 
-    BaseState<Real> rho0_halftime(max_radial_level+1, nr_fine);
-    BaseState<Real> rhoh0_halftime(max_radial_level+1, nr_fine);
+    BaseState<Real> rho0_halftime(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> rhoh0_halftime(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     rho0_halftime.copy(0.5*(rho0_old + rho0_new));
     rhoh0_halftime.copy(0.5*(rhoh0_old + rhoh0_new));
@@ -367,9 +367,9 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     Put1dArrayOnCart(tempbar, tempbar_cart, 0, 0, bcs_s, Temp);
 
     // edge variables    
-    BaseState<Real> rho0_edge(max_radial_level+1, nr_fine+1);
-    BaseState<Real> rhoh0_edge(max_radial_level+1, nr_fine+1);
-    BaseState<Real> tempbar_edge(max_radial_level+1, nr_fine+1);
+    BaseState<Real> rho0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> tempbar_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(tempbar, tempbar_edge);

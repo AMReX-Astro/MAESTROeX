@@ -37,7 +37,7 @@ Maestro::Evolve ()
 
             EstDt();
 
-            if (verbose > 0) {
+            if (maestro_verbose > 0) {
                 Print() << "Call to estdt at beginning of step " << istep
                         << " gives dt =" << dt << std::endl;
             }
@@ -46,13 +46,13 @@ Maestro::Evolve ()
 
             if (dt > max_dt_growth*dtold) {
                 dt = max_dt_growth*dtold;
-                if (verbose > 0) {
+                if (maestro_verbose > 0) {
                     Print() << "dt_growth factor limits the new dt = " << dt << std::endl;
                 }
             }
 
             if (dt > max_dt) {
-                if (verbose > 0) {
+                if (maestro_verbose > 0) {
                     Print() << "max_dt limits the new dt = " << max_dt << std::endl;
                 }
                 dt = max_dt;
