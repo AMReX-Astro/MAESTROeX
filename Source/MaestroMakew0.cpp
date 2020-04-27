@@ -119,6 +119,9 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
+    const auto Sbar_arr = Sbar_in.const_array();
+    const auto rho0_old_arr = rho0_old_in.const_array();
+    const auto rho0_new_arr = rho0_new_in.const_array();
     const auto p0_old_arr = p0_old_in.const_array();
     const auto p0_new_arr = p0_new_in.const_array();
     const auto gamma1bar_old_arr = gamma1bar_old_in.const_array();
@@ -183,7 +186,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                 }
 
                 w0[n+max_lev*r] = w0[n+max_lev*(r-1)]
-                    + Sbar_in(n,r-1) * dr_lev
+                    + Sbar_arr(n,r-1) * dr_lev
                     - psi_planar[r-1] / gamma1bar_p0_avg * dr_lev
                     - delta_chi_w0[n+max_lev*(r-1)] * dr_lev;
             }
@@ -587,6 +590,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     auto rho0_nph = rho0_nph_s.array();
     auto grav_edge = grav_edge_s.array();
 
+    const auto Sbar_arr = Sbar_in.const_array();
     const auto p0_old_arr = p0_old_in.const_array();
     const auto p0_new_arr = p0_new_in.const_array();
     const auto p0_minus_peosbar_arr = p0_minus_peosbar.const_array();
@@ -604,7 +608,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    const auto base_cutoff_density_coord_loc = base_geom.base_cutoff_density_coord(0);
+    const auto base_cutoff_density_coord = base_geom.base_cutoff_density_coord(0);
 
     const Real dr0 = base_geom.dr(0);
     const Real dpdt_factor_loc = dpdt_factor;
@@ -784,6 +788,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     auto rho0_nph = rho0_nph_s.array();
     auto grav_edge = grav_edge_s.array();
 
+    const auto Sbar_arr = Sbar_in.const_array();
     const auto p0_old_arr = p0_old_in.const_array();
     const auto p0_new_arr = p0_new_in.const_array();
     const auto p0_minus_peosbar_arr = p0_minus_peosbar.const_array();
@@ -801,7 +806,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
     Real base_cutoff_dens = 0.0;
     get_base_cutoff_density(&base_cutoff_dens);
-    const auto base_cutoff_density_coord_loc = base_geom.base_cutoff_density_coord(0);
+    const auto base_cutoff_density_coord = base_geom.base_cutoff_density_coord(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities

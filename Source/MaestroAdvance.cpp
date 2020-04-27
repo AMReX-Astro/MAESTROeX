@@ -290,8 +290,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
@@ -379,8 +378,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         ComputeCutoffCoords(rho0_new);
-        BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     } else {
         rho0_new.copy(rho0_old);
     }
@@ -436,8 +434,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
             ComputeCutoffCoords(rho0_new);
-            BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new
@@ -615,8 +612,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (use_thermal_diffusion) {
@@ -674,9 +670,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                 }
             }
         }
@@ -684,8 +681,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
@@ -759,8 +755,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         ComputeCutoffCoords(rho0_new);
-        BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -802,8 +797,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
             ComputeCutoffCoords(rho0_new);
-            BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph
@@ -984,9 +978,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                 }
             }
         }

@@ -33,6 +33,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     auto rhoh0_arr = rhoh0.array();
     auto rho0_arr = rho0.array();
     auto p0_arr = p0.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
 
     // irregular base state dr 
     RealVector model_dr_irreg;
@@ -86,7 +89,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         spec_above_cutoff[comp] = s0_init[n+max_lev*base_geom.nr_fine*(FirstSpec+comp)];
     } 
     Real temp_above_cutoff = s0_init[n+max_lev*base_geom.nr_fine*Temp];
-    Real p_above_cutoff = p0_init(n,0);
+    Real p_above_cutoff = p0_init_arr(n,0);
 
     for (auto r = 0; r < base_geom.nr(n); ++r) {
 
@@ -105,7 +108,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = spec_above_cutoff[comp];
             }
-            p0_init(n,r) = p_above_cutoff;
+            p0_init_arr(n,r) = p_above_cutoff;
             s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = temp_above_cutoff;
 
         } else {
@@ -147,7 +150,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = 
                     d_ambient * xn_ambient[comp];
             }
-            p0_init(n,r) = eos_state.p; // p_ambient !
+            p0_init_arr(n,r) = eos_state.p; // p_ambient !
             s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = t_ambient;
 
             // keep track of the height where we drop below the cutoff density
@@ -167,7 +170,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                         s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))];
                 }
                 temp_above_cutoff = s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)];
-                p_above_cutoff = p0_init(n,r);
+                p_above_cutoff = p0_init_arr(n,r);
             }
         }
     }
@@ -230,13 +233,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             Real rhog = 0.0;
             if (use_exact_base_state) {
                 Real dr_irreg = base_geom.r_cc_loc(n,r) - base_geom.r_cc_loc(n,r-1);
-                dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr_irreg;
+                dpdr = (p0_init_arr(n,r) - p0_init_arr(n,r-1))/dr_irreg;
 
                 Real rfrac = (base_geom.r_edge_loc(n,r) - base_geom.r_cc_loc(n,r-1)) / dr_irreg; 
                 rhog = ((1.0-rfrac) * s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] +  
                         rfrac * s0_init[n+max_lev*(r-1+base_geom.nr_fine*Rho)]) * g;
             } else {
-                dpdr = (p0_init(n,r) - p0_init(n,r-1))/dr(n);
+                dpdr = (p0_init_arr(n,r) - p0_init_arr(n,r-1))/dr(n);
                 rhog = 0.5 * (s0_init[n+max_lev*(r+base_geom.nr_fine*Rho)] +  
                               s0_init[n+max_lev*(r-1+base_geom.nr_fine*Rho)]) * g;
             }

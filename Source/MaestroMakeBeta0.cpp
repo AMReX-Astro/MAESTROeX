@@ -23,7 +23,6 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
     beta0_s.setVal(0.0);
 
-    const Real * AMREX_RESTRICT rho0_p = rho0.dataPtr();
     auto beta0 = beta0_s.array();
     const auto rho0 = rho0_s.const_array();
     const auto p0 = p0_s.const_array();

@@ -110,8 +110,7 @@ Maestro::Init ()
 
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (spherical) {
@@ -280,15 +279,13 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
 
         // first compute cutoff coordinates using initial density profile
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
@@ -298,8 +295,7 @@ Maestro::InitData ()
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
             ComputeCutoffCoords(rho0_old);
-            BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);
@@ -583,9 +579,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                 }
             }
         } else {
@@ -593,9 +590,10 @@ void Maestro::DivuIter (int istep_divu_iter)
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                auto Sbar_arr = Sbar.array();
+                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                     }
                 }
             }
@@ -730,9 +728,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                 }
             }
         } else {
@@ -740,9 +739,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
             
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                auto Sbar_arr = Sbar.array();
+                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                     }
                 }
             }

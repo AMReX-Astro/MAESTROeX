@@ -21,12 +21,11 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         for (auto n = 0; n < Nscal; ++n) {
             s0_init[lev+max_lev*(i+base_geom.nr_fine*n)] = 0.0;
         }
-        rho0(lev,i) = 0.0;
-        rhoh0(lev,i) = 0.0;
-        tempbar(lev,i) = 0.0;
-        tempbar_init(lev,i) = 0.0;
-        p0(lev,i) = 0.0;
-        p0_init(lev,i) = 0.0;
     }
-
+    rho0.setVal(0.0);
+    rhoh0.setVal(0.0);
+    tempbar.setVal(0.0);
+    tempbar_init.setVal(0.0);
+    p0.setVal(0.0);
+    p0_init.setVal(0.0);
 }

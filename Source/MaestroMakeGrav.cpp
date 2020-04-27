@@ -5,7 +5,7 @@ using namespace amrex;
 
 void
 Maestro::MakeGravCell(BaseState<Real>& grav_cell, 
-                      const BaseState<Real>& rho0)
+                      const BaseState<Real>& rho0_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
@@ -14,6 +14,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
     auto grav_cell_arr = grav_cell.array();
+    const auto rho0 = rho0_s.const_array();
 
     if (!spherical) {
         if (do_planar_invsq_grav)  {

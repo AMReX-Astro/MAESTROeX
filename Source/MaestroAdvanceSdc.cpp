@@ -727,9 +727,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute Sbar = Sbar + delta_gamma1_termbar
                     if (use_delta_gamma1_term) {
-                        for (auto l = 0; l <= max_radial_level; ++l) {
-                            for (auto r = 0; r < nr_fine; ++r) {
-                                Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                        auto Sbar_arr = Sbar.array();
+                        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                                Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                             }
                         }
                     }
@@ -1098,9 +1099,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for (auto l = 0; l <= max_radial_level; ++l) {
-                    for (auto r = 0; r < nr_fine; ++r) {
-                        Sbar(l,r) += delta_gamma1_termbar[l+(max_radial_level+1)*r];
+                auto Sbar_arr = Sbar.array();
+                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
                     }
                 }
             }

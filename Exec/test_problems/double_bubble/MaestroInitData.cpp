@@ -34,7 +34,7 @@ Maestro::InitLevelData(const int lev, const Real time,
     });
 
     const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-    const auto& p0_p = p0_init;
+    const auto p0_arr = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -75,7 +75,7 @@ Maestro::InitLevelData(const int lev, const Real time,
                 s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
             }
 
-            Perturb(p0_p(lev,r), s0, perturbations, 
+            Perturb(p0_arr(lev,r), s0, perturbations, 
                     prob_lo, prob_hi,
                     x, y,
                     y_pert_center_loc, 

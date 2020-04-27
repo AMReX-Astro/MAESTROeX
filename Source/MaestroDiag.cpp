@@ -16,7 +16,7 @@ const int setwVal = outfilePrecision+2+4+4; // 0. + precision + 4 for exp + 4 fo
 void
 Maestro::DiagFile (const int step,
                    const Real t_in,
-                   const BaseState<Real>& rho0,
+                   const BaseState<Real>& rho0_in,
                    const BaseState<Real>& p0_in,
                    const Vector<MultiFab>& u_in,
                    const Vector<MultiFab>& s_in,
@@ -497,12 +497,15 @@ Maestro::DiagFile (const int step,
     if (spherical) {
 #if (AMREX_SPACEDIM == 3)
 
+        auto rho0 = rho0_in.array();
+
         // m(r) will contain mass enclosed by the center
-        BaseState<Real> m(base_geom.nr_fine);
-        m[0] = 4.0/3.0 * M_PI * rho0(0,0)* r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
+        BaseState<Real> m_s(base_geom.nr_fine);
+        auto m = m_s.array();
+        m(0) = 4.0/3.0 * M_PI * rho0(0,0)* r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
 
         // dU = - G M dM / r;  dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
-        grav_ener = -4.0 * M_PI * Gconst * m[0] * r_cc_loc(0,0) * rho0(0,0) * (r_edge_loc(0,1) - r_edge_loc(0,0));
+        grav_ener = -4.0 * M_PI * Gconst * m(0) * r_cc_loc(0,0) * rho0(0,0) * (r_edge_loc(0,1) - r_edge_loc(0,0));
 
         for (auto r = 1; r < base_geom.nr_fine; ++r) {
             // the mass is defined at the cell-centers, so to compute the
@@ -530,14 +533,15 @@ Maestro::DiagFile (const int step,
                      r_edge_loc(0,r)*r_edge_loc(0,r));      
             } 
 
-            m[r] = m[r-1] + term1 + term2;
+            m(r) = m(r-1) + term1 + term2;
                 
             // dU = - G M dM / r;  
             // dM = 4 pi r**2 rho dr  -->  dU = - 4 pi G r rho dr
-            grav_ener -= 4.0*M_PI*Gconst*m[r]*r_cc_loc(0,r) * rho0(0,r)*(r_edge_loc(0,r+1)-r_edge_loc(0,r));
+            grav_ener -= 4.0*M_PI*Gconst*m(r)*r_cc_loc(0,r) * rho0(0,r)*(r_edge_loc(0,r+1)-r_edge_loc(0,r));
         }
 #endif
     } else {
+        const auto rho0 = rho0_in.const_array();
         // diag_grav_energy(&grav_ener, rho0_in.dataPtr(), r_cc_loc.dataPtr(), r_edge_loc.dataPtr());
         for (auto r = 0; r < base_geom.nr_fine; ++r) {
             Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);

@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -18,6 +18,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     const int max_lev = base_geom.max_radial_level + 1;
     const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
+
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -39,7 +46,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         RealVector xn_zone(NumSpec, 0.0);
         xn_zone[0] = 1.0;
 
-        p0_init(n,0) = pres_zone;
+        p0_init_arr(n,0) = pres_zone;
 
         // H = pres_base / dens_base / abs(grav_const)
         Real H = 1.e6 / 1.e-3 / fabs(grav_const);
@@ -65,16 +72,16 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
 
             if (r == 0) {
-                p0_init(n,r) -= base_geom.dr(n) * 0.5 * 
+                p0_init_arr(n,r) -= base_geom.dr(n) * 0.5 * 
                     s0_init[n+max_lev*(r+nr_fine*Rho)] * fabs(grav_const);
             } else {
-                p0_init(n,r) = p0_init(n,r-1) - base_geom.dr(n) * 
+                p0_init_arr(n,r) = p0_init_arr(n,r-1) - base_geom.dr(n) * 
                     0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + 
                            s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * 
                     fabs(grav_const);
             }
 
-            pres_zone = p0_init(n,r);
+            pres_zone = p0_init_arr(n,r);
 
             // use the EOS to make the state consistent
             eos_state.T     = temp_zone;
@@ -115,7 +122,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = eos_state.rho;
             s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
 
-            p0_init(n,r) = eos_state.p;
+            p0_init_arr(n,r) = eos_state.p;
         }
     }
 
@@ -123,9 +130,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     for (auto i = 0; i < nr_fine; ++i) {
         rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init(lev,i);
+        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
+        p0(lev,i) = p0_init_arr(lev,i);
     }
 
     // initialize any inlet BC parameters

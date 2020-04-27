@@ -64,8 +64,8 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const auto& rho0_old_p = rho0_old; 
-        auto& rho0_new_p = rho0_new; 
+        const auto rho0_old_arr = rho0_old.const_array();
+        auto rho0_new_arr = rho0_new.array(); 
         Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
 
         const Real dr_lev = base_geom.dr(n);
@@ -80,7 +80,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
                 int r = j + lo;
                 int p = n+max_lev*r;
 
-                rho0_new_p(n,r) = rho0_old_p(n,r)
+                rho0_new_arr(n,r) = rho0_old_arr(n,r)
                     - dt_loc/dr_lev * (rho0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rho0_predicted_edge(n,r)*w0_p[p]);
             });
             amrex::Gpu::synchronize();
