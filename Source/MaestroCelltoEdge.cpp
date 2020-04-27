@@ -50,6 +50,7 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
                     s0_edge[n+max_lev*r] = min(max(tmp,s0min),s0max);
                 }
             });
+            Gpu::synchronize();
         }
     }
 
@@ -105,6 +106,7 @@ Maestro::CelltoEdge(const RealVector& s0_cell_vec,
                     s0_edge(n,r) = min(max(tmp,s0min),s0max);
                 }
             });
+            Gpu::synchronize();
         }
     }
 
@@ -157,6 +159,7 @@ Maestro::CelltoEdge(const BaseState<Real>& s0_cell_s,
                     s0_edge(n,r) = min(max(tmp,s0min), s0max);
                 }
             });
+            Gpu::synchronize();
         }
     }
 

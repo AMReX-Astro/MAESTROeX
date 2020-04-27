@@ -55,6 +55,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             {       
                 gradw0_arr(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
             });
+            Gpu::synchronize();
         }
     }
 

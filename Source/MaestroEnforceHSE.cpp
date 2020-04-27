@@ -36,7 +36,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     // fine radial regions that no longer have a corresponding full
     // state
     // std::fill(p0.begin(), p0.end(), 0.);
-    p0.setVal(0.0);
+    p0_s.setVal(0.0);
 
     // integrate all of level 1 first
     // use the old pressure at r=0 as a reference point

@@ -80,6 +80,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     int r = j + lo;
                     phisum_p[lev+max_lev*r] /= ncell_lev;
                 });
+                Gpu::synchronize();
             }
         }
 
@@ -172,6 +173,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
                 radii_p[lev+fine_lev*(r+1)] = std::sqrt(0.75+2.0*Real(r)) * dx[0];
             });
+            Gpu::synchronize();
 
             radii[lev+fine_lev*(nr_irreg+2)] = 1.e99;
             radii[lev] = 0.0;
@@ -328,6 +330,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 }
             }
         });
+        Gpu::synchronize();
 
         // squish the list at each level down to exclude points with no contribution
         for (auto n = 0; n <= finest_level; ++n) {
@@ -397,6 +400,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+1)], 
                     phisum_p[which_lev_p[r]+fine_lev*(stencil_coord+2)], limit);
         });
+        Gpu::synchronize();
     }
 }
 
@@ -478,6 +482,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                     int r = j + lo;
                     phisum_arr(lev,r) /= ncell(lev);
                 });
+                Gpu::synchronize();
             }
         }
 
@@ -552,12 +557,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         // map into.  The radial locations have been precomputed and stored in radii.
         BaseState<Real> phisum_s(finest_level+1, nr_irreg+2);
         auto phisum = phisum_s.array();
-        phisum.setVal(0.0);
+        phisum_s.setVal(0.0);
         BaseState<Real> radii_s(finest_level+1, nr_irreg+3);
         auto radii = radii_s.array();
         BaseState<int> ncell_s(finest_level+1, nr_irreg+2);
         auto ncell = ncell_s.array();
-        ncell.setVal(0);
+        ncell_s.setVal(0);
 
         const auto& center_p = center;
 
@@ -573,6 +578,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
                 radii(lev,r+1) = std::sqrt(0.75+2.0*Real(r)) * dx[0];
             });
+            Gpu::synchronize();
 
             radii(lev,nr_irreg+2) = 1.e99;
             radii(lev,0) = 0.0;
@@ -730,7 +736,6 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 }
             }
         });
-
         Gpu::synchronize();
 
         // squish the list at each level down to exclude points with no contribution

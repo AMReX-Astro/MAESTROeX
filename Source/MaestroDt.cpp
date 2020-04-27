@@ -721,6 +721,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
             gp0[max_lev*r] = (p0_arr(0,r) - p0_arr(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
+    Gpu::synchronize();
 
     gp0_vec[max_lev*base_geom.nr_fine] = gp0_vec[max_lev*(base_geom.nr_fine-1)];
     gp0_vec[0] = gp0_vec[max_lev];

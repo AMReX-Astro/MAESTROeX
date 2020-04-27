@@ -108,6 +108,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge_stat
             sedgel(r+1)= s[r] + (0.5-ubardth)*slope + dth*force(r);
             sedger(r) = s[r] - (0.5+ubardth)*slope + dth*force(r);
         });
+        Gpu::synchronize();
 
     } else if (ppm_type == 1) {
 
@@ -186,6 +187,8 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge_stat
             sedgel(i+1) = Ip + dth*force(r);
             sedger(i) = Im + dth*force(r);
         });
+        Gpu::synchronize();
+
     } else if (ppm_type == 2) {
 
         AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, i, {
@@ -301,6 +304,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge_stat
             sedgel(r+1) = Ip + dth*force(r);
             sedger(r) = Im + dth*force(r);
         });
+        Gpu::synchronize();
     }
 
     const int nr_fine = base_geom.nr_fine;
@@ -322,7 +326,7 @@ void Maestro::MakeEdgeState1dSphr(RealVector& s_vec, BaseState<Real>& sedge_stat
         sedge(0,i) = w0_p[r] > 0.0 ? sedgel(i) : sedger(i);
         sedge(0,i) = fabs(w0_p[r])<rel_eps_local ? 0.5*(sedger(i)+sedgel(i)) : sedge(0,i);
     });
-
+    Gpu::synchronize();
 }
 
 void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_state, 
@@ -484,6 +488,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_st
                     sedgel(n,r+1) = s[p] + (0.5-ubardth)*slope + dth * force(n,r);
                     sedger(n,r) = s[p] - (0.5+ubardth)*slope + dth * force(n,r);
                 });
+                Gpu::synchronize();
 
             } else if (ppm_type == 1) {
 
@@ -615,6 +620,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_st
                     sedgel(n,r+1) = Ip + dth * force(n,r);
                     sedger(n,r) = Im + dth * force(n,r);
                 });
+                Gpu::synchronize();
 
             } else if (ppm_type == 2) {
 
@@ -680,6 +686,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_st
                         }
                     }
                 });
+                Gpu::synchronize();
 
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                     int r = j + lo;
@@ -795,6 +802,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_st
                     sedgel(n,r+1) = Ip + dth * force(n,r);
                     sedger(n,r) = Im + dth * force(n,r);
                 }); 
+                Gpu::synchronize();
             }
         }
     }
@@ -849,6 +857,7 @@ void Maestro::MakeEdgeState1dPlanar(RealVector& s_vec, BaseState<Real>& sedge_st
                     sedge(n,r) = fabs(w0_p[p]) < rel_eps_local ? 0.5*(sedger(n,r) + sedgel(n,r)) : sedge(n,r);
                 }
             });
+            Gpu::synchronize();
         }  // loop over disjointchunks
     } // loop over levels
 }
@@ -1039,9 +1048,9 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state, BaseState<Real>& sed
             Real sigmam = fabs(w0_p[r])*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s(0,r) - 3.0*(sm+sp);
             
-            Real Ip = w0_p[r+max_lev] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
+            Real Ip = w0_p[r+max_lev] > rel_eps_local ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
 
-            Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
+            Real Im = w0_p[r] < -rel_eps_local ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
 
             // // compute sedgel and sedger
             sedgel(i+1) = Ip + dth*force(r);
@@ -1155,9 +1164,9 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state, BaseState<Real>& sed
             Real sigmam = fabs(w0_p[r])*dtdr;  // NOTE: sigmam=0 for use_exact_base_state case
             Real s6 = 6.0*s(0,r) - 3.0*(sm+sp);
             
-            Real Ip = w0_p[r+1] > rel_eps ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
+            Real Ip = w0_p[r+1] > rel_eps_local ? sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6) : s(0,r);
 
-            Real Im = w0_p[r] < -rel_eps ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
+            Real Im = w0_p[r] < -rel_eps_local ? sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6) : s(0,r);
 
             // // compute sedgel and sedger
             sedgel(r+1) = Ip + dth*force(r);
@@ -1181,7 +1190,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state, BaseState<Real>& sed
 
         // solve Riemann problem to get final edge state
         sedge(0,i) = w0_p[r] > 0.0 ? sedgel(i) : sedger(i);
-        sedge(0,i) = fabs(w0_p[r])<rel_eps ? 0.5*(sedger(i)+sedgel(i)) : sedge[r];
+        sedge(0,i) = fabs(w0_p[r])<rel_eps_local ? 0.5*(sedger(i)+sedgel(i)) : sedge[r];
     });
     Gpu::synchronize();
 }
@@ -1461,12 +1470,12 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
                     Real s6 = 6.0*s(n,r) - 3.0*(sm+sp);
                     Real Ip = 0.0;
                     Real Im = 0.0;
-                    if (w0_p[pp] > rel_eps) {
+                    if (w0_p[pp] > rel_eps_local) {
                         Ip = sp - (sigmap/2.0)*(sp-sm-(1.0-2.0/3.0*sigmap)*s6);
                     } else {
                         Ip = s(n,r);
                     }
-                    if (w0_p[p] < -rel_eps) {
+                    if (w0_p[p] < -rel_eps_local) {
                         Im = sm + (sigmam/2.0)*(sp-sm+(1.0-2.0/3.0*sigmam)*s6);
                     } else {
                         Im = s(n,r);
@@ -1643,12 +1652,12 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
                     Real s6 = 6.0*s(n,r) - 3.0*(sm+sp);
                     Real Ip = 0.0;
                     Real Im = 0.0;
-                    if (w0_p[pp] > rel_eps) {
+                    if (w0_p[pp] > rel_eps_local) {
                         Ip = sp - 0.5*sigmap*(sp-sm-(1.0-2.0/3.0*sigmap)*s6);
                     } else {
                         Ip = s(n,r);
                     }
-                    if (w0_p[p] < -rel_eps) {
+                    if (w0_p[p] < -rel_eps_local) {
                         Im = sm + 0.5*sigmam*(sp-sm+(1.0-2.0/3.0*sigmam)*s6);
                     } else {
                         Im = s(n,r);
@@ -1691,13 +1700,18 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
 
         const int nr_lev = base_geom.nr(n);
 
+        Print() << "numdisjointchunks = " << base_geom.numdisjointchunks(n) << std::endl;
+
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
             const int lo = base_geom.r_start_coord(n,i);
             const int hi = base_geom.r_end_coord(n,i); 
 
             // solve Riemann problem to get final edge state
-            AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
+            // AMREX_PARALLEL_FOR_1D(hi-lo+2, j, {
+            ParallelFor(hi-lo+2, 
+            [=] AMREX_GPU_DEVICE (long j)
+            {
                 int r = j + lo;
                 int p = n + max_lev*r;
 
@@ -1710,7 +1724,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
                 } else {
                     // upwind
                     sedge(n,r) = w0_p[p] > 0.0 ? sedgel(n,r) : sedger(n,r);
-                    sedge(n,r) = fabs(w0_p[p]) < rel_eps ? 0.5*(sedger(n,r) + sedgel(n,r)) : sedge(n,r);
+                    sedge(n,r) = fabs(w0_p[p]) < rel_eps_local ? 0.5*(sedger(n,r) + sedgel(n,r)) : sedge(n,r);
                 }
             });
             Gpu::synchronize();

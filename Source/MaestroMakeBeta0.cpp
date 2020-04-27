@@ -265,6 +265,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                     int r = k + lo;
                     beta0(n,r) = rho0_p[n+max_lev*r];
                 });
+                Gpu::synchronize();
             }
         }
     } else if (beta0_type == 3) {
@@ -277,6 +278,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                     int r = k + lo;
                     beta0(n,r) = 1.0;
                 });
+                Gpu::synchronize();
             }
         }
     }

@@ -386,6 +386,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     {
         state_temp[max_lev*r] = base[max_lev*r];
     });
+    Gpu::synchronize();
 
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
@@ -414,6 +415,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         }
+        Gpu::synchronize();
     }
 
     // copy valid data into temp
@@ -426,13 +428,15 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 int r = k + lo;
                 state_temp[n+max_lev*r] = base[n+max_lev*r];
             });
+            Gpu::synchronize();
         }
     }
 
     // copy temp array back into the real thing
     AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
         base[r] = state_temp[r];
-    })
+    });
+    Gpu::synchronize();
 }
 
 void
@@ -454,6 +458,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
     {
         state_temp(0,r) = base(0,r);
     });
+    Gpu::synchronize();
 
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
@@ -482,6 +487,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
                 }
             });
         }
+        Gpu::synchronize();
     }
 
     // copy valid data into temp
@@ -494,6 +500,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
                 int r = k + lo;
                 state_temp(n,r) = base(n,r);
             });
+            Gpu::synchronize();
         }
     }
 

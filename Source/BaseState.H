@@ -51,13 +51,13 @@ struct BaseStateArray
         nvar = base_state.nComp();
     }
 
-    /// set to some scalar value 
-    void setVal(const T val) noexcept {
-        AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
-            dptr[i] = val;
-        });
-        amrex::Gpu::synchronize();
-    }
+    // /// set to some scalar value 
+    // void setVal(const T val) noexcept {
+    //     AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
+    //         dptr[i] = val;
+    //     });
+    //     amrex::Gpu::synchronize();
+    // }
 
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
