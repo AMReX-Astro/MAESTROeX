@@ -14,11 +14,14 @@ Maestro::CelltoEdge(const BaseState<Real>& s0_cell,
         Abort("Calling CelltoEdge with spherical == true");
     }
 
-    for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks(n); ++i) {
-            Real nr_lev = nr(n);
-            const int lo = r_start_coord(n,i);
-            const int hi = r_end_coord(n,i)+1;
+    const auto s0_cell = s0_cell_s.array();
+    auto s0_edge = s0_edge_s.array();
+
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
+            Real nr_lev = base_geom.nr(n);
+            const int lo = base_geom.r_start_coord(n,i);
+            const int hi = base_geom.r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
              
@@ -45,9 +48,10 @@ Maestro::CelltoEdge(const BaseState<Real>& s0_cell,
                     s0_edge(n,r) = min(max(tmp,s0min), s0max);
                 }
             });
+            Gpu::synchronize();
         }
     }
 
     // make the edge values synchronous across levels
-    RestrictBase(s0_edge, false);
+    RestrictBase(s0_edge_s, false);
 }

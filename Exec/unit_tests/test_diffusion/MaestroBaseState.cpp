@@ -4,14 +4,20 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
-                       const int lev)
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
+                       const int n)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
-    
-    const int n = lev;
+
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
     
     // get species indices
     const int ihe4 = network_spec_index("helium-4");
@@ -38,25 +44,25 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     Real diffusion_coefficient = const_conductivity / (eos_state.cp * ambient_dens);
    
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        s0_init(n,r,Rho)= eos_state.rho;
-        s0_init(n,r,RhoH) = eos_state.rho * eos_state.h;
+        s0_init_arr(n,r,Rho)= eos_state.rho;
+        s0_init_arr(n,r,RhoH) = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init(n,r,FirstSpec+comp) = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init(n,r) = eos_state.p;
-        s0_init(n,r,Temp) = eos_state.T;
+        p0_init_arr(n,r) = eos_state.p;
+        s0_init_arr(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto r = 0; r < nr_fine; ++r) {
-        rho0(lev,r) = s0_init(lev,r,Rho);
-        rhoh0(lev,r) = s0_init(lev,r,RhoH);
-        tempbar(lev,r) = s0_init(lev,r,Temp);
-        tempbar_init(lev,r) = s0_init(lev,r,Temp);
-        p0(lev,r) = p0_init(lev,r);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // initialize any inlet BC parameters

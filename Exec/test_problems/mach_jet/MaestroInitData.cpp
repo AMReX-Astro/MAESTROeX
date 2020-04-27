@@ -17,7 +17,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
-    const auto& s0_p = s0_init;
+    const auto s0_arr = s0_init.array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -27,7 +27,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         scal(i,j,k,RhoH) = s0_p(lev,r,RhoH);
         scal(i,j,k,Temp) = s0_p(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p(lev,r,FirstSpec+comp);
+            scal(i,j,k,FirstSpec+comp) = s0_arr(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;

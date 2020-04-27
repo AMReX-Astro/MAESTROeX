@@ -100,15 +100,20 @@ Maestro::Init ()
             // reset tagging array to include buffer zones
             TagArray();
         }
+
+        // set finest_radial_level in fortran
+        // compute numdisjointchunks, r_start_coord, r_end_coord
+        init_multilevel(tag_array.dataPtr(),&finest_level);
+        // InitMultilevel(finest_level);
+        BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+
+        compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
-    // set finest_radial_level 
-    // compute numdisjointchunks, r_start_coord, r_end_coord
-    InitMultilevel();
-
-    ComputeCutoffCoords(rho0_old);
-
-    if (spherical) {
+    if (spherical) { 
         MakeNormal();
         MakeCCtoRadii();
     }
@@ -238,7 +243,7 @@ Maestro::InitData ()
     s0_init.setVal(0.0);
     p0_init.setVal(0.0);
 
-    for (auto lev = 0; lev <= max_radial_level; ++lev) {
+    for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
         InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
     }
 
@@ -257,7 +262,10 @@ Maestro::InitData ()
 
     // set finest_radial_level 
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    InitMultilevel();
+    init_multilevel(tag_array.dataPtr(),&finest_level);
+    // InitMultilevel(finest_level);
+    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     // average down data and fill ghost cells
     AverageDown(sold, 0, Nscal);
@@ -268,11 +276,13 @@ Maestro::InitData ()
     if (fix_base_state) {
         // compute cutoff coordinates
         ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
 
         // first compute cutoff coordinates using initial density profile
         ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
@@ -282,6 +292,7 @@ Maestro::InitData ()
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
             ComputeCutoffCoords(rho0_old);
+            base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);
@@ -401,8 +412,8 @@ void Maestro::InitProj ()
     Vector<MultiFab>       delta_gamma1(finest_level+1);
     Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
-    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         rho_omegadot      [lev].define(grids[lev], dmap[lev], NumSpec, 0);
@@ -470,7 +481,7 @@ void Maestro::InitProj ()
 void Maestro::DivuIter (int istep_divu_iter)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
+    BL_PROFILE_VAR("Maestro::DivuIter()", DivuIter);
 
     Vector<MultiFab> stemp             (finest_level+1);
     Vector<MultiFab> rho_Hext          (finest_level+1);
@@ -485,10 +496,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1      (finest_level+1);
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> w0_force (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
@@ -618,10 +629,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
     Vector<MultiFab> sdc_source        (finest_level+1);
     
-    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_pthermbar (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> w0_force (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_pthermbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     
     Sbar.setVal(0.);
     etarho_ec.setVal(0.0);

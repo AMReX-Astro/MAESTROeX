@@ -25,16 +25,16 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitData()", InitData);
 
     const auto tileBox = mfi.tilebox();
-    const auto max_lev = max_radial_level + 1;
-    const auto nrf = nr_fine;
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
 
-    const auto& s0_p = s0_init;
-    const auto& p0_p = p0_init;
+    const auto s0_arr = s0_init.const_array();
+    const auto p0_arr = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -75,7 +75,7 @@ Maestro::InitLevelData(const int lev, const Real time,
                 s0[n] = s0_p(lev,r,n);
             }
 
-            Perturb(p0_p(lev,r), s0, perturbations, 
+            Perturb(p0_arr(lev,r), s0, perturbations, 
                     prob_lo, prob_hi,
                     x, y,
                     y_pert_center_loc, 

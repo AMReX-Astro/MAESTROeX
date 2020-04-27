@@ -16,8 +16,11 @@
 #include <network.H>
 #include <eos.H>
 #include <BaseState.H>
+#include <BaseStateGeometry.H>
 
 #include <state_indices.H>
+#include <maestro_params.H>
+using namespace maestro;
 #include <ModelParser.H>
 #include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
@@ -295,10 +298,10 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
-    void InitBaseStateGeometry(const int max_radial_level_in, 
-                               const int nr_fine_in,
-                               const amrex::Real dr_fine_in,
-                               const int nr_irreg_in);
+    // void InitBaseStateGeometry(const int max_radial_level_in, 
+    //                            const int nr_fine_in,
+    //                            const amrex::Real dr_fine_in,
+    //                            const int nr_irreg_in);
 #if (AMREX_SPACEDIM == 3)
     void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
@@ -306,10 +309,11 @@ public:
 #endif
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
-    void InitMultilevel();
+    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
 
-    void RestrictBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
-    void FillGhostBase(BaseState<amrex::Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -1198,9 +1202,9 @@ public:
                     const BaseState<amrex::Real>& p0_minus_peosbar,
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseState<amrex::Real>& a, const BaseState<amrex::Real>& b, 
-                 const BaseState<amrex::Real>& c, const BaseState<amrex::Real>& r, 
-                 BaseState<amrex::Real>& u, const int n);
+    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
+                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
+                 BaseStateArray<Real> u, const int n);
 
     void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
@@ -1855,7 +1859,6 @@ public:
     ////////////////
     // static data members defined in `_cpp_parameters`
     // this file is in Source/param_includes/
-#include <maestro_params.H>
     ////////////////
 
     // these are defined in `VariableSetup()`
@@ -1966,7 +1969,6 @@ public:
     BaseState<amrex::Real> psi;
     BaseState<amrex::Real> grav_cell_old;
     BaseState<amrex::Real> grav_cell_new;
-    BaseState<amrex::Real> r_cc_loc;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     BaseState<amrex::Real> p0_nm1;
     BaseState<amrex::Real> beta0_nm1;
@@ -1975,34 +1977,37 @@ public:
     // These are edge-centered
     BaseState<amrex::Real> w0;
     BaseState<amrex::Real> etarho_ec;
-    BaseState<amrex::Real> r_edge_loc;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
     // in `base_state.f90` in a fortran module for convenience
-    int max_radial_level;
-    int finest_radial_level;
-    int nr_fine;
-    amrex::Real dr_fine;
-    int nr_irreg;
-    BaseState<int> nr;
-    BaseState<amrex::Real> dr;
+    // int max_radial_level;
+    // int finest_radial_level;
+    // int nr_fine;
+    // amrex::Real dr_fine;
+    // int nr_irreg;
+    // BaseState<int> nr;
+    // BaseState<Real> dr;
 
-    BaseState<int> base_cutoff_density_coord;
-    BaseState<int> anelastic_cutoff_density_coord;
-    BaseState<int> burning_cutoff_density_lo_coord;
-    BaseState<int> burning_cutoff_density_hi_coord;
+    // BaseState<int> base_cutoff_density_coord;
+    // BaseState<int> anelastic_cutoff_density_coord;
+    // BaseState<int> burning_cutoff_density_lo_coord;
+    // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
-    amrex::Real c_rel_eps;
+    amrex::Real rel_eps;
 
     // these provide information about the multilevel base state configuration
-    BaseState<int> numdisjointchunks;
-    BaseState<int> r_start_coord;
-    BaseState<int> r_end_coord;
+    // BaseState<int> numdisjointchunks;
+    // BaseState<int> r_start_coord;
+    // BaseState<int> r_end_coord;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+    // BaseState<int> tag_array_b;
+
+    /// contains base state geometry variables
+    BaseStateGeometry base_geom;
 
     // diag file array buffers
     amrex::Vector<amrex::Real> diagfile1_data;
@@ -2047,25 +2052,5 @@ public:
     enum plotfile_flag {plotInitData = -9999999, plotInitProj = -9999998, plotDivuIter = -9999997};
 
 };
-
-// namespace amrex{
-//     namespace HostDevice { namespace Atomic {
-
-//     template <class T>
-//     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-//     void Max (T* max, T value) noexcept
-//     {
-// #if AMREX_DEVICE_COMPILE
-//         Gpu::Atomic::Max(sum,value);
-// #else
-// #ifdef _OPENMP
-// #pragma omp atomic update
-// #endif
-//         *sum += value;
-// #endif
-//     }
-
-// }}}
-
 
 #endif

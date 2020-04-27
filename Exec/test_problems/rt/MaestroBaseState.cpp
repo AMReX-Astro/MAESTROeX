@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -18,6 +18,14 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
     const int n = lev;
+
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -71,10 +79,10 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     // set a guess for the temperature for the EOS calls
     Real t_guess = 1.e-8;
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real rloc = (Real(r) + 0.5) * dr[n];
+        Real rloc = (Real(r) + 0.5) * base_geom.dr(n);
 
         Real d_ambient = 0.0;
         Real p_ambient = 0.0;
@@ -118,17 +126,17 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init(n,r,FirstSpec+comp) = 
                 d_ambient * xn_ambient[comp];
         }
-        p0_init(n,r) = eos_state.p; // p_ambient !
-        s0_init(lev,r,Temp) = t_ambient;
+        p0_init_arr(n,r) = eos_state.p; // p_ambient !
+        s0_init_arr(lev,r,Temp) = t_ambient;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto r = 0; r < nr_fine; ++r) {
-        rho0(lev,r) = s0_init(lev,r,Rho);
-        rhoh0(lev,r) = s0_init(lev,r,RhoH);
-        tempbar(lev,r) = s0_init(lev,r,Temp);
-        tempbar_init(lev,r) = s0_init(lev,r,Temp);
-        p0(lev,r) = p0_init(lev,r);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     Real min_temp = 1.e99;
@@ -146,13 +154,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     Real max_hse_error = -1.e30;
 
-    for (auto r = 1; r < nr[n]; ++r) {
+    for (auto r = 1; r < base_geom.nr(n); ++r) {
 
-        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*dr[n];
+        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*base_geom.dr(n);
 
-        Real dpdr = (p0_init(n,r) - p0_init(n,r-1)) / dr[n];
-        Real rhog = 0.5*(s0_init(n,r,Rho) + 
-                         s0_init(n,r-1,Rho))*grav_const;
+        Real dpdr = (p0_init_arr(n,r) - p0_init_arr(n,r-1)) / base_geom.dr(n);
+        Real rhog = 0.5*(s0_init_arr(n,r,Rho) + 
+                         s0_init_arr(n,r-1,Rho))*grav_const;
 
         max_hse_error = max(max_hse_error, fabs(dpdr - rhog)/fabs(dpdr));
     }

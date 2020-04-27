@@ -11,7 +11,7 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const auto nrf = nr_fine;
+    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {

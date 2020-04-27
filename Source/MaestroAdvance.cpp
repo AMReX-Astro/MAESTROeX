@@ -83,22 +83,22 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> w0_force (max_radial_level+1, nr_fine);
-    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> gamma1bar_temp1 (max_radial_level+1, nr_fine);
-    BaseState<Real> gamma1bar_temp2 (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
+    BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> rho0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> w0_force (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> gamma1bar_temp1 (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> gamma1bar_temp2 (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
-    BaseState<Real> rho0_predicted_edge (max_radial_level+1, nr_fine+1);
+    BaseState<Real> w0_old (base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_predicted_edge (base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     bool is_predictor;
 
@@ -282,6 +282,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force
         is_predictor = true;
@@ -368,6 +369,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         ComputeCutoffCoords(rho0_new);
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     } else {
         rho0_new.copy(rho0_old);
     }
@@ -423,6 +425,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
             ComputeCutoffCoords(rho0_new);
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new
@@ -600,6 +603,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
         ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (use_thermal_diffusion) {
@@ -663,6 +667,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force
         is_predictor = false;
@@ -736,6 +741,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         ComputeCutoffCoords(rho0_new);
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -777,6 +783,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
             ComputeCutoffCoords(rho0_new);
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph

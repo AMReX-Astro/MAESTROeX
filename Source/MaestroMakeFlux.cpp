@@ -23,12 +23,12 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
                        const BaseState<Real>& rho0_old_in,
-                       const BaseState<Real>& rho0_edge_old,
+                       const BaseState<Real>& rho0_edge_old_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
                        const BaseState<Real>& rho0_new_in,
-                       const BaseState<Real>& rho0_edge_new,
+                       const BaseState<Real>& rho0_edge_new_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const BaseState<Real>& rho0_predicted_edge,
+                       const BaseState<Real>& rho0_predicted_edge_state,
                        int start_comp, int num_comp)
 {
     // timer for profiling
@@ -37,6 +37,13 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const int species_pred_type_loc = species_pred_type;
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
+
+    const auto rho0_old_arr = rho0_old_in.const_array();
+    const auto rho0_new_arr = rho0_new_in.const_array();
+
+    const auto rho0_edge_old = rho0_edge_old_state.const_array();
+    const auto rho0_edge_new = rho0_edge_new_state.const_array();
+    const auto rho0_predicted_edge = rho0_predicted_edge_state.const_array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
    
@@ -79,7 +86,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
 
-            const auto& w0_p = w0;
+            const auto w0_arr = w0.const_array();
 
 #if (AMREX_SPACEDIM == 2)
 
@@ -92,7 +99,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     sfluxx(i,j,k,0) = 0.0;
                 }
 
-                Real rho0_edge = 0.5*(rho0_old_in(lev,j)+rho0_new_in(lev,j));
+                Real rho0_edge = 0.5*(rho0_old_arr(lev,j)+rho0_new_arr(lev,j));
 
                 if (species_pred_type_loc == pred_rhoprime_and_X) {
                     // edge states are rho' and X.  To make the (rho X) flux,
@@ -148,7 +155,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     }
 
                     if (comp==FirstSpec+NumSpec-1) {
-                        etarhoflux_arr(i,j,k) -= w0_p(lev,j)*rho0_predicted_edge(lev,j);
+                        etarhoflux_arr(i,j,k) -= w0_arr(lev,j)*rho0_predicted_edge(lev,j);
                     }
                 } 
 
@@ -168,7 +175,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxx(i,j,k,0) = 0.0;
                     }
 
-                    Real rho0_edge = 0.5*(rho0_old_in(lev,k)+rho0_new_in(lev,k));
+                    Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -199,7 +206,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxy(i,j,k,0) = 0.0;
                     }
 
-                    Real rho0_edge = 0.5*(rho0_old_in(lev,k)+rho0_new_in(lev,k));
+                    Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -255,7 +262,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         }
 
                         if (comp == FirstSpec+NumSpec-1) {
-                            etarhoflux_arr(i,j,k) -= w0_p(lev,k)*rho0_predicted_edge(lev,k);
+                            etarhoflux_arr(i,j,k) -= w0_arr(lev,k)*rho0_predicted_edge(lev,k);
                         }
                     } 
 
@@ -515,8 +522,16 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
 
-            const auto& rhoh0_old_p = rhoh0_old_in;
-            const auto& rhoh0_new_p = rhoh0_new_in;
+            const auto rho0_old_arr = rho0_old_in.const_array();
+            const auto rho0_new_arr = rho0_new_in.const_array();
+
+            const auto rho0_edge_old_arr = rho0_edge_old.const_array();
+            const auto rho0_edge_new_arr = rho0_edge_new.const_array();
+
+            const auto rhoh0_old_arr = rhoh0_old_in.const_array();
+            const auto rhoh0_new_arr = rhoh0_new_in.const_array();
+            const auto rhoh0_edge_old_arr = rhoh0_edge_old.const_array();
+            const auto rhoh0_edge_new_arr = rhoh0_edge_new.const_array();
 
 #if (AMREX_SPACEDIM == 2)
             AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
@@ -525,7 +540,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // enthalpy edge state is h
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // density edge state is rho'
-                        Real rho0_edge = 0.5*(rho0_old_in(lev,j)+rho0_new_in(lev,j));
+                        Real rho0_edge = 0.5*(rho0_old_arr(lev,j)+rho0_new_arr(lev,j));
 
                         sfluxx(i,j,k,RhoH) = 
                            umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,Rho))*sedgex(i,j,k,RhoH);
@@ -542,7 +557,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 } else if (enthalpy_pred_type_loc == pred_rhohprime || 
                     enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                     //   ! enthalpy edge state is (rho h)'
-                    Real rhoh0_edge = 0.5*(rhoh0_old_p(lev,j)+rhoh0_new_p(lev,j));
+                    Real rhoh0_edge = 0.5*(rhoh0_old_arr(lev,j)+rhoh0_new_arr(lev,j));
 
                     sfluxx(i,j,k,RhoH) = umacx(i,j,k)*(rhoh0_edge+sedgex(i,j,k,RhoH));
                 }
@@ -554,7 +569,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // enthalpy edge state is h
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // density edge state is rho'
-                        Real rho0_edge = 0.5*(rho0_edge_old(lev,j)+rho0_edge_new(lev,j));
+                        Real rho0_edge = 0.5*(rho0_edge_old_arr(lev,j)+rho0_edge_new_arr(lev,j));
 
                         sfluxy(i,j,k,RhoH) = 
                             vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,Rho))*sedgey(i,j,k,RhoH);
@@ -571,7 +586,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 } else if (enthalpy_pred_type_loc == pred_rhohprime || 
                     enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                     // enthalpy edge state is (rho h)'
-                    Real rhoh0_edge = 0.5*(rhoh0_edge_old(lev,j)+rhoh0_edge_new(lev,j));
+                    Real rhoh0_edge = 0.5*(rhoh0_edge_old_arr(lev,j)+rhoh0_edge_new_arr(lev,j));
                     
                     sfluxy(i,j,k,RhoH) = vmac(i,j,k)*(sedgey(i,j,k,RhoH)+rhoh0_edge);
                 }
@@ -580,14 +595,13 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 3)
 
             if (!spherical) {
-
                 AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
                     // create x-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
                         if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
-                            Real rho0_edge = 0.5*(rho0_old_in(lev,k)+rho0_new_in(lev,k));
+                            Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                             sfluxx(i,j,k,RhoH) = 
                             umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,Rho))*sedgex(i,j,k,RhoH);
@@ -604,7 +618,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (enthalpy_pred_type_loc == pred_rhohprime || 
                         enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         //   ! enthalpy edge state is (rho h)'
-                        Real rhoh0_edge = 0.5*(rhoh0_old_p(lev,k)+rhoh0_new_p(lev,k));
+                        Real rhoh0_edge = 0.5*(rhoh0_old_arr(lev,k)+rhoh0_new_arr(lev,k));
 
                         sfluxx(i,j,k,RhoH) = umacx(i,j,k)*(rhoh0_edge+sedgex(i,j,k,RhoH));
                     }
@@ -616,7 +630,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         // enthalpy edge state is h
                         if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
-                            Real rho0_edge = 0.5*(rho0_old_in(lev,k)+rho0_new_in(lev,k));
+                            Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                             sfluxy(i,j,k,RhoH) = 
                             vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,Rho))*sedgey(i,j,k,RhoH);
@@ -633,7 +647,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (enthalpy_pred_type_loc == pred_rhohprime ||
                         enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         //   ! enthalpy edge state is (rho h)'
-                        Real rhoh0_edge = 0.5*(rhoh0_old_p(lev,k)+rhoh0_new_p(lev,k));
+                        Real rhoh0_edge = 0.5*(rhoh0_old_arr(lev,k)+rhoh0_new_arr(lev,k));
 
                         sfluxy(i,j,k,RhoH) = vmac(i,j,k)*(rhoh0_edge+sedgey(i,j,k,RhoH));
                     }
@@ -645,7 +659,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         // enthalpy edge state is h
                         if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
-                            Real rho0_edge = 0.5*(rho0_edge_old(lev,k)+rho0_edge_new(lev,k));
+                            Real rho0_edge = 0.5*(rho0_edge_old_arr(lev,k)+rho0_edge_new_arr(lev,k));
 
                             sfluxz(i,j,k,RhoH) = 
                                 wmac(i,j,k)*(rho0_edge+sedgez(i,j,k,Rho))*sedgez(i,j,k,RhoH);
@@ -662,7 +676,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     } else if (enthalpy_pred_type_loc == pred_rhohprime || 
                         enthalpy_pred_type_loc == pred_T_then_rhohprime) {
                         // enthalpy edge state is (rho h)'
-                        Real rhoh0_edge = 0.5*(rhoh0_edge_old(lev,k)+rhoh0_edge_new(lev,k));
+                        Real rhoh0_edge = 0.5*(rhoh0_edge_old_arr(lev,k)+rhoh0_edge_new_arr(lev,k));
                         
                         sfluxz(i,j,k,RhoH) = wmac(i,j,k)*(sedgez(i,j,k,RhoH)+rhoh0_edge);
                     }

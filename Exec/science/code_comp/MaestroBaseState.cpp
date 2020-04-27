@@ -75,12 +75,12 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         return dU;
     };
 
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
 
     // allocate arrays
-    RealVector pres(nr[n]);
-    RealVector dens(nr[n]);
+    RealVector pres(base_geom.nr(n));
+    RealVector dens(base_geom.nr(n));
 
     RealVector U_old(2);
     RealVector U_new(2);
@@ -93,15 +93,15 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     U_old[0] = log(rho_0);
     U_old[1] = log(p_0);
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
 
         // do HSE using RK2
 
         // out intergration starts at y - h
-        Real h = r == 0 ? dr[n] * 0.5 : dr[n];
+        Real h = r == 0 ? base_geom.dr(n) * 0.5 : base_geom.dr(n);
 
         auto k = dUdy(y - h, U_old);
 
@@ -124,9 +124,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         }
     }
 
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * dr[n];
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr[n];
         RealVector xn = set_species(y);
 	
         eos_state.rho = dens[r];
@@ -148,7 +148,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
         rho0(lev,i) = s0_init(lev,i,Rho);
         rhoh0(lev,i) = s0_init(lev,i,RhoH);
         tempbar(lev,i) = s0_init(lev,i,Temp);

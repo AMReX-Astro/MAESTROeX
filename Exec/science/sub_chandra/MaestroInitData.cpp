@@ -11,8 +11,8 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
     
     const auto tileBox = mfi.tilebox();
-    const auto max_lev = max_radial_level + 1;
-    const auto nrf = nr_fine;
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
@@ -42,7 +42,8 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -104,14 +105,14 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     Real velpert_r_outer;
     for (auto i = 0; i < nr_fine; ++i) {
         if (s0_init(0,i,Rho) < sponge_start_factor*sponge_center_density) {
-            velpert_r_outer = r_cc_loc_b(0,i);
+            velpert_r_outer = base_geom.r_cc_loc(0,i);
         }
     }
 
     Real velpert_r_inner;
     for (auto i = 0; i < nr_fine; ++i) {
         if (s0_init(0,i,FirstSpec+ihe4)/s0_init(0,i,Rho) > 0.9) {
-            velpert_r_inner = r_cc_loc_b(0,i);
+            velpert_r_inner = base_geom.r_cc_loc(0,i);
         }
     }
     

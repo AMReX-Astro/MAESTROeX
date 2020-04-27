@@ -71,23 +71,23 @@ Maestro::Setup ()
 
     if (spherical) {
 #if (AMREX_SPACEDIM == 3)
-        // compute max_radial_level
-        max_radial_level = 0;
+        // compute base_geom.max_radial_level
+        base_geom.max_radial_level = 0;
 
-        // compute dr_fine
-        dr_fine = dxFine[0] / drdxfac;
+        // compute base_geom.dr_fine
+        base_geom.dr_fine = dxFine[0] / drdxfac;
 
-        // compute nr_irreg
+        // compute base_geom.nr_irreg
         int domhi = domainBoxFine.bigEnd(0)+1;
         if (!octant) {
-            nr_irreg = round((3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0);
+            base_geom.nr_irreg = (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0;
         } else {
-            nr_irreg = round((3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0);
+            base_geom.nr_irreg = (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0;
         }
 
-            // compute nr_fine
+            // compute base_geom.nr_fine
         if (use_exact_base_state) {
-            nr_fine = nr_irreg + 1;
+            base_geom.nr_fine = base_geom.nr_irreg + 1;
         } else {
             double lenx, leny, lenz, max_dist;
             if (octant) {
@@ -100,56 +100,52 @@ Maestro::Setup ()
                 lenz = 0.5*(probHi[2] - probLo[2]);
             }
             max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
-            nr_fine = int(max_dist / dr_fine) + 1;
+            base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
         }
 #endif
     } else {
-        // compute max_radial_level
-        max_radial_level = max_level;
+        // compute base_geom.max_radial_level
+        base_geom.max_radial_level = max_level;
 
-        // compute dr_fine
-        dr_fine = dxFine[AMREX_SPACEDIM-1];
+        // compute base_geom.dr_fine
+        base_geom.dr_fine = dxFine[AMREX_SPACEDIM-1];
 
-        // compute nr_fine
-        nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
+        // compute base_geom.nr_fine
+        base_geom.nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
     }
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     // base states are stored
-    s0_init      .resize(max_radial_level+1, nr_fine, Nscal);
-    p0_init      .resize(max_radial_level+1, nr_fine);
-    rho0_old     .resize(max_radial_level+1, nr_fine);
-    rho0_new     .resize(max_radial_level+1, nr_fine);
-    rhoh0_old    .resize(max_radial_level+1, nr_fine);
-    rhoh0_new    .resize(max_radial_level+1, nr_fine);
-    p0_old       .resize(max_radial_level+1, nr_fine);
-    p0_new       .resize(max_radial_level+1, nr_fine);
-    p0_nm1       .resize(max_radial_level+1, nr_fine);
-    tempbar      .resize(max_radial_level+1, nr_fine);
-    tempbar_init .resize(max_radial_level+1, nr_fine);
-    beta0_old    .resize(max_radial_level+1, nr_fine);
-    beta0_new    .resize(max_radial_level+1, nr_fine);
-    beta0_nm1    .resize(max_radial_level+1, nr_fine);
-    gamma1bar_old.resize(max_radial_level+1, nr_fine);
-    gamma1bar_new.resize(max_radial_level+1, nr_fine);
-    grav_cell_old.resize(max_radial_level+1, nr_fine);
-    grav_cell_new.resize(max_radial_level+1, nr_fine);
-    r_cc_loc     .resize(max_radial_level+1, nr_fine);
-    etarho_cc    .resize(max_radial_level+1, nr_fine);
-    psi          .resize(max_radial_level+1, nr_fine);
+    s0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine, Nscal);
+    p0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rho0_old     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rho0_new     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rhoh0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rhoh0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_old       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_new       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_nm1       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    tempbar      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    tempbar_init .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    beta0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    beta0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    beta0_nm1    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    gamma1bar_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    gamma1bar_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    grav_cell_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    grav_cell_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    etarho_cc    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    psi          .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    r_edge_loc.resize(max_radial_level+1, nr_fine+1);
-    w0.resize(max_radial_level+1, nr_fine+1);
-    etarho_ec.resize(max_radial_level+1, nr_fine+1);
+    w0.resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    etarho_ec .resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     // tagged box array for multilevel (planar)
-    tag_array .resize( (max_radial_level+1)*nr_fine );
-    numdisjointchunks.resize(max_radial_level+1);
-    r_start_coord.resize(max_radial_level+1, nr_fine+1);
-    r_end_coord.resize(max_radial_level+1, nr_fine+1);
+    tag_array .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    // tag_array_b.resize(base_geom.max_radial_level+1,base_geom.nr_fine);
 
     // diag file data arrays
     diagfile1_data.resize(diag_buf_size*11);
@@ -162,16 +158,17 @@ Maestro::Setup ()
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
-    RealVector r_cc_loc_vec((max_radial_level+1)*nr_fine);
-    RealVector r_edge_loc_vec((max_radial_level+1)*(nr_fine+1));
+    RealVector r_cc_loc_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
+    RealVector r_edge_loc_vec((base_geom.max_radial_level+1)*(base_geom.nr_fine+1));
     r_cc_loc.toVector(r_cc_loc_vec);
     r_edge_loc.toVector(r_edge_loc_vec);
-    init_base_state_geometry(&max_radial_level,&nr_fine,&dr_fine,
+    init_base_state_geometry(&base_geom.max_radial_level,&base_geom.nr_fine,&base_geom.dr_fine,
                              r_cc_loc_vec.dataPtr(),
                              r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(),
-                             &nr_irreg);
-    InitBaseStateGeometry(max_radial_level, nr_fine, dr_fine, nr_irreg);
+                             &base_geom.nr_irreg);
+    // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
+    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
 
     if (use_exact_base_state) average_base_state = 1;
 
@@ -217,6 +214,7 @@ Maestro::Setup ()
     }
 
     std::fill(tag_array.begin(), tag_array.end(), 0);
+    // tag_array_b.setVal(0);
 
     // if do_smallscale check other parameters for consistency
 
@@ -239,6 +237,8 @@ Maestro::ReadParameters ()
     Print() << "Calling ReadParameters()" << std::endl;
 
     ParmParse pp("maestro");
+
+    using namespace maestro;
 
 #include <maestro_queries.H>
 

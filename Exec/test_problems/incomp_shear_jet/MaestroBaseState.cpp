@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -18,6 +18,14 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
     const int n = lev;
+
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
+    auto tempbar_arr = tempbar.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -73,10 +81,10 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     //   -The components of the fluid state 's':
     //       density, enthalpy, species mass fractions, and temperature
     //   -The pressure (note, pressure is NOT a component of the 's' multifab)
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real rloc = (Real(r) + 0.5) * dr[n];
+        Real rloc = (Real(r) + 0.5) * base_geom.dr(n);
 
         // Init density, pressure, and temp
         Real d_ambient = rho_base;
@@ -118,17 +126,17 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init(n,r,FirstSpec+comp) = 
                 d_ambient * xn_ambient[comp];
         }
-        p0_init(n,r) = p_base;
-        s0_init(lev,r,Temp) = eos_state.T;
+        p0_init_arr(n,r) = p_base;
+        s0_init_arr(lev,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto r = 0; r < nr_fine; ++r) {
-        rho0(lev,r) = s0_init(lev,r,Rho);
-        rhoh0(lev,r) = s0_init(lev,r,RhoH);
-        tempbar(lev,r) = s0_init(lev,r,Temp);
-        tempbar_init(lev,r) = s0_init(lev,r,Temp);
-        p0(lev,r) = p0_init(lev,r);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // Check that the temperature is consistent with the EoS

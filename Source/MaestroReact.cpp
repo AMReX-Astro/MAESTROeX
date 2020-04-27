@@ -195,7 +195,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         }
     }
 
-    RealVector tempbar_init_vec((max_radial_level+1)*nr_fine);
+    RealVector tempbar_init_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
     if (!spherical) {
         tempbar_init.toVector(tempbar_init_vec);
     }

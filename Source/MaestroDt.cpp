@@ -186,7 +186,7 @@ Maestro::EstDt ()
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
-                    const auto nr_lev = nr[lev];
+                    const auto nr_lev = base_geom.nr(lev);
 
                     tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 1, 1);
 
@@ -278,7 +278,7 @@ Maestro::EstDt ()
                     if (spdx > eps) dt_temp = amrex::min(dt_temp, dx[0] / spdx);
                     if (spdy > eps) dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     if (spdz > eps) dt_temp = amrex::min(dt_temp, dx[2] / spdz);
-                    if (spdr > eps) dt_temp = amrex::min(dt_temp, dr[0] / spdr);
+                    if (spdr > eps) dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
 
                     dt_temp *= cfl;
 
@@ -383,7 +383,7 @@ Maestro::EstDt ()
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    c_rel_eps = umax;
+    rel_eps = umax;
     set_rel_eps(&umax);
 }
 
@@ -566,7 +566,7 @@ Maestro::FirstDt ()
                     tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 0, 1);
 
                     if (!spherical) {
-                        const auto nr_lev = nr[lev];
+                        const auto nr_lev = base_geom.nr(lev);
 
                         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                             Real gradp0 = 0.0;
@@ -674,7 +674,7 @@ Maestro::FirstDt ()
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    c_rel_eps = umax;
+    rel_eps = umax;
     set_rel_eps(&umax);
 }
 
@@ -683,28 +683,32 @@ void
 Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0, 
                     const BaseState<Real>& gamma1bar)
 {
-    const auto& r_cc_loc_p = r_cc_loc;
+    auto gp0_arr = gp0.array();
+    const auto p0_arr = p0.const_array();
+    const auto gamma1bar_arr = gamma1bar.const_array();
+    const auto& r_cc_loc = base_geom.r_cc_loc;
 
     // spherical divU constraint
     if (use_exact_base_state) {
-        AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
+        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0(0,r) = (p0(0,r) - p0(0,r-1)) / (r_cc_loc_p(0,r) - r_cc_loc_p(0,r-1))  / gamma1bar_p_avg;
+            gp0_arr(0,r) = (p0_arr(0,r) - p0_arr(0,r-1)) / (r_cc_loc(0,r) - r_cc_loc(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
-        const auto dr0 = dr[0];
-        AMREX_PARALLEL_FOR_1D(nr_fine-2, i, {
+        const auto dr0 = base_geom.dr(0);
+        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar(0,r)*p0(0,r) + gamma1bar(0,r-1)*p0(0,r-1));
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0(0,r) = (p0(0,r) - p0(0,r-1)) / dr0 / gamma1bar_p_avg;
+            gp0_arr(0,r) = (p0_arr(0,r) - p0_arr(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
+    Gpu::synchronize();
 
-    gp0(0,nr_fine) = gp0(0,nr_fine-1);
-    gp0(0,0) = gp0(0,1);
+    gp0_arr(0,base_geom.nr_fine) = gp0_arr(0,base_geom.nr_fine-1);
+    gp0_arr(0,0) = gp0_arr(0,1);
 }

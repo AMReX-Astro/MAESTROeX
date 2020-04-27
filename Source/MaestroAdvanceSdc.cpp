@@ -74,22 +74,22 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
-    BaseState<Real> grav_cell_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> rho0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> p0_minus_peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> peosbar (max_radial_level+1, nr_fine);
-    BaseState<Real> w0_force_dummy (max_radial_level+1, nr_fine);
-    BaseState<Real> Sbar (max_radial_level+1, nr_fine);
-    BaseState<Real> beta0_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> gamma1bar_nph (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_gamma1_termbar (max_radial_level+1, nr_fine);
-    BaseState<Real> delta_rhoh0 (max_radial_level+1, nr_fine);
+    BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> rho0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> w0_force_dummy (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> gamma1bar_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_rhoh0 (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    BaseState<Real> w0_old (max_radial_level+1, nr_fine+1);
-    BaseState<Real> rho0_pred_edge_dummy (max_radial_level+1, nr_fine+1);
+    BaseState<Real> w0_old (base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_pred_edge_dummy (base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     bool is_predictor;
     bool split_projection = true;
@@ -415,12 +415,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for enthalpy advance
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-            }
-        }
-
+        psi.copy((p0_new - p0_old) / dt);
     } else {
         p0_new.copy(p0_old);
         p0_nph.copy(p0_old);
@@ -540,11 +535,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for Make_S_cc
-        for (auto l = 0; l <= max_radial_level; ++l) {
-            for (auto r = 0; r < nr_fine; ++r) {
-                psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-            }
-        }
+        psi.copy((p0_new - p0_old) / dt);
 
         // update base state enthalpy
         Average(snew, rhoh0_new, RhoH);
@@ -817,11 +808,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             p0_nph.copy(0.5*(p0_old + p0_new));
             
             // hold dp0/dt in psi for enthalpy advance
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-                }
-            }
+            psi.copy((p0_new - p0_old) / dt);
         }
         
         // enthalpy update
@@ -945,11 +932,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             p0_nph.copy(0.5*(p0_old + p0_new));
 
             // hold dp0/dt in psi for Make_S_cc
-            for (auto l = 0; l <= max_radial_level; ++l) {
-                for (auto r = 0; r < nr_fine; ++r) {
-                    psi(l,r) = (p0_new(l,r) - p0_old(l,r))/dt;
-                }
-            }
+            psi.copy((p0_new - p0_old) / dt);
             
             // also update base state enthalpy
             Average(snew, rhoh0_new, RhoH);
