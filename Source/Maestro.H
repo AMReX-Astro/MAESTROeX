@@ -16,6 +16,7 @@
 
 #include <network.H>
 #include <eos.H>
+#include <conductivity.H>
 #include <BaseState.H>
 #include <BaseStateGeometry.H>
 #include <burner.H>
