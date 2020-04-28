@@ -11,6 +11,7 @@ CEXE_sources += MaestroAverage.cpp
 CEXE_sources += MaestroBaseState.cpp
 CEXE_sources += MaestroBaseStateGeometry.cpp
 CEXE_sources += MaestroBCFill.cpp
+CEXE_sources += MaestroBurner.cpp
 CEXE_sources += MaestroCelltoEdge.cpp
 CEXE_sources += MaestroCheckpoint.cpp
 CEXE_sources += MaestroConvert.cpp
