@@ -19,12 +19,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
-    
-    // constants in Fortran
-    Real base_cutoff_density = 0.0; 
-    get_base_cutoff_density(&base_cutoff_density);
-    Real buoyancy_cutoff_factor = 0.0;
-    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

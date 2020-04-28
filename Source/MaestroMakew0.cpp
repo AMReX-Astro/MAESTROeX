@@ -592,8 +592,6 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
     const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
 
-    Real base_cutoff_dens = 0.0;
-    get_base_cutoff_density(&base_cutoff_dens);
     const auto base_cutoff_density_coord = base_geom.base_cutoff_density_coord(0);
 
     const Real dr0 = base_geom.dr(0);
@@ -614,7 +612,7 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
     w0_from_Sbar(0) = 0.0;
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
-        Real volume_discrepancy = rho0_old_arr(0,r-1) > base_cutoff_dens ? 
+        Real volume_discrepancy = rho0_old_arr(0,r-1) > base_cutoff_density ? 
             dpdt_factor_loc * p0_minus_peosbar_arr(0,r-1)/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
@@ -784,8 +782,6 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
 
-    Real base_cutoff_dens = 0.0;
-    get_base_cutoff_density(&base_cutoff_dens);
     const auto base_cutoff_density_coord = base_geom.base_cutoff_density_coord(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
@@ -803,7 +799,7 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     w0_from_Sbar(0) = 0.0;
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
-        Real volume_discrepancy = rho0_old_arr(0,r-1) > base_cutoff_dens ? 
+        Real volume_discrepancy = rho0_old_arr(0,r-1) > base_cutoff_density ? 
             dpdt_factor_loc * p0_minus_peosbar_arr(0,r-1)/dt_in : 0.0;
 
         Real dr1 = r_edge_loc(0,r) - r_edge_loc(0,r-1);

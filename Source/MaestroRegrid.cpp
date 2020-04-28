@@ -69,8 +69,6 @@ Maestro::Regrid ()
     if (!spherical) {
         TagArray();
     }
-    init_multilevel(tag_array.dataPtr(),&finest_level);
-    // InitMultilevel(finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 

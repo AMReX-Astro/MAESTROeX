@@ -18,11 +18,9 @@ contains
     ! Binds to C function ``maestro_network_init``
 
     use actual_rhs_module, only: actual_rhs_init
-    use burner_loop_module, only: burner_loop_init
 
     call network_init()
     call actual_rhs_init()
-    call burner_loop_init()
 
   end subroutine maestro_network_init
 
@@ -70,134 +68,5 @@ contains
      call eos_init(small_dens=small_dens, small_temp=small_temp)
 
   end subroutine maestro_eos_init
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine maestro_extern_init() bind(C, name="maestro_extern_init")
-    ! initialize the external runtime parameters in
-    ! extern_probin_module
-    ! Binds to C function ``maestro_extern_init``
-    use amrex_fort_module, only: rt => amrex_real
-    !
-    call runtime_init()
-
-  end subroutine maestro_extern_init
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine maestro_conductivity_init() bind(C, name="maestro_conductivity_init")
-    ! initialize the external runtime parameters in
-    ! extern_probin_module
-    ! Binds to C function ``maestro_conductivity_init``
-    use conductivity_module, only: conductivity_init
-
-    call conductivity_init()
-
-  end subroutine maestro_conductivity_init
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine get_num_spec(nspec_out) bind(C, name="get_num_spec")
-    ! Binds to C function ``get_num_spec``
-
-    integer, intent(out) :: nspec_out
-
-    nspec_out = nspec
-
-  end subroutine get_num_spec
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine get_spec_names(spec_names,ispec,len) bind(C, name="get_spec_names")
-    ! Binds to C function ``get_spec_names``
-
-    integer, intent(in   ) :: ispec
-    integer, intent(inout) :: len
-    integer, intent(inout) :: spec_names(len)
-
-    ! Local variables
-    integer   :: i
-
-    len = len_trim(short_spec_names(ispec+1))
-
-    do i = 1,len
-       spec_names(i) = ichar(short_spec_names(ispec+1)(i:i))
-    end do
-
-  end subroutine get_spec_names
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine get_spec_az(ispec,A,Z) bind(C, name="get_spec_az")
-    ! Binds to C function ``get_spec_az``
-
-    use network, only: nspec, aion, zion
-    use amrex_fort_module, only: rt => amrex_real
-
-    implicit none
-
-    integer,  intent(in   ) :: ispec
-    real(rt), intent(inout) :: A, Z
-
-    ! C++ is 0-based indexing, so increment
-    A = aion(ispec+1)
-    Z = zion(ispec+1)
-
-  end subroutine get_spec_az
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine set_method_params(prob_lo_in,prob_hi_in) &
-       bind(C, name="set_method_params")
-    ! Binds to C function ``set_method_params``
-
-    double precision, intent(in) :: prob_lo_in(3), prob_hi_in(3)
-
-    if (parallel_IOProcessor()) then
-       print*,'Calling set_method_params()'
-    end if
-
-    prob_lo(1:3) = prob_lo_in(1:3)
-    prob_hi(1:3) = prob_hi_in(1:3)    
-
-  end subroutine set_method_params
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine set_rel_eps(rel_eps_in) bind(C,name="set_rel_eps")
-    ! Binds to C function ``set_rel_eps``
-
-    double precision, intent(in) :: rel_eps_in
-
-    rel_eps = rel_eps_in
-
-  end subroutine set_rel_eps
-
-  ! :::
-  ! ::: ----------------------------------------------------------------
-  ! :::
-
-  subroutine get_rel_eps(rel_eps_in) bind(C,name="get_rel_eps")
-    ! Binds to C function ``get_rel_eps``
-
-    double precision, intent(inout) :: rel_eps_in
-
-    rel_eps_in = rel_eps
-
-  end subroutine get_rel_eps
 
 end module maestro_init_module

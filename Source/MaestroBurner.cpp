@@ -32,7 +32,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
         }
     }
 
-    const auto max_lev = max_radial_level + 1;
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -59,7 +58,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
             const Array4<Real> rho_omegadot_arr = rho_omegadot[lev].array(mfi);
             const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
-            const Real * AMREX_RESTRICT tempbar_init_p = tempbar_init.dataPtr();
+            const auto tempbar_init_arr = tempbar_init.const_array();
 
             const Array4<const Real> tempbar_cart_arr = tempbar_init_cart[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
@@ -79,7 +78,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
                 if (drive_initial_convection) {
                     if (!spherical) {
                         auto r = (AMREX_SPACEDIM == 2) ? j : k;
-                        T_in = tempbar_init_p[lev+max_lev*r];
+                        T_in = tempbar_init_arr(lev,r);
                     } else {
                         T_in = tempbar_cart_arr(i,j,k);
                     }
@@ -186,7 +185,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
 
     // Put tempbar_init on cart
     Vector<MultiFab> p0_cart(finest_level+1);
-    const auto max_lev = max_radial_level + 1;
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
     if (spherical == 1) {

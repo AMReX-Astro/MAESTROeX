@@ -207,8 +207,6 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
     auto grav_edge = grav_edge_state.array();
     const auto rho0 = rho0_state.const_array();
     
-    get_base_cutoff_density(&base_cutoff_density);
-    
     if (!spherical) {
         if (do_planar_invsq_grav)  {
             const Real planar_invsq_mass_loc = planar_invsq_mass;

@@ -218,7 +218,6 @@ Maestro::ReadCheckPoint ()
         // read in rel_eps
         is >> rel_eps;
         GotoNextLine(is);
-        set_rel_eps(&rel_eps);
 
         for (int lev = 0; lev <= finest_level; ++lev) {
 

@@ -1300,8 +1300,8 @@ Maestro::MakeCCtoRadii ()
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // get references to the MultiFabs at level lev
-        const Real* dx = geom[lev].CellSize();
-        const Real* dx_fine = geom[max_level].CellSize();
+        const auto dx = geom[lev].CellSizeArray();
+        const auto dx_fine = geom[max_level].CellSizeArray();
 
         iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
@@ -1310,18 +1310,7 @@ Maestro::MakeCCtoRadii ()
 #pragma omp parallel
 #endif
         for ( MFIter mfi(cc_to_r, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-            const Box& tilebox = mfi.tilebox();
-
-            // call fortran subroutine
-            // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-            // lo/hi coordinates (including ghost cells), and/or the # of components
-#pragma gpu box(tilebox)
-            init_base_state_map_sphr(AMREX_INT_ANYD(tilebox.loVect()), 
-                     AMREX_INT_ANYD(tilebox.hiVect()), 
-                     BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
-                                     AMREX_REAL_ANYD(dx_fine),
-                                     AMREX_REAL_ANYD(dx));
+            InitBaseStateMapSphr(lev, mfi, dx_fine, dx);
         }
     }
 }
