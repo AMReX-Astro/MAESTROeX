@@ -172,12 +172,12 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeReactionRates()",MakeReactionRates);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
+    const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
-        // get references to the MultiFabs at level lev
-              MultiFab& rho_omegadot_mf = rho_omegadot[lev];
-              MultiFab&     rho_Hnuc_mf = rho_Hnuc[lev];
-        const MultiFab&         scal_mf =     scal[lev];
+    const Real temp_min = EOSData::mintemp;
+    const Real temp_max = EOSData::maxtemp;
+
+    for (int lev=0; lev<=finest_level; ++lev) {
 
         if (!do_burning) {
             rho_omegadot[lev].setVal(0.);
@@ -188,21 +188,63 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-                
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-#pragma gpu box(tileBox)
-                instantaneous_reaction_rates(AMREX_INT_ANYD(tileBox.loVect()), 
-                         AMREX_INT_ANYD(tileBox.hiVect()),
-                                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
-                                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                                             BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
+                const Box& tilebox = mfi.tilebox();
+
+                const Array4<Real> rho_omegadot_arr = rho_omegadot[lev].array(mfi);
+                const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
+                const Array4<const Real> scal_arr = scal[lev].array(mfi);
+                Array1D<Real,1,neqs> ydot;
+
+                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                    auto rho = scal_arr(i,j,k,Rho);
+                    Real x_in[NumSpec];
+                    for (auto n = 0; n < NumSpec; ++n) {
+                        x_in[n] = scal_arr(i,j,k,FirstSpec+n) / rho;
+                    }
+                    Real x_test = (ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
+
+                    eos_t eos_state;
+                    burn_t state;
+
+                    // if the threshold species is not in the network, then we burn
+                    // normally.  if it is in the network, make sure the mass
+                    // fraction is above the cutoff.
+                    if ((rho > burning_cutoff_density_lo && 
+                        rho < burning_cutoff_density_hi) &&
+                        ( ispec_threshold < 0 || 
+                        (ispec_threshold > 0 && x_test > burner_threshold_cutoff) ) ) {
+                        
+                        eos_state.rho = scal_arr(i,j,k,Rho);
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            eos_state.xn[n] = scal_arr(i,j,k,FirstSpec+n) / eos_state.rho;
+                        }
+                        eos_state.h = scal_arr(i,j,k,RhoH) / eos_state.rho;
+                        eos_state.T = std::sqrt(temp_min * temp_max);
+
+                        // call the EOS with input rh to set T for rate evaluation
+                        eos(eos_input_rh, eos_state);
+                        eos_to_burn(eos_state, state);
+                        
+                        // we don't need the temperature RHS so set self_heat = False
+                        state.self_heat = false;
+
+                        actual_rhs(state, ydot);
+                        
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            rho_omegadot_arr(i,j,k,n) = state.rho * aion[n] * ydot(n);
+                        }
+                        rho_omegadot_arr(i,j,k,NumSpec) = 0.0;
+                        rho_Hnuc_arr(i,j,k) = state.rho * ydot(net_ienuc);
+                    } else {
+                        for (auto n = 0; n < NumSpec; ++n) {
+                            rho_omegadot_arr(i,j,k,n) = 0.0;
+                        }
+                        rho_Hnuc_arr(i,j,k) = 0.0;
+                    }
+                });
             }
         }
     }
