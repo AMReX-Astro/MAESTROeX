@@ -79,6 +79,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 					q(i,j,k) = 1.0;
 				}
 			});
+            Gpu::synchronize();
         }
     }
 
@@ -91,6 +92,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 					q(i,j,k) = 1.0;
 				}
 			});
+            Gpu::synchronize();
         }
     }
 
@@ -112,6 +114,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 						}
 					});
 				}
+                Gpu::synchronize();
 			} else {
 				if (INLET_VEL != 0.0) {
 					if (comp == Rho) {
@@ -153,6 +156,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 						}
 					});
 				}
+                Gpu::synchronize();
 			} // end if is_vel
         }
     }
@@ -167,6 +171,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                 }
             });
 		} 
+        Gpu::synchronize();
     }
 
 #if AMREX_SPACEDIM == 3
@@ -231,6 +236,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 					});
 				}
 			} // end if is_vel
+            Gpu::synchronize();
         }
     }
 
@@ -244,6 +250,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                 }
             });
 		} 
+        Gpu::synchronize();
     }
 #endif
 }

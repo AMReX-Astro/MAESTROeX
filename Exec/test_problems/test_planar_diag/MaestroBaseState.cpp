@@ -65,11 +65,11 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     eos(eos_input_rp, eos_state); // (rho, p) --> T, h
 
     // set other base vars
-    s0_init(n,0,RhoH) = dens_base * eos_state.h;
+    s0_init_arr(n,0,RhoH) = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        s0_init(n,0,FirstSpec+comp) = dens_base * xn_zone[comp];
+        s0_init_arr(n,0,FirstSpec+comp) = dens_base * xn_zone[comp];
     }
-    s0_init(n,0,Temp) = eos_state.T;
+    s0_init_arr(n,0,Temp) = eos_state.T;
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
 
@@ -95,12 +95,12 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        s0_init(n,r,RhoH) = dens_zone * eos_state.h;
+        s0_init_arr(n,r,RhoH) = dens_zone * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init(n,r,FirstSpec+comp) = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 dens_zone * xn_zone[comp];
         }
-        s0_init(n,r,Temp) = eos_state.T;
+        s0_init_arr(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar

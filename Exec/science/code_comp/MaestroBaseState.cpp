@@ -16,6 +16,14 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
+    auto rho0_arr = rho0.array();
+    auto rhoh0_arr = rhoh0.array();
+    auto p0_arr = p0.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array()
+
     // define some helper functions with lambdas
     auto fv = [](Real y)
     {
@@ -137,23 +145,23 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         eos(eos_input_rp, eos_state);
 
-        s0_init(n,r,Rho) = eos_state.rho;
-        s0_init(n,r,RhoH)= eos_state.rho * eos_state.h;
+        s0_init_arr(n,r,Rho) = eos_state.rho;
+        s0_init_arr(n,r,RhoH)= eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init(n,r,FirstSpec+comp) = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init(n,r) = eos_state.p;
-        s0_init(n,r,Temp) = eos_state.T;
+        p0_init_arr(n,r) = eos_state.p;
+        s0_init_arr(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < base_geom.nr_fine; ++i) {
-        rho0(lev,i) = s0_init(lev,i,Rho);
-        rhoh0(lev,i) = s0_init(lev,i,RhoH);
-        tempbar(lev,i) = s0_init(lev,i,Temp);
-        tempbar_init(lev,i) = s0_init(lev,i,Temp);
-        p0(lev,i) = p0_init(lev,i);
+        rho0_arr(lev,i) = s0_init_arr(lev,i,Rho);
+        rhoh0_arr(lev,i) = s0_init_arr(lev,i,RhoH);
+        tempbar_arr(lev,i) = s0_init_arr(lev,i,Temp);
+        tempbar_init_arr(lev,i) = s0_init_arr(lev,i,Temp);
+        p0_arr(lev,i) = p0_init_arr(lev,i);
     }
 
     // initialize any inlet BC parameters

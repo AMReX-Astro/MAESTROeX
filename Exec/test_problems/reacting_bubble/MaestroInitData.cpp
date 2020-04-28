@@ -31,7 +31,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
-    const auto s0_arr = s0_init.array();
+    const auto s0_arr = s0_init.const_array();
     const auto p0_arr = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {

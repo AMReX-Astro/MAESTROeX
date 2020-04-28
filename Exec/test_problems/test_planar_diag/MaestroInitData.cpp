@@ -11,8 +11,6 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nrf = base_geom.nr_fine;
 
     if (AMREX_SPACEDIM != 2) {
         Abort("Error: InitLevelData only implemented for 2d.");
@@ -23,18 +21,18 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
-    const auto& s0_p = s0_init;
-    const auto& p0_p = p0_init;
+    const auto s0_arr = s0_init.const_array();
+    const auto p0_arr = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p(lev,r,Rho);
-        scal(i,j,k,RhoH) = s0_p(lev,r,RhoH);
-        scal(i,j,k,Temp) = s0_p(lev,r,Temp);
+        scal(i,j,k,Rho) = s0_arr(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_arr(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_arr(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p(lev,r,FirstSpec+comp);
+            scal(i,j,k,FirstSpec+comp) = s0_arr(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -82,8 +80,8 @@ Maestro::InitLevelData(const int lev, const Real time,
         eos_t eos_state;
 
         eos_state.rho = rho_local;
-        eos_state.p = p0_p(lev,r);
-        eos_state.T = s0_p[lev+max_lev*(r+nrf*Temp)];
+        eos_state.p = p0_arr(lev,r);
+        eos_state.T = s0_arr[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = 1.0; // single fluid
         }

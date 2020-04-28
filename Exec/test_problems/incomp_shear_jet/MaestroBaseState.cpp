@@ -120,10 +120,10 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        s0_init(lev,r,Rho) = d_ambient;
-        s0_init(lev,r,RhoH) = d_ambient * eos_state.h;
+        s0_init_arr(lev,r,Rho) = d_ambient;
+        s0_init_arr(lev,r,RhoH) = d_ambient * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init(n,r,FirstSpec+comp) = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 d_ambient * xn_ambient[comp];
         }
         p0_init_arr(n,r) = p_base;

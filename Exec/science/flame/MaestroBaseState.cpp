@@ -80,6 +80,14 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     Real dens_ash = eos_state.rho;
     Real rhoh_ash = dens_ash * eos_state.h;
 
+    auto s0_init_arr = s0_init.array();
+    auto rho0_arr = rho0.array();
+    auto rhoh0_arr = rhoh0.array();
+    auto p0_arr = p0.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
+
     for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
@@ -87,25 +95,25 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         if (rloc < geom[lev].ProbLo(AMREX_SPACEDIM-1) + interface_pos_frac*rlen) {
             // fuel 
-            s0_init(n,r,Rho) = dens_fuel;
-            s0_init(n,r,RhoH) = rhoh_fuel;
+            s0_init_arr(n,r,Rho) = dens_fuel;
+            s0_init_arr(n,r,RhoH) = rhoh_fuel;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init(n,r,FirstSpec+comp) = 
+                s0_init_arr(n,r,FirstSpec+comp) = 
                     dens_fuel * xn_fuel[comp];
             }
 
         } else {
             // ash
-            s0_init(n,r,Rho) = dens_ash;
-            s0_init(n,r,RhoH) = rhoh_ash;
+            s0_init_arr(n,r,Rho) = dens_ash;
+            s0_init_arr(n,r,RhoH) = rhoh_ash;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init(n,r,FirstSpec+comp) = 
+                s0_init_arr(n,r,FirstSpec+comp) = 
                     dens_fuel * xn_ash[comp];
             }
         }
 
         // give the temperature a smooth profile
-        s0_init(n,r,Temp) = temp_fuel + 
+        s0_init_arr(n,r,Temp) = temp_fuel + 
             (temp_ash - temp_fuel) * 0.5 * (1.0 + 
             tanh((rloc - (geom[lev].ProbLo(AMREX_SPACEDIM-1) + 
             interface_pos_frac*rlen)) / (smooth_len_frac*rlen)));
@@ -121,8 +129,8 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         xn_smooth[img24] = 1.0 - xn_smooth[ic12] - xn_smooth[io16];
 
         // get the new density and enthalpy
-        eos_state.rho   = s0_init(n,r,Rho);
-        eos_state.T     = s0_init(n,r,Temp);
+        eos_state.rho   = s0_init_arr(n,r,Rho);
+        eos_state.T     = s0_init_arr(n,r,Temp);
         eos_state.p     = p_ambient;
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = xn_smooth[comp];
@@ -131,22 +139,22 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         // (T,p) --> rho, h
         eos(eos_input_tp, eos_state);
 
-        s0_init(n,r,Rho) = eos_state.rho;
-        s0_init(n,r,RhoH) = eos_state.rho * eos_state.h;
+        s0_init_arr(n,r,Rho) = eos_state.rho;
+        s0_init_arr(n,r,RhoH) = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init(n,r,FirstSpec+comp) = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 eos_state.rho * xn_smooth[comp];
         }
-        p0_init(n,r) = p_ambient;
+        p0_init_arr(n,r) = p_ambient;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto r = 0; r < nr_fine; ++r) {
-        rho0(lev,r) = s0_init(n,r,Rho);
-        rhoh0(lev,r) = s0_init(n,r,RhoH);
-        tempbar(lev,r) = s0_init(n,r,Temp);
-        tempbar_init(lev,r) = s0_init(n,r,Temp);
-        p0(lev,r) = p0_init(lev,r);
+        rho0_arr(lev,r) = s0_init_arr(n,r,Rho);
+        rhoh0_arr(lev,r) = s0_init_arr(n,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(n,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(n,r,Temp);
+        p0_arr(lev,r) = p0_init(lev,r);
     }
 
     // initialize any inlet BC parameters

@@ -68,7 +68,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
                 dens_zone = 1.e-3 * exp(-z/H);
             }
 
-            s0_init(n,r,Rho) = dens_zone;
+            s0_init_arr(n,r,Rho) = dens_zone;
 
             if (r == 0) {
                 p0_init_arr(n,r) -= base_geom.dr(n) * 0.5 * 
@@ -93,13 +93,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
             // (rho,p) --> T, h
             eos(eos_input_rp, eos_state);
 
-            s0_init(n,r,Rho) = dens_zone;
-            s0_init(n,r,RhoH) = dens_zone * eos_state.h;
+            s0_init_arr(n,r,Rho) = dens_zone;
+            s0_init_arr(n,r,RhoH) = dens_zone * eos_state.h;
             for (auto comp = 1; comp < NumSpec; ++comp) {
-                s0_init(n,r,FirstSpec+comp) = 0.0;
+                s0_init_arr(n,r,FirstSpec+comp) = 0.0;
             }
-            s0_init(n,r,FirstSpec) = dens_zone;
-            s0_init(n,r,Temp) = eos_state.T;
+            s0_init_arr(n,r,FirstSpec) = dens_zone;
+            s0_init_arr(n,r,Temp) = eos_state.T;
         }
     } else {
         eos_t eos_state;
@@ -116,10 +116,10 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
         for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-            s0_init(lev,r,Rho)= eos_state.rho;
-            s0_init(lev,r,RhoH) = eos_state.rho * eos_state.h;
-            s0_init(n,r,FirstSpec) = eos_state.rho;
-            s0_init(n,r,Temp) = eos_state.T;
+            s0_init_arr(lev,r,Rho)= eos_state.rho;
+            s0_init_arr(lev,r,RhoH) = eos_state.rho * eos_state.h;
+            s0_init_arr(n,r,FirstSpec) = eos_state.rho;
+            s0_init_arr(n,r,Temp) = eos_state.T;
 
             p0_init_arr(n,r) = eos_state.p;
         }
