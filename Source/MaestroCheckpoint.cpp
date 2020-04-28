@@ -160,8 +160,8 @@ Maestro::WriteCheckPoint (int step) {
 
         BaseFCFile.precision(17);
 
-        for (int i=0; i<(max_radial_level+1)*(nr_fine+1); ++i) {
-            BaseFCFile << w0[i] << " "
+        for (int i=0; i<(base_geom.max_radial_level+1)*(base_geom.nr_fine+1); ++i) {
+            BaseFCFile << w0.array(i) << " "
                        << etarho_ec.array(i) << "\n";
         }
     }
@@ -342,7 +342,7 @@ Maestro::ReadCheckPoint ()
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
-            w0[i] = std::stod(word);
+            w0.array()(i) = std::stod(word);
             lis >> word;
             etarho_ec.array()(i) = std::stod(word);
         }

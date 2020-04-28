@@ -47,9 +47,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     if ( !(use_exact_base_state || average_base_state) ) {
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, i,
+            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, r,
             {       
-                gradw0_arr(l,i) = (w0_arr(l,r+1) - w0_arr(l,r))/dr0;
+                gradw0_arr(l,r) = (w0_arr(l,r+1) - w0_arr(l,r))/dr0;
             });
             Gpu::synchronize();
         }

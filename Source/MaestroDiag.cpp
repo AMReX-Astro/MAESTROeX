@@ -151,6 +151,7 @@ Maestro::DiagFile (const int step,
             const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
             const Array4<const Real> u = u_in[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
+            const auto w0_arr = w0.const_array();
 
             // weight is the factor by which the volume of a cell at the current level
             // relates to the volume of a cell at the coarsest level of refinement.
@@ -243,11 +244,11 @@ Maestro::DiagFile (const int step,
                     } else {
                         // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
-                        Real vert_vel = u(i,j,k,1) + 0.5*(w0(lev,j) + w0(lev,j+1));
+                        Real vert_vel = u(i,j,k,1) + 0.5*(w0_arr(lev,j) + w0_arr(lev,j+1));
                         vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     vert_vel*vert_vel);
 #else
-                        Real vert_vel = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
+                        Real vert_vel = u(i,j,k,2) + 0.5*(w0_arr(lev,k) + w0_arr(lev,k+1));
                         vel = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
                                     u(i,j,k,1)*u(i,j,k,1) + vert_vel*vert_vel);
 #endif
@@ -263,9 +264,9 @@ Maestro::DiagFile (const int step,
                             vel_Tmax_local[0]   = u(i,j,k,0);
                             vel_Tmax_local[1]   = u(i,j,k,1);
 #if (AMREX_SPACEDIM == 2)
-                            vel_Tmax_local[1] += 0.5*(w0(lev,j) + w0(lev,j+1));
+                            vel_Tmax_local[1] += 0.5*(w0_arr(lev,j) + w0_arr(lev,j+1));
 #else
-                            vel_Tmax_local[2] = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
+                            vel_Tmax_local[2] = u(i,j,k,2) + 0.5*(w0_arr(lev,k) + w0_arr(lev,k+1));
 #endif
                         }
 
@@ -280,9 +281,9 @@ Maestro::DiagFile (const int step,
                             vel_enucmax_local[0]   = u(i,j,k,0);
                             vel_enucmax_local[1]   = u(i,j,k,1);
 #if (AMREX_SPACEDIM == 2)
-                            vel_enucmax_local[1] += 0.5*(w0(lev,j) + w0(lev,j+1));
+                            vel_enucmax_local[1] += 0.5*(w0_arr(lev,j) + w0_arr(lev,j+1));
 #else
-                            vel_enucmax_local[2] = u(i,j,k,2) + 0.5*(w0(lev,k) + w0(lev,k+1));
+                            vel_enucmax_local[2] = u(i,j,k,2) + 0.5*(w0_arr(lev,k) + w0_arr(lev,k+1));
 #endif
                         }
                     }

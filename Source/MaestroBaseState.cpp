@@ -39,10 +39,11 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     // irregular base state dr 
     BaseState<Real> model_dr_irreg(npts_model);
+    auto model_dr_irreg_arr = model_dr_irreg.array();
     if (use_exact_base_state) {
-        model_dr_irreg[0] = input_model.model_r[0];
+        model_dr_irreg_arr(0) = input_model.model_r[0];
         for (auto i = 1; i < npts_model; ++i) {
-            model_dr_irreg[i] = input_model.model_r[i] - input_model.model_r[i-1];
+            model_dr_irreg_arr(i) = input_model.model_r[i] - input_model.model_r[i-1];
         }
     }
 
@@ -60,7 +61,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         Real mod_dr = 0.0;
         if (use_exact_base_state) {
-            mod_dr = base_geom.r_cc_loc(lev,0) < model_dr_irreg[0] ? remainder(model_dr_irreg[0], base_geom.r_cc_loc(lev,0)) : remainder(base_geom.r_cc_loc(lev,0), model_dr_irreg[0]);
+            mod_dr = base_geom.r_cc_loc(lev,0) < model_dr_irreg_arr(0) ? remainder(model_dr_irreg_arr(0), base_geom.r_cc_loc(lev,0)) : remainder(base_geom.r_cc_loc(lev,0), model_dr_irreg_arr(0));
         } else {
             mod_dr = dr(n) < model_dr ? 
                 remainder(model_dr, dr(n)) : remainder(dr(n), model_dr);
@@ -175,11 +176,11 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
-        rho0(lev,r) = s0_init_arr(lev,r,Rho);
-        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        rho0_arr(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0_arr(lev,r) = s0_init_arr(lev,r,RhoH);
         tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
         tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
-        p0(lev,r) = p0_init_arr(lev,r);
+        p0_arr(lev,r) = p0_init_arr(lev,r);
     }
 
     // check whether we are in HSE

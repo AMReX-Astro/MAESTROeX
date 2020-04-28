@@ -158,17 +158,23 @@ Maestro::Setup ()
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
+    // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
+    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
+
     RealVector r_cc_loc_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
     RealVector r_edge_loc_vec((base_geom.max_radial_level+1)*(base_geom.nr_fine+1));
-    r_cc_loc.toVector(r_cc_loc_vec);
-    r_edge_loc.toVector(r_edge_loc_vec);
+    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
+            r_cc_loc_vec[l + (base_geom.max_radial_level+1)*r] = base_geom.r_cc_loc(l,r);
+            r_edge_loc_vec[l + (base_geom.max_radial_level+1)*r] = base_geom.r_edge_loc(l,r);
+        }
+        r_edge_loc_vec[l + (base_geom.max_radial_level+1)*(base_geom.nr_fine)] = base_geom.r_edge_loc(l,base_geom.nr_fine);
+    }
     init_base_state_geometry(&base_geom.max_radial_level,&base_geom.nr_fine,&base_geom.dr_fine,
                              r_cc_loc_vec.dataPtr(),
                              r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(),
                              &base_geom.nr_irreg);
-    // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
-    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
 
     if (use_exact_base_state) average_base_state = 1;
 

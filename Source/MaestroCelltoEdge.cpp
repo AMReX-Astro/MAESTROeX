@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::CelltoEdge(const BaseState<Real>& s0_cell, 
-                    BaseState<Real>& s0_edge) 
+Maestro::CelltoEdge(const BaseState<Real>& s0_cell_s, 
+                    BaseState<Real>& s0_edge_s) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::CelltoEdge()", CelltoEdge);
@@ -14,7 +14,7 @@ Maestro::CelltoEdge(const BaseState<Real>& s0_cell,
         Abort("Calling CelltoEdge with spherical == true");
     }
 
-    const auto s0_cell = s0_cell_s.array();
+    const auto s0_cell = s0_cell_s.const_array();
     auto s0_edge = s0_edge_s.array();
 
     for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {

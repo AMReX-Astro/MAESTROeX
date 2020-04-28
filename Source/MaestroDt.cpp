@@ -80,7 +80,7 @@ Maestro::EstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    BaseState<Real> gp0(max_radial_level+1, nr_fine+1);
+    BaseState<Real> gp0(base_geom.max_radial_level+1, base_geom.nr_fine+1);
     gp0.setVal(0.);
 
     // divU constraint
@@ -434,7 +434,7 @@ Maestro::FirstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    BaseState<Real> gp0(max_radial_level+1, nr_fine+1);
+    BaseState<Real> gp0(base_geom.max_radial_level+1, base_geom.nr_fine+1);
     gp0.setVal(0.);
 
     // divU constraint

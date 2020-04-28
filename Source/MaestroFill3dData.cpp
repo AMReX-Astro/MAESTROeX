@@ -95,8 +95,7 @@ Maestro::Put1dArrayOnCart (int lev,
                 const int r = AMREX_SPACEDIM == 2 ? j : k;
 
                 s0_cart_arr(i,j,k,outcomp) = is_input_edge_centered == 1 ? 
-                    0.5 * (s0(lev,r) + s0(lev,r+1)) : 
-                    s0(lev,r);
+                    0.5 * (s0_arr(lev,r) + s0_arr(lev,r+1)) : s0_arr(lev,r);
             });
 
         } else {
@@ -136,7 +135,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
-                                s0(0,index+1) : s0(0,index);
+                                s0_arr(0,index+1) : s0_arr(0,index);
 
                         } else if (w0_interp_type_loc == 2) {
                             
@@ -188,7 +187,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real radius = sqrt(x*x + y*y + z*z);
                         int index = cc_to_r(i,j,k);
 
-                        Real s0_cart_val = s0(0,index);
+                        Real s0_cart_val = s0_arr(0,index);
                         
                         if (is_output_a_vector) {
                             s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
@@ -226,7 +225,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
-                                s0(0,index+1) : s0(0,index);
+                                s0_arr(0,index+1) : s0_arr(0,index);
 
                         } else if (w0_interp_type_loc == 2) {
                             
@@ -289,7 +288,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         if (s0_interp_type_loc == 1) {
 
-                            s0_cart_val = s0(0,index);
+                            s0_cart_val = s0_arr(0,index);
 
                         } else if (s0_interp_type_loc == 2) {
 
@@ -308,7 +307,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 } else if (index > nr_fine-1) {
                                     s0_cart_val = s0_arr(0,nr_fine-1);
                                 } else {
-                                    s0_cart_val = s0(0,index) 
+                                    s0_cart_val = s0_arr(0,index) 
                                         * (radius-r_cc_loc(0,index-1))/drf 
                                         + s0_arr(0,index-1) 
                                         * (r_cc_loc(0,index)-radius)/drf;
@@ -590,9 +589,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         }
 
                         w0_cart_val = QuadInterp(radius, 
-                                    r_edge_loc_p(0,index),
-                                    r_edge_loc_p(0,index+1), 
-                                    r_edge_loc_p(0,index+2), 
+                                    r_edge_loc(0,index),
+                                    r_edge_loc(0,index+1), 
+                                    r_edge_loc(0,index+2), 
                                     w0_arr(0,index),
                                     w0_arr(0,index+1),
                                     w0_arr(0,index+2));
@@ -624,7 +623,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                             index = 0;
                         } else if (index >= nr_fine-1) {
                             index = nr_fine-2;
-                        } else if (radius - r_edge_loc_p(0,index) < r_edge_loc_p(0,index+1)) {
+                        } else if (radius - r_edge_loc(0,index) < r_edge_loc(0,index+1)) {
                             index--;
                         }
 
@@ -705,7 +704,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 }
 
 void
-Maestro::MakeS0mac (const BaseState<Real>& s0_state,
+Maestro::MakeS0mac (const BaseState<Real>& s0,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
     // timer for profiling
@@ -723,7 +722,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
     }
 
     if (s0mac_interp_type == 1) {
-        Put1dArrayOnCart(s0_state, s0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(s0, s0_cart, 0, 0, bcs_f, 0);
     }
 
     if (s0mac[0][0].nGrow() != 1) {
@@ -734,7 +733,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
     const Real drf = base_geom.dr_fine;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto center_p = center;
-    const auto s0 = s0_state.array();
+    const auto s0_arr = s0.const_array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
@@ -793,24 +792,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index+1) 
+                                s0macx(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macx(i,j,k) = s0(0,index);
+                                s0macx(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index) 
+                                s0macx(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -829,24 +828,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index+1) 
+                                s0macy(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macy(i,j,k) = s0(0,index);
+                                s0macy(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index) 
+                                s0macy(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -865,24 +864,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index+1) 
+                                s0macz(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macz(i,j,k) = s0(0,index);
+                                s0macz(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index) 
+                                s0macz(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -911,9 +910,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
@@ -937,9 +936,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
@@ -963,9 +962,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
                 }
 
@@ -997,22 +996,22 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index+1) 
+                                s0macx(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macx(i,j,k) = s0(0,index);
+                                s0macx(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index) 
+                                s0macx(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1028,22 +1027,22 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index+1) 
+                                s0macy(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macy(i,j,k) = s0(0,index);
+                                s0macy(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index) 
+                                s0macy(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1059,22 +1058,22 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index+1) 
+                                s0macz(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macz(i,j,k) = s0(0,index);
+                                s0macz(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index) 
+                                s0macz(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1100,9 +1099,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
@@ -1123,9 +1122,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
@@ -1146,9 +1145,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
                 }
             }

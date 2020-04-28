@@ -21,6 +21,8 @@ Maestro::SpongeInit(const BaseState<Real>& rho0_s)
     //
     // The top of the sponge is then 2 * r_md - r_tp
 
+    const auto rho0 = rho0_s.const_array();
+
     Real prob_lo_r = spherical ? 0.0 : geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     Real r_top = prob_lo_r;

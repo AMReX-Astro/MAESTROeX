@@ -58,10 +58,11 @@ Maestro::Makew0(const BaseState<Real>& w0_old,
     }
 
     if (maestro_verbose >= 2) {
+        const auto w0_arr = w0.const_array();
         for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
             Real max_w0 = 0.0;
             for (auto r = base_geom.r_start_coord(n,1); r <= base_geom.r_end_coord(n,1)+1; ++r) {
-                max_w0 = max(max_w0, fabs(w0(n,r)));
+                max_w0 = max(max_w0, fabs(w0_arr(n,r)));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / base_geom.dr(n) << std::endl;
         }
@@ -111,7 +112,7 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
 
     const auto etarho_cc_arr = etarho_cc.const_array();
     auto w0_arr = w0.array();
-    const Real * AMREX_RESTRICT w0_old_arr = w0_old.dataPtr();
+    const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
     const auto Sbar_arr = Sbar_in.const_array();
     const auto rho0_old_arr = rho0_old_in.const_array();
@@ -138,7 +139,7 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
 
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
-                w0(0,0) = 0.0;
+                w0_arr(0,0) = 0.0;
             } else {
                 // Obtain the starting value of w0 from the coarser grid
                 w0_arr(n,base_geom.r_start_coord(n,j)) = w0_arr(n-1,base_geom.r_start_coord(n,j)/2);
@@ -165,7 +166,7 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
 
                 Real delta_chi_w0 = 0.0;
 
-                if (r < base_cutoff_density_coord_loc) {
+                if (r < base_cutoff_density_coord) {
                     if (is_predictor) {
                         delta_chi_w0 = dpdt_factor_loc * 
                             p0_minus_peosbar_arr(n,r-1) / 
@@ -197,7 +198,7 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
                     // Restrict w0 from level n to level i
                     for (auto r = base_geom.r_start_coord(n,j); r <= base_geom.r_end_coord(n,j)+1; ++r) {
                         if (r % refrat == 0) {
-                            w0(n,r/refrat) = w0(n,r);
+                            w0_arr(n,r/refrat) = w0_arr(n,r);
                         }
                     }
 
@@ -252,15 +253,15 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
 
-                Real w0_old_cen = 0.5 * (w0_old(n,r) + 
-                    w0_old(n,r+1));
+                Real w0_old_cen = 0.5 * (w0_old_arr(n,r) + 
+                    w0_old_arr(n,r+1));
                 Real w0_new_cen = 0.5 * (w0_arr(n,r) + 
                     w0_arr(n,r+1));
                 Real w0_avg = 0.5 * (dt_in * w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt_in *(w0_old(n,r+1)
-                    - w0_old(n,r)) + dtold_in * (w0_arr(n,r+1) 
+                Real div_avg = 0.5 * (dt_in *(w0_old_arr(n,r+1)
+                    - w0_old_arr(n,r)) + dtold_in * (w0_arr(n,r+1) 
                     - w0_arr(n,r))) / dt_avg;
-                w0_force(n,r) = (w0_new_cen - w0_old_cen)/dt_avg 
+                w0_force_arr(n,r) = (w0_new_cen - w0_old_cen)/dt_avg 
                     + w0_avg*div_avg/dr_lev;
             });
             Gpu::synchronize();
@@ -361,7 +362,6 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
 
     w0bar_fine_arr(0) = 0.0;
 
-    // for (auto r = 1; r <= nr_finest; ++r) {
     int lo = 1; 
     int hi = nr_finest;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -409,7 +409,6 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     auto u = u_s.array();
     auto F = A_s.array();
 
-    // for (auto r = 1; r <= fine_base_density_cutoff_coord; ++r) {
     lo = 1; 
     hi = fine_base_density_cutoff_coord;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -452,7 +451,6 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     // Call the tridiagonal solver
     Tridiag(A, B, C, F, u, fine_base_density_cutoff_coord+2);
 
-    // for (auto r = 1; r <= fine_base_density_cutoff_coord+1; ++r) {
     lo = 1; 
     hi = fine_base_density_cutoff_coord+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -461,7 +459,6 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     });
     Gpu::synchronize();
 
-    // for (auto r = fine_base_density_cutoff_coord+2; r <= nr_finest; ++r) {
     lo = fine_base_density_cutoff_coord+2; 
     hi = nr_finest;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -471,10 +468,9 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     Gpu::synchronize();
 
     // 6) compute w0 = w0bar + deltaw0
-    // for (auto r = 0; r < w0_fine.size(); ++r) {
     AMREX_PARALLEL_FOR_1D(nr_finest+1, r, {
         w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
-        w0_arr(finest_radial_level,r) = w0_fine_arr(r);
+        w0_arr(base_geom.finest_radial_level,r) = w0_fine_arr(r);
     });
     Gpu::synchronize();
 
@@ -525,12 +521,12 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
             hi = base_geom.r_end_coord(n,j);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                 int r = k + lo;
-                Real w0_old_cen = 0.5 * (w0_old(n,r) + w0_old(n,r+1));
+                Real w0_old_cen = 0.5 * (w0_old_arr(n,r) + w0_old_arr(n,r+1));
                 Real w0_new_cen = 0.5 * (w0_arr(n,r) + w0_arr(n,r+1));
                 Real w0_avg = 0.5 * (dt_in * w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-                Real div_avg = 0.5 * (dt_in * (w0_old(n,r+1)-w0_old(n,r)) + 
+                Real div_avg = 0.5 * (dt_in * (w0_old_arr(n,r+1)-w0_old_arr(n,r)) + 
                     dtold_in * (w0_arr(n,r+1)-w0_arr(n,r))) / dt_avg;
-                w0_force(n,r) = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
+                w0_force_arr(n,r) = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
             });
             Gpu::synchronize();
         }
@@ -629,7 +625,6 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
         }
     }
 
-    // for (auto r = 1; r <= base_geom.nr_fine; ++r) {
     int lo = 1; 
     int hi = base_geom.nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -656,7 +651,6 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
 
     int max_cutoff = min(base_cutoff_density_coord, base_geom.nr_fine-1);
     
-    // for (auto r = 1; r <= max_cutoff; ++r) {
     lo = 1; 
     hi = max_cutoff;
     //AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -703,9 +697,8 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
     // Call the tridiagonal solver
     Tridiag(A, B, C, F, u, max_cutoff+2);
 
-    w0(0,0) = w0_from_Sbar(0);
+    w0_arr(0,0) = w0_from_Sbar(0);
 
-    // for (auto r = 1; r <= max_cutoff+1; ++r) {
     lo = 1; 
     hi = max_cutoff+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -714,7 +707,6 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
     });
     Gpu::synchronize();
 
-    // for (auto r = max_cutoff+2; r <= base_geom.nr_fine; ++r) {
     lo = max_cutoff+2; 
     hi = base_geom.nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -730,8 +722,8 @@ Maestro::Makew0Sphr(const BaseState<Real>& w0_old,
         Real w0_old_cen = 0.5 * (w0_old_arr(0,r) + w0_old_arr(0,r+1));
         Real w0_new_cen = 0.5 * (w0_arr(0,r) + w0_arr(0,r+1));
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-        Real div_avg = 0.5 * (dt_in * (w0_old(0,r+1)-w0_old(0,r)) + dtold_in * (w0_arr(0,r+1)-w0_arr(0,r))) / dt_avg;
-        w0_force(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
+        Real div_avg = 0.5 * (dt_in * (w0_old_arr(0,r+1)-w0_old_arr(0,r)) + dtold_in * (w0_arr(0,r+1)-w0_arr(0,r))) / dt_avg;
+        w0_force_arr(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
     });
     Gpu::synchronize();
 }
@@ -798,7 +790,6 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
-    // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
         p0_nph(r) = 0.5*(p0_old_arr(0,r) + p0_new_arr(0,r));
         rho0_nph(r) = 0.5*(rho0_old_arr(0,r) + rho0_new_arr(0,r));
@@ -843,7 +834,6 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     // Note that we are solving for (r^2 delta w0), not just w0.
     int max_cutoff = base_cutoff_density_coord;
     
-    // for (auto r = 1; r <= max_cutoff; ++r) {
     int lo = 1; 
     int hi = max_cutoff;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -893,9 +883,8 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     // Call the tridiagonal solver
     Tridiag(A, B, C, F, u, max_cutoff+2);
 
-    w0(0,0) = w0_from_Sbar(0);
+    w0_arr(0,0) = w0_from_Sbar(0);
 
-    // for (auto r = 1; r <= max_cutoff+1; ++r) {
     lo = 1; 
     hi = max_cutoff+1;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -904,7 +893,6 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
     });
     Gpu::synchronize();
 
-    // for (auto r = max_cutoff+2; r <= base_geom.nr_fine; ++r) {
     lo = max_cutoff+2; 
     hi = base_geom.nr_fine;
     AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
@@ -921,8 +909,8 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
         Real w0_old_cen = 0.5 * (w0_old_arr(0,r) + w0_old_arr(0,r+1));
         Real w0_new_cen = 0.5 * (w0_arr(0,r) + w0_arr(0,r+1));
         Real w0_avg = 0.5 * (dt_in *  w0_old_cen + dtold_in *  w0_new_cen) / dt_avg;
-        Real div_avg = 0.5 * (dt_in * (w0_old(0,r+1)-w0_old(0,r)) + dtold_in * (w0_arr(0,r+1)-w0_arr(0,r))) / dt_avg;
-        w0_force(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
+        Real div_avg = 0.5 * (dt_in * (w0_old_arr(0,r+1)-w0_old_arr(0,r)) + dtold_in * (w0_arr(0,r+1)-w0_arr(0,r))) / dt_avg;
+        w0_force_arr(0,r) = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
     });
     Gpu::synchronize();
 }
@@ -954,8 +942,8 @@ Maestro::Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b,
 }
 
 void
-Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml, 
-                              BaseState<Real>& base_fine)
+Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml_s, 
+                              BaseState<Real>& base_fine_s)
 
 {
     // the mask array will keep track of whether we've filled in data

@@ -48,11 +48,14 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     BaseState<Real> temp_vec(base_geom.max_radial_level+1, base_geom.nr_fine);
     temp_vec.setVal(0.0);
+    auto temp_arr = temp_vec.array();
+
+    const auto s0_init_arr = s0_init.const_array();
 
     // initialize temperature 
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto r = 0; r < base_geom.nr(l); ++r) {
-            temp_vec(l,r) = s0_init(l,r,Temp);
+            temp_arr(l,r) = s0_init_arr(l,r,Temp);
         }
     }
 
@@ -66,7 +69,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     for (auto comp = 0; comp < NumSpec; ++comp) {
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
             for (auto r = 0; r < base_geom.nr(l); ++r) {
-                temp_vec(l,r) = s0_init(l,r,FirstSpec+comp);
+                temp_arr(l,r) = s0_init_arr(l,r,FirstSpec+comp);
             }
         }
         Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);

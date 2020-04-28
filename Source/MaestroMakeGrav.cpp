@@ -40,7 +40,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
 
             int nr_lev = base_geom.nr(0);
 
-            for (auto r = 1; r < nr(0); ++r) {
+            for (auto r = 1; r < base_geom.nr(0); ++r) {
 
                 // the mass is defined at the cell-centers, so to compute
                 // the mass at the current center, we need to add the

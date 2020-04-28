@@ -140,7 +140,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             }           
         }
 
-        BaseState<Real> phisum_b(phisum, max_radial_level+1, nr_fine);
+        BaseState<Real> phisum_b(phisum, base_geom.max_radial_level+1, base_geom.nr_fine);
         RestrictBase(phisum_b, true);
         FillGhostBase(phisum_b, true);
 

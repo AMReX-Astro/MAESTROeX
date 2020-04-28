@@ -21,11 +21,13 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 #endif
 
     // Local variables
-    BaseState<Real> etarhosum(base_geom.max_radial_level+1, base_geom.nr_fine+1);
-    etarhosum.setVal(0.0);
+    BaseState<Real> etarhosum_s(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    etarhosum_s.setVal(0.0);
+    auto etarhosum = etarhosum_s.array();
 
     // this stores how many cells there are laterally at each level
-    BaseState<int> ncell(base_geom.max_radial_level+1);
+    BaseState<int> ncell_s(base_geom.max_radial_level+1);
+    auto ncell = ncell_s.array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -115,16 +117,16 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
     auto etarho_ec_arr = etarho_ec.array();
     auto etarho_cc_arr = etarho_cc.array();
-    const auto etarhosum_arr = etarhosum.const_array();
+    const auto etarhosum_arr = etarhosum_s.const_array();
 
     for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const int lo = base_geom.r_start_coord(n,i);
             const int hi = base_geom.r_end_coord(n,i)+1;
-            const auto ncell_lev = base_geom.ncell(n);
+            const auto ncell_lev = ncell(n);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_ec_p(n,r) = etarhosum_arr(n,r) / Real(ncell_lev);
+                etarho_ec_arr(n,r) = etarhosum_arr(n,r) / Real(ncell_lev);
             });
             Gpu::synchronize();
         }

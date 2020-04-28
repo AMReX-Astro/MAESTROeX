@@ -225,32 +225,6 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state)
     }
 }
 
-
-void 
-Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
-
-    const int max_lev = base_geom.max_radial_level + 1;
-
-    for (int n = base_geom.finest_radial_level; n >= 1; --n) {        
-        for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
-            if (is_cell_centered) {
-                // for level n, make the coarser cells underneath simply the average of the fine
-                for (auto j = base_geom.r_start_coord(n,i); j < base_geom.r_end_coord(n,i); j+=2) {
-                    s0[n-1 + max_lev*j/2] = 0.5 * (s0[n + max_lev*j] + s0[n + max_lev*(j+1)]);
-                }
-            } else {
-                // for level n, make the coarse edge underneath equal to the fine edge value
-                for (auto j = base_geom.r_start_coord(n,i); j <= base_geom.r_end_coord(n,i)+1; j+=2) {
-                    s0[n-1 + max_lev*j/2] = s0[n + max_lev*j];
-                }
-            }
-        }
-    }
-}
-
 void 
 Maestro::RestrictBase(BaseState<Real>& s0, bool is_cell_centered)
 {
