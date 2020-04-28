@@ -285,36 +285,64 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
 
     for (int lev = 0; lev <= finest_level; ++lev)
     {
-        // get references to the MultiFabs at level lev
-        const MultiFab& scal_mf = scal[lev];
-        MultiFab& Tcoeff_mf  = Tcoeff[lev];
-        MultiFab& hcoeff_mf  = hcoeff[lev];
-        MultiFab& Xkcoeff_mf = Xkcoeff[lev];
-        MultiFab& pcoeff_mf  = pcoeff[lev];
-
         Print() << "... Level " << lev << " create thermal coeffs:" << std::endl;
+
+        const auto limit_conductivity_l = limit_conductivity;
+        const auto buoyancy_cutoff_factor_l = buoyancy_cutoff_factor;
+        const auto base_cutoff_density_l = base_cutoff_density;
 
         // loop over boxes
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of valid region
             const Box& gtbx = mfi.growntilebox(1);
 
-            // call fortran subroutine
-#pragma gpu box(gtbx)
-            make_thermal_coeffs(AMREX_INT_ANYD(gtbx.loVect()),AMREX_INT_ANYD(gtbx.hiVect()),
-                                BL_TO_FORTRAN_ANYD(scal_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(Tcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(hcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(Xkcoeff_mf[mfi]),
-                                BL_TO_FORTRAN_ANYD(pcoeff_mf[mfi]));
+            const Array4<Real> Tcoeff_arr = Tcoeff[lev].array(mfi);
+            const Array4<Real> hcoeff_arr = hcoeff[lev].array(mfi);
+            const Array4<Real> pcoeff_arr = pcoeff[lev].array(mfi);
+            const Array4<Real> Xkcoeff_arr = Xkcoeff[lev].array(mfi);
+            const Array4<const Real> scal_arr = scal[lev].array(mfi);
 
+            AMREX_PARALLEL_FOR_3D(gtbx, i, j, k, {
+                if (limit_conductivity_l && 
+                    scal_arr(i,j,k,Rho) < buoyancy_cutoff_factor_l * base_cutoff_density_l) {
+                    Tcoeff_arr(i,j,k) = 0.0;
+                    hcoeff_arr(i,j,k) = 0.0;
+                    pcoeff_arr(i,j,k) = 0.0;
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        Xkcoeff_arr(i,j,k,comp) = 0.0;
+                    }
+                } else {
+                    eos_t eos_state;
+                    eos_state.rho = scal_arr(i,j,k,Rho);
+                    eos_state.T = scal_arr(i,j,k,Temp);
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp) / eos_state.rho;
+                    }
+
+                    // dens, temp and xmass are inputs
+                    eos(eos_input_rt, eos_state);
+                    conductivity(eos_state);
+
+                    Tcoeff_arr(i,j,k) = -eos_state.conductivity;
+                    hcoeff_arr(i,j,k) = -eos_state.conductivity / eos_state.cp;
+                    pcoeff_arr(i,j,k) = (eos_state.conductivity / eos_state.cp) * \
+                        (1.0/eos_state.rho * (1.0 - eos_state.p/(eos_state.rho*eos_state.dpdr)) + \
+                        eos_state.dedr / eos_state.dpdr);
+
+                    const auto eos_xderivs = composition_derivatives(eos_state);
+
+                    for (auto comp = 0; comp < NumSpec; ++comp) {
+                        Xkcoeff_arr(i,j,k,comp) = eos_state.conductivity/eos_state.cp * \
+                            eos_xderivs.dhdX[comp];
+                    }
+                }
+            });
         }
     }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////
