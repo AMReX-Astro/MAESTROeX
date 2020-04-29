@@ -1312,6 +1312,9 @@ Maestro::MakeCCtoRadii ()
         const Real* dx = geom[lev].CellSize();
         const Real* dx_fine = geom[max_level].CellSize();
 
+	auto dx_lev = geom[lev].CellSizeArray();
+	auto dx_fine_vec = geom[max_level].CellSizeArray();
+
         MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -1331,6 +1334,8 @@ Maestro::MakeCCtoRadii ()
                      BL_TO_FORTRAN_ANYD(cc_to_r[mfi]),
                                      AMREX_REAL_ANYD(dx_fine),
                                      AMREX_REAL_ANYD(dx));
+
+	    InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
         }
     }
 }
