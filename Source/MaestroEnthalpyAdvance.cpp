@@ -126,7 +126,7 @@ Maestro::EnthalpyAdvance (int which_step,
     }
 
     // predict either T, h, or (rho h)' at the edges
-    int pred_comp;
+    int pred_comp = 0;
     if ( enthalpy_pred_type == predict_T_then_rhohprime ||
          enthalpy_pred_type == predict_T_then_h         ||
          enthalpy_pred_type == predict_Tprime_then_h)  {
@@ -185,9 +185,6 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            // for (int i=0; i<h0_old.size(); ++i) {
-            //     h0_old[i] = rhoh0_old[i] / rho0_old[i];
-            // }
             h0_old.copy(rhoh0_old / rho0_old);
 
             for (int lev=0; lev<=finest_level; ++lev) {
@@ -295,7 +292,6 @@ Maestro::EnthalpyAdvance (int which_step,
     //////////////////////////////////
 
     Addw0(umac, w0mac, 1.);
-
     
     Vector<MultiFab> p0_new_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -442,7 +438,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
     }
 
     // predict either T, h, or (rho h)' at the edges
-    int pred_comp;
+    int pred_comp = 0;
     if ( enthalpy_pred_type == predict_T_then_rhohprime ||
          enthalpy_pred_type == predict_T_then_h         ||
          enthalpy_pred_type == predict_Tprime_then_h)  {

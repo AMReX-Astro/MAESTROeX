@@ -382,6 +382,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
                     int r = j + lo;
 
                     Real dxscr[3];
+                    for (auto k = 0; k < 3; ++k) dxscr[k] = 0.0;
 
                     if (slope_order_loc == 0) {
                         slope = 0.0;

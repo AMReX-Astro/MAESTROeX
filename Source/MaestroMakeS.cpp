@@ -22,8 +22,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
 
-    const auto max_lev = base_geom.max_radial_level + 1;
-
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -122,7 +120,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             const Array4<const Real> thermal_arr = thermal[lev].array(mfi);
             const Array4<const Real> u_arr = u[lev].array(mfi);
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
-            const Array4<const Real> gradp0_arr = gradp0_cart[lev].array(mfi);
+            const Array4<const Real> gradp0_cart_arr = gradp0_cart[lev].array(mfi);
             const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
 
             if (spherical) {
@@ -172,7 +170,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
                         delta_gamma1_term_arr(i,j,k) = (eos_state.gam1 - gamma1bar_arr(i,j,k)) * 
                             u_arr(i,j,k,AMREX_SPACEDIM-1)* 
-                            gradp0_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
+                            gradp0_cart_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
                             gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
                     } else {
                         delta_gamma1_term_arr(i,j,k) = 0.0;
@@ -223,7 +221,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
                         delta_gamma1_term_arr(i,j,k) = (eos_state.gam1 - gamma1bar_arr(i,j,k)) * 
                             u_arr(i,j,k,AMREX_SPACEDIM-1)* 
-                            gradp0_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
+                            gradp0_cart_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
                             gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
                     } else {
                         delta_gamma1_term_arr(i,j,k) = 0.0;

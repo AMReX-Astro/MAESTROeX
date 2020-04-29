@@ -72,7 +72,6 @@ Maestro::Put1dArrayOnCart (int lev,
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto s0_arr = s0.const_array();
 
-    const int max_lev = base_geom.max_radial_level+1;
     const int nr_fine = base_geom.nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
 

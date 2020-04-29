@@ -96,7 +96,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         // here we account for r > rmax of the model.hse array, assuming
         // that the state stays constant beyond rmax
-        rloc = min(rloc, rmax);
+        rloc = amrex::min(rloc, rmax);
 
         // also, if we've falled below the cutoff density, just keep the
         // model constant

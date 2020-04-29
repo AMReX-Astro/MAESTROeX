@@ -24,7 +24,6 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
         const Array4<int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
         const auto probLo = geom[0].ProbLoArray();
-
         const auto center_p = center;
 
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {

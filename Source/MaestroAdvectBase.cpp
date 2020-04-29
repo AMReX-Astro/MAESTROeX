@@ -41,7 +41,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real dr_lev = base_geom.dr(n);
+        const Real dr = base_geom.dr(n);
 
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
@@ -51,7 +51,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
 
-                force_arr(n,r) = -rho0_old_arr(n,r) * (w0_arr(n,r+1) - w0_arr(n,r)) / dr_lev;
+                force_arr(n,r) = -rho0_old_arr(n,r) * (w0_arr(n,r+1) - w0_arr(n,r)) / dr;
             });
             amrex::Gpu::synchronize();
         }
@@ -61,8 +61,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real dr_lev = base_geom.dr(n);
-        const Real dt_loc = dt;
+        const auto dtdr = dt / base_geom.dr(n);
         
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
@@ -73,7 +72,7 @@ Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state)
                 int r = j + lo;
 
                 rho0_new_arr(n,r) = rho0_old_arr(n,r)
-                    - dt_loc/dr_lev * (rho0_predicted_edge(n,r+1)*w0_arr(n,r+1) - rho0_predicted_edge(n,r)*w0_arr(n,r));
+                    - dtdr * (rho0_predicted_edge(n,r+1)*w0_arr(n,r+1) - rho0_predicted_edge(n,r)*w0_arr(n,r));
             });
             amrex::Gpu::synchronize();
         }
@@ -89,7 +88,6 @@ Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge_state)
     const Real dr0 = base_geom.dr(0);
     const Real dtdr = dt / dr0;
     BaseState<Real> force(1,base_geom.nr_fine);
-    const int max_lev = base_geom.max_radial_level+1;
     auto rho0_predicted_edge = rho0_predicted_edge_state.array();
 
     // Predict rho_0 to vertical edges
@@ -101,7 +99,6 @@ Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge_state)
     auto force_arr = force.array();
 
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
-        int p = max_lev*r;
         force_arr(0,r) = -rho0_old_arr(0,r) * (w0_arr(0,r+1) - w0_arr(0,r)) / dr0 - 
             rho0_old_arr(0,r)*(w0_arr(0,r) + w0_arr(0,r+1))/r_cc_loc(0,r);
     });
@@ -157,7 +154,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real dr_lev = base_geom.dr(n);
+        const Real dr = base_geom.dr(n);
 
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
@@ -167,7 +164,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
             // here we predict (rho h)_0 on the edges
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                force_arr(n,r) = -rhoh0_old_arr(n,r) * (w0_arr(n,r+1) - w0_arr(n,r)) / dr_lev 
+                force_arr(n,r) = -rhoh0_old_arr(n,r) * (w0_arr(n,r+1) - w0_arr(n,r)) / dr 
                     + psi_arr(n,r);
             });
             Gpu::synchronize();
@@ -178,7 +175,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real dr_lev = base_geom.dr(n);
+        const Real dr = base_geom.dr(n);
         const Real dt_loc = dt;
 
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
@@ -190,7 +187,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 rhoh0_new_arr(n,r) = rhoh0_old_arr(n,r) 
-                    - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_arr(n,r+1) - rhoh0_predicted_edge(n,r)*w0_arr(n,r)) + dt_loc * psi_arr(n,r);
+                    - dt_loc/dr * (rhoh0_predicted_edge(n,r+1)*w0_arr(n,r+1) - rhoh0_predicted_edge(n,r)*w0_arr(n,r)) + dt_loc * psi_arr(n,r);
             });
             Gpu::synchronize();
         }

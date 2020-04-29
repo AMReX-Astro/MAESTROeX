@@ -69,8 +69,7 @@ Maestro::DensityAdvance (int which_step,
                         rho0_edge_old, rho0_old_cart, 
                         Rho, bcs_s, 0);
 
-    }
-    else if (species_pred_type == predict_rho_and_X) {
+    } else if (species_pred_type == predict_rho_and_X) {
         // rho source term
         ModifyScalForce(scal_force, scalold, umac, 
                         rho0_edge_old, rho0_old_cart,

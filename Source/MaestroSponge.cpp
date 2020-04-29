@@ -117,8 +117,6 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-            const auto& center_p = center;
-
             if (!spherical) {
                 const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
                 const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];

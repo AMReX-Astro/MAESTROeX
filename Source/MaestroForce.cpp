@@ -21,11 +21,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> rho0_cart(finest_level+1);
     
     // constants in Fortran
-    Real base_cutoff_density = 0.0; 
-    get_base_cutoff_density(&base_cutoff_density);
-    Real buoyancy_cutoff_factor = 0.0;
-    get_buoyancy_cutoff_factor(&buoyancy_cutoff_factor);
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -41,11 +36,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
     gradw0.setVal(0.0);
 
-    auto w0_arr = w0.array();
-    const Real dr0 = base_geom.dr_fine;
-    auto gradw0_arr = gradw0.array();
-
     if ( !(use_exact_base_state || average_base_state) ) {
+        auto w0_arr = w0.array();
+        const Real dr0 = base_geom.dr_fine;
+        auto gradw0_arr = gradw0.array();
+
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
             AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, r,
             {       
@@ -211,12 +206,12 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     Vector<MultiFab> divu_cart(finest_level+1);
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto w0_arr = w0.const_array();
 
     if (spherical) {
         BaseState<Real> divw0(1,base_geom.nr_fine);
         divw0.setVal(0.0);
         auto divw0_arr = divw0.array();
+        const auto w0_arr = w0.const_array();
 
         if (!use_exact_base_state) {
             for (int r=0; r<base_geom.nr_fine-1; ++r) {
