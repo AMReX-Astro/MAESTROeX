@@ -13,13 +13,13 @@ Maestro::InitLevelData(const int lev, const Real time,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero 
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+    ParallelFor(tileBox, AMREX_SPACEDIM, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         vel(i,j,k,n) = 0.0;
     });
 
     const auto s0_arr = s0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0

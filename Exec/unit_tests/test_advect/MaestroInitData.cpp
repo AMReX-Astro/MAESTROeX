@@ -13,10 +13,10 @@ Maestro::InitLevelData(const int lev, const Real time,
     const auto tileBox = mfi.tilebox();
 
     // set velocity and scalars to zero 
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+    ParallelFor(tileBox, AMREX_SPACEDIM, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         vel(i,j,k,n) = 0.0;
     });
-    AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+    ParallelFor(tileBox, Nscal, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         scal(i,j,k,n) = 0.0;
     });
 
@@ -28,7 +28,7 @@ Maestro::InitLevelData(const int lev, const Real time,
     // width of the gaussian
     const auto W = 0.05;
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
         const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
         const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
         const auto z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];

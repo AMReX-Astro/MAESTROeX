@@ -130,7 +130,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 		const Array4<Real> scal = sold[lev].array(mfi);
 
-		AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+		ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 			// set the temperature 
 			const auto temp_zone = std::pow(10.0, std::log10(temp_min_l) + Real(j) * dlogT);
 

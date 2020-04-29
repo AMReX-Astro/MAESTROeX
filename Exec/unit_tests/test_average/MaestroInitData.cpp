@@ -13,12 +13,12 @@ Maestro::InitLevelData(const int lev, const Real time,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero 
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+    ParallelFor(tileBox, AMREX_SPACEDIM, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         vel(i,j,k,n) = 0.0;
     });  
 
     // set scalars to zero 
-    AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+    ParallelFor(tileBox, Nscal, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         scal(i,j,k,n) = 0.0;
     });  
 }
@@ -43,11 +43,11 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         const Array4<Real> scal_arr = scal.array(mfi);
 
         // set velocity to zero 
-        AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+        ParallelFor(tileBox, AMREX_SPACEDIM, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             vel_arr(i,j,k,n) = 0.0;
         });
 
-        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+        ParallelFor(tileBox, Nscal, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             scal_arr(i,j,k,n) = 0.0;
         });
     }

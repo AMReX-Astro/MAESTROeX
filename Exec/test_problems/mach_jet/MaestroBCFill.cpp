@@ -75,7 +75,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(0) == BCType::ext_dir) {
             
-            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (i < imax) {
                     q(i,j,k) = 0.0;
                 }
@@ -88,7 +88,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.hi(0) == BCType::ext_dir) {
 	    
-            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (i > imin) {
                     q(i,j,k) = 0.0;
                 }
@@ -103,13 +103,13 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 	    
             if (is_vel) {
                 if (comp == 0) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (j < jmax) {
                             q(i,j,k) = 0.0;
                         }
                     });
                 } else if (comp == 1) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real x = (Real(i) + 0.5)*dr_fine_loc;
                             
                         if (j < jmax) {
@@ -121,7 +121,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             } else {
             
                 if (comp == Rho) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real x = (Real(i) + 0.5)*dr_fine_loc;
                         Real vy = (inlet_mach/1.e-1) * 
                             INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
@@ -134,7 +134,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                         }
                     });
                 } else if (comp == RhoH) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real x = (Real(i) + 0.5)*dr_fine_loc;
                         Real vy = (inlet_mach/1.e-1) * 
                             INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
@@ -147,7 +147,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                         }
                     });
                 } else if (comp == FirstSpec) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real x = (Real(i) + 0.5)*dr_fine_loc;
                         Real vy = (inlet_mach/1.e-1) * 
                             INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
@@ -160,7 +160,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                         }
                     });
                 } else if (comp == Temp) {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real x = (Real(i) + 0.5)*dr_fine_loc;
                         Real vy = (inlet_mach/1.e-1) * 
                             INLET_CS_l*(1.e-2 + A*(tanh(B*(x-0.40)) + tanh(B*(0.6-x))));
@@ -173,7 +173,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                         }
                     });
                 } else {
-                    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                    ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (j < jmax) {
                             q(i,j,k) = 0.0;
                         } 
@@ -187,7 +187,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto jmin = domhi[1]+1;
 
         if (bcs.hi(1) == BCType::ext_dir) {
-            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (j > jmin) {
                     q(i,j,k) = 0.0;
                 }
@@ -201,7 +201,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto kmax = domlo[2];
 
         if (bcs.lo(2) == BCType::ext_dir) {
-            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (k < kmax) {
                     q(i,j,k) = 0.0;
                 }
@@ -213,7 +213,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
         auto kmin = domhi[2]+1;
 
         if (bcs.hi(2) == BCType::ext_dir) {
-            AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (k > kmin) {
                     q(i,j,k) = 0.0;
                 }
