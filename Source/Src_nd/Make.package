@@ -7,6 +7,5 @@ F90EXE_sources += enforce_HSE.F90
 F90EXE_sources += fill_3d_data.F90
 F90EXE_sources += inlet_bc.F90
 F90EXE_sources += maestro_init.F90
-F90EXE_sources += make_explicit_thermal.F90
 F90EXE_sources += make_heating.F90
 F90EXE_sources += make_grav.F90

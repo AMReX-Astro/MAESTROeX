@@ -47,7 +47,8 @@ Maestro::Setup ()
 
     burner_init();
 
-    maestro_conductivity_init();
+    // maestro_conductivity_init();
+    conductivity_init();
 
 #ifdef ROTATION
     RotationInit();
