@@ -129,7 +129,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 #if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.rho = scal_arr(i,j,k,Rho);
@@ -183,7 +183,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
             } else {
                 const auto anelastic_cutoff_density_coord_lev = base_geom.anelastic_cutoff_density_coord(lev);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.rho = scal_arr(i,j,k,Rho);
@@ -260,7 +260,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                 const Array4<const Real> psi_arr = psi_cart[lev].array(mfi);
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     delta_gamma1_term_arr(i,j,k) += delta_gamma1_arr(i,j,k) * 
                         psi_arr(i,j,k) / (gamma1bar_arr(i,j,k) * 
                         gamma1bar_arr(i,j,k) * p0_arr(i,j,k));
@@ -313,7 +313,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
             const Array4<const Real> beta0_arr = beta0_cart[lev].array(mfi);
             const Array4<const Real> delta_gamma1_term_arr = delta_gamma1_term[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 rhcc_arr(i,j,k) = beta0_arr(i,j,k) * (S_cc_arr(i,j,k) - Sbar_arr(i,j,k) + delta_gamma1_term_arr(i,j,k));
             });
         }
@@ -386,7 +386,7 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 Real correction_factor = rho0_arr(i,j,k) > base_cutoff_density_loc ? 
                     beta0_arr(i,j,k) * dpdt_factor_loc / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k)) / dt_loc : 0.0;
 
@@ -480,19 +480,19 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
             const Array4<Real> delta_chi_arr = delta_chi[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 rhcc_arr(i,j,k) = beta0_arr(i,j,k) * (S_cc_arr(i,j,k) - 
                     Sbar_arr(i,j,k) + delta_gamma1_arr(i,j,k));
             });
 
             if (dpdt_factor > 0.0) {
                 if (is_predictor) {
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         delta_chi_arr(i,j,k) = 0.0;
                     });
                 } 
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     if (rho0_arr(i,j,k) > base_cutoff_density_loc) {
                         delta_chi_arr(i,j,k) += dpdt_factor_loc * delta_p_arr(i,j,k) / 
                             (dt_loc*gamma1bar_arr(i,j,k)*p0_arr(i,j,k));

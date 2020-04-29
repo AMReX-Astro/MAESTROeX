@@ -254,7 +254,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #endif  
 
             if (mult_or_div == 1) {
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     int r = j;
 #else 
@@ -263,7 +264,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                     uedge(i,j,k) *= beta0(lev,r);
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     vedge(i,j,k) *= beta0_edge(lev,j);
 #else 
@@ -272,13 +274,15 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                 });
 
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     wedge(i,j,k) *= beta0_edge(lev,k);
                 });
 #endif
             } else {
 
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     int r = j;
 #else 
@@ -287,7 +291,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                     uedge(i,j,k) /= beta0(lev,r);
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     vedge(i,j,k) /= beta0_edge(lev,j);
 #else 
@@ -296,7 +301,8 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
                 });
 
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     wedge(i,j,k) /= beta0_edge(lev,k);
                 });
 #endif
@@ -335,7 +341,8 @@ void Maestro::ComputeMACSolverRHS (Vector<MultiFab>& solverrhs,
             const Array4<const Real> wedge = umac[lev][2].array(mfi);
 #endif
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 // Compute newrhs = oldrhs - div(Uedge)
                 solverrhs_arr(i,j,k) = macrhs_arr(i,j,k) 
                     - ( (uedge(i+1,j,k)-uedge(i,j,k))/dx[0]
@@ -380,15 +387,18 @@ void Maestro::AvgFaceBcoeffsInv(Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #endif
             const Array4<const Real> rhocc_arr = rhocc[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 xbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i-1,j,k));
             });
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 ybcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j-1,k));
             });
 #if (AMREX_SPACEDIM == 3)
-            AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+            ParallelFor(zbx,
+            [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 zbcoef(i,j,k) = 2.0 / (rhocc_arr(i,j,k) + rhocc_arr(i,j,k-1));
             });
 #endif

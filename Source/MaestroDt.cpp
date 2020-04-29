@@ -147,7 +147,7 @@ Maestro::EstDt ()
                     Real spdx = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);                 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 1); 
 #if (AMREX_SPACEDIM == 2)
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                             spd(i,j,k,0) = u(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
                     });
                     Real spdy = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
@@ -155,7 +155,7 @@ Maestro::EstDt ()
 #else 
                     Real spdy = uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                             spd(i,j,k,0) = u(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     });
                     Real spdz = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
@@ -191,7 +191,7 @@ Maestro::EstDt ()
                     tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 1, 1);
 
                     // divU constraint
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
                     {
                         Real gradp0 = 0.0;
 #if (AMREX_SPACEDIM == 2)
@@ -231,7 +231,7 @@ Maestro::EstDt ()
                     // which is equivalent to
                     // (rho/2)*dS/dt*dt^2 + rho*S*dt + (rho_min-rho) = 0
                     // which has solution dt = 2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c))
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (dSdt_arr(i,j,k) > 1.e-20) {
                             auto a = 0.5 * scal_arr(i,j,k,Rho) * dSdt_arr(i,j,k);
                             auto b = scal_arr(i,j,k,Rho) * S_cc_arr(i,j,k);
@@ -257,17 +257,17 @@ Maestro::EstDt ()
 
                     tmp[mfi].setVal<RunOn::Device>(0.0, tileBox, 0, 3);
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         spd(i,j,k,0) = u(i,j,k,0) + 0.5*(w0macx(i,j,k)+w0macx(i+1,j,k));
                     });
                     Real spdx = tmp[mfi].maxabs<RunOn::Device>(tileBox, 0);
                     
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         spd(i,j,k,1) = u(i,j,k,1) + 0.5*(w0macy(i,j,k)+w0macy(i,j+1,k));
                     });
                     Real spdy = tmp[mfi].maxabs<RunOn::Device>(tileBox, 1);
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         spd(i,j,k,2) = u(i,j,k,2) + 0.5*(w0macz(i,j,k)+w0macz(i,j,k+1));
                     });
                     Real spdz = tmp[mfi].maxabs<RunOn::Device>(tileBox, 2);
@@ -296,7 +296,7 @@ Maestro::EstDt ()
                     tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 3, 2);
 
                     // divU constraint
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         Real gp_dot_u = 0.0;
                         for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
                             gp_dot_u += u(i,j,k,n) * gp0_arr(i,j,k,n);
@@ -320,7 +320,7 @@ Maestro::EstDt ()
                     // which is equivalent to
                     // (rho/2)*dS/dt*dt^2 + rho*S*dt + (rho_min-rho) = 0
                     // which has solution dt = 2.0d0*c/(-b-sqrt(b**2-4.0d0*a*c))
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (dSdt_arr(i,j,k) > 1.e-20) {
                             auto a = 0.5 * scal_arr(i,j,k,Rho) * dSdt_arr(i,j,k);
                             auto b = scal_arr(i,j,k,Rho) * S_cc_arr(i,j,k);
@@ -496,7 +496,7 @@ Maestro::FirstDt ()
 
                 spd.setVal<RunOn::Device>(0.0, tileBox, 0, 1);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     eos_t eos_state;
 
                     // compute the sound speed from rho and temp
@@ -567,7 +567,7 @@ Maestro::FirstDt ()
                     if (!spherical) {
                         const auto nr_lev = base_geom.nr(lev);
 
-                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                             Real gradp0 = 0.0;
 #if (AMREX_SPACEDIM == 2)
                             if (j == 0) {
@@ -599,7 +599,7 @@ Maestro::FirstDt ()
 #if (AMREX_SPACEDIM == 3)
                         const Array4<const Real> gp0_arr = gp0_cart[lev].array(mfi);
 
-                        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                             Real gp_dot_u = 0.0;
 
                             for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
@@ -688,7 +688,7 @@ Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0,
 
     // spherical divU constraint
     if (use_exact_base_state) {
-        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
+        ParallelFor(base_geom.nr_fine-2, [=] AMREX_GPU_DEVICE (int i) {
             int r = i + 1;
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
@@ -697,7 +697,7 @@ Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0,
         });
     } else {
         const auto dr0 = base_geom.dr(0);
-        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
+        ParallelFor(base_geom.nr_fine-2, [=] AMREX_GPU_DEVICE (int i) {
             int r = i + 1;
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));

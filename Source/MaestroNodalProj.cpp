@@ -595,7 +595,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
             const Array4<Real> gphi_arr = gphi[lev].array(mfi);
 
 #if (AMREX_SPACEDIM == 2)
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 gphi_arr(i,j,k,0) = 0.5*(phi_arr(i+1,j,k) 
                     + phi_arr(i+1,j+1,k) 
                     - phi_arr(i  ,j,k) - phi_arr(i  ,j+1,k) ) / dx[0];
@@ -604,7 +604,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi,
                     - phi_arr(i,j  ,k) - phi_arr(i+1,j  ,k) ) / dx[1];
             });
 #else
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
              gphi_arr(i,j,k,0) = 0.25*(
                    phi_arr(i+1,j,k  ) + phi_arr(i+1,j+1,k  ) 
                   +phi_arr(i+1,j,k+1) + phi_arr(i+1,j+1,k+1) 
@@ -645,13 +645,13 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart)
         for ( MFIter mfi(snew_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
             // Get the index space of the tile's valid region
-            const Box& tileBox = mfi.tilebox();
+            const Box& tilebox = mfi.tilebox();
 
             const Array4<const Real> pi_arr = pi[lev].array(mfi);
             const Array4<Real> pi_cc = snew[lev].array(mfi, Pi);
             const Array4<const Real> beta0_cart_arr = beta0_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                 pi_cc(i,j,k) = 0.25 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
                     + pi_arr(i,j+1,k) + pi_arr(i+1,j+1,k));

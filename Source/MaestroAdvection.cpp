@@ -120,7 +120,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                 // Enthalpy update
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real divterm = ((sfluxx(i+1,j,k,RhoH) - sfluxx(i,j,k,RhoH))/dx[0]
                         + (sfluxy(i,j+1,k,RhoH) - sfluxy(i,j,k,RhoH))/dx[1]
 #if (AMREX_SPACEDIM == 3)
@@ -150,7 +150,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
             } else if (start_comp == FirstSpec) {   
                 // RhoX update
 
-                AMREX_PARALLEL_FOR_4D(tileBox, NumSpec, i, j, k, n, {
+                ParallelFor(tileBox, NumSpec, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = FirstSpec + n;
 
                     Real divterm = (sfluxx(i+1,j,k,comp) - sfluxx(i,j,k,comp))/dx[0];
@@ -162,7 +162,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                         + dt_loc * (-divterm + force_arr(i,j,k,comp));
                 });
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // update density
                     snew_arr(i,j,k,Rho) = sold_arr(i,j,k,Rho);
 
@@ -281,7 +281,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
             if (!spherical) {
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // create cell-centered Utilde
                     Real ubar = 0.5*(umacx(i,j,k) + umacx(i+1,j,k));
                     Real vbar = 0.5*(vmac(i,j,k) + vmac(i,j+1,k));
@@ -341,7 +341,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                 const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // create cell-centered Utilde
                     Real ubar = 0.5*(umacx(i,j,k) + umacx(i+1,j,k));
                     Real vbar = 0.5*(vmac(i,j,k) + vmac(i,j+1,k));

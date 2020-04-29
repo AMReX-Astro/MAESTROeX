@@ -27,14 +27,14 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
 
         const auto center_p = center;
 
-        AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+        ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
             Real x = probLo[0] + (static_cast<Real>(i)+0.5)*dx_lev[0] - center_p[0];
             Real y = probLo[1] + (static_cast<Real>(j)+0.5)*dx_lev[1] - center_p[1];
             Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center_p[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
             cc_to_r(i,j,k) = round(index);
-        })
+        });
     }
 }
 #endif

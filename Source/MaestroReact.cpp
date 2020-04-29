@@ -196,9 +196,10 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
                 const Array4<Real> rho_omegadot_arr = rho_omegadot[lev].array(mfi);
                 const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
                 const Array4<const Real> scal_arr = scal[lev].array(mfi);
-                Array1D<Real,1,neqs> ydot;
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                {
                     auto rho = scal_arr(i,j,k,Rho);
                     Real x_in[NumSpec];
                     for (auto n = 0; n < NumSpec; ++n) {
@@ -230,7 +231,8 @@ Maestro::MakeReactionRates (Vector<MultiFab>& rho_omegadot,
                         
                         // we don't need the temperature RHS so set self_heat = False
                         state.self_heat = false;
-
+                        
+                        Array1D<Real,1,neqs> ydot;
                         actual_rhs(state, ydot);
                         
                         for (auto n = 0; n < NumSpec; ++n) {

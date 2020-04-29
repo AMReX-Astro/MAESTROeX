@@ -14,13 +14,15 @@ Maestro::InitLevelData(const int lev, const Real time,
     const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero 
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+    ParallelFor(tileBox,
+    [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
         vel(i,j,k,n) = 0.0;
     });
 
     const auto s0_arr = s0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox,
+    [=] AMREX_GPU_DEVICE (int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
@@ -53,11 +55,13 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         const Array4<Real> scal_arr = scal.array(mfi);
 
         // set velocity to zero 
-        AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+        ParallelFor(tileBox, AMREX_SPACEDIM,
+        [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             vel_arr(i,j,k,n) = 0.0;
         });
 
-        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+        ParallelFor(tileBox, Nscal,
+        [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             scal_arr(i,j,k,n) = 0.0;
         });
     }
@@ -111,7 +115,8 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         const Array4<const Real> p0_arr = p0_cart.array(mfi);
 
         // initialize rho as sum of partial densities rho*X_i
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, 
+        [=] AMREX_GPU_DEVICE (int i, int j, int k) {
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 scal_arr(i,j,k,Rho) += scal_arr(i,j,k,FirstSpec+comp);
             }

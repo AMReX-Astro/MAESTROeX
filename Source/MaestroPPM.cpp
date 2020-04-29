@@ -39,7 +39,7 @@ Maestro::PPM (const Box& bx,
 
     if (ppm_type == 1) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // Compute van Leer slopes in x-direction 
 
@@ -239,7 +239,7 @@ Maestro::PPM (const Box& bx,
 
     } else if (ppm_type == 2) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // -1
             // Interpolate s to x-edges.
@@ -667,7 +667,7 @@ Maestro::PPM (const Box& bx,
 
     if (ppm_type == 1) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // Compute van Leer slopes in y-direction.
 
@@ -867,7 +867,7 @@ Maestro::PPM (const Box& bx,
 
     } else if (ppm_type == 2) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // -1
             // Interpolate s to y-edges.
@@ -1292,7 +1292,7 @@ Maestro::PPM (const Box& bx,
 
     if (ppm_type == 1) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // Compute van Leer slopes in z-direction.
 
@@ -1499,7 +1499,7 @@ Maestro::PPM (const Box& bx,
 
     } else if (ppm_type == 2) {
 
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE (int i, int j, int k) 
         {
             // -1
             // Interpolate s to z-edges.

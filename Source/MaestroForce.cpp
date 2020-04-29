@@ -41,8 +41,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     if ( !(use_exact_base_state || average_base_state) ) {
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, r,
-            {       
+            ParallelFor(base_geom.nr_fine,
+            [=] AMREX_GPU_DEVICE (int r) {
                 gradw0_arr(l,r) = (w0_arr(l,r+1) - w0_arr(l,r))/dr0;
             });
             Gpu::synchronize();
@@ -96,8 +96,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             // offload to GPU
             if (!spherical) {
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
-                {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
                     
                     // cutoff the buoyancy term if we are outside of the star
@@ -138,8 +138,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 #if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
             
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
-                {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
 
                     // cutoff the buoyancy term if we are outside of the star
@@ -264,8 +264,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                 const auto domhi = domainBox.hiVect3d();
                 const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
                 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
-                {                   
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {                   
                     // umac does not contain w0
                     Real divumac = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
                                   +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
@@ -326,8 +326,8 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #endif
             } else {
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
-                {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // umac does not contain w0
 #if (AMREX_SPACEDIM == 2)
                     Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
@@ -485,9 +485,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             // For non-spherical, add wtilde d(p0)/dr
             // For spherical, we make u grad p = div (u p) - p div (u)
             if (!spherical) {
-
-                AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
-                {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real gradp0 = 0.0;
                 
 #if (AMREX_SPACEDIM == 2)
@@ -535,8 +534,8 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
             } else {
                 
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D (tileBox, i, j, k,
-                {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real divup = (umac(i+1,j,k) * p0macx(i+1,j,k) - umac(i,j,k) * p0macx(i,j,k)) / dx[0] + 
                         (vmac(i,j+1,k) * p0macy(i,j+1,k) - vmac(i,j,k) * p0macy(i,j,k)) / dx[1] + 
                         (wmac(i,j,k+1) * p0macz(i,j,k+1) - wmac(i,j,k) * p0macz(i,j,k)) / dx[2];
@@ -629,7 +628,8 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             const Array4<const Real> psi_arr = psi_cart[lev].array(mfi);
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real gradp0 = 0.0;
 #if (AMREX_SPACEDIM == 2)
                     if (j == 0) {
@@ -677,7 +677,8 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
                 });
             } else {
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.T = scal_arr(i,j,k,Temp);

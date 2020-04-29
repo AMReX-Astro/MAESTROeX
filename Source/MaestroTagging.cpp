@@ -41,7 +41,9 @@ Maestro::TagBoxes(TagBoxArray& tags,
 
     const Box& tilebox  = mfi.tilebox();
 
-    AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+    ParallelFor(tilebox,
+    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+    {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         if (tag_array_p[lev+max_lev*r] > 0) {
@@ -68,7 +70,9 @@ Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     const Box& tilebox  = mfi.tilebox();
 
     // Tag on regions of high temperature
-    AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+    ParallelFor(tilebox,
+    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+    {
         if (state(i,j,k,Temp) >= 6.5e8) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 

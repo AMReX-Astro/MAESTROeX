@@ -91,7 +91,9 @@ Maestro::Put1dArrayOnCart (int lev,
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                 const int r = AMREX_SPACEDIM == 2 ? j : k;
 
                 s0_cart_arr(i,j,k,outcomp) = is_input_edge_centered == 1 ? 
@@ -110,7 +112,9 @@ Maestro::Put1dArrayOnCart (int lev,
                     // 2.  Piecewise linear
                     // 3.  Quadratic
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
@@ -178,7 +182,9 @@ Maestro::Put1dArrayOnCart (int lev,
                     // we directly inject the spherical values into each cell center
                     // because s0 is also bin-centered.
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
@@ -210,7 +216,9 @@ Maestro::Put1dArrayOnCart (int lev,
                     // 2.  Piecewise linear
                     // 3.  Quadratic
 
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    ParallelFor(tileBox,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
@@ -273,7 +281,6 @@ Maestro::Put1dArrayOnCart (int lev,
                     // 1.  Piecewise constant
                     // 2.  Piecewise linear
                     // 3.  Quadratic
-                    // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     ParallelFor(tileBox, 
                     [=] AMREX_GPU_DEVICE(int i, int j, int k)
                     {
@@ -391,13 +398,17 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
 #if (AMREX_SPACEDIM == 2)
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                     vedge(i,j,k) += mult * w0_arr(lev,j);
                 });
 #else
                 const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                     wedge(i,j,k) += mult * w0_arr(lev,k);
                 });
 #endif
@@ -413,15 +424,21 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                     uedge(i,j,k) += mult * w0macx(i,j,k);
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                     vedge(i,j,k) += mult * w0macy(i,j,k);
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+[=] AMREX_GPU_DEVICE (int i, int j, int k)
+{ 
                     wedge(i,j,k) += mult * w0macz(i,j,k);
                 });
 #else
@@ -501,7 +518,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
                 const Array4<Real> w0_nodal_arr = w0_nodal[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(gntbx, i, j, k, {
+                ParallelFor(gntbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -547,21 +566,29 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 
             if (w0mac_interp_type == 1) {
 
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macx(i,j,k) = 0.5 * (w0_cart_arr(i-1,j,k,0) + w0_cart_arr(i,j,k,0));
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macy(i,j,k) = 0.5 * (w0_cart_arr(i,j-1,k,1) + w0_cart_arr(i,j,k,1));
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macz(i,j,k) = 0.5 * (w0_cart_arr(i,j,k-1,2) + w0_cart_arr(i,j,k,2));
                 });
 
             } else if (w0mac_interp_type == 2 || w0mac_interp_type == 3) {
 
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -600,7 +627,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     w0macx(i,j,k) = w0_cart_val * x / radius;
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -639,7 +668,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     w0macy(i,j,k) = w0_cart_val * y / radius;
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -681,19 +712,25 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                 
             } else if (w0mac_interp_type == 4) {
 
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macx(i,j,k) = 0.25 * (w0_nodal_arr(i,j,k,0) 
                         + w0_nodal_arr(i,j+1,k,0) + w0_nodal_arr(i,j,k+1,0) 
                         + w0_nodal_arr(i,j+1,k+1,0));
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macy(i,j,k) = 0.25 * (w0_nodal_arr(i,j,k,1) 
                         + w0_nodal_arr(i+1,j,k,1) + w0_nodal_arr(i,j,k+1,1) 
                         + w0_nodal_arr(i+1,j,k+1,1));
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     w0macz(i,j,k) = 0.25 * (w0_nodal_arr(i,j,k,2) 
                         + w0_nodal_arr(i+1,j,k,2) + w0_nodal_arr(i,j+1,k,2) 
                         + w0_nodal_arr(i+1,j+1,k,2));
@@ -765,21 +802,29 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
 
                 if (s0mac_interp_type == 1) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macx(i,j,k) = 0.5 * (s0_cart_arr(i-1,j,k) + s0_cart_arr(i,j,k));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macy(i,j,k) = 0.5 * (s0_cart_arr(i,j-1,k) + s0_cart_arr(i,j,k));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macz(i,j,k) = 0.5 * (s0_cart_arr(i,j,k-1) + s0_cart_arr(i,j,k));
                     });
 
                 } else if (s0mac_interp_type == 2) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -815,7 +860,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -851,7 +898,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -889,7 +938,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
 
                 } else if (s0mac_interp_type == 3) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -915,7 +966,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                                             s0_arr(0,index+1));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -941,7 +994,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                                             s0_arr(0,index+1));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -972,21 +1027,29 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
 
                 if (s0mac_interp_type == 1) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macx(i,j,k) = 0.5 * (s0_cart_arr(i-1,j,k) + s0_cart_arr(i,j,k));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macy(i,j,k) = 0.5 * (s0_cart_arr(i,j-1,k) + s0_cart_arr(i,j,k));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         s0macz(i,j,k) = 0.5 * (s0_cart_arr(i,j,k-1) + s0_cart_arr(i,j,k));
                     });
 
                 } else if (s0mac_interp_type == 2) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -1017,7 +1080,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -1048,7 +1113,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -1081,7 +1148,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
 
                 } else if (s0mac_interp_type == 3) {
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -1104,7 +1173,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                                             s0_arr(0,index+1));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -1127,7 +1198,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                                             s0_arr(0,index+1));
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx,
+                    [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                    { 
                         Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                         Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
@@ -1187,7 +1260,9 @@ Maestro::MakeNormal ()
                 const Box& tileBox = mfi.tilebox();
                 const Array4<Real> normal_arr = normal[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
@@ -1237,7 +1312,9 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
 #endif
 
             if (harmonic_avg) {
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real denom = scc(i,j,k) + scc(i-1,j,k);
                     Real prod  = scc(i,j,k) * scc(i-1,j,k);
 
@@ -1248,7 +1325,9 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                     }
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real denom = scc(i,j,k) + scc(i,j-1,k);
                     Real prod  = scc(i,j,k) * scc(i,j-1,k);
 
@@ -1259,7 +1338,9 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                     }
                 });
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     Real denom = scc(i,j,k) + scc(i,j,k-1);
                     Real prod  = scc(i,j,k) * scc(i,j,k-1);
 
@@ -1271,14 +1352,20 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
                 });
 #endif
             } else {
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     facex(i,j,k) = 0.5 * (scc(i,j,k) + scc(i-1,j,k));
                 });
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     facey(i,j,k) = 0.5 * (scc(i,j,k) + scc(i,j-1,k));
                 });
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                { 
                     facez(i,j,k) = 0.5 * (scc(i,j,k) + scc(i,j,k-1));
                 });
 #endif

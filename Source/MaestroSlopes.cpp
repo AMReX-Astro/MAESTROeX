@@ -36,14 +36,14 @@ Maestro::Slopex(const Box& bx,
     if (slope_order == 0) {
         // 1st order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             slx(i,j,k,n) = 0.0;
         });
 
     } else if (slope_order == 2) {
         // 2nd order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             Real del = 0.5*(s(i+1,j,k,n) - s(i-1,j,k,n));
             Real dpls = 2.0*(s(i+1,j,k,n) - s(i  ,j,k,n));
@@ -87,7 +87,7 @@ Maestro::Slopex(const Box& bx,
     } else if (slope_order == 4) {
         // 4th order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i-2,j,k,n));
@@ -211,14 +211,14 @@ Maestro::Slopey(const Box& bx,
     if (slope_order == 0) {
         // 1st order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             sly(i,j,k,n) = 0.0;
         });
 
     } else if (slope_order == 2) {
         // 2nd order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             Real del  = 0.5*(s(i,j+1,k,n) - s(i,j-1,k,n));
             Real dpls = 2.0 *(s(i,j+1,k,n) - s(i,j  ,k,n));
@@ -263,7 +263,7 @@ Maestro::Slopey(const Box& bx,
     } else if (slope_order == 4) {
         // 4th order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i,j-2,k,n));
@@ -387,14 +387,14 @@ Maestro::Slopez(const Box& bx,
     if (slope_order == 0) {
         // 1st order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
             slz(i,j,k,n) = 0.0;
         });
 
     } else if (slope_order == 2) {
         // 2nd order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             Real del  = 0.5*(s(i,j,k+1,n) - s(i,j,k-1,n));
             Real dpls = 2.0*(s(i,j,k+1,n) - s(i,j,k  ,n));
@@ -438,7 +438,7 @@ Maestro::Slopez(const Box& bx,
     } else if (slope_order == 4) {
         // 4th order
 
-        AMREX_PARALLEL_FOR_4D(bx, ncomp, i, j, k, n, {
+        ParallelFor(bx, ncomp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
 
             // left
             Real dcen = 0.5*(s(i,j,k,n)-s(i,j,k-2,n));

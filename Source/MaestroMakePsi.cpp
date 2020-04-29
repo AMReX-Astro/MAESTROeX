@@ -49,7 +49,7 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
     const auto Sbar_arr = Sbar_in.const_array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
-    AMREX_PARALLEL_FOR_1D(npts, r, {
+    ParallelFor(npts, [=] AMREX_GPU_DEVICE (int r) {
         Real div_w0_sph = 1.0 / (r_cc_loc(0,r)*r_cc_loc(0,r)) * 
             (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) *
              w0_arr(0,r+1) - 
@@ -74,7 +74,7 @@ Maestro::MakePsiIrreg(const BaseState<Real>& grav_cell)
     const auto grav_cell_arr = grav_cell.const_array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
-    AMREX_PARALLEL_FOR_1D(npts, r, {
+    ParallelFor(npts, [=] AMREX_GPU_DEVICE (int r) {
         psi_arr(0,r) = etarho_cc_arr(0,r) * grav_cell_arr(0,r);
     });
     Gpu::synchronize();

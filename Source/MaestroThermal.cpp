@@ -304,7 +304,7 @@ Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
             const Array4<Real> Xkcoeff_arr = Xkcoeff[lev].array(mfi);
             const Array4<const Real> scal_arr = scal[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(gtbx, i, j, k, {
+            ParallelFor(gtbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (limit_conductivity_l && 
                     scal_arr(i,j,k,Rho) < buoyancy_cutoff_factor_l * base_cutoff_density_l) {
                     Tcoeff_arr(i,j,k) = 0.0;

@@ -515,7 +515,7 @@ Maestro::PlotFileMF (const int nPlot,
             // we have to use protected_divide here to guard against division by zero
             // in the case that there are zeros rho0
             MultiFab& plot_mf_data_mf = *plot_mf_data[i];
-            for ( MFIter mfi(plot_mf_data_mf); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(plot_mf_data_mf); mfi.isValid(); ++mfi) {
                 plot_mf_data_mf[mfi].protected_divide<RunOn::Device>(plot_mf_data_mf[mfi], dest_comp, dest_comp+2);
             }
 
@@ -1333,7 +1333,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -1342,7 +1342,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
                 const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     Real v_total = vel_arr(i,j,k,1) + 0.5 * (w0_arr(i,j,k,1) + w0_arr(i,j+1,k,1));
                     magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
@@ -1360,7 +1360,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -1371,7 +1371,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
                 const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real u_total = vel_arr(i,j,k,0) + 0.5 * (w0macx(i,j,k) + w0macx(i+1,j,k));
                     Real v_total = vel_arr(i,j,k,1) + 0.5 * (w0macy(i,j,k) + w0macy(i,j+1,k));
                     Real w_total = vel_arr(i,j,k,2) + 0.5 * (w0macz(i,j,k) + w0macz(i,j,k+1));
@@ -1403,7 +1403,7 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -1414,7 +1414,7 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
             const Array4<const Real> w0rcart_arr = w0rcart[lev].array(mfi);
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 circvel_arr(i,j,k) = 0.0;
                 radvel_arr(i,j,k) = 0.0;
 
@@ -1475,7 +1475,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
 #endif
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho   = state_arr(i,j,k,Rho);
@@ -1498,7 +1498,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
             const auto hi = tileBox.hiVect3d();
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real nabla = 0.0;
 
                     if (state_arr(i,j,k,Rho) > base_cutoff_density_loc) {
@@ -1551,7 +1551,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
                 Real * AMREX_RESTRICT dtemp = dtemp_vec.dataPtr();
                 Real * AMREX_RESTRICT dp = dp_vec.dataPtr();
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real nabla = 0.0;
 
                     if (state_arr(i,j,k,Rho) > base_cutoff_density_loc) {
@@ -1619,8 +1619,8 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
     }
 
     // average down and fill ghost cells
-    AverageDown(ad_excess,0,1);
-    FillPatch(t_old,ad_excess,ad_excess,ad_excess,0,0,1,0,bcs_f);
+    AverageDown(ad_excess, 0, 1);
+    FillPatch(t_old, ad_excess, ad_excess, ad_excess, 0, 0, 1, 0, bcs_f);
 }
 
 
@@ -1676,7 +1676,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -1690,7 +1690,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 #if (AMREX_SPACEDIM == 2)
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k)
             {
                 Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
                 Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
@@ -1737,7 +1737,7 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
             });
 
 #else 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k)
             {
                 Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
                 Real uz = 0.5*(u(i,j,k+1,0)-u(i,j,k-1,0))/hz;
@@ -1955,8 +1955,8 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
     }
 
     // average down and fill ghost cells
-    AverageDown(vorticity,0,1);
-    FillPatch(t_old,vorticity,vorticity,vorticity,0,0,1,0,bcs_f);
+    AverageDown(vorticity, 0, 1);
+    FillPatch(t_old, vorticity, vorticity, vorticity, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -1988,15 +1988,15 @@ Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
             const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
             const Array4<Real> deltagamma_arr = deltagamma[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho   = state_arr(i,j,k,Rho);
                 eos_state.T     = state_arr(i,j,k,Temp);
                 if (use_pprime_in_tfromp_loc) {
-                    eos_state.p     = p0_arr(i,j,k) + state_arr(i,j,k,Pi);
+                    eos_state.p = p0_arr(i,j,k) + state_arr(i,j,k,Pi);
                 } else {
-                    eos_state.p     = p0_arr(i,j,k);
+                    eos_state.p = p0_arr(i,j,k);
                 }
 
                 for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -2028,7 +2028,7 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -2036,7 +2036,7 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
             const Array4<const Real> state_arr = state[lev].array(mfi);
             const Array4<Real> entropy_arr = entropy[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j ,k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state_arr(i,j,k,Rho);
@@ -2053,8 +2053,8 @@ Maestro::MakeEntropy (const Vector<MultiFab>& state,
     }
 
     // average down and fill ghost cells
-    AverageDown(entropy,0,1);
-    FillPatch(t_old,entropy,entropy,entropy,0,0,1,0,bcs_f);
+    AverageDown(entropy, 0, 1);
+    FillPatch(t_old, entropy, entropy, entropy, 0, 0, 1, 0, bcs_f);
 }
 
 void
@@ -2072,7 +2072,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -2081,7 +2081,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
                 const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     divw0_arr(i,j,k) = (w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1)) / dx[1];
 #else
@@ -2096,7 +2096,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& tileBox = mfi.tilebox();
@@ -2107,7 +2107,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
                 const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     divw0_arr(i,j,k) = (w0macx(i+1,j,k) - w0macx(i,j,k)) / dx[0] + 
                         (w0macy(i,j+1,k) - w0macy(i,j,k)) / dx[1] + 
                         (w0macz(i,j,k+1) - w0macz(i,j,k)) / dx[2];
@@ -2135,7 +2135,7 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(pidivu[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(pidivu[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const auto dx = geom[lev].CellSizeArray();
@@ -2144,7 +2144,7 @@ Maestro::MakePiDivu (const Vector<MultiFab>& vel,
             const Array4<const Real> pi_cc = state[lev].array(mfi, Pi);
             const Array4<Real> pidivu_arr = pidivu[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 pidivu_arr(i,j,k) = pi_cc(i,j,k) * 0.5 * (
                     (vel_arr(i+1,j,k,0) - vel_arr(i-1,j,k,0))/dx[0]
                   + (vel_arr(i,j+1,k,1) - vel_arr(i,j-1,k,1))/dx[1]
@@ -2174,14 +2174,14 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(abar[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(abar[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
             const Array4<const Real> state_arr = state[lev].array(mfi);
             const Array4<Real> abar_arr = abar[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 Real denominator = 0.0;
 
                 for (auto comp = 0; comp < NumSpec; ++comp) {

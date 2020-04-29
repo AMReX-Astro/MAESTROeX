@@ -46,7 +46,6 @@ Maestro::Setup ()
     maestro_eos_init();
     eos_init();
 
-    // maestro_conductivity_init();
     conductivity_init();
 
 #ifdef ROTATION

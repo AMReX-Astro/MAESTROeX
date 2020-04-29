@@ -32,7 +32,7 @@ Maestro::MakeIntraCoeffs (const Vector<MultiFab>& scal1,
             const Array4<Real> cp_arr = cp[lev].array(mfi);
             const Array4<Real> xi_arr = xi[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(gtbx, i, j, k, {
+            ParallelFor(gtbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 // old state first
                 eos_t eos_state;
 

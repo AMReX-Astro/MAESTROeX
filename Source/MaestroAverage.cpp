@@ -58,7 +58,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     int r = AMREX_SPACEDIM == 2 ? j : k;
 #if (AMREX_SPACEDIM == 2)
                     if (k == 0)
@@ -76,7 +76,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) { 
                 const int lo = base_geom.r_start_coord(lev,i);
                 const int hi = base_geom.r_end_coord(lev,i);
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+                ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j) {
                     int r = j + lo;
                     phisum_arr(lev,r) /= ncell(lev);
                 });
@@ -122,7 +122,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                 const Array4<const int> cc_to_r = cell_cc_to_r[lev].array(mfi);
                 const Array4<const Real> phi_arr = phi[lev].array(mfi,comp);
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     auto index = cc_to_r(i,j,k);
 
                     amrex::HostDevice::Atomic::Add(&(phisum_arr(lev,index)), phi_arr(i,j,k));
@@ -137,7 +137,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev < max_lev; ++lev) {
-            AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+            ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE (int r) {
                 if (ncell(lev,r) > 0) {
                     phisum_arr(lev,r) /= ncell(lev,r);
                 } else {
@@ -179,7 +179,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             // Get the index space of the domain
             const auto dx = geom[lev].CellSizeArray();
 
-            AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
+            ParallelFor(nr_irreg+1, [=] AMREX_GPU_DEVICE (int r) {
                 radii(lev,r+1) = std::sqrt(0.75+2.0*Real(r)) * dx[0];
             });
             Gpu::synchronize();
@@ -218,7 +218,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
                 bool use_mask = !(lev==fine_lev-1);
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
@@ -277,7 +277,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         const auto dr0 = base_geom.dr(0);
         const auto nrf = base_geom.nr_fine;
 
-        AMREX_PARALLEL_FOR_1D(nrf, r, {
+        ParallelFor(nrf, [=] AMREX_GPU_DEVICE (int r) {
 
             Real radius = (Real(r) + 0.5) * dr0;
             // Vector<int> rcoord_p(fine_lev, 0);
@@ -377,7 +377,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         const Real drdxfac_loc = drdxfac;
         auto phibar_arr = phibar.array();
 
-        AMREX_PARALLEL_FOR_1D(nrf, r, {
+        ParallelFor(nrf, [=] AMREX_GPU_DEVICE (int r) {
 
             Real radius = (Real(r) + 0.5) * dr0;
             int stencil_coord = 0;

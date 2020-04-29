@@ -122,7 +122,9 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             if (!spherical) {
                 const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
                 const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k)
+                {
                     sponge_arr(i,j,k) = 1.0;
                 });
 
@@ -139,7 +141,8 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                             Real smdamp = 0.5 * (1.0 - std::cos(M_PI * (r - r_sp_loc) / (r_tp_loc - r_sp_loc)));
                             int smdamp_idx = lo + n;
 
-                            AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
+                            ParallelFor(tileBox,
+                            [=] AMREX_GPU_DEVICE (int ii, int jj, int kk) {
 #if (AMREX_SPACEDIM == 2)
                                 if (jj == smdamp_idx) 
 #else
@@ -155,7 +158,8 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                 const Real r_sp_outer_loc = r_sp_outer;
                 const Real r_tp_outer_loc = r_tp_outer;
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox,
+                [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     sponge_arr(i,j,k) = 1.0;
 
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];

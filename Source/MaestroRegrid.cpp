@@ -372,8 +372,8 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
 
     // copy the coarsest level of the real arrays into the
     // temp arrays
-    AMREX_PARALLEL_FOR_1D(nrf, r,
-    {
+    ParallelFor(nrf,
+    [=] AMREX_GPU_DEVICE (int r) {
         state_temp(0,r) = base(0,r);
     });
     Gpu::synchronize();
@@ -382,8 +382,8 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
             const auto nrn = base_geom.nr(n) + 1;
-            AMREX_PARALLEL_FOR_1D(nrn, r,
-            {
+            ParallelFor(nrn,
+            [=] AMREX_GPU_DEVICE (int r) {
                 if (r % 2 == 0) {
                     state_temp(n,r) = state_temp(n-1,r/2);
                 } else {
@@ -392,8 +392,8 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
             });
         } else {
             const auto nrn = base_geom.nr(n);
-            AMREX_PARALLEL_FOR_1D(nrn, r,
-            {
+            ParallelFor(nrn,
+            [=] AMREX_GPU_DEVICE (int r) {
                 if (r == 0 || r == nrn-1) {
                     state_temp(n,r) = state_temp(n-1,r/2);
                 } else {
@@ -413,8 +413,8 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const auto lo = base_geom.r_start_coord(n,i);
             const auto hi = is_edge ? base_geom.r_end_coord(n,i)+1 : base_geom.r_end_coord(n,i);
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
-            {
+            ParallelFor(hi-lo+1,
+            [=] AMREX_GPU_DEVICE (int k) {
                 int r = k + lo;
                 state_temp(n,r) = base(n,r);
             });

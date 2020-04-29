@@ -54,7 +54,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 
 #if (AMREX_SPACEDIM == 2)
             int zlo = tilebox.loVect3d()[2];
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 if (k == zlo) {
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev,j)), etarhoflux_arr(i,j,k));
                 }
@@ -76,14 +76,14 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
                 const int lo = ybx.loVect3d()[0];
                 const int hi = ybx.hiVect3d()[0];
 
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, n, {
+                ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int n) {
                     int i = n + lo;
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev,j)), etarhoflux_arr(i,j,k));
                 });
                 Gpu::synchronize();
             }
 #else 
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 amrex::HostDevice::Atomic::Add(&(etarhosum(lev,k)), etarhoflux_arr(i,j,k));
             });
 
@@ -100,7 +100,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             if (top_edge) {
                 const auto zbx = mfi.nodaltilebox(2);
                 int zhi = zbx.hiVect3d()[2];
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     if (k == zhi) {
                         amrex::HostDevice::Atomic::Add(&(etarhosum(lev,k)), etarhoflux_arr(i,j,k));
                     }
@@ -124,7 +124,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             const int lo = base_geom.r_start_coord(n,i);
             const int hi = base_geom.r_end_coord(n,i)+1;
             const auto ncell_lev = ncell(n);
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+            ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j) {
                 int r = j + lo;
                 etarho_ec_arr(n,r) = etarhosum_arr(n,r) / Real(ncell_lev);
             });
@@ -143,7 +143,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const int lo = base_geom.r_start_coord(n,i);
             const int hi = base_geom.r_end_coord(n,i)+1;
-            AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
+            ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j) {
                 int r = j + lo;
                 etarho_cc_arr(n,r) = 0.5 * (etarho_ec_arr(n,r) + 
                     etarho_ec_arr(n,r+1));
@@ -215,7 +215,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
             const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 Real U_dot_er = 0.5*(umac_arr(i,j,k) + umac_arr(i+1,j,k) 
                     + w0macx(i,j,k) + w0macx(i+1,j,k)) * normal_arr(i,j,k,0) + 
                     0.5*(vmac(i,j,k) + vmac(i,j+1,k) 
@@ -250,15 +250,14 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // note that in spherical the base state has no refinement
     // the 0th value of etarho = 0, since U dot . e_r must be
     // zero at the center (since e_r is not defined there)
-    const bool sph_loc = spherical;
-    AMREX_PARALLEL_FOR_1D(nrf, r, {
+    ParallelFor(nrf, [=] AMREX_GPU_DEVICE (int r) {
         if (r == 0) {
             etarho_ec_arr(0,r) = 0.0;
         } else if (r == nrf-1) {
             // probably should do some better extrapolation here eventually
             etarho_ec_arr(0,r) = etarho_cc_arr(0,r-1);
         } else {
-            if (sph_loc) {
+            if (spherical) {
                 Real dr1 = r_cc_loc(0,r) - r_edge_loc(0,r);
                 Real dr2 = r_edge_loc(0,r) - r_cc_loc(0,r-1);
                 etarho_ec_arr(0,r) = (dr2*etarho_cc_arr(0,r) + dr1*etarho_cc_arr(0,r-1))/(dr1+dr2);

@@ -259,7 +259,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                 // for (int r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int k) {
                     int r = k + lo;
                     beta0(n,r) = rho0(n,r);
                 });
@@ -272,7 +272,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
             for (int j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);
-                AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
+                ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int k) {
                     int r = k + lo;
                     beta0(n,r) = 1.0;
                 });

@@ -91,7 +91,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
-            AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+            ParallelFor(xbx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                 int comp = n+start_comp;
 
                 // reset density flux
@@ -122,7 +122,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
             });
 
             // y-direction
-            AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+            ParallelFor(ybx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                 int comp = n + start_comp;
 
                 // reset density flux
@@ -167,7 +167,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 
             if (!spherical) {
                 // x-direction
-                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                ParallelFor(xbx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -198,7 +198,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 });
 
                 // y-direction
-                AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+                ParallelFor(ybx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -229,7 +229,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 });
 
                 // z-direction
-                AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
+                ParallelFor(zbx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -276,7 +276,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 const Array4<const Real> rho0_edgez = rho0mac_edgez.array(mfi);
 
                 // x-direction
-                AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
+                ParallelFor(xbx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -305,7 +305,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 });
 
                 // y-direction
-                AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
+                ParallelFor(ybx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -334,7 +334,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 });
 
                 // z-direction
-                AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
+                ParallelFor(zbx, num_comp, [=] AMREX_GPU_DEVICE (int i, int j, int k, int n) {
                     int comp = n + start_comp;
 
                     // reset density flux
@@ -534,7 +534,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             const auto rhoh0_edge_new_arr = rhoh0_edge_new.const_array();
 
 #if (AMREX_SPACEDIM == 2)
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 // create x-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
@@ -563,7 +563,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                 }
             });
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 // create y-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
@@ -595,7 +595,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
 #elif (AMREX_SPACEDIM == 3)
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // create x-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -624,7 +624,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     }
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // create y-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -653,7 +653,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     }
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                     // create z-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -689,7 +689,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     const Array4<const Real> rhoh0_edgey = rhoh0mac_edgey.array(mfi);
                     const Array4<const Real> rhoh0_edgez = rhoh0mac_edgez.array(mfi);
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -710,7 +710,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -730,7 +730,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -758,7 +758,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     const Array4<const Real> h0_edgey = h0mac_edgey.array(mfi);
                     const Array4<const Real> h0_edgez = h0mac_edgez.array(mfi);
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 
                         if (have_h) {
                             // enthalpy edge state is h
@@ -802,7 +802,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 
                         if (have_h) {
                             // enthalpy edge state is h
@@ -844,7 +844,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
 
                         if (have_h) {
                             // enthalpy edge state is h
