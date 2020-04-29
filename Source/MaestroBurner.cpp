@@ -21,7 +21,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     // Put tempbar_init on cart
     Vector<MultiFab> tempbar_init_cart(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
             tempbar_init_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             tempbar_init_cart[lev].setVal(0.);
@@ -60,7 +60,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
             const auto tempbar_init_arr = tempbar_init.const_array();
 
-            const Array4<const Real> tempbar_cart_arr = tempbar_init_cart[lev].array(mfi);
+            // use a dummy value for non-spherical as tempbar_init_cart is not defined
+            const Array4<const Real> tempbar_cart_arr = spherical ? tempbar_init_cart[lev].array(mfi) : rho_Hext[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
             
             ParallelFor(tileBox, 
