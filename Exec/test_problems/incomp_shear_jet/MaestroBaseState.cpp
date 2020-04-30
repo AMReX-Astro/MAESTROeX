@@ -17,7 +17,8 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
 
     const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
-    const int max_lev = max_radial_level + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     Print() << "cutoff densities:" << std::endl;
@@ -74,10 +75,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     //   -The components of the fluid state 's':
     //       density, enthalpy, species mass fractions, and temperature
     //   -The pressure (note, pressure is NOT a component of the 's' multifab)
-    for (auto r = 0; r < nr[n]; ++r) {
+    for (auto r = 0; r < base_geom.nr(n); ++r) {
 
         // height above the bottom of the domain
-        Real rloc = (Real(r) + 0.5) * dr[n];
+        Real rloc = (Real(r) + 0.5) * base_geom.dr(n);
 
         // Init density, pressure, and temp
         Real d_ambient = rho_base;

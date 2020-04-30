@@ -21,16 +21,15 @@ Maestro::SpongeInit(const RealVector& rho0)
     //
     // The top of the sponge is then 2 * r_md - r_tp
 
-    const int max_lev = max_radial_level + 1;
-    get_r_end_coord(r_end_coord.dataPtr());
+    const int max_lev = base_geom.max_radial_level + 1;
 
     Real prob_lo_r = spherical ? 0.0 : geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     Real r_top = prob_lo_r;
     if (!use_exact_base_state) {
-        r_top += Real(r_end_coord[max_lev]+1) * dr[0];
+        r_top += Real(base_geom.r_end_coord(0,1)+1) * base_geom.dr(0);
     } else {
-        r_top += r_edge_loc[max_lev*nr_fine];
+        r_top += base_geom.r_edge_loc(0,base_geom.nr_fine);
     }
     r_sp = r_top;
 
@@ -38,35 +37,35 @@ Maestro::SpongeInit(const RealVector& rho0)
 
     if (!use_exact_base_state) {
         // set r_sp;
-        for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
+        for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
             if (rho0[max_lev*r] < sponge_start_density) {
-                r_sp = prob_lo_r + (Real(r) + 0.5) * dr[0];
+                r_sp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;
             }
         }
 
         // set r_md
         r_md = r_top;
-        for (auto r = 0; r <= r_end_coord[max_lev]; ++r) {
+        for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
             if (rho0[max_lev*r] < sponge_center_density) {
-                r_md = prob_lo_r + (Real(r) + 0.5) * dr[0];
+                r_md = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;
             }
         }
     } else {
         // set r_sp;
-        for (auto r = 0; r < nr_fine; ++r) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
             if (rho0[max_lev*r] < sponge_start_density) {
-                r_sp = prob_lo_r + r_cc_loc[max_lev*r];
+                r_sp = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;
             }
         }
 
         // set r_md
         r_md = r_top;
-        for (auto r = 0; r < nr_fine; ++r) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
             if (rho0[max_lev*r] < sponge_center_density) {
-                r_md = prob_lo_r +r_cc_loc[max_lev*r];
+                r_md = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;
             }
         }
@@ -79,9 +78,9 @@ Maestro::SpongeInit(const RealVector& rho0)
     if (spherical) {
         r_sp_outer = r_tp;
         if (!use_exact_base_state) {
-            r_tp_outer = r_sp_outer + 4.0 * drdxfac * dr[0];
+            r_tp_outer = r_sp_outer + 4.0 * drdxfac * base_geom.dr(0);
         } else {
-            r_tp_outer = r_sp_outer + 4.0 * 2.0/std::sqrt(3) * r_cc_loc[0];
+            r_tp_outer = r_sp_outer + 4.0 * 2.0/std::sqrt(3) * base_geom.r_cc_loc(0,0);
         }
     }
 

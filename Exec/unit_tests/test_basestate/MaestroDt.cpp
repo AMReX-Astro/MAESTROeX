@@ -11,7 +11,7 @@ Maestro::EstDt ()
     BL_PROFILE_VAR("Maestro::EstDt()",EstDt);
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    Vector<Real> w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 
@@ -106,7 +106,7 @@ Maestro::EstDt ()
 	    if (spherical == 0) {
 		const Real maxw0 = w0_mf[mfi].maxabs<RunOn::Device>(tileBox, AMREX_SPACEDIM-1);
 
-		dr_fine_loc = (prob_hi - prob_lo)/nr_fine;
+		dr_fine_loc = (prob_hi - prob_lo)/base_geom.nr_fine;
                 dt_grid = std::min(1.1 * dt_grid, cfl * dr_fine_loc / (maxw0 + SMALL));
 		
             } else {
@@ -115,7 +115,7 @@ Maestro::EstDt ()
                 const Real maxw0 = w0_mf[mfi].maxabs<RunOn::Device>(tileBox, 0);
 		
 		if (prob_type == 1 || prob_type == 3 || prob_type == 4) {
-		    dr_fine_loc = (prob_hi - prob_lo)/nr_fine; 
+		    dr_fine_loc = (prob_hi - prob_lo)/base_geom.nr_fine; 
 		} else {
 		    // need to compute it this way to agree with how the initial model
 		    // was computed
@@ -187,7 +187,7 @@ Maestro::FirstDt ()
     dt = 1.e20;
 
     // allocate a dummy w0_force and set equal to zero
-    Vector<Real> w0_force_dummy( (max_radial_level+1)*nr_fine );
+    Vector<Real> w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     w0_force_dummy.shrink_to_fit();
     std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
 

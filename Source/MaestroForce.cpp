@@ -20,6 +20,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
+
     // constants in Fortran
     Real base_cutoff_density = 0.0; 
     get_base_cutoff_density(&base_cutoff_density);
@@ -39,23 +42,25 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     }
 
-    RealVector gradw0( (max_radial_level+1)*nr_fine , 0.0);
-    gradw0.shrink_to_fit();
+    BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
+    gradw0.setVal(0.0);
 
-    Real* AMREX_RESTRICT p_gradw0 = gradw0.dataPtr();
     Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
-    const Real dr0 = dr_fine;
+    const Real dr0 = base_geom.dr_fine;
+    auto gradw0_arr = gradw0.array();
 
     if ( !(use_exact_base_state || average_base_state) ) {
-        AMREX_PARALLEL_FOR_1D (gradw0.size(), i,
-        {       
-            p_gradw0[i] = (p_w0[i+1] - p_w0[i])/dr0;
-        });
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, i,
+            {       
+                gradw0_arr(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
+            });
+        }
     }
 
-    Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
-    Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
+    Put1dArrayOnCart(gradw0, gradw0_cart, 0, 0, bcs_u, 0, 1);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(grav_cell, grav_cart, 0, 1, bcs_f, 0);
 
     // Reset vel_force
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -207,18 +212,21 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
         Put1dArrayOnCart(s0_edge,s0_edge_cart,0,0,bcs_f,0);
     }
 
-    RealVector divw0;
+    
     Vector<MultiFab> divu_cart(finest_level+1);
+    const auto& r_cc_loc = base_geom.r_cc_loc;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
 
     if (spherical) {
-        divw0.resize(nr_fine);
-        std::fill(divw0.begin(), divw0.end(), 0.);
+        BaseState<Real> divw0(1,base_geom.nr_fine);
+        divw0.setVal(0.0);
+        auto divw0_arr = divw0.array();
 
         if (!use_exact_base_state) {
-            for (int r=0; r<nr_fine-1; ++r) {
-                Real dr_loc = r_edge_loc[r+1] - r_edge_loc[r];
-                divw0[r] = (r_edge_loc[r+1]*r_edge_loc[r+1] * w0[r+1]
-                           - r_edge_loc[r]*r_edge_loc[r] * w0[r]) / (dr_loc * r_cc_loc[r]*r_cc_loc[r]);
+            for (int r=0; r<base_geom.nr_fine-1; ++r) {
+                Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
+                divw0_arr(0,r) = (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * w0[r+1]
+                           - r_edge_loc(0,r)*r_edge_loc(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
             }
         }
 
@@ -226,7 +234,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
             divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             divu_cart[lev].setVal(0.);
         }
-        Put1dArrayOnCart(divw0,divu_cart,0,0,bcs_u,0);
+        Put1dArrayOnCart(divw0, divu_cart, 0, 0, bcs_u, 0);
     }
     
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -238,7 +246,201 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            
+            // Get Array4 inputs
+            const Array4<const Real> scal = state[lev].array(mfi,comp);
+            const Array4<const Real> umac = umac_in[lev][0].array(mfi);
+            const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
+#if (AMREX_SPACEDIM == 3)
+            const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
+#endif
+            const Array4<const Real> s0_arr = s0_cart[lev].array(mfi);
+            const Array4<const Real> s0_edge_arr = s0_edge_cart[lev].array(mfi);
+            const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+
+            // output
+            const Array4<Real> force = scal_force[lev].array(mfi,comp);
+            
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            // offload to GPU
+            if (spherical) {
+#if (AMREX_SPACEDIM == 3)
+                // lo and hi of domain
+                const Box& domainBox = geom[lev].Domain();
+                const auto domlo = domainBox.loVect3d();
+                const auto domhi = domainBox.hiVect3d();
+                const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
+                
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {                   
+                    // umac does not contain w0
+                    Real divumac = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+                                  +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
+                                  +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
+                    
+                    if (fullform == 1) {
+                        force(i,j,k) -= scal(i,j,k)*(divumac + divu_arr(i,j,k));
+                    } else {
+                        Real s0_xlo = 0.0;
+                        Real s0_xhi = 0.0;              
+                        if (i < domhi[0]) {
+                            s0_xhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i+1,j,k));
+                        } else {
+                            s0_xhi = s0_arr(i,j,k);
+                        }
+                        if (i > domlo[0]) {
+                            s0_xlo = 0.5 * (s0_arr(i,j,k) + s0_arr(i-1,j,k));
+                        } else {
+                            s0_xlo = s0_arr(i,j,k);
+                        }
+                        
+                        Real s0_ylo = 0.0;
+                        Real s0_yhi = 0.0;
+                        if (j < domhi[1]) {
+                            s0_yhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j+1,k));
+                        } else {
+                            s0_yhi = s0_arr(i,j,k);
+                        }
+                        if (j > domlo[1]) {
+                            s0_ylo = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j-1,k));
+                        } else {
+                            s0_ylo = s0_arr(i,j,k);
+                        }
+
+                        Real s0_zlo = 0.0;
+                        Real s0_zhi = 0.0;
+                        if (k < domhi[2]) {
+                            s0_zhi = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j,k+1));
+                        } else {
+                            s0_zhi = s0_arr(i,j,k);
+                        }
+                        if (k > domlo[2]) {
+                            s0_zlo = 0.5 * (s0_arr(i,j,k) + s0_arr(i,j,k-1));
+                        } else {
+                            s0_zlo = s0_arr(i,j,k);
+                        }
+                        
+                        Real divs0u = (umac(i+1,j,k)*s0_xhi - umac(i,j,k)*s0_xlo)/dx[0] + 
+                            (vmac(i,j+1,k)*s0_yhi - vmac(i,j,k)*s0_ylo)/dx[1] + 
+                            (wmac(i,j,k+1)*s0_zhi - wmac(i,j,k)*s0_zlo)/dx[2];
+                            
+                        force(i,j,k) += -divs0u
+                            - (scal(i,j,k)-s0_arr(i,j,k))*(divumac + divu_arr(i,j,k));
+                    }
+                });
+#else
+                Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
+#endif
+            } else {
+
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
+                {
+                    // umac does not contain w0
+#if (AMREX_SPACEDIM == 2)
+                    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+                        +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1];
+
+                    // add w0 contribution
+                    divu += (w0_arr(i,j+1,k,AMREX_SPACEDIM-1)- w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
+#elif (AMREX_SPACEDIM == 3)
+                    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
+                        +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] 
+                        +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
+
+                    // add w0 contribution
+                    divu += (w0_arr(i,j,k+1,AMREX_SPACEDIM-1)-w0_arr(i,j,k,AMREX_SPACEDIM-1))/dx[AMREX_SPACEDIM-1];
+#endif
+                    if (fullform == 1) {
+                        force(i,j,k) -= scal(i,j,k) * divu;
+                    } else {
+
+#if (AMREX_SPACEDIM == 2)
+                        Real divs0u = s0_arr(i,j,k)*(  umac(i+1,j,k) - umac(i,j,k))/dx[0] 
+                            +(vmac(i,j+1,k) * s0_edge_arr(i,j+1,k) - 
+                              vmac(i,j  ,k) * s0_edge_arr(i,j,k) )/ dx[1];
+#elif (AMREX_SPACEDIM == 3)
+                        Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0] 
+                                                      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] ) 
+                            +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) - 
+                              wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
+#endif
+
+                        force(i,j,k) += -(scal(i,j,k)-s0_arr(i,j,k))*divu - divs0u;
+                    }
+                });
+            }
+        }
+    }
+
+    // average fine data onto coarser cells
+    AverageDown(scal_force, comp, 1);
+
+    // fill ghost cells
+    FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
+}
+
+
+void
+Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
+                         const Vector<MultiFab>& state,
+                         const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
+                         const RealVector& s0,
+                         const BaseState<Real>& s0_edge,
+                         const Vector<MultiFab>& s0_cart,
+                         int comp,
+                         const Vector<BCRec>& bcs,
+                         int fullform)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::ModifyScalForce()",ModifyScalForce);
+
+    Vector<MultiFab> s0_edge_cart(finest_level+1);
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        s0_edge_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+    }
+
+    if (spherical == 0) {
+        Put1dArrayOnCart(s0_edge, s0_edge_cart, 0, 0, bcs_f, 0);
+    }
+
+    Vector<MultiFab> divu_cart(finest_level+1);
+    const auto& r_cc_loc = base_geom.r_cc_loc;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
+
+    if (spherical) {
+        BaseState<Real> divw0(1,base_geom.nr_fine);
+        divw0.setVal(0.0);
+        auto divw0_arr = divw0.array();
+
+        if (!use_exact_base_state) {
+            for (int r=0; r<base_geom.nr_fine-1; ++r) {
+                Real dr_loc = r_edge_loc(0,r+1) - r_edge_loc(0,r);
+                divw0_arr(0,r) = (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * w0[r+1]
+                           - r_edge_loc(0,r)*r_edge_loc(0,r) * w0[r]) / (dr_loc * r_cc_loc(0,r)*r_cc_loc(0,r));
+            }
+        }
+
+        for (int lev=0; lev<=finest_level; ++lev) {
+            divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+            divu_cart[lev].setVal(0.);
+        }
+        Put1dArrayOnCart(divw0, divu_cart, 0, 0, bcs_u, 0);
+    }
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+        // Get the index space and grid spacing of the domain
+        const auto dx = geom[lev].CellSizeArray();
+
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             
             // Get Array4 inputs
             const Array4<const Real> scal = state[lev].array(mfi,comp);
@@ -394,9 +596,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         Abort("ERROR: should only call mkrhohforce when predicting rhoh', h, or rhoh");
     }
 
-    RealVector rho0( (max_radial_level+1)*nr_fine );
-    RealVector   p0( (max_radial_level+1)*nr_fine );
-    RealVector grav( (max_radial_level+1)*nr_fine );
+    RealVector rho0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector   p0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector grav( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     rho0.shrink_to_fit();
     p0.shrink_to_fit();
     grav.shrink_to_fit();
@@ -435,12 +637,12 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
 
     MakeGravCell(grav, rho0);
 
-    Put1dArrayOnCart(grav,grav_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(grav, grav_cart, 0, 0, bcs_f, 0);
 
     // constants in Fortran
     const int enthalpy_pred_type_in = enthalpy_pred_type;
@@ -450,8 +652,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get cutoff coord
-        int base_cutoff_density_coord_loc = 0;
-        get_base_cutoff_density_coord(lev, &base_cutoff_density_coord_loc);
+        int base_cutoff_density_coord = base_geom.base_cutoff_density_coord(lev);
     
         // Get grid spacing
         const auto dx = geom[lev].CellSizeArray();
@@ -498,7 +699,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real gradp0 = 0.0;
                 
 #if (AMREX_SPACEDIM == 2)
-                    if (j < base_cutoff_density_coord_loc) {
+                    if (j < base_cutoff_density_coord) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
                     } else if (j == domhi) {
                         // NOTE: this should be zero since p0 is constant up here
@@ -511,7 +712,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                     Real veladv = 0.5*(vmac(i,j,k)+vmac(i,j+1,k));
                     rhoh_force(i,j,k) = veladv * gradp0;
 #else 
-                    if (k < base_cutoff_density_coord_loc) {
+                    if (k < base_cutoff_density_coord) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
                     } else if (k == domhi) {
                         // NOTE: this should be zero since p0 is constant up here
@@ -604,7 +805,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     }
 
     Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

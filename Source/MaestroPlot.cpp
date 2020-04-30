@@ -141,7 +141,7 @@ Maestro::WritePlotFile (const int step,
     // write out the cell-centered base state
     if (ParallelDescriptor::IOProcessor()) {
 
-        for (int lev=0; lev<=max_radial_level; ++lev) {
+        for (int lev=0; lev<=base_geom.max_radial_level; ++lev) {
 
             std::ofstream BaseCCFile;
             BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
@@ -159,12 +159,12 @@ Maestro::WritePlotFile (const int step,
 
             BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
 
-            for (int i=0; i<nr[lev]; ++i) {
-                BaseCCFile << r_cc_loc[lev+(max_radial_level+1)*i] << " "
-                           << rho0_in[lev+(max_radial_level+1)*i] << " "
-                           << rhoh0_in[lev+(max_radial_level+1)*i] << " "
-                           << p0_in[lev+(max_radial_level+1)*i] << " "
-                           << gamma1bar_in[lev+(max_radial_level+1)*i] << "\n";
+            for (int i=0; i<base_geom.nr(lev); ++i) {
+                BaseCCFile << base_geom.r_cc_loc(lev,i) << " "
+                           << rho0_in[lev+(base_geom.max_radial_level+1)*i] << " "
+                           << rhoh0_in[lev+(base_geom.max_radial_level+1)*i] << " "
+                           << p0_in[lev+(base_geom.max_radial_level+1)*i] << " "
+                           << gamma1bar_in[lev+(base_geom.max_radial_level+1)*i] << "\n";
             }
         }
     }
@@ -172,7 +172,7 @@ Maestro::WritePlotFile (const int step,
     // write out the face-centered base state
     if (ParallelDescriptor::IOProcessor()) {
 
-        for (int lev = 0; lev <= max_radial_level; ++lev) {
+        for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
 
             std::ofstream BaseFCFile;
             BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
@@ -190,9 +190,9 @@ Maestro::WritePlotFile (const int step,
 
             BaseFCFile << "r_edge  w0 \n";
 
-            for (int i = 0; i <= nr[lev]; ++i) {
-                BaseFCFile << r_edge_loc[lev+(max_radial_level+1)*i] << " "
-                           << w0[lev+(max_radial_level+1)*i] << "\n";
+            for (int i = 0; i <= base_geom.nr(lev); ++i) {
+                BaseFCFile << base_geom.r_edge_loc(lev,i) << " "
+                           << w0[lev+(base_geom.max_radial_level+1)*i] << "\n";
             }
         }
     }
@@ -248,7 +248,7 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> tempmf(finest_level+1);
     Vector<MultiFab> tempmf_scalar1(finest_level+1);
     Vector<MultiFab> tempmf_scalar2(finest_level+1);
-    RealVector tempbar_plot ((max_radial_level+1)*nr_fine);
+    RealVector tempbar_plot ((base_geom.max_radial_level+1)*base_geom.nr_fine);
     tempbar_plot.shrink_to_fit();
     std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
 
@@ -1685,7 +1685,7 @@ Maestro::MakeGrav (const RealVector& rho0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGrav()", MakeGrav);
 
-    RealVector grav_cell( (max_radial_level+1)*nr_fine );
+    RealVector grav_cell( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     grav_cell.shrink_to_fit();
 
     MakeGravCell(grav_cell, rho0);

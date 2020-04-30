@@ -122,13 +122,13 @@ public:
 
     ////////////
     // MaestroAdvectBase.cpp functions
-    void AdvectBaseDens(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(RealVector& rho0_predicted_edge);
-    void AdvectBaseDensSphr(RealVector& rho0_predicted_edge);
+    void AdvectBaseDens(BaseState<amrex::Real>& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge);
+    void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge);
 
-    void AdvectBaseEnthalpy(RealVector& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpyPlanar(RealVector& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpySphr(RealVector& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpy(BaseState<amrex::Real>& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpyPlanar(BaseState<amrex::Real>& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpySphr(BaseState<amrex::Real>& rhoh0_predicted_edge);
     // end MaestroAdvectBase.cpp functions
     ////////////
 
@@ -195,6 +195,21 @@ public:
                        const RealVector& r0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const RealVector& r0_predicted_edge,
+                       int start_comp, int num_comp);
+
+    void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                       amrex::Vector<amrex::MultiFab>& etarhoflux,
+                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const RealVector& r0_old,
+                       const BaseState<amrex::Real>& rho0_edge_old,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
+                       const RealVector& r0_new,
+                       const BaseState<amrex::Real>& rho0_edge_new,
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
+                       const BaseState<amrex::Real>& rho0_predicted_edge,
                        int start_comp, int num_comp);
 
     /// Calculate `rhoh` flux
@@ -300,21 +315,27 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
-    void InitBaseStateGeometry(const int max_radial_level_in, 
-                               const int nr_fine_in,
-                               const amrex::Real dr_fine_in,
-                               const int nr_irreg_in);
+    // void InitBaseStateGeometry(const int max_radial_level_in, 
+    //                            const int nr_fine_in,
+    //                            const amrex::Real dr_fine_in,
+    //                            const int nr_irreg_in);
 #if (AMREX_SPACEDIM == 3)
     void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
 #endif
-    void ComputeCutoffCoords(RealVector& rho0);
+    void ComputeCutoffCoords(const RealVector& rho0);
 
-    void InitMultilevel(const int finest_radial_level_in);
+    // void InitMultilevel(const int finest_radial_level_in);
                                
     void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
     void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
+
+    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+
+    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -350,6 +371,12 @@ public:
 
     void CelltoEdge(const RealVector& s0_cell_vec, 
                     RealVector& s0_edge_vec);
+
+    void CelltoEdge(const RealVector& s0_cell_vec, 
+                    BaseState<amrex::Real>& s0_edge);
+
+    void CelltoEdge(const BaseState<amrex::Real>& s0_cell_vec, 
+                    BaseState<amrex::Real>& s0_edge);
 
     // end MaestroCelltoEdge.cpp functions
     ////////////
@@ -454,7 +481,7 @@ public:
                          amrex::Vector<amrex::MultiFab>& etarhoflux,
                          amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                          const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                         const RealVector& rho0_predicted_edge);
+                         const BaseState<amrex::Real>& rho0_predicted_edge);
 
     // SDC
     void DensityAdvanceSDC (int which_step,
@@ -466,7 +493,7 @@ public:
                             amrex::Vector<amrex::MultiFab>& etarhoflux,
                             amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                             const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                            const RealVector& rho0_predicted_edge);
+                            const BaseState<amrex::Real>& rho0_predicted_edge);
     ////////////////////////
 
     ////////////
@@ -634,6 +661,13 @@ public:
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            const int sbccomp = 0, int variable_type=0);
 
+    void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0, int variable_type=0);                       
+
     /// Maps 1d arrays onto multi-D cartesian MultiFabs
     ///
     /// @param level        AMR level to perform calculation on
@@ -666,6 +700,13 @@ public:
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
                            int sbccomp = 0);
 
+    void Put1dArrayOnCart (int level, const BaseState<amrex::Real>& s0,
+                           amrex::Vector<amrex::MultiFab>& s0_cart,
+                           int is_input_edge_centered,
+                           int is_output_a_vector,
+                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
+                           int sbccomp = 0);                       
+
     AMREX_GPU_DEVICE amrex::Real QuadInterp(const amrex::Real x, 
                         const amrex::Real x0, const amrex::Real x1, 
                         const amrex::Real x2,
@@ -688,6 +729,9 @@ public:
 
     /// MAC-project the base state scalar `s0`
     void MakeS0mac (const RealVector& s0,
+                    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
+
+    void MakeS0mac (const BaseState<amrex::Real>& s0,
                     amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
 
     /// Create the unit normal across the grids
@@ -719,6 +763,16 @@ public:
                          const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                          const RealVector& s0,
                          const RealVector& s0_edge,
+                         const amrex::Vector<amrex::MultiFab>& s0_cart,
+                         int comp,
+                         const amrex::Vector<amrex::BCRec>& bcs,
+                         int fullform);
+
+    void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
+                         const amrex::Vector<amrex::MultiFab>& state,
+                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
+                         const RealVector& s0,
+                         const BaseState<amrex::Real>& s0_edge,
                          const amrex::Vector<amrex::MultiFab>& s0_cart,
                          int comp,
                          const amrex::Vector<amrex::BCRec>& bcs,
@@ -817,10 +871,10 @@ public:
     ///   enters as either zero, or the solution to the predictor MAC projection
     /// @param macrhs enters as `beta0*(S-Sbar)`
     /// @param beta0 is a 1d cell-centered array
-    void MacProj (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+    void MacProj(amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
-                  const RealVector& beta0,
+                  const BaseState<amrex::Real>& beta0,
                   const int& is_predictor);
 
     /// Multiply (or divide) face-centered data by `beta0`
@@ -830,8 +884,8 @@ public:
     /// @param beta0_edge   face-centered \f$\beta_0\f$
     /// @param mult_or_div  do we multiply or divide?
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
-                           const RealVector& beta0,
-                           const RealVector& beta0_edge,
+                           const BaseState<amrex::Real>& beta0,
+                           const BaseState<amrex::Real>& beta0_edge,
                            const int& mult_or_div);
 
     /// Compute the RHS for the solve, `RHS = macrhs - div(beta0*umac)`
@@ -859,7 +913,7 @@ public:
     ////////////
     // MaestroMakeBeta0.cpp functions
 
-    void MakeBeta0(RealVector& beta, 
+    void MakeBeta0(BaseState<amrex::Real>& beta, 
                    const RealVector& rho0,
                    const RealVector& p0,
                    const RealVector& gamma1bar,
@@ -1030,14 +1084,14 @@ public:
 
     ////////////
     // MaestroMakeEdgeState.cpp functions
-    void MakeEdgeState1d(RealVector& s, RealVector& sedge, 
-                         RealVector& force);
+    void MakeEdgeState1d(RealVector& s, BaseState<amrex::Real>& sedge, 
+                         BaseState<amrex::Real>& force);
 
-    void MakeEdgeState1dSphr(RealVector& s, RealVector& sedge, 
-                             RealVector& force);
+    void MakeEdgeState1dSphr(RealVector& s, BaseState<amrex::Real>& sedge, 
+                             BaseState<amrex::Real>& force);
 
-    void MakeEdgeState1dPlanar(RealVector& s, RealVector& sedge, 
-                               RealVector& force);
+    void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
+                               BaseState<amrex::Real>& force);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
@@ -1067,6 +1121,9 @@ public:
 
     void MakeGravEdge(RealVector& grav_edge, 
                       const RealVector& rho0);
+
+    void MakeGravEdge(BaseState<Real>& grav_edge, 
+                      const BaseState<Real>& rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1106,7 +1163,7 @@ public:
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
                                const amrex::Vector<amrex::MultiFab>& S_cc,
                                const RealVector& Sbar,
-                               const RealVector& beta0,
+                               const BaseState<amrex::Real>& beta0,
                                const amrex::Vector<amrex::MultiFab>& delta_gamma1_term);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
@@ -1114,7 +1171,7 @@ public:
                                          const RealVector& rho0,
                              const amrex::Vector<amrex::MultiFab>& S_cc,
                              const RealVector& Sbar,
-                             const RealVector& beta0,
+                             const BaseState<amrex::Real>& beta0,
                              const amrex::Vector<amrex::MultiFab>& delta_gamma1_term,
                              const RealVector& gamma1bar,
                                          const RealVector& p0,
@@ -1124,7 +1181,7 @@ public:
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
                                  const RealVector& rho0,
-                                 const RealVector& beta0,
+                                 const BaseState<amrex::Real>& beta0,
                                  const RealVector& gamma1bar,
                                  const RealVector& p0,
                                  const amrex::Vector<amrex::MultiFab>& delta_p_term);
@@ -1217,11 +1274,15 @@ public:
                     RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const RealVector& a, const RealVector& b, 
-                 const RealVector& c, const RealVector& r, 
-                 RealVector& u, const int n);
+    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
+                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
+                 BaseStateArray<Real> u, const int n);
 
     void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
+
+    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<amrex::Real>& base_fine);
+
+    void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
     // end MaestroMakew0.cpp functions
     ////////////
@@ -1458,6 +1519,9 @@ public:
     /// the other levels and then copy the valid data from
     /// the old arrays onto the new.
     void RegridBaseState(RealVector& base, const bool is_edge=false);
+
+
+    void RegridBaseState(BaseState<amrex::Real>& base, const bool is_edge=false);
 
     /// Tag all cells for refinement
     ///
@@ -1980,50 +2044,54 @@ public:
     RealVector p0_new;
     RealVector tempbar;
     RealVector tempbar_init;
-    RealVector beta0_old;
-    RealVector beta0_new;
+    BaseState<amrex::Real> beta0_old;
+    BaseState<amrex::Real> beta0_new;
     RealVector gamma1bar_old;
     RealVector gamma1bar_new;
-    RealVector etarho_cc;
-    RealVector psi;
+    BaseState<amrex::Real> etarho_cc;
+    BaseState<amrex::Real> psi;
     RealVector grav_cell_old;
     RealVector grav_cell_new;
-    RealVector r_cc_loc;
+    // RealVector r_cc_loc;
+    BaseState<amrex::Real> r_cc_loc_b;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
     RealVector p0_nm1;
-    RealVector beta0_nm1;
+    BaseState<amrex::Real> beta0_nm1;
 
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
     RealVector w0;
-    RealVector etarho_ec;
-    RealVector r_edge_loc;
+    BaseState<amrex::Real> etarho_ec;
+    // RealVector r_edge_loc;
+    BaseState<amrex::Real> r_edge_loc_b;
 
     // Information for the base state.
     // We also store these (except for the large arrays)
     // in `base_state.f90` in a fortran module for convenience
-    int max_radial_level;
-    int finest_radial_level;
-    int nr_fine;
-    amrex::Real dr_fine;
-    int nr_irreg;
-    IntVector nr;
-    RealVector dr;
-    IntVector base_cutoff_density_coord;
-    IntVector anelastic_cutoff_density_coord;
-    IntVector burning_cutoff_density_lo_coord;
-    IntVector burning_cutoff_density_hi_coord;
+    // int max_radial_level;
+    // int finest_radial_level;
+    // int nr_fine;
+    // amrex::Real dr_fine;
+    // int nr_irreg;
+    // BaseState<int> nr;
+    // BaseState<Real> dr;
+
+    // BaseState<int> base_cutoff_density_coord;
+    // BaseState<int> anelastic_cutoff_density_coord;
+    // BaseState<int> burning_cutoff_density_lo_coord;
+    // BaseState<int> burning_cutoff_density_hi_coord;
 
     // relative error needed for base state computations
-    amrex::Real c_rel_eps;
+    amrex::Real rel_eps;
 
     // these provide information about the multilevel base state configuration
-    IntVector numdisjointchunks;
-    IntVector r_start_coord;
-    IntVector r_end_coord;
+    // BaseState<int> numdisjointchunks;
+    // BaseState<int> r_start_coord;
+    // BaseState<int> r_end_coord;
 
     /// array of tagged boxes (planar)
     IntVector tag_array;
+    // BaseState<int> tag_array_b;
 
     /// contains base state geometry variables
     BaseStateGeometry base_geom;

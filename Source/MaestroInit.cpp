@@ -95,16 +95,19 @@ Maestro::Init ()
             // reset tagging array to include buffer zones
             TagArray();
         }
+
+        // set finest_radial_level in fortran
+        // compute numdisjointchunks, r_start_coord, r_end_coord
+        init_multilevel(tag_array.dataPtr(),&finest_level);
+        // InitMultilevel(finest_level);
+        BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+
+        compute_cutoff_coords(rho0_old.dataPtr());
+        ComputeCutoffCoords(rho0_old);
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
     }
-
-    // set finest_radial_level in fortran
-    // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(),&finest_level);
-    // base_geom.InitMultiLevel(finest_level, tag_array.array());
-
-    compute_cutoff_coords(rho0_old.dataPtr());
-    ComputeCutoffCoords(rho0_old);
-    // base_geom.ComputeCutoffCoords(rho0_old.array());
 
     if (spherical) {
         MakeNormal();
@@ -121,16 +124,14 @@ Maestro::Init ()
     if (restart_file == "") {
 
         // compute gamma1bar
-        MakeGamma1bar(sold,gamma1bar_old,p0_old);
+        MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
         // compute beta0
         MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
-                  grav_cell_old, use_exact_base_state);        
+                  grav_cell_old, use_exact_base_state);     
 
         // set beta0^{-1} = beta0_old
-        for (int i=0; i<beta0_old.size(); ++i) {
-            beta0_nm1[i] = beta0_old[i];
-        }
+        beta0_nm1.copy(beta0_old);
 
         // initial projection
         if (do_initial_projection) {
@@ -225,13 +226,13 @@ Maestro::InitData ()
     Print() << "initdata model_File = " << model_file << std::endl;
 
     // read in model file and fill in s0_init and p0_init for all levels
-    for (auto lev = 0; lev <= max_radial_level; ++lev) {
+    for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
         InitBaseState(rho0_old, rhoh0_old, 
                       p0_old, lev);
     }
 
     if (use_exact_base_state) {
-        std::fill(psi.begin(), psi.end(), 0.);
+        psi.setVal(0.0);
     }
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
@@ -246,7 +247,9 @@ Maestro::InitData ()
     // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
     init_multilevel(tag_array.dataPtr(),&finest_level);
-    // base_geom.InitMultiLevel(finest_level, tag_array.array());
+    // InitMultilevel(finest_level);
+    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     // average down data and fill ghost cells
     AverageDown(sold,0,Nscal);
@@ -264,27 +267,28 @@ Maestro::InitData ()
         // compute cutoff coordinates
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        // base_geom.ComputeCutoffCoords(rho0_old.array());
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
         MakeGravCell(grav_cell_old, rho0_old);
-    }
-    else {
+    } else {
 
         // first compute cutoff coordinates using initial density profile
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        // base_geom.ComputeCutoffCoords(rho0_old.array());
+        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+        base_geom.ComputeCutoffCoords(rho0_state.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
             std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
             std::fill(rhoh0_old.begin(), rhoh0_old.end(), 0.);
-        }
-        else {
+        } else {
             // set rho0 to be the average
             Average(sold,rho0_old,Rho);
             compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
-            // base_geom.ComputeCutoffCoords(rho0_old.array());
+            BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+            base_geom.ComputeCutoffCoords(rho0_state.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);
@@ -455,8 +459,8 @@ void Maestro::InitProj ()
     Vector<MultiFab>       delta_gamma1(finest_level+1);
     Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
-    RealVector Sbar( (max_radial_level+1)*nr_fine );
-    RealVector delta_gamma1_termbar( (max_radial_level+1)*nr_fine );
+    RealVector Sbar( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector delta_gamma1_termbar( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
@@ -511,7 +515,8 @@ void Maestro::InitProj ()
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
 #ifndef SDC
@@ -526,7 +531,7 @@ void Maestro::InitProj ()
 void Maestro::DivuIter (int istep_divu_iter)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::DivuIter()",DivuIter);
+    BL_PROFILE_VAR("Maestro::DivuIter()", DivuIter);
 
     Vector<MultiFab> stemp             (finest_level+1);
     Vector<MultiFab> rho_Hext          (finest_level+1);
@@ -541,11 +546,11 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1      (finest_level+1);
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-    RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
-    RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-    RealVector p0_minus_peosbar      ( (max_radial_level+1)*nr_fine );
-    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
-    RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
+    RealVector Sbar                  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector w0_force              ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector p0_minus_peosbar      ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector delta_chi_w0          ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector delta_gamma1_termbar  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
 
     Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
@@ -554,10 +559,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     delta_gamma1_termbar.shrink_to_fit();
 
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
-    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
-    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    psi.setVal(0.0);
+    etarho_cc.setVal(0.0);
     std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
@@ -627,7 +632,8 @@ void Maestro::DivuIter (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
@@ -684,11 +690,11 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
     Vector<MultiFab> sdc_source        (finest_level+1);
     
-    RealVector Sbar                  ( (max_radial_level+1)*nr_fine );
-    RealVector w0_force              ( (max_radial_level+1)*nr_fine );
-    RealVector p0_minus_pthermbar    ( (max_radial_level+1)*nr_fine );
-    RealVector delta_gamma1_termbar  ( (max_radial_level+1)*nr_fine );
-    RealVector delta_chi_w0          ( (max_radial_level+1)*nr_fine );
+    RealVector Sbar                  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector w0_force              ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector p0_minus_pthermbar    ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector delta_gamma1_termbar  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    RealVector delta_chi_w0          ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     
     Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
@@ -697,10 +703,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     delta_chi_w0.shrink_to_fit();
     
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
-    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
-    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    psi.setVal(0.0);
+    etarho_cc.setVal(0.0);
     std::fill(p0_minus_pthermbar.begin(),   p0_minus_pthermbar.end(),   0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
     std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
@@ -769,7 +775,8 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
     
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter,false);

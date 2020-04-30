@@ -15,6 +15,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
 
+    const auto nr_fine = base_geom.nr_fine;
+    const auto max_radial_level = base_geom.max_radial_level;
+
 	// vectors store the multilevel 1D states as one very long array
 	// these are cell-centered
 	Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
@@ -29,7 +32,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// vectors store the multilevel 1D states as one very long array
 	// these are edge-centered
 	Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-	Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+	BaseState<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
 	// make sure C++ is as efficient as possible with memory usage
 	p0_minus_peosbar.shrink_to_fit();
@@ -39,7 +42,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Sbar_nph.shrink_to_fit();
 	delta_chi_w0.shrink_to_fit();
 	w0_old.shrink_to_fit();
-	rho0_predicted_edge.shrink_to_fit();
 	Hext_bar.shrink_to_fit();
 	tempbar_new.shrink_to_fit();
 
@@ -60,7 +62,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	get_heating(Hext_bar.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
-	            rhoX0_old.dataPtr(), t_old, dt, r_cc_loc.dataPtr());
+	            rhoX0_old.dataPtr(), t_old, dt, base_geom.r_cc_loc.dataPtr());
 
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -107,7 +109,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-	               r_edge_loc.dataPtr(), r_cc_loc.dataPtr(), dt);
+	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update pressure
@@ -193,7 +195,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-	               r_edge_loc.dataPtr(), r_cc_loc.dataPtr(), dt);
+	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

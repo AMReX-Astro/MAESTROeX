@@ -14,15 +14,13 @@ Maestro::DensityAdvance (int which_step,
                          Vector<MultiFab>& etarhoflux,
                          Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                          const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                         const RealVector& rho0_predicted_edge)
+                         const BaseState<Real>& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvance()",DensityAdvance);
 
-    RealVector rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    rho0_edge_old.shrink_to_fit();
-    rho0_edge_new.shrink_to_fit();
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1,base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1,base_geom.nr_fine+1);
 
     if (spherical == 0) {
         // create edge-centered base state quantities.
@@ -49,13 +47,13 @@ Maestro::DensityAdvance (int which_step,
         rho0_old_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(rho0_old,rho0_old_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(rho0_old, rho0_old_cart, 0, 0, bcs_s, Rho);
 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
     /////////////////////////////////////////////////////////////////
 
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
 
     /////////////////////////////////////////////////////////////////
     // Compute source terms
@@ -67,12 +65,16 @@ Maestro::DensityAdvance (int which_step,
     if (species_pred_type == predict_rhoprime_and_X) {
         // rho' source term
         // this is needed for pred_rhoprime_and_X
-        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,rho0_old_cart,Rho,bcs_s,0);
+        ModifyScalForce(scal_force, scalold, umac, rho0_old,
+                        rho0_edge_old, rho0_old_cart, 
+                        Rho, bcs_s, 0);
 
     }
     else if (species_pred_type == predict_rho_and_X) {
         // rho source term
-        ModifyScalForce(scal_force,scalold,umac,rho0_old,rho0_edge_old,rho0_old_cart,Rho,bcs_s,1);
+        ModifyScalForce(scal_force, scalold, umac, rho0_old,
+                        rho0_edge_old, rho0_old_cart,
+                        Rho, bcs_s, 1);
 
     }
 
@@ -83,7 +85,6 @@ Maestro::DensityAdvance (int which_step,
 
     // for predict_rhoX, we are predicting (rho X)
     // as a conservative equation, and there is no force.
-
 
     /////////////////////////////////////////////////////////////////
     // Add w0 back to MAC velocities (trans velocities already have w0).
@@ -176,10 +177,10 @@ Maestro::DensityAdvance (int which_step,
 
         // compute species fluxes
         MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_old,rho0_edge_old,rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
                      rho0_predicted_edge,
-                     FirstSpec,NumSpec);
+                     FirstSpec, NumSpec);
 
     } else if (which_step == 2) {
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rho0mac_old(finest_level+1);
@@ -202,10 +203,10 @@ Maestro::DensityAdvance (int which_step,
 
         // compute species fluxes
         MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_new,rho0_edge_new,rho0mac_new,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_new, rho0_edge_new, rho0mac_new,
                      rho0_predicted_edge,
-                     FirstSpec,NumSpec);
+                     FirstSpec, NumSpec);
     }
 
     //**************************************************************************
@@ -227,7 +228,8 @@ Maestro::DensityAdvance (int which_step,
     Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
-    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);
+    UpdateScal(scalold, scalnew, sflux, scal_force, 
+               FirstSpec, NumSpec, p0_new_cart);
 }
 
 
@@ -242,15 +244,13 @@ Maestro::DensityAdvanceSDC (int which_step,
                             Vector<MultiFab>& etarhoflux,
                             Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                             const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                            const RealVector& rho0_predicted_edge)
+                            const BaseState<Real>& rho0_predicted_edge)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::DensityAdvanceSDC()",DensityAdvanceSDC);
 
-    RealVector rho0_edge_old( (max_radial_level+1)*(nr_fine+1) );
-    RealVector rho0_edge_new( (max_radial_level+1)*(nr_fine+1) );
-    rho0_edge_old.shrink_to_fit();
-    rho0_edge_new.shrink_to_fit();
+    BaseState<Real> rho0_edge_old(base_geom.max_radial_level+1,base_geom.nr_fine+1);
+    BaseState<Real> rho0_edge_new(base_geom.max_radial_level+1,base_geom.nr_fine+1);
 
     if (spherical == 0) {
         // create edge-centered base state quantities.
@@ -280,7 +280,8 @@ Maestro::DensityAdvanceSDC (int which_step,
     }
     // fill ghost cells behind physical boundaries
     // !!!!!! uncertain about this
-    FillPatch(t_old,scal_force,scal_force,scal_force,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_f);
+    FillPatch(t_old, scal_force, scal_force, scal_force,
+              FirstSpec, FirstSpec, NumSpec, FirstSpec, bcs_f);
     
     Vector<MultiFab> rho0_old_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -356,17 +357,21 @@ Maestro::DensityAdvanceSDC (int which_step,
 
         // we are predicting X to the edges, using the advective form of
         // the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,0);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, 
+                     is_vel, bcs_s, Nscal, FirstSpec,
+                     FirstSpec, NumSpec, 0);
 
     } else if (species_pred_type == predict_rhoX) {
-
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,FirstSpec,FirstSpec,NumSpec,1);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, 
+                     is_vel, bcs_s, Nscal, FirstSpec,
+                     FirstSpec, NumSpec, 1);
     }
     
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
-        MakeEdgeScal(scalold,sedge,umac,scal_force,is_vel,bcs_s,Nscal,Rho,Rho,1,0);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, 
+                     is_vel, bcs_s, Nscal, Rho, Rho, 1, 0);
 
     } else if (species_pred_type == predict_rhoX) {
 
@@ -410,8 +415,8 @@ Maestro::DensityAdvanceSDC (int which_step,
 
         // compute species fluxes
         MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_old,rho0_edge_old,rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_old, rho0_edge_old, rho0mac_old,
                      rho0_predicted_edge,
                      FirstSpec, NumSpec);
 
@@ -430,16 +435,16 @@ Maestro::DensityAdvanceSDC (int which_step,
                              rho0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
 
-            MakeS0mac(rho0_old,rho0mac_old);
-            MakeS0mac(rho0_new,rho0mac_new);
+            MakeS0mac(rho0_old, rho0mac_old);
+            MakeS0mac(rho0_new, rho0mac_new);
         }
 
         // compute species fluxes
         MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac,
-                     rho0_old,rho0_edge_old,rho0mac_old,
-                     rho0_new,rho0_edge_new,rho0mac_new,
+                     rho0_old, rho0_edge_old, rho0mac_old,
+                     rho0_new, rho0_edge_new, rho0mac_new,
                      rho0_predicted_edge,
-                     FirstSpec,NumSpec);
+                     FirstSpec, NumSpec);
     }
 
     //**************************************************************************
@@ -463,5 +468,6 @@ Maestro::DensityAdvanceSDC (int which_step,
     Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
-    UpdateScal(scalold, scalnew, sflux, scal_force, FirstSpec, NumSpec, p0_new_cart);
+    UpdateScal(scalold, scalnew, sflux, scal_force, 
+               FirstSpec, NumSpec, p0_new_cart);
 }

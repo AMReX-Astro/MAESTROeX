@@ -21,12 +21,12 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
 #endif
 
     // Local variables
-    const int max_lev = max_radial_level + 1;
-    RealVector etarhosum( (nr_fine+1)*(max_radial_level+1), 0.0);
+    const int max_lev = base_geom.max_radial_level + 1;
+    RealVector etarhosum( (base_geom.nr_fine+1)*(base_geom.max_radial_level+1), 0.0);
     etarhosum.shrink_to_fit();
 
     // this stores how many cells there are laterally at each level
-    RealVector ncell(max_radial_level+1);
+    RealVector ncell(base_geom.max_radial_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -64,8 +64,8 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             // we only add the contribution at the top edge if we are at the top of the domain
             // this prevents double counting
             auto top_edge = false;
-            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect3d()[1] == r_end_coord[lev+max_lev*i]) {
+            for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) {
+                if (tilebox.hiVect3d()[1] == base_geom.r_end_coord(lev,i)) {
                     top_edge = true;
                 }
             }
@@ -91,8 +91,8 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
             // this prevents double counting
             auto top_edge = false;
 
-            for (auto i = 1; i <= numdisjointchunks[lev]; ++i) {
-                if (tilebox.hiVect3d()[2] == r_end_coord[lev+max_lev*i]) {
+            for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) {
+                if (tilebox.hiVect3d()[2] == base_geom.r_end_coord(lev,i)) {
                     top_edge = true;
                 }
             }
@@ -110,28 +110,23 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
         }
     }
 
-    ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(nr_fine+1)*(max_radial_level+1));
+    ParallelDescriptor::ReduceRealSum(etarhosum.dataPtr(),(base_geom.nr_fine+1)*(base_geom.max_radial_level+1));
 
-    get_numdisjointchunks(numdisjointchunks.dataPtr());
-    get_r_start_coord(r_start_coord.dataPtr());
-    get_r_end_coord(r_end_coord.dataPtr());
-    get_finest_radial_level(&finest_radial_level);
+    etarho_ec.setVal(0.0);
+    etarho_cc.setVal(0.0);
 
-    std::fill(etarho_ec.begin(), etarho_ec.end(), 0.0);
-    std::fill(etarho_cc.begin(), etarho_cc.end(), 0.0);
-
-    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
+    auto etarho_ec_arr = etarho_ec.array();
     const Real * AMREX_RESTRICT etarhosum_p = etarhosum.dataPtr();
-    Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    auto etarho_cc_arr = etarho_cc.array();
 
-    for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             Real ncell_lev = ncell[n];
-            const int lo = r_start_coord[n+max_lev*i];
-            const int hi = r_end_coord[n+max_lev*i]+1;
+            const int lo = base_geom.r_start_coord(n,i);
+            const int hi = base_geom.r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_ec_p[n+max_lev*r] = etarhosum_p[n+max_lev*r] / ncell_lev;
+                etarho_ec_arr(n,r) = etarhosum_p[n+max_lev*r] / ncell_lev;
             });
         }
     }
@@ -143,14 +138,14 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
     FillGhostBase(etarho_ec, false);
 
     // make the cell-centered etarho_cc by averaging etarho to centers
-    for (auto n = 0; n <= finest_radial_level; ++n) {
-        for (auto i = 1; i <= numdisjointchunks[n]; ++i) {
-            const int lo = r_start_coord[n+max_lev*i];
-            const int hi = r_end_coord[n+max_lev*i]+1;
+    for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
+            const int lo = base_geom.r_start_coord(n,i);
+            const int hi = base_geom.r_end_coord(n,i)+1;
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
-                etarho_cc_p[n+max_lev*r] = 0.5 * (etarho_ec_p[n+max_lev*r] + 
-                    etarho_ec_p[n+max_lev*(r+1)]);
+                etarho_cc_arr(n,r) = 0.5 * (etarho_ec_arr(n,r) + 
+                    etarho_ec_arr(n,r+1));
             });
         }
     }
@@ -179,8 +174,8 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarhoSphr()",MakeEtarhoSphr);
 
-    const int max_lev = max_radial_level + 1;
-    const int nrf = nr_fine + 1;
+    const int max_lev = base_geom.max_radial_level + 1;
+    const int nrf = base_geom.nr_fine + 1;
 
     Vector<MultiFab> eta_cart(finest_level+1);
     Vector<MultiFab> rho0_nph_cart(finest_level+1);
@@ -189,15 +184,17 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         rho0_nph_cart[lev].define(grids[lev],dmap[lev],1,0);
     }
 
-    RealVector rho0_nph(max_lev*nr_fine);
+    BaseState<Real> rho0_nph(max_lev, base_geom.nr_fine);
+    auto rho0_nph_arr = rho0_nph.array();
 
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new.dataPtr();
-    Real * AMREX_RESTRICT rho0_nph_p = rho0_nph.dataPtr();
 
-    AMREX_PARALLEL_FOR_1D(max_lev*nr_fine, i, {
-        rho0_nph_p[i] = 0.5*(rho0_old_p[i]+rho0_new_p[i]);
-    });
+    for (auto l = 0; l < max_lev; ++l) {
+        AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+            rho0_nph_arr(l,r) = 0.5*(rho0_old_p[l+max_lev*r]+rho0_new_p[l+max_lev*r]);
+        });
+    }
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
 
@@ -249,12 +246,15 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
 
     // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
-    Average(eta_cart,etarho_cc,0);
+    RealVector etarho_cc_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
+    etarho_cc.toVector(etarho_cc_vec);
+    Average(eta_cart, etarho_cc_vec, 0);
+    etarho_cc.copy(etarho_cc_vec);
 
-    const Real * AMREX_RESTRICT r_cc_loc_p = r_cc_loc.dataPtr();
-    const Real * AMREX_RESTRICT r_edge_loc_p = r_edge_loc.dataPtr();
-    Real * AMREX_RESTRICT etarho_ec_p = etarho_ec.dataPtr();
-    const Real * AMREX_RESTRICT etarho_cc_p = etarho_cc.dataPtr();
+    const auto& r_cc_loc = base_geom.r_cc_loc;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
+    auto etarho_ec_arr = etarho_ec.array();
+    const auto etarho_cc_arr = etarho_cc.const_array();
 
     // put eta on base state edges
     // note that in spherical the base state has no refinement
@@ -263,17 +263,17 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     const bool sph_loc = spherical;
     AMREX_PARALLEL_FOR_1D(nrf, r, {
         if (r == 0) {
-            etarho_ec_p[r] = 0.0;
+            etarho_ec_arr(0,r) = 0.0;
         } else if (r == nrf-1) {
             // probably should do some better extrapolation here eventually
-            etarho_ec_p[r] = etarho_cc_p[r-1];
+            etarho_ec_arr(0,r) = etarho_cc_arr(0,r-1);
         } else {
             if (sph_loc) {
-                Real dr1 = r_cc_loc_p[r] - r_edge_loc_p[r];
-                Real dr2 = r_edge_loc_p[r] - r_cc_loc_p[r-1];
-                etarho_ec_p[r] = (dr2*etarho_cc_p[r] + dr1*etarho_cc_p[r-1])/(dr1+dr2);
+                Real dr1 = r_cc_loc(0,r) - r_edge_loc(0,r);
+                Real dr2 = r_edge_loc(0,r) - r_cc_loc(0,r-1);
+                etarho_ec_arr(0,r) = (dr2*etarho_cc_arr(0,r) + dr1*etarho_cc_arr(0,r-1))/(dr1+dr2);
             } else {
-                etarho_ec_p[r] = 0.5*(etarho_cc_p[r] + etarho_cc_p[r-1]);
+                etarho_ec_arr(0,r) = 0.5*(etarho_cc_arr(0,r) + etarho_cc_arr(0,r-1));
             }
         }
     });
