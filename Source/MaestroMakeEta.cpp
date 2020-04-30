@@ -143,7 +143,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
     for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const int lo = base_geom.r_start_coord(n,i);
-            const int hi = base_geom.r_end_coord(n,i)+1;
+            const int hi = base_geom.r_end_coord(n,i);
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 etarho_cc_arr(n,r) = 0.5 * (etarho_ec_arr(n,r) + 

@@ -1700,8 +1700,6 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
 
         const int nr_lev = base_geom.nr(n);
 
-        Print() << "numdisjointchunks = " << base_geom.numdisjointchunks(n) << std::endl;
-
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 
             const int lo = base_geom.r_start_coord(n,i);
