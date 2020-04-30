@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -16,6 +16,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     }
 
     const int max_lev = base_geom.max_radial_level + 1;
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
     
     for (auto i = 0; i < base_geom.nr_fine; ++i) {
         for (auto n = 0; n < Nscal; ++n) {
