@@ -761,8 +761,9 @@ public:
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
                         int harmonic_avg);
-
+#if (AMREX_SPACEDIM == 3)
     void MakeCCtoRadii ();
+#endif
     // end MaestroFill3dData.cpp functions
     ////////////
 

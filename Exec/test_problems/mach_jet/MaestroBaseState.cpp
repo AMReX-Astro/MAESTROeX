@@ -18,6 +18,8 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     const int max_lev = base_geom.max_radial_level + 1;
     const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
 
     auto rho0 = rho0_s.array();
     auto rhoh0 = rhoh0_s.array();
