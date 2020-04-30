@@ -130,20 +130,20 @@ Maestro::Setup ()
     p0_nm1       .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     tempbar      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     tempbar_init .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    beta0_old    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    beta0_new    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    beta0_nm1    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    beta0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    beta0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    beta0_nm1    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     gamma1bar_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     gamma1bar_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     grav_cell_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     grav_cell_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    etarho_cc    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    psi          .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    etarho_cc    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    psi          .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     w0        .resize( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    etarho_ec .resize( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    etarho_ec .resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     // tagged box array for multilevel (planar)
     tag_array .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
@@ -166,17 +166,11 @@ Maestro::Setup ()
     p0_nm1       .shrink_to_fit();
     tempbar      .shrink_to_fit();
     tempbar_init .shrink_to_fit();
-    beta0_old    .shrink_to_fit();
-    beta0_new    .shrink_to_fit();
-    beta0_nm1    .shrink_to_fit();
     gamma1bar_old.shrink_to_fit();
     gamma1bar_new.shrink_to_fit();
     grav_cell_old.shrink_to_fit();
     grav_cell_new.shrink_to_fit();
     w0           .shrink_to_fit();
-    etarho_cc    .shrink_to_fit();
-    psi          .shrink_to_fit();
-    etarho_ec    .shrink_to_fit();
     tag_array    .shrink_to_fit();
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();

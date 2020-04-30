@@ -179,10 +179,10 @@ public:
     void resize(const int num_levs, const int length=1, const int ncomp=1);
 
     /// set to some scalar value 
-    void setVal(const T val);
+    void setVal(const T& val);
 
     /// set the comp'th component to some scalar value
-    void setVal(const int comp, const T val);
+    void setVal(const int comp, const T& val);
 
     /// number of levels in base 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
@@ -195,11 +195,22 @@ public:
     /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
     int nComp() const { return nvar; };
-    
+
+    /// deep copy 
+    void copy(const BaseState<T>& src);
+    void copy(const amrex::Gpu::ManagedVector<T>& src);
+    void copy(const amrex::Vector<T>& src);
+
     void toVector(amrex::Vector<T>& vec);
     void toVector(amrex::Gpu::ManagedVector<T>& vec);
 
+    /// swap the data with src
+    void swap(BaseState<T>& src);
+
     T* dataPtr () noexcept { return base_data.dataPtr(); };
+
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
+    T* dataPtr () const noexcept { return this->dptr; }
 
     /// scalar addition to the whole base state 
     template <class U>
@@ -339,7 +350,7 @@ BaseState<T>::resize(const int num_levs, const int length, const int ncomp)
 
 template <class T>
 void
-BaseState<T>::setVal(const T val)
+BaseState<T>::setVal(const T& val)
 {
     BaseStateArray<T> base_arr = this->array();
     AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
@@ -351,7 +362,7 @@ BaseState<T>::setVal(const T val)
 
 template <class T>
 void
-BaseState<T>::setVal(const int comp, const T val)
+BaseState<T>::setVal(const int comp, const T& val)
 {
     BaseStateArray<T> base_arr = this->array();
     AMREX_PARALLEL_FOR_1D(len*nlev, i, {
@@ -359,6 +370,49 @@ BaseState<T>::setVal(const int comp, const T val)
     });
 
     amrex::Gpu::synchronize();
+}
+
+template <class T>
+void
+BaseState<T>::copy(const BaseState<T>& src)
+{
+    AMREX_ASSERT(nlev == src.nlev);
+    AMREX_ASSERT(nvar == src.nvar);
+    AMREX_ASSERT(len == src.len);
+
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src.base_data[comp + nvar*(r + len*l)];
+            } 
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::copy(const amrex::Gpu::ManagedVector<T>& src)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
+            } 
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::copy(const amrex::Vector<T>& src)
+{
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src[l + nlev*(r + len*comp)];
+            } 
+        }
+    }
 }
 
 template <class T>
@@ -385,6 +439,26 @@ BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec)
             }
         }
     }
+}
+
+template <class T>
+void
+BaseState<T>::swap(BaseState<T>& src)
+{
+    AMREX_ASSERT(nlev == src.nlev);
+    AMREX_ASSERT(nvar == src.nvar);
+    AMREX_ASSERT(len == src.len);
+
+    auto arr = this->array();
+    auto src_arr = src.array();
+
+    AMREX_PARALLEL_FOR_1D(len*nlev*nvar, i, {
+        T temp = arr(i);
+        arr(i) = src_arr(i);
+        src_arr(i) = temp;
+    });
+
+    amrex::Gpu::synchronize();
 }
 
 template <class T>

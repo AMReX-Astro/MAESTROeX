@@ -20,6 +20,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
 
+    const auto max_lev = base_geom.max_radial_level + 1;
+    const auto nrf = base_geom.nr_fine;
+
     // constants in Fortran
     Real base_cutoff_density = 0.0; 
     get_base_cutoff_density(&base_cutoff_density);
@@ -39,23 +42,25 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
     }
 
-    RealVector gradw0( (base_geom.max_radial_level+1)*base_geom.nr_fine , 0.0);
-    gradw0.shrink_to_fit();
+    BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
+    gradw0.setVal(0.0);
 
-    Real* AMREX_RESTRICT p_gradw0 = gradw0.dataPtr();
     Real* AMREX_RESTRICT p_w0 = w0.dataPtr();
     const Real dr0 = base_geom.dr_fine;
+    auto gradw0_arr = gradw0.array();
 
     if ( !(use_exact_base_state || average_base_state) ) {
-        AMREX_PARALLEL_FOR_1D (gradw0.size(), i,
-        {       
-            p_gradw0[i] = (p_w0[i+1] - p_w0[i])/dr0;
-        });
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            AMREX_PARALLEL_FOR_1D (base_geom.nr_fine, i,
+            {       
+                gradw0_arr(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
+            });
+        }
     }
 
-    Put1dArrayOnCart(gradw0,gradw0_cart,0,0,bcs_u,0,1);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
-    Put1dArrayOnCart(grav_cell,grav_cart,0,1,bcs_f,0);
+    Put1dArrayOnCart(gradw0, gradw0_cart, 0, 0, bcs_u, 0, 1);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(grav_cell, grav_cart, 0, 1, bcs_f, 0);
 
     // Reset vel_force
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -632,12 +637,12 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
-    Put1dArrayOnCart(rho0,rho0_cart,0,0,bcs_s,Rho);
+    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
 
     MakeGravCell(grav, rho0);
 
-    Put1dArrayOnCart(grav,grav_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(grav, grav_cart, 0, 0, bcs_f, 0);
 
     // constants in Fortran
     const int enthalpy_pred_type_in = enthalpy_pred_type;
@@ -800,7 +805,7 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
     }
 
     Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(psi,psi_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 

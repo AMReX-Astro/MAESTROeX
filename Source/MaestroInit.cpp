@@ -128,12 +128,10 @@ Maestro::Init ()
 
         // compute beta0
         MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, 
-                  grav_cell_old, use_exact_base_state);        
+                  grav_cell_old, use_exact_base_state);     
 
         // set beta0^{-1} = beta0_old
-        for (int i=0; i<beta0_old.size(); ++i) {
-            beta0_nm1[i] = beta0_old[i];
-        }
+        beta0_nm1.copy(beta0_old);
 
         // initial projection
         if (do_initial_projection) {
@@ -234,7 +232,7 @@ Maestro::InitData ()
     }
 
     if (use_exact_base_state) {
-        std::fill(psi.begin(), psi.end(), 0.);
+        psi.setVal(0.0);
     }
 
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
@@ -517,7 +515,8 @@ void Maestro::InitProj ()
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
 #ifndef SDC
@@ -560,10 +559,10 @@ void Maestro::DivuIter (int istep_divu_iter)
     delta_gamma1_termbar.shrink_to_fit();
 
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
-    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
-    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    psi.setVal(0.0);
+    etarho_cc.setVal(0.0);
     std::fill(p0_minus_peosbar.begin(),     p0_minus_peosbar.end(),     0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
 
@@ -633,7 +632,8 @@ void Maestro::DivuIter (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
 
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter);
@@ -703,10 +703,10 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     delta_chi_w0.shrink_to_fit();
     
     std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
-    std::fill(etarho_ec.begin(),            etarho_ec.end(),            0.);
+    etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
-    std::fill(psi.begin(),                  psi.end(),                  0.);
-    std::fill(etarho_cc.begin(),            etarho_cc.end(),            0.);
+    psi.setVal(0.0);
+    etarho_cc.setVal(0.0);
     std::fill(p0_minus_pthermbar.begin(),   p0_minus_pthermbar.end(),   0.);
     std::fill(delta_gamma1_termbar.begin(), delta_gamma1_termbar.end(), 0.);
     std::fill(delta_chi_w0.begin(),         delta_chi_w0.end(),         0.);
@@ -775,7 +775,8 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_old,Sbar,beta0_old,delta_gamma1_term);
+    MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_old, Sbar,
+        beta0_old, delta_gamma1_term);
     
     // perform a nodal projection
     NodalProj(divu_iters_comp,rhcc_for_nodalproj,istep_divu_iter,false);

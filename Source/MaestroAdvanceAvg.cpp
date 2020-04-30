@@ -70,7 +70,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     RealVector   peosbar         ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector   w0_force_dummy  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector   Sbar            ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector   beta0_nph       ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector   gamma1bar_nph   ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector   delta_gamma1_termbar ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector delta_chi_w0_dummy   ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
@@ -88,7 +88,6 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     peosbar.shrink_to_fit();
     w0_force_dummy.shrink_to_fit();
     Sbar.shrink_to_fit();
-    beta0_nph.shrink_to_fit();
     gamma1bar_nph.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -430,12 +429,13 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        auto psi_arr = psi.array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                psi_arr(l,r) = (p0_new[l+(base_geom.max_radial_level+1)*r] - p0_old[l+(base_geom.max_radial_level+1)*r])/dt;
+            }
         }
-
-    }
-    else {
+    } else {
         p0_new = p0_old;
     }
 
@@ -524,14 +524,14 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
     }
     else {
         // Just pass beta0 and gamma1bar through if not evolving base state
-        beta0_new = beta0_old;
+        beta0_new.copy(beta0_old);
         gamma1bar_new = gamma1bar_old;
     }
 
-    for(int i=0; i<beta0_nph.size(); ++i) {
-        beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
+    for(int i=0; i<gamma1bar_nph.size(); ++i) {
         gamma1bar_nph[i] = 0.5*(gamma1bar_old[i]+gamma1bar_new[i]);
     }
+    beta0_nph.copy(0.5*(beta0_old+beta0_new));
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 6 -- define a new average expansion rate at n+1/2
@@ -708,7 +708,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         
         MakeGravCell(grav_cell_new, rho0_new);
 
-        for(int i=0; i<beta0_nph.size(); ++i) {
+        for(int i=0; i<rho0_nph.size(); ++i) {
             rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
         }
         
@@ -731,8 +731,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         }
 
         // hold dp0/dt in psi for enthalpy advance
-        for (int i=0; i<p0_old.size(); ++i) {
-            psi[i] = (p0_new[i] - p0_old[i])/dt;
+        auto psi_arr = psi.array();
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                psi_arr(l,r) = (p0_new[l+(base_geom.max_radial_level+1)*r] - p0_old[l+(base_geom.max_radial_level+1)*r])/dt;
+            }
         }
     }
 
@@ -810,9 +813,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                   grav_cell_new);
     }
 
-    for(int i=0; i<beta0_nph.size(); ++i) {
-        beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-    }
+    beta0_nph.copy(0.5*(beta0_old + beta0_new));
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 10 -- compute S^{n+1} for the final projection
@@ -967,9 +968,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     }
 
-    for(int i=0; i<beta0_nm1.size(); ++i) {
-        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-    }
+    beta0_nm1.copy(0.5*(beta0_old + beta0_new));
 
     if (!is_initIter) {
         if (!fix_base_state) {

@@ -14,8 +14,8 @@ Maestro::Regrid ()
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
     
-    RealVector rho0_temp((base_geom.max_radial_level+1)*base_geom.nr_fine);
-    rho0_temp.shrink_to_fit();
+    BaseState<Real> rho0_temp(base_geom.max_radial_level+1, base_geom.nr_fine);
+    auto rho0_temp_arr = rho0_temp.array();
 
     if (!spherical) {
         base_geom.finest_radial_level = finest_level;
@@ -44,9 +44,7 @@ Maestro::Regrid ()
             // Here we want to fill in the rho0 array so there is
             // valid data in any new grid locations that are created
             // during the regrid.
-            for (int i = 0; i < rho0_old.size(); ++i) {
-                rho0_temp[i] = rho0_old[i];
-            }
+            rho0_temp.copy(rho0_old);
 
             // We will copy rho0_temp back into the rho0 array after we regrid.
             RegridBaseState(rho0_temp);
@@ -60,9 +58,7 @@ Maestro::Regrid ()
         // Here we want to fill in the rho0 array so there is
         // valid data in any new grid locations that are created
         // during the regrid.
-        for (int i = 0; i < rho0_old.size(); ++i) {
-            rho0_temp[i] = rho0_old[i];
-        }
+        rho0_temp.copy(rho0_old);
     }
 
     // regrid could add newly refine levels (if finest_level < max_level)
@@ -95,8 +91,10 @@ Maestro::Regrid ()
         // force rho0 to be the average of rho
         Average(sold,rho0_old,Rho);
     } else {
-        for (int i = 0; i < rho0_old.size(); ++i) {
-            rho0_old[i] = rho0_temp[i];
+        for (auto lev = 0; lev <= base_geom.max_radial_level+1; ++lev) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                rho0_old[lev + (base_geom.max_radial_level+1)*r] = rho0_temp_arr(lev,r);
+            }
         }
     }
 
@@ -435,4 +433,70 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
         base[r] = state_temp[r];
     })
+}
+
+void
+Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::RegridBaseState()", RegridBaseState);
+
+    const int max_lev = base_geom.max_radial_level + 1;
+
+    const int nrf = is_edge ? base_geom.nr_fine+1 : base_geom.nr_fine;
+    BaseState<Real> state_temp_s(max_lev, nrf);
+    auto state_temp = state_temp_s.array();
+    auto base = base_s.array();
+
+    //copy the coarsest level of the real arrays into the
+    // temp arrays
+    AMREX_PARALLEL_FOR_1D(nrf, r,
+    {
+        state_temp(0,r) = base(0,r);
+    });
+
+    // piecewise linear interpolation to fill the cc temp arrays
+    for (auto n = 1; n < max_lev; ++n) {
+        if (is_edge) {
+            const auto nrn = base_geom.nr(n) + 1;
+            AMREX_PARALLEL_FOR_1D(nrn, r,
+            {
+                if (r % 2 == 0) {
+                    state_temp(n,r) = state_temp(n-1,r/2);
+                } else {
+                    state_temp(n,r) = 0.5 * (state_temp(n-1,r/2) + 0.25 * state_temp(n-1,r/2+1));
+                }
+            });
+        } else {
+            const auto nrn = base_geom.nr(n);
+            AMREX_PARALLEL_FOR_1D(nrn, r,
+            {
+                if (r == 0 || r == nrn-1) {
+                    state_temp(n,r) = state_temp(n-1,r/2);
+                } else {
+                    if (r % 2 == 0) {
+                        state_temp(n,r) = 0.75 * state_temp(n-1,r/2) + 0.25 * state_temp(n-1,r/2-1);
+                    } else {
+                        state_temp(n,r) = 0.75 * state_temp(n-1,r/2) + 0.25 * state_temp(n-1,r/2+1);
+                    }
+                }
+            });
+        }
+    }
+
+    // copy valid data into temp
+    for (auto n = 1; n < max_lev; ++n) {
+        for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
+            const auto lo = base_geom.r_start_coord(n,i);
+            const auto hi = is_edge ? base_geom.r_end_coord(n,i)+1 : base_geom.r_end_coord(n,i);
+            AMREX_PARALLEL_FOR_1D(hi-lo+1, k,
+            {
+                int r = k + lo;
+                state_temp(n,r) = base(n,r);
+            });
+        }
+    }
+
+    // copy temp array back into the real thing
+    base_s.copy(state_temp_s);
 }

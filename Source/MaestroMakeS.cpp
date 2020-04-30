@@ -22,6 +22,8 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Make_S_cc()", Make_S_cc);
 
+    const auto max_lev = base_geom.max_radial_level + 1;
+
     // put 1d base state quantities on cartestian grid for spherical case
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -30,8 +32,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
 
     // calculate gradp0
     RealVector gradp0((base_geom.max_radial_level+1)*base_geom.nr_fine);
-
-    const auto max_lev = base_geom.max_radial_level + 1;
+    
     const auto& r_cc_loc = base_geom.r_cc_loc;
 
     if (spherical) {
@@ -270,7 +271,7 @@ void
 Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
                                const Vector<MultiFab>& S_cc,
                                const RealVector& Sbar,
-                               const RealVector& beta0,
+                               const BaseState<Real>& beta0,
                                const Vector<MultiFab>& delta_gamma1_term)
 {
     // timer for profiling
@@ -322,7 +323,7 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
 void
 Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
                                  const RealVector& rho0,
-                                 const RealVector& beta0,
+                                 const BaseState<Real>& beta0,
                                  const RealVector& gamma1bar,
                                  const RealVector& p0,
                                  const Vector<MultiFab>& delta_p_term)
@@ -406,7 +407,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const RealVector& rho0,
                              const Vector<MultiFab>& S_cc,
                              const RealVector& Sbar,
-                             const RealVector& beta0,
+                             const BaseState<Real>& beta0,
                              const Vector<MultiFab>& delta_gamma1_term,
                              const RealVector& gamma1bar,
                              const RealVector& p0,

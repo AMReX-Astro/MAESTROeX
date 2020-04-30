@@ -11,10 +11,10 @@ using namespace amrex;
 // macrhs enters as beta0*(S-Sbar)
 // beta0 is a 1d cell-centered array
 void
-Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
+Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
                   const Vector<MultiFab>& macrhs,
-                  const RealVector& beta0,
+                  const BaseState<Real>& beta0,
                   const int& is_predictor)
 {
     // timer for profiling
@@ -28,8 +28,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
     // we also need beta0 at edges
     // allocate AND compute it here
-    RealVector beta0_edge( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    beta0_edge.shrink_to_fit();
+    BaseState<Real> beta0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     Vector< std::array< MultiFab,AMREX_SPACEDIM > > beta0_cart_edge(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -38,7 +37,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                      beta0_cart_edge[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
     }
 
-    if (spherical == 1) {
+    if (spherical) {
         MakeS0mac(beta0, beta0_cart_edge);
     } else {
         CelltoEdge(beta0, beta0_edge);
@@ -48,7 +47,7 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     int mult_or_div;
     if (spherical == 0) {
         mult_or_div = 1;
-        MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+        MultFacesByBeta0(umac, beta0, beta0_edge, mult_or_div);
     } else {     // spherical == 1
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
@@ -107,9 +106,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // multiply face-centered B coefficients by beta0 so they contain beta0/rho
     if (spherical == 0) {
         mult_or_div = 1;
-        MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+        MultFacesByBeta0(face_bcoef, beta0, beta0_edge, mult_or_div);
         if (use_alt_energy_fix) {
-            MultFacesByBeta0(face_bcoef,beta0,beta0_edge,mult_or_div);
+            MultFacesByBeta0(face_bcoef,  beta0,beta0_edge, mult_or_div);
         }
     } else {     //spherical == 1
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -190,9 +189,9 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // convert beta0*Utilde to Utilde
-    if (spherical == 0) {
+    if (!spherical) {
         mult_or_div = 0;
-        MultFacesByBeta0(umac,beta0,beta0_edge,mult_or_div);
+        MultFacesByBeta0(umac, beta0, beta0_edge, mult_or_div);
     } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
@@ -222,12 +221,15 @@ Maestro::MacProj (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
 
 // multiply (or divide) face-data by beta0
 void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& edge,
-                                const RealVector& beta0,
-                                const RealVector& beta0_edge,
+                                const BaseState<Real>& beta0_s,
+                                const BaseState<Real>& beta0_edge_s,
                                 const int& mult_or_div)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MultFacesByBeta0()", MultFacesByBeta0);
+
+    const auto beta0 = beta0_s.const_array();
+    const auto beta0_edge = beta0_edge_s.const_array();
 
     // write an MFIter loop to convert edge -> beta0*edge OR beta0*edge -> edge
     for (int lev = 0; lev <= finest_level; ++lev)
@@ -250,8 +252,6 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #if (AMREX_SPACEDIM == 3)
             const Array4<Real> wedge = edge[lev][2].array(mfi);
 #endif  
-            const Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
-            const Real * AMREX_RESTRICT beta0_edge_p = beta0_edge.dataPtr();
 
             int max_lev = base_geom.max_radial_level+1;
 
@@ -262,20 +262,20 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #else 
                     int r = k;
 #endif
-                    uedge(i,j,k) *= beta0_p[lev+r*max_lev];
+                    uedge(i,j,k) *= beta0(lev,r);
                 });
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
 #if (AMREX_SPACEDIM == 2)
-                    vedge(i,j,k) *= beta0_edge_p[lev+j*max_lev];
+                    vedge(i,j,k) *= beta0_edge(lev,j);
 #else 
-                    vedge(i,j,k) *= beta0_p[lev+k*max_lev];
+                    vedge(i,j,k) *= beta0(lev,k);
 #endif
                 });
 
 #if (AMREX_SPACEDIM == 3)
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) *= beta0_edge_p[lev+k*max_lev];
+                    wedge(i,j,k) *= beta0_edge(lev,k);
                 });
 #endif
             } else {
@@ -286,20 +286,20 @@ void Maestro::MultFacesByBeta0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >&
 #else 
                     int r = k;
 #endif
-                    uedge(i,j,k) /= beta0_p[lev+r*max_lev];
+                    uedge(i,j,k) /= beta0(lev,r);
                 });
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
 #if (AMREX_SPACEDIM == 2)
-                    vedge(i,j,k) /= beta0_edge_p[lev+j*max_lev];
+                    vedge(i,j,k) /= beta0_edge(lev,j);
 #else 
-                    vedge(i,j,k) /= beta0_p[lev+k*max_lev];
+                    vedge(i,j,k) /= beta0(lev,k);
 #endif
                 });
 
 #if (AMREX_SPACEDIM == 3)
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) /= beta0_edge_p[lev+k*max_lev];
+                    wedge(i,j,k) /= beta0_edge(lev,k);
                 });
 #endif
             }
@@ -432,3 +432,5 @@ void Maestro::SetMacSolverBCs(MLABecLaplacian& mlabec)
 
     mlabec.setDomainBC(mlmg_lobc,mlmg_hibc);
 }
+
+

@@ -91,7 +91,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     RealVector peosbar         ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector w0_force        ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector Sbar            ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector beta0_nph       ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector gamma1bar_temp1 ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector gamma1bar_temp2 ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector delta_gamma1_termbar ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
@@ -110,7 +110,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     peosbar.shrink_to_fit();
     w0_force.shrink_to_fit();
     Sbar.shrink_to_fit();
-    beta0_nph.shrink_to_fit();
     gamma1bar_temp1.shrink_to_fit();
     gamma1bar_temp2.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
@@ -352,8 +351,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,rho0_old,S_cc_nph,Sbar,beta0_old,delta_gamma1_term,
-                       gamma1bar_old,p0_old,delta_p_term,delta_chi,is_predictor);
+    MakeRHCCforMacProj(macrhs, rho0_old, S_cc_nph, Sbar, beta0_old, delta_gamma1_term,
+                       gamma1bar_old, p0_old, delta_p_term,delta_chi, is_predictor);
 
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
@@ -364,7 +363,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_old, is_predictor);
 
     macproj_time += ParallelDescriptor::second() - macproj_time_start;
     ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
@@ -602,7 +601,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        MakeGamma1bar(snew, gamma1bar_new, p0_new);
 
         base_time_start = ParallelDescriptor::second();
         
@@ -614,13 +613,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     } else {
         // Just pass beta0 and gamma1bar through if not evolving base state
-        beta0_new = beta0_old;
+        beta0_new.copy(beta0_old);
         gamma1bar_new = gamma1bar_old;
     }
 
-    for(int i=0; i<beta0_nph.size(); ++i) {
-        beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-    }
+    beta0_nph.copy(0.5 * (beta0_old + beta0_new));
 
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
@@ -748,8 +745,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     AdvancePremac(umac,w0mac,w0_force,w0_force_cart);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
-    MakeRHCCforMacProj(macrhs,rho0_new,S_cc_nph,Sbar,beta0_nph,delta_gamma1_term,
-                       gamma1bar_new,p0_new,delta_p_term,delta_chi,is_predictor);
+    MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
+                       gamma1bar_new, p0_new, delta_p_term,delta_chi,is_predictor);
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,ParallelDescriptor::IOProcessorNumber());
@@ -759,7 +756,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_nph, is_predictor);
 
     macproj_time += ParallelDescriptor::second() - macproj_time_start;
     ParallelDescriptor::ReduceRealMax(macproj_time,ParallelDescriptor::IOProcessorNumber());
@@ -967,17 +964,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
 
-    React(s2,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_new,0.5*dt,t_old+0.5*dt);
+    React(s2, snew, rho_Hext, rho_omegadot, rho_Hnuc, 
+          p0_new, 0.5*dt, t_old+0.5*dt);
 
     react_time += ParallelDescriptor::second() - react_time_start;
     ParallelDescriptor::ReduceRealMax(react_time,ParallelDescriptor::IOProcessorNumber());
-    ParallelDescriptor::Bcast(&react_time,1,ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::Bcast(&react_time, 1,ParallelDescriptor::IOProcessorNumber());
 
     misc_time_start = ParallelDescriptor::second();
 
     if (evolve_base_state) {
         // compute beta0 and gamma1bar
-        MakeGamma1bar(snew,gamma1bar_new,p0_new);
+        MakeGamma1bar(snew, gamma1bar_new, p0_new);
 
         base_time_start = ParallelDescriptor::second();
 
@@ -989,9 +987,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     }
 
-    for(int i=0; i<beta0_nph.size(); ++i) {
-        beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-    }
+    beta0_nph.copy(0.5 * (beta0_old + beta0_new));
 
     misc_time += ParallelDescriptor::second() - misc_time_start;
     ParallelDescriptor::ReduceRealMax(misc_time,ParallelDescriptor::IOProcessorNumber());
@@ -1030,7 +1026,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // define dSdt = (S_cc_new - S_cc_old) / dt
     for (int lev=0; lev<=finest_level; ++lev) {
-        MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
+        MultiFab::LinComb(dSdt[lev], -1./dt, S_cc_old[lev], 
+            0, 1./dt, S_cc_new[lev], 0, 0, 1, 0);
     }
 
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
@@ -1054,7 +1051,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
-    VelocityAdvance(rhohalf,umac,w0mac,w0_force,w0_force_cart,rho0_nph,grav_cell_nph,sponge);
+    VelocityAdvance(rhohalf, umac, w0mac, w0_force,
+        w0_force_cart, rho0_nph, grav_cell_nph, sponge);
 
 
     if (evolve_base_state && is_initIter) {
@@ -1084,19 +1082,20 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             MultiFab::Copy(rhcc_for_nodalproj_old[lev], rhcc_for_nodalproj[lev], 0, 0, 1, 1);
         }
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph,delta_gamma1_term);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_new, 
+            Sbar, beta0_nph, delta_gamma1_term);
 
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Subtract(rhcc_for_nodalproj[lev], rhcc_for_nodalproj_old[lev], 0, 0, 1, 1);
             rhcc_for_nodalproj[lev].mult(1./dt,0,1,1);
         }
 
-    }
-    else {
+    } else {
 
         proj_type = regular_timestep_comp;
 
-        MakeRHCCforNodalProj(rhcc_for_nodalproj,S_cc_new,Sbar,beta0_nph,delta_gamma1_term);
+        MakeRHCCforNodalProj(rhcc_for_nodalproj, S_cc_new,
+            Sbar, beta0_nph, delta_gamma1_term);
 
         // compute delta_p_term = peos_new - peosbar_cart (for RHS of projection)
         if (dpdt_factor > 0.) {
@@ -1116,17 +1115,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 MultiFab::Subtract(delta_p_term[lev],peosbar_cart[lev],0,0,1,0);
             }
 
-            CorrectRHCCforNodalProj(rhcc_for_nodalproj,rho0_new,beta0_nph,gamma1bar_new,
-                                    p0_new,delta_p_term);
+            CorrectRHCCforNodalProj(rhcc_for_nodalproj, rho0_new, beta0_nph, gamma1bar_new,
+                                    p0_new, delta_p_term);
         }
     }
 
     // call nodal projection
-    NodalProj(proj_type,rhcc_for_nodalproj);
+    NodalProj(proj_type, rhcc_for_nodalproj);
 
-    for(int i=0; i<beta0_nm1.size(); ++i) {
-        beta0_nm1[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-    }
+    beta0_nm1.copy(0.5 * (beta0_old + beta0_new));
 
     ndproj_time += ParallelDescriptor::second() - ndproj_time_start;
     ParallelDescriptor::ReduceRealMax(ndproj_time,ParallelDescriptor::IOProcessorNumber());

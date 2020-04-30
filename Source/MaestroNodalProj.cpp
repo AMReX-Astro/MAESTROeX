@@ -71,7 +71,7 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     (Utilde^n+1,* - Utilde^n)/dt    -- (unew-uold)/dt
     // regular_timestep_comp:   (Utilde^n+1,* + dt*gpi/rhohalf) -- unew + dt*gpi/rhohalf
     // note sig is only used for regular_timestep_comp, and currently holds rhohalf
-    CreateUvecForProj(proj_type,Vproj,sig);
+    CreateUvecForProj(proj_type, Vproj, sig);
 
     bool using_alt_energy_fix = false;
     if (use_alt_energy_fix &&
@@ -92,14 +92,10 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     (beta0_old+beta0_new)/2
     // regular_timestep_comp:   (beta0_old+beta0_new)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-        Put1dArrayOnCart(beta0_old,beta0_cart,0,0,bcs_f,0);
+        Put1dArrayOnCart(beta0_old, beta0_cart, 0, 0, bcs_f,0);
     } else {
-        RealVector beta0_nph( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-        beta0_nph.shrink_to_fit();
-        for(int i=0; i<beta0_nph.size(); ++i) {
-            beta0_nph[i] = 0.5*(beta0_old[i]+beta0_new[i]);
-        }
-        Put1dArrayOnCart(beta0_nph,beta0_cart,0,0,bcs_f,0);
+        auto beta0_nph = 0.5 * (beta0_old + beta0_new);
+        Put1dArrayOnCart(beta0_nph, beta0_cart, 0, 0, bcs_f, 0);
     }
 
     // convert Vproj to beta0*Vproj

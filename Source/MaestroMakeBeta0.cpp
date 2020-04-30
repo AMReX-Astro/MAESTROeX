@@ -4,7 +4,7 @@
 using namespace amrex;
 
 void 
-Maestro::MakeBeta0(RealVector& beta0, 
+Maestro::MakeBeta0(BaseState<Real>& beta0_s, 
                    const RealVector& rho0,
                    const RealVector& p0,
                    const RealVector& gamma1bar,
@@ -21,10 +21,10 @@ Maestro::MakeBeta0(RealVector& beta0,
     BaseState<Real> beta0_edge_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
     auto beta0_edge = beta0_edge_state.array();
 
-    std::fill(beta0.begin(), beta0.end(), 0.);
+    beta0_s.setVal(0.0);
 
-    Real * AMREX_RESTRICT beta0_p = beta0.dataPtr();
     const Real * AMREX_RESTRICT rho0_p = rho0.dataPtr();
+    auto beta0 = beta0_s.array();
 
     if (beta0_type == 1) {
         ///////////////////////////////////////////////////////////////////////
@@ -172,18 +172,18 @@ Maestro::MakeBeta0(RealVector& beta0,
                         }
 
                         beta0_edge(n,r+1) = beta0_edge(n,r) * exp(-integral);
-                        beta0[n+max_lev*r] = 0.5*(beta0_edge(n,r) + 
+                        beta0(n,r) = 0.5*(beta0_edge(n,r) + 
                             beta0_edge(n,r+1));
 
                     } else {// r >= anelastic_cutoff_density
 
                         if (fabs(rho0[n+max_lev*(r-1)]) > rel_eps) {
-                            beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)] * 
+                            beta0(n,r) = beta0(n,r-1) * 
                                 (rho0[n+max_lev*r]/rho0[n+max_lev*(r-1)]);
                         } else {
-                            beta0[n+max_lev*r] = beta0[n+max_lev*(r-1)];
+                            beta0(n,r) = beta0(n,r-1);
                         }
-                        beta0_edge(n,r+1) = 2.0*beta0[n+max_lev*r] - 
+                        beta0_edge(n,r+1) = 2.0*beta0(n,r) - 
                             beta0_edge(n,r);
                     }
                 }
@@ -194,20 +194,20 @@ Maestro::MakeBeta0(RealVector& beta0,
                     Real offset = beta0_edge(n,base_geom.r_end_coord(n,j)+1)
                         - beta0_edge(n-1,(base_geom.r_end_coord(n,j)+1)/2);
 
-                    for (auto i = n-1; i >= 0; --i) {
+                    for (int i = n-1; i >= 0; --i) {
 
                         int refrat = round(pow(2, n-i));
 
                         // Offset the centered beta on level i above this point so the total 
                         // integral is consistent
-                        for (auto r = base_geom.r_end_coord(n,j)/refrat+1; r <= base_geom.nr(i); ++r) {
-                            beta0[i+max_lev*r] += offset;
+                        for (int r = base_geom.r_end_coord(n,j)/refrat+1; r <= base_geom.nr(i); ++r) {
+                            beta0(i,r) += offset;
                         }
 
                         // Redo the anelastic cutoff part
-                        for (auto r = base_geom.anelastic_cutoff_density_coord(i); r <= base_geom.nr(i); ++r) {
+                        for (int r = base_geom.anelastic_cutoff_density_coord(i); r <= base_geom.nr(i); ++r) {
                             if (rho0[i+max_lev*(r-1)] != 0.0) {
-                                beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
+                                beta0(i,r) = beta0(i,r-1) * 
                                     (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
                             }
                         }
@@ -218,16 +218,16 @@ Maestro::MakeBeta0(RealVector& beta0,
                         // the top of grid n.  Then recompute beta0 at level i above the top 
                         // of grid n.
                         if (base_geom.r_end_coord(n,j) >= base_geom.anelastic_cutoff_density_coord(n)) {
-                            for (auto r = base_geom.anelastic_cutoff_density_coord(i); 
+                            for (int r = base_geom.anelastic_cutoff_density_coord(i); 
                                  r <= (base_geom.r_end_coord(n,j)+1)/refrat-1; ++r) {
-                                beta0[i+max_lev*r] = 0.5*(beta0[i+1+max_lev*2*r] + 
-                                    beta0[i+1+max_lev*(2*r+1)]);
+                                beta0(i,r) = 0.5*(beta0(i+1,2*r) + 
+                                    beta0(i+1,2*r+1));
                             }
 
-                            for (auto r = (base_geom.r_end_coord(n,j)+1)/refrat; 
+                            for (int r = (base_geom.r_end_coord(n,j)+1)/refrat; 
                                  r <= base_geom.nr(i); ++r) {
                                 if (rho0[i+max_lev*(r-1)] != 0.0) {
-                                    beta0[i+max_lev*r] = beta0[i+max_lev*(r-1)] * 
+                                    beta0(i,r) = beta0(i,r-1) * 
                                         (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
                                 }
                             }
@@ -238,40 +238,41 @@ Maestro::MakeBeta0(RealVector& beta0,
         } // end loop over levels
 
         // 0.0 the beta0 where there is no corresponding full state array
-        for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
-            for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+        for (int n = 1; n <= base_geom.finest_radial_level; ++n) {
+            for (int j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 if (j == base_geom.numdisjointchunks(n)) {
-                    for (auto r = base_geom.r_end_coord(n,j)+1; r < base_geom.nr(n); ++r) {
-                        beta0[n+max_lev*r] = 0.0;
+                    for (int r = base_geom.r_end_coord(n,j)+1; r < base_geom.nr(n); ++r) {
+                        beta0(n,r) = 0.0;
                     }
                 } else {
-                    for (auto r = base_geom.r_end_coord(n,j)+1; r < base_geom.r_start_coord(n,j+1); ++r) {
-                        beta0[n+max_lev*r] = 0.0;
+                    for (int r = base_geom.r_end_coord(n,j)+1; r < base_geom.r_start_coord(n,j+1); ++r) {
+                        beta0(n,r) = 0.0;
                     }
                 }
             }
         }
     } else if (beta0_type == 2) {
         // beta_0 = rho_0
-        for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
-            for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+        for (int n = 0; n <= base_geom.finest_radial_level; ++n) {
+            for (int j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+                // for (int r = r_start_coord(n,j); r <= r_end_coord(n,j); ++r) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
-                    beta0_p[n+max_lev*r] = rho0_p[n+max_lev*r];
+                    beta0(n,r) = rho0_p[n+max_lev*r];
                 });
             }
         }
     } else if (beta0_type == 3) {
         // beta_0 = 1.0
-        for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
-            for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
+        for (int n = 0; n <= base_geom.finest_radial_level; ++n) {
+            for (int j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 int lo = base_geom.r_start_coord(n,j);
                 int hi = base_geom.r_end_coord(n,j);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
-                    beta0_p[n+max_lev*r] = 1.0;
+                    beta0(n,r) = 1.0;
                 });
             }
         }
