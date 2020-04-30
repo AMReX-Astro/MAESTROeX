@@ -110,18 +110,18 @@ Maestro::InitData ()
 		p0_nm1[i] = p0_old[i];
 	}
 
-    rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
-    rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
+        rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
+        rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
 	rhoX0_old.shrink_to_fit();
 	rhoX0_new.shrink_to_fit();
 
-    make_rhoX0(s0_init.dataPtr(), rhoX0_old.dataPtr());
+        make_rhoX0(s0_init.dataPtr(), rhoX0_old.dataPtr());
 
 
 	// set some stuff to zero
-	std::fill(etarho_ec.begin(), etarho_ec.end(), 0.);
-	std::fill(etarho_cc.begin(), etarho_cc.end(), 0.);
-	std::fill(psi.begin(), psi.end(), 0.);
+        etarho_ec.setVal(0.0);
+	etarho_cc.setVal(0.0);
+	psi.setVal(0.0);
 	std::fill(w0.begin(), w0.end(), 0.);
 
 

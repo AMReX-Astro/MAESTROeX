@@ -382,9 +382,9 @@ Maestro::Evolve ()
 		}
 
 		// build the coefficient in the divergence.  We are doing
-        // divergence-free (incompressible), so set beta0 = 1
-		std::fill(beta0_old.begin(), beta0_old.end(), 1.);
-		std::fill(beta0_new.begin(), beta0_new.end(), 1.);
+                // divergence-free (incompressible), so set beta0 = 1
+		beta0_old.setVal(1.0);
+		beta0_new.setVal(1.0);
 
 		t_new = t_old + 1.;
 
@@ -432,8 +432,8 @@ Maestro::Evolve ()
 		Vector<MultiFab> macpi(finest_level+1);
 		Vector<MultiFab> macrhs(finest_level+1);
 
-		std::fill(beta0_old.begin(), beta0_old.end(), 1.);
-		std::fill(beta0_new.begin(), beta0_new.end(), 1.);
+		beta0_old.setVal(1.0);
+		beta0_new.setVal(1.0);
 
 		for (int lev=0; lev<=finest_level; ++lev) {
 			// cell-centered MultiFabs

@@ -32,7 +32,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// vectors store the multilevel 1D states as one very long array
 	// these are edge-centered
 	Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-	Vector<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+	BaseState<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
 
 	// make sure C++ is as efficient as possible with memory usage
 	p0_minus_peosbar.shrink_to_fit();
@@ -42,7 +42,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Sbar_nph.shrink_to_fit();
 	delta_chi_w0.shrink_to_fit();
 	w0_old.shrink_to_fit();
-	rho0_predicted_edge.shrink_to_fit();
 	Hext_bar.shrink_to_fit();
 	tempbar_new.shrink_to_fit();
 
