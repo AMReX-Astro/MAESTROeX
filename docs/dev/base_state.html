@@ -116,6 +116,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Base State</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basestate-and-basestatearray"><code class="docutils literal notranslate"><span class="pre">BaseState</span></code> and <code class="docutils literal notranslate"><span class="pre">BaseStateArray</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#basestate-arithmetic"><code class="docutils literal notranslate"><span class="pre">BaseState</span></code> arithmetic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basestategeometry"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
@@ -249,10 +250,10 @@
 <span class="k">const</span> <span class="kt">int</span> <span class="n">ncomp</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
 
 <span class="n">BaseState</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">base_state</span><span class="p">(</span><span class="n">nlev</span><span class="p">,</span> <span class="n">ncells</span><span class="p">,</span> <span class="n">ncomp</span><span class="p">);</span>
-<span class="k">const</span> <span class="n">BaseStateArr</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">base_arr</span> <span class="o">=</span> <span class="n">base_state</span><span class="p">.</span><span class="n">array</span><span class="p">();</span>
+<span class="n">BaseStateArray</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">base_arr</span> <span class="o">=</span> <span class="n">base_state</span><span class="p">.</span><span class="n">array</span><span class="p">();</span>
 
 <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l</span> <span class="o">&lt;</span> <span class="n">nlev</span><span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">AMREX_PARALLEL_FOR_1D</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span>
+    <span class="n">ParallelFor</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="p">[</span><span class="o">=</span><span class="p">]</span> <span class="n">AMREX_GPU_DEVICE</span> <span class="p">(</span><span class="kt">int</span> <span class="n">r</span><span class="p">)</span>
     <span class="p">{</span>
         <span class="n">base_arr</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
         <span class="n">base_arr</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
@@ -266,7 +267,7 @@
 </div>
 <div class="section" id="basestate-arithmetic">
 <h2><code class="docutils literal notranslate"><span class="pre">BaseState</span></code> arithmetic<a class="headerlink" href="#basestate-arithmetic" title="Permalink to this headline">¶</a></h2>
-<p>If performing simple arithmetic with <a href="#id1"><span class="problematic" id="id2">``</span></a>BaseState``s, then this can be done straightforwardly using the built in member functions. <a href="#id3"><span class="problematic" id="id4">``</span></a>BaseState``s can be added, subtracted, multiplied and divided by scalars and element-wise by other <a href="#id5"><span class="problematic" id="id6">``</span></a>BaseState``s.</p>
+<p>If performing simple arithmetic with <code class="docutils literal notranslate"><span class="pre">BaseState</span></code> s, then this can be done straightforwardly using the built in member functions. <code class="docutils literal notranslate"><span class="pre">BaseState</span></code> s can be added, subtracted, multiplied and divided by scalars and element-wise by other <code class="docutils literal notranslate"><span class="pre">BaseState</span></code> s.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span> <span class="kt">int</span> <span class="n">nlevs</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
 <span class="k">const</span> <span class="kt">int</span> <span class="n">ncells</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
 
@@ -280,6 +281,43 @@
 <span class="n">base_state</span> <span class="o">+=</span> <span class="mf">0.5</span><span class="p">;</span>
 
 <span class="n">BaseState</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">another_state</span> <span class="o">=</span> <span class="n">base_state</span> <span class="o">*</span> <span class="p">(</span><span class="n">other_state</span> <span class="o">-</span> <span class="mf">2.5</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="basestategeometry">
+<h2><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code><a class="headerlink" href="#basestategeometry" title="Permalink to this headline">¶</a></h2>
+<p>In AMReX, information about the grid geometry and routines associated with it are stored in the <code class="docutils literal notranslate"><span class="pre">Geometry</span></code> class. In MAESTROeX, information and routines concerning the geometry of the base state are stored in the <code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code> class.</p>
+<p>Member variables of the <code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code> class are normally only ever read by routines of other classes. Consequently, <code class="docutils literal notranslate"><span class="pre">BaseState</span></code> objects storing the actual data are private member variables (so can only be accessed directly by <code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code> methods), however they have corresponding public <code class="docutils literal notranslate"><span class="pre">BaseStateArray</span></code> variables which can be accessed by other classes.</p>
+<p>The base state geometry of a problem is initialized in <code class="docutils literal notranslate"><span class="pre">Maestro::Setup()</span></code> by <code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::Init()</span></code>. After it has been initialized, its member variables can be used. For example, a typical iteration over a <code class="docutils literal notranslate"><span class="pre">BaseState</span></code> would look like</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">BaseState</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">base_data</span><span class="p">(</span><span class="n">base_geom</span><span class="p">.</span><span class="n">max_radial_level</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">nr_fine</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">base_arr</span> <span class="o">=</span> <span class="n">base_data</span><span class="p">.</span><span class="n">array</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l</span> <span class="o">&lt;=</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">max_radial_level</span><span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">ParallelFor</span><span class="p">(</span><span class="n">base_geom</span><span class="p">.</span><span class="n">nr_fine</span><span class="p">,</span> <span class="p">[</span><span class="o">=</span><span class="p">]</span> <span class="n">AMREX_GPU_DEVICE</span> <span class="p">(</span><span class="kt">int</span> <span class="n">r</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">base_arr</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+    <span class="p">});</span>
+    <span class="n">Gpu</span><span class="o">::</span><span class="n">synchronize</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For multilevel problems, the iteration over the base state looks a bit different, as on each level we must make sure that we only consider base state cells covered by grids. The discrete blocks of base state cells covered by grids on each level are defined by <code class="docutils literal notranslate"><span class="pre">base_geom.numdisjointchunks</span></code>, and the start and end points of each block/chunk by the variables <code class="docutils literal notranslate"><span class="pre">base_geom.r_start_coord</span></code> and <code class="docutils literal notranslate"><span class="pre">base_geom.r_end_coord</span></code>.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">BaseState</span><span class="o">&lt;</span><span class="n">Real</span><span class="o">&gt;</span> <span class="n">base_data</span><span class="p">(</span><span class="n">base_geom</span><span class="p">.</span><span class="n">max_radial_level</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">nr_fine</span><span class="p">);</span>
+<span class="k">auto</span> <span class="n">base_arr</span> <span class="o">=</span> <span class="n">base_data</span><span class="p">.</span><span class="n">array</span><span class="p">();</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">l</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">l</span> <span class="o">&lt;=</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">max_radial_level</span><span class="p">;</span> <span class="o">++</span><span class="n">l</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">numdisjointchunks</span><span class="p">(</span><span class="n">l</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">lo</span> <span class="o">=</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">r_start_coord</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">i</span><span class="p">);</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">base_geom</span><span class="p">.</span><span class="n">r_end_coord</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">i</span><span class="p">);</span>
+
+        <span class="n">ParallelFor</span><span class="p">(</span><span class="n">hi</span><span class="o">-</span><span class="n">lo</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="o">=</span><span class="p">]</span> <span class="n">AMREX_GPU_DEVICE</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">auto</span> <span class="n">r</span> <span class="o">=</span> <span class="n">j</span> <span class="o">+</span> <span class="n">lo</span><span class="p">;</span>
+            <span class="n">base_arr</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="n">r</span><span class="p">)</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+        <span class="p">});</span>
+        <span class="n">Gpu</span><span class="o">::</span><span class="n">synchronize</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
