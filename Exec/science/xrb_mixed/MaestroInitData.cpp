@@ -81,7 +81,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             eos_state.p = p0_arr(lev,r);
             eos_state.rho = dens;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_arr(i,j,k,FirstSpec+comp) / s0_arr(lev,r,Temp);
+                eos_state.xn[comp] = s0_arr(lev,r,FirstSpec+comp) / s0_arr(lev,r,Rho);
             }
 
             eos(eos_input_flag, eos_state);

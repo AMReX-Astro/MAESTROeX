@@ -236,7 +236,7 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& S_cc_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
+    BL_PROFILE_VAR("Maestro::PlotFileMF()", PlotFileMF);
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;

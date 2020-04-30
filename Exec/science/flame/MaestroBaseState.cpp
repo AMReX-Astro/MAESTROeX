@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
-                       BaseState<Real>& p0_s, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -16,12 +16,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         Abort("ERROR: ERROR: fuel density < (base_cutoff_density or anelastic_cutoff_density)");
     }
 
-    const Real TINY = 1.e-10;
-    const Real SMALL = 1.e-12;
     const int n = lev;
-    auto rho0 = rho0_s.array();
-    auto rhoh0 = rhoh0_s.array();
-    auto p0 = p0_s.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -152,12 +147,12 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto r = 0; r < nr_fine; ++r) {
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
         rho0_arr(lev,r) = s0_init_arr(n,r,Rho);
         rhoh0_arr(lev,r) = s0_init_arr(n,r,RhoH);
         tempbar_arr(lev,r) = s0_init_arr(n,r,Temp);
         tempbar_init_arr(lev,r) = s0_init_arr(n,r,Temp);
-        p0_arr(lev,r) = p0_init(lev,r);
+        p0_arr(lev,r) = p0_init_arr(lev,r);
     }
 
     // initialize any inlet BC parameters

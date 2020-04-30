@@ -82,7 +82,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_arr[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_arr(lev,r,n);
             }
 
             Perturb(p0_arr(lev,r), s0, scal_pert, vel_pert,

@@ -153,6 +153,8 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
                 const Real r_sp_outer_loc = r_sp_outer;
                 const Real r_tp_outer_loc = r_tp_outer;
 
+                const auto& center_p = center;
+
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     sponge_arr(i,j,k) = 1.0;
 

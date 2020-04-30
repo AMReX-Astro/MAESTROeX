@@ -72,7 +72,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     BaseState<Real> temp_vec(base_geom.max_radial_level+1, base_geom.nr_fine);
     auto temp_arr = temp_vec.array();
-    const auto s0_init_arr = s0_init.const_array()
+    const auto s0_init_arr = s0_init.const_array();
 
     // initialize temperature 
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {

@@ -15,7 +15,6 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         Abort("ERROR: rt InitBaseState is not valid for spherical");
     }
 
-    const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
     const int n = lev;
 
@@ -140,8 +139,8 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     }
 
     Real min_temp = 1.e99;
-    for (auto r = 0; r < nr_fine; ++r) {
-        min_temp = min(min_temp, s0_init_arr(lev,r,Temp));
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        min_temp = amrex::min(min_temp, s0_init_arr(lev,r,Temp));
     }
 
     if (min_temp < small_temp) {
@@ -155,8 +154,6 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     Real max_hse_error = -1.e30;
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
-
-        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*base_geom.dr(n);
 
         Real dpdr = (p0_init_arr(n,r) - p0_init_arr(n,r-1)) / base_geom.dr(n);
         Real rhog = 0.5*(s0_init_arr(n,r,Rho) + 

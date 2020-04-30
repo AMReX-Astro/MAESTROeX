@@ -143,7 +143,7 @@ Maestro::Evolve ()
 		}
 	}
 
-	Vector<Real> dummy;
+	BaseState<Real> dummy;
 
 	if (project_type == 1) {
 

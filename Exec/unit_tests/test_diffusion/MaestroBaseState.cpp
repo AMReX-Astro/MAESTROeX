@@ -6,11 +6,12 @@ using namespace amrex;
 void 
 Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
                        BaseState<Real>& p0_s, 
-                       const int n)
+                       const int lev)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
+    const auto n = lev;
     auto rho0 = rho0_s.array();
     auto rhoh0 = rhoh0_s.array();
     auto p0 = p0_s.array();

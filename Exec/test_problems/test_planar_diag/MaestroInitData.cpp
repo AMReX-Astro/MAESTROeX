@@ -55,7 +55,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
         const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
 
-        const Real rho0 = s0_init[lev+max_lev*(r+nrf*Rho)];
+        const Real rho0 = s0_arr(lev,r,Rho);
 	
         // This seems to work ok with sealed box?
         // Real rho_local = rho0 * (1.0 + 
@@ -81,7 +81,7 @@ Maestro::InitLevelData(const int lev, const Real time,
 
         eos_state.rho = rho_local;
         eos_state.p = p0_arr(lev,r);
-        eos_state.T = s0_arr[lev+max_lev*(r+nrf*Temp)];
+        eos_state.T = s0_arr(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
             eos_state.xn[comp] = 1.0; // single fluid
         }

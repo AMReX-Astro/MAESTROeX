@@ -12,17 +12,17 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
-                        const Vector<Real>& a,
-                        const Vector<Real>& b,
-                        const Vector<Real>& c,
-                        const Vector<Real>& d,
+                        const BaseState<Real>& a,
+                        const BaseState<Real>& b,
+                        const BaseState<Real>& c,
+                        const BaseState<Real>& d,
                         const Vector<MultiFab>& rho_omegadot,
                         Vector<MultiFab>& rho_Hnuc,
                         const Vector<MultiFab>& rho_Hext,
                         const bool is_small)
 {
 	// timer for profiling
-	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
+	BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
 
 	// wallclock time
 	const Real strt_total = ParallelDescriptor::second();
@@ -78,7 +78,6 @@ Maestro::WritePlotFile (const int step,
 	for (int i = 0; i <= finest_level; ++i) {
 		delete mf[i];
 	}
-
 }
 
 
@@ -100,12 +99,12 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& a,
                      const Vector<MultiFab>& b,
                      Vector<MultiFab>& s_in,
-                     const Vector<Real>& d,
-                     const Vector<Real>& e,
+                     const BaseState<Real>& d,
+                     const BaseState<Real>& e,
                      const Vector<MultiFab>& f)
 {
 	// timer for profiling
-	BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
+	BL_PROFILE_VAR("Maestro::PlotFileMF()", PlotFileMF);
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;
