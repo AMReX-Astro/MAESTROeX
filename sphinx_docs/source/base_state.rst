@@ -92,8 +92,9 @@ The base state geometry of a problem is initialized in ``Maestro::Setup()`` by `
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE (int r)
         {
-            base_data(l,r) = 0.0;
+            base_arr(l,r) = 0.0;
         });
+        Gpu::synchronize();
     }
 
 
@@ -112,7 +113,8 @@ For multilevel problems, the iteration over the base state looks a bit different
             ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j)
             {
                 auto r = j + lo;
-                base_data(l,r) = 0.0;
+                base_arr(l,r) = 0.0;
             });
+            Gpu::synchronize();
         }
     }
