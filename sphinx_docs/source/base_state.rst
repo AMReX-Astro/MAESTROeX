@@ -39,10 +39,10 @@ Instead of accessing data in individual cells using and ``Array4``, for a ``Base
    const int ncomp = 3;
 
    BaseState<Real> base_state(nlev, ncells, ncomp);
-   const BaseStateArr<Real> base_arr = base_state.array(); 
+   BaseStateArray<Real> base_arr = base_state.array(); 
 
    for (auto l = 0; l < nlev; ++l) {
-       AMREX_PARALLEL_FOR_1D(ncells, r,
+       ParallelFor(ncells, [=] AMREX_GPU_DEVICE (int r)
        {
            base_arr(l,r,0) = 0.0;
            base_arr(l,r,1) = 1.0;
@@ -57,7 +57,7 @@ Note here that we **must** call ``Gpu::synchronize()`` after the GPU kernel. For
 ``BaseState`` arithmetic
 ========================
 
-If performing simple arithmetic with ``BaseState``s, then this can be done straightforwardly using the built in member functions. ``BaseState``s can be added, subtracted, multiplied and divided by scalars and element-wise by other ``BaseState``s.
+If performing simple arithmetic with ``BaseState`` s, then this can be done straightforwardly using the built in member functions. ``BaseState`` s can be added, subtracted, multiplied and divided by scalars and element-wise by other ``BaseState`` s.
 
 .. code-block:: cpp
 
@@ -75,3 +75,46 @@ If performing simple arithmetic with ``BaseState``s, then this can be done strai
    
    BaseState<Real> another_state = base_state * (other_state - 2.5);
 
+``BaseStateGeometry``
+=====================
+
+In AMReX, information about the grid geometry and routines associated with it are stored in the ``Geometry`` class. In MAESTROeX, information and routines concerning the geometry of the base state are stored in the ``BaseStateGeometry`` class. 
+
+Member variables of the ``BaseStateGeometry`` class are normally only ever read by routines of other classes. Consequently, ``BaseState`` objects storing the actual data are private member variables (so can only be accessed directly by ``BaseStateGeometry`` methods), however they have corresponding public ``BaseStateArray`` variables which can be accessed by other classes. 
+
+The base state geometry of a problem is initialized in ``Maestro::Setup()`` by ``BaseStateGeometry::Init()``. After it has been initialized, its member variables can be used. For example, a typical iteration over a ``BaseState`` would look like 
+
+.. code-block:: cpp
+
+    BaseState<Real> base_data(base_geom.max_radial_level+1, base_geom.nr_fine);
+    auto base_arr = base_data.array();
+
+    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+        ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE (int r)
+        {
+            base_arr(l,r) = 0.0;
+        });
+        Gpu::synchronize();
+    }
+
+
+For multilevel problems, the iteration over the base state looks a bit different, as on each level we must make sure that we only consider base state cells covered by grids. The discrete blocks of base state cells covered by grids on each level are defined by ``base_geom.numdisjointchunks``, and the start and end points of each block/chunk by the variables ``base_geom.r_start_coord`` and ``base_geom.r_end_coord``. 
+
+.. code-block:: cpp
+
+    BaseState<Real> base_data(base_geom.max_radial_level+1, base_geom.nr_fine);
+    auto base_arr = base_data.array();
+
+    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+        for (auto i = 1; i <= base_geom.numdisjointchunks(l); ++i) {
+            const auto lo = base_geom.r_start_coord(l,i);
+            const auto hi = base_geom.r_end_coord(l,i);
+
+            ParallelFor(hi-lo+1, [=] AMREX_GPU_DEVICE (int j)
+            {
+                auto r = j + lo;
+                base_arr(l,r) = 0.0;
+            });
+            Gpu::synchronize();
+        }
+    }

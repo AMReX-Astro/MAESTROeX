@@ -9,8 +9,8 @@ auto set_species(Real y);
 auto grav_zone(Real y);
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -85,6 +85,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
 
     // allocate arrays
     RealVector pres(base_geom.nr(n));

@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
+                       BaseState<Real>& p0_s, 
                        const int lev)
 {
     // timer for profiling
@@ -19,6 +19,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
     const int n = lev;
+    auto rho0 = rho0_s.array();
+    auto rhoh0 = rhoh0_s.array();
+    auto p0 = p0_s.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 

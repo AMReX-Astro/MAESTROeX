@@ -113,10 +113,12 @@ Maestro::Init ()
         base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
-    if (spherical) { 
+#if (AMREX_SPACEDIM == 3)
+    if (spherical) {
         MakeNormal();
         MakeCCtoRadii();
     }
+#endif
 
     if (do_sponge) {
         SpongeInit(rho0_old);
