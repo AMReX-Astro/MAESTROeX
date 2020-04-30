@@ -2102,8 +2102,8 @@ Maestro::MakeCCtoRadii ()
         const Real* dx = geom[lev].CellSize();
         const Real* dx_fine = geom[max_level].CellSize();
 
-	auto dx_lev = geom[lev].CellSizeArray();
-	auto dx_fine_vec = geom[max_level].CellSizeArray();
+        auto dx_lev = geom[lev].CellSizeArray();
+        auto dx_fine_vec = geom[max_level].CellSizeArray();
 
         MultiFab& cc_to_r = cell_cc_to_r[lev];
 
@@ -2125,7 +2125,7 @@ Maestro::MakeCCtoRadii ()
                                      AMREX_REAL_ANYD(dx_fine),
                                      AMREX_REAL_ANYD(dx));
 
-	    InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
+            InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
         }
     }
 }
