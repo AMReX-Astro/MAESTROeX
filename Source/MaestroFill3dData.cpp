@@ -2077,12 +2077,12 @@ Maestro::PutDataOnFaces(const Vector<MultiFab>& s_cc,
     AverageDownFaces(face);
 }
 
-
+#if (AMREX_SPACEDIM == 3)
 void
 Maestro::MakeCCtoRadii ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeCCtoRadius()",MakeCCtoRadii);
+    BL_PROFILE_VAR("Maestro::MakeCCtoRadius()", MakeCCtoRadii);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -2117,3 +2117,4 @@ Maestro::MakeCCtoRadii ()
         }
     }
 }
+#endif
