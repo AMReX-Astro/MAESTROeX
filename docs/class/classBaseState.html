@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Class BaseState &mdash; MAESTROeX 20.05
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Class BaseStateGeometry" href="classBaseStateGeometry.html" />
+    <link rel="prev" title="Class list" href="../classlist.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="../index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="../_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.05
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="../class/classBaseState.html">master</a> | <a href="../dev/class/classBaseState.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base_state.html">Base State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../filelist.html">File list</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../classlist.html">Class list</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Class BaseState</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classBaseStateGeometry.html">Class BaseStateGeometry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classBndryFuncArrayMaestro.html">Class BndryFuncArrayMaestro</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classMaestro.html">Class Maestro</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../classlist.html">Class list</a> &raquo;</li>
+        
+      <li>Class BaseState</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/class/classBaseState.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="class-basestate">
+<h1>Class BaseState<a class="headerlink" href="#class-basestate" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp class">
+<dt id="_CPPv4I0E9BaseState">
+<span id="_CPPv3I0E9BaseState"></span><span id="_CPPv2I0E9BaseState"></span><span class="target" id="classBaseState"></span>template&lt;class <code class="sig-name descname">T</code>&gt;<br /><em class="property">class </em><code class="sig-name descname">BaseState</code><a class="headerlink" href="#_CPPv4I0E9BaseState" title="Permalink to this definition">¶</a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Public Functions</p>
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState9BaseStateEv">
+<span id="_CPPv3N9BaseState9BaseStateEv"></span><span id="_CPPv2N9BaseState9BaseStateEv"></span><span id="BaseState::BaseState"></span><span class="target" id="classBaseState_1a025a5cba66bc76c81cd6318e549360b9"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState9BaseStateEKiKiKi">
+<span id="_CPPv3N9BaseState9BaseStateEKiKiKi"></span><span id="_CPPv2N9BaseState9BaseStateEKiKiKi"></span><span id="BaseState::BaseState__iC.iC.iC"></span><span class="target" id="classBaseState_1adc2af24e6da6de9c9c01f907e57f04b6"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em> = 1, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi">
+<span id="_CPPv3N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi"></span><span id="_CPPv2N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi"></span><span id="BaseState::BaseState__Gpu::ManagedVector:T:CR.iC.iC.iC"></span><span class="target" id="classBaseState_1a2a13baa1ea6e6e67c287e06b136f841a"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><em class="property">const</em> Gpu::ManagedVector&lt;T&gt; &amp;<em>src</em>, <em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em>, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateERKN5amrex3Gpu13ManagedVectorI1TEEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>create a <a class="reference internal" href="#classBaseState"><span class="std std-ref">BaseState</span></a> object from an existing Fortran-friendly base state </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState9BaseStateERKN5amrex6VectorI1TEEKiKiKi">
+<span id="_CPPv3N9BaseState9BaseStateERKN5amrex6VectorI1TEEKiKiKi"></span><span id="_CPPv2N9BaseState9BaseStateERKN5amrex6VectorI1TEEKiKiKi"></span><span id="BaseState::BaseState__Vector:T:CR.iC.iC.iC"></span><span class="target" id="classBaseState_1ad9db62764f2d637a6f0c79c787d492d6"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;T&gt; &amp;<em>src</em>, <em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em>, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateERKN5amrex6VectorI1TEEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState9BaseStateERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseState9BaseStateERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseState9BaseStateERK9BaseStateI1TE"></span><span id="BaseState::BaseState__BaseState:T:CR"></span><span class="target" id="classBaseState_1ab6836aa4a08504d0a1bd2c0463014e2e"></span><code class="sig-name descname">BaseState</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4N9BaseState9BaseStateERK9BaseStateI1TE" title="BaseState::BaseState">BaseState</a>&lt;T&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState9BaseStateERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>copy constructor. This makes a deep copy of the src. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1a4818963d9975fdf40ccfb2c5401fc44a"></span><code class="sig-name descname">AMREX_FORCE_INLINE BaseStateArray&lt;T const&gt; BaseState::array() const</code></dt>
+<dd><p>return a <a class="reference internal" href="../file/BaseState_8H.html#structBaseStateArray"><span class="std std-ref">BaseStateArray</span></a> object to allow for accessing the underlying data </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1a89482d13f8d06a0f5169f1817baee211"></span><code class="sig-name descname">AMREX_FORCE_INLINE BaseStateArray&lt;T&gt; BaseState::array()</code></dt>
+<dd><p>return a <a class="reference internal" href="../file/BaseState_8H.html#structBaseStateArray"><span class="std std-ref">BaseStateArray</span></a> object to allow for accessing the underlying data </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1acf6b53a330eacc4e84a3189df6159640"></span><code class="sig-name descname">AMREX_FORCE_INLINE BaseStateArray&lt;const T&gt; BaseState::const_array() const</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1ae34f13b413236f76aaa03e5372ba3520"></span><code class="sig-name descname">AMREX_FORCE_INLINE T BaseState::array(const int i)</code></dt>
+<dd><p>return ith element of underlying data array </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState6defineEKiKiKi">
+<span id="_CPPv3N9BaseState6defineEKiKiKi"></span><span id="_CPPv2N9BaseState6defineEKiKiKi"></span><span id="BaseState::define__iC.iC.iC"></span><span class="target" id="classBaseState_1ad2cd46c33d59f5d395729143b466c5d9"></span>void <code class="sig-name descname">define</code><span class="sig-paren">(</span><em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em> = 1, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6defineEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>allocate memory for the <a class="reference internal" href="#classBaseState"><span class="std std-ref">BaseState</span></a> </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState6resizeEKiKiKi">
+<span id="_CPPv3N9BaseState6resizeEKiKiKi"></span><span id="_CPPv2N9BaseState6resizeEKiKiKi"></span><span id="BaseState::resize__iC.iC.iC"></span><span class="target" id="classBaseState_1a8de1520fa3fbb5238d8fc0038119f70e"></span>void <code class="sig-name descname">resize</code><span class="sig-paren">(</span><em class="property">const</em> int <em>num_levs</em>, <em class="property">const</em> int <em>length</em> = 1, <em class="property">const</em> int <em>ncomp</em> = 1<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6resizeEKiKiKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState6setValERK1T">
+<span id="_CPPv3N9BaseState6setValERK1T"></span><span id="_CPPv2N9BaseState6setValERK1T"></span><span id="BaseState::setVal__TCR"></span><span class="target" id="classBaseState_1ad842590aaabf8902875ea049fe8d70d5"></span>void <code class="sig-name descname">setVal</code><span class="sig-paren">(</span><em class="property">const</em> T &amp;<em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6setValERK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set to some scalar value </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState6setValEKiRK1T">
+<span id="_CPPv3N9BaseState6setValEKiRK1T"></span><span id="_CPPv2N9BaseState6setValEKiRK1T"></span><span id="BaseState::setVal__iC.TCR"></span><span class="target" id="classBaseState_1aa1def2ef0eae0cd6aa283924d2fce176"></span>void <code class="sig-name descname">setVal</code><span class="sig-paren">(</span><em class="property">const</em> int <em>comp</em>, <em class="property">const</em> T &amp;<em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState6setValEKiRK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>set the comp’th component to some scalar value </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1af8a07dbb88666dae766b64228b453ffc"></span><code class="sig-name descname">AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int BaseState::nLevels() const</code></dt>
+<dd><p>number of levels in base </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1a9c242e54809277fd726c62c4d701d606"></span><code class="sig-name descname">AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int BaseState::length() const</code></dt>
+<dd><p>number of cells in base </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1a26a730a6186ef755d4540ca67370e7ef"></span><code class="sig-name descname">AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int BaseState::nComp() const</code></dt>
+<dd><p>number of components </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState4copyERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseState4copyERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseState4copyERK9BaseStateI1TE"></span><span id="BaseState::copy__BaseState:T:CR"></span><span class="target" id="classBaseState_1aca80936911ae5e059cfc90ce8244c53a"></span>void <code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;T&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState4copyERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>deep copy </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState4copyERKN5amrex3Gpu13ManagedVectorI1TEE">
+<span id="_CPPv3N9BaseState4copyERKN5amrex3Gpu13ManagedVectorI1TEE"></span><span id="_CPPv2N9BaseState4copyERKN5amrex3Gpu13ManagedVectorI1TEE"></span><span id="BaseState::copy__Gpu::ManagedVector:T:CR"></span><span class="target" id="classBaseState_1a2d75b72ede5ac2638ec26248e77fc31f"></span>void <code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="property">const</em> Gpu::ManagedVector&lt;T&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState4copyERKN5amrex3Gpu13ManagedVectorI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState4copyERKN5amrex6VectorI1TEE">
+<span id="_CPPv3N9BaseState4copyERKN5amrex6VectorI1TEE"></span><span id="_CPPv2N9BaseState4copyERKN5amrex6VectorI1TEE"></span><span id="BaseState::copy__Vector:T:CR"></span><span class="target" id="classBaseState_1aeae3fdff23e35c105f3fd04d14f4b701"></span>void <code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="property">const</em> Vector&lt;T&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState4copyERKN5amrex6VectorI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState8toVectorERN5amrex6VectorI1TEE">
+<span id="_CPPv3N9BaseState8toVectorERN5amrex6VectorI1TEE"></span><span id="_CPPv2N9BaseState8toVectorERN5amrex6VectorI1TEE"></span><span id="BaseState::toVector__Vector:T:R"></span><span class="target" id="classBaseState_1aba02f122118770bdf7393429c3e2d9fb"></span>void <code class="sig-name descname">toVector</code><span class="sig-paren">(</span>Vector&lt;T&gt; &amp;<em>vec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState8toVectorERN5amrex6VectorI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState8toVectorERN5amrex3Gpu13ManagedVectorI1TEE">
+<span id="_CPPv3N9BaseState8toVectorERN5amrex3Gpu13ManagedVectorI1TEE"></span><span id="_CPPv2N9BaseState8toVectorERN5amrex3Gpu13ManagedVectorI1TEE"></span><span id="BaseState::toVector__Gpu::ManagedVector:T:R"></span><span class="target" id="classBaseState_1a0ab25c34914f07b4b81afe6f9f36baad"></span>void <code class="sig-name descname">toVector</code><span class="sig-paren">(</span>Gpu::ManagedVector&lt;T&gt; &amp;<em>vec</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState8toVectorERN5amrex3Gpu13ManagedVectorI1TEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState4swapER9BaseStateI1TE">
+<span id="_CPPv3N9BaseState4swapER9BaseStateI1TE"></span><span id="_CPPv2N9BaseState4swapER9BaseStateI1TE"></span><span id="BaseState::swap__BaseState:T:R"></span><span class="target" id="classBaseState_1ab3cad5bf189e582e9bd5e28e19218d12"></span>void <code class="sig-name descname">swap</code><span class="sig-paren">(</span>BaseState&lt;T&gt; &amp;<em>src</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState4swapER9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>swap the data with src </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseState7dataPtrEv">
+<span id="_CPPv3N9BaseState7dataPtrEv"></span><span id="_CPPv2N9BaseState7dataPtrEv"></span><span id="BaseState::dataPtr"></span><span class="target" id="classBaseState_1a5f899ca57c77e9cf63c19835519aa775"></span>T *<code class="sig-name descname">dataPtr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseState7dataPtrEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt>
+<span class="target" id="classBaseState_1a63d9e1ab9544f3f8c2972778ccecd543"></span><code class="sig-name descname">AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE T* BaseState::dataPtr() const</code></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatepLEK1T">
+<span id="_CPPv3N9BaseStatepLEK1T"></span><span id="_CPPv2N9BaseStatepLEK1T"></span><span id="BaseState::add-assign-operator__TC"></span><span class="target" id="classBaseState_1ac5e49d82f73e67ffe5e4186fcb90d18e"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator+=</code><span class="sig-paren">(</span><em class="property">const</em> T <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatepLEK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatepLERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseStatepLERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseStatepLERK9BaseStateI1TE"></span><span id="BaseState::add-assign-operator__BaseState:T:CR"></span><span class="target" id="classBaseState_1a6449952fbfd878943a883aecab782f6e"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator+=</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;T&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatepLERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatemIEK1T">
+<span id="_CPPv3N9BaseStatemIEK1T"></span><span id="_CPPv2N9BaseStatemIEK1T"></span><span id="BaseState::sub-assign-operator__TC"></span><span class="target" id="classBaseState_1a1d00ae8058ce99cf1c74749d2d632702"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator-=</code><span class="sig-paren">(</span><em class="property">const</em> T <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatemIEK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatemIERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseStatemIERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseStatemIERK9BaseStateI1TE"></span><span id="BaseState::sub-assign-operator__BaseState:T:CR"></span><span class="target" id="classBaseState_1a9738d6da405a1578c1ac1f3dee5bd191"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator-=</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;T&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatemIERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatemLEK1T">
+<span id="_CPPv3N9BaseStatemLEK1T"></span><span id="_CPPv2N9BaseStatemLEK1T"></span><span id="BaseState::mul-assign-operator__TC"></span><span class="target" id="classBaseState_1aba1991fb0cf3979c9a5d5d21cc0713a8"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator*=</code><span class="sig-paren">(</span><em class="property">const</em> T <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatemLEK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatemLERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseStatemLERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseStatemLERK9BaseStateI1TE"></span><span id="BaseState::mul-assign-operator__BaseState:T:CR"></span><span class="target" id="classBaseState_1a0aaaad4965620f59878183f928c54318"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator*=</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;T&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatemLERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatedVEK1T">
+<span id="_CPPv3N9BaseStatedVEK1T"></span><span id="_CPPv2N9BaseStatedVEK1T"></span><span id="BaseState::div-assign-operator__TC"></span><span class="target" id="classBaseState_1a56cd595c7901606e8e16eee08884f36c"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator/=</code><span class="sig-paren">(</span><em class="property">const</em> T <em>val</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatedVEK1T" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4N9BaseStatedVERK9BaseStateI1TE">
+<span id="_CPPv3N9BaseStatedVERK9BaseStateI1TE"></span><span id="_CPPv2N9BaseStatedVERK9BaseStateI1TE"></span><span id="BaseState::div-assign-operator__BaseState:T:CR"></span><span class="target" id="classBaseState_1ada68169f0e8401aedaed827d895751d5"></span>BaseState&lt;T&gt; &amp;<code class="sig-name descname">operator/=</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;T&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N9BaseStatedVERK9BaseStateI1TE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Protected Attributes</p>
+<dl class="cpp member">
+<dt id="_CPPv4N9BaseState9base_dataE">
+<span id="_CPPv3N9BaseState9base_dataE"></span><span id="_CPPv2N9BaseState9base_dataE"></span><span id="BaseState::base_data__Gpu::ManagedVector:T:"></span><span class="target" id="classBaseState_1ad728fb297d9c96413e414cc6e95ffc63"></span>Gpu::ManagedVector&lt;T&gt; <code class="sig-name descname">base_data</code><a class="headerlink" href="#_CPPv4N9BaseState9base_dataE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp member">
+<dt id="_CPPv4N9BaseState4nlevE">
+<span id="_CPPv3N9BaseState4nlevE"></span><span id="_CPPv2N9BaseState4nlevE"></span><span id="BaseState::nlev__i"></span><span class="target" id="classBaseState_1a485910f7867dba372614e11da3c591a7"></span>int <code class="sig-name descname">nlev</code><a class="headerlink" href="#_CPPv4N9BaseState4nlevE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp member">
+<dt id="_CPPv4N9BaseState4nvarE">
+<span id="_CPPv3N9BaseState4nvarE"></span><span id="_CPPv2N9BaseState4nvarE"></span><span id="BaseState::nvar__i"></span><span class="target" id="classBaseState_1ab97eae88d7c91e3a98a2829b8e2d0eee"></span>int <code class="sig-name descname">nvar</code><a class="headerlink" href="#_CPPv4N9BaseState4nvarE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp member">
+<dt id="_CPPv4N9BaseState3lenE">
+<span id="_CPPv3N9BaseState3lenE"></span><span id="_CPPv2N9BaseState3lenE"></span><span id="BaseState::len__i"></span><span class="target" id="classBaseState_1a39f747eaacd91678486d8e222e0b7583"></span>int <code class="sig-name descname">len</code><a class="headerlink" href="#_CPPv4N9BaseState3lenE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Friends</p>
+<dl class="cpp function">
+<dt id="_CPPv4I0Epl9BaseStateI1UEK1URK9BaseStateI1UE">
+<span id="_CPPv3I0EplK1URK9BaseStateI1UE"></span><span id="_CPPv2I0EplK1URK9BaseStateI1UE"></span><span class="target" id="classBaseState_1a04d7334c8db15441e2b61393596fd06b"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UEK1URK9BaseStateI1UE" title="operator+::U">U</a>&gt; <code class="sig-name descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UEK1URK9BaseStateI1UE" title="operator+::U">U</a> <em>val</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UEK1URK9BaseStateI1UE" title="operator+::U">U</a>&gt; &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Epl9BaseStateI1UEK1URK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>scalar addition to the whole base state </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Epl9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EplRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EplRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1a375bc48eae5f9f849156e234b89edae7"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator+::U">U</a>&gt; <code class="sig-name descname">operator+</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator+::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Epl9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator+::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Epl9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>element-wise addition </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Emi9BaseStateI1UEK1URK9BaseStateI1UE">
+<span id="_CPPv3I0EmiK1URK9BaseStateI1UE"></span><span id="_CPPv2I0EmiK1URK9BaseStateI1UE"></span><span class="target" id="classBaseState_1ad46fbe0bfc6bb8a494aa66d12970bad2"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UEK1URK9BaseStateI1UE" title="operator-::U">U</a>&gt; <code class="sig-name descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UEK1URK9BaseStateI1UE" title="operator-::U">U</a> <em>val</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UEK1URK9BaseStateI1UE" title="operator-::U">U</a>&gt; &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Emi9BaseStateI1UEK1URK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>scalar subtraction from the whole base state </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Emi9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EmiRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EmiRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1a13d3cddef8344dbc7d7c20879a87b7f3"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator-::U">U</a>&gt; <code class="sig-name descname">operator-</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator-::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Emi9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator-::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Emi9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>element-wise subtraction </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Eml9BaseStateI1UEK1URK9BaseStateI1UE">
+<span id="_CPPv3I0EmlK1URK9BaseStateI1UE"></span><span id="_CPPv2I0EmlK1URK9BaseStateI1UE"></span><span class="target" id="classBaseState_1aa97eac0352c9a974c1bd04f4f5cfb884"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UEK1URK9BaseStateI1UE" title="operator*::U">U</a>&gt; <code class="sig-name descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UEK1URK9BaseStateI1UE" title="operator*::U">U</a> <em>val</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UEK1URK9BaseStateI1UE" title="operator*::U">U</a>&gt; &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Eml9BaseStateI1UEK1URK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>scalar multiplication of the whole base state </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Eml9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EmlRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EmlRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1aef27a026fbcb8ee0cb1d2303ca5a63f4"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator*::U">U</a>&gt; <code class="sig-name descname">operator*</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator*::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Eml9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator*::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Eml9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>element-wise multiplication </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Edv9BaseStateI1UEK1URK9BaseStateI1UE">
+<span id="_CPPv3I0EdvK1URK9BaseStateI1UE"></span><span id="_CPPv2I0EdvK1URK9BaseStateI1UE"></span><span class="target" id="classBaseState_1aad73798f8151c64bd54d8740081bf5a9"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UEK1URK9BaseStateI1UE" title="operator/::U">U</a>&gt; <code class="sig-name descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> <a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UEK1URK9BaseStateI1UE" title="operator/::U">U</a> <em>val</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UEK1URK9BaseStateI1UE" title="operator/::U">U</a>&gt; &amp;<em>p</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Edv9BaseStateI1UEK1URK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>scalar division of the whole base state </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0Edv9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EdvRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EdvRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1a1e46b658291d70fba6999c89f01a9b8a"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />BaseState&lt;<a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator/::U">U</a>&gt; <code class="sig-name descname">operator/</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator/::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0Edv9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="operator/::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0Edv9BaseStateI1UERK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>element-wise division </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0EeqbRK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EeqRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EeqRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1ac1d99b71b2e3c4a401349f8b8f4d785a"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator==</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0EeqbRK9BaseStateI1UERK9BaseStateI1UE" title="operator==::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0EeqbRK9BaseStateI1UERK9BaseStateI1UE" title="operator==::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EeqbRK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>comparison operator </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt id="_CPPv4I0EnebRK9BaseStateI1UERK9BaseStateI1UE">
+<span id="_CPPv3I0EneRK9BaseStateI1UERK9BaseStateI1UE"></span><span id="_CPPv2I0EneRK9BaseStateI1UERK9BaseStateI1UE"></span><span class="target" id="classBaseState_1a24a6b43f37a189bb854c2dcfab3afac6"></span>template&lt;class <code class="sig-name descname">U</code>&gt;<br />bool <code class="sig-name descname">operator!=</code><span class="sig-paren">(</span><em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0EnebRK9BaseStateI1UERK9BaseStateI1UE" title="operator!=::U">U</a>&gt; &amp;<em>lhs</em>, <em class="property">const</em> BaseState&lt;<a class="reference internal" href="#_CPPv4I0EnebRK9BaseStateI1UERK9BaseStateI1UE" title="operator!=::U">U</a>&gt; &amp;<em>rhs</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EnebRK9BaseStateI1UERK9BaseStateI1UE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>comparison operator </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="classBaseStateGeometry.html" class="btn btn-neutral float-right" title="Class BaseStateGeometry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../classlist.html" class="btn btn-neutral float-left" title="Class list" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

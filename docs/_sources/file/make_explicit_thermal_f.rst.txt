@@ -1,8 +1,0 @@
-make_explicit_thermal.F90
-=========================
-
-make\_explicit\_thermal\_module
--------------------------------
-
-.. f:automodule:: make_explicit_thermal_module
-

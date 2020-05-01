@@ -1,4 +1,0 @@
-File maestro_queries.H
-======================
-
-.. doxygenfile:: maestro_queries.H

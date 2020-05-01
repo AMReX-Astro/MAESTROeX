@@ -4,6 +4,8 @@ File list
 .. toctree::
    :maxdepth: 2
 
+   file/BaseState_8H.rst
+   file/BaseStateGeometry_8H.rst
    file/Maestro_8H.rst
    file/MaestroBCThreads_8H.rst
    file/MaestroInletBCs_8H.rst

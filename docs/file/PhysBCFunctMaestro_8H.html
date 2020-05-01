@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>File PhysBCFunctMaestro.H &mdash; MAESTROeX 20.04a
+  <title>File PhysBCFunctMaestro.H &mdash; MAESTROeX 20.05
  documentation</title>
   
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                20.04a
+                20.05
 
               </div>
             
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base_state.html">Base State</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
@@ -144,6 +145,8 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BaseStateGeometry_8H.html">File BaseStateGeometry.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
@@ -228,34 +231,34 @@
 <h1>File PhysBCFunctMaestro.H<a class="headerlink" href="#file-physbcfunctmaestro-h" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Typedefs</p>
-<dl class="type">
+<dl class="cpp type">
 <dt id="_CPPv423BndryFuncDefaultMaestro">
 <span id="_CPPv323BndryFuncDefaultMaestro"></span><span id="_CPPv223BndryFuncDefaultMaestro"></span><span id="BndryFuncDefaultMaestro"></span><span class="target" id="PhysBCFunctMaestro_8H_1a3a8dc2970890ba8d58f55d727024e3d2"></span><em class="property">typedef </em>void (*<code class="sig-name descname">BndryFuncDefaultMaestro</code>)<span class="sig-paren">(</span><em class="property">const</em> Array4&lt;Real&gt; &amp;scal, <em class="property">const</em> Box &amp;bx, <em class="property">const</em> Box &amp;domainBox, <em class="property">const</em> Real *dx, <em class="property">const</em> BCRec bcs, <em class="property">const</em> Real *gridlo, <em class="property">const</em> int comp<span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423BndryFuncDefaultMaestro" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
-<dl class="type">
+<dl class="cpp type">
 <dt id="_CPPv418PhysBCFunctMaestro">
 <span id="_CPPv318PhysBCFunctMaestro"></span><span id="_CPPv218PhysBCFunctMaestro"></span><span class="target" id="PhysBCFunctMaestro_8H_1ab89d4d477401e72f6acd10ae10579d3c"></span><em class="property">using </em><code class="sig-name descname">PhysBCFunctMaestro</code> = PhysBCFunct&lt;<a class="reference internal" href="../class/classBndryFuncArrayMaestro.html#_CPPv421BndryFuncArrayMaestro" title="BndryFuncArrayMaestro">BndryFuncArrayMaestro</a>&gt;<a class="headerlink" href="#_CPPv418PhysBCFunctMaestro" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
-<dl class="class">
+<dl class="cpp class">
 <dt id="_CPPv421BndryFuncArrayMaestro">
 <span id="_CPPv321BndryFuncArrayMaestro"></span><span id="_CPPv221BndryFuncArrayMaestro"></span><span id="BndryFuncArrayMaestro"></span><span class="target" id="classBndryFuncArrayMaestro"></span><em class="property">class </em><code class="sig-name descname">BndryFuncArrayMaestro</code> : <em class="property">public</em> BndryFuncArray<br /></dt>
 <dd><em>#include &lt;PhysBCFunctMaestro.H&gt;</em><p>This version calls function working on array. </p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Public Functions</p>
-<dl class="function">
+<dl class="cpp function">
 <dt id="_CPPv4N21BndryFuncArrayMaestro21BndryFuncArrayMaestroEv">
 <span id="_CPPv3N21BndryFuncArrayMaestro21BndryFuncArrayMaestroEv"></span><span id="_CPPv2N21BndryFuncArrayMaestro21BndryFuncArrayMaestroEv"></span><span id="BndryFuncArrayMaestro::BndryFuncArrayMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1a5b7a5d65287473963024b366433f4ab3"></span><code class="sig-name descname">BndryFuncArrayMaestro</code><span class="sig-paren">(</span><span class="sig-paren">)</span><br /></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt id="_CPPv4N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE23BndryFuncDefaultMaestro">
 <span id="_CPPv3N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE23BndryFuncDefaultMaestro"></span><span id="_CPPv2N21BndryFuncArrayMaestro21BndryFuncArrayMaestroE23BndryFuncDefaultMaestro"></span><span id="BndryFuncArrayMaestro::BndryFuncArrayMaestro__BndryFuncDefaultMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1aa70cd97a3bb1c8aa657298005b14ae4f"></span><code class="sig-name descname">BndryFuncArrayMaestro</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv423BndryFuncDefaultMaestro" title="BndryFuncDefaultMaestro">BndryFuncDefaultMaestro</a> <em>inFunc</em><span class="sig-paren">)</span><br /></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt id="_CPPv4N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi">
 <span id="_CPPv3N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi"></span><span id="_CPPv2N21BndryFuncArrayMaestroclERKN5amrex3BoxERN5amrex9FArrayBoxEKiKiRKN5amrex8GeometryEKN5amrex4RealERKN5amrex6VectorIN5amrex5BCRecEEEKiKi"></span><span id="BndryFuncArrayMaestro::call-operator__BoxCR.FArrayBoxR.iC.iC.GeometryCR.RealC.Vector:BCRec:CR.iC.iC"></span><span class="target" id="classBndryFuncArrayMaestro_1aca60dff4e924d4d8e27249c47fb6d90f"></span>void <code class="sig-name descname">operator()</code><span class="sig-paren">(</span>Box <em class="property">const</em> &amp;<em>bx</em>, FArrayBox &amp;<em>dest</em>, <em class="property">const</em> int <em>dcomp</em>, <em class="property">const</em> int <em>numcomp</em>, Geometry <em class="property">const</em> &amp;<em>geom</em>, <em class="property">const</em> Real <em>time</em>, <em class="property">const</em> Vector&lt;BCRec&gt; &amp;<em>bcr</em>, <em class="property">const</em> int <em>bcomp</em>, <em class="property">const</em> int <em>orig_comp</em><span class="sig-paren">)</span><br /></dt>
 <dd></dd></dl>
@@ -263,7 +266,7 @@
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Protected Attributes</p>
-<dl class="member">
+<dl class="cpp member">
 <dt id="_CPPv4N21BndryFuncArrayMaestro6m_funcE">
 <span id="_CPPv3N21BndryFuncArrayMaestro6m_funcE"></span><span id="_CPPv2N21BndryFuncArrayMaestro6m_funcE"></span><span id="BndryFuncArrayMaestro::m_func__BndryFuncDefaultMaestro"></span><span class="target" id="classBndryFuncArrayMaestro_1a2ca44d43c4a643834e42201536e632eb"></span><a class="reference internal" href="#_CPPv423BndryFuncDefaultMaestro" title="BndryFuncDefaultMaestro">BndryFuncDefaultMaestro</a> <code class="sig-name descname">m_func</code> = nullptr<br /></dt>
 <dd></dd></dl>

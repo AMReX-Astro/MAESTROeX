@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>base_state_geometry.F90 &mdash; MAESTROeX 20.04a
+  <title>base_state_geometry.F90 &mdash; MAESTROeX 20.05
  documentation</title>
   
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                20.04a
+                20.05
 
               </div>
             
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base_state.html">Base State</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
@@ -144,6 +145,8 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BaseStateGeometry_8H.html">File BaseStateGeometry.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
@@ -161,7 +164,6 @@
 <li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_explicit_thermal_f.html">make_explicit_thermal.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
 </ul>
@@ -271,93 +273,93 @@ the base state arrays begin with index 0, not 1.</p>
 </ul>
 <p class="rubric">Variables</p>
 <ul>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/anelastic_cutoff_density_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">anelastic_cutoff_density_coord</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/anelastic_cutoff_density_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/base_cutoff_density_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">base_cutoff_density_coord</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/base_cutoff_density_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/burning_cutoff_density_hi_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">burning_cutoff_density_hi_coord</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/pointer</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/burning_cutoff_density_hi_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/burning_cutoff_density_lo_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">burning_cutoff_density_lo_coord</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/pointer</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/burning_cutoff_density_lo_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/center">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">center</code> (*)<em> [</em><em>double precision</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/center" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/dr">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">dr</code> (*)<em> [</em><em>double precision</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/dr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/dr_fine">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">dr_fine</code><em> [</em><em>double precision</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/dr_fine" title="Permalink to this definition">¶</a></dt>
 <dd><p>base state grid spacing associated with <em>max_radial_level</em></p>
 </dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/finest_radial_level">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">finest_radial_level</code><em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/finest_radial_level" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/max_radial_level">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">max_radial_level</code><em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/max_radial_level" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/nr">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">nr</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/nr" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/nr_fine">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">nr_fine</code><em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/nr_fine" title="Permalink to this definition">¶</a></dt>
 <dd><p>number of zones associated with <em>max_radial_level</em></p>
 </dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/nr_irreg">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">nr_irreg</code><em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/nr_irreg" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/numdisjointchunks">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">numdisjointchunks</code> (*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/numdisjointchunks" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/r_end_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">r_end_coord</code> (*,*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/r_end_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </li>
-<li><dl class="variable">
+<li><dl class="f variable">
 <dt id="f/base_state_geometry_module/r_start_coord">
 <code class="sig-prename descclassname">base_state_geometry_module/</code><code class="sig-name descname">r_start_coord</code> (*,*)<em> [</em><em>integer</em><em>,</em><em>public/save/allocatable</em><em>]</em><a class="headerlink" href="#f/base_state_geometry_module/r_start_coord" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>File maestro_queries.H &mdash; MAESTROeX 20.04a
+  <title>File maestro_queries.H &mdash; MAESTROeX 20.05
  documentation</title>
   
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                20.04a
+                20.05
 
               </div>
             
@@ -113,6 +113,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base_state.html">Base State</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
@@ -144,6 +145,8 @@
 <p class="caption"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BaseStateGeometry_8H.html">File BaseStateGeometry.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
@@ -151,7 +154,7 @@
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../param_includes_files.html">Param_includes</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="maestro__defaults_8H.html">File maestro_defaults.H</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro__declares_8H.html">File maestro_declares.H</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro__params_8H.html">File maestro_params.H</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">File maestro_queries.H</a></li>
 <li class="toctree-l3"><a class="reference internal" href="meth_params_f.html">meth_params.F90</a></li>
@@ -238,784 +241,784 @@
 <h1>File maestro_queries.H<a class="headerlink" href="#file-maestro-queries-h" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric">Functions</p>
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a47d1a7575c68f4bb2df71b65d16c9b4b"></span><code class="sig-name descname">pp query(&quot;reflux_type&quot;, reflux_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae0f1f6bc97f570fef03aba745bcdb2e4"></span><code class="sig-name descname">pp query(&quot;reflux_type&quot;, maestro::reflux_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6709d55c4ad6e4a6ba5b8d0ee81897b7"></span><code class="sig-name descname">pp query(&quot;maestro_verbose&quot;, maestro_verbose)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab7d7399aad0881edfa876a7bb580c626"></span><code class="sig-name descname">pp query(&quot;maestro_verbose&quot;, maestro::maestro_verbose)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a2416335dd81a0e33a9e9073a58533436"></span><code class="sig-name descname">pp query(&quot;model_file&quot;, model_file)</code></dt>
+<span class="target" id="maestro__queries_8H_1afbd403a5c8d046b6115b1783781311bb"></span><code class="sig-name descname">pp query(&quot;model_file&quot;, maestro::model_file)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a86440fd8108170aed6120dd0365776d6"></span><code class="sig-name descname">pp query(&quot;perturb_model&quot;, perturb_model)</code></dt>
+<span class="target" id="maestro__queries_8H_1a803a3cae07ebc9896d2ef6bbd0b7e8de"></span><code class="sig-name descname">pp query(&quot;perturb_model&quot;, maestro::perturb_model)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a1fa728600990c8be52ebf3caca8bc560"></span><code class="sig-name descname">pp query(&quot;print_init_hse_diag&quot;, print_init_hse_diag)</code></dt>
+<span class="target" id="maestro__queries_8H_1a20c92f9f6d846da283ac0af0d3b856eb"></span><code class="sig-name descname">pp query(&quot;print_init_hse_diag&quot;, maestro::print_init_hse_diag)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa03b622de90081f346d28613f66638fc"></span><code class="sig-name descname">pp query(&quot;stop_time&quot;, stop_time)</code></dt>
+<span class="target" id="maestro__queries_8H_1a6cc58aa98bff5fdae5a36e2b731c9486"></span><code class="sig-name descname">pp query(&quot;stop_time&quot;, maestro::stop_time)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a2009faf34ce0c2f3b7f4fd9e5aada874"></span><code class="sig-name descname">pp query(&quot;max_step&quot;, max_step)</code></dt>
+<span class="target" id="maestro__queries_8H_1abbc6c7d882b552916fe7d072f8aca364"></span><code class="sig-name descname">pp query(&quot;max_step&quot;, maestro::max_step)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1adc25612e1eedfca7e665d6eacdb3717f"></span><code class="sig-name descname">pp query(&quot;cfl&quot;, cfl)</code></dt>
+<span class="target" id="maestro__queries_8H_1a1ca5d3e70b8997ee8fd1ecb89cb3f62a"></span><code class="sig-name descname">pp query(&quot;cfl&quot;, maestro::cfl)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa42108b83bc7e800ea59e05acab731b4"></span><code class="sig-name descname">pp query(&quot;init_shrink&quot;, init_shrink)</code></dt>
+<span class="target" id="maestro__queries_8H_1a92ab5884d8c0559a75df394c28bc3bd7"></span><code class="sig-name descname">pp query(&quot;init_shrink&quot;, maestro::init_shrink)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6560b9208f78506d026d1d04b42b77ed"></span><code class="sig-name descname">pp query(&quot;small_dt&quot;, small_dt)</code></dt>
+<span class="target" id="maestro__queries_8H_1a03218d926c07f8f0ad65e24eb11784d9"></span><code class="sig-name descname">pp query(&quot;small_dt&quot;, maestro::small_dt)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a090429ee0571eb0963dd2beaaaf8e267"></span><code class="sig-name descname">pp query(&quot;max_dt_growth&quot;, max_dt_growth)</code></dt>
+<span class="target" id="maestro__queries_8H_1ac061f78e464e705a7971056aca3af24f"></span><code class="sig-name descname">pp query(&quot;max_dt_growth&quot;, maestro::max_dt_growth)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ab6ed983324210533587a791906ce2bb1"></span><code class="sig-name descname">pp query(&quot;max_dt&quot;, max_dt)</code></dt>
+<span class="target" id="maestro__queries_8H_1acf1e5d525cc90fbbfa88155fb2d7d467"></span><code class="sig-name descname">pp query(&quot;max_dt&quot;, maestro::max_dt)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a594caa26dfe5911cf454b4106f2d96de"></span><code class="sig-name descname">pp query(&quot;fixed_dt&quot;, fixed_dt)</code></dt>
+<span class="target" id="maestro__queries_8H_1a7a0952ddd9092acef059356e57f850bf"></span><code class="sig-name descname">pp query(&quot;fixed_dt&quot;, maestro::fixed_dt)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1acbd44793082765df46919192bda3d001"></span><code class="sig-name descname">pp query(&quot;nuclear_dt_fac&quot;, nuclear_dt_fac)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8c458deea569ad0fe64727cf1cbd8d27"></span><code class="sig-name descname">pp query(&quot;nuclear_dt_fac&quot;, maestro::nuclear_dt_fac)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad2194fc0a5be6c88044d790e6e325a74"></span><code class="sig-name descname">pp query(&quot;use_soundspeed_firstdt&quot;, use_soundspeed_firstdt)</code></dt>
+<span class="target" id="maestro__queries_8H_1a7894b299f80174d82e048c1b58491be7"></span><code class="sig-name descname">pp query(&quot;use_soundspeed_firstdt&quot;, maestro::use_soundspeed_firstdt)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8ddc967e4b4f42459661c34e804dbac4"></span><code class="sig-name descname">pp query(&quot;use_divu_firstdt&quot;, use_divu_firstdt)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab1ff8f4ecfc7e8afe0ac6c05d9e09f79"></span><code class="sig-name descname">pp query(&quot;use_divu_firstdt&quot;, maestro::use_divu_firstdt)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a72ab2cfeda97ddfad67b7ca76bdb7e8e"></span><code class="sig-name descname">pp query(&quot;spherical&quot;, spherical)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae917f6c3b52b678ccb7b5f0f5147788b"></span><code class="sig-name descname">pp query(&quot;spherical&quot;, maestro::spherical)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a824e7be98c35238c92feb4d1f2ba8d66"></span><code class="sig-name descname">pp query(&quot;octant&quot;, octant)</code></dt>
+<span class="target" id="maestro__queries_8H_1a09701e002c9f9cf01444c532d3f01073"></span><code class="sig-name descname">pp query(&quot;octant&quot;, maestro::octant)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a29286f1ccf27dc3fb6187ba066874007"></span><code class="sig-name descname">pp query(&quot;do_2d_planar_octant&quot;, do_2d_planar_octant)</code></dt>
+<span class="target" id="maestro__queries_8H_1a11c4380a93b3447c34be675c229ce9d6"></span><code class="sig-name descname">pp query(&quot;do_2d_planar_octant&quot;, maestro::do_2d_planar_octant)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae94cf6cbec38b1b293a887a18ed2b291"></span><code class="sig-name descname">pp query(&quot;regrid_int&quot;, regrid_int)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3d20d53b54af582a1dd3187896d68b20"></span><code class="sig-name descname">pp query(&quot;regrid_int&quot;, maestro::regrid_int)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a442bc60d39f8ef6afe6cb7efc0e86a9d"></span><code class="sig-name descname">pp query(&quot;amr_buf_width&quot;, amr_buf_width)</code></dt>
+<span class="target" id="maestro__queries_8H_1adbfd13dd1f311942c602e1cad5076e6b"></span><code class="sig-name descname">pp query(&quot;amr_buf_width&quot;, maestro::amr_buf_width)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa4a12e57152fb25d7159b7045a82e4b6"></span><code class="sig-name descname">pp query(&quot;drdxfac&quot;, drdxfac)</code></dt>
+<span class="target" id="maestro__queries_8H_1a325268ba55e84f67b38b2b1911063b41"></span><code class="sig-name descname">pp query(&quot;drdxfac&quot;, maestro::drdxfac)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8674a8f4b452ab1a4c44a778bf737701"></span><code class="sig-name descname">pp query(&quot;minwidth&quot;, minwidth)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3dfac63a307ba3486f9a2d182edb90f8"></span><code class="sig-name descname">pp query(&quot;minwidth&quot;, maestro::minwidth)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa035e2e5e6bf4180407585aed4cadb10"></span><code class="sig-name descname">pp query(&quot;min_eff&quot;, min_eff)</code></dt>
+<span class="target" id="maestro__queries_8H_1a92803096715d00936a918f49b2602af6"></span><code class="sig-name descname">pp query(&quot;min_eff&quot;, maestro::min_eff)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0b3977e391cb469c31b25b13f152e89c"></span><code class="sig-name descname">pp query(&quot;use_tpert_in_tagging&quot;, use_tpert_in_tagging)</code></dt>
+<span class="target" id="maestro__queries_8H_1a0e275f064acde57b3c180e3811e61d73"></span><code class="sig-name descname">pp query(&quot;use_tpert_in_tagging&quot;, maestro::use_tpert_in_tagging)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a5a15ac633304fd486464cccc92282fd5"></span><code class="sig-name descname">pp query(&quot;plot_int&quot;, plot_int)</code></dt>
+<span class="target" id="maestro__queries_8H_1a966c463266a0e558cefcaba3b27a3944"></span><code class="sig-name descname">pp query(&quot;plot_int&quot;, maestro::plot_int)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1afcdea225f3589d852ea26d7abfce6097"></span><code class="sig-name descname">pp query(&quot;small_plot_int&quot;, small_plot_int)</code></dt>
+<span class="target" id="maestro__queries_8H_1a0552074c8e9d06b557f6b38973bef744"></span><code class="sig-name descname">pp query(&quot;small_plot_int&quot;, maestro::small_plot_int)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a69399608dfa0dd497238008a593d9b29"></span><code class="sig-name descname">pp query(&quot;plot_deltat&quot;, plot_deltat)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2085a4a7de0a0807e2d5cd307778a501"></span><code class="sig-name descname">pp query(&quot;plot_deltat&quot;, maestro::plot_deltat)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a338bb7b5cab861c46a10f5255edd66cf"></span><code class="sig-name descname">pp query(&quot;small_plot_deltat&quot;, small_plot_deltat)</code></dt>
+<span class="target" id="maestro__queries_8H_1aad4ad269c965da8b47b43c61a2e76ade"></span><code class="sig-name descname">pp query(&quot;small_plot_deltat&quot;, maestro::small_plot_deltat)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0878cc04d53c63244900b1d6e64eeb06"></span><code class="sig-name descname">pp query(&quot;chk_int&quot;, chk_int)</code></dt>
+<span class="target" id="maestro__queries_8H_1a288cec9a6c194a096067958f309645e3"></span><code class="sig-name descname">pp query(&quot;chk_int&quot;, maestro::chk_int)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a5b28a5f90743c133a901dab194656cdb"></span><code class="sig-name descname">pp query(&quot;chk_deltat&quot;, chk_deltat)</code></dt>
+<span class="target" id="maestro__queries_8H_1a97eb1cc5ceceb07402bf09ee0d20f358"></span><code class="sig-name descname">pp query(&quot;chk_deltat&quot;, maestro::chk_deltat)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a740467d76b1dd3b818061c5f896739f1"></span><code class="sig-name descname">pp query(&quot;plot_h_with_use_tfromp&quot;, plot_h_with_use_tfromp)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8d84f1735dbbf49f131bf0e97814ae31"></span><code class="sig-name descname">pp query(&quot;plot_h_with_use_tfromp&quot;, maestro::plot_h_with_use_tfromp)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ac212ebf9010b59c57d5fe6fd2c21bba4"></span><code class="sig-name descname">pp query(&quot;plot_spec&quot;, plot_spec)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa0a46e50b7cd016f1235512e3de16ce6"></span><code class="sig-name descname">pp query(&quot;plot_spec&quot;, maestro::plot_spec)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a659e2f62d3f9970227a8dea8ee103298"></span><code class="sig-name descname">pp query(&quot;plot_omegadot&quot;, plot_omegadot)</code></dt>
+<span class="target" id="maestro__queries_8H_1a23c46b2acca66ba08cb2287df2a11b0a"></span><code class="sig-name descname">pp query(&quot;plot_omegadot&quot;, maestro::plot_omegadot)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a92b570ffd9d10909f996ce134250b2fa"></span><code class="sig-name descname">pp query(&quot;plot_Hext&quot;, plot_Hext)</code></dt>
+<span class="target" id="maestro__queries_8H_1a75476157e0802596dd3f1b15f7cfce3d"></span><code class="sig-name descname">pp query(&quot;plot_Hext&quot;, maestro::plot_Hext)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a2a0b47434ba97ecf9020e7f4fc0024e2"></span><code class="sig-name descname">pp query(&quot;plot_Hnuc&quot;, plot_Hnuc)</code></dt>
+<span class="target" id="maestro__queries_8H_1af54f6b879fb9046cbbacea414eb408c5"></span><code class="sig-name descname">pp query(&quot;plot_Hnuc&quot;, maestro::plot_Hnuc)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae582dbfef307c6d6a5b82c16851b22b2"></span><code class="sig-name descname">pp query(&quot;plot_eta&quot;, plot_eta)</code></dt>
+<span class="target" id="maestro__queries_8H_1abbe49fa8492d98862fdafac4d6b20507"></span><code class="sig-name descname">pp query(&quot;plot_eta&quot;, maestro::plot_eta)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6cc2b8d319be30f0fea1e58ee7d55eb4"></span><code class="sig-name descname">pp query(&quot;plot_trac&quot;, plot_trac)</code></dt>
+<span class="target" id="maestro__queries_8H_1a39e80eeb9b94a5e045270c0779c5321f"></span><code class="sig-name descname">pp query(&quot;plot_trac&quot;, maestro::plot_trac)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ab294f27542fbea12d3947089af2583f8"></span><code class="sig-name descname">pp query(&quot;plot_base_state&quot;, plot_base_state)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2150c8e37f2c9e4af44de42afefa7c5c"></span><code class="sig-name descname">pp query(&quot;plot_base_state&quot;, maestro::plot_base_state)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6cf05e4050c2e1ada9bb9781d6b03417"></span><code class="sig-name descname">pp query(&quot;plot_gpi&quot;, plot_gpi)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8ba9db49f455e6ae02db7a8cae685da9"></span><code class="sig-name descname">pp query(&quot;plot_gpi&quot;, maestro::plot_gpi)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae0603e6782cde69e5108da95511daae5"></span><code class="sig-name descname">pp query(&quot;plot_cs&quot;, plot_cs)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2c7c0037a8037067d8f8a9aff2ec25a9"></span><code class="sig-name descname">pp query(&quot;plot_cs&quot;, maestro::plot_cs)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a5bb25de8890e87741cdf4444cb4cf251"></span><code class="sig-name descname">pp query(&quot;plot_grav&quot;, plot_grav)</code></dt>
+<span class="target" id="maestro__queries_8H_1a142fffc44c8ee7f4d82f01c1fbfbfcbb"></span><code class="sig-name descname">pp query(&quot;plot_grav&quot;, maestro::plot_grav)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a19a0512152ddc476f58c39dfda513636"></span><code class="sig-name descname">pp query(&quot;plot_base_name&quot;, plot_base_name)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae9da9e5492781d2d1d5e7645eb54dd8e"></span><code class="sig-name descname">pp query(&quot;plot_base_name&quot;, maestro::plot_base_name)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a858cfe61e46885c2adecaf834f42c1ad"></span><code class="sig-name descname">pp query(&quot;small_plot_base_name&quot;, small_plot_base_name)</code></dt>
+<span class="target" id="maestro__queries_8H_1a5155100cf5eeacfe153a7a17f4ecb105"></span><code class="sig-name descname">pp query(&quot;small_plot_base_name&quot;, maestro::small_plot_base_name)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0a9741a0a5ccd2c93a7b3ceac6990cc3"></span><code class="sig-name descname">pp query(&quot;check_base_name&quot;, check_base_name)</code></dt>
+<span class="target" id="maestro__queries_8H_1a0f407b84005318e6a33e9d79bdc828dc"></span><code class="sig-name descname">pp query(&quot;check_base_name&quot;, maestro::check_base_name)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a7252801f59f61199c847cb51a7abd8a8"></span><code class="sig-name descname">pp query(&quot;diag_buf_size&quot;, diag_buf_size)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad3f3f6e4d3fbc7fcc1e6455fbe6ae6fe"></span><code class="sig-name descname">pp query(&quot;diag_buf_size&quot;, maestro::diag_buf_size)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad165bc9cc68a5469829f370b93a161d6"></span><code class="sig-name descname">pp query(&quot;plot_ad_excess&quot;, plot_ad_excess)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad80b7082d4168aabf3e9df69cab35c06"></span><code class="sig-name descname">pp query(&quot;plot_ad_excess&quot;, maestro::plot_ad_excess)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ab877e46fec8c2efce9f97c3577c3bc23"></span><code class="sig-name descname">pp query(&quot;plot_processors&quot;, plot_processors)</code></dt>
+<span class="target" id="maestro__queries_8H_1aeaa20a9ed6f543b8bb2b67343881e3d7"></span><code class="sig-name descname">pp query(&quot;plot_processors&quot;, maestro::plot_processors)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad2646d70451eca49466e67f92d27f015"></span><code class="sig-name descname">pp query(&quot;plot_pidivu&quot;, plot_pidivu)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2a359576c5ea9f47a484fd3ad08eae2d"></span><code class="sig-name descname">pp query(&quot;plot_pidivu&quot;, maestro::plot_pidivu)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a18ce12b5893d8c09335ef1127b27b2f5"></span><code class="sig-name descname">pp query(&quot;small_plot_vars&quot;, small_plot_vars)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2e87e662c666a37c9483c3bab61a268c"></span><code class="sig-name descname">pp query(&quot;small_plot_vars&quot;, maestro::small_plot_vars)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a664ffce8f6d3a497955394eb12bd8128"></span><code class="sig-name descname">pp query(&quot;init_iter&quot;, init_iter)</code></dt>
+<span class="target" id="maestro__queries_8H_1a5c055924bfa83b175ffe3f7eaa7dfeb2"></span><code class="sig-name descname">pp query(&quot;init_iter&quot;, maestro::init_iter)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a520844207e40e3ec704474b55daa33a4"></span><code class="sig-name descname">pp query(&quot;init_divu_iter&quot;, init_divu_iter)</code></dt>
+<span class="target" id="maestro__queries_8H_1a76fd05a57f172772817390893b39e898"></span><code class="sig-name descname">pp query(&quot;init_divu_iter&quot;, maestro::init_divu_iter)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa50a0d2bb6c981a5f6748bf08746bf05"></span><code class="sig-name descname">pp query(&quot;restart_file&quot;, restart_file)</code></dt>
+<span class="target" id="maestro__queries_8H_1af821a22683cc97b4f3494419ed944b04"></span><code class="sig-name descname">pp query(&quot;restart_file&quot;, maestro::restart_file)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa1e79c1b0bb55d3de05554cc5642c295"></span><code class="sig-name descname">pp query(&quot;restart_into_finer&quot;, restart_into_finer)</code></dt>
+<span class="target" id="maestro__queries_8H_1a450e8e89a10e9840c2db498e929775c5"></span><code class="sig-name descname">pp query(&quot;restart_into_finer&quot;, maestro::restart_into_finer)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a9a4349d02781958a6705eeca3a554b9c"></span><code class="sig-name descname">pp query(&quot;do_initial_projection&quot;, do_initial_projection)</code></dt>
+<span class="target" id="maestro__queries_8H_1a45591075cc646964af2bc9f38949d580"></span><code class="sig-name descname">pp query(&quot;do_initial_projection&quot;, maestro::do_initial_projection)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae5cebd49208e74f13b9d3809a74a8015"></span><code class="sig-name descname">pp query(&quot;mg_verbose&quot;, mg_verbose)</code></dt>
+<span class="target" id="maestro__queries_8H_1abc02f29f6b4d6719852c505c6e40b7bc"></span><code class="sig-name descname">pp query(&quot;mg_verbose&quot;, maestro::mg_verbose)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1adf896b04e09cd1d99de8e5e5fd17799f"></span><code class="sig-name descname">pp query(&quot;cg_verbose&quot;, cg_verbose)</code></dt>
+<span class="target" id="maestro__queries_8H_1a174c965cfa603aa31081436cd90ffdca"></span><code class="sig-name descname">pp query(&quot;cg_verbose&quot;, maestro::cg_verbose)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a14948bcae4a520dcc7b823cc9733f840"></span><code class="sig-name descname">pp query(&quot;mg_cycle_type&quot;, mg_cycle_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1afdf5cefa5aa4b45d2b36975f57f947b3"></span><code class="sig-name descname">pp query(&quot;mg_cycle_type&quot;, maestro::mg_cycle_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0d1ac2d727d527ee8b771fc6a14b29ce"></span><code class="sig-name descname">pp query(&quot;hg_cycle_type&quot;, hg_cycle_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a169ad8d1e25f60e0c45dae1086f5a160"></span><code class="sig-name descname">pp query(&quot;hg_cycle_type&quot;, maestro::hg_cycle_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa822a16eb1221ef6b79f3e8ac9af6075"></span><code class="sig-name descname">pp query(&quot;hg_bottom_solver&quot;, hg_bottom_solver)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa781937434633a1854751c129654c893"></span><code class="sig-name descname">pp query(&quot;hg_bottom_solver&quot;, maestro::hg_bottom_solver)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ada5d18fba05ba4e5ea0a2b88f032dfc5"></span><code class="sig-name descname">pp query(&quot;mg_bottom_solver&quot;, mg_bottom_solver)</code></dt>
+<span class="target" id="maestro__queries_8H_1a7e098a89b158281f435f86a89c00ce9e"></span><code class="sig-name descname">pp query(&quot;mg_bottom_solver&quot;, maestro::mg_bottom_solver)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a97e42bdd6b68d7312ee4d4402bd73388"></span><code class="sig-name descname">pp query(&quot;max_mg_bottom_nlevels&quot;, max_mg_bottom_nlevels)</code></dt>
+<span class="target" id="maestro__queries_8H_1a96425eee76bb3450fb5efae3d6a14906"></span><code class="sig-name descname">pp query(&quot;max_mg_bottom_nlevels&quot;, maestro::max_mg_bottom_nlevels)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0aa3fc419a75300b8cb2a23ea364e6c2"></span><code class="sig-name descname">pp query(&quot;mg_bottom_nu&quot;, mg_bottom_nu)</code></dt>
+<span class="target" id="maestro__queries_8H_1a5a48418bb6763ca85eda7b006329c694"></span><code class="sig-name descname">pp query(&quot;mg_bottom_nu&quot;, maestro::mg_bottom_nu)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae6f291be2f5b1d2d0e904bea6b19137a"></span><code class="sig-name descname">pp query(&quot;mg_nu_1&quot;, mg_nu_1)</code></dt>
+<span class="target" id="maestro__queries_8H_1a4d2b20face8f666d6ac87b41f4151b14"></span><code class="sig-name descname">pp query(&quot;mg_nu_1&quot;, maestro::mg_nu_1)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1affd1a39a6301707c6ea76fa446b23eb9"></span><code class="sig-name descname">pp query(&quot;mg_nu_2&quot;, mg_nu_2)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3fd5c84dac5f13b20c8a1dd4a67c2f2c"></span><code class="sig-name descname">pp query(&quot;mg_nu_2&quot;, maestro::mg_nu_2)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a31e24a710a41a3a7293ab1f20867a5c4"></span><code class="sig-name descname">pp query(&quot;hg_dense_stencil&quot;, hg_dense_stencil)</code></dt>
+<span class="target" id="maestro__queries_8H_1a839fdc987b3520ba388933926e5bb1e2"></span><code class="sig-name descname">pp query(&quot;hg_dense_stencil&quot;, maestro::hg_dense_stencil)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1acad192cca4d6dbd18f550523ea906d49"></span><code class="sig-name descname">pp query(&quot;do_sponge&quot;, do_sponge)</code></dt>
+<span class="target" id="maestro__queries_8H_1a085e6df384366974b166bdaf0035b0ec"></span><code class="sig-name descname">pp query(&quot;do_sponge&quot;, maestro::do_sponge)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1affb9407df4d86e21c85aa90037000b80"></span><code class="sig-name descname">pp query(&quot;sponge_kappa&quot;, sponge_kappa)</code></dt>
+<span class="target" id="maestro__queries_8H_1a5f815ac3d58a882ca803b991fa84810b"></span><code class="sig-name descname">pp query(&quot;sponge_kappa&quot;, maestro::sponge_kappa)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a0fb8aac48f0ad0abc35581e87cd950cb"></span><code class="sig-name descname">pp query(&quot;sponge_center_density&quot;, sponge_center_density)</code></dt>
+<span class="target" id="maestro__queries_8H_1adbaf01c1ddbc2e6f7800476de089349e"></span><code class="sig-name descname">pp query(&quot;sponge_center_density&quot;, maestro::sponge_center_density)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a12596961ddf14156eeae7811e7ede212"></span><code class="sig-name descname">pp query(&quot;sponge_start_factor&quot;, sponge_start_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1afeb3e06967c97f639e4dc6ef4c56becd"></span><code class="sig-name descname">pp query(&quot;sponge_start_factor&quot;, maestro::sponge_start_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a1d406c7d672a734ec2fc5fead3706fad"></span><code class="sig-name descname">pp query(&quot;plot_sponge_fdamp&quot;, plot_sponge_fdamp)</code></dt>
+<span class="target" id="maestro__queries_8H_1aaf09afd69bb4c4a3f8973155ffc61b3e"></span><code class="sig-name descname">pp query(&quot;plot_sponge_fdamp&quot;, maestro::plot_sponge_fdamp)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa11d4dc5e8eb6fa662875ab0ad37526f"></span><code class="sig-name descname">pp query(&quot;anelastic_cutoff_density&quot;, anelastic_cutoff_density)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8fb6d9e77a8cbc4628c4b30ec4e00e60"></span><code class="sig-name descname">pp query(&quot;anelastic_cutoff_density&quot;, maestro::anelastic_cutoff_density)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a103bbd5cf84341c010e1b44def704a4d"></span><code class="sig-name descname">pp query(&quot;base_cutoff_density&quot;, base_cutoff_density)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3e30053a2d5c8d2cecdd6c2c77e0d1a9"></span><code class="sig-name descname">pp query(&quot;base_cutoff_density&quot;, maestro::base_cutoff_density)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1adcf11fe882e5913d5745aa6ad169abfb"></span><code class="sig-name descname">pp query(&quot;burning_cutoff_density_lo&quot;, burning_cutoff_density_lo)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad8a708d3a7d83710d7087f688e868c81"></span><code class="sig-name descname">pp query(&quot;burning_cutoff_density_lo&quot;, maestro::burning_cutoff_density_lo)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a2426dc0743896981b4b7b557f25725ea"></span><code class="sig-name descname">pp query(&quot;burning_cutoff_density_hi&quot;, burning_cutoff_density_hi)</code></dt>
+<span class="target" id="maestro__queries_8H_1affbb074cc5a7bc27419d1f9ca6a041fb"></span><code class="sig-name descname">pp query(&quot;burning_cutoff_density_hi&quot;, maestro::burning_cutoff_density_hi)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a660656c9356b6e6650abddb8c7b220e6"></span><code class="sig-name descname">pp query(&quot;heating_cutoff_density_lo&quot;, heating_cutoff_density_lo)</code></dt>
+<span class="target" id="maestro__queries_8H_1a9280eeed6daf016682af7bd645b4746e"></span><code class="sig-name descname">pp query(&quot;heating_cutoff_density_lo&quot;, maestro::heating_cutoff_density_lo)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6c6cf1b494a774b04e4ce49beb8e1e96"></span><code class="sig-name descname">pp query(&quot;heating_cutoff_density_hi&quot;, heating_cutoff_density_hi)</code></dt>
+<span class="target" id="maestro__queries_8H_1a34ea0de5670283bf555c90f516e5cf81"></span><code class="sig-name descname">pp query(&quot;heating_cutoff_density_hi&quot;, maestro::heating_cutoff_density_hi)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a100d82d87691f5b1a13e97d8ee39ef31"></span><code class="sig-name descname">pp query(&quot;buoyancy_cutoff_factor&quot;, buoyancy_cutoff_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1a0a8822b1bae5ddba6a3419ffddf3abe5"></span><code class="sig-name descname">pp query(&quot;buoyancy_cutoff_factor&quot;, maestro::buoyancy_cutoff_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a1805281b4f96177a73defaac739da6f3"></span><code class="sig-name descname">pp query(&quot;dpdt_factor&quot;, dpdt_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae40008db057758f78ddff6af630eadeb"></span><code class="sig-name descname">pp query(&quot;dpdt_factor&quot;, maestro::dpdt_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8292a8fc6c646d9071f5f9bee344f715"></span><code class="sig-name descname">pp query(&quot;do_planar_invsq_grav&quot;, do_planar_invsq_grav)</code></dt>
+<span class="target" id="maestro__queries_8H_1adbe7a50b2aeeccd30a96ea872211a3e6"></span><code class="sig-name descname">pp query(&quot;do_planar_invsq_grav&quot;, maestro::do_planar_invsq_grav)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a55bf249ee84f4f89b08fa9e4dbd9d4a0"></span><code class="sig-name descname">pp query(&quot;planar_invsq_mass&quot;, planar_invsq_mass)</code></dt>
+<span class="target" id="maestro__queries_8H_1a62defa3119e1de8da9f51098f9832a16"></span><code class="sig-name descname">pp query(&quot;planar_invsq_mass&quot;, maestro::planar_invsq_mass)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad58e0b728290db015d8d65d91c96c2c9"></span><code class="sig-name descname">pp query(&quot;evolve_base_state&quot;, evolve_base_state)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab514a2e0ab9521253a05c3bd95ba5ec3"></span><code class="sig-name descname">pp query(&quot;evolve_base_state&quot;, maestro::evolve_base_state)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa3cf19200000faa7ba46083928f318b1"></span><code class="sig-name descname">pp query(&quot;use_exact_base_state&quot;, use_exact_base_state)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8157a94638581e77ece69edede23365b"></span><code class="sig-name descname">pp query(&quot;use_exact_base_state&quot;, maestro::use_exact_base_state)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ac80a4919d1779cc28847dc0a818502b1"></span><code class="sig-name descname">pp query(&quot;fix_base_state&quot;, fix_base_state)</code></dt>
+<span class="target" id="maestro__queries_8H_1a36d403ebdec192ba4b22329f1ba39004"></span><code class="sig-name descname">pp query(&quot;fix_base_state&quot;, maestro::fix_base_state)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a567f9093188aa2bdd831de519b34d48d"></span><code class="sig-name descname">pp query(&quot;average_base_state&quot;, average_base_state)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad3775e16edc4fc7646990a63a302cffc"></span><code class="sig-name descname">pp query(&quot;average_base_state&quot;, maestro::average_base_state)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a745b4ad88c037adedeafd2a3948bb30c"></span><code class="sig-name descname">pp query(&quot;do_smallscale&quot;, do_smallscale)</code></dt>
+<span class="target" id="maestro__queries_8H_1a9ec0176398a84004ae8f43d9df200e0b"></span><code class="sig-name descname">pp query(&quot;do_smallscale&quot;, maestro::do_smallscale)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad46b1747671fde4f428e47764d6485d2"></span><code class="sig-name descname">pp query(&quot;do_eos_h_above_cutoff&quot;, do_eos_h_above_cutoff)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa60d4d14c47cf764969237f68ad8c187"></span><code class="sig-name descname">pp query(&quot;do_eos_h_above_cutoff&quot;, maestro::do_eos_h_above_cutoff)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ac3a9fb42996681620584ead5836fa729"></span><code class="sig-name descname">pp query(&quot;enthalpy_pred_type&quot;, enthalpy_pred_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a21c5bb7282891a34e758e7d12b9e15ee"></span><code class="sig-name descname">pp query(&quot;enthalpy_pred_type&quot;, maestro::enthalpy_pred_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a5b4c44aaf609c4095f55e0464e636c18"></span><code class="sig-name descname">pp query(&quot;species_pred_type&quot;, species_pred_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2201e1076dcf184cffafb3c59fcb2e30"></span><code class="sig-name descname">pp query(&quot;species_pred_type&quot;, maestro::species_pred_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a52010fe233ffec2f72da37848351db2e"></span><code class="sig-name descname">pp query(&quot;use_delta_gamma1_term&quot;, use_delta_gamma1_term)</code></dt>
+<span class="target" id="maestro__queries_8H_1a154f0b0d1b32d202031d5b23048a8957"></span><code class="sig-name descname">pp query(&quot;use_delta_gamma1_term&quot;, maestro::use_delta_gamma1_term)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1af70e327c809a12582253e4dec293cefb"></span><code class="sig-name descname">pp query(&quot;use_etarho&quot;, use_etarho)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad27845c9213f4ff1aff8caaf92973d00"></span><code class="sig-name descname">pp query(&quot;use_etarho&quot;, maestro::use_etarho)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8002396020cb08b7acf73c42ff3eab87"></span><code class="sig-name descname">pp query(&quot;slope_order&quot;, slope_order)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3a4b98cbb6cd7fce271195d7b540be68"></span><code class="sig-name descname">pp query(&quot;slope_order&quot;, maestro::slope_order)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a88984a0f0c8547b3262f7e2597b1042a"></span><code class="sig-name descname">pp query(&quot;grav_const&quot;, grav_const)</code></dt>
+<span class="target" id="maestro__queries_8H_1a180c46d0655123e5eabc98bd311e43b8"></span><code class="sig-name descname">pp query(&quot;grav_const&quot;, maestro::grav_const)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1acaad24b247740b0fa8b9f9d9277aca7a"></span><code class="sig-name descname">pp query(&quot;ppm_type&quot;, ppm_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1af490fc8ab2aa2691ca52b3b9f47b2972"></span><code class="sig-name descname">pp query(&quot;ppm_type&quot;, maestro::ppm_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a13bb24f127b1245e8f3a7aa4ca4e7b57"></span><code class="sig-name descname">pp query(&quot;bds_type&quot;, bds_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a6c81070bcfb6371b8c17d7ec92f2906a"></span><code class="sig-name descname">pp query(&quot;bds_type&quot;, maestro::bds_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a402cdb13768f0e958b2385521d42e4ad"></span><code class="sig-name descname">pp query(&quot;ppm_trace_forces&quot;, ppm_trace_forces)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae13158f4de8cdbad82989cab8a99b9b3"></span><code class="sig-name descname">pp query(&quot;ppm_trace_forces&quot;, maestro::ppm_trace_forces)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1acedbe690622f302858160a5e9cb495d5"></span><code class="sig-name descname">pp query(&quot;beta0_type&quot;, beta0_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab30fea2e1ab2897a5c65876e94e806dc"></span><code class="sig-name descname">pp query(&quot;beta0_type&quot;, maestro::beta0_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a23abf6276c41cfb9a294ba2643332dcb"></span><code class="sig-name descname">pp query(&quot;use_linear_grav_in_beta0&quot;, use_linear_grav_in_beta0)</code></dt>
+<span class="target" id="maestro__queries_8H_1abb10fca936c6269ec31ed142fe0a83ed"></span><code class="sig-name descname">pp query(&quot;use_linear_grav_in_beta0&quot;, maestro::use_linear_grav_in_beta0)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6f9da776d75539711b4b31ab97e6a8a9"></span><code class="sig-name descname">pp query(&quot;rotational_frequency&quot;, rotational_frequency)</code></dt>
+<span class="target" id="maestro__queries_8H_1ac1ddf2013be7f33a46d93c523f9f5b57"></span><code class="sig-name descname">pp query(&quot;rotational_frequency&quot;, maestro::rotational_frequency)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a7f3017b70a63f9faf74a57e999c31bd4"></span><code class="sig-name descname">pp query(&quot;co_latitude&quot;, co_latitude)</code></dt>
+<span class="target" id="maestro__queries_8H_1a913a74a22e2c9ce3997ed4b5a1dfaa39"></span><code class="sig-name descname">pp query(&quot;co_latitude&quot;, maestro::co_latitude)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a4717ad60d3e88666458d6aa2b224599a"></span><code class="sig-name descname">pp query(&quot;rotation_radius&quot;, rotation_radius)</code></dt>
+<span class="target" id="maestro__queries_8H_1a1d2af393f4fee87046011d2bfec4971a"></span><code class="sig-name descname">pp query(&quot;rotation_radius&quot;, maestro::rotation_radius)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1abf9aed0aa8f5d2337a670002d537d4ad"></span><code class="sig-name descname">pp query(&quot;mach_max_abort&quot;, mach_max_abort)</code></dt>
+<span class="target" id="maestro__queries_8H_1aaf2706c6bbe7b0a8f2bddebef65d2f9b"></span><code class="sig-name descname">pp query(&quot;mach_max_abort&quot;, maestro::mach_max_abort)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aadeb407c4d874fc3fe8dc6c016ca08cd"></span><code class="sig-name descname">pp query(&quot;drive_initial_convection&quot;, drive_initial_convection)</code></dt>
+<span class="target" id="maestro__queries_8H_1ad5a66fd0026f72cda33db7f8c37cee9d"></span><code class="sig-name descname">pp query(&quot;drive_initial_convection&quot;, maestro::drive_initial_convection)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6b5a9909c66841fd6f299e853202f0f1"></span><code class="sig-name descname">pp query(&quot;stop_initial_convection&quot;, stop_initial_convection)</code></dt>
+<span class="target" id="maestro__queries_8H_1a56e2b02873aa9c4513d678a458a34cc8"></span><code class="sig-name descname">pp query(&quot;stop_initial_convection&quot;, maestro::stop_initial_convection)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a6b6d58ce58390769cc0a00e6c56e00b5"></span><code class="sig-name descname">pp query(&quot;restart_with_vel_field&quot;, restart_with_vel_field)</code></dt>
+<span class="target" id="maestro__queries_8H_1af9a5ced76dec39f8a88814cc0e4d182b"></span><code class="sig-name descname">pp query(&quot;restart_with_vel_field&quot;, maestro::restart_with_vel_field)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a71aaa455799b4efd12581d5519b98e03"></span><code class="sig-name descname">pp query(&quot;use_alt_energy_fix&quot;, use_alt_energy_fix)</code></dt>
+<span class="target" id="maestro__queries_8H_1a1d8b5bf0915d89538a7bea1a7d57f6ea"></span><code class="sig-name descname">pp query(&quot;use_alt_energy_fix&quot;, maestro::use_alt_energy_fix)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ad2eddfdca2b548263de6b931070814af"></span><code class="sig-name descname">pp query(&quot;use_omegadot_terms_in_S&quot;, use_omegadot_terms_in_S)</code></dt>
+<span class="target" id="maestro__queries_8H_1a92250988125b94008fd1f15379df5e36"></span><code class="sig-name descname">pp query(&quot;use_omegadot_terms_in_S&quot;, maestro::use_omegadot_terms_in_S)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a94769df9c68dc4ed011cc23c0320cc07"></span><code class="sig-name descname">pp query(&quot;use_thermal_diffusion&quot;, use_thermal_diffusion)</code></dt>
+<span class="target" id="maestro__queries_8H_1acb1373d7f898a1a9db524f35e53e38ff"></span><code class="sig-name descname">pp query(&quot;use_thermal_diffusion&quot;, maestro::use_thermal_diffusion)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae1d59cb27ef40928087a216328c75544"></span><code class="sig-name descname">pp query(&quot;temp_diffusion_formulation&quot;, temp_diffusion_formulation)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae12cd778b9cd9744a2489c2bf00599a4"></span><code class="sig-name descname">pp query(&quot;temp_diffusion_formulation&quot;, maestro::temp_diffusion_formulation)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a22a7fdf5b4ea4a763cd2dba58de42c6b"></span><code class="sig-name descname">pp query(&quot;thermal_diffusion_type&quot;, thermal_diffusion_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1af67b5586b8b88f58aabd2e7e236b3a88"></span><code class="sig-name descname">pp query(&quot;thermal_diffusion_type&quot;, maestro::thermal_diffusion_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa0b43e0ac95766e2419f2a1870f9449d"></span><code class="sig-name descname">pp query(&quot;limit_conductivity&quot;, limit_conductivity)</code></dt>
+<span class="target" id="maestro__queries_8H_1aee34acaa547594d1cfb2f281e60866ef"></span><code class="sig-name descname">pp query(&quot;limit_conductivity&quot;, maestro::limit_conductivity)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a4a84464b885f83974177b325917f981e"></span><code class="sig-name descname">pp query(&quot;do_burning&quot;, do_burning)</code></dt>
+<span class="target" id="maestro__queries_8H_1a23206e0ac7340a98a268780bf73c8a65"></span><code class="sig-name descname">pp query(&quot;do_burning&quot;, maestro::do_burning)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aec6601934162055a9975f3298e6d6b60"></span><code class="sig-name descname">pp query(&quot;burner_threshold_species&quot;, burner_threshold_species)</code></dt>
+<span class="target" id="maestro__queries_8H_1aabfb4f8a24e3e222fe1e4fc5e33af8c8"></span><code class="sig-name descname">pp query(&quot;burner_threshold_species&quot;, maestro::burner_threshold_species)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a91c8d3e59b18fce00196d577c144aeb1"></span><code class="sig-name descname">pp query(&quot;burner_threshold_cutoff&quot;, burner_threshold_cutoff)</code></dt>
+<span class="target" id="maestro__queries_8H_1aeceb69f1a99e0ca07a522fb9b5966f98"></span><code class="sig-name descname">pp query(&quot;burner_threshold_cutoff&quot;, maestro::burner_threshold_cutoff)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8a25d656679eabfeccbc91219111edae"></span><code class="sig-name descname">pp query(&quot;do_subgrid_burning&quot;, do_subgrid_burning)</code></dt>
+<span class="target" id="maestro__queries_8H_1a9009f8650144aa033680df0057203d9b"></span><code class="sig-name descname">pp query(&quot;do_subgrid_burning&quot;, maestro::do_subgrid_burning)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a9d29ce9155723bb6b954fadd6570dcf5"></span><code class="sig-name descname">pp query(&quot;reaction_sum_tol&quot;, reaction_sum_tol)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3793478fa2b1dfb67e322bdff29c569f"></span><code class="sig-name descname">pp query(&quot;reaction_sum_tol&quot;, maestro::reaction_sum_tol)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a69cb45dfc70af4e37a7c06615f600c8a"></span><code class="sig-name descname">pp query(&quot;small_temp&quot;, small_temp)</code></dt>
+<span class="target" id="maestro__queries_8H_1adfe5d692773a67218702f285c3108096"></span><code class="sig-name descname">pp query(&quot;small_temp&quot;, maestro::small_temp)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a1150fbd0c98a244f090135a85cbe2324"></span><code class="sig-name descname">pp query(&quot;small_dens&quot;, small_dens)</code></dt>
+<span class="target" id="maestro__queries_8H_1a2849182c8bd3f9e548a4dd8838506c5a"></span><code class="sig-name descname">pp query(&quot;small_dens&quot;, maestro::small_dens)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1adc2fdea7fd92bc09bc8babf765d286ed"></span><code class="sig-name descname">pp query(&quot;use_tfromp&quot;, use_tfromp)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab0523255d0b2edafdc5ba9575c6f32d7"></span><code class="sig-name descname">pp query(&quot;use_tfromp&quot;, maestro::use_tfromp)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a7237732f5e103bffa6f6f745c7376c3e"></span><code class="sig-name descname">pp query(&quot;use_eos_e_instead_of_h&quot;, use_eos_e_instead_of_h)</code></dt>
+<span class="target" id="maestro__queries_8H_1ac206abc998944310d0404542b361b802"></span><code class="sig-name descname">pp query(&quot;use_eos_e_instead_of_h&quot;, maestro::use_eos_e_instead_of_h)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a88b8eaabbebfc4953d1182a37f7f3c82"></span><code class="sig-name descname">pp query(&quot;use_pprime_in_tfromp&quot;, use_pprime_in_tfromp)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa46857a7a3da55428a2b0d62d8ae355c"></span><code class="sig-name descname">pp query(&quot;use_pprime_in_tfromp&quot;, maestro::use_pprime_in_tfromp)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a9dc463be6d506f7ec8752a5fef99889f"></span><code class="sig-name descname">pp query(&quot;s0_interp_type&quot;, s0_interp_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a9e754b39fe2dd94315a42c437bd8ec35"></span><code class="sig-name descname">pp query(&quot;s0_interp_type&quot;, maestro::s0_interp_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a61bab670e447eec7919c667af6fcec72"></span><code class="sig-name descname">pp query(&quot;w0_interp_type&quot;, w0_interp_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa86de25ce643b46ff62902a6a9649edb"></span><code class="sig-name descname">pp query(&quot;w0_interp_type&quot;, maestro::w0_interp_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a88a1a7e568147b28ab3142461788e66e"></span><code class="sig-name descname">pp query(&quot;s0mac_interp_type&quot;, s0mac_interp_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1aae3c4292db2e64762476b7793099ec8c"></span><code class="sig-name descname">pp query(&quot;s0mac_interp_type&quot;, maestro::s0mac_interp_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aae690934754f45deed295bfb9d77201d"></span><code class="sig-name descname">pp query(&quot;w0mac_interp_type&quot;, w0mac_interp_type)</code></dt>
+<span class="target" id="maestro__queries_8H_1a7a32e8aad245ab2f3ebdc6930109274c"></span><code class="sig-name descname">pp query(&quot;w0mac_interp_type&quot;, maestro::w0mac_interp_type)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aeeb84ce4412d027a76c964453d76b1c6"></span><code class="sig-name descname">pp query(&quot;print_fortran_warnings&quot;, print_fortran_warnings)</code></dt>
+<span class="target" id="maestro__queries_8H_1a85879a61321b12848baa655c39892897"></span><code class="sig-name descname">pp query(&quot;print_fortran_warnings&quot;, maestro::print_fortran_warnings)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa8e49789bccfa4d92e44b12189eecf0d"></span><code class="sig-name descname">pp query(&quot;print_update_diagnostics&quot;, print_update_diagnostics)</code></dt>
+<span class="target" id="maestro__queries_8H_1a643b227c9caf1230d0340c5dc0ede2a6"></span><code class="sig-name descname">pp query(&quot;print_update_diagnostics&quot;, maestro::print_update_diagnostics)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a262c2d1ed9bbf391788fb6523b2a4e24"></span><code class="sig-name descname">pp query(&quot;track_grid_losses&quot;, track_grid_losses)</code></dt>
+<span class="target" id="maestro__queries_8H_1af50ea8bf3984b4d8dda9a8e3950f1aa6"></span><code class="sig-name descname">pp query(&quot;track_grid_losses&quot;, maestro::track_grid_losses)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a29c8d747bf19d9d9bc0434ceea4eaec1"></span><code class="sig-name descname">pp query(&quot;sum_interval&quot;, sum_interval)</code></dt>
+<span class="target" id="maestro__queries_8H_1a48ae82100e780261fa1935880952b633"></span><code class="sig-name descname">pp query(&quot;sum_interval&quot;, maestro::sum_interval)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a4428a11c236bed02a655379e6ae89084"></span><code class="sig-name descname">pp query(&quot;sum_per&quot;, sum_per)</code></dt>
+<span class="target" id="maestro__queries_8H_1a9e4395a27d14829364448af877fae1a1"></span><code class="sig-name descname">pp query(&quot;sum_per&quot;, maestro::sum_per)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aeaae1884f748e73267b45f3185481927"></span><code class="sig-name descname">pp query(&quot;show_center_of_mass&quot;, show_center_of_mass)</code></dt>
+<span class="target" id="maestro__queries_8H_1a6f1857409d88d5355eea153ed942802d"></span><code class="sig-name descname">pp query(&quot;show_center_of_mass&quot;, maestro::show_center_of_mass)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa4a691a4b9c76a366d99eefeeb3d6c48"></span><code class="sig-name descname">pp query(&quot;hard_cfl_limit&quot;, hard_cfl_limit)</code></dt>
+<span class="target" id="maestro__queries_8H_1a5e05813fb1969dd3d5a11c13bb8ef5f7"></span><code class="sig-name descname">pp query(&quot;hard_cfl_limit&quot;, maestro::hard_cfl_limit)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a9f3d5f7f7a1aa4a55689b5f744df77c2"></span><code class="sig-name descname">pp query(&quot;job_name&quot;, job_name)</code></dt>
+<span class="target" id="maestro__queries_8H_1aec7cc2b162cae44d26083151a077f960"></span><code class="sig-name descname">pp query(&quot;job_name&quot;, maestro::job_name)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ade6dc347dbfe6c76a60a214e636a1bf1"></span><code class="sig-name descname">pp query(&quot;output_at_completion&quot;, output_at_completion)</code></dt>
+<span class="target" id="maestro__queries_8H_1a61731d40d27bf18e87d6ff81bf713d61"></span><code class="sig-name descname">pp query(&quot;output_at_completion&quot;, maestro::output_at_completion)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a133fc46a4ada7339ebf607043a8a713c"></span><code class="sig-name descname">pp query(&quot;reset_checkpoint_time&quot;, reset_checkpoint_time)</code></dt>
+<span class="target" id="maestro__queries_8H_1a81d9b5ca785012deac400d665c7a1b68"></span><code class="sig-name descname">pp query(&quot;reset_checkpoint_time&quot;, maestro::reset_checkpoint_time)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a4753e49cc5c2c72882c88a11d07f9f07"></span><code class="sig-name descname">pp query(&quot;reset_checkpoint_step&quot;, reset_checkpoint_step)</code></dt>
+<span class="target" id="maestro__queries_8H_1a98283ff75d1512be0b2b76a843f5a3e7"></span><code class="sig-name descname">pp query(&quot;reset_checkpoint_step&quot;, maestro::reset_checkpoint_step)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a693a69fd310c0e3b1961d055271536f9"></span><code class="sig-name descname">pp query(&quot;use_particles&quot;, use_particles)</code></dt>
+<span class="target" id="maestro__queries_8H_1a3e39a95c7a43c1c17ade0c8beae43d83"></span><code class="sig-name descname">pp query(&quot;use_particles&quot;, maestro::use_particles)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a243a2f46d7f9344e9f077fc213364d22"></span><code class="sig-name descname">pp query(&quot;store_particle_vels&quot;, store_particle_vels)</code></dt>
+<span class="target" id="maestro__queries_8H_1a990767ea10affe3ab4698fe4481b51e3"></span><code class="sig-name descname">pp query(&quot;store_particle_vels&quot;, maestro::store_particle_vels)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1ae1759ad8d95d7385db4a45ba8b0a5a4c"></span><code class="sig-name descname">pp query(&quot;do_heating&quot;, do_heating)</code></dt>
+<span class="target" id="maestro__queries_8H_1a98a9db2cf14364e30d6f3e792fd5a9a8"></span><code class="sig-name descname">pp query(&quot;do_heating&quot;, maestro::do_heating)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a76f6d1d8e4f8d42c0610c09e9de59058"></span><code class="sig-name descname">pp query(&quot;sdc_iters&quot;, sdc_iters)</code></dt>
+<span class="target" id="maestro__queries_8H_1a6159cb7e4de093109dcb1af6ea63d7ab"></span><code class="sig-name descname">pp query(&quot;sdc_iters&quot;, maestro::sdc_iters)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1abdc93838383d20d7a0facff08b3f16eb"></span><code class="sig-name descname">pp query(&quot;sdc_couple_mac_velocity&quot;, sdc_couple_mac_velocity)</code></dt>
+<span class="target" id="maestro__queries_8H_1ace4665f1e3d0615c00527a4cd3c42870"></span><code class="sig-name descname">pp query(&quot;sdc_couple_mac_velocity&quot;, maestro::sdc_couple_mac_velocity)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a78341fe1e6f7b461bf2d9ea7144717fd"></span><code class="sig-name descname">pp query(&quot;deterministic_nodal_solve&quot;, deterministic_nodal_solve)</code></dt>
+<span class="target" id="maestro__queries_8H_1ac253e625e320edfe8f6acce7b1f729a8"></span><code class="sig-name descname">pp query(&quot;deterministic_nodal_solve&quot;, maestro::deterministic_nodal_solve)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8f990fbd2fc4fa3cd2f7e7c0f7a13b57"></span><code class="sig-name descname">pp query(&quot;eps_init_proj_cart&quot;, eps_init_proj_cart)</code></dt>
+<span class="target" id="maestro__queries_8H_1ae264654865fbac17db9ac93587506751"></span><code class="sig-name descname">pp query(&quot;eps_init_proj_cart&quot;, maestro::eps_init_proj_cart)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a9c3a7b994c008c3446ce72dbc3bbd2b1"></span><code class="sig-name descname">pp query(&quot;eps_init_proj_sph&quot;, eps_init_proj_sph)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8a9d3b87fde6096e20e4247f12b13d8e"></span><code class="sig-name descname">pp query(&quot;eps_init_proj_sph&quot;, maestro::eps_init_proj_sph)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a3608be3ef439e281efe675a5cdc9b044"></span><code class="sig-name descname">pp query(&quot;eps_divu_cart&quot;, eps_divu_cart)</code></dt>
+<span class="target" id="maestro__queries_8H_1ac02fa776a2c76cd0ecc36e9ea7afc857"></span><code class="sig-name descname">pp query(&quot;eps_divu_cart&quot;, maestro::eps_divu_cart)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a3871c06232dc5aeb5be8b40c8fadc0fb"></span><code class="sig-name descname">pp query(&quot;eps_divu_sph&quot;, eps_divu_sph)</code></dt>
+<span class="target" id="maestro__queries_8H_1a10da75ff58932de8af0c8a56d2e47781"></span><code class="sig-name descname">pp query(&quot;eps_divu_sph&quot;, maestro::eps_divu_sph)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a16b92b2b3aba02e85c71eab32fd6550f"></span><code class="sig-name descname">pp query(&quot;divu_iter_factor&quot;, divu_iter_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1a38ed1469798a5cef0f6a21dc8b7fdcb5"></span><code class="sig-name descname">pp query(&quot;divu_iter_factor&quot;, maestro::divu_iter_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1abdb8e7cd4606ba93472f5180cd81abad"></span><code class="sig-name descname">pp query(&quot;divu_level_factor&quot;, divu_level_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1aafa87ae3e2c41807afef2615c15fc35a"></span><code class="sig-name descname">pp query(&quot;divu_level_factor&quot;, maestro::divu_level_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a52301c22c67c7756ce252353b44c11e7"></span><code class="sig-name descname">pp query(&quot;eps_mac&quot;, eps_mac)</code></dt>
+<span class="target" id="maestro__queries_8H_1aa2d5c39b73f070282932b50dcda6e03e"></span><code class="sig-name descname">pp query(&quot;eps_mac&quot;, maestro::eps_mac)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a64948150fc570d3cb2e82c65edfe4508"></span><code class="sig-name descname">pp query(&quot;eps_mac_max&quot;, eps_mac_max)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab02c8db85ec20219f558cb60e3142653"></span><code class="sig-name descname">pp query(&quot;eps_mac_max&quot;, maestro::eps_mac_max)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a20870557f5a647a72ce2dcdd20997fa9"></span><code class="sig-name descname">pp query(&quot;mac_level_factor&quot;, mac_level_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1a8b7778d7f8c982b9a2fcf47aa0e9fc93"></span><code class="sig-name descname">pp query(&quot;mac_level_factor&quot;, maestro::mac_level_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8a792b0aeb3f84b76345b3a9f22b25f6"></span><code class="sig-name descname">pp query(&quot;eps_mac_bottom&quot;, eps_mac_bottom)</code></dt>
+<span class="target" id="maestro__queries_8H_1ab082d46478339b556b49f2678f040b76"></span><code class="sig-name descname">pp query(&quot;eps_mac_bottom&quot;, maestro::eps_mac_bottom)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1a8d40f61d8ca1b6d0ac7e673c01517b95"></span><code class="sig-name descname">pp query(&quot;eps_hg&quot;, eps_hg)</code></dt>
+<span class="target" id="maestro__queries_8H_1a533dbefc347a29be62e9639fd12e4e77"></span><code class="sig-name descname">pp query(&quot;eps_hg&quot;, maestro::eps_hg)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1af584a48a092d9178ad3bb6e0307f04f0"></span><code class="sig-name descname">pp query(&quot;eps_hg_max&quot;, eps_hg_max)</code></dt>
+<span class="target" id="maestro__queries_8H_1abee73310eab819010017da7031c7cfe6"></span><code class="sig-name descname">pp query(&quot;eps_hg_max&quot;, maestro::eps_hg_max)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1af40a8cabe3ec995bd04f9f231f7cc3c2"></span><code class="sig-name descname">pp query(&quot;hg_level_factor&quot;, hg_level_factor)</code></dt>
+<span class="target" id="maestro__queries_8H_1a4bec8d6150f2d92a10613bf291f08934"></span><code class="sig-name descname">pp query(&quot;hg_level_factor&quot;, maestro::hg_level_factor)</code></dt>
 <dd></dd></dl>
 
-<dl class="function">
+<dl class="cpp function">
 <dt>
-<span class="target" id="maestro__queries_8H_1aa4b530de4bd3c8f0d129c15593c588a3"></span><code class="sig-name descname">pp query(&quot;eps_hg_bottom&quot;, eps_hg_bottom)</code></dt>
+<span class="target" id="maestro__queries_8H_1a53cc310835ef0b4c1935476fb1ca90d6"></span><code class="sig-name descname">pp query(&quot;eps_hg_bottom&quot;, maestro::eps_hg_bottom)</code></dt>
 <dd></dd></dl>
 
 </div>

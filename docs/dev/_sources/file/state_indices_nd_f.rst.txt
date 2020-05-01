@@ -1,8 +1,0 @@
-state_indices_nd.F90
-====================
-
-state\_indices\_module
-----------------------
-
-.. f:automodule:: state_indices_module
-

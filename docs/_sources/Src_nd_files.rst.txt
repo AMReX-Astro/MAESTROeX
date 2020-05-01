@@ -12,7 +12,6 @@ Src_nd
    file/initdata_f
    file/inlet_bc_f
    file/maestro_init_f
-   file/make_explicit_thermal_f
    file/make_grav_f
    file/make_heating_f
    
