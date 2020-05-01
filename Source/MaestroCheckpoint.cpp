@@ -132,16 +132,16 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<rho0_new.size(); ++i) {
             BaseCCFile << rho0_new[i] << " "
-                       << p0_new.array(i) << " "
-                       << gamma1bar_new.array(i) << " "
-                       << rhoh0_new.array(i) << " "
-                       << beta0_new.array(i) << " "
-                       << psi.array(i) << " "
+                       << p0_new.array()(i) << " "
+                       << gamma1bar_new.array()(i) << " "
+                       << rhoh0_new.array()(i) << " "
+                       << beta0_new.array()(i) << " "
+                       << psi.array()(i) << " "
                        << tempbar[i] << " "
-                       << etarho_cc.array(i) << " "
+                       << etarho_cc.array()(i) << " "
                        << tempbar_init[i] << " "
-                       << p0_old.array(i) << " "
-                       << beta0_nm1.array(i) << "\n";
+                       << p0_old.array()(i) << " "
+                       << beta0_nm1.array()(i) << "\n";
         }
     }
 
@@ -162,7 +162,7 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<w0.size(); ++i) {
             BaseFCFile << w0[i] << " "
-                       << etarho_ec.array(i) << "\n";
+                       << etarho_ec.array()(i) << "\n";
         }
     }
 

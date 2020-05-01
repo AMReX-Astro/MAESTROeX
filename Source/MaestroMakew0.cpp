@@ -303,7 +303,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    const auto r_edge_loc = base_geom.r_edge_loc;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.

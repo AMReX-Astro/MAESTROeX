@@ -21,7 +21,7 @@ Maestro::EnforceHSE(const RealVector& rho0,
     auto grav_edge = grav_edge_s.array();
     auto p0old = p0old_s.array();
     auto p0 = p0_s.array();
-    auto grav_cell = grav_cell_s.array();
+    const auto grav_cell = grav_cell_s.const_array();
 
     Real offset = 0.0;
 
