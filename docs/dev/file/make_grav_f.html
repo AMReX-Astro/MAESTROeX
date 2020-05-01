@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>make_grav.F90 &mdash; MAESTROeX 20.05
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="make_heating.F90" href="make_heating_f.html" />
+    <link rel="prev" title="maestro_init.F90" href="maestro_init_f.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="../index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="../_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.05
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="../../file/make_grav_f.html">master</a> | <a href="../file/make_grav_f.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../initial_models.html">Initial Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu.html">GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../base_state.html">Base State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="BaseStateGeometry_8H.html">File BaseStateGeometry.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
+<li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">make_grav.F90</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#f/make_grav_module">make_grav_module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../param_includes_files.html">Param_includes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../filelist.html">File list</a> &raquo;</li>
+        
+          <li><a href="../Src_nd_files.html">Src_nd</a> &raquo;</li>
+        
+      <li>make_grav.F90</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/file/make_grav_f.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="make-grav-f90">
+<h1>make_grav.F90<a class="headerlink" href="#make-grav-f90" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="f/make_grav_module">
+<span id="make-grav-module"></span><h2>make_grav_module<a class="headerlink" href="#f/make_grav_module" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Quick access</p>
+<dl class="field-list simple">
+<dt class="field-odd">Routines</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
+</dd>
+</dl>
+<p class="rubric">Required modules</p>
+<ul class="simple">
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">amrex_constants_module</span></code></p></li>
+<li><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr_fine()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">max_radial_level()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr" title="f/base_state_geometry_module/nr"><code class="xref f f-func docutils literal notranslate"><span class="pre">nr()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/numdisjointchunks" title="f/base_state_geometry_module/numdisjointchunks"><code class="xref f f-func docutils literal notranslate"><span class="pre">numdisjointchunks()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_start_coord" title="f/base_state_geometry_module/r_start_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_start_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/r_end_coord" title="f/base_state_geometry_module/r_end_coord"><code class="xref f f-func docutils literal notranslate"><span class="pre">r_end_coord()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/finest_radial_level" title="f/base_state_geometry_module/finest_radial_level"><code class="xref f f-func docutils literal notranslate"><span class="pre">finest_radial_level()</span></code></a>): a module for storing the geometric information so we don’t have to pass it</p></li>
+<li><p><a class="reference internal" href="meth_params_f.html#f/meth_params_module" title="f/meth_params_module"><code class="xref f f-mod docutils literal notranslate"><span class="pre">meth_params_module</span></code></a> (<a class="reference internal" href="meth_params_f.html#f/meth_params_module/spherical" title="f/meth_params_module/spherical"><code class="xref f f-func docutils literal notranslate"><span class="pre">spherical()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/grav_const" title="f/meth_params_module/grav_const"><code class="xref f f-func docutils literal notranslate"><span class="pre">grav_const()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/base_cutoff_density" title="f/meth_params_module/base_cutoff_density"><code class="xref f f-func docutils literal notranslate"><span class="pre">base_cutoff_density()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_planar_invsq_grav" title="f/meth_params_module/do_planar_invsq_grav"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_planar_invsq_grav()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/planar_invsq_mass" title="f/meth_params_module/planar_invsq_mass"><code class="xref f f-func docutils literal notranslate"><span class="pre">planar_invsq_mass()</span></code></a>, <a class="reference internal" href="meth_params_f.html#f/meth_params_module/do_2d_planar_octant" title="f/meth_params_module/do_2d_planar_octant"><code class="xref f f-func docutils literal notranslate"><span class="pre">do_2d_planar_octant()</span></code></a>)</p></li>
+<li><p><code class="xref f f-mod docutils literal notranslate"><span class="pre">fundamental_constants_module</span></code> (<code class="xref f f-func docutils literal notranslate"><span class="pre">gconst()</span></code>)</p></li>
+</ul>
+<p class="rubric">Subroutines and functions</p>
+<dl class="subroutine">
+<dt id="f/make_grav_module/make_grav_cell">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_grav_module/</code><code class="sig-name descname">make_grav_cell</code><span class="sig-paren">(</span><em class="sig-param">grav_cell</em>, <em class="sig-param">rho0</em>, <em class="sig-param">r_cc_loc</em>, <em class="sig-param">r_edge_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_grav_module/make_grav_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the base state gravitational acceleration at the cell
+centers.  The base state uses 0-based indexing, so grav_cell
+does too.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grav_cell</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>out</em><em>]</em></p></li>
+<li><p><strong>rho0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_cc_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>)</p>
+</dd>
+<dt class="field-odd">Call to</dt>
+<dd class="field-odd"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="subroutine">
+<dt id="f/make_grav_module/make_grav_edge">
+<em class="property">subroutine  </em><code class="sig-prename descclassname">make_grav_module/</code><code class="sig-name descname">make_grav_edge</code><span class="sig-paren">(</span><em class="sig-param">grav_edge</em>, <em class="sig-param">rho0</em>, <em class="sig-param">r_edge_loc</em><span class="sig-paren">)</span><a class="headerlink" href="#f/make_grav_module/make_grav_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>compute the base state gravity at the cell edges
+:p real grav_edge(max_radial_level)+1,nr_fine)+1) [out]: 0) is the gravitational acceleration at the left edge of zone 0).
+The base state uses 0-based indexing, so grav_edge does too.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rho0</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>r_edge_loc</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>)+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+</ul>
+</dd>
+<dt class="field-even">Use </dt>
+<dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module" title="f/base_state_geometry_module: a module for storing the geometric information so we don't have to pass it"><code class="xref f f-mod docutils literal notranslate"><span class="pre">base_state_geometry_module</span></code></a> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a>)</p>
+</dd>
+<dt class="field-odd">Called from</dt>
+<dd class="field-odd"><p><a class="reference internal" href="enforce_HSE_f.html#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a></p>
+</dd>
+<dt class="field-even">Call to</dt>
+<dd class="field-even"><p><a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/restrict_base" title="f/base_state_geometry_module/restrict_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">restrict_base()</span></code></a>, <a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/fill_ghost_base" title="f/base_state_geometry_module/fill_ghost_base"><code class="xref f f-func docutils literal notranslate"><span class="pre">fill_ghost_base()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="make_heating_f.html" class="btn btn-neutral float-right" title="make_heating.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="maestro_init_f.html" class="btn btn-neutral float-left" title="maestro_init.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

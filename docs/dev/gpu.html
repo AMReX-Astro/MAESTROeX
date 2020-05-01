@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>GPU &mdash; MAESTROeX 20.05
+ documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Base State" href="base_state.html" />
+    <link rel="prev" title="Initial Models" href="initial_models.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+
+          
+            <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
+            <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                20.05
+
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+    <div class="branch">
+        Branch: <a href="../gpu.html">master</a> | <a href="./gpu.html">development</a>
+    </div>
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="problems.html">Problem Setups</a></li>
+<li class="toctree-l1"><a class="reference internal" href="unit_tests.html">Unit Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="param_intro.html">Runtime Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initial_models.html">Initial Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GPU</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-gpu-support">Building GPU Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#offloading-a-routine-to-gpu">Offloading a routine to GPU</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#c">C++</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fortran">Fortran</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#profiling-with-gpus">Profiling with GPUs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-gpu-debugging">Basic GPU Debugging</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="base_state.html">Base State</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="makefiles.html">MAESTROeX Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eos_notes.html">Equation of State Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="networks.html">Reaction Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html">The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#eta-flow-chart"><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#computing-etarhoec-and-etarhocc">Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhoec">Using <span class="math notranslate nohighlight">\(\etarhoec\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="eta.html#using-etarhocc">Using <span class="math notranslate nohighlight">\(\etarhocc\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="pert.html">Interface State Details</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Godunov.html">Godunov Interface States</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mg.html">Multigrid</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rotation.html">Rotation in MAESTROeX</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spherical_basestate.html">Modifications for a Spherical Self-Gravitating Star</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planar_invsq_basestate.html">Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="thermo_notes.html">Notes on Thermodynamics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="beta0.html">Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></a></li>
+<li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MAESTROeX</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>GPU</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/gpu.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gpu">
+<span id="sec-gpu"></span><h1>GPU<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h1>
+<p>In this chapter, we will present the GPU support in MAESTROeX,
+including necessary build parameters, how to offload a routine
+to GPU, and some basic profiling and debugging options.
+Note that currently MAESTROeX only supports NVIDIA GPUs.</p>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>Since MAESTROeX uses primarily CUDA C++ and CUDA Fortran,
+it requires a recent version of CUDA (e.g., &gt;= 9) and the device
+must have compute capability of &gt;= 6.</p>
+</div>
+<div class="section" id="building-gpu-support">
+<span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Permalink to this headline">¶</a></h2>
+<p>To build MAESTROeX with GPU support, add the following argument
+to the GNUmakefile:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_CUDA</span> <span class="o">:=</span> <span class="n">TRUE</span>
+</pre></div>
+</div>
+<p>We also need to set <code class="docutils literal notranslate"><span class="pre">USE_OMP</span> <span class="pre">=</span> <span class="pre">FALSE</span></code> because OpenMP is currently
+not compatible with building with CUDA.
+<code class="docutils literal notranslate"><span class="pre">USE_CUDA</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> and <code class="docutils literal notranslate"><span class="pre">USE_OMP</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> will fail to compile.
+However, you may use MPI with CUDA for additional parallelization.</p>
+<p>Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be set as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="o">:=</span> <span class="n">pgi</span>
+</pre></div>
+</div>
+<p>The integrator used by the Microphysics library must be set to <code class="docutils literal notranslate"><span class="pre">VODE90</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INTEGRATOR_DIR</span>   <span class="o">:=</span> <span class="n">VODE90</span>
+</pre></div>
+</div>
+<p>Depending on which system you are running on, it may be necessary to specify
+the CUDA Capability using the <code class="docutils literal notranslate"><span class="pre">CUDA_ARCH</span></code> flag. The CUDA Capability will
+depend on the specific GPU hardware you are running on. On a Linux system, the
+capability of your device can typically be found by compiling and running the <code class="docutils literal notranslate"><span class="pre">deviceQuery</span></code>
+script found in the CUDA samples directory:
+<code class="docutils literal notranslate"><span class="pre">/usr/local/cuda/samples/1_Utilities/deviceQuery</span></code> (its exact location may
+vary depending on where CUDA is installed on your system). The default value of
+this flag is 70, corresponding to a capability of 7.x. For a device with
+capability 6.x, the flag should be set to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CUDA_ARCH</span> <span class="o">:=</span> <span class="mi">60</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="offloading-a-routine-to-gpu">
+<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Permalink to this headline">¶</a></h2>
+<p>In order to offload a routine to the GPU, we insert a <code class="docutils literal notranslate"><span class="pre">#pragma</span> <span class="pre">gpu</span></code>
+statement on the line before the call. This tells the preprocessor to
+generate a CUDA device version of the function, with all the
+additional CUDA GPU management. In addition to this, there are a few
+other modifications required to ensure the function operates correctly
+on the GPU. We summarize these below.</p>
+<div class="section" id="c">
+<h3>C++<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Make sure that the box <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> are the first two arguments
+and use <code class="docutils literal notranslate"><span class="pre">AMREX_INT_ANYD</span></code> as the macro wrapping <code class="docutils literal notranslate"><span class="pre">bx.loVect()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">bx.hiVect()</span></code></p></li>
+<li><p>Likewise, inplace of <code class="docutils literal notranslate"><span class="pre">ZFILL()</span></code>, use <code class="docutils literal notranslate"><span class="pre">AMREX_REAL_ANYD</span></code></p></li>
+<li><p>Scalars must be passed by value to Fortran functions (not by
+reference)</p></li>
+<li><p>Make sure that you change the variable definitions in the Fortran
+code to include value so that the Fortran knows the variables are
+being passed by value rather than by reference. If you don’t do
+this, the code is liable to segfault</p></li>
+<li><p>FArrayBox functions like <code class="docutils literal notranslate"><span class="pre">setVal()</span></code> and <code class="docutils literal notranslate"><span class="pre">saxpy()</span></code> are not on the
+GPU, so you should explicitly write out these operations in C++.
+The MultiFab counterparts are on the GPU.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">BL_TO_FORTRAN_ANYD()</span></code> to wrap MultiFab arguments (and in the header file wrap with <code class="docutils literal notranslate"><span class="pre">BL_FORT_FAB_ARG_3D</span></code>)</p></li>
+</ul>
+<p>To illustrate these modifications, consider the function <code class="docutils literal notranslate"><span class="pre">mk_sponge</span></code>. To call the function on the CPU, we would write</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">MFIter</span> <span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span> <span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span> <span class="o">++</span><span class="n">mfi</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">const</span> <span class="n">Box</span><span class="o">&amp;</span> <span class="n">tileBox</span> <span class="o">=</span> <span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
+
+    <span class="n">mk_sponge</span><span class="p">(</span><span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span> <span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
+              <span class="n">BL_TO_FORTRAN_3D</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
+              <span class="n">ZFILL</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">dt</span><span class="p">);</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<p>Implementing the changes described above to offload this to GPU, this becomes</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">MFIter</span> <span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span> <span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span> <span class="o">++</span><span class="n">mfi</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">const</span> <span class="n">Box</span><span class="o">&amp;</span> <span class="n">tileBox</span> <span class="o">=</span> <span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
+
+<span class="cp">#pragma gpu box(tileBox)</span>
+    <span class="n">mk_sponge</span><span class="p">(</span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span> <span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
+              <span class="n">BL_TO_FORTRAN_ANYD</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
+              <span class="n">AMREX_REAL_ANYD</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="n">dt</span><span class="p">);</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fortran">
+<h3>Fortran<a class="headerlink" href="#fortran" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>The routine must only operate on a single zone in <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p>
+<ul>
+<li><p>Even for temporary arrays, you cannot write to an <code class="docutils literal notranslate"><span class="pre">i+1</span></code> zone
+(e.g. when doing limiting) – this will cause a race condition.
+If necessary, do extra computation to avoid the temporary arrays.</p></li>
+</ul>
+</li>
+<li><p>Mark the routine with <code class="docutils literal notranslate"><span class="pre">!$gpu</span></code></p></li>
+<li><p>If a module defines its own variables, these variables need to be
+<code class="docutils literal notranslate"><span class="pre">allocatable</span></code> (even if they are scalars) and marked as
+<code class="docutils literal notranslate"><span class="pre">attributes(managed)</span></code>. Additional routines may be needed to
+allocate these variables before they’re used and deallocate them
+when they’re no longer needed.</p>
+<ul>
+<li><p>Examples of this can be seen for the sponge parameters. These are
+marked as <code class="docutils literal notranslate"><span class="pre">allocatable</span></code> and <code class="docutils literal notranslate"><span class="pre">attributes(managed)</span></code> in
+<code class="docutils literal notranslate"><span class="pre">sponge.F90</span></code>, and therefore must be allocated (by <code class="docutils literal notranslate"><span class="pre">init_sponge</span></code>).</p></li>
+</ul>
+</li>
+<li><p>Temporary variables must be defined outside of function calls. E.g. if a
+function call contains <code class="docutils literal notranslate"><span class="pre">foo(x(a:b)/y)</span></code>, you need to define a new variable
+<code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">x(a:b)/y</span></code> then pass this into the function as <code class="docutils literal notranslate"><span class="pre">foo(z)</span></code>.</p>
+<ul>
+<li><p>If you don’t do this, you may see the error <code class="docutils literal notranslate"><span class="pre">Array</span> <span class="pre">reshaping</span> <span class="pre">is</span>
+<span class="pre">not</span> <span class="pre">supported</span> <span class="pre">for</span> <span class="pre">device</span> <span class="pre">subprogram</span> <span class="pre">calls</span></code></p></li>
+</ul>
+</li>
+<li><p>If importing a function from another module, make sure to put the
+import within the function/subroutine, and put <code class="docutils literal notranslate"><span class="pre">!</span> <span class="pre">function</span></code> at the
+end of the line, e.g.</p></li>
+</ul>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">use </span><span class="n">my_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">my_func</span> <span class="c">! function</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Individual functions should be imported individually (so not <code class="docutils literal notranslate"><span class="pre">use</span>
+<span class="pre">my_module,</span> <span class="pre">only:</span> <span class="pre">func1,</span> <span class="pre">func2</span> <span class="pre">!</span> <span class="pre">function</span></code>) and there must be a
+space either side of the <code class="docutils literal notranslate"><span class="pre">!</span></code></p></li>
+<li><p>Make sure the fortran file is <code class="docutils literal notranslate"><span class="pre">.F90</span></code> rather than <code class="docutils literal notranslate"><span class="pre">.f90</span></code> (and
+remember to update the <code class="docutils literal notranslate"><span class="pre">Make.xx</span></code> file to reflect this). If you
+don’t do this, you will see the error <code class="docutils literal notranslate"><span class="pre">Label</span> <span class="pre">field</span> <span class="pre">of</span> <span class="pre">continuation</span>
+<span class="pre">line</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">blank</span></code></p>
+<ul>
+<li><p>This is required as we use the convention that <code class="docutils literal notranslate"><span class="pre">.F90</span></code> files are
+processed by the preprocessor, and <code class="docutils literal notranslate"><span class="pre">.f90</span></code> files are not. The
+preprocessor will therefore only generate the required device
+function if the file has the correct extension.</p></li>
+</ul>
+</li>
+</ul>
+<p>We can see some of the above modifications by looking at the
+subroutine <code class="docutils literal notranslate"><span class="pre">estdt</span></code> in <code class="docutils literal notranslate"><span class="pre">compute_dt.F90</span></code>:</p>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">estdt</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">umax</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">scal</span><span class="p">,</span>  <span class="n">s_lo</span><span class="p">,</span> <span class="n">s_hi</span><span class="p">,</span> <span class="n">nc_s</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">u</span><span class="p">,</span>     <span class="n">u_lo</span><span class="p">,</span> <span class="n">u_hi</span><span class="p">,</span> <span class="n">nc_u</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">force</span><span class="p">,</span> <span class="n">f_lo</span><span class="p">,</span> <span class="n">f_hi</span><span class="p">,</span> <span class="n">nc_f</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">divu</span><span class="p">,</span>  <span class="n">d_lo</span><span class="p">,</span> <span class="n">d_hi</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">dSdt</span><span class="p">,</span>  <span class="n">t_lo</span><span class="p">,</span> <span class="n">t_hi</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">w0_cart</span><span class="p">,</span> <span class="n">w_lo</span><span class="p">,</span> <span class="n">w_hi</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">p0_cart</span><span class="p">,</span> <span class="n">p_lo</span><span class="p">,</span> <span class="n">p_hi</span><span class="p">,</span> <span class="p">&amp;</span>
+                 <span class="n">gamma1bar_cart</span><span class="p">,</span> <span class="n">g_lo</span><span class="p">,</span> <span class="n">g_hi</span><span class="p">)</span> <span class="k">bind</span> <span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;estdt&quot;</span><span class="p">)</span>
+
+   <span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">HALF</span>
+   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">amrex_min</span> <span class="c">! function</span>
+   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">amrex_max</span> <span class="c">! function</span>
+
+   <span class="c">! input parameters</span>
+   <span class="kt">integer</span>  <span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span>   <span class="p">)</span> <span class="kd">::</span> <span class="n">lev</span>
+   <span class="kt">double precision</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dt</span><span class="p">,</span> <span class="n">umax</span>
+   <span class="kt">integer</span>         <span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span>   <span class="p">)</span> <span class="kd">::</span> <span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+   <span class="p">...</span>
+
+   <span class="c">! local variables</span>
+   <span class="kt">double precision</span> <span class="kd">::</span> <span class="n">spdx</span><span class="p">,</span> <span class="n">spdy</span><span class="p">,</span> <span class="n">spdz</span><span class="p">,</span> <span class="n">spdr</span><span class="p">,</span> <span class="n">rho_min</span>
+   <span class="kt">double precision</span> <span class="kd">::</span> <span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="n">fz</span><span class="p">,</span> <span class="n">dt_temp</span>
+   <span class="kt">double precision</span> <span class="kd">::</span> <span class="n">eps</span><span class="p">,</span><span class="n">denom</span><span class="p">,</span><span class="n">gradp0</span>
+   <span class="kt">double precision</span> <span class="kd">::</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span>
+   <span class="kt">integer</span>          <span class="kd">::</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span>
+
+   <span class="c">!$gpu</span>
+
+   <span class="n">rho_min</span> <span class="o">=</span> <span class="mf">1.d-20</span>
+   <span class="p">...</span>
+
+   <span class="k">do </span><span class="n">k</span> <span class="o">=</span> <span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+      <span class="k">do </span><span class="n">j</span> <span class="o">=</span> <span class="n">lo</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">hi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+         <span class="k">do </span><span class="n">i</span> <span class="o">=</span> <span class="n">lo</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">hi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">spdx</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">spdx</span> <span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+
+   <span class="p">...</span>
+
+<span class="k">end subroutine </span><span class="n">estdt</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Here, we can see that <code class="docutils literal notranslate"><span class="pre">amrex_min</span></code> and <code class="docutils literal notranslate"><span class="pre">amrex_max</span></code> functions from the
+<code class="docutils literal notranslate"><span class="pre">amrex_fort_module</span></code> are marked separately as <code class="docutils literal notranslate"><span class="pre">!</span> <span class="pre">function</span></code>, which tells
+the preprocessor to generate a device version of this function.</p></li>
+<li><p>The scalar <code class="docutils literal notranslate"><span class="pre">lev</span></code> is passed in by value.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">!$gpu</span></code> directive has been inserted after the definition of
+all the variables passed into the routine and all the local
+variables, but before the main body of the function.</p></li>
+<li><p>The routine only operates on values in a single zone of <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="profiling-with-gpus">
+<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Permalink to this headline">¶</a></h2>
+<p>NVIDIA’s profiler, <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>, is recommended when profiling for GPUs.
+It returns data on how long each kernel launch lasted on the GPU,
+the number of threads and registers used, the occupancy of the GPU
+and provides recommendations for improving the code.  For more information on how to
+use <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>, see NVIDIA’s User’s Guide.</p>
+<p>If a quicker profiling method is preferred, AMReX’s timers can be used
+to report some generic timings that may be useful in categorizing an application.
+To yield a consistent timing of a routine, a timer will need to be wrapped
+around an <code class="docutils literal notranslate"><span class="pre">MFIter</span></code> loop that encompasses the entire set of GPU launches
+contained within. For example:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">BL_PROFILE_VAR</span><span class="p">(</span><span class="s">&quot;A_NAME&quot;</span><span class="p">,</span> <span class="n">blp</span><span class="p">);</span>     <span class="c1">// Profiling start</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">MFIter</span> <span class="n">mfi</span><span class="p">(</span><span class="n">mf</span><span class="p">);</span> <span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span> <span class="o">++</span><span class="n">mfi</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// code that runs on the GPU</span>
+<span class="p">}</span>
+<span class="n">BL_PROFILE_STOP</span><span class="p">(</span><span class="n">blp</span><span class="p">);</span>              <span class="c1">// Profiling stop</span>
+</pre></div>
+</div>
+<p>For now, this is the best way to profile GPU codes using the compiler flag <code class="docutils literal notranslate"><span class="pre">TINY_PROFILE</span> <span class="pre">=</span> <span class="pre">TRUE</span></code>.
+If you require further profiling detail, use <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>.</p>
+</div>
+<div class="section" id="basic-gpu-debugging">
+<span id="sec-gpudebug"></span><h2>Basic GPU Debugging<a class="headerlink" href="#basic-gpu-debugging" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Turn off GPU offloading for some part of the code with</p></li>
+</ul>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">...</span> <span class="p">;</span>
+<span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>To test if your kernels have launched, run</p></li>
+</ul>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nvprof ./Maestro2d.xxx
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Run under <code class="docutils literal notranslate"><span class="pre">nvprof</span> <span class="pre">-o</span> <span class="pre">profile%p.nvvp</span> <span class="pre">./Maestro2d.xxx</span></code> for
+a small problem and examine page faults using NVIDIA’s visual profiler, <cite>nvvp</cite></p></li>
+<li><p>Run under <code class="docutils literal notranslate"><span class="pre">cuda-memcheck</span></code></p></li>
+<li><p>Run under <code class="docutils literal notranslate"><span class="pre">cuda-gdb</span></code></p></li>
+<li><p>Run with <code class="docutils literal notranslate"><span class="pre">CUDA_LAUNCH_BLOCKING=1</span></code>.  This means that only one
+kernel will run at a time.  This can help identify if there are race
+conditions.</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="base_state.html" class="btn btn-neutral float-right" title="Base State" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="initial_models.html" class="btn btn-neutral float-left" title="Initial Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2020, MAESTROeX development tem
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+
+</body>
+</html>

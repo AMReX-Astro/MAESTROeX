@@ -1,0 +1,4 @@
+Class BaseState
+===============
+
+.. doxygenclass:: BaseState
