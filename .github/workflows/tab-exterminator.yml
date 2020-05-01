@@ -20,7 +20,8 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git commit -am "Tabs have been converted to spaces by tab_exterminator.sh"
+        git add --all
+        git diff-index --quiet HEAD || git commit -m "Tabs have been converted to spaces by tab_exterminator.sh"
 
     - name: Push changes
       uses: ad-m/github-push-action@master
