@@ -2057,6 +2057,8 @@ public:
     RealVector p0_init;
     RealVector rho0_old;
     RealVector rho0_new;
+    RealVector rhoX0_old; // for test_basestate
+    RealVector rhoX0_new; // for test_basestate
     BaseState<amrex::Real> rhoh0_old;
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;

@@ -60,7 +60,7 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s,
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
         tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
         tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,) = p0_init[lev+max_lev*i];
+        p0(lev,i) = p0_init[lev+max_lev*i];
     }
 
     // initialize any inlet BC parameters

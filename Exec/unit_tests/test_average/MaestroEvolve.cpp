@@ -31,7 +31,7 @@ Maestro::Evolve ()
 	std::fill(phi_avg.begin(), phi_avg.end(), 0.);
 	std::fill(error.begin(), error.end(), 0.);
 
-	std::copy(p0_old.begin(), p0_old.end(), phi_exact.begin());
+	p0_old.setVal(0.);
 
 	Print() << "Putting 1d array on Cartesian" << std::endl;
 
