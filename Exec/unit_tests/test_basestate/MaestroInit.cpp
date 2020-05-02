@@ -36,17 +36,20 @@ Maestro::Init ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 
+#if (AMREX_SPACEDIM == 3)
 	if (spherical == 1) {
 		MakeNormal();
 		MakeCCtoRadii();
 	}
+#endif
 
 	// make gravity
-	make_grav_cell(grav_cell_old.dataPtr(),
-	               rho0_old.dataPtr(),
-	               base_geom.r_cc_loc.dataPtr(),
-	               base_geom.r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_old, rho0_old);
 
 	// compute initial time step
 	FirstDt();
@@ -88,27 +91,24 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
+	BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.ComputeCutoffCoords(rho0_state.array());
 
 	// compute gravity
-	make_grav_cell(grav_cell_old.dataPtr(),
-	               rho0_old.dataPtr(),
-	               base_geom.r_cc_loc.dataPtr(),
-	               base_geom.r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_old, rho0_old);
 
 	// compute p0 with HSE
-	enforce_HSE(rho0_old.dataPtr(),
-	            p0_old.dataPtr(),
-	            grav_cell_old.dataPtr(),
-	            base_geom.r_cc_loc.dataPtr(),
-	            base_geom.r_edge_loc.dataPtr());
+	EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
 	// set p0^{-1} = p0_old
-	for (int i=0; i<p0_old.size(); ++i) {
-		p0_nm1[i] = p0_old[i];
-	}
+	p0_nm1.copy(p0_old);
 
         rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
         rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
@@ -207,7 +207,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                     ZFILL(dx_fine),
                     ZFILL(dx));
 
-			InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
+	    InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
 #endif
 		}
 	}

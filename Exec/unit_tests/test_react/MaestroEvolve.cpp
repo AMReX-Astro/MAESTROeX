@@ -28,13 +28,14 @@ Maestro::Evolve ()
 	// We shall therefore create a dummy variable to fill up all the variables
 	// passed into the function that won't be used.
 	Vector<Real> dummy;
+	BaseState<Real> dummy_b;
 
 	// Model 1: No burning, no heating
 	Print() << "\nModel 1: No burning, no heating\n";
 	do_burning = false;
 	do_heating = false;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt,t_old);
-	WritePlotFile(-1,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	WritePlotFile(-1,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,rho_omegadot,
 	              rho_Hnuc,rho_Hext);
 
 	// Model 2: Burning without heating
@@ -42,7 +43,7 @@ Maestro::Evolve ()
 	do_burning = true;
 	do_heating = false;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt,t_old);
-	WritePlotFile(-2,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	WritePlotFile(-2,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,rho_omegadot,
 	              rho_Hnuc,rho_Hext);
 
 	// Model 3: Heating without burning
@@ -50,7 +51,7 @@ Maestro::Evolve ()
 	do_burning = false;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt,t_old);
-	WritePlotFile(-3,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	WritePlotFile(-3,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,rho_omegadot,
 	              rho_Hnuc,rho_Hext);
 
 	// Model 4: Burning and heating
@@ -58,7 +59,7 @@ Maestro::Evolve ()
 	do_burning = true;
 	do_heating = true;
 	React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt,t_old);
-	WritePlotFile(-4,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+	WritePlotFile(-4,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,rho_omegadot,
 	              rho_Hnuc,rho_Hext);
 
 	// Explore ten orders of magnitude of the time domain using user inputs.
@@ -69,7 +70,7 @@ Maestro::Evolve ()
 
 	for (auto i=0; i < react_its; ++i) {
 	    React(sold,snew,rho_Hext,rho_omegadot,rho_Hnuc,p0_old,dt,t_old);
-		WritePlotFile(i,t_new,dt,dummy,dummy,dummy,dummy,rho_omegadot,
+		WritePlotFile(i,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,rho_omegadot,
 		              rho_Hnuc,rho_Hext);
 	}
 

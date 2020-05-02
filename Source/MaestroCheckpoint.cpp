@@ -131,17 +131,17 @@ Maestro::WriteCheckPoint (int step) {
         BaseCCFile.precision(17);
 
         for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
-            BaseCCFile << rho0_new.array(i) << " "
-                       << p0_new.array(i) << " "
-                       << gamma1bar_new.array(i) << " "
-                       << rhoh0_new.array(i) << " "
-                       << beta0_new.array(i) << " "
-                       << psi.array(i) << " "
-                       << tempbar.array(i) << " "
-                       << etarho_cc.array(i) << " "
-                       << tempbar_init.array(i) << " "
-                       << p0_old.array(i) << " "
-                       << beta0_nm1.array(i) << "\n";
+            BaseCCFile << rho0_new.array()(i) << " "
+                       << p0_new.array()(i) << " "
+                       << gamma1bar_new.array()(i) << " "
+                       << rhoh0_new.array()(i) << " "
+                       << beta0_new.array()(i) << " "
+                       << psi.array()(i) << " "
+                       << tempbar.array()(i) << " "
+                       << etarho_cc.array()(i) << " "
+                       << tempbar_init.array()(i) << " "
+                       << p0_old.array()(i) << " "
+                       << beta0_nm1.array()(i) << "\n";
         }
     }
 
@@ -162,7 +162,7 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<w0.size(); ++i) {
             BaseFCFile << w0[i] << " "
-                       << etarho_ec.array(i) << "\n";
+                       << etarho_ec.array()(i) << "\n";
         }
     }
 

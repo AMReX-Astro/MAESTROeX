@@ -15,12 +15,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
 
-    const auto nr_fine = base_geom.nr_fine;
-    const auto max_radial_level = base_geom.max_radial_level;
+        const auto nr_fine = base_geom.nr_fine;
+        const auto max_radial_level = base_geom.max_radial_level;
 
 	// vectors store the multilevel 1D states as one very long array
 	// these are cell-centered
-	Vector<Real> p0_minus_peosbar( (max_radial_level+1)*nr_fine );
+        BaseState<Real> p0_minus_peosbar( max_radial_level+1, nr_fine );
 	Vector<Real> w0_force        ( (max_radial_level+1)*nr_fine );
 	Vector<Real> Sbar_old        ( (max_radial_level+1)*nr_fine );
 	Vector<Real> Sbar_new        ( (max_radial_level+1)*nr_fine );
@@ -32,10 +32,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// vectors store the multilevel 1D states as one very long array
 	// these are edge-centered
 	Vector<Real> w0_old             ( (max_radial_level+1)*(nr_fine+1) );
-	BaseState<Real> rho0_predicted_edge( (max_radial_level+1)*(nr_fine+1) );
+	BaseState<Real> rho0_predicted_edge( max_radial_level+1, nr_fine+1 );
 
 	// make sure C++ is as efficient as possible with memory usage
-	p0_minus_peosbar.shrink_to_fit();
 	w0_force.shrink_to_fit();
 	Sbar_old.shrink_to_fit();
 	Sbar_new.shrink_to_fit();
@@ -47,15 +46,21 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	int is_predictor;
 
-	std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+	p0_minus_peosbar.setVal(0.);
 	std::fill(delta_chi_w0.begin(), delta_chi_w0.end(), 0.);
 
+	// make Fortran-friendly RealVectors
+	RealVector p0_old_vec( (max_radial_level+1)*nr_fine );
+	RealVector gamma1bar_old_vec( (max_radial_level+1)*nr_fine );
+	p0_old.toVector(p0_old_vec);
+	gamma1bar_old.toVector(gamma1bar_old_vec);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute initial gamma1bar_old
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	compute_gamma1bar(gamma1bar_old.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
-	                  rhoX0_old.dataPtr(), p0_old.dataPtr());
+	compute_gamma1bar(gamma1bar_old_vec.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
+	                  rhoX0_old.dataPtr(), p0_old_vec.dataPtr());
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute the heating term and Sbar
@@ -107,7 +112,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update species
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
+	// make a Fortran-friendly RealVector of rho0_predicted_edge
+	RealVector rho0_predicted_edge_vec( (max_radial_level+1)*(nr_fine+1) );
+	rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
+	
+	update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
 	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
@@ -116,19 +125,24 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	// set new p0 through HSE
-	// p0_new = p0_old;
-	for (auto i=0; i < p0_old.size(); ++i)
-		p0_new[i] = p0_old[i];
+	p0_new.copy(p0_old);
 
 	EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
+	// make Fortran-friendly RealVectors
+	RealVector p0_new_vec( (max_radial_level+1)*nr_fine );
+	RealVector gamma1bar_new_vec( (max_radial_level+1)*nr_fine );
+	p0_new.toVector(p0_new_vec);
+	gamma1bar_new.toVector(gamma1bar_new_vec);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	compute_gamma1bar(gamma1bar_new.dataPtr(), rho0_new.dataPtr(), tempbar.dataPtr(),
-	                  rhoX0_new.dataPtr(), p0_new.dataPtr());
-
+	compute_gamma1bar(gamma1bar_new_vec.dataPtr(), rho0_new.dataPtr(), tempbar.dataPtr(),
+	                  rhoX0_new.dataPtr(), p0_new_vec.dataPtr());
+	gamma1bar_new = BaseState<Real>(gamma1bar_new_vec, max_radial_level+1, nr_fine, 1);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update temperature
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -136,7 +150,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	std::copy(tempbar.begin(), tempbar.end(), tempbar_new.begin());
 
 	update_temp(rho0_new.dataPtr(), tempbar_new.dataPtr(), rhoX0_new.dataPtr(),
-	            p0_new.dataPtr());
+	            p0_new_vec.dataPtr());
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! reset cutoff coordinates
@@ -155,7 +169,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	for (int i=0; i<Sbar_nph.size(); ++i)
 		Sbar_nph[i] = 0.5*(Sbar_old[i] + Sbar_new[i]);
 
-	std::fill(p0_minus_peosbar.begin(), p0_minus_peosbar.end(), 0.);
+	p0_minus_peosbar.setVal(0.);
 
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -175,6 +189,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	AdvectBaseDens(rho0_predicted_edge);
+	rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
 	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! recompute cutoff coordinates now that rho0 has changed
@@ -193,7 +208,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update species
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
+	update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
 	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
@@ -201,17 +216,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update pressure
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	p0_new = p0_old;
+	p0_new.copy(p0_old);
 
 	EnforceHSE(rho0_new, p0_new, grav_cell_new);
+	p0_new.toVector(p0_new_vec);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	compute_gamma1bar(gamma1bar_new.dataPtr(), rho0_new.dataPtr(), tempbar.dataPtr(),
-	                  rhoX0_new.dataPtr(), p0_new.dataPtr());
-
+	compute_gamma1bar(gamma1bar_new_vec.dataPtr(), rho0_new.dataPtr(), tempbar.dataPtr(),
+	                  rhoX0_new.dataPtr(), p0_new_vec.dataPtr());
+	gamma1bar_new = BaseState<Real>(gamma1bar_new_vec, max_radial_level+1, nr_fine, 1);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update temperature

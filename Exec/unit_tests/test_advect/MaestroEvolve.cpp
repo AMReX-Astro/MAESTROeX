@@ -116,10 +116,10 @@ Maestro::Evolve ()
 			// the base state will not carry any information in this test problem
 			std::fill(rho0_old.begin(),   rho0_old.end(),   0.);
 			std::fill(rho0_new.begin(),   rho0_new.end(),   0.);
-			std::fill(rhoh0_old.begin(),  rhoh0_old.end(),  0.);
-			std::fill(rhoh0_new.begin(),  rhoh0_new.end(),  0.);
-			std::fill(p0_old.begin(),     p0_old.end(),     0.);
-			std::fill(p0_new.begin(),     p0_new.end(),     0.);
+			rhoh0_old.setVal(0.);
+		        rhoh0_new.setVal(0.);
+			p0_old.setVal(0.);
+			p0_new.setVal(0.);
 			std::fill(w0.begin(),         w0.end(),         0.);
 			rho0_predicted_edge.setVal(0.);
 

@@ -13,9 +13,9 @@ Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
                         const Vector<Real>& a,
-                        const Vector<Real>& b,
-                        const Vector<Real>& c,
-                        const Vector<Real>& d,
+                        const BaseState<Real>& b,
+                        const BaseState<Real>& c,
+                        const BaseState<Real>& d,
                         const Vector<MultiFab>& rho_omegadot,
                         Vector<MultiFab>& rho_Hnuc,
                         const Vector<MultiFab>& rho_Hext,
@@ -55,7 +55,7 @@ Maestro::WritePlotFile (const int step,
 	int nPlot = 0;
 	const auto& varnames = PlotFileVarNames(&nPlot);
     const Vector<MultiFab> dummy;
-	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho_omegadot,rho_Hnuc,rho_Hext,dummy,dummy,snew,a,a,dummy);
+	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho_omegadot,rho_Hnuc,rho_Hext,dummy,dummy,snew,b,b,dummy);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;
@@ -100,8 +100,8 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& a,
                      const Vector<MultiFab>& b,
                      Vector<MultiFab>& s_in,
-                     const Vector<Real>& d,
-                     const Vector<Real>& e,
+                     const BaseState<Real>& d,
+                     const BaseState<Real>& e,
                      const Vector<MultiFab>& f)
 {
 	// timer for profiling

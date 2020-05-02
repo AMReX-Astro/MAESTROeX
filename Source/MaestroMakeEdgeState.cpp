@@ -1035,8 +1035,8 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state, BaseState<Real>& sed
 
             // modify using quadratic limiters
             if ((sp-s(0,r))*(s(0,r)-sm) <= 0.0) {
-                sp = s[r];
-                sm = s[r];
+                sp = s(0,r);
+                sm = s(0,r);
             } else if (fabs(sp-s(0,r)) >= 2.0*fabs(sm-s(0,r))) {
                 sp = 3.0*s(0,r) - 2.0*sm;
             } else if (fabs(sm-s(0,r)) >= 2.0*fabs(sp-s(0,r))) {
