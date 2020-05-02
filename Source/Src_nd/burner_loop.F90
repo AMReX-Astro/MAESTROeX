@@ -443,7 +443,7 @@ contains
                    state_in % k = k
                    state_in % success = .true.
                    state_in % sdc_iter = sdc_iter
-                   state_in % num_sdc_iter = number_sdc_iterations
+                   state_in % num_sdc_iters = number_sdc_iterations
 
                    call integrator(state_in, state_out, dt_in, time_in)
                    
@@ -566,7 +566,7 @@ contains
                    state_in % k = k
                    state_in % success = .true.
                    state_in % sdc_iter = sdc_iter
-                   state_in % num_sdc_iter = number_sdc_iterations
+                   state_in % num_sdc_iters = number_sdc_iterations
 
                    call integrator(state_in, state_out, dt_in, time_in)
 
