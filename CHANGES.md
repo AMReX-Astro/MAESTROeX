@@ -1,3 +1,11 @@
+# 20.05
+
+  * Created new base state and base state geometry classes
+
+  * Started to convert base state vectors (based on Fortran indexing) to new base state class that uses C indexing
+
+  * Offloaded more routines to GPU: InitData, MakeThermalCoeffs
+
 # 20.04a
 
   * Include latest release from Microphysics submodule
