@@ -63,16 +63,15 @@ Maestro::Evolve ()
 		// move new state into old state by swapping pointers
 		for (int lev=0; lev<=finest_level; ++lev) {
 			std::swap(S_cc_old[lev], S_cc_new[lev]);
-
-			std::swap( rho0_old, rho0_new);
-			std::swap(rhoh0_old,rhoh0_new);
-			std::swap(   p0_nm1,   p0_old);
-			std::swap(   p0_old,   p0_new);
-
-			std::swap(gamma1bar_old,gamma1bar_new);
-			std::swap(grav_cell_old,grav_cell_new);
 		}
 
+		std::swap( rho0_old, rho0_new);
+		rhoh0_old.swap(rhoh0_new);
+		p0_nm1.swap(p0_old);
+		p0_old.swap(p0_new);
+
+		gamma1bar_old.swap(gamma1bar_new);
+		grav_cell_old.swap(grav_cell_new);
 	}
 
 	// Now need to check the HSE-ness

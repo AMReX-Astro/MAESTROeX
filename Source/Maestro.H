@@ -1957,6 +1957,8 @@ public:
     BaseState<amrex::Real> p0_init;
     BaseState<amrex::Real> rho0_old;
     BaseState<amrex::Real> rho0_new;
+    RealVector rhoX0_old; // for test_basestate
+    RealVector rhoX0_new; // for test_basestate
     BaseState<amrex::Real> rhoh0_old;
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;

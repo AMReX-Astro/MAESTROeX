@@ -15,8 +15,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
 
-    const auto nr_fine = base_geom.nr_fine;
-    const auto max_radial_level = base_geom.max_radial_level;
+        const auto nr_fine = base_geom.nr_fine;
+        const auto max_radial_level = base_geom.max_radial_level;
 
 	// vectors store the multilevel 1D states as one very long array
 	// these are cell-centered
@@ -39,15 +39,21 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	p0_minus_peosbar.setVal(0.);
 	delta_chi_w0.setVal(0.);
 
+	// make Fortran-friendly RealVectors
+	RealVector p0_old_vec( (max_radial_level+1)*nr_fine );
+	RealVector gamma1bar_old_vec( (max_radial_level+1)*nr_fine );
+	p0_old.toVector(p0_old_vec);
+	gamma1bar_old.toVector(gamma1bar_old_vec);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute initial gamma1bar_old
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    auto rho0_old_arr = rho0_old.array();
-    auto p0_old_arr = p0_old.array();
-    auto rhoX0_old_arr = rhoX0_old.array();
-    auto tempbar_arr = tempbar.array();
-    auto gamma1bar_old_arr = gamma1bar_old.array();
+        auto rho0_old_arr = rho0_old.array();
+	auto p0_old_arr = p0_old.array();
+	auto rhoX0_old_arr = rhoX0_old.array();
+	auto tempbar_arr = tempbar.array();
+	auto gamma1bar_old_arr = gamma1bar_old.array();
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto n = 0; n < base_geom.nr(l); ++n) {
@@ -64,7 +70,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             gamma1bar_old_arr(l,r) = eos_state.gam1;
         }
-    }
+	}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute the heating term and Sbar
@@ -78,10 +84,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! make Sbar
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    auto Hext_bar_arr = Hext_bar.array();
-    auto Sbar_old_arr = Sbar_old.array();
+	auto Hext_bar_arr = Hext_bar.array();
+	auto Sbar_old_arr = Sbar_old.array();
 
-    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto n = 0; n < base_geom.nr(l); ++n) {
             eos_t eos_state;
 
@@ -95,7 +101,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             Sbar_old_arr(l,r) = Hext_bar_arr(l,r) * eos_state.dpdT / (eos_state.rho * eos_state.cp * eos_state.dpdr);
         }
-    }
+	}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute w_0
@@ -119,15 +125,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! recompute cutoff coordinates now that rho0 has changed
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    auto rho0_new_arr = rho0_new.array();
-    auto p0_new_arr = p0_new.array();
-    auto rhoX0_new_arr = rhoX0_new.array();
-    auto gamma1bar_new_arr = gamma1bar_new.array();
-    auto tempbar_new_arr = tempbar_new.array();
+	auto rho0_new_arr = rho0_new.array();
+	auto p0_new_arr = p0_new.array();
+	auto rhoX0_new_arr = rhoX0_new.array();
+	auto gamma1bar_new_arr = gamma1bar_new.array();
+	auto tempbar_new_arr = tempbar_new.array();
 
 	compute_cutoff_coords(rho0_new.dataPtr());
 	ComputeCutoffCoords(rho0_new);
-    base_geom.ComputeCutoffCoords(rho0_new.array());
+	base_geom.ComputeCutoffCoords(rho0_new.array());
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gravity
@@ -139,7 +145,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update species
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
+	// make a Fortran-friendly RealVector of rho0_predicted_edge
+	RealVector rho0_predicted_edge_vec( (max_radial_level+1)*(nr_fine+1) );
+	rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
+	
+	update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
 	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
@@ -152,6 +162,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
+	// make Fortran-friendly RealVectors
+	RealVector p0_new_vec( (max_radial_level+1)*nr_fine );
+	RealVector gamma1bar_new_vec( (max_radial_level+1)*nr_fine );
+	p0_new.toVector(p0_new_vec);
+	gamma1bar_new.toVector(gamma1bar_new_vec);
+	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -171,13 +187,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             gamma1bar_new_arr(l,r) = eos_state.gam1;
         }
-    }
+	}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update temperature
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto n = 0; n < base_geom.nr(l); ++n) {
             eos_t eos_state;
 
@@ -192,7 +208,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             tempbar_new_arr(l,r) = eos_state.T;
         }
-    }
+	}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! reset cutoff coordinates
@@ -200,14 +216,14 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	compute_cutoff_coords(rho0_old.dataPtr());
 	ComputeCutoffCoords(rho0_old);
-    base_geom.ComputeCutoffCoords(rho0_old.array());
+	base_geom.ComputeCutoffCoords(rho0_old.array());
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! make Sbar
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    auto Sbar_new_arr = Sbar_new.array();
+	auto Sbar_new_arr = Sbar_new.array();
 
-    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto n = 0; n < base_geom.nr(l); ++n) {
             eos_t eos_state;
 
@@ -216,7 +232,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             for (auto n = 0; n < NumSpec; ++n) {
                 eos_state.xn[n] = rhoX0_new_arr(l,r,n) / rho0_new_arr(l,r);
             } 
-
+   
             eos(eos_input_rpt, eos_state);
 
             Sbar_new_arr(l,r) = Hext_bar_arr(l,r) * eos_state.dpdT / (eos_state.rho * eos_state.cp * eos_state.dpdr);
@@ -245,6 +261,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	AdvectBaseDens(rho0_predicted_edge);
+	rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
 	
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! recompute cutoff coordinates now that rho0 has changed
@@ -252,7 +269,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	compute_cutoff_coords(rho0_new.dataPtr());
 	ComputeCutoffCoords(rho0_new);
-    base_geom.ComputeCutoffCoords(rho0_new.array());
+	base_geom.ComputeCutoffCoords(rho0_new.array());
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gravity
@@ -264,7 +281,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update species
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	update_species(rho0_old.dataPtr(), rho0_predicted_edge.dataPtr(),
+	update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
 	               rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
 	               base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(), dt);
 
@@ -275,6 +292,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	p0_new.copy(p0_old);
 
 	EnforceHSE(rho0_new, p0_new, grav_cell_new);
+	p0_new.toVector(p0_new_vec);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute gamma1bar_new
@@ -295,13 +313,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             gamma1bar_new_arr(l,r) = eos_state.gam1;
         }
-    }
+	}
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update temperature
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto n = 0; n < base_geom.nr(l); ++n) {
             eos_t eos_state;
 
@@ -316,7 +334,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             tempbar_new_arr(l,r) = eos_state.T;
         }
-    }
+	}
 
 	rhoX0_old.swap(rhoX0_new);
 	tempbar.swap(tempbar_new);

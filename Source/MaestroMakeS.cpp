@@ -29,7 +29,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     Vector<MultiFab> psi_cart(finest_level+1);
 
     auto nr_fine = base_geom.nr_fine;
-    const auto r_cc_loc = base_geom.r_cc_loc;
+    const auto& r_cc_loc = base_geom.r_cc_loc;
 
     // calculate gradp0
     BaseState<Real> gradp0(base_geom.max_radial_level+1, nr_fine);

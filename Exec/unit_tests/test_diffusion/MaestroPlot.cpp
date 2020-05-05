@@ -37,11 +37,11 @@ Maestro::WritePlotFile (const int step,
     // make plot mfs
     const Vector<MultiFab> dummy;
 	const auto& state_mf = PlotFileMF(nPlot,0,dt_in,state,dummy,dummy,
-        dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,analytic,b,b,dummy);
 	const auto& analytic_mf = PlotFileMF(nPlot,1,dt_in,dummy,dummy,
-        dummy,dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,dummy,analytic,b,b,dummy);
 	const auto& error_mf = PlotFileMF(nPlot,2,dt_in,err,dummy,dummy,
-        dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,analytic,b,b,dummy);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;

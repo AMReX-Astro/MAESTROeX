@@ -8,10 +8,10 @@ using namespace amrex;
 void
 Maestro::Evolve ()
 {
-    for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
-        InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
+        for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+            InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
 	}
-    const auto nr_fine = base_geom.nr_fine;
+	const auto nr_fine = base_geom.nr_fine;
 	
 	InitFromScratch(0.0);
 
@@ -38,9 +38,9 @@ Maestro::Evolve ()
 
 	Average(phi, phi_avg, 0);
 
-    auto error_arr = error.array();
-    auto phi_exact_arr = phi_exact.array();
-    auto phi_avg_arr = phi_avg.array();
+	auto error_arr = error.array();
+	auto phi_exact_arr = phi_exact.array();
+	auto phi_avg_arr = phi_avg.array();
 
 	// Compare the initial and final phi
 	for (int lev=0; lev<=base_geom.max_radial_level; ++lev) {

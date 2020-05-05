@@ -55,7 +55,7 @@ Maestro::WritePlotFile (const int step,
 	int nPlot = 0;
 	const auto& varnames = PlotFileVarNames(&nPlot);
     const Vector<MultiFab> dummy;
-	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho_omegadot,rho_Hnuc,rho_Hext,dummy,dummy,snew,a,a,dummy);
+	const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho_omegadot,rho_Hnuc,rho_Hext,dummy,dummy,snew,b,b,dummy);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;
