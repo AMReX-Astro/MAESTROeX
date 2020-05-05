@@ -80,6 +80,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     auto rho0 = rho0_s.array();
     auto rhoh0 = rhoh0_s.array();
     auto p0 = p0_s.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
 
     // allocate arrays
     RealVector pres(base_geom.nr(n));
@@ -146,7 +149,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
             s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = 
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init(n,r) = eos_state.p;
+        p0_init_arr(n,r) = eos_state.p;
         s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = eos_state.T;
     }
 
@@ -154,9 +157,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     for (auto i = 0; i < base_geom.nr_fine; ++i) {
         rho0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
-        tempbar(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
-        tempbar_init(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
-        p0(lev,i) = p0_init[lev+max_lev*i];
+        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        p0(lev,i) = p0_init_arr(lev,i);
     }
 
     // initialize any inlet BC parameters

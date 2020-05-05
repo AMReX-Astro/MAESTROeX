@@ -11,7 +11,7 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
-                        const Vector<Real>& a,
+                        const BaseState<Real>& a,
                         const BaseState<Real>& b,
                         const BaseState<Real>& c,
                         const BaseState<Real>& d,

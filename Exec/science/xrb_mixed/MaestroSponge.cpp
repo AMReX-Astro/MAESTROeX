@@ -5,7 +5,7 @@
 using namespace amrex;
 
 void
-Maestro::SpongeInit(const RealVector& rho0)
+Maestro::SpongeInit(const BaseState<Real>& rho0_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SpongeInit()", SpongeInit);
@@ -19,7 +19,8 @@ Maestro::SpongeInit(const RealVector& rho0)
     // the end of the top sponge is r_tp_outer = topsponge_hi_r.
 
     const int max_lev = base_geom.max_radial_level + 1;
-
+    const auto& rho0 = rho0_s.const_array();
+    
     Real prob_lo_r = geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     // Top sponge
@@ -30,7 +31,7 @@ Maestro::SpongeInit(const RealVector& rho0)
 
     // set topsponge_lo_r = r_sp_outer;
     for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-	if (rho0[max_lev*r] < sponge_start_density) {
+	if (rho0(0,r) < sponge_start_density) {
 	    r_sp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
 	    break;
 	}
@@ -39,7 +40,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     // set topsponge_hi_r = r_tp_outer;
     r_tp_outer = r_top;
     for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-        if (rho0[max_lev*r] < anelastic_cutoff_density) {
+        if (rho0(0,r) < anelastic_cutoff_density) {
             r_tp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
             break;
         }
@@ -47,7 +48,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     
     // set botsponge_lo_r = r_sp;
     for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-        if (rho0[max_lev*r] < 6.0e7) {
+        if (rho0(0,r) < 6.0e7) {
             r_sp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
             break;
         }
@@ -55,7 +56,7 @@ Maestro::SpongeInit(const RealVector& rho0)
 
     // set botsponge_hi_r = r_tp;
     for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-        if (rho0[max_lev*r] < 5.0e7) {
+        if (rho0(0,r) < 5.0e7) {
             r_tp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
             break;
         }

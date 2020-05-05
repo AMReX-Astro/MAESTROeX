@@ -20,7 +20,8 @@ Maestro::InitLevelData(const int lev, const Real time,
     });
 
     const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-
+    const auto& p0_init_arr = p0_init.const_array();
+    
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
@@ -65,24 +66,24 @@ Maestro::InitLevelData(const int lev, const Real time,
             auto eos_input_flag = eos_input_tp;
 
             if (perturb_temp_true) {
-                Real t0 = s0_p[lev+max_lev*(r + nr_fine*Temp)];
+                Real t0 = s0_p[lev+max_lev*(r + nrf*Temp)];
                 temp = t0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                dens = s0_p[lev+max_lev*(r + nr_fine*Rho)];
+                dens = s0_p[lev+max_lev*(r + nrf*Rho)];
                 eos_input_flag = eos_input_tp;
             } else {
-                Real d0 = s0_p[lev+max_lev*(r + nr_fine*Rho)];
+                Real d0 = s0_p[lev+max_lev*(r + nrf*Rho)];
                 dens = d0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                temp = s0_p[lev+max_lev*(r + nr_fine*Temp)];
+                temp = s0_p[lev+max_lev*(r + nrf*Temp)];
                 eos_input_flag = eos_input_rp;
             }
 
             eos_t eos_state;
 
             eos_state.T = temp;
-            eos_state.p = p0_init(lev,r);
+            eos_state.p = p0_init_arr(lev,r);
             eos_state.rho = dens;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_p[lev+max_lev*(r+nr_fine*(FirstSpec+comp))] / s0_p[lev+max_lev*(r + nr_fine*Rho)];
+                eos_state.xn[comp] = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))] / s0_p[lev+max_lev*(r + nrf*Rho)];
             }
 
             eos(eos_input_flag, eos_state);

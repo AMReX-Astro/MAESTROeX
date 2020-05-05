@@ -61,6 +61,9 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
 	// average down data and fill ghost cells
 	AverageDown(sold,0,Nscal);
@@ -68,16 +71,17 @@ Maestro::InitData ()
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	RealVector s0_swap;
 	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
 
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
 
 	// set rho0 to be the average
 	Average(sold,rho0_old,Rho);
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
 
 	// call eos with r,p as input to recompute T,h
 	TfromRhoP(sold,p0_old,1);

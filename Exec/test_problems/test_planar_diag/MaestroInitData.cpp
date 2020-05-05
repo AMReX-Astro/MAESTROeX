@@ -24,7 +24,7 @@ Maestro::InitLevelData(const int lev, const Real time,
     });
 
     const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-    const auto& p0_p = p0_init;
+    const auto& p0_p = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;

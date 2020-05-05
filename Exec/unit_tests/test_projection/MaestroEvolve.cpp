@@ -143,13 +143,12 @@ Maestro::Evolve ()
 		}
 	}
 
-	Vector<Real> dummy;
-	BaseState<Real> dummy_b;
+	BaseState<Real> dummy;
 
 	if (project_type == 1) {
 
 		// write uold
-		WritePlotFile(0,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,uold,uold,uold);
+		WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,uold,uold,uold);
 
 		// copy the velocity field over to the intermediate state, umid
 		for (int lev=0; lev<=finest_level; ++lev)
@@ -182,7 +181,7 @@ Maestro::Evolve ()
 			}
 		}
 		// write umac_old
-		WritePlotFile(0,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,utemp,uold,uold);
+		WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 		// copy the velocity field over to the intermediate state, umid
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -226,9 +225,9 @@ Maestro::Evolve ()
     	FillPatch(t_old,umid,umid,umid,0,0,AMREX_SPACEDIM,0,bcs_u);
 
 		// write umid
-		WritePlotFile(1,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,umid,uold,uold);
+		WritePlotFile(1,t_new,dt,dummy,dummy,dummy,dummy,umid,uold,uold);
 		// write gphi
-		WritePlotFile(2,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,gphi,uold,uold);
+		WritePlotFile(2,t_new,dt,dummy,dummy,dummy,dummy,gphi,uold,uold);
 
 		// copy the velocity field over to the final state, unew
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -323,7 +322,7 @@ Maestro::Evolve ()
 			}
 		}
 
-		WritePlotFile(1,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,utemp,uold,uold);
+		WritePlotFile(1,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 		// write gphi_mac
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -351,7 +350,7 @@ Maestro::Evolve ()
 			}
 		}
 
-		WritePlotFile(2,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,utemp,uold,uold);
+		WritePlotFile(2,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 		// copy the velocity field over to the final state, unew
 		for (int lev=0; lev<=finest_level; ++lev) {
@@ -403,7 +402,7 @@ Maestro::Evolve ()
 		}
 
 		// write unew
-		WritePlotFile(3,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,unew,uold,uold);
+		WritePlotFile(3,t_new,dt,dummy,dummy,dummy,dummy,unew,uold,uold);
 
 		// I think now can compare to uold and see if it's the same?
 		{
@@ -493,7 +492,7 @@ Maestro::Evolve ()
 			}
 		}
 
-		WritePlotFile(3,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,utemp,uold,uold);
+		WritePlotFile(3,t_new,dt,dummy,dummy,dummy,dummy,utemp,uold,uold);
 
 
 	}

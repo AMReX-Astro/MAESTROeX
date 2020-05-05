@@ -22,7 +22,10 @@ Maestro::Init ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 	// compute initial time step
 	// FirstDt();
 	get_min_timestep(&dt);
@@ -63,6 +66,9 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
 	// average down data and fill ghost cells
 	AverageDown(sold,0,Nscal);
@@ -70,14 +76,12 @@ Maestro::InitData ()
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	Vector<Real> s0_swap;
 	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
 
 	// set tempbar to be the average
 	Average(sold,tempbar,Temp);
-	for (int i=0; i<tempbar.size(); ++i)
-		tempbar_init[i] = tempbar[i];
+	tempbar_init.copy(tempbar);
 
 	for (int lev=0; lev<=finest_level; ++lev)
 		MultiFab::Copy(snew[lev],sold[lev],0,0,Nscal,ng_s);

@@ -22,12 +22,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// these are cell-centered
         BaseState<Real> p0_minus_peosbar( max_radial_level+1, nr_fine );
 	Vector<Real> w0_force        ( (max_radial_level+1)*nr_fine );
-	Vector<Real> Sbar_old        ( (max_radial_level+1)*nr_fine );
-	Vector<Real> Sbar_new        ( (max_radial_level+1)*nr_fine );
-	Vector<Real> Sbar_nph        ( (max_radial_level+1)*nr_fine );
+	BaseState<Real> Sbar_old        ( max_radial_level+1, nr_fine );
+	BaseState<Real> Sbar_new        ( max_radial_level+1, nr_fine );
+	BaseState<Real> Sbar_nph        ( max_radial_level+1, nr_fine );
 	Vector<Real> delta_chi_w0    ( (max_radial_level+1)*nr_fine );
 	Vector<Real> Hext_bar        ( (max_radial_level+1)*nr_fine );
-	Vector<Real> tempbar_new     ( (max_radial_level+1)*nr_fine );
+	BaseState<Real> tempbar_new     ( max_radial_level+1, nr_fine );
 
 	// vectors store the multilevel 1D states as one very long array
 	// these are edge-centered
@@ -36,13 +36,9 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
 	// make sure C++ is as efficient as possible with memory usage
 	w0_force.shrink_to_fit();
-	Sbar_old.shrink_to_fit();
-	Sbar_new.shrink_to_fit();
-	Sbar_nph.shrink_to_fit();
 	delta_chi_w0.shrink_to_fit();
 	w0_old.shrink_to_fit();
 	Hext_bar.shrink_to_fit();
-	tempbar_new.shrink_to_fit();
 
 	int is_predictor;
 
@@ -147,7 +143,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update temperature
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	std::copy(tempbar.begin(), tempbar.end(), tempbar_new.begin());
+	tempbar.copy(tempbar_new);
 
 	update_temp(rho0_new.dataPtr(), tempbar_new.dataPtr(), rhoX0_new.dataPtr(),
 	            p0_new_vec.dataPtr());
@@ -166,8 +162,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	make_Sbar(Sbar_new.dataPtr(), rho0_new.dataPtr(), tempbar_new.dataPtr(),
 	          rhoX0_new.dataPtr(), Hext_bar.dataPtr());
 
-	for (int i=0; i<Sbar_nph.size(); ++i)
-		Sbar_nph[i] = 0.5*(Sbar_old[i] + Sbar_new[i]);
+	Sbar_nph.copy(0.5*(Sbar_old + Sbar_new));
 
 	p0_minus_peosbar.setVal(0.);
 
@@ -233,12 +228,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! update temperature
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	std::copy(tempbar.begin(), tempbar.end(), tempbar_new.begin());
+	tempbar.copy(tempbar_new);
 
 	update_temp(rho0_new.dataPtr(), tempbar_new.dataPtr(), rhoX0_new.dataPtr(),
 	            p0_new.dataPtr());
 
 	std::swap(rhoX0_old, rhoX0_new);
-	std::swap(tempbar, tempbar_new);
+	tempbar.swap(tempbar_new);
 
 }
