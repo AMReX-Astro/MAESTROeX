@@ -303,7 +303,7 @@ Maestro::InitData ()
             EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
             // call eos with r,p as input to recompute T,h
-            TfromRhoP(sold, p0_old, 1);
+            TfromRhoP(sold, p0_old, true);
 
             // set rhoh0 to be the average
             Average(sold, rhoh0_old, RhoH);

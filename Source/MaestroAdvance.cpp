@@ -297,10 +297,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
         // put w0 on Cartesian edges
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             MakeW0mac(w0mac);
         }
-
+#endif
         // put w0_force on Cartesian cells
         Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
 
@@ -531,7 +532,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2, p0_new, 0);
+        TfromRhoP(s2, p0_new, false);
     } else {
         TfromRhoH(s2, p0_new);
     }
@@ -680,12 +681,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
-
+        
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
-
+#endif
         // // put w0_force on Cartesian cells
         Put1dArrayOnCart(w0_force, w0_force_cart, 0, 1, bcs_f, 0);
     }
@@ -891,7 +893,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     // now update temperature
     if (use_tfromp) {
-        TfromRhoP(s2, p0_new, 0);
+        TfromRhoP(s2, p0_new, false);
     } else {
         TfromRhoH(s2, p0_new);
     }

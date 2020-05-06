@@ -273,12 +273,13 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-        
+
+#if (AMREX_SPACEDIM == 3)        
         if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
-
+#endif
     } else {
         // these should have no effect if evolve_base_state = false
         Sbar.setVal(0.);
@@ -569,11 +570,13 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-        
+
+#if (AMREX_SPACEDIM == 3)        
         if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
+#endif
     }
 
     //////////////////////////////////////////////////////////////////////////////

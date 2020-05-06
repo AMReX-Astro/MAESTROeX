@@ -281,7 +281,6 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
             FillGhostBase(grav_edge, false);
         } else {
             // constant gravity
-            // std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
             grav_edge_state.setVal(grav_const);
         }
         

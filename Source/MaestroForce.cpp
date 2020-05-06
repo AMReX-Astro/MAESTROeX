@@ -427,9 +427,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+#if (AMREX_SPACEDIM == 3)
     if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
+#endif
     Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
 
@@ -612,7 +614,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
-            const auto domlo = domainBox.loVect3d();
             const auto domhi = domainBox.hiVect3d();
 
             // Get grid spacing

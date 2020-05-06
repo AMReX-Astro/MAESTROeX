@@ -40,6 +40,7 @@ Maestro::DiagFile (const int step,
     Vector<MultiFab> rho_omegadot      (finest_level+1);
     Vector<MultiFab> rho_Hnuc          (finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
     if (spherical) {
 
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -62,6 +63,7 @@ Maestro::DiagFile (const int step,
         // expansion velocity)
         Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0, 1);
     } 
+#endif
 
     // compute rho_Hext and rho_Hnuc
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -121,9 +123,7 @@ Maestro::DiagFile (const int step,
         Real nuc_ener_level = 0.0;
 
         const auto dx = geom[lev].CellSizeArray();
-
         const auto prob_lo = geom[lev].ProbLoArray();
-        const auto prob_hi = geom[lev].ProbHiArray();
 
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
@@ -148,7 +148,6 @@ Maestro::DiagFile (const int step,
 
             const Array4<const Real> scal = s_in[lev].array(mfi);
             const Array4<const Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
-            const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
             const Array4<const Real> u = u_in[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
             const auto w0_arr = w0.const_array();

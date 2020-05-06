@@ -129,7 +129,7 @@ Maestro::Put1dArrayOnCart (int lev,
                                 - r_cc_loc(0,index-1));
                         }
 
-                        Real s0_cart_val;
+                        Real s0_cart_val = 0.0;
 
                         if (w0_interp_type_loc == 1) {
 
@@ -217,7 +217,7 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         Real radius = sqrt(x*x + y*y + z*z);
 
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
                         Real rfac = (radius - Real(index) * drf) / drf;
                         Real s0_cart_val = 0.0;
 
@@ -281,7 +281,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         Real s0_cart_val = 0.0;
 
@@ -449,7 +449,7 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
     }
 }
 
-
+#if (AMREX_SPACEDIM == 3)
 void
 Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 {
@@ -605,7 +605,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {
@@ -644,7 +644,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {
@@ -991,7 +991,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
@@ -1022,7 +1022,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
@@ -1053,7 +1053,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
@@ -1086,7 +1086,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1109,7 +1109,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1132,7 +1132,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1153,7 +1153,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0,
         }
     }
 }
-
+#endif
 void
 Maestro::MakeNormal ()
 {

@@ -16,7 +16,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
                     const Vector<MultiFab>& rho_Hext,
                     const Vector<MultiFab>& thermal,
                     const BaseState<Real>& p0_s,
-                    const BaseState<Real>& gamma1bar_s,
+                    const BaseState<Real>& gamma1bar,
                     BaseState<Real>& delta_gamma1_termbar)
 {
     // timer for profiling
@@ -35,7 +35,6 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     BaseState<Real> gradp0(base_geom.max_radial_level+1, nr_fine);
     auto gradp0_arr = gradp0.array();
     const auto p0 = p0_s.const_array();
-    const auto gamma1bar = gamma1bar_s.const_array();
 
     if (spherical) {
         if (use_delta_gamma1_term) {
@@ -91,7 +90,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gamma1bar_s, gamma1bar_cart ,0, 0, bcs_f, 0);
+        Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
         Put1dArrayOnCart(p0_s, p0_cart, 0, 0, bcs_f, 0);
         Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     }

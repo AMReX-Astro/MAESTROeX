@@ -38,7 +38,9 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     if (spherical) {
+#if (AMREX_SPACEDIM == 3)
         MakeS0mac(beta0, beta0_cart_edge);
+#endif
     } else {
         CelltoEdge(beta0, beta0_edge);
     }

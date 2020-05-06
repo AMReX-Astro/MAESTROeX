@@ -285,10 +285,12 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                    gamma1bar_old, p0_minus_peosbar, 
                    dt, dtold, is_predictor);
 
+#if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
             }
+#endif
         }
     }
 
@@ -713,11 +715,13 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                             rho0_new, p0_old, p0_new, gamma1bar_old, 
                             gamma1bar_new, p0_minus_peosbar, 
                             dt, dtold, is_predictor);
-                                
+
+#if (AMREX_SPACEDIM == 3)                                
                     if (spherical) {
                         // put w0 on Cartesian edges
                         MakeW0mac(w0mac);
                     }
+#endif
                 }
             }
 

@@ -184,6 +184,7 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             h0_old.copy(rhoh0_old / rho0_old);
 
@@ -200,11 +201,11 @@ Maestro::EnthalpyAdvance (int which_step,
                              h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                              h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
-
             MakeS0mac(rho0_old, rho0mac_old);
             MakeS0mac(rhoh0_old, rhoh0mac_old);
             MakeS0mac(h0_old, h0mac_old);
         }
+#endif
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
@@ -221,6 +222,7 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_new(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             h0_old.copy(rhoh0_old / rho0_old);
             h0_new.copy(rhoh0_new / rho0_new);
@@ -250,7 +252,6 @@ Maestro::EnthalpyAdvance (int which_step,
                              h0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                              h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
-
             MakeS0mac(rho0_old, rho0mac_old);
             MakeS0mac(rhoh0_old, rhoh0mac_old);
             MakeS0mac(h0_old, h0mac_old);
@@ -258,6 +259,7 @@ Maestro::EnthalpyAdvance (int which_step,
             MakeS0mac(rhoh0_new, rhoh0mac_new);
             MakeS0mac(h0_new, h0mac_new);
         }
+#endif
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
@@ -496,6 +498,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_old(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             h0_old.copy(rhoh0_old / rho0_old);
 
@@ -512,11 +515,11 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              h0mac_old[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                              h0mac_old[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
-
             MakeS0mac(rho0_old, rho0mac_old);
             MakeS0mac(rhoh0_old, rhoh0mac_old);
             MakeS0mac(h0_old, h0mac_old);
         }
+#endif
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,
@@ -533,6 +536,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > > rhoh0mac_new(finest_level+1);
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             h0_old.copy(rhoh0_old / rho0_old);
             h0_new.copy(rhoh0_new / rho0_new);
@@ -562,7 +566,6 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              h0mac_new[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1); ,
                              h0mac_new[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1); );
             }
-
             MakeS0mac(rho0_old, rho0mac_old);
             MakeS0mac(rhoh0_old, rhoh0mac_old);
             MakeS0mac(h0_old, h0mac_old);
@@ -570,6 +573,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
             MakeS0mac(rhoh0_new, rhoh0mac_new);
             MakeS0mac(h0_new, h0mac_new);
         }
+#endif
 
         // compute enthalpy fluxes
         MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac,

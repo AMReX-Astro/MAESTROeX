@@ -310,11 +310,11 @@ public:
 #endif
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
-    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
-    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
+    void RestrictBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
 
-    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
-    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
+    void FillGhostBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -428,7 +428,7 @@ public:
 
     /// Utility to write out a multilevel multifab to a plotfile
     void WriteMF   (const amrex::Vector<amrex::MultiFab>& mf,
-                    std::string name);
+                    const std::string& name);
     ////////////////////////
 
     ////////////////////////
@@ -675,14 +675,14 @@ public:
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
-
+#if (AMREX_SPACEDIM == 3)
     /// MAC-project the base state velocity
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
     /// MAC-project the base state scalar `s0`
     void MakeS0mac (const BaseState<amrex::Real>& s0,
                     amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
-
+#endif
     /// Create the unit normal across the grids
     void MakeNormal ();
 
@@ -1204,9 +1204,9 @@ public:
                     const BaseState<amrex::Real>& p0_minus_peosbar,
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
-                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
-                 BaseStateArray<Real> u, const int n);
+    void Tridiag(const BaseStateArray<Real>& a, const BaseStateArray<Real>& b, 
+                 const BaseStateArray<Real>& c, const BaseStateArray<Real>& r, 
+                 const BaseStateArray<Real>& u, const int n);
 
     void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
@@ -1269,8 +1269,8 @@ public:
     amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
                            const int nSmallPlot,
                            amrex::Vector<const amrex::MultiFab*> mf,
-                           const amrex::Vector<std::string> varnames,
-                           const amrex::Vector<std::string> small_plot_varnames);
+                           const amrex::Vector<std::string>& varnames,
+                           const amrex::Vector<std::string>& small_plot_varnames);
 
     /// Set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
@@ -1603,16 +1603,16 @@ public:
     // MaestroTagging.cpp functions
 
     void RetagArray(const amrex::Box& bx,
-                    const int lev, IntVector& tag_array);
+                    const int lev);
 
     void TagBoxes(amrex::TagBoxArray& tags, 
                   const amrex::MFIter& mfi,
-                  const int lev, IntVector& tag_array,
+                  const int lev, 
                   const amrex::Real time) ;
 
     void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
                    const amrex::MFIter& mfi,
-                   const int lev, IntVector& tag_array,
+                   const int lev, 
                    const amrex::Real time);              
     ////////////
 

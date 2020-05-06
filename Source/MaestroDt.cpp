@@ -40,14 +40,13 @@ Maestro::EstDt ()
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
+#if (AMREX_SPACEDIM == 3)
     if (spherical) {
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM == 3)
             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-#endif
         }
 
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -60,6 +59,7 @@ Maestro::EstDt ()
             MakeW0mac(w0mac);
         }
     }
+#endif
 
     // build and compute vel_force
     Vector<MultiFab> vel_force(finest_level+1);
@@ -129,7 +129,6 @@ Maestro::EstDt ()
 
                 const Array4<const Real> scal_arr = sold[lev].array(mfi);
                 const Array4<const Real> u = uold[lev].array(mfi);
-                const Array4<const Real> force = vel_force[lev].array(mfi);
                 const Array4<const Real> S_cc_arr = S_cc_old[lev].array(mfi);
                 const Array4<const Real> dSdt_arr = dSdt[lev].array(mfi);
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
@@ -482,7 +481,6 @@ Maestro::FirstDt ()
 
                 const Array4<const Real> scal_arr = sold[lev].array(mfi);
                 const Array4<const Real> u = uold[lev].array(mfi);
-                const Array4<const Real> force = vel_force[lev].array(mfi);
                 const Array4<const Real> S_cc_arr = S_cc_old[lev].array(mfi);
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
