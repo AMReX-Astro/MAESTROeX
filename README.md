@@ -3,6 +3,7 @@
 [![DOI](https://zenodo.org/badge/104002862.svg)](https://zenodo.org/badge/latestdoi/104002862)
 [![DOI](https://joss.theoj.org/papers/10.21105/joss.01757/status.svg)](https://doi.org/10.21105/joss.01757)
 [![AMReX](https://amrex-codes.github.io/badges/powered%20by-AMReX-red.svg)](https://amrex-codes.github.io)
+![github pages](https://github.com/AMReX-Astro/MAESTROeX/workflows/github%20pages/badge.svg)
 
 ![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)
 
