@@ -9,7 +9,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const Vector<MultiFab>& rho,
                        const RealVector& rho0,
-                       const RealVector& grav_cell,
+                       const BaseState<Real>& grav_cell,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
@@ -55,6 +55,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             {       
                 gradw0_arr(l,i) = (p_w0[l+max_lev*(i+1)] - p_w0[l+max_lev*i])/dr0;
             });
+            Gpu::synchronize();
         }
     }
 
@@ -192,7 +193,6 @@ void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const RealVector& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
@@ -387,7 +387,6 @@ void
 Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
                          const Vector<MultiFab>& state,
                          const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0,
                          const BaseState<Real>& s0_edge,
                          const Vector<MultiFab>& s0_cart,
                          int comp,
@@ -576,6 +575,7 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     FillPatch(t_old, scal_force, scal_force, scal_force, comp, comp, 1, 0, bcs_f);
 }
 
+
 void
 Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
                        const int is_prediction,
@@ -597,20 +597,18 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     RealVector rho0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector   p0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector grav( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real>   p0(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> grav(base_geom.max_radial_level+1, base_geom.nr_fine);
     rho0.shrink_to_fit();
-    p0.shrink_to_fit();
-    grav.shrink_to_fit();
 
     if (which_step == 1) {
         rho0 = rho0_old;
-        p0 =   p0_old;
+        p0.copy(p0_old);
     } else {
         for(int i=0; i<rho0.size(); ++i) {
             rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-            p0[i] = 0.5*(  p0_old[i]+  p0_new[i]);
         }
+        p0.copy(0.5*(p0_old + p0_new));
     }
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -772,8 +770,9 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     // average down and fill ghost cells
-    AverageDown(scal_force,RhoH,1);
-    FillPatch(t_old,scal_force,scal_force,scal_force,RhoH,RhoH,1,0,bcs_f);
+    AverageDown(scal_force, RhoH, 1);
+    FillPatch(t_old, scal_force, scal_force, scal_force, 
+              RhoH, RhoH, 1, 0, bcs_f);
 }
 
 

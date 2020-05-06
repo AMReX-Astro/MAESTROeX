@@ -4,19 +4,19 @@
 using namespace amrex;
 
 void
-Maestro::MakeGravCell(RealVector& grav_cell, 
+Maestro::MakeGravCell(BaseState<Real>& grav_cell, 
                       const RealVector& rho0)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeGravCell()",MakeGravCell);
+    BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
 
     const int max_lev = base_geom.max_radial_level+1;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
+    auto grav_cell_arr = grav_cell.array();
 
     if (!spherical) {
         if (do_planar_invsq_grav)  {
-            Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
             const Real planar_invsq_mass_loc = planar_invsq_mass;
             // we are doing a plane-parallel geometry with a 1/r**2
             // gravitational acceleration.  The mass is assumed to be
@@ -25,8 +25,9 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    grav_cell_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_cc_loc(n,r)*r_cc_loc(n,r));
+                    grav_cell_arr(n,r) = -Gconst*planar_invsq_mass_loc / (r_cc_loc(n,r)*r_cc_loc(n,r));
                 });
+                Gpu::synchronize();
             }
         } else if (do_2d_planar_octant) {
             //   compute gravity as in the spherical case
@@ -35,7 +36,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
             // level = 0
             m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
-            grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
+            grav_cell_arr(0,0) = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
 
             int nr_lev = base_geom.nr(0);
 
@@ -68,7 +69,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
                 m(0,r) = m(0,r-1) + term1 + term2;
 
-                grav_cell[max_lev*r] = -Gconst * m(0,r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
+                grav_cell_arr(0,r) = -Gconst * m(0,r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
             }
 
             // level > 0
@@ -78,7 +79,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
                     if (base_geom.r_start_coord(n,i) == 0) {
                         m(n,0) = 4.0/3.0*M_PI*rho0[n]*r_cc_loc(n,0)*r_cc_loc(n,0)*r_cc_loc(n,0);
-                        grav_cell[n] = -Gconst * m(n,0) / (r_cc_loc(n,0)*r_cc_loc(n,0));
+                        grav_cell_arr(n,0) = -Gconst * m(n,0) / (r_cc_loc(n,0)*r_cc_loc(n,0));
                     } else {
                         int r = base_geom.r_start_coord(n,i);
                         m(n,r) = m(n-1,r/2-1);
@@ -109,7 +110,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
                         } 
 
                         m(n,r) += term1 + term2;
-                        grav_cell[n+max_lev*r] = -Gconst * m(n,r) / (r_cc_loc(n,r)*r_cc_loc(n,r));
+                        grav_cell_arr(n,r) = -Gconst * m(n,r) / (r_cc_loc(n,r)*r_cc_loc(n,r));
                     }
 
                     for (auto r = base_geom.r_start_coord(n,i)+1;
@@ -142,7 +143,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
                         m(n,r) = m(n,r-1) + term1 + term2;
 
-                        grav_cell[n+max_lev*r] = -Gconst * m(n,r) / (r_cc_loc(n,r)*r_cc_loc(n,r));
+                        grav_cell_arr(n,r) = -Gconst * m(n,r) / (r_cc_loc(n,r)*r_cc_loc(n,r));
                     }
                 }
             }
@@ -151,7 +152,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
             FillGhostBase(grav_cell, true);
         } else {
             // constant gravity
-            std::fill(grav_cell.begin(), grav_cell.end(), grav_const);
+            grav_cell.setVal(grav_const);
         }
     } else { // spherical = 1
 
@@ -159,7 +160,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
         auto m = m_state.array();
 
         m(0,0) = 4.0/3.0*M_PI*rho0[0]*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
-        grav_cell[0] = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
+        grav_cell_arr(0,0) = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
 
         for (auto r = 1; r < base_geom.nr_fine; ++r) {
 
@@ -190,7 +191,7 @@ Maestro::MakeGravCell(RealVector& grav_cell,
 
             m(0,r) = m(0,r-1) + term1 + term2;
 
-            grav_cell[max_lev*r] = -Gconst * m(0,r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
+            grav_cell_arr(0,r) = -Gconst * m(0,r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
         }
     }
 }
@@ -221,6 +222,7 @@ Maestro::MakeGravEdge(RealVector& grav_edge,
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc(n,r)*r_edge_loc(n,r));
                 });
+                Gpu::synchronize();
             }
         } else if (do_2d_planar_octant) {
             // compute gravity as in spherical geometry
@@ -333,6 +335,7 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
                 AMREX_PARALLEL_FOR_1D(nr_lev, r, {
                     grav_edge(n,r) = -Gconst*planar_invsq_mass_loc / (r_edge_loc(n,r)*r_edge_loc(n,r));
                 });
+                Gpu::synchronize();
             }
         } else if (do_2d_planar_octant) {
             // compute gravity as in spherical geometry

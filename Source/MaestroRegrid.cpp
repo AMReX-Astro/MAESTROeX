@@ -74,7 +74,7 @@ Maestro::Regrid ()
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
-    if (spherical == 1) {
+    if (spherical) {
         MakeNormal();
         if (use_exact_base_state) {
             Abort("MaestroRegrid.cpp: need to fill cell_cc_to_r for spherical & exact_base_state");
@@ -89,7 +89,7 @@ Maestro::Regrid ()
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
-        Average(sold,rho0_old,Rho);
+        Average(sold, rho0_old, Rho);
     } else {
         for (auto lev = 0; lev <= base_geom.max_radial_level+1; ++lev) {
             for (auto r = 0; r < base_geom.nr_fine; ++r) {
@@ -386,6 +386,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
     {
         state_temp[max_lev*r] = base[max_lev*r];
     });
+    Gpu::synchronize();
 
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
@@ -414,6 +415,7 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 }
             });
         }
+        Gpu::synchronize();
     }
 
     // copy valid data into temp
@@ -426,13 +428,15 @@ Maestro::RegridBaseState(RealVector& base_vec, const bool is_edge)
                 int r = k + lo;
                 state_temp[n+max_lev*r] = base[n+max_lev*r];
             });
+            Gpu::synchronize();
         }
     }
 
     // copy temp array back into the real thing
     AMREX_PARALLEL_FOR_1D(max_lev*nrf, r, {
         base[r] = state_temp[r];
-    })
+    });
+    Gpu::synchronize();
 }
 
 void
@@ -454,6 +458,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
     {
         state_temp(0,r) = base(0,r);
     });
+    Gpu::synchronize();
 
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
@@ -482,6 +487,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
                 }
             });
         }
+        Gpu::synchronize();
     }
 
     // copy valid data into temp
@@ -494,6 +500,7 @@ Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge)
                 int r = k + lo;
                 state_temp(n,r) = base(n,r);
             });
+            Gpu::synchronize();
         }
     }
 

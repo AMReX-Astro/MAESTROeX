@@ -51,13 +51,13 @@ struct BaseStateArray
         nvar = base_state.nComp();
     }
 
-    /// set to some scalar value 
-    void setVal(const T val) noexcept {
-        AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
-            dptr[i] = val;
-        });
-        amrex::Gpu::synchronize();
-    }
+    // /// set to some scalar value 
+    // void setVal(const T val) noexcept {
+    //     AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
+    //         dptr[i] = val;
+    //     });
+    //     amrex::Gpu::synchronize();
+    // }
 
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
@@ -198,6 +198,7 @@ public:
 
     /// deep copy 
     void copy(const BaseState<T>& src);
+    void copy(const BaseStateArray<T> src);
     void copy(const amrex::Gpu::ManagedVector<T>& src);
     void copy(const amrex::Vector<T>& src);
 
@@ -246,6 +247,7 @@ public:
     template <class U>
     friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
     BaseState<T>& operator/= (const T val);
+    BaseState<T> operator/ (const T val) const noexcept;
 
     /// element-wise division 
     template <class U>
@@ -384,6 +386,23 @@ BaseState<T>::copy(const BaseState<T>& src)
         for (auto r = 0; r < len; ++r) {
             for (auto comp = 0; comp < nvar; ++comp) {
                 base_data[comp + nvar*(r + len*l)] = src.base_data[comp + nvar*(r + len*l)];
+            } 
+        }
+    }
+}
+
+template <class T>
+void
+BaseState<T>::copy(const BaseStateArray<T> src)
+{
+    AMREX_ASSERT(nlev == src.nlev);
+    AMREX_ASSERT(nvar == src.nvar);
+    AMREX_ASSERT(len == src.len);
+
+    for (auto l = 0; l < nlev; ++l) {
+        for (auto r = 0; r < len; ++r) {
+            for (auto comp = 0; comp < nvar; ++comp) {
+                base_data[comp + nvar*(r + len*l)] = src(l, r, comp);
             } 
         }
     }
@@ -615,6 +634,18 @@ BaseState<T>::operator/= (const T val) {
     });
     amrex::Gpu::synchronize();
     return *this;
+}
+
+template <class T>
+BaseState<T>
+BaseState<T>::operator/ (const T val) const noexcept{
+    BaseState<T> s(nlev, len, nvar);
+    BaseStateArray<T> base_arr = s.array();
+    AMREX_PARALLEL_FOR_1D(nvar*len*nlev, i, {
+        base_arr(i) = base_data[i] / val;
+    });
+    amrex::Gpu::synchronize();
+    return s;
 }
 
 template <class T>

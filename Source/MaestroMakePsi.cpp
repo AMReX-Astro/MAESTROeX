@@ -31,8 +31,8 @@ Maestro::MakePsiPlanar()
 }
 
 void 
-Maestro::MakePsiSphr(const RealVector& gamma1bar, 
-                     const RealVector& p0_avg,
+Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar, 
+                     const BaseState<Real>& p0_avg,
                      const RealVector& Sbar_in) 
 {
     // timer for profiling
@@ -47,10 +47,10 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_p = gamma1bar.dataPtr();
-    const Real * AMREX_RESTRICT p0_avg_p = p0_avg.dataPtr();
     const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     auto psi_arr = psi.array();
+    const auto gamma1bar_arr = gamma1bar.const_array();
+    const auto p0_avg_arr = p0_avg.const_array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
@@ -59,13 +59,14 @@ Maestro::MakePsiSphr(const RealVector& gamma1bar,
              w0_p[max_lev*(r+1)] - 
              r_edge_loc(0,r)*r_edge_loc(0,r) * 
              w0_p[max_lev*r]) / dr0;
-        psi_arr(0,r) = gamma1bar_p[max_lev*r] * p0_avg_p[max_lev*r] * 
+        psi_arr(0,r) = gamma1bar_arr(0,r) * p0_avg_arr(0,r) * 
             (Sbar_p[max_lev*r] - div_w0_sph);
     });
+    Gpu::synchronize();
 }
 
 void 
-Maestro::MakePsiIrreg(const RealVector& grav_cell) 
+Maestro::MakePsiIrreg(const BaseState<Real>& grav_cell) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiIrreg()", MakePsiIrreg);
@@ -74,14 +75,15 @@ Maestro::MakePsiIrreg(const RealVector& grav_cell)
 
     psi.setVal(0.0);
 
-    const auto etarho_cc_arr = etarho_cc.array();
-    const Real * AMREX_RESTRICT grav_cell_p = grav_cell.dataPtr();
+    const auto etarho_cc_arr = etarho_cc.const_array();
     auto psi_arr = psi.array();
+    const auto grav_cell_arr = grav_cell.const_array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
-        psi_arr(0,r) = etarho_cc_arr(0,r) * grav_cell_p[max_lev*r];
+        psi_arr(0,r) = etarho_cc_arr(0,r) * grav_cell_arr(0,r);
     });
+    Gpu::synchronize();
 
     for (auto r = base_geom.base_cutoff_density_coord(0)+1; r < base_geom.nr_fine; ++r) {
         psi_arr(0,r) = psi_arr(0,r-1);

@@ -132,16 +132,16 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<rho0_new.size(); ++i) {
             BaseCCFile << rho0_new[i] << " "
-                       << p0_new[i] << " "
-                       << gamma1bar_new[i] << " "
-                       << rhoh0_new[i] << " "
-                       << beta0_new.array(i) << " "
-                       << psi.array(i) << " "
+                       << p0_new.array()(i) << " "
+                       << gamma1bar_new.array()(i) << " "
+                       << rhoh0_new.array()(i) << " "
+                       << beta0_new.array()(i) << " "
+                       << psi.array()(i) << " "
                        << tempbar[i] << " "
-                       << etarho_cc.array(i) << " "
+                       << etarho_cc.array()(i) << " "
                        << tempbar_init[i] << " "
-                       << p0_old[i] << " "
-                       << beta0_nm1.array(i) << "\n";
+                       << p0_old.array()(i) << " "
+                       << beta0_nm1.array()(i) << "\n";
         }
     }
 
@@ -162,7 +162,7 @@ Maestro::WriteCheckPoint (int step) {
 
         for (int i=0; i<w0.size(); ++i) {
             BaseFCFile << w0[i] << " "
-                       << etarho_ec.array(i) << "\n";
+                       << etarho_ec.array()(i) << "\n";
         }
     }
 
@@ -300,11 +300,11 @@ Maestro::ReadCheckPoint ()
             lis >> word;
             rho0_old[i] = std::stod(word);
             lis >> word;
-            p0_old[i] = std::stod(word);
+            p0_old.array()(i) = std::stod(word);
             lis >> word;
-            gamma1bar_old[i] = std::stod(word);
+            gamma1bar_old.array()(i) = std::stod(word);
             lis >> word;
-            rhoh0_old[i] = std::stod(word);
+            rhoh0_old.array()(i) = std::stod(word);
             lis >> word;
             beta0_old.array()(i) = std::stod(word);
             lis >> word;
@@ -316,7 +316,7 @@ Maestro::ReadCheckPoint ()
             lis >> word;
             tempbar_init[i] = std::stod(word);
             lis >> word;
-            p0_nm1[i] = std::stod(word);
+            p0_nm1.array()(i) = std::stod(word);
             lis >> word;
             beta0_nm1.array()(i) = std::stod(word);
         }

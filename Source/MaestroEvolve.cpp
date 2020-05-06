@@ -99,7 +99,7 @@ Maestro::Evolve ()
             Real diag_start_total = ParallelDescriptor::second();
 
             // save diag output into buffer
-            DiagFile(istep,t_new,rho0_new,p0_new,unew,snew,diag_index);
+            DiagFile(istep, t_new, rho0_new, p0_new, unew,snew, diag_index);
 
             // wallclock time
             Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
@@ -120,8 +120,9 @@ Maestro::Evolve ()
         {
         // write a plotfile
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
-                            gamma1bar_new,unew,snew,S_cc_new);
+            WritePlotFile(istep, t_new, dt, rho0_new,
+                            rhoh0_new, p0_new,
+                            gamma1bar_new, unew, snew, S_cc_new);
         }
 
         if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
@@ -130,8 +131,8 @@ Maestro::Evolve ()
         {
             // write a small plotfile
             Print() << "\nWriting small plotfile " << istep << std::endl;
-            WriteSmallPlotFile(istep,t_new,dt,rho0_new,rhoh0_new,p0_new,
-                                gamma1bar_new,unew,snew,S_cc_new);
+            WriteSmallPlotFile(istep, t_new, dt, rho0_new, rhoh0_new, p0_new,
+                                gamma1bar_new, unew, snew, S_cc_new);
         }
 
         if ( (chk_int > 0 && istep % chk_int == 0) ||
@@ -158,12 +159,12 @@ Maestro::Evolve ()
         }
 
         std::swap( rho0_old, rho0_new);
-        std::swap(rhoh0_old,rhoh0_new);
-        std::swap(   p0_nm1,   p0_old);
-        std::swap(   p0_old,   p0_new);
+        rhoh0_old.swap(rhoh0_new);
+        p0_nm1.swap(p0_old);
+        p0_old.swap(p0_new);
 
         beta0_old.swap(beta0_new);
-        std::swap(gamma1bar_old,gamma1bar_new);
-        std::swap(grav_cell_old,grav_cell_new);
+        gamma1bar_old.swap(gamma1bar_new);
+        grav_cell_old.swap(grav_cell_new);
     }
 }

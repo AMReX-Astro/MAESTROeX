@@ -11,15 +11,15 @@ void Maestro::WriteSmallPlotFile (const int step,
                                   const Real t_in,
                                   const Real dt_in,
                                   const RealVector& rho0_in,
-                                  const RealVector& rhoh0_in,
-                                  const RealVector& p0_in,
-                                  const RealVector& gamma1bar_in,
+                                  const BaseState<Real>& rhoh0_in,
+                                  const BaseState<Real>& p0_in,
+                                  const BaseState<Real>& gamma1bar_in,
                                   const Vector<MultiFab>& u_in,
                                   Vector<MultiFab>& s_in,
                                   const Vector<MultiFab>& S_cc_in)
 {
-    WritePlotFile (step, t_in, dt_in, rho0_in, rhoh0_in, p0_in,
-                   gamma1bar_in, u_in, s_in, S_cc_in, true);
+    WritePlotFile(step, t_in, dt_in, rho0_in, rhoh0_in, p0_in,
+                  gamma1bar_in, u_in, s_in, S_cc_in, true);
 }
 
 // write plotfile to disk
@@ -28,16 +28,16 @@ Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
                         const RealVector& rho0_in,
-                        const RealVector& rhoh0_in,
-                        const RealVector& p0_in,
-                        const RealVector& gamma1bar_in,
+                        const BaseState<Real>& rhoh0_in,
+                        const BaseState<Real>& p0_in,
+                        const BaseState<Real>& gamma1bar_in,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& s_in,
                         const Vector<MultiFab>& S_cc_in,
                         const bool is_small)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
+    BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
 
     // wallclock time
     const Real strt_total = ParallelDescriptor::second();
@@ -88,14 +88,14 @@ Maestro::WritePlotFile (const int step,
     for (int lev=0; lev<=finest_level; ++lev) {
         rhoh0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(rhoh0_in,rhoh0_cart,0,0);
+    Put1dArrayOnCart(rhoh0_in, rhoh0_cart, 0, 0);
 
     // convert p0 to multi-D MultiFab
     Vector<MultiFab> p0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(p0_in,p0_cart,0,0);
+    Put1dArrayOnCart(p0_in, p0_cart, 0, 0);
 
     // convert gamma1bar to multi-D MultiFab
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
@@ -107,8 +107,8 @@ Maestro::WritePlotFile (const int step,
     int nPlot = 0;
     const auto& varnames = PlotFileVarNames(&nPlot);
 
-    const auto& mf = PlotFileMF(nPlot,t_in,dt_in,rho0_cart,rhoh0_cart,p0_cart,
-                                gamma1bar_cart,u_in,s_in,p0_in,gamma1bar_in,
+    const auto& mf = PlotFileMF(nPlot, t_in, dt_in, rho0_cart,rhoh0_cart, p0_cart,
+                                gamma1bar_cart, u_in, s_in,p0_in, gamma1bar_in,
                                 S_cc_in);
 
     // WriteMultiLevelPlotfile expects an array of step numbers
@@ -162,9 +162,9 @@ Maestro::WritePlotFile (const int step,
             for (int i=0; i<base_geom.nr(lev); ++i) {
                 BaseCCFile << base_geom.r_cc_loc(lev,i) << " "
                            << rho0_in[lev+(base_geom.max_radial_level+1)*i] << " "
-                           << rhoh0_in[lev+(base_geom.max_radial_level+1)*i] << " "
-                           << p0_in[lev+(base_geom.max_radial_level+1)*i] << " "
-                           << gamma1bar_in[lev+(base_geom.max_radial_level+1)*i] << "\n";
+                           << rhoh0_in.array()(lev,i) << " "
+                           << p0_in.array()(lev,i) << " "
+                           << gamma1bar_in.array()(lev,i) << "\n";
             }
         }
     }
@@ -231,8 +231,8 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& gamma1bar_cart,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& s_in,
-                     const RealVector& p0_in,
-                     const RealVector& gamma1bar_in,
+                     const BaseState<Real>& p0_in,
+                     const BaseState<Real>& gamma1bar_in,
                      const Vector<MultiFab>& S_cc_in)
 {
     // timer for profiling
@@ -407,7 +407,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // compute tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in, p0_in);
     // tfromp
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -415,7 +415,7 @@ Maestro::PlotFileMF (const int nPlot,
     ++dest_comp;
 
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
         // tfromh
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -434,12 +434,12 @@ Maestro::PlotFileMF (const int nPlot,
 
     // deltaT
     // compute & copy tfromp
-    TfromRhoP(s_in,p0_in);
+    TfromRhoP(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
     }
     // compute tfromh
-    TfromRhoH(s_in,p0_in);
+    TfromRhoH(s_in, p0_in);
     // compute deltaT = (tfromp - tfromh) / tfromh
     for (int i = 0; i <= finest_level; ++i) {
         MultiFab::Subtract(*plot_mf_data[i],s_in[i],Temp,dest_comp,1,0);
@@ -449,7 +449,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // restore tfromp if necessary
     if (use_tfromp) {
-        TfromRhoP(s_in,p0_in);
+        TfromRhoP(s_in, p0_in);
     }
 
     // pi
@@ -555,7 +555,7 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     // Mach number
-    MachfromRhoH(s_in,u_in,p0_in,w0r_cart,tempmf);
+    MachfromRhoH(s_in, u_in, p0_in, w0r_cart, tempmf);
 
     // MachNumber
     for (int i = 0; i <= finest_level; ++i) {
@@ -627,7 +627,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     // soundspeed
     if (plot_cs) {
-        CsfromRhoH(s_in, p0_in, p0_cart, tempmf);
+        CsfromRhoH(s_in, p0_cart, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
         }
@@ -1685,16 +1685,15 @@ Maestro::MakeGrav (const RealVector& rho0,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGrav()", MakeGrav);
 
-    RealVector grav_cell( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    grav_cell.shrink_to_fit();
+    BaseState<Real> grav_cell(base_geom.max_radial_level+1, base_geom.nr_fine);
 
     MakeGravCell(grav_cell, rho0);
 
-    Put1dArrayOnCart(grav_cell,grav,0,0,bcs_f,0);
+    Put1dArrayOnCart(grav_cell, grav, 0, 0, bcs_f, 0);
 
     // average down and fill ghost cells
-    AverageDown(grav,0,1);
-    FillPatch(t_old,grav,grav,grav,0,0,1,0,bcs_f);
+    AverageDown(grav, 0, 1);
+    FillPatch(t_old, grav, grav, grav, 0, 0, 1 ,0, bcs_f);
 }
 
 
@@ -2016,9 +2015,9 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 void
 Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
-                         const RealVector& p0,
+                         const BaseState<Real>& p0,
                          const Vector<MultiFab>& p0_cart,
-                         const RealVector& gamma1bar,
+                         const BaseState<Real>& gamma1bar,
                          const Vector<MultiFab>& gamma1bar_cart,
                          Vector<MultiFab>& deltagamma)
 {

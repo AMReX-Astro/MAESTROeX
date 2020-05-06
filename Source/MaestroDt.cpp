@@ -692,14 +692,14 @@ Maestro::FirstDt ()
 
 
 void
-Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec, 
-                    const RealVector& gamma1bar_vec)
+Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0, 
+                    const BaseState<Real>& gamma1bar)
 {
     const int max_lev = base_geom.max_radial_level + 1;
 
     Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
-    const Real * AMREX_RESTRICT p0 = p0_vec.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar = gamma1bar_vec.dataPtr();
+    const auto p0_arr = p0.const_array();
+    const auto gamma1bar_arr = gamma1bar.const_array();
     const auto& r_cc_loc = base_geom.r_cc_loc;
 
     // spherical divU constraint
@@ -707,20 +707,21 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const RealVector& p0_vec,
         AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / (r_cc_loc(0,r) - r_cc_loc(0,r-1))  / gamma1bar_p_avg;
+            gp0[max_lev*r] = (p0_arr(0,r) - p0_arr(0,r-1)) / (r_cc_loc(0,r) - r_cc_loc(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
         const auto dr0 = base_geom.dr(0);
         AMREX_PARALLEL_FOR_1D(base_geom.nr_fine-2, i, {
             int r = i + 1;
 
-            Real gamma1bar_p_avg = 0.5 * (gamma1bar[max_lev*r]*p0[max_lev*r] + gamma1bar[max_lev*(r-1)]*p0[max_lev*(r-1)]);
+            Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0[max_lev*r] = (p0[max_lev*r] - p0[max_lev*(r-1)]) / dr0 / gamma1bar_p_avg;
+            gp0[max_lev*r] = (p0_arr(0,r) - p0_arr(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
+    Gpu::synchronize();
 
     gp0_vec[max_lev*base_geom.nr_fine] = gp0_vec[max_lev*(base_geom.nr_fine-1)];
     gp0_vec[0] = gp0_vec[max_lev];

@@ -6,7 +6,7 @@ using namespace amrex;
 
 void
 Maestro::TfromRhoH (Vector<MultiFab>& scal,
-                    const RealVector& p0)
+                    const BaseState<Real>& p0)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TfromRhoH()", TfromRhoH);
@@ -17,7 +17,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0,p0_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
 
     const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
 
@@ -83,7 +83,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
 
 void
 Maestro::TfromRhoP (Vector<MultiFab>& scal,
-                    const RealVector& p0,
+                    const BaseState<Real>& p0,
                     const bool updateRhoH)
 {
     // timer for profiling
@@ -105,7 +105,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -142,13 +142,13 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
     }
 
     // average down and fill ghost cells (Temperature)
-    AverageDown(scal,Temp,1);
-    FillPatch(t_old,scal,scal,scal,Temp,Temp,1,Temp,bcs_s);
+    AverageDown(scal, Temp, 1);
+    FillPatch(t_old, scal, scal, scal, Temp, Temp, 1, Temp, bcs_s);
 
     // average down and fill ghost cells (Enthalpy)
     if (updateRhoH) {
-        AverageDown(scal,RhoH,1);
-        FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
+        AverageDown(scal, RhoH, 1);
+        FillPatch(t_old, scal, scal, scal, RhoH, RhoH, 1, RhoH, bcs_s);
     }
 }
 
@@ -203,7 +203,7 @@ Maestro::PfromRhoH (const Vector<MultiFab>& state,
 void
 Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
                            const Vector<MultiFab>& vel,
-                           const RealVector& p0,
+                           const BaseState<Real>& p0,
                            const Vector<MultiFab>& w0cart,
                            Vector<MultiFab>& mach)
 {
@@ -226,7 +226,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -280,7 +280,6 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
-                     const RealVector& p0,
                      const Vector<MultiFab>& p0_cart,
                      Vector<MultiFab>& cs)
 {
@@ -295,7 +294,7 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
@@ -336,10 +335,10 @@ Maestro::CsfromRhoH (const Vector<MultiFab>& scal,
 
 void
 Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
-                        const RealVector& rho0_edge_old,
-                        const RealVector& rhoh0_edge_old,
-                        const RealVector& rho0_edge_new,
-                        const RealVector& rhoh0_edge_new)
+                        const BaseState<Real>& rho0_edge_old,
+                        const BaseState<Real>& rhoh0_edge_old,
+                        const BaseState<Real>& rho0_edge_new,
+                        const BaseState<Real>& rhoh0_edge_new)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::HfromRhoTedge()", HfromRhoTedge);
@@ -358,33 +357,27 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     }
 
     RealVector rho0_halftime( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector rhoh0_halftime( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> rhoh0_halftime(base_geom.max_radial_level+1, base_geom.nr_fine);
     rho0_halftime.shrink_to_fit();
-    rhoh0_halftime.shrink_to_fit();
 
     for (int i = 0; i < (base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
         rho0_halftime[i] = 0.5*(rho0_old[i] + rho0_new[i]);
-        rhoh0_halftime[i] = 0.5*(rhoh0_old[i] + rhoh0_new[i]);
     }
+    rhoh0_halftime.copy(0.5*(rhoh0_old + rhoh0_new));
     
     Put1dArrayOnCart(rho0_halftime,rho0_cart,0,0,bcs_s,Rho);
     Put1dArrayOnCart(rhoh0_halftime,rhoh0_cart,0,0,bcs_s,RhoH);
     Put1dArrayOnCart(tempbar,tempbar_cart,0,0,bcs_s,Temp);
 
     // edge variables    
-    RealVector rho0_edge( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    RealVector rhoh0_edge( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    RealVector tempbar_edge( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    rho0_edge.shrink_to_fit();
-    rhoh0_edge.shrink_to_fit();
-    tempbar_edge.shrink_to_fit();
+    BaseState<Real> rho0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rhoh0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> tempbar_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     if (!spherical) {
         CelltoEdge(tempbar, tempbar_edge);
-        for (int i = 0; i < (base_geom.max_radial_level+1)*(base_geom.nr_fine+1); ++i) {
-            rho0_edge[i] = 0.5*(rho0_edge_old[i] + rho0_edge_new[i]);
-            rhoh0_edge[i] = 0.5*(rhoh0_edge_old[i] + rhoh0_edge_new[i]);
-        }
+        rho0_edge.copy(0.5*(rho0_edge_old + rho0_edge_new));
+        rhoh0_edge.copy(0.5*(rhoh0_edge_old + rhoh0_edge_new));
     }
     
     Vector<MultiFab> rho0_edge_cart(finest_level+1);
@@ -400,10 +393,10 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
         tempbar_edge_cart[lev].setVal(0.);
     }
 
-    if (spherical == 0) {
-        Put1dArrayOnCart(rho0_edge,rho0_edge_cart,1,0,bcs_s,Rho);
-        Put1dArrayOnCart(rhoh0_edge,rhoh0_edge_cart,1,0,bcs_s,RhoH);
-        Put1dArrayOnCart(tempbar_edge,tempbar_edge_cart,1,0,bcs_s,Temp);
+    if (!spherical) {
+        Put1dArrayOnCart(rho0_edge, rho0_edge_cart, 1, 0, bcs_s, Rho);
+        Put1dArrayOnCart(rhoh0_edge, rhoh0_edge_cart, 1, 0, bcs_s, RhoH);
+        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, 1, 0, bcs_s, Temp);
     }
 
     // make a lot of local copies
@@ -443,7 +436,7 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
             const Array4<Real> sedgez = sedge[lev][2].array(mfi);
 #endif
 
-            if (spherical == 0) {
+            if (!spherical) {
                 const Array4<const Real> rho0_edge_arr = rho0_edge_cart[lev].array(mfi);
                 const Array4<const Real> rhoh0_edge_arr = rhoh0_edge_cart[lev].array(mfi);
                 const Array4<const Real> tempbar_edge_arr = tempbar_edge_cart[lev].array(mfi);

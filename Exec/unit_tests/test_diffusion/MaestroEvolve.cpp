@@ -90,9 +90,10 @@ Maestro::Evolve ()
 	// We shall therefore create a dummy variable to fill up all the variables
 	// passed into the function that won't be used.
 	Vector<Real> dummy;
+	BaseState<Real> dummy_b;
 
 	// dump initial state
-	WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,sold,analytic,error);
+	WritePlotFile(0,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,sold,analytic,error);
 
 	for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
 	{
@@ -177,7 +178,7 @@ Maestro::Evolve ()
                               (istep == max_step) ) || (t_old >= stop_time) )
         {
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep,t_new,dt,dummy,dummy,dummy,dummy,sold,analytic,error);
+            WritePlotFile(istep,t_new,dt,dummy,dummy_b,dummy_b,dummy_b,sold,analytic,error);
         }
 
 		t_old = t_new;

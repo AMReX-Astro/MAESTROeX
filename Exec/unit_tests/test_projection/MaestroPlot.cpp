@@ -12,9 +12,9 @@ Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
                         const Vector<Real>& a,
-                        const Vector<Real>& b,
-                        const Vector<Real>& c,
-                        const Vector<Real>& d,
+                        const BaseState<Real>& b,
+                        const BaseState<Real>& c,
+                        const BaseState<Real>& d,
                         const Vector<MultiFab>& u_in,
                         Vector<MultiFab>& e,
                         const Vector<MultiFab>& f,
@@ -49,7 +49,7 @@ Maestro::WritePlotFile (const int step,
 
     if (step == 2) {
         const Vector<std::string> varnames = {"gphix", "gphiy", "gphiz"};
-        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,a,a, dummy);
+        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,b,b, dummy);
         WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
     	                        Geom(), t_in, step_array, refRatio());
 
@@ -59,7 +59,7 @@ Maestro::WritePlotFile (const int step,
 
     } else {
     	const auto& varnames = PlotFileVarNames(&nPlot);
-        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,a,a, dummy);
+        const auto& mf = PlotFileMF(nPlot,t_in,dt_in,dummy,dummy,dummy,dummy,u_in,e,b,b, dummy);
 
         WriteMultiLevelPlotfile(plotfilename, finest_level+1, mf, varnames,
     	                        Geom(), t_in, step_array, refRatio());
@@ -89,8 +89,8 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& d,
                      const Vector<MultiFab>& u_in,
                      Vector<MultiFab>& e,
-                     const Vector<Real>& f,
-                     const Vector<Real>& g,
+                     const BaseState<Real>& f,
+                     const BaseState<Real>& g,
                      const Vector<MultiFab>& h)
 {
 	// timer for profiling
@@ -1078,9 +1078,9 @@ Maestro::MakeVorticity (const Vector<MultiFab>& vel,
 
 void
 Maestro::MakeDeltaGamma (const Vector<MultiFab>& state,
-                         const RealVector& p0,
+                         const BaseState<Real>& p0,
                          const Vector<MultiFab>& p0_cart,
-                         const RealVector& gamma1bar,
+                         const BaseState<Real>& gamma1bar,
                          const Vector<MultiFab>& gamma1bar_cart,
                          Vector<MultiFab>& deltagamma)
 {

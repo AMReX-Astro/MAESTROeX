@@ -134,7 +134,7 @@ Maestro::AdvectBaseEnthalpy(BaseState<Real>& rhoh0_predicted_edge)
     
     rhoh0_predicted_edge.setVal(0.0);
 
-    if (spherical == 0) {
+    if (!spherical) {
         AdvectBaseEnthalpyPlanar(rhoh0_predicted_edge);
         RestrictBase(rhoh0_new, true);
         FillGhostBase(rhoh0_new, true);
@@ -153,7 +153,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
 
     // zero the new enthalpy so we don't leave a non-zero enthalpy in fine radial
     // regions that no longer have a corresponding full state
-    std::fill(rhoh0_new.begin(), rhoh0_new.end(), 0);
+    rhoh0_new.setVal(0.0);
 
     const int max_lev = base_geom.max_radial_level+1;
     auto rhoh0_predicted_edge = rhoh0_predicted_edge_state.array();
@@ -163,7 +163,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
+        const auto rhoh0_old_arr = rhoh0_old.array(); 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         const auto psi_arr = psi.array();  
 
@@ -178,7 +178,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 int p = n+max_lev*r;
-                force_arr(n,r) = -rhoh0_old_p[p] * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev 
+                force_arr(n,r) = -rhoh0_old_arr(n,r) * (w0_p[n+max_lev*(r+1)] - w0_p[p]) / dr_lev 
                     + psi_arr(n,r);
             });
             Gpu::synchronize();
@@ -189,8 +189,8 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
 
     for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-        const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
-        Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr(); 
+        const auto rhoh0_old_arr = rhoh0_old.array(); 
+        auto rhoh0_new_arr = rhoh0_new.array(); 
         const Real * AMREX_RESTRICT w0_p = w0.dataPtr();  
         const auto psi_arr = psi.array(); 
 
@@ -206,7 +206,7 @@ Maestro::AdvectBaseEnthalpyPlanar(BaseState<Real>& rhoh0_predicted_edge_state)
             AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
                 int r = j + lo;
                 int p = n+max_lev*r;
-                rhoh0_new_p[p] = rhoh0_old_p[p] 
+                rhoh0_new_arr(n,r) = rhoh0_old_arr(n,r) 
                     - dt_loc/dr_lev * (rhoh0_predicted_edge(n,r+1)*w0_p[n+max_lev*(r+1)] - rhoh0_predicted_edge(n,r)*w0_p[p]) + dt_loc * psi_arr(n,r);
             });
             Gpu::synchronize();
@@ -229,18 +229,18 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge_state)
     auto rhoh0_predicted_edge = rhoh0_predicted_edge_state.array();
 
     // predict (rho h)_0 on the edges
-    const Real * AMREX_RESTRICT rhoh0_old_p = rhoh0_old.dataPtr(); 
-    Real * AMREX_RESTRICT rhoh0_new_p = rhoh0_new.dataPtr();
+    const auto rhoh0_old_arr = rhoh0_old.const_array(); 
+    auto rhoh0_new_arr = rhoh0_new.array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr(); 
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto psi_arr = psi.array(); 
-    const auto force_arr = force.array();
+    const auto psi_arr = psi.const_array(); 
+    auto force_arr = force.array();
 
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
         int p = max_lev*r;
-        force_arr(0,r) = -rhoh0_old_p[p] * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
-            rhoh0_old_p[p]*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc(0,r) + psi_arr(0,r);
+        force_arr(0,r) = -rhoh0_old_arr(0,r) * (w0_p[max_lev*(r+1)] - w0_p[p]) / dr0 - 
+            rhoh0_old_arr(0,r)*(w0_p[p] + w0_p[max_lev*(r+1)])/r_cc_loc(0,r) + psi_arr(0,r);
     });
     Gpu::synchronize();
 
@@ -249,7 +249,7 @@ Maestro::AdvectBaseEnthalpySphr(BaseState<Real>& rhoh0_predicted_edge_state)
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
         int p = max_lev*r;
 
-        rhoh0_new_p[p] = rhoh0_old_p[p] - dtdr/(r_cc_loc(0,r)*r_cc_loc(0,r)) * 
+        rhoh0_new_arr(0,r) = rhoh0_old_arr(0,r) - dtdr/(r_cc_loc(0,r)*r_cc_loc(0,r)) * 
             (r_edge_loc(0,r+1)*r_edge_loc(0,r+1) * rhoh0_predicted_edge(0,r+1) * w0_p[max_lev*(r+1)] - 
             r_edge_loc(0,r)*r_edge_loc(0,r) * rhoh0_predicted_edge(0,r) * w0_p[p]) + 
             dt_loc * psi_arr(0,r);

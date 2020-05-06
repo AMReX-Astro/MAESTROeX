@@ -81,6 +81,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
                     int i = n + lo;
                     amrex::HostDevice::Atomic::Add(&(etarhosum_p[lev+max_lev*j]), etarhoflux_arr(i,j,k));
                 });
+                Gpu::synchronize();
             }
 #else 
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
@@ -128,6 +129,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
                 int r = j + lo;
                 etarho_ec_arr(n,r) = etarhosum_p[n+max_lev*r] / ncell_lev;
             });
+            Gpu::synchronize();
         }
     }
 
@@ -147,6 +149,7 @@ Maestro::MakeEtarho (const Vector<MultiFab>& etarho_flux)
                 etarho_cc_arr(n,r) = 0.5 * (etarho_ec_arr(n,r) + 
                     etarho_ec_arr(n,r+1));
             });
+            Gpu::synchronize();
         }
     }
 
@@ -194,6 +197,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
         AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
             rho0_nph_arr(l,r) = 0.5*(rho0_old_p[l+max_lev*r]+rho0_new_p[l+max_lev*r]);
         });
+        Gpu::synchronize();
     }
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
@@ -277,4 +281,5 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
             }
         }
     });
+    Gpu::synchronize();
 }

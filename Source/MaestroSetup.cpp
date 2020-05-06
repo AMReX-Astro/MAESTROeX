@@ -92,14 +92,13 @@ Maestro::Setup ()
         } else {
             double lenx, leny, lenz, max_dist;
             if (octant) {
-            lenx = probHi[0] - probLo[0];
-            leny = probHi[1] - probLo[1];
-            lenz = probHi[2] - probLo[2];
-            }
-            else {
-            lenx = 0.5*(probHi[0] - probLo[0]);
-            leny = 0.5*(probHi[1] - probLo[1]);
-            lenz = 0.5*(probHi[2] - probLo[2]);
+                lenx = probHi[0] - probLo[0];
+                leny = probHi[1] - probLo[1];
+                lenz = probHi[2] - probLo[2];
+            } else {
+                lenx = 0.5*(probHi[0] - probLo[0]);
+                leny = 0.5*(probHi[1] - probLo[1]);
+                lenz = 0.5*(probHi[2] - probLo[2]);
             }
             max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
             base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
@@ -123,20 +122,20 @@ Maestro::Setup ()
     p0_init      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     rho0_old     .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     rho0_new     .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    rhoh0_old    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    rhoh0_new    .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    p0_old       .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    p0_new       .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    p0_nm1       .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    rhoh0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rhoh0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_old       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_new       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    p0_nm1       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     tempbar      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     tempbar_init .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     beta0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     beta0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     beta0_nm1    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    gamma1bar_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    gamma1bar_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    grav_cell_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    grav_cell_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    gamma1bar_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    gamma1bar_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    grav_cell_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    grav_cell_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     etarho_cc    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     psi          .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
 
@@ -159,17 +158,8 @@ Maestro::Setup ()
     p0_init      .shrink_to_fit();
     rho0_old     .shrink_to_fit();
     rho0_new     .shrink_to_fit();
-    rhoh0_old    .shrink_to_fit();
-    rhoh0_new    .shrink_to_fit();
-    p0_old       .shrink_to_fit();
-    p0_new       .shrink_to_fit();
-    p0_nm1       .shrink_to_fit();
     tempbar      .shrink_to_fit();
     tempbar_init .shrink_to_fit();
-    gamma1bar_old.shrink_to_fit();
-    gamma1bar_new.shrink_to_fit();
-    grav_cell_old.shrink_to_fit();
-    grav_cell_new.shrink_to_fit();
     w0           .shrink_to_fit();
     tag_array    .shrink_to_fit();
     diagfile1_data.shrink_to_fit();
@@ -346,9 +336,7 @@ Maestro::BCSetup()
                 }
             }
         }
-    }
-    else
-    {
+    } else {
         //
         // Do idiot check.  If not periodic, should be no interior.
         //
@@ -389,8 +377,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::int_dir);
             }
-        }
-        else if (phys_bc[dir] == Inflow) {
+        } else if (phys_bc[dir] == Inflow) {
             // inflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
@@ -405,8 +392,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[dir] == Outflow) {
+        } else if (phys_bc[dir] == Outflow) {
             // outflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::foextrap);
@@ -421,8 +407,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[dir] == Symmetry) {
+        } else if (phys_bc[dir] == Symmetry) {
             // symmetry
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::reflect_even);
@@ -438,8 +423,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::reflect_even);
             }
-        }
-        else if (phys_bc[dir] == SlipWall) {
+        } else if (phys_bc[dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::hoextrap);
@@ -455,8 +439,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[dir] == NoSlipWall) {
+        } else if (phys_bc[dir] == NoSlipWall) {
             // no-slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
@@ -471,8 +454,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
-        }
-        else {
+        } else {
             Abort("Invalid lo_bc");
         }
 
@@ -492,8 +474,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::int_dir);
             }
-        }
-        else if (phys_bc[AMREX_SPACEDIM+dir] == Inflow) {
+        } else if (phys_bc[AMREX_SPACEDIM+dir] == Inflow) {
             // inflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
@@ -508,8 +489,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[AMREX_SPACEDIM+dir] == Outflow) {
+        } else if (phys_bc[AMREX_SPACEDIM+dir] == Outflow) {
             // outflow
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::foextrap);
@@ -524,8 +504,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[AMREX_SPACEDIM+dir] == Symmetry) {
+        } else if (phys_bc[AMREX_SPACEDIM+dir] == Symmetry) {
             // symmetry
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::reflect_even);
@@ -541,8 +520,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::reflect_even);
             }
-        }
-        else if (phys_bc[AMREX_SPACEDIM+dir] == SlipWall) {
+        } else if (phys_bc[AMREX_SPACEDIM+dir] == SlipWall) {
             // slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::hoextrap);
@@ -558,8 +536,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        }
-        else if (phys_bc[AMREX_SPACEDIM+dir] == NoSlipWall) {
+        } else if (phys_bc[AMREX_SPACEDIM+dir] == NoSlipWall) {
             // no-slip wall
             for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
@@ -574,8 +551,7 @@ Maestro::BCSetup()
             for (int comp=0; comp<Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        }
-        else {
+        } else {
             Abort("Invalid hi_bc");
         }
     } // end loop over directions

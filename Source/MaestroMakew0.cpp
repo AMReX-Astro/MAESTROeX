@@ -9,11 +9,11 @@ Maestro::Makew0(const RealVector& w0_old,
                 const RealVector& Sbar_in, 
                 const RealVector& rho0_old_in,
                 const RealVector& rho0_new_in,
-                const RealVector& p0_old_in,
-                const RealVector& p0_new_in,
-                const RealVector& gamma1bar_old_in,
-                const RealVector& gamma1bar_new_in,
-                const RealVector& p0_minus_peosbar, 
+                const BaseState<Real>& p0_old_in,
+                const BaseState<Real>& p0_new_in,
+                const BaseState<Real>& gamma1bar_old_in,
+                const BaseState<Real>& gamma1bar_new_in,
+                const BaseState<Real>& p0_minus_peosbar, 
                 RealVector& delta_chi_w0, 
                 const Real dt_in, const Real dtold_in, 
                 const bool is_predictor) 
@@ -78,11 +78,11 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                       const RealVector& Sbar_in, 
                       const RealVector& rho0_old_in,
                       const RealVector& rho0_new_in,
-                      const RealVector& p0_old_in,
-                      const RealVector& p0_new_in,
-                      const RealVector& gamma1bar_old_in,
-                      const RealVector& gamma1bar_new_in,
-                      const RealVector& p0_minus_peosbar,  
+                      const BaseState<Real>& p0_old_in,
+                      const BaseState<Real>& p0_new_in,
+                      const BaseState<Real>& gamma1bar_old_in,
+                      const BaseState<Real>& gamma1bar_new_in,
+                      const BaseState<Real>& p0_minus_peosbar,  
                       RealVector& delta_chi_w0, 
                       const Real dt_in, const Real dtold_in, 
                       const bool is_predictor) 
@@ -119,6 +119,11 @@ Maestro::Makew0Planar(const RealVector& w0_old,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
+    const auto p0_old_arr = p0_old_in.const_array();
+    const auto p0_new_arr = p0_new_in.const_array();
+    const auto gamma1bar_old_arr = gamma1bar_old_in.const_array();
+    const auto gamma1bar_new_arr = gamma1bar_new_in.const_array();
+    const auto p0_minus_peosbar_arr = p0_minus_peosbar.const_array();
 
     const Real dt_loc = dt;
     const Real grav_const_loc = grav_const;
@@ -151,26 +156,27 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     psi_planar(r) = etarho_cc_arr(n,r) * fabs(grav_const_loc);
                 }
             });
+            Gpu::synchronize();
 
             for (auto r = base_geom.r_start_coord(n,j)+1; 
                 r <= base_geom.r_end_coord(n,j)+1; ++r) {
 
-                Real gamma1bar_p0_avg = (gamma1bar_old_in[n+max_lev*(r-1)]
-                    + gamma1bar_new_in[n+max_lev*(r-1)]) *
-                    (p0_old_in[n+max_lev*(r-1)] + 
-                    p0_new_in[n+max_lev*(r-1)])/4.0;
+                Real gamma1bar_p0_avg = (gamma1bar_old_arr(n,r-1)
+                    + gamma1bar_new_arr(n,r-1)) *
+                    (p0_old_arr(n,r-1) + 
+                    p0_new_arr(n,r-1))/4.0;
 
                 if (r < base_cutoff_density_coord) {
                     if (is_predictor) {
                         delta_chi_w0[n+max_lev*(r-1)] = dpdt_factor_loc * 
-                            p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_old_in[n+max_lev*(r-1)]*
-                            p0_old_in[n+max_lev*(r-1)]*dt_loc);
+                            p0_minus_peosbar_arr(n,r-1) / 
+                            (gamma1bar_old_arr(n,r-1)*
+                            p0_old_arr(n,r-1)*dt_loc);
                     } else {
                         delta_chi_w0[n+max_lev*(r-1)] += dpdt_factor_loc *
-                            p0_minus_peosbar[n+max_lev*(r-1)] / 
-                            (gamma1bar_new_in[n+max_lev*(r-1)]*
-                            p0_new_in[n+max_lev*(r-1)]*dt_loc);
+                            p0_minus_peosbar_arr(n,r-1) / 
+                            (gamma1bar_new_arr(n,r-1)*
+                            p0_new_arr(n,r-1)*dt_loc);
                     }
                 } else {
                     delta_chi_w0[n+max_lev*(r-1)] = 0.0;
@@ -206,6 +212,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                         int r = k + lo;
                         w0_p[i+max_lev*r] += offset;
                     });
+                    Gpu::synchronize();
                 }
             }
         }
@@ -229,6 +236,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                     w0_p[n+max_lev*r] = 0.0;
                 });
             }
+            Gpu::synchronize();
         }
     }
 
@@ -259,6 +267,7 @@ Maestro::Makew0Planar(const RealVector& w0_old,
                 w0_force_p[n+max_lev*r] = (w0_new_cen - w0_old_cen)/dt_avg 
                     + w0_avg*div_avg/dr_lev;
             });
+            Gpu::synchronize();
         }
     }
 
@@ -272,11 +281,11 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                           const RealVector& Sbar_in, 
                           const RealVector& rho0_old_in,
                           const RealVector& rho0_new_in,
-                          const RealVector& p0_old_in,
-                          const RealVector& p0_new_in,
-                          const RealVector& gamma1bar_old_in,
-                          const RealVector& gamma1bar_new_in,
-                          const RealVector& p0_minus_peosbar,  
+                          const BaseState<Real>& p0_old_in,
+                          const BaseState<Real>& p0_new_in,
+                          const BaseState<Real>& gamma1bar_old_in,
+                          const BaseState<Real>& gamma1bar_new_in,
+                          const BaseState<Real>& p0_minus_peosbar,  
                           RealVector& delta_chi_w0, 
                           const Real dt_in, const Real dtold_in) 
 {
@@ -294,7 +303,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
-    const auto r_edge_loc = base_geom.r_edge_loc;
+    const auto& r_edge_loc = base_geom.r_edge_loc;
 
     // The planar 1/r**2 gravity constraint equation is solved
     // by calling the tridiagonal solver, just like spherical.
@@ -321,12 +330,12 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     BaseState<Real> grav_edge_fine(nr_finest+1);
 
     // 2) copy the data into the temp, uniformly-gridded basestate arrays.
-    ProlongBasetoUniform(p0_old, p0_old_fine);
-    ProlongBasetoUniform(p0_new, p0_new_fine);
-    ProlongBasetoUniform(rho0_old, rho0_old_fine);
-    ProlongBasetoUniform(rho0_new, rho0_new_fine);
-    ProlongBasetoUniform(gamma1bar_old, gamma1bar_old_fine);
-    ProlongBasetoUniform(gamma1bar_new, gamma1bar_new_fine);
+    ProlongBasetoUniform(p0_old_in, p0_old_fine);
+    ProlongBasetoUniform(p0_new_in, p0_new_fine);
+    ProlongBasetoUniform(rho0_old_in, rho0_old_fine);
+    ProlongBasetoUniform(rho0_new_in, rho0_new_fine);
+    ProlongBasetoUniform(gamma1bar_old_in, gamma1bar_old_fine);
+    ProlongBasetoUniform(gamma1bar_new_in, gamma1bar_new_fine);
     ProlongBasetoUniform(p0_minus_peosbar, p0_minus_peosbar_fine);
     ProlongBasetoUniform(etarho_cc, etarho_cc_fine);
     ProlongBasetoUniform(Sbar_in, Sbar_in_fine);
@@ -349,13 +358,9 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
     auto grav_edge_fine_arr = grav_edge_fine.array();
 
     // create time-centered base-state quantities
-    // for (auto r = 0; r < nr_finest; ++r) {
-    // AMREX_PARALLEL_FOR_1D(nr_finest, r, {
     p0_nph_fine.copy(0.5*(p0_old_fine+ p0_new_fine));
     rho0_nph_fine.copy(0.5*(rho0_old_fine + rho0_new_fine));
     gamma1bar_nph_fine.copy(0.5*(gamma1bar_old_fine + gamma1bar_new_fine));
-    // });
-
 
     // 3) solve to w0bar -- here we just take into account the Sbar and
     //    volume discrepancy terms
@@ -377,6 +382,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
             Sbar_in_fine_arr(r-1) * dr_finest 
             - (volume_discrepancy / gamma1bar_p0_avg ) * dr_finest;
     });
+    Gpu::synchronize();
 
     // 4) get the edge-centered gravity on the uniformly-gridded
     // basestate arrays
@@ -433,6 +439,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
             grav_edge_fine_arr(r) * (etarho_cc_fine_arr(r) - etarho_cc_fine_arr(r-1)) / 
             dr_finest;
     });
+    Gpu::synchronize();
 
     // Lower boundary
     A(0) = 0.0;
@@ -459,6 +466,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
         int r = j + lo;
         deltaw0_fine_arr(r) = u(r);
     });
+    Gpu::synchronize();
 
     // for (auto r = fine_base_density_cutoff_coord+2; r <= nr_finest; ++r) {
     lo = fine_base_density_cutoff_coord+2; 
@@ -467,6 +475,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
         int r = j + lo;
         deltaw0_fine_arr(r) = deltaw0_fine_arr(fine_base_density_cutoff_coord+1);
     });
+    Gpu::synchronize();
 
     // 6) compute w0 = w0bar + deltaw0
     // for (auto r = 0; r < w0_fine.size(); ++r) {
@@ -474,6 +483,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
         w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
         w0_p[base_geom.finest_radial_level+max_lev*r] = w0_fine_arr(r);
     });
+    Gpu::synchronize();
 
     // 7) fill the multilevel w0 array from the uniformly-gridded w0 we
     // just solved for.  Here, we make the coarse edge underneath equal
@@ -502,6 +512,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                     w0_p[n+max_lev*r] = 0.0;
                 });
             }
+            Gpu::synchronize();
         }
     }
 
@@ -528,6 +539,7 @@ Maestro::Makew0PlanarVarg(const RealVector& w0_old,
                     dtold_in * (w0_p[n+max_lev*(r+1)]-w0_p[n+max_lev*r])) / dt_avg;
                 w0_force_p[n+max_lev*r] = (w0_new_cen-w0_old_cen)/dt_avg + w0_avg*div_avg/dr_lev;
             });
+            Gpu::synchronize();
         }
     }
 
@@ -541,11 +553,11 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
                     const RealVector& Sbar_in, 
                     const RealVector& rho0_old_in,
                     const RealVector& rho0_new_in,
-                    const RealVector& p0_old_in,
-                    const RealVector& p0_new_in,
-                    const RealVector& gamma1bar_old_in,
-                    const RealVector& gamma1bar_new_in,
-                    const RealVector& p0_minus_peosbar,  
+                    const BaseState<Real>& p0_old_in,
+                    const BaseState<Real>& p0_new_in,
+                    const BaseState<Real>& gamma1bar_old_in,
+                    const BaseState<Real>& gamma1bar_new_in,
+                    const BaseState<Real>& p0_minus_peosbar,  
                     RealVector& delta_chi_w0, 
                     const Real dt_in, const Real dtold_in) 
 {
@@ -576,16 +588,17 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     auto rho0_nph = rho0_nph_s.array();
     auto grav_edge = grav_edge_s.array();
 
-    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
+    const auto p0_old_arr = p0_old_in.const_array();
+    const auto p0_new_arr = p0_new_in.const_array();
+    const auto p0_minus_peosbar_arr = p0_minus_peosbar.const_array();
+    const auto gamma1bar_old_arr = gamma1bar_old_in.const_array();
+    const auto gamma1bar_new_arr = gamma1bar_new_in.const_array();
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto etarho_cc_arr = etarho_cc.array();
-    const auto etarho_ec_arr = etarho_ec.array();
+    const auto etarho_cc_arr = etarho_cc.const_array();
+    const auto etarho_ec_arr = etarho_ec.const_array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -598,12 +611,13 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
     
     // create time-centered base-state quantities
-    // for (auto r = 0; r < base_geom.nr_fine; ++r) {
+    // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
-        p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
+        p0_nph(r) = 0.5*(p0_old_arr(0,r)+ p0_new_arr(0,r));
         rho0_nph(0,r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
-        gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
+        gamma1bar_nph(r) = 0.5*(gamma1bar_old_arr(0,r) + gamma1bar_new_arr(0,r));
     });
+    Gpu::synchronize();
     
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
@@ -612,7 +626,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
         Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
-            dpdt_factor_loc * p0_minus_peosbar[max_lev*(r-1)]/dt_in : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_arr(0,r-1)/dt_in : 0.0;
 
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
             dr0 * Sbar_in[max_lev*(r-1)] * r_cc_loc(0,r-1)*r_cc_loc(0,r-1);
@@ -629,6 +643,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         int r = j + lo;
         w0_from_Sbar(r) /= (r_edge_loc(0,r)*r_edge_loc(0,r));
     });
+    Gpu::synchronize();
 
     // make the edge-centered gravity
     MakeGravEdge(grav_edge_s, rho0_nph_s);
@@ -675,6 +690,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
                 4.0 * M_PI * Gconst * 0.5 * 
                 (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_arr(0,r);
     });
+    Gpu::synchronize();
 
     // Lower boundary
     A(0) = 0.0;
@@ -703,6 +719,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         int r = j + lo;
         w0_p[max_lev*r] = u(r) / (r_edge_loc(0,r)*r_edge_loc(0,r)) + w0_from_Sbar(r);
     });
+    Gpu::synchronize();
 
     // for (auto r = max_cutoff+2; r <= base_geom.nr_fine; ++r) {
     lo = max_cutoff+2; 
@@ -711,6 +728,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         int r = j + lo;
         w0_p[max_lev*r] = w0_p[max_cutoff+1] * r_edge_loc(0,max_cutoff+1)*r_edge_loc(0,max_cutoff+1)/(r_edge_loc(0,r)*r_edge_loc(0,r));
     });
+    Gpu::synchronize();
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     const Real dt_avg = 0.5 * (dt_in + dtold_in);
@@ -723,6 +741,7 @@ Maestro::Makew0Sphr(const RealVector& w0_old,
         Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
         w0_force_p[max_lev*r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr0;
     });
+    Gpu::synchronize();
 }
 
 void 
@@ -731,11 +750,11 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
                         const RealVector& Sbar_in, 
                         const RealVector& rho0_old_in,
                         const RealVector& rho0_new_in,
-                        const RealVector& p0_old_in,
-                        const RealVector& p0_new_in,
-                        const RealVector& gamma1bar_old_in,
-                        const RealVector& gamma1bar_new_in,
-                        const RealVector& p0_minus_peosbar,  
+                        const BaseState<Real>& p0_old_in,
+                        const BaseState<Real>& p0_new_in,
+                        const BaseState<Real>& gamma1bar_old_in,
+                        const BaseState<Real>& gamma1bar_new_in,
+                        const BaseState<Real>& p0_minus_peosbar,  
                         RealVector& delta_chi_w0, 
                         const Real dt_in, const Real dtold_in) 
 {
@@ -766,16 +785,17 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     auto rho0_nph = rho0_nph_s.array();
     auto grav_edge = grav_edge_s.array();
 
-    const Real * AMREX_RESTRICT p0_old_p = p0_old_in.dataPtr();
-    const Real * AMREX_RESTRICT p0_new_p = p0_new_in.dataPtr();
+    const auto p0_old_arr = p0_old_in.const_array();
+    const auto p0_new_arr = p0_new_in.const_array();
+    const auto p0_minus_peosbar_arr = p0_minus_peosbar.const_array();
+    const auto gamma1bar_old_arr = gamma1bar_old_in.const_array();
+    const auto gamma1bar_new_arr = gamma1bar_new_in.const_array();
     const Real * AMREX_RESTRICT rho0_old_p = rho0_old_in.dataPtr();
     const Real * AMREX_RESTRICT rho0_new_p = rho0_new_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_old_p = gamma1bar_old_in.dataPtr();
-    const Real * AMREX_RESTRICT gamma1bar_new_p = gamma1bar_new_in.dataPtr();
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto etarho_cc_arr = etarho_cc.array();
-    const auto etarho_ec_p = etarho_ec.array();
+    const auto etarho_cc_arr = etarho_cc.const_array();
+    const auto etarho_ec_arr = etarho_ec.const_array();
     Real * AMREX_RESTRICT w0_p = w0.dataPtr();
     const Real * AMREX_RESTRICT w0_old_p = w0_old.dataPtr();
     Real * AMREX_RESTRICT w0_force_p = w0_force.dataPtr();
@@ -786,12 +806,13 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
-    // for (auto r = 0; r < base_geom.nr_fine; ++r) {
+    // for (auto r = 0; r < nr_fine; ++r) {
     AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
-        p0_nph(r) = 0.5*(p0_old_p[max_lev*r] + p0_new_p[max_lev*r]);
+        p0_nph(r) = 0.5*(p0_old_arr(0,r) + p0_new_arr(0,r));
         rho0_nph(r) = 0.5*(rho0_old_p[max_lev*r] + rho0_new_p[max_lev*r]);
-        gamma1bar_nph(r) = 0.5*(gamma1bar_old_p[max_lev*r] + gamma1bar_new_p[max_lev*r]);
+        gamma1bar_nph(r) = 0.5*(gamma1bar_old_arr(0,r) + gamma1bar_new_arr(0,r));
     });
+    Gpu::synchronize();
 
     // NOTE: We first solve for the w0 resulting only from Sbar,
     //      w0_from_sbar by integrating d/dr (r^2 w0_from_sbar) =
@@ -800,7 +821,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
         Real volume_discrepancy = rho0_old_in[max_lev*(r-1)] > base_cutoff_dens ? 
-            dpdt_factor_loc * p0_minus_peosbar[max_lev*(r-1)]/dt_in : 0.0;
+            dpdt_factor_loc * p0_minus_peosbar_arr(0,r-1)/dt_in : 0.0;
 
         Real dr1 = r_edge_loc(0,r) - r_edge_loc(0,r-1);
         w0_from_Sbar(r) = w0_from_Sbar(r-1) + 
@@ -858,8 +879,9 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
                 r_cc_loc(0,r-1)*r_cc_loc(0,r-1) * etarho_cc_arr(0,r-1)) / 
                 (dr3 * r_edge_loc(0,r)*r_edge_loc(0,r)) - 
                 4.0 * M_PI * Gconst * 0.5 * 
-                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_p(0,r);
+                (rho0_nph(0,r) + rho0_nph(0,r-1)) * etarho_ec_arr(0,r);
     });
+    Gpu::synchronize();
 
     // Lower boundary
     A(0) = 0.0;
@@ -888,6 +910,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         int r = j + lo;
         w0_p[max_lev*r] = u(r) / (r_edge_loc(0,r)*r_edge_loc(0,r)) + w0_from_Sbar(r);
     });
+    Gpu::synchronize();
 
     // for (auto r = max_cutoff+2; r <= base_geom.nr_fine; ++r) {
     lo = max_cutoff+2; 
@@ -896,6 +919,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         int r = j + lo;
         w0_p[max_lev*r] = w0_p[max_lev*(max_cutoff+1)] * r_edge_loc(0,max_cutoff+1)*r_edge_loc(0,max_cutoff+1)/(r_edge_loc(0,r)*r_edge_loc(0,r));
     });
+    Gpu::synchronize();
 
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     const Real dt_avg = 0.5 * (dt_in + dtold_in);
@@ -909,6 +933,7 @@ Maestro::Makew0SphrIrreg(const RealVector& w0_old,
         Real div_avg = 0.5 * (dt_in * (w0_old_p[max_lev*(r+1)]-w0_old_p[max_lev*r]) + dtold_in * (w0_p[max_lev*(r+1)]-w0_p[max_lev*r])) / dt_avg;
         w0_force_p[max_lev*r] = (w0_new_cen-w0_old_cen) / dt_avg + w0_avg * div_avg / dr1;
     });
+    Gpu::synchronize();
 }
 
 void

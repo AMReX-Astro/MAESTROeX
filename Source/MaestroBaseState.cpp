@@ -4,8 +4,8 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0, 
-                       RealVector& p0, 
+Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -29,6 +29,9 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     Real base_cutoff_density_loc = 1.e99;
     Real model_dr = (input_model.model_r[npts_model-1] - input_model.model_r[0]) / Real(npts_model - 1);
     Real rmax = input_model.model_r[npts_model-1];
+
+    auto rhoh0_arr = rhoh0.array();
+    auto p0_arr = p0.array();
 
     // irregular base state dr 
     RealVector model_dr_irreg;
@@ -171,10 +174,10 @@ Maestro::InitBaseState(RealVector& rho0, RealVector& rhoh0,
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < base_geom.nr_fine; ++i) {
         rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
-        rhoh0[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
+        rhoh0_arr(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
         tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
         tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
-        p0[lev+max_lev*i] = p0_init[lev+max_lev*i];
+        p0_arr(lev,i) = p0_init[lev+max_lev*i];
     }
 
     // check whether we are in HSE
