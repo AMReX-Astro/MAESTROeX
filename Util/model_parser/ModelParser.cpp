@@ -1,10 +1,10 @@
 #include <ModelParser.H>
-#include <math.h>
+#include <cmath>
 
 using namespace amrex;
 
 void 
-ModelParser::ReadFile(const std::string model_file_name)
+ModelParser::ReadFile(const std::string& model_file_name)
 {
     // open the model file 
     std::ifstream model_file(model_file_name);
