@@ -9,8 +9,8 @@ auto set_species(Real y);
 auto grav_zone(Real y);
 
 void 
-Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
-                       BaseState<Real>& p0_s, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
+                       BaseState<Real>& p0, 
                        const int lev)
 {
     // timer for profiling
@@ -22,7 +22,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     auto p0_init_arr = p0_init.array();
     auto tempbar_arr = tempbar.array();
     auto tempbar_init_arr = tempbar_init.array();
-    auto s0_init_arr = s0_init.array()
+    auto s0_init_arr = s0_init.array();
 
     // define some helper functions with lambdas
     auto fv = [](Real y)
@@ -83,14 +83,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         return dU;
     };
 
-    const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
-    auto rho0 = rho0_s.array();
-    auto rhoh0 = rhoh0_s.array();
-    auto p0 = p0_s.array();
-    auto p0_init_arr = p0_init.array();
-    auto tempbar_arr = tempbar.array();
-    auto tempbar_init_arr = tempbar_init.array();
 
     // allocate arrays
     RealVector pres(base_geom.nr(n));

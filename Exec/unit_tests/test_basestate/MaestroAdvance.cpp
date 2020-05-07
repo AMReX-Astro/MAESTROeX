@@ -56,7 +56,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	auto gamma1bar_old_arr = gamma1bar_old.array();
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_old_arr(l,r);
@@ -88,7 +88,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	auto Sbar_old_arr = Sbar_old.array();
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_old_arr(l,r);
@@ -97,7 +97,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 eos_state.xn[n] = rhoX0_old_arr(l,r,n) / rho0_old_arr(l,r);
             } 
 
-            eos(eos_input_rpt, eos_state);
+            eos(eos_input_rt, eos_state);
 
             Sbar_old_arr(l,r) = Hext_bar_arr(l,r) * eos_state.dpdT / (eos_state.rho * eos_state.cp * eos_state.dpdr);
         }
@@ -113,7 +113,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	is_predictor = 1;
 	Makew0(w0_old, w0_force, Sbar_old, rho0_old, rho0_old,
 	       p0_old, p0_old, gamma1bar_old, gamma1bar_old,
-	       p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+	       p0_minus_peosbar, dt, dtold, is_predictor);
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! update density and compute rho0_predicted_edge
@@ -173,7 +173,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_new_arr(l,r);
@@ -194,7 +194,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_new_arr(l,r);
@@ -224,7 +224,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	auto Sbar_new_arr = Sbar_new.array();
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_new_arr(l,r);
@@ -233,13 +233,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
                 eos_state.xn[n] = rhoX0_new_arr(l,r,n) / rho0_new_arr(l,r);
             } 
    
-            eos(eos_input_rpt, eos_state);
+            eos(eos_input_rt, eos_state);
 
             Sbar_new_arr(l,r) = Hext_bar_arr(l,r) * eos_state.dpdT / (eos_state.rho * eos_state.cp * eos_state.dpdr);
         }
     }
 
-	fSbar_nph.copy(0.5*(Sbar_old + Sbar_new));
+	Sbar_nph.copy(0.5*(Sbar_old + Sbar_new));
 
 	p0_minus_peosbar.setVal(0.);
 
@@ -253,7 +253,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	is_predictor = 0;
 	Makew0(w0_old, w0_force, Sbar_nph, rho0_old, rho0_new,
 	       p0_old, p0_new, gamma1bar_old, gamma1bar_new,
-	       p0_minus_peosbar, delta_chi_w0, dt, dtold, is_predictor);
+	       p0_minus_peosbar, dt, dtold, is_predictor);
 	
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -299,7 +299,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_new_arr(l,r);
@@ -320,7 +320,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto n = 0; n < base_geom.nr(l); ++n) {
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
             eos_t eos_state;
 
             eos_state.rho = rho0_new_arr(l,r);
