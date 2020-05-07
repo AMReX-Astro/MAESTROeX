@@ -201,6 +201,21 @@ Debugging
    AMReX can intercept floating point exceptions and provide a helpful
    backtrace file that shows you where they were generated. 
 
+#. *How can I get information about potential bugs before running the code?*
+
+    We run ```clang-tidy`` <https://clang.llvm.org/extra/clang-tidy/>`_ on all pull requests using a `GitHub action <https://github.com/AMReX-Astro/cpp-linter-action>`_. ``clang-tidy`` analyzes the source code, produces warnings for potential bugs and offers suggestions for performance improvements. 
+
+    ``clang-tidy`` can also be run locally. This requires the ``clang-tidy`` and ``bear`` packages (installed using e.g. ``sudo apt install bear clang-tidy`` on Ubuntu), and the python script
+    ```run-clang-tidy.py` <https://github.com/AMReX-Astro/cpp-linter-action/blob/master/run-clang-tidy.py>`_. The analysis is performed by first compiling a problem using the ``bear`` package, then running the python script to analyze the source files. From within a problem directory, run
+
+    .. code-block:: bash
+
+        bear make -j 20 USE_OMP=FALSE USE_MPI=FALSE DEBUG=TRUE 
+
+        python3 run-clang-tidy.py -header-filter='MAESTROeX' -ignore-files='amrex|Microphysics' -j 20 > clang-tidy-report.txt
+
+    The compiler flags can be modified to suit the problem to be analyzed, but the ``DEBUG`` flag must be set to ``TRUE``. The ``header-filter`` option for the python script tells the script to only analyze header files containing the given regex pattern, and the ``ignore-files`` flag tells it to ignore any source files containing the given regex pattern. The ``-j`` option tells the script to run a given number of processes in parallel. The output is then redirected to a text file. 
+
 I/O
 ===
 
