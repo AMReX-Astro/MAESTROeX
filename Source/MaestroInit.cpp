@@ -93,8 +93,11 @@ Maestro::Init ()
             unew[lev].setVal(0.);
             snew[lev].setVal(0.);
         }
+
         // put w0 on Cartesian cell-centers
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+	if (evolve_base_state) {
+	    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+	}
         
         if (!spherical) {
             // reset tagging array to include buffer zones
@@ -248,7 +251,7 @@ Maestro::InitData ()
     for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
         InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
     }
-
+    
     if (use_exact_base_state) {
         psi.setVal(0.0);
     }
