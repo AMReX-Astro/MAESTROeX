@@ -19,7 +19,7 @@ Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
 
     int ng = s0_cart[0].nGrow();
-    if (ng > 0 && bcs.size() == 0) {
+    if (ng > 0 && bcs.empty()) {
         Abort("Put1dArrayOnCart with ghost cells requires bcs input");
     }
 
@@ -506,7 +506,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real rfac = (radius - Real(index) * drf) / drf;
 
                     Real w0_cart_val;
@@ -566,7 +566,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {

@@ -26,9 +26,9 @@ public:
         log_lines = 0;
     };
 
-    void Log(const std::string str, const amrex::Real d);
-    void Log(const std::string str, const int i);
-    void Log(const std::string str);
+    void Log(const std::string& str, const amrex::Real d);
+    void Log(const std::string& str, const int i);
+    void Log(const std::string& str);
 
     void LogBreak();
 

@@ -18,7 +18,7 @@ Maestro::Init ()
 
     Print() << "Calling Init()" << std::endl;
 
-    if (restart_file == "") {
+    if (restart_file.empty()) {
 
         start_step = 1;
 
@@ -130,7 +130,7 @@ Maestro::Init ()
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);
 
-    if (restart_file == "") {
+    if (restart_file.empty()) {
 
         // compute gamma1bar
         MakeGamma1bar(sold, gamma1bar_old, p0_old);

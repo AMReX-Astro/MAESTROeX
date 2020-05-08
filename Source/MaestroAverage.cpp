@@ -277,8 +277,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             int rcoord_p[MAESTRO_MAX_LEVELS];
 
             // initialize
-            for (auto i = 0; i < MAESTRO_MAX_LEVELS; ++i) {
-                rcoord_p[i] = 0.0;
+            for (int & coord : rcoord_p) {
+                coord = 0.0;
             }
 
             // for each level, find the closest coordinate
@@ -391,7 +391,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             stencil_coord = amrex::min(stencil_coord, 
                     max_rcoord(which_lev(r))-1);
 
-            bool limit = (r > nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2))) ? false : true;
+            bool limit = (r <= nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2)));
 
             phibar_arr(0,r) = QuadInterp(radius, 
                     radii(which_lev(r),stencil_coord), 
