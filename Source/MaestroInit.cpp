@@ -31,6 +31,7 @@ Maestro::Init ()
             if (spherical) { MakeNormal(); }
 
             Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
+
             WritePlotFile(plotInitData, t_old, 0, rho0_old,
                           rhoh0_old, p0_old, gamma1bar_old,
                           uold, sold, S_cc_old);
@@ -319,6 +320,10 @@ Maestro::InitData ()
 
     // set p0^{-1} = p0_old
     p0_nm1.copy(p0_old);
+
+    // initialize these since an initial plotfile needs valid data in here
+    gamma1bar_old.setVal(0.);
+    w0.setVal(0.);
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
