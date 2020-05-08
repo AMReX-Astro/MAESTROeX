@@ -182,7 +182,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 #endif
 
     if (!evolve_base_state) {
-	w0.setVal(0.0);
+        w0.setVal(0.0);
     }
     
     // make the sponge for all levels

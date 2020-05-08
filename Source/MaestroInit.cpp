@@ -95,9 +95,9 @@ Maestro::Init ()
         }
 
         // put w0 on Cartesian cell-centers
-	if (evolve_base_state) {
-	    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-	}
+        if (evolve_base_state) {
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        }
         
         if (!spherical) {
             // reset tagging array to include buffer zones
