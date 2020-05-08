@@ -253,7 +253,7 @@ Maestro::InitData ()
         InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
     }
     
-    if (use_exact_base_state) {
+    if (use_exact_base_state || !evolve_base_state) {
         psi.setVal(0.0);
     }
 
