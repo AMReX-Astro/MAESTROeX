@@ -127,7 +127,7 @@ public:
 
     // BaseState(const int num_levs, const int length=1, const int ncomp=1);
 
-    BaseState(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
+    explicit BaseState(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
     
     /// create a BaseState object from an existing Fortran-friendly base state
     BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length=1, const int ncomp=1);

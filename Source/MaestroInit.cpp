@@ -322,8 +322,8 @@ Maestro::InitData ()
     p0_nm1.copy(p0_old);
 
     // initialize these since an initial plotfile needs valid data in here
-    gamma1bar_old.setVal(0.);
-    w0.setVal(0.);
+    // gamma1bar_old.setVal(0.);
+    // w0.setVal(0.);
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
