@@ -27,7 +27,6 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
     ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-
     misc_time_start = ParallelDescriptor::second();
 
     // features to be added later:
@@ -85,12 +84,12 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    RealVector rho0_nph        ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> rho0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    BaseState<Real> p0_minus_peosbar(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector w0_force        ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    RealVector Sbar            ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> gamma1bar_temp1 (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> gamma1bar_temp2 (base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -100,12 +99,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     RealVector w0_old             ( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    BaseState<Real> rho0_predicted_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_predicted_edge (base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     // make sure C++ is as efficient as possible with memory usage
-    rho0_nph.shrink_to_fit();
     w0_force.shrink_to_fit();
-    Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     w0_old.shrink_to_fit();
@@ -293,8 +290,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 1;
@@ -318,7 +314,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     } else {
         // these should have no effect if evolve_base_state = false
-        std::fill(Sbar.begin(), Sbar.end(), 0.);
+        Sbar.setVal(0.);
         std::fill(w0_force.begin(), w0_force.end(), 0.);
 
     }
@@ -381,12 +377,10 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
-        BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     } else {
-        rho0_new = rho0_old;
+        rho0_new.copy(rho0_old);
     }
 
     // thermal is the forcing for rhoh or temperature
@@ -419,13 +413,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
   
     // need full UMAC velocities for DensityAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac, 1.);
     
     // advect rhoX, rho, and tracers
     DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac,  w0mac,-1.);
     
     if (evolve_base_state) {
 
@@ -439,10 +433,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
             // correct the base state density by "averaging"
             Average(s2, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
-            BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new
@@ -619,10 +611,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
     if (evolve_base_state) {
         // reset cutoff coordinates to old time value
-        compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
     if (use_thermal_diffusion) {
@@ -680,16 +670,18 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                }
             }
         }
 
         base_time_start = ParallelDescriptor::second();
 
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         // compute w0, w0_force, and delta_chi_w0
         is_predictor = 0;
@@ -762,10 +754,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
 
-        compute_cutoff_coords(rho0_new.dataPtr());
         ComputeCutoffCoords(rho0_new);
-        BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_new.array());
     }
 
     // copy temperature from s1 into s2 for seeding eos calls
@@ -785,13 +775,13 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
     }
 
     // need full UMAC velocities for DensityAdvance
-    Addw0(umac,w0mac,1.);
+    Addw0(umac, w0mac,1.);
     
     // advect rhoX, rho, and tracers
     DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux,umac,w0mac,rho0_predicted_edge);
 
     // subtract w0mac from umac
-    Addw0(umac,w0mac,-1.);
+    Addw0(umac, w0mac, -1.);
     
     if (evolve_base_state) {
 
@@ -806,10 +796,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
             // correct the base state density by "averaging"
             // call average(mla,s2,rho0_new,dx,rho_comp)
             Average(s2, rho0_new, Rho);
-            compute_cutoff_coords(rho0_new.dataPtr());
             ComputeCutoffCoords(rho0_new);
-            BaseState<Real> rho0_state(rho0_new, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_new.array());
         }
 
         // update grav_cell_new, rho0_nph, grav_cell_nph
@@ -817,9 +805,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         MakeGravCell(grav_cell_new, rho0_new);
 
-        for(int i=0; i<rho0_nph.size(); ++i) {
-            rho0_nph[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-        }
+        rho0_nph.copy(0.5*(rho0_old + rho0_new));
         MakeGravCell(grav_cell_nph, rho0_nph);
 
         base_time += ParallelDescriptor::second() - base_time_start;
@@ -868,7 +854,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         ParallelDescriptor::ReduceRealMax(base_time,ParallelDescriptor::IOProcessorNumber());
         ParallelDescriptor::Bcast(&base_time,1,ParallelDescriptor::IOProcessorNumber());
     } else {
-        rho0_nph = rho0_old;
+        rho0_nph.copy(rho0_old);
         grav_cell_nph.copy(grav_cell_old);
     }
 
@@ -992,8 +978,11 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                }
             }
         }
     }

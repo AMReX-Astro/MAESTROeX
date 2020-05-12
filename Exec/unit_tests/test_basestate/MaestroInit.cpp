@@ -98,8 +98,7 @@ Maestro::InitData ()
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
 	ComputeCutoffCoords(rho0_old);
-	BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-	base_geom.ComputeCutoffCoords(rho0_state.array());
+	base_geom.ComputeCutoffCoords(rho0_old.array());
 
 	// compute gravity
 	MakeGravCell(grav_cell_old, rho0_old);
@@ -127,9 +126,8 @@ Maestro::InitData ()
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	Vector<Real> s0_swap;
 	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
 
 }
 
@@ -184,29 +182,27 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+	for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
 	{
 		const Box& tilebox = mfi.tilebox();
 		const int* lo  = tilebox.loVect();
 		const int* hi  = tilebox.hiVect();
 
-		if (spherical == 0) {
-            const Array4<Real> scal_arr = scal.array(mfi);
+		if (!spherical) {
+                        const Array4<Real> scal_arr = scal.array(mfi);
 			const Array4<Real> vel_arr = vel.array(mfi);
-
-			const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-			const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
 		    
-            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
+
 		} else {
 #if (AMREX_SPACEDIM == 3)
             const auto dx_fine_vec = geom[max_level].CellSizeArray();
-			const auto dx_lev = geom[lev].CellSizeArray();
-		    
+            const auto dx_lev = geom[lev].CellSizeArray();
+        
             init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi),
-                        BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-                                    ZFILL(dx_fine),
-                                    ZFILL(dx));
+                    BL_TO_FORTRAN_3D(cc_to_r[mfi]),
+                    ZFILL(dx_fine),
+                    ZFILL(dx));
 
 	    InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
 #endif

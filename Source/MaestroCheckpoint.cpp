@@ -130,16 +130,16 @@ Maestro::WriteCheckPoint (int step) {
 
         BaseCCFile.precision(17);
 
-        for (int i=0; i<rho0_new.size(); ++i) {
-            BaseCCFile << rho0_new[i] << " "
+        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
+            BaseCCFile << rho0_new.array()(i) << " "
                        << p0_new.array()(i) << " "
                        << gamma1bar_new.array()(i) << " "
                        << rhoh0_new.array()(i) << " "
                        << beta0_new.array()(i) << " "
                        << psi.array()(i) << " "
-                       << tempbar[i] << " "
+                       << tempbar.array()(i) << " "
                        << etarho_cc.array()(i) << " "
-                       << tempbar_init[i] << " "
+                       << tempbar_init.array()(i) << " "
                        << p0_old.array()(i) << " "
                        << beta0_nm1.array()(i) << "\n";
         }
@@ -298,7 +298,7 @@ Maestro::ReadCheckPoint ()
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
-            rho0_old[i] = std::stod(word);
+            rho0_old.array()(i) = std::stod(word);
             lis >> word;
             p0_old.array()(i) = std::stod(word);
             lis >> word;
@@ -310,11 +310,11 @@ Maestro::ReadCheckPoint ()
             lis >> word;
             psi.array()(i) = std::stod(word);
             lis >> word;
-            tempbar[i] = std::stod(word);
+            tempbar.array()(i) = std::stod(word);
             lis >> word;
             etarho_cc.array()(i) = std::stod(word);
             lis >> word;
-            tempbar_init[i] = std::stod(word);
+            tempbar_init.array()(i) = std::stod(word);
             lis >> word;
             p0_nm1.array()(i) = std::stod(word);
             lis >> word;
@@ -322,11 +322,10 @@ Maestro::ReadCheckPoint ()
         }
     }
 
-
     if (do_smallscale) {
-        Average(sold,rho0_old,Rho);
-        compute_cutoff_coords(rho0_old.dataPtr());
-        std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+        Average(sold, rho0_old, Rho);
+        ComputeCutoffCoords(rho0_old);
+        rho0_old.setVal(0.);
     }
 
     // BaseFC

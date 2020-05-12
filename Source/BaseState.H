@@ -51,14 +51,6 @@ struct BaseStateArray
         nvar = base_state.nComp();
     }
 
-    // /// set to some scalar value 
-    // void setVal(const T val) noexcept {
-    //     AMREX_PARALLEL_FOR_1D(nlev*len*nvar, i, {
-    //         dptr[i] = val;
-    //     });
-    //     amrex::Gpu::synchronize();
-    // }
-
     AMREX_GPU_HOST_DEVICE
     explicit operator bool() const noexcept { return dptr != nullptr; }
 
@@ -246,6 +238,7 @@ public:
     /// scalar division of the whole base state 
     template <class U>
     friend BaseState<U> operator/ (const U val, const BaseState<U>& p);
+    BaseState<T> operator/ (const T val);
     BaseState<T>& operator/= (const T val);
     BaseState<T> operator/ (const T val) const noexcept;
 
@@ -621,6 +614,15 @@ BaseState<T>
 operator/ (const T val, const BaseState<T>& p) {
     // make a deep copy
     BaseState<T> s(p);
+    s /= val;
+    return s;
+}
+
+template <class T>
+BaseState<T>
+BaseState<T>::operator/ (const T val) {
+    // make a deep copy
+    BaseState<T> s(*this);
     s /= val;
     return s;
 }

@@ -5,8 +5,8 @@ using namespace amrex;
 // prototype for pertubation function to be called on the 
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
-void Perturb(const Real p0_init, 
-             const Real* s0_init,
+void Perturb(const Real p0, 
+             const Real* s0,
              Real* perturbations,  
              const Real x, const Real y, const Real z,
              const Real pert_rad_factor,
@@ -19,9 +19,7 @@ void
 Maestro::InitLevelData(const int lev, const Real time, 
                        const MFIter& mfi, 
                        const Array4<Real> scal, 
-                       const Array4<Real> vel, 
-                       const Real* s0_init, 
-                       const Real* p0_init)
+                       const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -35,15 +33,18 @@ Maestro::InitLevelData(const int lev, const Real time,
         vel(i,j,k,n) = 0.0;
     });
 
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto p0_arr = p0_init.const_array();
+
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_init[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_init[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_init[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
+        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
+        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_init[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -70,10 +71,10 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_init[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
             }
 
-            Perturb(p0_init[lev+max_lev*r], s0, perturbations, 
+            Perturb(p0_arr(lev,r), s0, perturbations, 
                     x, y, z, 
                     pert_rad_factor_loc, 
                     pert_temp_factor_loc, 
@@ -97,24 +98,24 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
     const int max_lev = base_geom.max_radial_level + 1;
     
-    #ifdef _OPENMP
-    #pragma omp parallel
-    #endif
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
     for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
     {
-	const auto tileBox = mfi.tilebox();
-	
-	const Array4<Real> vel_arr = vel.array(mfi);
-	const Array4<Real> scal_arr = scal.array(mfi);
+        const auto tileBox = mfi.tilebox();
+        
+        const Array4<Real> vel_arr = vel.array(mfi);
+        const Array4<Real> scal_arr = scal.array(mfi);
 
-	// set velocity to zero 
-	AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
-	    vel_arr(i,j,k,n) = 0.0;
-	});
+        // set velocity to zero 
+        AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+            vel_arr(i,j,k,n) = 0.0;
+        });
 
-	AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
-	    scal_arr(i,j,k,n) = 0.0;
-	});
+        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n, {
+            scal_arr(i,j,k,n) = 0.0;
+        });
     }
     
     // if we are spherical, we want to make sure that p0 is good, since that is
@@ -156,67 +157,67 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 #endif
     for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
     {
-	const auto tileBox = mfi.tilebox();
-	
-	const Array4<Real> scal_arr = scal.array(mfi);
-	const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
+        const auto tileBox = mfi.tilebox();
+        
+        const Array4<Real> scal_arr = scal.array(mfi);
+        const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-	// initialize rho as sum of partial densities rho*X_i
-	AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-	    for (auto comp = 0; comp < NumSpec; ++comp) {
-		scal_arr(i,j,k,Rho) += scal_arr(i,j,k,FirstSpec+comp);
-	    }
+        // initialize rho as sum of partial densities rho*X_i
+        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                scal_arr(i,j,k,Rho) += scal_arr(i,j,k,FirstSpec+comp);
+            }
 
-	    // initialize (rho h) and T using the EOS
-	    eos_t eos_state;
-	    eos_state.T     = scal_arr(i,j,k,Temp);
-	    eos_state.p     = p0_arr(i,j,k);
-	    eos_state.rho   = scal_arr(i,j,k,Rho);
-	    for (auto comp = 0; comp < NumSpec; ++comp) {
-		eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp)/eos_state.rho;
-	    }
+            // initialize (rho h) and T using the EOS
+            eos_t eos_state;
+            eos_state.T     = scal_arr(i,j,k,Temp);
+            eos_state.p     = p0_arr(i,j,k);
+            eos_state.rho   = scal_arr(i,j,k,Rho);
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                eos_state.xn[comp] = scal_arr(i,j,k,FirstSpec+comp)/eos_state.rho;
+            }
 
-	    eos(eos_input_rp, eos_state);
+            eos(eos_input_rp, eos_state);
 
-	    scal_arr(i,j,k,RhoH) = eos_state.rho*eos_state.h;
-	    scal_arr(i,j,k,Temp) = eos_state.T;
-	});
+            scal_arr(i,j,k,RhoH) = eos_state.rho*eos_state.h;
+            scal_arr(i,j,k,Temp) = eos_state.T;
+        });
 
-	if (perturb_model) {
-	    const auto prob_lo = geom[lev].ProbLoArray();
-	    const auto dx = geom[lev].CellSizeArray();
+        if (perturb_model) {
+            const auto prob_lo = geom[lev].ProbLoArray();
+            const auto dx = geom[lev].CellSizeArray();
 
-	    const auto pert_rad_factor_loc = pert_rad_factor;
-	    const auto pert_temp_factor_loc = pert_temp_factor;
-	    const auto do_small_domain_loc = do_small_domain;
+            const auto pert_rad_factor_loc = pert_rad_factor;
+            const auto pert_temp_factor_loc = pert_temp_factor;
+            const auto do_small_domain_loc = do_small_domain;
 
-	    // add an optional perturbation
-	    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-	        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0];
-		Real y = prob_lo[1] + (Real(j)+0.5) * dx[1];
-		Real z = prob_lo[2] + (Real(k)+0.5) * dx[2];
+            // add an optional perturbation
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                Real x = prob_lo[0] + (Real(i)+0.5) * dx[0];
+                Real y = prob_lo[1] + (Real(j)+0.5) * dx[1];
+                Real z = prob_lo[2] + (Real(k)+0.5) * dx[2];
 
-		Real perturbations[Nscal];
-		Real s0[Nscal];
-		
-		for (auto n = 0; n < Nscal; ++n) {
-		    s0[n] = scal_arr(i,j,k,n);
-		}
+                Real perturbations[Nscal];
+                Real s0[Nscal];
+                
+                for (auto n = 0; n < Nscal; ++n) {
+                    s0[n] = scal_arr(i,j,k,n);
+                }
 
-		Perturb(p0_arr(i,j,k), s0, perturbations, 
-			x, y, z, 
-			pert_rad_factor_loc, 
-			pert_temp_factor_loc, 
-			do_small_domain_loc, true);
+                Perturb(p0_arr(i,j,k), s0, perturbations, 
+                    x, y, z, 
+                    pert_rad_factor_loc, 
+                    pert_temp_factor_loc, 
+                    do_small_domain_loc, true);
 
-		scal_arr(i,j,k,Rho) = perturbations[Rho];
-		scal_arr(i,j,k,RhoH) = perturbations[RhoH];
-		scal_arr(i,j,k,Temp) = perturbations[Temp];
-		for (auto comp = 0; comp < NumSpec; ++comp) {
-		    scal_arr(i,j,k,FirstSpec+comp) = perturbations[FirstSpec+comp];
-		}
-	    });
-	}
+                scal_arr(i,j,k,Rho) = perturbations[Rho];
+                scal_arr(i,j,k,RhoH) = perturbations[RhoH];
+                scal_arr(i,j,k,Temp) = perturbations[Temp];
+                for (auto comp = 0; comp < NumSpec; ++comp) {
+                    scal_arr(i,j,k,FirstSpec+comp) = perturbations[FirstSpec+comp];
+                }
+            });
+        }
     }
 }
 

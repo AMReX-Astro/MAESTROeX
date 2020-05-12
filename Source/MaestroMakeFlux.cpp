@@ -427,10 +427,10 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
+                       const BaseState<Real>& rho0_old_in,
                        const BaseState<Real>& rho0_edge_old_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
+                       const BaseState<Real>& rho0_new_in,
                        const BaseState<Real>& rho0_edge_new_state,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const BaseState<Real>& rho0_predicted_edge_state,
@@ -447,16 +447,19 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
     const bool use_exact_base_state_loc = use_exact_base_state;
     const bool evolve_base_state_loc = evolve_base_state;
 
-    auto rho0_edge_old = rho0_edge_old_state.array();
-    auto rho0_edge_new = rho0_edge_new_state.array();
-    auto rho0_predicted_edge = rho0_predicted_edge_state.array();
+    const auto rho0_old_arr = rho0_old_in.const_array();
+    const auto rho0_new_arr = rho0_new_in.const_array();
+
+    const auto rho0_edge_old = rho0_edge_old_state.const_array();
+    const auto rho0_edge_new = rho0_edge_new_state.const_array();
+    const auto rho0_predicted_edge = rho0_predicted_edge_state.const_array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
    
 #if (AMREX_SPACEDIM == 3)
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
 
-        if (spherical == 1) {
+        if (spherical) {
             rho0mac_edgex.define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             rho0mac_edgey.define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
             rho0mac_edgez.define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
@@ -493,9 +496,6 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
 #endif
 
             Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-            const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
-            const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
-            
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
@@ -507,7 +507,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                     sfluxx(i,j,k,0) = 0.0;
                 }
 
-                Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
+                Real rho0_edge = 0.5*(rho0_old_arr(lev,j)+rho0_new_arr(lev,j));
 
                 if (species_pred_type_loc == pred_rhoprime_and_X) {
                     // edge states are rho' and X.  To make the (rho X) flux,
@@ -583,7 +583,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxx(i,j,k,0) = 0.0;
                     }
 
-                    Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+                    Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -614,7 +614,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                         sfluxy(i,j,k,0) = 0.0;
                     }
 
-                    Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+                    Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -812,7 +812,7 @@ Maestro::MakeRhoXFlux (const Vector<MultiFab>& state,
                 }
             }
 
-            if (spherical == 0) {
+            if (!spherical) {
                 // need edge_restrict for etarhoflux
             }
         }
@@ -832,10 +832,10 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                        Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
+                       const BaseState<Real>& rho0_old_in,
                        const BaseState<Real>& rho0_edge_old,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
+                       const BaseState<Real>& rho0_new_in,
                        const BaseState<Real>& rho0_edge_new,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& r0mac_new,
                        const BaseState<Real>& rhoh0_old_in,
@@ -893,7 +893,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
         rhoh0mac_edgey.setVal(0.);
         rhoh0mac_edgez.setVal(0.);
 
-        if (spherical == 1) {
+        if (spherical) {
             if (use_exact_base_state) {
                 MultiFab::LinComb(rhoh0mac_edgex,0.5,rh0mac_old[lev][0],0,0.5,rh0mac_new[lev][0],0,0,1,0);
                 MultiFab::LinComb(rhoh0mac_edgey,0.5,rh0mac_old[lev][1],0,0.5,rh0mac_new[lev][1],0,0,1,0);
@@ -933,8 +933,8 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
 
-            const Real * AMREX_RESTRICT rho0_old_p = r0_old.dataPtr();
-            const Real * AMREX_RESTRICT rho0_new_p = r0_new.dataPtr();
+            const auto rho0_old_arr = rho0_old_in.const_array();
+            const auto rho0_new_arr = rho0_new_in.const_array();
 
             const auto rho0_edge_old_arr = rho0_edge_old.const_array();
             const auto rho0_edge_new_arr = rho0_edge_new.const_array();
@@ -951,7 +951,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                     // enthalpy edge state is h
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // density edge state is rho'
-                        Real rho0_edge = 0.5*(rho0_old_p[lev+j*(max_lev+1)]+rho0_new_p[lev+j*(max_lev+1)]);
+                        Real rho0_edge = 0.5*(rho0_old_arr(lev,j)+rho0_new_arr(lev,j));
 
                         sfluxx(i,j,k,rhoh_comp) = 
                            umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
@@ -1012,7 +1012,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         // enthalpy edge state is h
                         if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
-                            Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+                            Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                             sfluxx(i,j,k,rhoh_comp) = 
                             umacx(i,j,k)*(rho0_edge+sedgex(i,j,k,rho_comp))*sedgex(i,j,k,rhoh_comp);
@@ -1041,7 +1041,7 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
                         // enthalpy edge state is h
                         if (species_pred_type_loc == pred_rhoprime_and_X) {
                             // density edge state is rho'
-                            Real rho0_edge = 0.5*(rho0_old_p[lev+k*(max_lev+1)]+rho0_new_p[lev+k*(max_lev+1)]);
+                            Real rho0_edge = 0.5*(rho0_old_arr(lev,k)+rho0_new_arr(lev,k));
 
                             sfluxy(i,j,k,rhoh_comp) = 
                             vmac(i,j,k)*(rho0_edge+sedgey(i,j,k,rho_comp))*sedgey(i,j,k,rhoh_comp);
@@ -1320,15 +1320,13 @@ Maestro::MakeRhoHFlux (const Vector<MultiFab>& state,
             const Real area[2] = {dx[1], dx[0]};
 #endif
 
-            if (flux_reg_s[lev+1])
-            {
+            if (flux_reg_s[lev+1]) {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev+1/lev flux register (index lev+1)
                     flux_reg_s[lev+1]->CrseInit(sflux[lev][i],i,RhoH,RhoH,1, -1.0*dt*area[i]);
                 }
             }
-            if (flux_reg_s[lev])
-            {
+            if (flux_reg_s[lev]) {
                 for (int i = 0; i < AMREX_SPACEDIM; ++i) {
                     // update the lev/lev-1 flux register (index lev)
                     flux_reg_s[lev]->FineAdd(sflux[lev][i],i,RhoH,RhoH,1, 1.0*dt*area[i]);

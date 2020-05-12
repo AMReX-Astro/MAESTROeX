@@ -8,13 +8,13 @@ void
 Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                        const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const Vector<MultiFab>& rho,
-                       const RealVector& rho0,
+                       const BaseState<Real>& rho0,
                        const BaseState<Real>& grav_cell,
                        const Vector<MultiFab>& w0_force_cart,
                        int do_add_utilde_force)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeVelForce()",MakeVelForce);
+    BL_PROFILE_VAR("Maestro::MakeVelForce()", MakeVelForce);
 
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
@@ -39,7 +39,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rho0_cart[lev].setVal(0.);
-
     }
 
     BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
@@ -596,18 +595,15 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
         Abort("ERROR: should only call mkrhohforce when predicting rhoh', h, or rhoh");
     }
 
-    RealVector rho0( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> rho0(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real>   p0(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> grav(base_geom.max_radial_level+1, base_geom.nr_fine);
-    rho0.shrink_to_fit();
 
     if (which_step == 1) {
-        rho0 = rho0_old;
+        rho0.copy(rho0_old);
         p0.copy(p0_old);
     } else {
-        for(int i=0; i<rho0.size(); ++i) {
-            rho0[i] = 0.5*(rho0_old[i]+rho0_new[i]);
-        }
+        rho0.copy(0.5*(rho0_old + rho0_new));
         p0.copy(0.5*(p0_old + p0_new));
     }
 
@@ -650,7 +646,7 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     for (int lev=0; lev<=finest_level; ++lev) {
 
         // Get cutoff coord
-        int base_cutoff_density_coord = base_geom.base_cutoff_density_coord(lev);
+        const auto base_cutoff_density_coord = base_geom.base_cutoff_density_coord(lev);
     
         // Get grid spacing
         const auto dx = geom[lev].CellSizeArray();

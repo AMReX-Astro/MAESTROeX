@@ -110,8 +110,7 @@ Maestro::Init ()
 
         compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -226,7 +225,7 @@ Maestro::Init ()
         if (sum_interval > 0  || sum_per > 0) {
             int index_dummy = 0;
             Print() << "\nWriting diagnosis file after all initialization" << std::endl;
-            DiagFile(0,t_old,rho0_old,p0_old,uold,sold,index_dummy);
+            DiagFile(0, t_old, rho0_old, p0_old, uold, sold, index_dummy);
         }
     }
 }
@@ -276,36 +275,29 @@ Maestro::InitData ()
 
     // free memory in s0_init and p0_init by swapping it
     // with an empty vector that will go out of scope
-    RealVector s0_swap, p0_swap;
+    RealVector s0_swap;
     std::swap(s0_swap, s0_init);
-    std::swap(p0_swap, p0_init);
 
     if (fix_base_state) {
         // compute cutoff coordinates
-        compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
 
         // first compute cutoff coordinates using initial density profile
-        compute_cutoff_coords(rho0_old.dataPtr());
         ComputeCutoffCoords(rho0_old);
-        BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-        base_geom.ComputeCutoffCoords(rho0_state.array());
+        base_geom.ComputeCutoffCoords(rho0_old.array());
 
         if (do_smallscale) {
             // set rho0_old = rhoh0_old = 0.
-            std::fill(rho0_old.begin(),  rho0_old.end(),  0.);
+            rho0_old.setVal(0.0);
             rhoh0_old.setVal(0.0);
         } else {
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
-            compute_cutoff_coords(rho0_old.dataPtr());
             ComputeCutoffCoords(rho0_old);
-            BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-            base_geom.ComputeCutoffCoords(rho0_state.array());
+            base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // compute gravity
             MakeGravCell(grav_cell_old, rho0_old);
@@ -321,10 +313,8 @@ Maestro::InitData ()
         }
 
         // set tempbar to be the average
-        Average(sold,tempbar,Temp);
-        for (int i=0; i<tempbar.size(); ++i) {
-            tempbar_init[i] = tempbar[i];
-        }
+        Average(sold, tempbar, Temp);
+        tempbar_init.copy(tempbar);
     }
 
     // set p0^{-1} = p0_old
@@ -397,17 +387,8 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
             const Array4<Real> scal_arr = scal.array(mfi);
             const Array4<Real> vel_arr = vel.array(mfi);
 
-            const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-            const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
-
-            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
-            // initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-            //          BL_TO_FORTRAN_FAB(scal[mfi]),
-            //          BL_TO_FORTRAN_FAB(vel[mfi]),
-            //          s0_init.dataPtr(), p0_init.dataPtr(),
-            //          ZFILL(dx));
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
         }
-
     } else {
 #if (AMREX_SPACEDIM == 3)
         const auto dx_fine_vec = geom[max_level].CellSizeArray();
@@ -429,31 +410,12 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
         }
 
         InitLevelDataSphr(lev, t_old, scal, vel);
-
-// #ifdef _OPENMP
-// #pragma omp parallel
-// #endif
-//         for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
-//         {
-//             const Box& tilebox = mfi.tilebox();
-//             const int* lo  = tilebox.loVect();
-//             const int* hi  = tilebox.hiVect();
-//             initdata_sphr(&t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-//                           BL_TO_FORTRAN_FAB(scal[mfi]),
-//                           BL_TO_FORTRAN_FAB(vel[mfi]),
-//                           s0_init.dataPtr(), p0_init.dataPtr(),
-//                           ZFILL(dx),
-//                           r_cc_loc.dataPtr(), r_edge_loc.dataPtr(),
-//                           BL_TO_FORTRAN_3D(cc_to_r[mfi]));
-//         }
 #endif        
     }
 
     if (lev > 0 && reflux_type == 2) {
         flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
     }
-
-    // exit(0);
 }
 
 
@@ -474,9 +436,8 @@ void Maestro::InitProj ()
     Vector<MultiFab>       delta_gamma1(finest_level+1);
     Vector<MultiFab>  delta_gamma1_term(finest_level+1);
 
-    RealVector Sbar( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector delta_gamma1_termbar( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    Sbar.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -525,7 +486,7 @@ void Maestro::InitProj ()
         // average S into Sbar
         Average(S_cc_old, Sbar, 0);
     } else {
-        std::fill(Sbar.begin(), Sbar.end(), 0.);
+        Sbar.setVal(0.);
     }
 
     // make the nodal rhs for projection beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -560,18 +521,17 @@ void Maestro::DivuIter (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1      (finest_level+1);
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
 
-    RealVector Sbar                  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector w0_force              ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     BaseState<Real> p0_minus_peosbar  (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector delta_chi_w0          ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector delta_gamma1_termbar  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
 
-    Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
 
-    std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+    Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     psi.setVal(0.0);
@@ -621,16 +581,22 @@ void Maestro::DivuIter (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                }
             }
         } else {
             Average(S_cc_old, Sbar, 0);
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for(int i=0; i<Sbar.size(); ++i) {
-                    Sbar[i] += delta_gamma1_termbar[i];
+                auto Sbar_arr = Sbar.array();
+                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                    }
                 }
             }
 
@@ -703,18 +669,17 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     Vector<MultiFab> delta_gamma1_term (finest_level+1);
     Vector<MultiFab> sdc_source        (finest_level+1);
     
-    RealVector Sbar                  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector w0_force              ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     BaseState<Real> p0_minus_pthermbar    (base_geom.max_radial_level+1, base_geom.nr_fine);
     RealVector delta_gamma1_termbar  ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     RealVector delta_chi_w0          ( (base_geom.max_radial_level+1)*base_geom.nr_fine );
     
-    Sbar.shrink_to_fit();
     w0_force.shrink_to_fit();
     delta_gamma1_termbar.shrink_to_fit();
     delta_chi_w0.shrink_to_fit();
     
-    std::fill(Sbar.begin(),                 Sbar.end(),                 0.);
+    Sbar.setVal(0.);
     etarho_ec.setVal(0.0);
     std::fill(w0_force.begin(),             w0_force.end(),             0.);
     psi.setVal(0.0);
@@ -765,16 +730,22 @@ void Maestro::DivuIterSDC (int istep_divu_iter)
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state) {
         if ((use_exact_base_state || average_base_state) && use_delta_gamma1_term) {
-            for(int i=0; i<Sbar.size(); ++i) {
-                Sbar[i] += delta_gamma1_termbar[i];
+            auto Sbar_arr = Sbar.array();
+            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                }
             }
         } else {
             Average(S_cc_old, Sbar, 0);
             
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                for(int i=0; i<Sbar.size(); ++i) {
-                    Sbar[i] += delta_gamma1_termbar[i];
+                auto Sbar_arr = Sbar.array();
+                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
+                    }
                 }
             }
             

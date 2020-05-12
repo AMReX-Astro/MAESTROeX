@@ -185,13 +185,10 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            auto h0_old_arr = h0_old.array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            // for (int i=0; i<h0_old.size(); ++i) {
+            //     h0_old[i] = rhoh0_old[i] / rho0_old[i];
+            // }
+            h0_old.copy(rhoh0_old / rho0_old);
 
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -228,16 +225,8 @@ Maestro::EnthalpyAdvance (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            auto h0_old_arr = h0_old.array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            auto h0_new_arr = h0_new.array();
-            const auto rhoh0_new_arr = rhoh0_new.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
-                    h0_new_arr(l,r) = rhoh0_new_arr(l,r) / rho0_new[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            h0_old.copy(rhoh0_old / rho0_old);
+            h0_new.copy(rhoh0_new / rho0_new);
 
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -512,13 +501,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_old(finest_level+1);
 
         if (spherical) {
-            auto h0_old_arr = h0_old.array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            h0_old.copy(rhoh0_old / rho0_old);
 
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -555,16 +538,8 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         Vector< std::array< MultiFab,AMREX_SPACEDIM > >    h0mac_new(finest_level+1);
 
         if (spherical) {
-            auto h0_old_arr = h0_old.array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            auto h0_new_arr = h0_new.array();
-            const auto rhoh0_new_arr = rhoh0_new.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    h0_old_arr(l,r) = rhoh0_old_arr(l,r) / rho0_old[l+(base_geom.max_radial_level+1)*r];
-                    h0_new_arr(l,r) = rhoh0_new_arr(l,r) / rho0_new[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            h0_old.copy(rhoh0_old / rho0_old);
+            h0_new.copy(rhoh0_new / rho0_new);
 
             for (int lev=0; lev<=finest_level; ++lev) {
                 AMREX_D_TERM(rho0mac_old[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,

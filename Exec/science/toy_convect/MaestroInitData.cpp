@@ -5,9 +5,7 @@ using namespace amrex;
 // initializes data on a specific level
 void
 Maestro::InitLevelData(const int lev, const Real time, 
-                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel, 
-                       const Real* s0_p, 
-                       const Real* p0_p)
+                       const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -71,6 +69,8 @@ Maestro::InitLevelData(const int lev, const Real time,
             vel(i,j,k,1) += vpert;
         });
     }
+
+    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;

@@ -5,7 +5,7 @@ using namespace amrex;
 
 void 
 Maestro::MakeBeta0(BaseState<Real>& beta0_s, 
-                   const RealVector& rho0,
+                   const BaseState<Real>& rho0_s,
                    const BaseState<Real>& p0_s,
                    const BaseState<Real>& gamma1bar_s,
                    const BaseState<Real>& grav_cell_s,
@@ -23,8 +23,8 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
     beta0_s.setVal(0.0);
 
-    const Real * AMREX_RESTRICT rho0_p = rho0.dataPtr();
     auto beta0 = beta0_s.array();
+    const auto rho0 = rho0_s.const_array();
     const auto p0 = p0_s.const_array();
     const auto gamma1bar = gamma1bar_s.const_array();
     const auto grav_cell = grav_cell_s.const_array();
@@ -55,7 +55,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
             for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
                 // Compute beta0 on edges and centers at level n
                 if (n == 0) {
-                    beta0_edge(0,0) = rho0[0];
+                    beta0_edge(0,0) = rho0(0,0);
                 } else {
                     // Obtain the starting value of beta0_edge_lo from the coarser grid
                     beta0_edge(n,base_geom.r_start_coord(n,j)) = beta0_edge(n-1,base_geom.r_start_coord(n,j)/2);
@@ -87,9 +87,9 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
                             // piecewise linear reconstruction of rho0,
                             // gamma1bar, and p0 -- see paper III, appendix C
-                            Real del = 0.5 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*(r-1)])/drc;
-                            Real dpls = 2.0 * (rho0[n+max_lev*(r+1)] - rho0[n+max_lev*r])/drp;
-                            Real dmin = 2.0 * (rho0[n+max_lev*r] - rho0[n+max_lev*(r-1)])/drm;
+                            Real del = 0.5 * (rho0(n,r+1) - rho0(n,r-1))/drc;
+                            Real dpls = 2.0 * (rho0(n,r+1) - rho0(n,r))/drp;
+                            Real dmin = 2.0 * (rho0(n,r) - rho0(n,r-1))/drm;
                             Real slim = min(fabs(dpls), fabs(dmin));
                             slim = slim == slim ? slim : 0.0;
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
@@ -129,7 +129,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                             (p0(n,r) - 0.5*nu*drm)) <= 0.0) {
                             
                             // just do piecewise constant integration
-                            integral = fabs(grav_cell(n,r))*rho0[n+max_lev*r]*0.5*(drp+drm)
+                            integral = fabs(grav_cell(n,r))*rho0(n,r)*0.5*(drp+drm)
                                 / (p0(n,r)*gamma1bar(n,r));
                             
                         } else {
@@ -145,10 +145,10 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                                 Real kappa = sflag * min(slim, fabs(del));
                                 
                                 Real denom = nu*gamma1bar(n,r) - mu*p0(n,r);
-                                Real coeff1 = (lambda*gamma1bar(n,r) - mu*rho0[n+max_lev*r]) *
+                                Real coeff1 = (lambda*gamma1bar(n,r) - mu*rho0(n,r)) *
                                     (kappa *gamma1bar(n,r) + mu*fabs(grav_cell(n,r))) /
                                     (mu*mu*denom);
-                                Real coeff2 = (lambda*p0(n,r) - nu*rho0[n+max_lev*r])*
+                                Real coeff2 = (lambda*p0(n,r) - nu*rho0(n,r))*
                                     (-kappa*p0(n,r) - nu*fabs(grav_cell(n,r))) /
                                     (nu*nu*denom);
                                 Real coeff3 = kappa*lambda / (mu*nu);
@@ -163,8 +163,8 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                             } else {
                                 // paper III, equation C2
                                 Real denom = nu*gamma1bar(n,r) - mu*p0(n,r);
-                                Real coeff1 = lambda*gamma1bar(n,r)/mu - rho0[n+max_lev*r];
-                                Real coeff2 = lambda*p0(n,r)/nu - rho0[n+max_lev*r];
+                                Real coeff1 = lambda*gamma1bar(n,r)/mu - rho0(n,r);
+                                Real coeff2 = lambda*p0(n,r)/nu - rho0(n,r);
 
                                 integral = (fabs(grav_cell(n,r)) / denom) *
                                     (coeff1*log((gamma1bar(n,r) + 0.5*mu*drp)/
@@ -180,9 +180,9 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
                     } else {// r >= anelastic_cutoff_density
 
-                        if (fabs(rho0[n+max_lev*(r-1)]) > rel_eps) {
+                        if (fabs(rho0(n,r-1)) > rel_eps) {
                             beta0(n,r) = beta0(n,r-1) * 
-                                (rho0[n+max_lev*r]/rho0[n+max_lev*(r-1)]);
+                                (rho0(n,r)/rho0(n,r-1));
                         } else {
                             beta0(n,r) = beta0(n,r-1);
                         }
@@ -209,9 +209,9 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
                         // Redo the anelastic cutoff part
                         for (int r = base_geom.anelastic_cutoff_density_coord(i); r <= base_geom.nr(i); ++r) {
-                            if (rho0[i+max_lev*(r-1)] != 0.0) {
+                            if (rho0(i,r-1) != 0.0) {
                                 beta0(i,r) = beta0(i,r-1) * 
-                                    (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
+                                    (rho0(i,r)/rho0(i,r-1));
                             }
                         }
 
@@ -229,9 +229,9 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
                             for (int r = (base_geom.r_end_coord(n,j)+1)/refrat; 
                                  r <= base_geom.nr(i); ++r) {
-                                if (rho0[i+max_lev*(r-1)] != 0.0) {
+                                if (rho0(i,r-1) != 0.0) {
                                     beta0(i,r) = beta0(i,r-1) * 
-                                        (rho0[i+max_lev*r]/rho0[i+max_lev*(r-1)]);
+                                        (rho0(i,r)/rho0(i,r-1));
                                 }
                             }
                         }
@@ -263,7 +263,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
                 int hi = base_geom.r_end_coord(n,j);
                 AMREX_PARALLEL_FOR_1D(hi-lo+1, k, {
                     int r = k + lo;
-                    beta0(n,r) = rho0_p[n+max_lev*r];
+                    beta0(n,r) = rho0(n,r);
                 });
                 Gpu::synchronize();
             }

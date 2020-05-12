@@ -1697,8 +1697,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state, BaseState<Real>& s
     }
 
     for (int n = 0; n <= base_geom.finest_radial_level; ++n) {
-
-        const int nr_lev = base_geom.nr(n);
+        const auto nr_lev = base_geom.nr(n);
 
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
 

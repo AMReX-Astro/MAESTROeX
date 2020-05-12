@@ -61,6 +61,9 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
 	// average down data and fill ghost cells
 	AverageDown(sold,0,Nscal);
@@ -68,16 +71,17 @@ Maestro::InitData ()
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	RealVector s0_swap;
 	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
 
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
 
 	// set rho0 to be the average
 	Average(sold,rho0_old,Rho);
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
 
 	// call eos with r,p as input to recompute T,h
 	TfromRhoP(sold,p0_old,1);
@@ -119,34 +123,12 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
 
-	const Real* dx = geom[lev].CellSize();
-
-	MultiFab& scal = sold[lev];
-	MultiFab& vel = uold[lev];
-
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-	for (MFIter mfi(scal, TilingIfNotGPU()); mfi.isValid(); ++mfi)
+	for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi)
 	{
-		const Box& tilebox = mfi.tilebox();
-		const int* lo  = tilebox.loVect();
-		const int* hi  = tilebox.hiVect();
-
-		const Array4<Real> scal_arr = scal.array(mfi);
-		const Array4<Real> vel_arr = vel.array(mfi);
-
-		const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-		const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
-
-		InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
-		// initdata(&lev, &t_old, ARLIM_3D(lo), ARLIM_3D(hi),
-		//          BL_TO_FORTRAN_FAB(scal[mfi]),
-		//          BL_TO_FORTRAN_FAB(vel[mfi]),
-		//          s0_init.dataPtr(), p0_init.dataPtr(),
-		//          ZFILL(dx));
-
+		InitLevelData(lev, t_old, mfi, sold[lev].array(mfi), uold[lev].array(mfi));
 	}
-
 }

@@ -133,12 +133,13 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
 #endif
 
 void 
-Maestro::ComputeCutoffCoords(const RealVector& rho0)
+Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
     const int max_lev = base_geom.max_radial_level + 1;
     int which_lev = 0;
+    const auto rho0 = rho0_state.const_array();
 
     // find the finest level containing the anelastic cutoff density,
     // and set the anelastic cutoff coord for this level
@@ -148,7 +149,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = base_geom.r_start_coord(n,i);
                 int hi = base_geom.r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= anelastic_cutoff_density) {
+                    if (rho0(n,r) <= anelastic_cutoff_density) {
                         base_geom.anelastic_cutoff_density_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -193,7 +194,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = base_geom.r_start_coord(n,i);
                 int hi = base_geom.r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= base_cutoff_density) {
+                    if (rho0(n,r) <= base_cutoff_density) {
                         base_geom.base_cutoff_density_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -240,7 +241,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = base_geom.r_start_coord(n,i);
                 int hi = base_geom.r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] <= burning_cutoff_density_lo) {
+                    if (rho0(n,r) <= burning_cutoff_density_lo) {
                         base_geom.burning_cutoff_density_lo_coord(n) = r;
                         which_lev = n;
                         found = true;
@@ -285,7 +286,7 @@ Maestro::ComputeCutoffCoords(const RealVector& rho0)
                 int lo = base_geom.r_start_coord(n,i);
                 int hi = base_geom.r_end_coord(n,i);
                 for (auto r = lo; r <= hi; ++r) {
-                    if (rho0[n + max_lev*r] >= burning_cutoff_density_hi) {
+                    if (rho0(n,r) >= burning_cutoff_density_hi) {
                         base_geom.burning_cutoff_density_hi_coord(n) = r;
                         which_lev = n;
                         found = true;

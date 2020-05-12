@@ -60,18 +60,20 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 	// average down data and fill ghost cells
 	AverageDown(sold,0,Nscal);
 	FillPatch(t_old,sold,sold,sold,0,0,Nscal,0,bcs_s);
 
 	// free memory in s0_init and p0_init by swapping it
 	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
+	Vector<Real> s0_swap;
 	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
 
-    p0_new = p0_old;
+	p0_new.copy(p0_old);
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -99,7 +101,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	const auto center_p = center;
 	const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-	Real * AMREX_RESTRICT p0_p = p0_old.dataPtr();
+	auto p0_p = p0_old.array();
 
 	const int max_lev = base_geom.max_radial_level + 1;
 	const auto nrf = base_geom.nr_fine;
@@ -184,7 +186,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 				scal(i,j,k,FirstSpec+comp) = eos_state.xn[comp] * eos_state.rho;
 			}
 
-			p0_p[lev+max_lev*r] = eos_state.p;
+			p0_p(lev,r) = eos_state.p;
 		}); 
 	}
 }

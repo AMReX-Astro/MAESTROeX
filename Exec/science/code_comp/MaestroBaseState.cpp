@@ -9,7 +9,7 @@ auto set_species(Real y);
 auto grav_zone(Real y);
 
 void 
-Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s, 
+Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s, 
                        BaseState<Real>& p0_s, 
                        const int lev)
 {
@@ -77,8 +77,12 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s,
 
     const int max_lev = base_geom.max_radial_level + 1;
     const int n = lev;
+    auto rho0 = rho0_s.array();
     auto rhoh0 = rhoh0_s.array();
     auto p0 = p0_s.array();
+    auto p0_init_arr = p0_init.array();
+    auto tempbar_arr = tempbar.array();
+    auto tempbar_init_arr = tempbar_init.array();
 
     // allocate arrays
     RealVector pres(base_geom.nr(n));
@@ -128,8 +132,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s,
 
     for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr(n);
-	RealVector xn = set_species(y);
+        Real y = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5) * base_geom.dr[n];
+        RealVector xn = set_species(y);
 	
         eos_state.rho = dens[r];
         eos_state.p = pres[r];
@@ -145,17 +149,17 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0_s,
             s0_init[n+max_lev*(r+base_geom.nr_fine*(FirstSpec+comp))] = 
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init[n+max_lev*r] = eos_state.p;
+        p0_init_arr(n,r) = eos_state.p;
         s0_init[n+max_lev*(r+base_geom.nr_fine*Temp)] = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
     for (auto i = 0; i < base_geom.nr_fine; ++i) {
-        rho0[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
+        rho0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Rho)];
         rhoh0(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*RhoH)];
-        tempbar[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
-        tempbar_init[lev+max_lev*i] = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
-        p0(lev,i) = p0_init[lev+max_lev*i];
+        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+base_geom.nr_fine*Temp)];
+        p0(lev,i) = p0_init_arr(lev,i);
     }
 
     // initialize any inlet BC parameters

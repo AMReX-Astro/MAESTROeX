@@ -5,7 +5,7 @@
 using namespace amrex;
 
 void
-Maestro::SpongeInit(const RealVector& rho0)
+Maestro::SpongeInit(const BaseState<Real>& rho0_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SpongeInit()", SpongeInit);
@@ -22,6 +22,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     // The top of the sponge is then 2 * r_md - r_tp
 
     const int max_lev = base_geom.max_radial_level + 1;
+    const auto rho0 = rho0_s.const_array();
 
     Real prob_lo_r = spherical ? 0.0 : geom[0].ProbLo(AMREX_SPACEDIM-1);
 
@@ -38,7 +39,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     if (!use_exact_base_state) {
         // set r_sp;
         for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-            if (rho0[max_lev*r] < sponge_start_density) {
+            if (rho0(0,r) < sponge_start_density) {
                 r_sp = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;
             }
@@ -47,7 +48,7 @@ Maestro::SpongeInit(const RealVector& rho0)
         // set r_md
         r_md = r_top;
         for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-            if (rho0[max_lev*r] < sponge_center_density) {
+            if (rho0(0,r) < sponge_center_density) {
                 r_md = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
                 break;
             }
@@ -55,7 +56,7 @@ Maestro::SpongeInit(const RealVector& rho0)
     } else {
         // set r_sp;
         for (auto r = 0; r < base_geom.nr_fine; ++r) {
-            if (rho0[max_lev*r] < sponge_start_density) {
+            if (rho0(0,r) < sponge_start_density) {
                 r_sp = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;
             }
@@ -64,7 +65,7 @@ Maestro::SpongeInit(const RealVector& rho0)
         // set r_md
         r_md = r_top;
         for (auto r = 0; r < base_geom.nr_fine; ++r) {
-            if (rho0[max_lev*r] < sponge_center_density) {
+            if (rho0(0,r) < sponge_center_density) {
                 r_md = prob_lo_r + base_geom.r_cc_loc(0,r);
                 break;
             }
@@ -90,7 +91,6 @@ Maestro::SpongeInit(const RealVector& rho0)
             Print() << "outer sponge: r_sp_outer, r_tp_outer: " << r_sp_outer << ", " << r_tp_outer << std::endl;
         }
     }
-
 }
 
 void

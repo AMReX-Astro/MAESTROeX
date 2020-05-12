@@ -33,7 +33,7 @@ Maestro::MakePsiPlanar()
 void 
 Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar, 
                      const BaseState<Real>& p0_avg,
-                     const RealVector& Sbar_in) 
+                     const BaseState<Real>& Sbar_in) 
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakePsiSphr()", MakePsiSphr);
@@ -47,10 +47,10 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
     const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const Real * AMREX_RESTRICT Sbar_p = Sbar_in.dataPtr();
     auto psi_arr = psi.array();
     const auto gamma1bar_arr = gamma1bar.const_array();
     const auto p0_avg_arr = p0_avg.const_array();
+    const auto Sbar_arr = Sbar_in.const_array();
 
     const auto npts = base_geom.base_cutoff_density_coord(0);
     AMREX_PARALLEL_FOR_1D(npts, r, {
@@ -60,7 +60,7 @@ Maestro::MakePsiSphr(const BaseState<Real>& gamma1bar,
              r_edge_loc(0,r)*r_edge_loc(0,r) * 
              w0_p[max_lev*r]) / dr0;
         psi_arr(0,r) = gamma1bar_arr(0,r) * p0_avg_arr(0,r) * 
-            (Sbar_p[max_lev*r] - div_w0_sph);
+            (Sbar_arr(0,r) - div_w0_sph);
     });
     Gpu::synchronize();
 }

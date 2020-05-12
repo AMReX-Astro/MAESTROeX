@@ -91,18 +91,12 @@ Maestro::Regrid ()
         // force rho0 to be the average of rho
         Average(sold, rho0_old, Rho);
     } else {
-        for (auto lev = 0; lev <= base_geom.max_radial_level+1; ++lev) {
-            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                rho0_old[lev + (base_geom.max_radial_level+1)*r] = rho0_temp_arr(lev,r);
-            }
-        }
+        rho0_old.copy(rho0_temp);
     }
 
     // compute cutoff coordinates
-    compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
-    BaseState<Real> rho0_state(rho0_old, base_geom.max_radial_level+1, base_geom.nr_fine);
-    base_geom.ComputeCutoffCoords(rho0_state.array());
+    base_geom.ComputeCutoffCoords(rho0_old.array());
 
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);

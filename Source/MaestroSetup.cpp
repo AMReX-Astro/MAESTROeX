@@ -119,16 +119,16 @@ Maestro::Setup ()
     // these are cell-centered
     // base states are stored
     s0_init      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*Nscal );
-    p0_init      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    rho0_old     .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    rho0_new     .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    p0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rho0_old     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    rho0_new     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     rhoh0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     rhoh0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     p0_old       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     p0_new       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     p0_nm1       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    tempbar      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    tempbar_init .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    tempbar      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    tempbar_init .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     beta0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     beta0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     beta0_nm1    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -155,11 +155,6 @@ Maestro::Setup ()
 
     // make sure C++ is as efficient as possible with memory usage
     s0_init      .shrink_to_fit();
-    p0_init      .shrink_to_fit();
-    rho0_old     .shrink_to_fit();
-    rho0_new     .shrink_to_fit();
-    tempbar      .shrink_to_fit();
-    tempbar_init .shrink_to_fit();
     w0           .shrink_to_fit();
     tag_array    .shrink_to_fit();
     diagfile1_data.shrink_to_fit();

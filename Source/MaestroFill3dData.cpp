@@ -43,10 +43,10 @@ Maestro::Put1dArrayOnCart (const RealVector& s0,
 void
 Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
                            Vector<MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
                            const Vector<BCRec>& bcs,
-                           int sbccomp, int variable_type)
+                           const int sbccomp, int variable_type)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
@@ -57,8 +57,8 @@ Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
-                         is_output_a_vector,bcs,sbccomp);
+        Put1dArrayOnCart(lev, s0, s0_cart,is_input_edge_centered,
+                         is_output_a_vector, bcs, sbccomp);
     }
 
     int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
@@ -76,6 +76,18 @@ Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
 void
 Maestro::Put1dArrayOnCart (int lev,
                            const RealVector& s0,
+                           Vector<MultiFab>& s0_cart,
+                           const int is_input_edge_centered,
+                           const int is_output_a_vector,
+                           const Vector<BCRec>& bcs,
+                           const int sbccomp)
+{
+    Put1dArrayOnCart(lev, s0, s0_cart[lev], is_input_edge_centered, is_output_a_vector, bcs, sbccomp);
+}
+
+void
+Maestro::Put1dArrayOnCart (int lev,
+                           const BaseState<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            const int is_input_edge_centered,
                            const int is_output_a_vector,
@@ -380,7 +392,7 @@ Maestro::Put1dArrayOnCart (const int lev,
 void
 Maestro::Put1dArrayOnCart (int lev,
                            const BaseState<Real>& s0_state,
-                           Vector<MultiFab>& s0_cart,
+                           MultiFab& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
                            const Vector<BCRec>& bcs,
@@ -406,12 +418,12 @@ Maestro::Put1dArrayOnCart (int lev,
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-    for (MFIter mfi(s0_cart[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+    for (MFIter mfi(s0_cart, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
         // Get the index space of the valid region
         const Box& tileBox = mfi.tilebox();
 
-        const Array4<Real> s0_cart_arr = s0_cart[lev].array(mfi);
+        const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
         
         if (!spherical) {
 
@@ -1958,7 +1970,7 @@ Maestro::MakeNormal ()
 
     if (spherical) {
 
-        const auto center_p = center;
+        const auto& center_p = center;
 
         for (int lev=0; lev<=finest_level; ++lev) {
 
