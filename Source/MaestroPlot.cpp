@@ -192,7 +192,7 @@ Maestro::WritePlotFile (const int step,
 
             for (int i = 0; i <= base_geom.nr(lev); ++i) {
                 BaseFCFile << base_geom.r_edge_loc(lev,i) << " "
-                           << w0[lev+(base_geom.max_radial_level+1)*i] << "\n";
+                           << w0.array()(lev,i) << "\n";
             }
         }
     }
@@ -236,7 +236,7 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& S_cc_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
+    BL_PROFILE_VAR("Maestro::PlotFileMF()", PlotFileMF);
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -248,9 +248,8 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> tempmf(finest_level+1);
     Vector<MultiFab> tempmf_scalar1(finest_level+1);
     Vector<MultiFab> tempmf_scalar2(finest_level+1);
-    RealVector tempbar_plot ((base_geom.max_radial_level+1)*base_geom.nr_fine);
-    tempbar_plot.shrink_to_fit();
-    std::fill(tempbar_plot.begin(), tempbar_plot.end(), 0.);
+    BaseState<Real> tempbar_plot (base_geom.max_radial_level+1, base_geom.nr_fine);
+    tempbar_plot.setVal(0.);
 
     int dest_comp = 0;
 
@@ -497,7 +496,7 @@ Maestro::PlotFileMF (const int nPlot,
     // tpert
     {
         Average(s_in, tempbar_plot, Temp);
-        Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -529,7 +528,7 @@ Maestro::PlotFileMF (const int nPlot,
     Vector<MultiFab> w0r_cart(finest_level+1);
 
     for (int lev=0; lev<=finest_level; ++lev) {
-        if (spherical == 1) {
+        if (spherical) {
             // w0mac will contain an edge-centered w0 on a Cartesian grid,
             // for use in computing divergences.
             AMREX_D_TERM(w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1); ,
@@ -547,11 +546,13 @@ Maestro::PlotFileMF (const int nPlot,
         w0r_cart[lev].setVal(0.);
     }
 
-    if (evolve_base_state == 1) {
-        if (spherical == 1) {
+    if (evolve_base_state) {
+#if (AMREX_SPACEDIM == 3)
+        if (spherical) {
             MakeW0mac(w0mac);
         }
-        Put1dArrayOnCart(w0,w0r_cart,1,0,bcs_u,0);
+#endif
+        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0);
     }
 
     // Mach number
@@ -584,7 +585,7 @@ Maestro::PlotFileMF (const int nPlot,
         }
 
         Average(tempmf, tempbar_plot, 0);
-        Put1dArrayOnCart(tempbar_plot,tempmf,0,0,bcs_f,0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
@@ -694,7 +695,7 @@ Maestro::PlotFileMF (const int nPlot,
     dest_comp++;
 
     // radial and circular velocities
-    if (spherical == 1) {
+    if (spherical) {
         MakeVelrc(u_in, w0r_cart, tempmf, tempmf_scalar1);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
@@ -746,8 +747,8 @@ Maestro::PlotFileMF (const int nPlot,
 Vector<const MultiFab*>
 Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
                          Vector<const MultiFab*> mf,
-                         const Vector<std::string> varnames,
-                         const Vector<std::string> small_plot_varnames)
+                         const Vector<std::string>& varnames,
+                         const Vector<std::string>& small_plot_varnames)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SmallPlotFileMF()",SmallPlotFileMF);
@@ -764,14 +765,11 @@ Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i] = new MultiFab(mf[i]->boxArray(),
                                        mf[i]->DistributionMap(),nSmallPlot,0);
-
     }
 
-    for (auto it=small_plot_varnames.begin();
-         it!=small_plot_varnames.end(); ++it) {
-
+    for (const auto& it : small_plot_varnames) {
         for (auto n = 0; n < nPlot; n++) {
-            if (*it == varnames[n]) {
+            if (it == varnames[n]) {
                 for (int i = 0; i <= finest_level; ++i)
                     plot_mf_data[i]->copy(*(mf[i]), n, dest_comp, 1);
                 ++dest_comp;
@@ -818,7 +816,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
     if (plot_ad_excess) (*nPlot)++;
     if (plot_pidivu) (*nPlot)++;
     if (plot_processors) (*nPlot)++;
-    if (spherical == 1) (*nPlot) += 2; // radial_velocity, circ_velocity
+    if (spherical) (*nPlot) += 2; // radial_velocity, circ_velocity
     if (do_sponge) (*nPlot)++;
 
     Vector<std::string> names(*nPlot);
@@ -849,7 +847,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
         // This call return the actual length of each string in "len"
         //
         get_spec_names(int_spec_names.dataPtr(),&i,&len);
-        char* spec_name = new char[len+1];
+        auto* spec_name = new char[len+1];
         for (int j = 0; j < len; j++)
             spec_name[j] = int_spec_names[j];
         spec_name[len] = '\0';
@@ -869,7 +867,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
             // This call return the actual length of each string in "len"
             //
             get_spec_names(int_spec_names.dataPtr(),&i,&len);
-            char* spec_name = new char[len+1];
+            auto* spec_name = new char[len+1];
             for (int j = 0; j < len; j++) {
                 spec_name[j] = int_spec_names[j];
             }
@@ -894,7 +892,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
             // This call return the actual length of each string in "len"
             //
             get_spec_names(int_spec_names.dataPtr(),&i,&len);
-            char* spec_name = new char[len+1];
+            auto* spec_name = new char[len+1];
             for (int j = 0; j < len; j++) {
                 spec_name[j] = int_spec_names[j];
             }
@@ -965,7 +963,7 @@ Maestro::PlotFileVarNames (int * nPlot) const
     names[cnt++] = "thermal";
     names[cnt++] = "conductivity";
 
-    if (spherical == 1) {
+    if (spherical) {
         names[cnt++] = "radial_velocity";
         names[cnt++] = "circ_velocity";
     }
@@ -1012,8 +1010,8 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
                 // test to see if it's a valid varname by iterating over
                 // varnames
                 auto found_name = false;
-                for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-                    if (nm == *it) {
+                for (const auto& it : varnames) {
+                    if (nm == it) {
                         names.push_back(nm);
                         found_name = true;
                         break;
@@ -1033,8 +1031,8 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
             // test to see if it's a valid varname by iterating over
             // varnames
             auto found_name = false;
-            for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-                if (nm == *it) {
+            for (const auto& it : varnames) {
+                if (nm == it) {
                     names.push_back(nm);
                     found_name = true;
                     break;
@@ -1101,7 +1099,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
         jobInfoFile << " Plotfile Information\n";
         jobInfoFile << PrettyLine;
 
-        time_t now = time(0);
+        time_t now = time(nullptr);
 
         // Convert now to tm struct for local timezone
         tm* localtm = localtime(&now);
@@ -1257,7 +1255,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
             // This call return the actual length of each string in "len"
             //
             get_spec_names(int_spec_names.dataPtr(),&i,&len);
-            char* spec_name = new char[len+1];
+            auto* spec_name = new char[len+1];
             for (int j = 0; j < len; j++)
                 spec_name[j] = int_spec_names[j];
             spec_name[len] = '\0';
@@ -1370,7 +1368,7 @@ Maestro::MakeMagvel (const Vector<MultiFab>& vel,
 
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
-    if (spherical == 1) {
+    if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
@@ -1551,7 +1549,7 @@ Maestro::MakeAdExcess (const Vector<MultiFab>& state,
             const auto lo = tileBox.loVect3d();
             const auto hi = tileBox.hiVect3d();
 
-            if (spherical == 0) {
+            if (!spherical) {
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     Real nabla = 0.0;
 
@@ -2120,7 +2118,7 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
-        if (spherical == 0) {
+        if (!spherical) {
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -2171,8 +2169,8 @@ Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     }
 
     // average down and fill ghost cells
-    AverageDown(divw0,0,1);
-    FillPatch(t_old,divw0,divw0,divw0,0,0,1,0,bcs_f);
+    AverageDown(divw0, 0, 1);
+    FillPatch(t_old, divw0, divw0, divw0, 0, 0, 1, 0, bcs_f);
 }
 
 void

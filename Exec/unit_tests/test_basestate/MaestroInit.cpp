@@ -18,7 +18,6 @@ Maestro::Init ()
 
 	Print() << "Calling Init()" << std::endl;
 
-
 	start_step = 1;
 
 	// fill in multifab and base state data
@@ -109,26 +108,26 @@ Maestro::InitData ()
 	// set p0^{-1} = p0_old
 	p0_nm1.copy(p0_old);
 
-        rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
-        rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
-	rhoX0_old.shrink_to_fit();
-	rhoX0_new.shrink_to_fit();
+        rhoX0_old.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
+        rhoX0_new.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
 
-        make_rhoX0(s0_init.dataPtr(), rhoX0_old.dataPtr());
-
+	auto rhoX0_old_arr = rhoX0_old.array();
+	const auto s0_init_arr = s0_init.const_array();
+	
+        for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+	for (auto r = 0; r < base_geom.nr(n); ++r) {
+	    for (auto comp = 0; comp < NumSpec; ++comp) {
+		rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
+	    }
+	}
+	}
 
 	// set some stuff to zero
         etarho_ec.setVal(0.0);
 	etarho_cc.setVal(0.0);
 	psi.setVal(0.0);
-	std::fill(w0.begin(), w0.end(), 0.);
-
-
-	// free memory in s0_init and p0_init by swapping it
-	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap;
-	std::swap(s0_swap,s0_init);
-
+	w0.setVal(0.);
+	
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -176,7 +175,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 
 	MultiFab& scal = sold[lev];
 	MultiFab& vel = uold[lev];
-	MultiFab& cc_to_r = cell_cc_to_r[lev];
+	iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP

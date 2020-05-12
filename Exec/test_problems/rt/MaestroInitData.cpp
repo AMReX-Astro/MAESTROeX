@@ -25,26 +25,24 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitData()", InitData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-    const auto& p0_p = p0_init.const_array();;
+    const auto s0_arr = s0_init.const_array();
+    const auto p0_arr = p0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_arr(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_arr(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_arr(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_arr(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -84,10 +82,10 @@ Maestro::InitLevelData(const int lev, const Real time,
             Real s0[Nscal];
 
             for (auto n = 0; n < Nscal; ++n) {
-                s0[n] = s0_p[lev+max_lev*(r+nrf*n)];
+                s0[n] = s0_arr(lev,r,n);
             }
 
-            Perturb(p0_p(lev,r), s0, scal_pert, vel_pert,
+            Perturb(p0_arr(lev,r), s0, scal_pert, vel_pert,
                     prob_lo, prob_hi,
                     x, y, 
                     alpha_p, phi_p, rho_1_loc, rho_2_loc,

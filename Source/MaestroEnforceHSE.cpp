@@ -11,7 +11,6 @@ Maestro::EnforceHSE(const BaseState<Real>& rho0_s,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
 
-    const int max_lev = base_geom.max_radial_level+1;
     const auto& dr = base_geom.dr;
     const auto& r_start_coord = base_geom.r_start_coord;
     const auto& r_end_coord = base_geom.r_end_coord;
@@ -36,7 +35,6 @@ Maestro::EnforceHSE(const BaseState<Real>& rho0_s,
     // zero the new pressure so we don't leave a non-zero pressure in
     // fine radial regions that no longer have a corresponding full
     // state
-    // std::fill(p0.begin(), p0.end(), 0.);
     p0_s.setVal(0.0);
 
     // integrate all of level 1 first

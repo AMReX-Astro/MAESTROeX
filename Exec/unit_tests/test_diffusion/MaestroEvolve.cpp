@@ -132,7 +132,7 @@ Maestro::Evolve ()
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi ) {
+			for (MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi) {
 
 				const auto tileBox = mfi.tilebox();
 				const auto prob_lo = geom[lev].ProbLoArray();

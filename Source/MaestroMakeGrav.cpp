@@ -10,7 +10,6 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
 
-    const int max_lev = base_geom.max_radial_level+1;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
     auto grav_cell_arr = grav_cell.array();
@@ -38,10 +37,8 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             // level = 0
             m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
             grav_cell_arr(0,0) = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
-
-            int nr_lev = base_geom.nr(0);
-
-            for (auto r = 1; r < nr_lev; ++r) {
+            
+            for (auto r = 1; r < base_geom.nr(0); ++r) {
 
                 // the mass is defined at the cell-centers, so to compute
                 // the mass at the current center, we need to add the
@@ -198,125 +195,12 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
 }
 
 void
-Maestro::MakeGravEdge(RealVector& grav_edge, 
-                      const RealVector& rho0)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeGravEdge()",MakeGravEdge);
-
-    const int max_lev = base_geom.max_radial_level+1;
-    const auto& r_edge_loc = base_geom.r_edge_loc;
-
-    get_base_cutoff_density(&base_cutoff_density);
-
-    if (!spherical) {
-        if (do_planar_invsq_grav)  {
-            Real * AMREX_RESTRICT grav_edge_p = grav_edge.dataPtr();
-            const Real planar_invsq_mass_loc = planar_invsq_mass;
-            // we are doing a plane-parallel geometry with a 1/r**2
-            // gravitational acceleration.  The mass is assumed to be
-            // at the origin.  The mass in the computational domain
-            // does not contribute to the gravitational acceleration.
-            //   
-            for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
-                const int nr_lev = base_geom.nr(n);
-                AMREX_PARALLEL_FOR_1D(nr_lev, r, {
-                    grav_edge_p[n+max_lev*r] = -Gconst*planar_invsq_mass_loc / (r_edge_loc(n,r)*r_edge_loc(n,r));
-                });
-                Gpu::synchronize();
-            }
-        } else if (do_2d_planar_octant) {
-            // compute gravity as in spherical geometry
-
-            BaseState<Real> m_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);
-            auto m = m_state.array();
-
-            grav_edge[0] = 0.0;
-            m(0,0) = 0.0;
-
-            for (auto r = 0; r < base_geom.nr(0); ++r) {
-
-                // only add to the enclosed mass if the density is
-                // > base_cutoff_density
-                if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                    m(0,r) = m(0,r-1) + 4.0/3.0*M_PI *
-                        (r_edge_loc(0,r) - r_edge_loc(0,r-1)) *
-                        (r_edge_loc(0,r)*r_edge_loc(0,r) +
-                        r_edge_loc(0,r)*r_edge_loc(0,r-1) +
-                        r_edge_loc(0,r-1)*r_edge_loc(0,r-1)) * rho0[max_lev*(r-1)];
-                } else {
-                    m(0,r) = m(0,r-1);
-                }
-
-                grav_edge[max_lev*r] = -Gconst * m(0,r) / (r_edge_loc(0,r)*r_edge_loc(0,r));
-            }
-
-            for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
-                for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
-
-                    if (base_geom.r_start_coord(n,i) == 0) {
-                        m(n,0) = 0.0;
-                    } else {
-                        m(n,base_geom.r_start_coord(n,i)) = m(n-1,base_geom.r_start_coord(n,i)/2);
-                        grav_edge[n+max_lev*base_geom.r_start_coord(n,i)] = grav_edge[n-1+max_lev*base_geom.r_start_coord(n,i)/2];
-                    }
-
-                    for (auto r = base_geom.r_start_coord(n,i)+1; 
-                         r <= base_geom.r_end_coord(n,i)+1; ++r) {
-
-                        // only add to the enclosed mass if the density is
-                        // > base_cutoff_density
-                        if (rho0[n+max_lev*(r-1)] > base_cutoff_density) {
-                            m(n,r) = m(n,r-1) + 4.0/3.0*M_PI *
-                                (r_edge_loc(n,r) - r_edge_loc(n,r-1)) *
-                                (r_edge_loc(n,r)*r_edge_loc(n,r) +
-                                r_edge_loc(n,r)*r_edge_loc(n,r-1) +
-                                r_edge_loc(n,r-1)*r_edge_loc(n,r-1)) * rho0[n+max_lev*(r-1)];
-                        } else {
-                            m(n,r) = m(n,r-1);
-                        }
-
-                        grav_edge[n+max_lev*r] = -Gconst * m(n,r) / (r_edge_loc(n,r)*r_edge_loc(n,r));
-                    }
-                }
-            }
-            RestrictBase(grav_edge, false);
-            FillGhostBase(grav_edge, false);
-        } else {
-            // constant gravity
-            std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
-        }
-        
-    } else {
-
-        grav_edge[0] = 0.0;
-        Real mencl = 0.0;
-
-        for (auto r = 1; r <= base_geom.nr_fine; ++r) {
-
-            // only add to the enclosed mass if the density is
-            // > base_cutoff_density
-            if (rho0[max_lev*(r-1)] > base_cutoff_density) {
-                mencl += 4.0/3.0 * M_PI *
-                    (r_edge_loc(0,r) - r_edge_loc(0,r-1)) *
-                    (r_edge_loc(0,r) * r_edge_loc(0,r) +
-                    r_edge_loc(0,r) * r_edge_loc(0,r-1) +
-                    r_edge_loc(0,r-1)*r_edge_loc(0,r-1)) * rho0[max_lev*(r-1)];
-            }
-
-            grav_edge[max_lev*r] = -Gconst * mencl / (r_edge_loc(0,r)*r_edge_loc(0,r));
-        }
-    }
-}
-
-void
 Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state, 
                       const BaseState<Real>& rho0_state)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()", MakeGravEdge);
 
-    const int max_lev = base_geom.max_radial_level+1;
     const auto& r_edge_loc = base_geom.r_edge_loc;
     auto grav_edge = grav_edge_state.array();
     const auto rho0 = rho0_state.const_array();
@@ -397,7 +281,6 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
             FillGhostBase(grav_edge, false);
         } else {
             // constant gravity
-            // std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
             grav_edge_state.setVal(grav_const);
         }
         

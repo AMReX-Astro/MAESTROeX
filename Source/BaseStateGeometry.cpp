@@ -10,7 +10,7 @@ BaseStateGeometry::Init(const int max_radial_level_in,
                         const int nr_fine_in,
                         const Real dr_fine_in,
                         const int nr_irreg_in,
-                        const Vector<Geometry> geom,
+                        const Vector<Geometry>& geom,
                         const int max_level,
                         GpuArray<Real,3>& center)
 {

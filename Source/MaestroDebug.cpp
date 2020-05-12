@@ -140,7 +140,7 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
 
 // utility to write out a multilevel multifab to a plotfile
 void Maestro::WriteMF (const Vector<MultiFab>& mf,
-                       std::string name)
+                       const std::string& name)
 {
     int nComp = mf[0].nComp();
 

@@ -75,7 +75,7 @@ contains
     double precision, intent (inout) :: phisum(0:max_radial_level,0:nr_fine-1)
     integer         , intent (inout) ::  ncell(0:max_radial_level,0:nr_fine-1)
     integer         , intent (in   ) :: ccr_lo(3), ccr_hi(3)
-    double precision, intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
+    integer         , intent (in   ) :: cc_to_r(ccr_lo(1):ccr_hi(1), &
          ccr_lo(2):ccr_hi(2),ccr_lo(3):ccr_hi(3))
 
     ! local

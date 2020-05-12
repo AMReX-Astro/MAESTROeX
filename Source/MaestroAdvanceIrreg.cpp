@@ -66,27 +66,20 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> rho0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    BaseState<Real> p0_minus_peosbar(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
-    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> w0_force_dummy (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> gamma1bar_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    RealVector delta_gamma1_termbar ((base_geom.max_radial_level+1)*base_geom.nr_fine);
-    RealVector delta_chi_w0_dummy   ((base_geom.max_radial_level+1)*base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    BaseState<Real> rho0_pred_edge_dummy(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> w0_old (base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    BaseState<Real> rho0_pred_edge_dummy (base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
-    // make sure C++ is as efficient as possible with memory usage
-    w0_force_dummy.shrink_to_fit();
-    delta_gamma1_termbar.shrink_to_fit();
-    w0_old.shrink_to_fit();
-    delta_chi_w0_dummy.shrink_to_fit();
-
-    int is_predictor;
+    bool is_predictor;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
@@ -188,9 +181,9 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Sbar.setVal(0.);
 
     // set dummy variables to zero
-    std::fill(w0_force_dummy.begin(), w0_force_dummy.end(), 0.);
+    w0_force_dummy.setVal(0.);
     rho0_pred_edge_dummy.setVal(0.0);
-    std::fill(w0.begin(), w0.end(), 0.);
+    w0.setVal(0.0);
 
     // make the sponge for all levels
     if (do_sponge) {
@@ -270,22 +263,23 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Average(S_cc_nph, Sbar, 0);
 
         // save old-time value
-        w0_old = w0;
+        w0_old.copy(w0);
 
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 1;
+        // compute w0, w0_force
+        is_predictor = true;
         Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, 
                p0_old, p0_old, gamma1bar_old, gamma1bar_old, 
-               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
+               p0_minus_peosbar, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-        
+
+#if (AMREX_SPACEDIM == 3)        
         if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
-
+#endif
     } else {
         // these should have no effect if evolve_base_state = false
         Sbar.setVal(0.);
@@ -300,8 +294,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    is_predictor = 1;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    is_predictor = true;
+    AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -331,7 +325,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     if (spherical && evolve_base_state) {
         // add w0mac back to umac
-        Addw0(umac,w0mac,1.);
+        Addw0(umac, w0mac, 1.);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -379,7 +373,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(1,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+    DensityAdvance(1, s1, s2, sedge, sflux, scal_force, 
+                   etarhoflux_dummy, umac, w0mac, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -424,11 +419,11 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1,s1,s2,sedge,sflux,scal_force,umac,w0mac,thermal1);
+    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
-        MakeEtarhoSphr(s1,s2,umac,w0mac_dummy);
+        MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -564,27 +559,24 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            auto Sbar_arr = Sbar.array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
 
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 0;
+        // compute w0, w0_force
+        is_predictor = false;
         Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_new, 
                p0_old, p0_new, gamma1bar_old, gamma1bar_new, 
-               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
+               p0_minus_peosbar, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
-        
+
+#if (AMREX_SPACEDIM == 3)        
         if (spherical) {
             // put w0 on Cartesian edges
             MakeW0mac(w0mac);
         }
+#endif
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -596,8 +588,8 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // compute unprojected MAC velocities
-    is_predictor = 0;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    is_predictor = false;
+    AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
@@ -621,7 +613,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
     if (spherical && evolve_base_state) {
         // add w0mac back to umac
-        Addw0(umac,w0mac,1.);
+        Addw0(umac, w0mac, 1.);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -647,7 +639,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     }
 
     // advect rhoX, rho, and tracers
-    DensityAdvance(2,s1,s2,sedge,sflux,scal_force,etarhoflux_dummy,umac,w0mac,rho0_pred_edge_dummy);
+    DensityAdvance(2, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac, w0mac, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -693,7 +685,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2,s1,s2,sedge,sflux,scal_force,umac,w0mac_dummy,thermal1);
+    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy, thermal1);
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
@@ -783,19 +775,14 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
 
         // compute Sbar = Sbar + delta_gamma1_termbar
         if (use_delta_gamma1_term) {
-            auto Sbar_arr = Sbar.array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            Sbar += delta_gamma1_termbar;
         }
 
-        // compute w0, w0_force, and delta_chi_w0
-        is_predictor = 0;
+        // compute w0, w0_force
+        is_predictor = false;
         Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
                p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
-               p0_minus_peosbar, delta_chi_w0_dummy, dt, dtold, is_predictor);
+               p0_minus_peosbar, dt, dtold, is_predictor);
 
         // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
@@ -812,15 +799,15 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     // Define rho at half time using the new rho from Step 8
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
-    VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
-                    rho0_nph,grav_cell_nph,sponge);
+    VelocityAdvance(rhohalf, umac, w0mac_dummy, w0_force_cart_dummy,
+                    rho0_nph, grav_cell_nph, sponge);
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        w0 = w0_old;
+        w0.copy(w0_old);
     }
 
-    if (spherical == 1 && evolve_base_state) {
+    if (spherical && evolve_base_state) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);
@@ -889,7 +876,7 @@ Maestro::AdvanceTimeStepIrreg (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && evolve_base_state) {
+    if (spherical && evolve_base_state) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Add(unew[lev],w0_cart[lev],0,0,AMREX_SPACEDIM,0);

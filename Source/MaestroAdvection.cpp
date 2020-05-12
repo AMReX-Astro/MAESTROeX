@@ -9,7 +9,6 @@ using namespace amrex;
 void
 Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const RealVector& w0_force,
                         const Vector<MultiFab>& w0_force_cart)
 {
     // timer for profiling
@@ -55,7 +54,7 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     }
 
     // create utrans
-    MakeUtrans(utilde,ufull,utrans,w0mac);
+    MakeUtrans(utilde, ufull, utrans, w0mac);
 
     // create a MultiFab to hold the velocity forcing
     Vector<MultiFab> vel_force(finest_level+1);
@@ -74,9 +73,9 @@ Maestro::AdvancePremac (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                  w0_force_cart,do_add_utilde_force);
 
     // add w0 to trans velocities
-    Addw0 (utrans,w0mac,1.);
+    Addw0(utrans, w0mac, 1.);
 
-    VelPred(utilde,ufull,utrans,umac,w0mac,vel_force);
+    VelPred(utilde, ufull, utrans, umac, w0mac, vel_force);
 }
 
 
@@ -92,8 +91,6 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
     BL_PROFILE_VAR("Maestro::UpdateScal()", UpdateScal);
 
     const Real dt_loc = dt;
-    const Real base_cutoff_dens_loc = base_cutoff_density;
-    const bool do_eos_h_above_cutoff_loc = do_eos_h_above_cutoff;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -132,7 +129,7 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     snew_arr(i,j,k,RhoH) = sold_arr(i,j,k,RhoH) 
                         + dt_loc * (-divterm + force_arr(i,j,k,RhoH));
 
-                    if (do_eos_h_above_cutoff_loc && snew_arr(i,j,k,Rho) <= base_cutoff_dens_loc) {
+                    if (do_eos_h_above_cutoff && snew_arr(i,j,k,Rho) <= base_cutoff_density) {
                         eos_t eos_state;
 
                         eos_state.rho = snew_arr(i,j,k,Rho);
@@ -177,11 +174,11 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
                     }
 
                     // enforce a density floor
-                    if (snew_arr(i,j,k,Rho) < 0.5*base_cutoff_dens_loc) {
+                    if (snew_arr(i,j,k,Rho) < 0.5*base_cutoff_density) {
                         for (int comp=start_comp; comp<start_comp+NumSpec; ++comp) {
-                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_dens_loc/snew_arr(i,j,k,Rho);
+                            snew_arr(i,j,k,comp) *= 0.5*base_cutoff_density/snew_arr(i,j,k,Rho);
                         }
-                        snew_arr(i,j,k,Rho) = 0.5*base_cutoff_dens_loc;
+                        snew_arr(i,j,k,Rho) = 0.5*base_cutoff_density;
                     }
 
                     // do not allow the species to leave here negative.
@@ -226,13 +223,13 @@ Maestro::UpdateScal(const Vector<MultiFab>& stateold,
 
     // average fine data onto coarser cells
     // fill ghost cells
-    AverageDown(statenew,start_comp,num_comp);
+    AverageDown(statenew, start_comp, num_comp);
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp, 
               num_comp, start_comp, bcs_s);
 
     // do the same for density if we updated the species
     if (start_comp == FirstSpec) {
-        AverageDown(statenew,Rho,1);
+        AverageDown(statenew, Rho, 1);
         FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
     }
 }
@@ -251,7 +248,6 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
     // 2) Add forcing term to new Utilde
 
     const Real dt_loc = dt;
-    const bool do_sponge_loc = do_sponge;
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -280,7 +276,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
             const Array4<const Real> sponge_arr = sponge[lev].array(mfi);
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
-            if (spherical == 0) {
+            if (!spherical) {
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                     // create cell-centered Utilde
@@ -333,7 +329,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                         (uedgez(i,j,k+1,n) - uedgez(i,j,k,n))/dx[2];
 #endif
                         // Add the sponge
-                        if (do_sponge_loc) unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
+                        if (do_sponge) unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
                     }                    
                 });
             } else {
@@ -396,7 +392,7 @@ Maestro::UpdateVel (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                     unew_arr(i,j,k,2) -= dt_loc * w0_gradwr;
 
                     // Add the sponge
-                    if (do_sponge_loc) {
+                    if (do_sponge) {
                         for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                             unew_arr(i,j,k,n) *= sponge_arr(i,j,k);
                         }

@@ -77,30 +77,21 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     BaseState<Real> grav_cell_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> rho0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> p0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    BaseState<Real> p0_minus_peosbar(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> p0_minus_peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> peosbar (base_geom.max_radial_level+1, base_geom.nr_fine);
-    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    BaseState<Real> w0_force_dummy (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> Sbar (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> beta0_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> gamma1bar_nph (base_geom.max_radial_level+1, base_geom.nr_fine);
-    RealVector delta_gamma1_termbar ((base_geom.max_radial_level+1)*base_geom.nr_fine);
-    RealVector delta_chi_w0_dummy   ((base_geom.max_radial_level+1)*base_geom.nr_fine);
-    RealVector     delta_rhoh0      ((base_geom.max_radial_level+1)*base_geom.nr_fine);
+    BaseState<Real> delta_gamma1_termbar (base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> delta_rhoh0 (base_geom.max_radial_level+1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    RealVector   w0_old             ( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    BaseState<Real> w0_old (base_geom.max_radial_level+1, base_geom.nr_fine+1);
     BaseState<Real> rho0_pred_edge_dummy (base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
-    // make sure C++ is as efficient as possible with memory usage
-    w0_force_dummy.shrink_to_fit();
-    delta_gamma1_termbar.shrink_to_fit();
-    w0_old.shrink_to_fit();
-    delta_chi_w0_dummy.shrink_to_fit();
-    delta_rhoh0.shrink_to_fit();
-
-    int is_predictor;
-
+    bool is_predictor;
     bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
@@ -216,10 +207,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // initialize to zero
     Sbar.setVal(0.);
-    std::fill(w0.begin()  , w0.end()  , 0.);
+    w0.setVal(0.0);
 
     // set dummy variables to zero
-    std::fill(w0_force_dummy.begin()      , w0_force_dummy.end()      , 0.);
+    w0_force_dummy.setVal(0.0);
     rho0_pred_edge_dummy.setVal(0.0);
 
     // make the sponge for all levels
@@ -285,26 +276,27 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             Average(S_cc_nph, Sbar, 0);
 
             // save old-time value
-            w0_old = w0;
+            w0_old.copy(w0);
 
-            // compute w0, w0_force, and delta_chi_w0
-            is_predictor = 1;
+            // compute w0, w0_force
+            is_predictor = true;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                    rho0_old, p0_old, p0_old, gamma1bar_old, 
                    gamma1bar_old, p0_minus_peosbar, 
-                   delta_chi_w0_dummy, dt, dtold, is_predictor);
+                   dt, dtold, is_predictor);
 
+#if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
             }
+#endif
         }
     }
 
-    
     // compute unprojected MAC velocities
-    is_predictor = 1;
-    AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+    is_predictor = true;
+    AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
     for (int lev=0; lev<=finest_level; ++lev) {
         delta_chi[lev].setVal(0.);
@@ -330,18 +322,17 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_old, is_predictor);
 
     // wallclock time
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
     ParallelDescriptor::ReduceRealMax(end_total_macproj,ParallelDescriptor::IOProcessorNumber());
 
     
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // add w0mac back to umac
-        Addw0(umac,w0mac,1.);
+        Addw0(umac, w0mac, 1.);
     }
-
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- Predictor
@@ -444,7 +435,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvanceSDC(1,sold,shat,sedge,sflux,scal_force,umac,w0mac,diff_old);
+    EnthalpyAdvanceSDC(1, sold, shat, sedge, sflux, scal_force, umac, w0mac,diff_old);
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -452,13 +443,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Average(shat, rhoh0_new, RhoH);
 
         // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-        const auto rhoh0_new_arr = rhoh0_new.const_array();
-        const auto rhoh0_old_arr = rhoh0_old.const_array();
-        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                delta_rhoh0[l+(base_geom.max_radial_level+1)*r] = (rhoh0_new_arr(l,r) - rhoh0_old_arr(l,r))/dt;
-            }
-        }
+        delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt);
     }
 
     // extract aofs = (shat - sold) / dt - intra
@@ -540,7 +525,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             if (!spherical) {
                 MakeEtarho(etarhoflux_dummy);
             } else {
-                MakeEtarhoSphr(sold,snew,umac,w0mac_dummy);
+                MakeEtarhoSphr(sold, snew, umac, w0mac_dummy);
             }
         }
 
@@ -559,13 +544,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
         //                       - (rhoh0_hat - rhoh0_old)/dt
-        const auto rhoh0_new_arr = rhoh0_new.const_array();
-        const auto rhoh0_old_arr = rhoh0_old.const_array();
-        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                delta_rhoh0[l+(base_geom.max_radial_level+1)*r] = (rhoh0_new_arr(l,r) - rhoh0_old_arr(l,r))/dt - delta_rhoh0[l+(base_geom.max_radial_level+1)*r];
-            }
-        }
+        delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
         Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
     }
 
@@ -727,31 +706,28 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                     
                     // compute Sbar = Sbar + delta_gamma1_termbar
                     if (use_delta_gamma1_term) {
-                        auto Sbar_arr = Sbar.array();
-                        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                                Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
-                            }
-                        }
+                        Sbar += delta_gamma1_termbar;
                     }
                     
-                    // compute w0, w0_force, and delta_chi_w0
-                    is_predictor = 0;
+                    // compute w0, w0_force
+                    is_predictor = false;
                     Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, 
                             rho0_new, p0_old, p0_new, gamma1bar_old, 
                             gamma1bar_new, p0_minus_peosbar, 
-                            delta_chi_w0_dummy, dt, dtold, is_predictor);
-                                
+                            dt, dtold, is_predictor);
+
+#if (AMREX_SPACEDIM == 3)                                
                     if (spherical) {
                         // put w0 on Cartesian edges
                         MakeW0mac(w0mac);
                     }
+#endif
                 }
             }
 
             // compute unprojected MAC velocities
-            is_predictor = 0;
-            AdvancePremac(umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy);
+            is_predictor = false;
+            AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
             if (evolve_base_state && !split_projection) {
                 Sbar.copy(1.0/(gamma1bar_nph*p0_nph) * (p0_nph - p0_old)/dt);
@@ -761,7 +737,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
                                 gamma1bar_new, p0_new,delta_p_term, delta_chi,is_predictor);
 
-            if (spherical == 1 && evolve_base_state && split_projection) {
+            if (spherical && evolve_base_state && split_projection) {
                 // subtract w0mac from umac
                 Addw0(umac,w0mac,-1.);
             }
@@ -771,14 +747,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // MAC projection
             // includes spherical option in C++ function
-            MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
+            MacProj(umac, macphi, macrhs, beta0_nph, is_predictor);
 
             // wallclock time
             Real end_total_macproj_corrector = ParallelDescriptor::second() - start_total_macproj_corrector;
             ParallelDescriptor::ReduceRealMax(end_total_macproj_corrector,ParallelDescriptor::IOProcessorNumber());
 
 
-            if (spherical == 1 && evolve_base_state && split_projection) {
+            if (spherical && evolve_base_state && split_projection) {
                 // add w0mac back to umac
                 Addw0(umac,w0mac,1.);
             }
@@ -851,13 +827,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             Average(shat, rhoh0_new, RhoH);
 
             // store (rhoh0_hat - rhoh0_old)/dt in delta_rhoh0
-            const auto rhoh0_new_arr = rhoh0_new.const_array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    delta_rhoh0[l+(base_geom.max_radial_level+1)*r] = (rhoh0_new_arr(l,r) - rhoh0_old_arr(l,r))/dt;
-                }
-            }
+            delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt);
         }
 
         // extract aofs = (shat - sold) / dt - intra
@@ -973,13 +943,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             
             // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
             //                       - (rhoh0_hat - rhoh0_old)/dt
-            const auto rhoh0_new_arr = rhoh0_new.const_array();
-            const auto rhoh0_old_arr = rhoh0_old.const_array();
-            for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                    delta_rhoh0[l+(base_geom.max_radial_level+1)*r] = (rhoh0_new_arr(l,r) - rhoh0_old_arr(l,r))/dt - delta_rhoh0[l+(base_geom.max_radial_level+1)*r];
-                }
-            }
+            delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
             Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
         }
 
@@ -1086,10 +1050,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "<<< STEP 5 : Advance velocity and dynamic pressure >>>" << std::endl;
     }
 
-    MakeReactionRates(rho_omegadot,rho_Hnuc,snew); 
+    MakeReactionRates(rho_omegadot, rho_Hnuc, snew); 
     
-    Make_S_cc(S_cc_new,delta_gamma1_term,delta_gamma1,snew,uold,rho_omegadot,rho_Hnuc,
-              rho_Hext,diff_new,p0_new,gamma1bar_new,delta_gamma1_termbar);
+    Make_S_cc(S_cc_new, delta_gamma1_term, delta_gamma1, snew, uold, rho_omegadot, rho_Hnuc,
+              rho_Hext, diff_new, p0_new, gamma1bar_new,delta_gamma1_termbar);
 
     if (evolve_base_state) {
         if (split_projection) {
@@ -1099,20 +1063,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             // compute Sbar = Sbar + delta_gamma1_termbar
             if (use_delta_gamma1_term) {
-                auto Sbar_arr = Sbar.array();
-                for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-                    for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                        Sbar_arr(l,r) += delta_gamma1_termbar[l+(base_geom.max_radial_level+1)*r];
-                    }
-                }
+                Sbar += delta_gamma1_termbar;
             }
 
-            // compute w0, w0_force, and delta_chi_w0
-            is_predictor = 0;
+            // compute w0, w0_force
+            is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, 
                    rho0_new, p0_new, p0_new, gamma1bar_new, 
                    gamma1bar_new, p0_minus_peosbar, 
-                   delta_chi_w0_dummy, dt, dtold, is_predictor);
+                   dt, dtold, is_predictor);
 
             if (spherical) {
                 // put w0 on Cartesian cell-centers
@@ -1121,7 +1080,6 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         }
     }
 
-    
     // define dSdt = (S_cc_new - S_cc_old) / dt
     for (int lev=0; lev<=finest_level; ++lev) {
         MultiFab::LinComb(dSdt[lev],-1./dt,S_cc_old[lev],0,1./dt,S_cc_new[lev],0,0,1,0);
@@ -1130,15 +1088,15 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     // Define rho at half time using the new rho from Step 4
     FillPatch(0.5*(t_old+t_new), rhohalf, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
-    VelocityAdvance(rhohalf,umac,w0mac_dummy,w0_force_dummy,w0_force_cart_dummy,
-                    rho0_nph,grav_cell_nph,sponge);
+    VelocityAdvance(rhohalf, umac, w0mac_dummy, w0_force_cart_dummy,
+                    rho0_nph, grav_cell_nph, sponge);
 
     if (evolve_base_state && is_initIter) {
         // throw away w0 by setting w0 = w0_old
-        w0 = w0_old;
+        w0.copy(w0_old);
     }
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);
@@ -1212,7 +1170,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
     Real end_total_nodalproj = ParallelDescriptor::second() - start_total_nodalproj;
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical == 1 && evolve_base_state && split_projection) {
+    if (spherical && evolve_base_state && split_projection) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Add(unew[lev],w0cc[lev],0,0,AMREX_SPACEDIM,0);

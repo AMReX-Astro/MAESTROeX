@@ -14,8 +14,6 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeBeta0()", MakeBeta0);
 
-    const int max_lev = base_geom.max_radial_level+1;
-
     const auto& dr = base_geom.dr;
 
     BaseState<Real> beta0_edge_state(base_geom.finest_radial_level+1, base_geom.nr_fine+1);

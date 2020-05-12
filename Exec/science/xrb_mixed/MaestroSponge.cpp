@@ -18,9 +18,8 @@ Maestro::SpongeInit(const BaseState<Real>& rho0_s)
     // The start of the top sponge is r_sp_outer = topsponge_lo_r, and
     // the end of the top sponge is r_tp_outer = topsponge_hi_r.
 
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto& rho0 = rho0_s.const_array();
-    
+    const auto rho0 = rho0_s.const_array();
+
     Real prob_lo_r = geom[0].ProbLo(AMREX_SPACEDIM-1);
 
     // Top sponge
@@ -31,10 +30,10 @@ Maestro::SpongeInit(const BaseState<Real>& rho0_s)
 
     // set topsponge_lo_r = r_sp_outer;
     for (auto r = 0; r <= base_geom.r_end_coord(0,1); ++r) {
-	if (rho0(0,r) < sponge_start_density) {
-	    r_sp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
-	    break;
-	}
+        if (rho0(0,r) < sponge_start_density) {
+            r_sp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            break;
+        }
     }
 
     // set topsponge_hi_r = r_tp_outer;

@@ -75,7 +75,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
             Array4<Real> const Im_arr = Im.array(mfi);
             Array4<Real> const Ip_arr = Ip.array(mfi);
-            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
 
             if (ppm_type == 0) {
                 // we're going to reuse Ip here as slopex as it has the
@@ -291,7 +290,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             Array4<Real> const utrans_arr = utrans[lev][0].array(mfi);
             Array4<Real> const Im_arr = Im.array(mfi);
             Array4<Real> const Ip_arr = Ip.array(mfi);
-            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
             Array4<const Real> const w0macx = w0mac[lev][0].array(mfi);
 
             // x-direction
@@ -406,7 +404,6 @@ Maestro::MakeUtrans (const Vector<MultiFab>& utilde,
             Array4<Real> const vtrans_arr = utrans[lev][1].array(mfi);
             Array4<Real> const Im_arr = Im.array(mfi);
             Array4<Real> const Ip_arr = Ip.array(mfi);
-            Array4<const Real> const w0_arr = w0_cart[lev].array(mfi);
             Array4<const Real> const w0macy = w0mac[lev][1].array(mfi);
 
             // y-direction

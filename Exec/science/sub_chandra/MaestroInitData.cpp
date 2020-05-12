@@ -11,25 +11,23 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
     
     const auto tileBox = mfi.tilebox();
-    const auto max_lev = base_geom.max_radial_level + 1;
-    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
+    const auto s0_arr = s0_init.const_array();
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_arr(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_arr(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_arr(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_arr(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -42,8 +40,6 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nr_fine = base_geom.nr_fine;
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -75,12 +71,15 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
     // make a temporary MultiFab and RealVector to hold the cartesian data then copy it back to scal 
     MultiFab temp_mf(scal.boxArray(), scal.DistributionMap(), 1, 0);
 
-    RealVector temp_vec(max_lev*nr_fine);
+    BaseState<Real> temp_vec(base_geom.max_radial_level+1, base_geom.nr_fine);
+    auto temp_arr = temp_vec.array();
+
+    const auto s0_arr = s0_init.const_array();
 
     // initialize temperature 
-    for (auto l = 0; l < max_lev; ++l) {
-        for (auto n = 0; n < nr_fine; ++n) {
-            temp_vec[l+max_lev*n] = s0_init[l+max_lev*(n+nr_fine*Temp)];
+    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
+            temp_arr(l,r) = s0_arr(l,r,Temp);
         }
     }
 
@@ -92,9 +91,9 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        for (auto l = 0; l < max_lev; ++l) {
-            for (auto n = 0; n < nr_fine; ++n) {
-                temp_vec[l+max_lev*n] = s0_init[l+max_lev*(n+nr_fine*(FirstSpec+comp))];
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                temp_arr(l,r) = s0_arr(l,r,FirstSpec+comp);
             }
         }
         Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);
@@ -103,15 +102,15 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 
     // compute the radial bounds of the perturbation
     Real velpert_r_outer;
-    for (auto i = 0; i < nr_fine; ++i) {
-        if (s0_init[max_lev*(i+nr_fine*Rho)] < sponge_start_factor*sponge_center_density) {
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
+        if (s0_arr(0,i,Rho) < sponge_start_factor*sponge_center_density) {
             velpert_r_outer = base_geom.r_cc_loc(0,i);
         }
     }
 
     Real velpert_r_inner;
-    for (auto i = 0; i < nr_fine; ++i) {
-        if (s0_init[max_lev*(i+nr_fine*(FirstSpec+ihe4))]/s0_init[max_lev*(i+nr_fine*Rho)] > 0.9) {
+    for (auto i = 0; i < base_geom.nr_fine; ++i) {
+        if (s0_arr(0,i,FirstSpec+ihe4)/s0_arr(0,i,Rho) > 0.9) {
             velpert_r_inner = base_geom.r_cc_loc(0,i);
         }
     }

@@ -15,8 +15,6 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         Abort("ERROR: mach_jet base_state is not valid for spherical");
     }
 
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     auto rho0 = rho0_s.array();
@@ -25,6 +23,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     auto p0_init_arr = p0_init.array();
     auto tempbar_arr = tempbar.array();
     auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -69,15 +68,15 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
                 dens_zone = 1.e-3 * exp(-z/H);
             }
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
+            s0_init_arr(n,r,Rho) = dens_zone;
 
             if (r == 0) {
                 p0_init_arr(n,r) -= base_geom.dr(n) * 0.5 * 
-                    s0_init[n+max_lev*(r+nr_fine*Rho)] * fabs(grav_const);
+                    s0_init_arr(n,r,Rho) * fabs(grav_const);
             } else {
                 p0_init_arr(n,r) = p0_init_arr(n,r-1) - base_geom.dr(n) * 
-                    0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + 
-                           s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * 
+                    0.5 * (s0_init_arr(n,r,Rho) + 
+                           s0_init_arr(n,r-1,Rho)) * 
                     fabs(grav_const);
             }
 
@@ -94,13 +93,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
             // (rho,p) --> T, h
             eos(eos_input_rp, eos_state);
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
-            s0_init[n+max_lev*(r+nr_fine*RhoH)] = dens_zone * eos_state.h;
-            for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 0.0;
+            s0_init_arr(n,r,Rho) = dens_zone;
+            s0_init_arr(n,r,RhoH) = dens_zone * eos_state.h;
+            for (auto comp = 1; comp < NumSpec; ++comp) {
+                s0_init_arr(n,r,FirstSpec+comp) = 0.0;
             }
-            s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = dens_zone;
-            s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+            s0_init_arr(n,r,FirstSpec) = dens_zone;
+            s0_init_arr(n,r,Temp) = eos_state.T;
         }
     } else {
         eos_t eos_state;
@@ -117,22 +116,22 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
         for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-            s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-            s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
-            s0_init[n+max_lev*(r+nr_fine*FirstSpec)] = eos_state.rho;
-            s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+            s0_init_arr(lev,r,Rho)= eos_state.rho;
+            s0_init_arr(lev,r,RhoH) = eos_state.rho * eos_state.h;
+            s0_init_arr(n,r,FirstSpec) = eos_state.rho;
+            s0_init_arr(n,r,Temp) = eos_state.T;
 
             p0_init_arr(n,r) = eos_state.p;
         }
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init_arr(lev,i);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // initialize any inlet BC parameters

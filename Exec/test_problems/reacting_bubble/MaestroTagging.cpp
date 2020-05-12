@@ -6,7 +6,7 @@ using namespace amrex;
 
 void
 Maestro::RetagArray(const Box& bx,
-                    const int lev, IntVector& tag_array)
+                    const int lev)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RetagArray()", RetagArray);
@@ -27,7 +27,7 @@ Maestro::RetagArray(const Box& bx,
 void
 Maestro::TagBoxes(TagBoxArray& tags, 
                   const MFIter& mfi,
-                  const int lev, IntVector& tag_array,
+                  const int lev,
                   const Real time)
 {
     // timer for profiling
@@ -53,7 +53,7 @@ Maestro::TagBoxes(TagBoxArray& tags,
 void
 Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf, 
                    const MFIter& mfi,
-                   const int lev, IntVector& tag_array,
+                   const int lev,
                    const Real time)
 {
     // timer for profiling

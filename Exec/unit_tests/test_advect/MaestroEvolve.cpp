@@ -119,13 +119,13 @@ Maestro::Evolve ()
 			}
 
 			// the base state will not carry any information in this test problem
-			rho0_old.setVal(0.);
-			rho0_new.setVal(0.);
-			rhoh0_old.setVal(0.);
-		        rhoh0_new.setVal(0.);
-			p0_old.setVal(0.);
-			p0_new.setVal(0.);
-			std::fill(w0.begin(),         w0.end(),         0.);
+			rho0_old.setVal(0.0);
+			rho0_new.setVal(0.0);
+			rhoh0_old.setVal(0.0);
+			rhoh0_new.setVal(0.0);
+			p0_old.setVal(0.0);
+			p0_new.setVal(0.0);
+			w0.setVal(0.0);
 			rho0_predicted_edge.setVal(0.);
 
 			// initialize the velocity field -- it is unity in the

@@ -8,39 +8,6 @@
 using namespace amrex;
 
 void
-Maestro::Put1dArrayOnCart (const RealVector& s0,
-                           Vector<MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const Vector<BCRec>& bcs,
-                           const int sbccomp, int variable_type)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
-
-    int ng = s0_cart[0].nGrow();
-    if (ng > 0 && bcs.size() == 0) {
-        Abort("Put1dArrayOnCart with ghost cells requires bcs input");
-    }
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-        Put1dArrayOnCart(lev,s0,s0_cart,is_input_edge_centered,
-                         is_output_a_vector,bcs,sbccomp);
-    }
-
-    int ncomp = is_output_a_vector ? AMREX_SPACEDIM : 1;
-
-    // set covered coarse cells to be the average of overlying fine cells
-    AverageDown(s0_cart,0,ncomp);
-
-    // fill ghost cells using first-order extrapolation
-    if (ng > 0) {
-        FillPatch(t_old, s0_cart, s0_cart, s0_cart, 0, 0, ncomp, sbccomp, bcs,
-                  variable_type);
-    }
-}
-
-void
 Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            const int is_input_edge_centered,
@@ -52,7 +19,7 @@ Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart()", Put1dArrayOnCart);
 
     int ng = s0_cart[0].nGrow();
-    if (ng > 0 && bcs.size() == 0) {
+    if (ng > 0 && bcs.empty()) {
         Abort("Put1dArrayOnCart with ghost cells requires bcs input");
     }
 
@@ -75,7 +42,7 @@ Maestro::Put1dArrayOnCart (const BaseState<Real>& s0,
 
 void
 Maestro::Put1dArrayOnCart (int lev,
-                           const RealVector& s0,
+                           const BaseState<Real>& s0,
                            Vector<MultiFab>& s0_cart,
                            const int is_input_edge_centered,
                            const int is_output_a_vector,
@@ -88,310 +55,6 @@ Maestro::Put1dArrayOnCart (int lev,
 void
 Maestro::Put1dArrayOnCart (int lev,
                            const BaseState<Real>& s0,
-                           Vector<MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const Vector<BCRec>& bcs,
-                           const int sbccomp)
-{
-    Put1dArrayOnCart(lev, s0, s0_cart[lev], is_input_edge_centered, is_output_a_vector, bcs, sbccomp);
-}
-
-void
-Maestro::Put1dArrayOnCart (const int lev,
-                           const RealVector& s0,
-                           MultiFab& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const Vector<BCRec>& bcs,
-                           const int sbccomp)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()", Put1dArrayOnCart);
-
-    const auto dx = geom[lev].CellSizeArray();
-    const auto prob_lo = geom[lev].ProbLoArray();
-    const auto center_p = center;
-
-    const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto& r_cc_loc = base_geom.r_cc_loc;
-    const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
-
-    const int max_lev = base_geom.max_radial_level+1;
-    const int nr_fine = base_geom.nr_fine;
-    const int w0_interp_type_loc = w0_interp_type;
-
-    // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-    for ( MFIter mfi(s0_cart, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-        // Get the index space of the valid region
-        const Box& tileBox = mfi.tilebox();
-
-        const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
-
-        if (spherical == 0) {
-
-            const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
-
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                const int r = AMREX_SPACEDIM == 2 ? j : k;
-
-                s0_cart_arr(i,j,k,outcomp) = is_input_edge_centered == 1 ? 
-                    0.5 * (s0_p[lev+r*max_lev] + s0_p[lev+(r+1)*max_lev]) : 
-                    s0_p[lev+r*max_lev];
-            });
-
-        } else {
-
-            const Array4<const Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
-
-            if (use_exact_base_state) {
-                if (is_input_edge_centered) {
-                    // we implemented three different ideas for computing s0_cart,
-                    // where s0 is edge-centered.
-                    // 1.  Piecewise constant
-                    // 2.  Piecewise linear
-                    // 3.  Quadratic
-
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(cc_to_r(i,j,k));
-
-                        Real rfac;
-                        if (index < nr_fine) {
-                            rfac = (radius - r_edge_loc(0,index+1)) 
-                            / (r_cc_loc(0,index+1) 
-                                - r_cc_loc(0,index));
-                        } else {
-                            rfac = (radius - r_edge_loc(0,index+1)) 
-                            / (r_cc_loc(0,index) 
-                                - r_cc_loc(0,index-1));
-                        }
-
-                        Real s0_cart_val = s0_p[index*max_lev];
-
-                        if (w0_interp_type_loc == 1) {
-
-                            s0_cart_val = rfac > 0.5 ? 
-                                s0_p[(index+1)*max_lev] : s0_p[index*max_lev];
-
-                        } else if (w0_interp_type_loc == 2) {
-                            
-                            if (index < nr_fine) {
-                                s0_cart_val = rfac * s0_p[(index+1)*max_lev] 
-                                    + (1.0-rfac) * s0_p[index*max_lev];
-                            } else {
-                                s0_cart_val = s0_p[nr_fine*max_lev];
-                            }
-
-                        } else if (w0_interp_type_loc == 3) {
-                            if (index <= 0) {
-                                index = 0;
-                            } else if (index >= nr_fine-1) {
-                                index = nr_fine - 2;
-                            } else if (radius-r_edge_loc(0,index) 
-                                    < r_edge_loc(0,index+1)) {
-                                index--;
-                            }
-
-                            s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc(0,index),
-                                r_edge_loc(0,index+1), 
-                                r_edge_loc(0,index+2), 
-                                s0_p[index*max_lev],
-                                s0_p[(index+1)*max_lev],
-                                s0_p[(index+2)*max_lev]);
-                        }
-
-                        if (is_output_a_vector) {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
-                            s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
-                            s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
-                        } else {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val;
-                        }
-                    });
-
-                } else { // is_input_edge_centered = 0
-                    // we directly inject the spherical values into each cell center
-                    // because s0 is also bin-centered.
-
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(cc_to_r(i,j,k));
-
-                        Real s0_cart_val = s0_p[index*max_lev];
-                        
-                        if (is_output_a_vector) {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
-                            s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
-                            s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
-                        } else {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val;
-                        }
-                    });
-                } // is_input_edge_centered
-
-            } else { // use_exact_base_state = 0
-
-                const Real drf = base_geom.dr_fine;
-
-                if (is_input_edge_centered) {
-                    // we implemented three different ideas for computing s0_cart,
-                    // where s0 is edge-centered.
-                    // 1.  Piecewise constant
-                    // 2.  Piecewise linear
-                    // 3.  Quadratic
-
-                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-
-                        int index = int(radius / drf);
-                        Real rfac = (radius - Real(index) * drf) / drf;
-                        Real s0_cart_val = 0.0;
-
-                        if (w0_interp_type_loc == 1) {
-
-                            s0_cart_val = rfac > 0.5 ? 
-                                s0_p[(index+1)*max_lev] : s0_p[index*max_lev];
-
-                        } else if (w0_interp_type_loc == 2) {
-                            
-                            if (index < nr_fine) {
-                                s0_cart_val = rfac * s0_p[(index+1)*max_lev] + (1.0-rfac) * s0_p[index*max_lev];
-                            } else {
-                                s0_cart_val = s0_p[nr_fine*max_lev];
-                            }
-
-                        } else if (w0_interp_type_loc == 3) {
-                            
-                            if (index <= 0) {
-                                index = 0;
-                            } else if (index >= nr_fine-1) {
-                                index = nr_fine - 2;
-                            } else if (radius-r_edge_loc(0,index) 
-                                    < r_edge_loc(0,index+1)) {
-                                index--;
-                            }
-
-                            s0_cart_val = QuadInterp(radius, 
-                                r_edge_loc(0,index),
-                                r_edge_loc(0,index+1), 
-                                r_edge_loc(0,index+2), 
-                                s0_p[index*max_lev],
-                                s0_p[(index+1)*max_lev],
-                                s0_p[(index+2)*max_lev]);
-                        }
-                        
-                        if (is_output_a_vector) {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
-                            s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
-                            s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
-                        } else {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val;
-                        }
-                    });
-
-                } else { // is_input_edge_centered = 0
-
-                    const int s0_interp_type_loc = s0_interp_type;
-
-                    // we currently have three different ideas for computing s0_cart,
-                    // where s0 is bin-centered.
-                    // 1.  Piecewise constant
-                    // 2.  Piecewise linear
-                    // 3.  Quadratic
-                    // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    ParallelFor(tileBox, 
-                    [=] AMREX_GPU_DEVICE(int i, int j, int k)
-                    {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        Real s0_cart_val = 0.0;
-
-                        if (s0_interp_type_loc == 1) {
-
-                            s0_cart_val = s0_p[index*max_lev];
-
-                        } else if (s0_interp_type_loc == 2) {
-
-                            if (radius >= r_cc_loc(0,index)) {
-                                if (index >= nr_fine-1) {
-                                    s0_cart_val = s0_p[(nr_fine-1)*max_lev];
-                                } else {
-                                    s0_cart_val = s0_p[(index+1)*max_lev] 
-                                        * (radius-r_cc_loc(0,index))/drf 
-                                        + s0_p[index*max_lev] 
-                                        * (r_cc_loc(0,index+1)-radius)/drf;
-                                }
-                            } else {
-                                if (index == 0) {
-                                    s0_cart_val = s0_p[index*max_lev];
-                                } else if (index > nr_fine-1) {
-                                    s0_cart_val = s0_p[(nr_fine-1)*max_lev];
-                                } else {
-                                    s0_cart_val = s0_p[index*max_lev] 
-                                        * (radius-r_cc_loc(0,index-1))/drf 
-                                        + s0_p[(index-1)*max_lev] 
-                                        * (r_cc_loc(0,index)-radius)/drf;
-                                }
-                            }
-                        } else if (s0_interp_type_loc == 3) {
-                            if (index == 0) {
-                                index = 1;
-                            } else if (index >= nr_fine-1) {
-                                index = nr_fine-2;
-                            }
-
-                            s0_cart_val = QuadInterp(radius, 
-                                r_cc_loc(0,index-1),
-                                r_cc_loc(0,index),
-                                r_cc_loc(0,index+1), 
-                                s0_p[(index-1)*max_lev],
-                                s0_p[index*max_lev],
-                                s0_p[(index+1)*max_lev]);
-                        }
-                        
-                        if (is_output_a_vector) {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
-                            s0_cart_arr(i,j,k,1) = s0_cart_val * y / radius;
-                            s0_cart_arr(i,j,k,2) = s0_cart_val * z / radius;
-                        } else {
-                            s0_cart_arr(i,j,k,0) = s0_cart_val;
-                        }
-                    });
-                } // is_input_edge_centered
-            } // use_exact_base_state
-        }
-    }
-}
-
-void
-Maestro::Put1dArrayOnCart (int lev,
-                           const BaseState<Real>& s0_state,
                            MultiFab& s0_cart,
                            int is_input_edge_centered,
                            int is_output_a_vector,
@@ -407,12 +70,10 @@ Maestro::Put1dArrayOnCart (int lev,
 
     const auto& r_edge_loc = base_geom.r_edge_loc;
     const auto& r_cc_loc = base_geom.r_cc_loc;
+    const auto s0_arr = s0.const_array();
 
-    const int max_lev = base_geom.max_radial_level+1;
     const int nr_fine = base_geom.nr_fine;
     const int w0_interp_type_loc = w0_interp_type;
-
-    const auto s0 = s0_state.array();
 
     // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -424,7 +85,7 @@ Maestro::Put1dArrayOnCart (int lev,
         const Box& tileBox = mfi.tilebox();
 
         const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
-        
+
         if (!spherical) {
 
             const int outcomp = is_output_a_vector == 1 ? AMREX_SPACEDIM-1 : 0;
@@ -433,13 +94,12 @@ Maestro::Put1dArrayOnCart (int lev,
                 const int r = AMREX_SPACEDIM == 2 ? j : k;
 
                 s0_cart_arr(i,j,k,outcomp) = is_input_edge_centered == 1 ? 
-                    0.5 * (s0(lev,r) + s0(lev,r+1)) : 
-                    s0(lev,r);
+                    0.5 * (s0_arr(lev,r) + s0_arr(lev,r+1)) : s0_arr(lev,r);
             });
 
         } else {
 
-            const Array4<const Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
+            const Array4<const int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
             if (use_exact_base_state) {
                 if (is_input_edge_centered) {
@@ -459,7 +119,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         int index = cc_to_r(i,j,k);
 
                         Real rfac;
-                        if (index < base_geom.nr_fine) {
+                        if (index < nr_fine) {
                             rfac = (radius - r_edge_loc(0,index+1)) 
                             / (r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index));
@@ -469,20 +129,20 @@ Maestro::Put1dArrayOnCart (int lev,
                                 - r_cc_loc(0,index-1));
                         }
 
-                        Real s0_cart_val;
+                        Real s0_cart_val = 0.0;
 
                         if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
-                                s0(0,index+1) : s0(0,index);
+                                s0_arr(0,index+1) : s0_arr(0,index);
 
                         } else if (w0_interp_type_loc == 2) {
                             
                             if (index < nr_fine) {
-                                s0_cart_val = rfac * s0(0,index+1) 
-                                    + (1.0-rfac) * s0(0,index);
+                                s0_cart_val = rfac * s0_arr(0,index+1) 
+                                    + (1.0-rfac) * s0_arr(0,index);
                             } else {
-                                s0_cart_val = s0(0,nr_fine);
+                                s0_cart_val = s0_arr(0,nr_fine);
                             }
 
                         } else if (w0_interp_type_loc == 3) {
@@ -499,9 +159,9 @@ Maestro::Put1dArrayOnCart (int lev,
                                 r_edge_loc(0,index),
                                 r_edge_loc(0,index+1), 
                                 r_edge_loc(0,index+2), 
-                                s0(0,index),
-                                s0(0,index+1),
-                                s0(0,index+2));
+                                s0_arr(0,index),
+                                s0_arr(0,index+1),
+                                s0_arr(0,index+2));
                         }
 
                         if (is_output_a_vector) {
@@ -526,7 +186,7 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real radius = sqrt(x*x + y*y + z*z);
                         int index = cc_to_r(i,j,k);
 
-                        Real s0_cart_val = s0(0,index);
+                        Real s0_cart_val = s0_arr(0,index);
                         
                         if (is_output_a_vector) {
                             s0_cart_arr(i,j,k,0) = s0_cart_val * x / radius;
@@ -557,21 +217,21 @@ Maestro::Put1dArrayOnCart (int lev,
 
                         Real radius = sqrt(x*x + y*y + z*z);
 
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
                         Real rfac = (radius - Real(index) * drf) / drf;
                         Real s0_cart_val = 0.0;
 
                         if (w0_interp_type_loc == 1) {
 
                             s0_cart_val = rfac > 0.5 ? 
-                                s0(0,index+1) : s0(0,index);
+                                s0_arr(0,index+1) : s0_arr(0,index);
 
                         } else if (w0_interp_type_loc == 2) {
                             
                             if (index < nr_fine) {
-                                s0_cart_val = rfac * s0(0,index+1) + (1.0-rfac) * s0(0,index);
+                                s0_cart_val = rfac * s0_arr(0,index+1) + (1.0-rfac) * s0_arr(0,index);
                             } else {
-                                s0_cart_val = s0(0,nr_fine);
+                                s0_cart_val = s0_arr(0,nr_fine);
                             }
 
                         } else if (w0_interp_type_loc == 3) {
@@ -589,9 +249,9 @@ Maestro::Put1dArrayOnCart (int lev,
                                 r_edge_loc(0,index),
                                 r_edge_loc(0,index+1), 
                                 r_edge_loc(0,index+2), 
-                                s0(0,index),
-                                s0(0,index+1),
-                                s0(0,index+2));
+                                s0_arr(0,index),
+                                s0_arr(0,index+1),
+                                s0_arr(0,index+2));
                         }
                         
                         if (is_output_a_vector) {
@@ -621,34 +281,34 @@ Maestro::Put1dArrayOnCart (int lev,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         Real s0_cart_val = 0.0;
 
                         if (s0_interp_type_loc == 1) {
 
-                            s0_cart_val = s0(0,index);
+                            s0_cart_val = s0_arr(0,index);
 
                         } else if (s0_interp_type_loc == 2) {
 
                             if (radius >= r_cc_loc(0,index)) {
                                 if (index >= nr_fine-1) {
-                                    s0_cart_val = s0(0,nr_fine-1);
+                                    s0_cart_val = s0_arr(0,nr_fine-1);
                                 } else {
-                                    s0_cart_val = s0(0,index+1) 
+                                    s0_cart_val = s0_arr(0,index+1) 
                                         * (radius-r_cc_loc(0,index))/drf 
-                                        + s0(0,index) 
+                                        + s0_arr(0,index)  
                                         * (r_cc_loc(0,index+1)-radius)/drf;
                                 }
                             } else {
                                 if (index == 0) {
-                                    s0_cart_val = s0(0,index);
+                                    s0_cart_val = s0_arr(0,index);
                                 } else if (index > nr_fine-1) {
-                                    s0_cart_val = s0(0,nr_fine-1);
+                                    s0_cart_val = s0_arr(0,nr_fine-1);
                                 } else {
-                                    s0_cart_val = s0(0,index) 
+                                    s0_cart_val = s0_arr(0,index) 
                                         * (radius-r_cc_loc(0,index-1))/drf 
-                                        + s0(0,index-1) 
+                                        + s0_arr(0,index-1) 
                                         * (r_cc_loc(0,index)-radius)/drf;
                                 }
                             }
@@ -663,9 +323,9 @@ Maestro::Put1dArrayOnCart (int lev,
                                 r_cc_loc(0,index-1),
                                 r_cc_loc(0,index),
                                 r_cc_loc(0,index+1), 
-                                s0(0,index-1),
-                                s0(0,index),
-                                s0(0,index+1));
+                                s0_arr(0,index-1),
+                                s0_arr(0,index),
+                                s0_arr(0,index+1));
                         }
                         
                         if (is_output_a_vector) {
@@ -705,10 +365,9 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const Real& mult)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Addw0()",Addw0);
+    BL_PROFILE_VAR("Maestro::Addw0()", Addw0);
 
-    const int max_lev = base_geom.max_radial_level+1;
-    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
+    const auto w0_arr = w0.const_array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -727,18 +386,18 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
             const Array4<Real> wedge = u_edge[lev][2].array(mfi);
 #endif
             
-            if (spherical == 0) {
+            if (!spherical) {
 #if (AMREX_SPACEDIM == 2)
                 const Box& ybx = amrex::grow(mfi.nodaltilebox(1), amrex::IntVect(1,0));
 
                 AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                    vedge(i,j,k) += mult * w0_p[lev+j*max_lev];
+                    vedge(i,j,k) += mult * w0_arr(lev,j);
                 });
 #else
                 const Box& zbx = amrex::grow(mfi.nodaltilebox(2), amrex::IntVect(1,1,0));
 
                 AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                    wedge(i,j,k) += mult * w0_p[lev+k*max_lev];
+                    wedge(i,j,k) += mult * w0_arr(lev,k);
                 });
 #endif
             } else {
@@ -790,14 +449,14 @@ Maestro::Addw0 (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& u_edge,
     }
 }
 
-
+#if (AMREX_SPACEDIM == 3)
 void
 Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeW0mac()",MakeW0mac);
+    BL_PROFILE_VAR("Maestro::MakeW0mac()", MakeW0mac);
 
-    if (spherical == 0) {
+    if (!spherical) {
         Abort("Error: only call MakeW0mac for spherical");
     }
 
@@ -814,11 +473,10 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 
     const int nr_fine = base_geom.nr_fine;
-    const int max_lev = base_geom.max_radial_level+1;
     const int w0mac_interp_type_loc = w0mac_interp_type;
     const Real drf = base_geom.dr_fine;
-    const Real * AMREX_RESTRICT w0_p = w0.dataPtr();
-    const auto& r_edge_loc = base_geom.r_edge_loc;
+    const auto w0_arr = w0.array();
+    const auto r_edge_loc = base_geom.r_edge_loc;
     const auto& center_p = center;
 
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -835,7 +493,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-            for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+            for (MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
                 // Get the index space of the valid region
                 const Box& gntbx = mfi.grownnodaltilebox(-1, 1);
@@ -848,14 +506,14 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real rfac = (radius - Real(index) * drf) / drf;
 
                     Real w0_cart_val;
                     if (index < nr_fine) {
-                        w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                        w0_cart_val = rfac * w0_arr(0,index+1) + (1.0-rfac) * w0_arr(0,index);
                     } else {
-                        w0_cart_val = w0_p[nr_fine*max_lev];
+                        w0_cart_val = w0_arr(0,nr_fine);
                     }
 
                     if (radius == 0.0) {
@@ -874,7 +532,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+        for (MFIter mfi(w0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
 
             const Box& xbx = mfi.grownnodaltilebox(0, 1);
             const Box& ybx = mfi.grownnodaltilebox(1, 1);
@@ -908,7 +566,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {
@@ -916,9 +574,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
 
                         if (index < nr_fine) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_arr(0,index+1) + (1.0-rfac) * w0_arr(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine*max_lev];
+                            w0_cart_val = w0_arr(0,nr_fine);
                         }
                     } else {
                         if (index <= 0) {
@@ -933,9 +591,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc(0,index),
                                     r_edge_loc(0,index+1), 
                                     r_edge_loc(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_arr(0,index),
+                                    w0_arr(0,index+1),
+                                    w0_arr(0,index+2));
                     }
 
                     w0macx(i,j,k) = w0_cart_val * x / radius;
@@ -947,7 +605,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {
@@ -955,9 +613,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
 
                         if (index < nr_fine) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_arr(0,index+1) + (1.0-rfac) * w0_arr(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine*max_lev];
+                            w0_cart_val = w0_arr(0,nr_fine);
                         }
                     } else { 
                         if (index <= 0) {
@@ -972,9 +630,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc(0,index),
                                     r_edge_loc(0,index+1), 
                                     r_edge_loc(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_arr(0,index),
+                                    w0_arr(0,index+1),
+                                    w0_arr(0,index+2));
                     }
 
                     w0macy(i,j,k) = w0_cart_val * y / radius;
@@ -986,7 +644,7 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                     Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                     Real radius = sqrt(x*x + y*y + z*z);
-                    int index = int(radius / drf);
+                    auto index = int(radius / drf);
                     Real w0_cart_val;
 
                     if (w0mac_interp_type_loc == 2) {
@@ -994,9 +652,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                         Real rfac = (radius - Real(index)*drf) / drf;
                         
                         if (index < nr_fine) {
-                            w0_cart_val = rfac * w0_p[(index+1)*max_lev] + (1.0-rfac) * w0_p[index*max_lev];
+                            w0_cart_val = rfac * w0_arr(0,index+1) + (1.0-rfac) * w0_arr(0,index);
                         } else {
-                            w0_cart_val = w0_p[nr_fine*max_lev];
+                            w0_cart_val = w0_arr(0,nr_fine);
                         }
                     } else {
 
@@ -1012,9 +670,9 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
                                     r_edge_loc(0,index),
                                     r_edge_loc(0,index+1), 
                                     r_edge_loc(0,index+2), 
-                                    w0_p[index*max_lev],
-                                    w0_p[(index+1)*max_lev],
-                                    w0_p[(index+2)*max_lev]);
+                                    w0_arr(0,index),
+                                    w0_arr(0,index+1),
+                                    w0_arr(0,index+2));
                     }
 
                     w0macz(i,j,k) = w0_cart_val * z / radius;
@@ -1044,15 +702,14 @@ Maestro::MakeW0mac (Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac)
     }
 }
 
-
 void
-Maestro::MakeS0mac (const RealVector& s0,
+Maestro::MakeS0mac (const BaseState<Real>& s0,
                     Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
 
-    if (spherical == 0) {
+    if (!spherical) {
         Abort("Error: only call MakeS0mac for spherical");
     }
 
@@ -1072,467 +729,10 @@ Maestro::MakeS0mac (const RealVector& s0,
     }
 
     const int nr_fine = base_geom.nr_fine;
-    const int max_lev = base_geom.max_radial_level+1;
-    const Real drf = base_geom.dr_fine;
-    const Real * AMREX_RESTRICT s0_p = s0.dataPtr();
-    const auto& r_cc_loc = base_geom.r_cc_loc;
-    const auto center_p = center;
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        MultiFab& s0cart_mf = s0_cart[lev];
-    
-        const auto dx = geom[lev].CellSizeArray();
-        const auto prob_lo = geom[lev].ProbLoArray();
-
-        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(s0cart_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& xbx = mfi.grownnodaltilebox(0, 1);
-            const Box& ybx = mfi.grownnodaltilebox(1, 1);
-            const Box& zbx = mfi.grownnodaltilebox(2, 1);
-
-            const Array4<Real> s0macx = s0mac[lev][0].array(mfi);
-            const Array4<Real> s0macy = s0mac[lev][1].array(mfi);
-            const Array4<Real> s0macz = s0mac[lev][2].array(mfi);
-            const Array4<const Real> s0_cart_arr = s0_cart[lev].array(mfi);
-
-            if (use_exact_base_state) {
-                // we currently have three different ideas for computing s0mac
-                // 1.  Interpolate s0 to cell centers, then average to edges
-                // 2.  Interpolate s0 to edges directly using linear interpolation
-                // 3.  Interpolate s0 to edges directly using quadratic interpolation
-                // 4.  Interpolate s0 to nodes, then average to edges
-
-                if (s0mac_interp_type == 1) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        s0macx(i,j,k) = 0.5 * (s0_cart_arr(i-1,j,k) + s0_cart_arr(i,j,k));
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        s0macy(i,j,k) = 0.5 * (s0_cart_arr(i,j-1,k) + s0_cart_arr(i,j,k));
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        s0macz(i,j,k) = 0.5 * (s0_cart_arr(i,j,k-1) + s0_cart_arr(i,j,k));
-                    });
-
-                } else if (s0mac_interp_type == 2) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[0]*dx[0]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            Real dri = r_cc_loc(0,index+1) 
-                                - r_cc_loc(0,index);
-                            if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macx(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/dri
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/dri;
-                            }
-                        } else {
-                            Real dri = r_cc_loc(0,index) 
-                                - r_cc_loc(0,index-1);
-                            if (index == 0) {
-                                s0macx(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macx(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/dri;
-                            }
-                        }
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[1]*dx[1]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            Real dri = r_cc_loc(0,index+1) 
-                                - r_cc_loc(0,index);
-                            if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macy(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/dri
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/dri;
-                            }
-                        } else {
-                            Real dri = r_cc_loc(0,index) 
-                                - r_cc_loc(0,index-1);
-                            if (index == 0) {
-                                s0macy(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macy(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/dri;
-                            }
-                        }
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[2]*dx[2]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            Real dri = r_cc_loc(0,index+1) 
-                                - r_cc_loc(0,index);
-                            if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macz(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/dri
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/dri;
-                            }
-                        } else {
-                            Real dri = r_cc_loc(0,index) 
-                                - r_cc_loc(0,index-1);
-                            if (index == 0) {
-                                s0macz(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macz(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/dri;
-                            }
-                        }
-                    });
-
-                } else if (s0mac_interp_type == 3) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[0]*dx[0]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        // index refers to the center point in the quadratic stencil.
-                        // we need to modify this if we're too close to the edge
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macx(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[1]*dx[1]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        // index refers to the center point in the quadratic stencil.
-                        // we need to modify this if we're too close to the edge
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macy(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = round(radius*radius / (dx[2]*dx[2]) - 0.375);
-                        // closest radial index to edge-centered point
-
-                        // index refers to the center point in the quadratic stencil.
-                        // we need to modify this if we're too close to the edge
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macz(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-                }
-
-            } else { // use_exact_base_state = 0
-
-                if (s0mac_interp_type == 1) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        s0macx(i,j,k) = 0.5 * (s0_cart_arr(i-1,j,k) + s0_cart_arr(i,j,k));
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        s0macy(i,j,k) = 0.5 * (s0_cart_arr(i,j-1,k) + s0_cart_arr(i,j,k));
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        s0macz(i,j,k) = 0.5 * (s0_cart_arr(i,j,k-1) + s0_cart_arr(i,j,k));
-                    });
-
-                } else if (s0mac_interp_type == 2) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macx(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/drf
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/drf;
-                            }
-                        } else {
-                            if (index == 0) {
-                                s0macx(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macx(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/drf;
-                            }
-                        }
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macy(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/drf
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/drf;
-                            }
-                        } else {
-                            if (index == 0) {
-                                s0macy(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macy(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/drf;
-                            }
-                        }
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (radius >= r_cc_loc(0,index)) {
-                            if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macz(i,j,k) = s0_p[(index+1)*max_lev] 
-                                    * (radius-r_cc_loc(0,index))/drf
-                                    + s0_p[index*max_lev]
-                                    * (r_cc_loc(0,index+1)-radius)/drf;
-                            }
-                        } else {
-                            if (index == 0) {
-                                s0macz(i,j,k) = s0_p[index*max_lev];
-                            } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0_p[(base_geom.nr_fine-1)*max_lev];
-                            } else {
-                                s0macz(i,j,k) = s0_p[index*max_lev] 
-                                    * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0_p[(index-1)*max_lev]
-                                    * (r_cc_loc(0,index)-radius)/drf;
-                            }
-                        }
-                    });
-
-                } else if (s0mac_interp_type == 3) {
-
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
-                        Real x = prob_lo[0] + Real(i) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macx(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + Real(j) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macy(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
-                        Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
-                        Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
-                        Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
-
-                        Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
-
-                        if (index == 0) {
-                            index = 1;
-                        } else if (index >= nr_fine-1) {
-                            index = nr_fine-2;
-                        }
-
-                        s0macz(i,j,k) = QuadInterp(radius, 
-                                            r_cc_loc(0,index-1),
-                                            r_cc_loc(0,index), 
-                                            r_cc_loc(0,index+1), 
-                                            s0_p[(index-1)*max_lev],
-                                            s0_p[index*max_lev],
-                                            s0_p[(index+1)*max_lev]);
-                    });
-                }
-            }
-        }
-    }
-}
-
-void
-Maestro::MakeS0mac (const BaseState<Real>& s0_state,
-                    Vector<std::array< MultiFab,AMREX_SPACEDIM > >& s0mac)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeS0mac()",MakeS0mac);
-
-    if (spherical == 0) {
-        Abort("Error: only call MakeS0mac for spherical");
-    }
-
-    // Construct a cartesian version of s0
-    Vector<MultiFab> s0_cart(finest_level+1);
-    for (int lev=0; lev<=finest_level; ++lev) {
-        s0_cart[lev].define(grids[lev], dmap[lev], 1, 2);
-        s0_cart[lev].setVal(0.);
-    }
-
-    if (s0mac_interp_type == 1) {
-        Put1dArrayOnCart(s0_state, s0_cart, 0, 0, bcs_f, 0);
-    }
-
-    if (s0mac[0][0].nGrow() != 1) {
-        Abort("Error: MakeS0mac assumes one ghost cell");
-    }
-
-    const int nr_fine = base_geom.nr_fine;
-    const int max_lev = base_geom.max_radial_level+1;
     const Real drf = base_geom.dr_fine;
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto center_p = center;
-    const auto s0 = s0_state.array();
+    const auto s0_arr = s0.const_array();
 
     for (int lev=0; lev<=finest_level; ++lev) {
     
@@ -1591,24 +791,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index+1) 
+                                s0macx(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macx(i,j,k) = s0(0,index);
+                                s0macx(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index) 
+                                s0macx(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -1627,24 +827,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index+1) 
+                                s0macy(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macy(i,j,k) = s0(0,index);
+                                s0macy(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index) 
+                                s0macy(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -1663,24 +863,24 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                             Real dri = r_cc_loc(0,index+1) 
                                 - r_cc_loc(0,index);
                             if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index+1) 
+                                s0macz(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/dri
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/dri;
                             }
                         } else {
                             Real dri = r_cc_loc(0,index) 
                                 - r_cc_loc(0,index-1);
                             if (index == 0) {
-                                s0macz(i,j,k) = s0(0,index);
+                                s0macz(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index) 
+                                s0macz(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/dri
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/dri;
                             }
                         }
@@ -1709,9 +909,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
@@ -1735,9 +935,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
@@ -1761,9 +961,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
                 }
 
@@ -1791,26 +991,26 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index+1) 
+                                s0macx(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macx(i,j,k) = s0(0,index);
+                                s0macx(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macx(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macx(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macx(i,j,k) = s0(0,index) 
+                                s0macx(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1822,26 +1022,26 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index+1) 
+                                s0macy(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macy(i,j,k) = s0(0,index);
+                                s0macy(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macy(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macy(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macy(i,j,k) = s0(0,index) 
+                                s0macy(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1853,26 +1053,26 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (radius >= r_cc_loc(0,index)) {
                             if (index >= nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index+1) 
+                                s0macz(i,j,k) = s0_arr(0,index+1) 
                                     * (radius-r_cc_loc(0,index))/drf
-                                    + s0(0,index)
+                                    + s0_arr(0,index)
                                     * (r_cc_loc(0,index+1)-radius)/drf;
                             }
                         } else {
                             if (index == 0) {
-                                s0macz(i,j,k) = s0(0,index);
+                                s0macz(i,j,k) = s0_arr(0,index);
                             } else if (index > nr_fine-1) {
-                                s0macz(i,j,k) = s0(0,base_geom.nr_fine-1);
+                                s0macz(i,j,k) = s0_arr(0,base_geom.nr_fine-1);
                             } else {
-                                s0macz(i,j,k) = s0(0,index) 
+                                s0macz(i,j,k) = s0_arr(0,index) 
                                     * (radius-r_cc_loc(0,index-1))/drf
-                                    + s0(0,index-1)
+                                    + s0_arr(0,index-1)
                                     * (r_cc_loc(0,index)-radius)/drf;
                             }
                         }
@@ -1886,7 +1086,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1898,9 +1098,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
@@ -1909,7 +1109,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1921,9 +1121,9 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
 
                     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
@@ -1932,7 +1132,7 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x*x + y*y + z*z);
-                        int index = int(radius / drf);
+                        auto index = int(radius / drf);
 
                         if (index == 0) {
                             index = 1;
@@ -1944,16 +1144,16 @@ Maestro::MakeS0mac (const BaseState<Real>& s0_state,
                                             r_cc_loc(0,index-1),
                                             r_cc_loc(0,index), 
                                             r_cc_loc(0,index+1), 
-                                            s0(0,index-1),
-                                            s0(0,index),
-                                            s0(0,index+1));
+                                            s0_arr(0,index-1),
+                                            s0_arr(0,index),
+                                            s0_arr(0,index+1));
                     });
                 }
             }
         }
     }
 }
-
+#endif
 void
 Maestro::MakeNormal ()
 {
@@ -2102,10 +1302,10 @@ Maestro::MakeCCtoRadii ()
         const Real* dx = geom[lev].CellSize();
         const Real* dx_fine = geom[max_level].CellSize();
 
+        iMultiFab& cc_to_r = cell_cc_to_r[lev];
+        
         auto dx_lev = geom[lev].CellSizeArray();
         auto dx_fine_vec = geom[max_level].CellSizeArray();
-
-        MultiFab& cc_to_r = cell_cc_to_r[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP

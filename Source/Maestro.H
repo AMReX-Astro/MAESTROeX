@@ -143,7 +143,6 @@ public:
     /// @param w0_force_cart    base-state-velocity force on cartesian grid
     void AdvancePremac (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                         const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                        const RealVector& w0_force,
                         const amrex::Vector<amrex::MultiFab>& w0_force_cart);
 
     /// Calculate `rhoX` flux
@@ -182,21 +181,6 @@ public:
     /// @param r0_predicted_edge  new base-state density on cell edges
     /// @param start_comp       index of component of `state` to begin with
     /// @param num_comp         number of components to perform calculation for
-    void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
-                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-                       amrex::Vector<amrex::MultiFab>& etarhoflux,
-                       amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const RealVector& r0_old,
-                       const RealVector& r0_edge_old,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const RealVector& r0_new,
-                       const RealVector& r0_edge_new,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const RealVector& r0_predicted_edge,
-                       int start_comp, int num_comp);
-
     void MakeRhoXFlux (const amrex::Vector<amrex::MultiFab>& state,
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                        amrex::Vector<amrex::MultiFab>& etarhoflux,
@@ -296,9 +280,6 @@ public:
     /// @param phibar   Averaged quantity
     /// @param comp     Index of component of `mf` to average
     void Average (const amrex::Vector<amrex::MultiFab>& mf,
-                  RealVector& phibar,
-                  int comp);
-    void Average (const amrex::Vector<amrex::MultiFab>& mf,
                   BaseState<amrex::Real>& phibar,
                   int comp);
 
@@ -329,16 +310,11 @@ public:
 #endif
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
 
-    // void InitMultilevel(const int finest_radial_level_in);
-                               
-    void RestrictBase(RealVector& s0_vec, bool is_cell_centered);
-    void FillGhostBase(RealVector& s0_vec, bool is_cell_centered);
+    void RestrictBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
+    void RestrictBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
 
-    void RestrictBase(BaseState<Real>& s0_vec, bool is_cell_centered);
-    void RestrictBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
-
-    void FillGhostBase(BaseState<Real>& s0_vec, bool is_cell_centered);
-    void FillGhostBase(BaseStateArray<Real> s0_vec, bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
+    void FillGhostBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -372,13 +348,7 @@ public:
     ////////////
     // MaestroCelltoEdge.cpp functions
 
-    void CelltoEdge(const RealVector& s0_cell_vec, 
-                    RealVector& s0_edge_vec);
-
-    void CelltoEdge(const RealVector& s0_cell_vec, 
-                    BaseState<amrex::Real>& s0_edge);
-
-    void CelltoEdge(const BaseState<amrex::Real>& s0_cell_vec, 
+    void CelltoEdge(const BaseState<amrex::Real>& s0_cell, 
                     BaseState<amrex::Real>& s0_edge);
 
     // end MaestroCelltoEdge.cpp functions
@@ -409,11 +379,6 @@ public:
     /// @param bcs_in   boundary conditions
     /// @param flag     determines whether base state is subtracted (true) or added (false)
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
-                        const RealVector& s0,
-                        int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
-                        bool flag);
-    void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
                         const amrex::Vector<amrex::BCRec>& bcs_in,
@@ -431,11 +396,6 @@ public:
     /// @param bccomp   component of `bcs_in` to use to enforce boundary conditions
     /// @param bcs_in   boundary conditions
     /// @param flag     determines whether base state is subtracted (true) or added (false)
-    void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
-                        const RealVector& s0,
-                        int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
-                        bool flag);
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
@@ -468,7 +428,7 @@ public:
 
     /// Utility to write out a multilevel multifab to a plotfile
     void WriteMF   (const amrex::Vector<amrex::MultiFab>& mf,
-                    std::string name);
+                    const std::string& name);
     ////////////////////////
 
     ////////////////////////
@@ -528,7 +488,8 @@ public:
     ////////////
 
     ////////////
-    // Time step computation in `MaestroDt.cpp`
+    // MaestroDt.cpp functions
+    // Time step computation 
 
     /// Compute the time step
     void EstDt ();
@@ -536,7 +497,7 @@ public:
     /// Compute initial time step
     void FirstDt ();
 
-    void EstDt_Divu(RealVector& gp0_vec, const BaseState<amrex::Real>& p0, 
+    void EstDt_Divu(BaseState<amrex::Real>& gp0, const BaseState<amrex::Real>& p0, 
                     const BaseState<amrex::Real>& gamma1bar);
 
     // end MaestroDt.cpp functions
@@ -668,13 +629,6 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const RealVector& s0,
-                           amrex::Vector<amrex::MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           const int sbccomp = 0, int variable_type=0);
-
     void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
                            int is_input_edge_centered,
@@ -691,28 +645,6 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const int level, const RealVector& s0,
-                           amrex::Vector<amrex::MultiFab>& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
-
-       /// Maps 1d arrays onto multi-D cartesian MultiFabs
-    ///
-    /// @param level        AMR level to perform calculation on
-    /// @param s0           1d base state
-    /// @param s0_cart      base state mapped to multi-d cartesian MultiFab
-    /// @param is_input_edge_centered   is the input edge-centered?
-    /// @param is_output_a_vector       is the output a vector?
-    /// @param bcs          boundary conditions
-    /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const int level, const RealVector& s0,
-                           amrex::MultiFab& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
-                           const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
     void Put1dArrayOnCart (const int level, const BaseState<amrex::Real>& s0,
                            amrex::MultiFab& s0_cart,
                            const int is_input_edge_centered,
@@ -743,17 +675,14 @@ public:
     void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
                 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
-
+#if (AMREX_SPACEDIM == 3)
     /// MAC-project the base state velocity
     void MakeW0mac (amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac);
 
     /// MAC-project the base state scalar `s0`
-    void MakeS0mac (const RealVector& s0,
-                    amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
-
     void MakeS0mac (const BaseState<amrex::Real>& s0,
                     amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& s0mac);
-
+#endif
     /// Create the unit normal across the grids
     void MakeNormal ();
 
@@ -778,15 +707,6 @@ public:
                        const BaseState<amrex::Real>& grav,
                        const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                        int do_add_utilde_force);
-
-    void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
-                         const amrex::Vector<amrex::MultiFab>& state,
-                         const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
-                         const RealVector& s0_edge,
-                         const amrex::Vector<amrex::MultiFab>& s0_cart,
-                         int comp,
-                         const amrex::Vector<amrex::BCRec>& bcs,
-                         int fullform);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
                          const amrex::Vector<amrex::MultiFab>& state,
@@ -1101,14 +1021,6 @@ public:
 
     ////////////
     // MaestroMakeEdgeState.cpp functions
-    void MakeEdgeState1d(RealVector& s, BaseState<amrex::Real>& sedge, 
-                         BaseState<amrex::Real>& force);
-
-    void MakeEdgeState1dSphr(RealVector& s, BaseState<amrex::Real>& sedge, 
-                             BaseState<amrex::Real>& force);
-
-    void MakeEdgeState1dPlanar(RealVector& s, BaseState<amrex::Real>& sedge, 
-                               BaseState<amrex::Real>& force);
     void MakeEdgeState1d(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
                          BaseState<amrex::Real>& force);
 
@@ -1144,11 +1056,8 @@ public:
     void MakeGravCell(BaseState<amrex::Real>& grav_cell, 
                       const BaseState<amrex::Real>& rho0);
 
-    void MakeGravEdge(RealVector& grav_edge, 
-                      const RealVector& rho0);
-
-    void MakeGravEdge(BaseState<Real>& grav_edge, 
-                      const BaseState<Real>& rho0);
+    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
+                      const BaseState<amrex::Real>& rho0);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1182,7 +1091,7 @@ public:
                     const amrex::Vector<amrex::MultiFab>& thermal,
                     const BaseState<amrex::Real>& p0,
                     const BaseState<amrex::Real>& gamma1bar,
-                    RealVector& delta_gamma1_termbar);
+                    BaseState<amrex::Real>& delta_gamma1_termbar);
 
     /// Compute `rhcc = beta0*(S_cc-Sbar) + beta0*delta_chi`
     void MakeRHCCforNodalProj (amrex::Vector<amrex::MultiFab>& rhcc,
@@ -1232,10 +1141,10 @@ public:
     ////////////
 
     ////////////
-    // MaestroMakew0.cpp functions
+    // MaestroMakew0.cpp functions    
 
-    void Makew0(const RealVector& w0_old, 
-                RealVector& w0_force, 
+    void Makew0(const BaseState<amrex::Real>& w0_old, 
+                BaseState<amrex::Real>& w0_force, 
                 const BaseState<amrex::Real>& Sbar_in, 
                 const BaseState<amrex::Real>& rho0_old_in,
                 const BaseState<amrex::Real>& rho0_new_in,
@@ -1244,11 +1153,10 @@ public:
                 const BaseState<amrex::Real>& gamma1bar_old_in,
                 const BaseState<amrex::Real>& gamma1bar_new_in,
                 const BaseState<amrex::Real>& p0_minus_peosbar, 
-                RealVector& delta_chi_w0, 
                 const amrex::Real dt_in, const amrex::Real dtold_in, const bool is_predictor);
 
-    void Makew0PlanarVarg(const RealVector& w0_old, 
-                        RealVector& w0_force, 
+    void Makew0PlanarVarg(const BaseState<amrex::Real>& w0_old, 
+                        BaseState<amrex::Real>& w0_force, 
                         const BaseState<amrex::Real>& Sbar_in, 
                         const BaseState<amrex::Real>& rho0_old_in,
                         const BaseState<amrex::Real>& rho0_new_in,
@@ -1257,11 +1165,10 @@ public:
                         const BaseState<amrex::Real>& gamma1bar_old_in,
                         const BaseState<amrex::Real>& gamma1bar_new_in,
                         const BaseState<amrex::Real>& p0_minus_peosbar,
-                        RealVector& delta_chi_w0, 
                         const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Makew0Planar(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+    void Makew0Planar(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1270,12 +1177,11 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in,  
                     const bool is_predictor);
 
-    void Makew0SphrIrreg(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+    void Makew0SphrIrreg(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1284,11 +1190,10 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Makew0Sphr(const RealVector& w0_old, 
-                    RealVector& w0_force, 
+    void Makew0Sphr(const BaseState<amrex::Real>& w0_old, 
+                    BaseState<amrex::Real>& w0_force, 
                     const BaseState<amrex::Real>& Sbar_in, 
                     const BaseState<amrex::Real>& rho0_old_in,
                     const BaseState<amrex::Real>& rho0_new_in,
@@ -1297,16 +1202,11 @@ public:
                     const BaseState<amrex::Real>& gamma1bar_old_in,
                     const BaseState<amrex::Real>& gamma1bar_new_in,
                     const BaseState<amrex::Real>& p0_minus_peosbar,
-                    RealVector& delta_chi_w0, 
                     const amrex::Real dt_in, const amrex::Real dtold_in);
 
-    void Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
-                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
-                 BaseStateArray<Real> u, const int n);
-
-    void ProlongBasetoUniform(const RealVector& base_ml, RealVector& base_fine);
-
-    void ProlongBasetoUniform(const RealVector& base_ml, BaseState<amrex::Real>& base_fine);
+    void Tridiag(const BaseStateArray<Real>& a, const BaseStateArray<Real>& b, 
+                 const BaseStateArray<Real>& c, const BaseStateArray<Real>& r, 
+                 const BaseStateArray<Real>& u, const int n);
 
     void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
 
@@ -1369,8 +1269,8 @@ public:
     amrex::Vector<const amrex::MultiFab*> SmallPlotFileMF(const int nPlot,
                            const int nSmallPlot,
                            amrex::Vector<const amrex::MultiFab*> mf,
-                           const amrex::Vector<std::string> varnames,
-                           const amrex::Vector<std::string> small_plot_varnames);
+                           const amrex::Vector<std::string>& varnames,
+                           const amrex::Vector<std::string>& small_plot_varnames);
 
     /// Set plotfile variables names
     amrex::Vector<std::string> PlotFileVarNames (int * nPlot) const;
@@ -1544,9 +1444,6 @@ public:
     /// We copy the coarsest level only, interpolate to all
     /// the other levels and then copy the valid data from
     /// the old arrays onto the new.
-    void RegridBaseState(RealVector& base, const bool is_edge=false);
-
-
     void RegridBaseState(BaseState<amrex::Real>& base, const bool is_edge=false);
 
     /// Tag all cells for refinement
@@ -1706,16 +1603,16 @@ public:
     // MaestroTagging.cpp functions
 
     void RetagArray(const amrex::Box& bx,
-                    const int lev, IntVector& tag_array);
+                    const int lev);
 
     void TagBoxes(amrex::TagBoxArray& tags, 
                   const amrex::MFIter& mfi,
-                  const int lev, IntVector& tag_array,
+                  const int lev, 
                   const amrex::Real time) ;
 
     void StateError(amrex::TagBoxArray& tags, const amrex::MultiFab& state_mf,
                    const amrex::MFIter& mfi,
-                   const int lev, IntVector& tag_array,
+                   const int lev, 
                    const amrex::Real time);              
     ////////////
 
@@ -1808,7 +1705,6 @@ public:
     void VelocityAdvance (const amrex::Vector<amrex::MultiFab>& rhohalf,
                           amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                           const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-                          const RealVector& w0_force,
                           const amrex::Vector<amrex::MultiFab>& w0_force_cart,
                           const BaseState<amrex::Real>& rho0_nph,
                           const BaseState<amrex::Real>& grav_cell_nph,
@@ -2041,7 +1937,7 @@ public:
     /// we make this persistent in that we only have to rebuild and
     /// fill this after regridding
     amrex::Vector<amrex::MultiFab> normal;
-    amrex::Vector<amrex::MultiFab> cell_cc_to_r;
+    amrex::Vector<amrex::iMultiFab> cell_cc_to_r;
 
     /// stores domain boundary conditions.
     /// These muse be vectors (rather than arrays) so we can ParmParse them
@@ -2057,12 +1953,12 @@ public:
 
     // vectors store the multilevel 1D states as one very long array.
     // these are cell-centered
-    RealVector s0_init;
+    BaseState<amrex::Real> s0_init;
     BaseState<amrex::Real> p0_init;
     BaseState<amrex::Real> rho0_old;
     BaseState<amrex::Real> rho0_new;
-    RealVector rhoX0_old; // for test_basestate
-    RealVector rhoX0_new; // for test_basestate
+    BaseState<amrex::Real> rhoX0_old; // for test_basestate
+    BaseState<amrex::Real> rhoX0_new; // for test_basestate
     BaseState<amrex::Real> rhoh0_old;
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;
@@ -2083,7 +1979,7 @@ public:
 
     // Vectors store the multilevel 1D states as one very long array.
     // These are edge-centered
-    RealVector w0;
+    BaseState<amrex::Real> w0;
     BaseState<amrex::Real> etarho_ec;
 
     // Information for the base state.

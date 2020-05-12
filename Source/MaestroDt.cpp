@@ -17,11 +17,6 @@ Maestro::EstDt ()
 
     dt = 1.e20;
 
-    // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    w0_force_dummy.shrink_to_fit();
-    std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
-
     // build dummy w0_force_cart and set equal to zero
     Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -45,14 +40,13 @@ Maestro::EstDt ()
     // face-centered
     Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
 
-    if (spherical == 1) {
+#if (AMREX_SPACEDIM == 3)
+    if (spherical) {
         // initialize
         for (int lev=0; lev<=finest_level; ++lev) {
             w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
             w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
-#if (AMREX_SPACEDIM == 3)
             w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
-#endif
         }
 
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -65,6 +59,7 @@ Maestro::EstDt ()
             MakeW0mac(w0mac);
         }
     }
+#endif
 
     // build and compute vel_force
     Vector<MultiFab> vel_force(finest_level+1);
@@ -85,16 +80,15 @@ Maestro::EstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    gp0.shrink_to_fit();
-    std::fill(gp0.begin(),gp0.end(), 0.);
+    BaseState<Real> gp0(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    gp0.setVal(0.);
 
     // divU constraint
-    if (spherical == 1) {
+    if (spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
       
-    Put1dArrayOnCart (gp0,gp0_cart,1,1,bcs_f,0);
+    Put1dArrayOnCart (gp0, gp0_cart, 1, 1,  bcs_f,0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -135,7 +129,6 @@ Maestro::EstDt ()
 
                 const Array4<const Real> scal_arr = sold[lev].array(mfi);
                 const Array4<const Real> u = uold[lev].array(mfi);
-                const Array4<const Real> force = vel_force[lev].array(mfi);
                 const Array4<const Real> S_cc_arr = S_cc_old[lev].array(mfi);
                 const Array4<const Real> dSdt_arr = dSdt[lev].array(mfi);
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
@@ -144,7 +137,7 @@ Maestro::EstDt ()
 
                 const Array4<Real> spd = tmp.array(mfi);
 
-                if (spherical == 0) {
+                if (!spherical) {
 
                     const Real rho_min = 1.e-20;
                     Real dt_temp = 1.e99;
@@ -401,11 +394,6 @@ Maestro::FirstDt ()
 
     dt = 1.e20;
 
-    // allocate a dummy w0_force and set equal to zero
-    RealVector w0_force_dummy( (base_geom.max_radial_level+1)*base_geom.nr_fine );
-    w0_force_dummy.shrink_to_fit();
-    std::fill(w0_force_dummy.begin(),w0_force_dummy.end(), 0.);
-
     // build dummy w0_force_cart and set equal to zero
     Vector<MultiFab> w0_force_cart_dummy(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -445,16 +433,15 @@ Maestro::FirstDt ()
         gp0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
         gp0_cart[lev].setVal(0.);
     }
-    RealVector gp0( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
-    gp0.shrink_to_fit();
-    std::fill(gp0.begin(),gp0.end(), 0.);
+    BaseState<Real> gp0(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    gp0.setVal(0.);
 
     // divU constraint
     if (use_divu_firstdt && spherical) {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
-    Put1dArrayOnCart(gp0,gp0_cart,1,1,bcs_f,0);
+    Put1dArrayOnCart(gp0, gp0_cart, 1, 1, bcs_f, 0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level+1);
@@ -494,7 +481,6 @@ Maestro::FirstDt ()
 
                 const Array4<const Real> scal_arr = sold[lev].array(mfi);
                 const Array4<const Real> u = uold[lev].array(mfi);
-                const Array4<const Real> force = vel_force[lev].array(mfi);
                 const Array4<const Real> S_cc_arr = S_cc_old[lev].array(mfi);
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
                 const Array4<const Real> gamma1bar_arr = gamma1bar_cart[lev].array(mfi);
@@ -692,12 +678,10 @@ Maestro::FirstDt ()
 
 
 void
-Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0, 
+Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0, 
                     const BaseState<Real>& gamma1bar)
 {
-    const int max_lev = base_geom.max_radial_level + 1;
-
-    Real * AMREX_RESTRICT gp0 = gp0_vec.dataPtr();
+    auto gp0_arr = gp0.array();
     const auto p0_arr = p0.const_array();
     const auto gamma1bar_arr = gamma1bar.const_array();
     const auto& r_cc_loc = base_geom.r_cc_loc;
@@ -709,7 +693,7 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0[max_lev*r] = (p0_arr(0,r) - p0_arr(0,r-1)) / (r_cc_loc(0,r) - r_cc_loc(0,r-1))  / gamma1bar_p_avg;
+            gp0_arr(0,r) = (p0_arr(0,r) - p0_arr(0,r-1)) / (r_cc_loc(0,r) - r_cc_loc(0,r-1))  / gamma1bar_p_avg;
         });
     } else {
         const auto dr0 = base_geom.dr(0);
@@ -718,11 +702,11 @@ Maestro::EstDt_Divu(RealVector& gp0_vec, const BaseState<Real>& p0,
 
             Real gamma1bar_p_avg = 0.5 * (gamma1bar_arr(0,r)*p0_arr(0,r) + gamma1bar_arr(0,r-1)*p0_arr(0,r-1));
 
-            gp0[max_lev*r] = (p0_arr(0,r) - p0_arr(0,r-1)) / dr0 / gamma1bar_p_avg;
+            gp0_arr(0,r) = (p0_arr(0,r) - p0_arr(0,r-1)) / dr0 / gamma1bar_p_avg;
         });
     }
     Gpu::synchronize();
 
-    gp0_vec[max_lev*base_geom.nr_fine] = gp0_vec[max_lev*(base_geom.nr_fine-1)];
-    gp0_vec[0] = gp0_vec[max_lev];
+    gp0_arr(0,base_geom.nr_fine) = gp0_arr(0,base_geom.nr_fine-1);
+    gp0_arr(0,0) = gp0_arr(0,1);
 }

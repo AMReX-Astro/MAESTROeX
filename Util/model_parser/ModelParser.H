@@ -6,6 +6,7 @@
 #include <MaestroUtil.H>
 #include <state_indices.H>
 #include <network_properties.H>
+#include <BaseState.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -23,7 +24,7 @@ public:
 
     ModelParser() {model_initialized = false;};
 
-    void ReadFile(const std::string model_file);
+    void ReadFile(const std::string& model_file);
 
     amrex::Real Interpolate(const amrex::Real r, const int ivar, 
                             bool interpolate_top=false);

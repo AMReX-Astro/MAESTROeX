@@ -11,26 +11,24 @@ Maestro::InitLevelData(const int lev, const Real time,
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
     const auto tileBox = mfi.tilebox();
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nrf = base_geom.nr_fine;
 
     // set velocity to zero 
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
         vel(i,j,k,n) = 0.0;
     });
 
-    const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-    const auto& p0_init_arr = p0_init.const_array();
-    
+    const auto s0_arr = s0_init.const_array();
+    const auto p0_arr = p0_init.const_array();
+
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
-        scal(i,j,k,Rho) = s0_p[lev+max_lev*(r+nrf*Rho)];
-        scal(i,j,k,RhoH) = s0_p[lev+max_lev*(r+nrf*RhoH)];
-        scal(i,j,k,Temp) = s0_p[lev+max_lev*(r+nrf*Temp)];
+        scal(i,j,k,Rho) = s0_arr(lev,r,Rho);
+        scal(i,j,k,RhoH) = s0_arr(lev,r,RhoH);
+        scal(i,j,k,Temp) = s0_arr(lev,r,Temp);
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            scal(i,j,k,FirstSpec+comp) = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))];
+            scal(i,j,k,FirstSpec+comp) = s0_arr(lev,r,FirstSpec+comp);
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
@@ -66,24 +64,24 @@ Maestro::InitLevelData(const int lev, const Real time,
             auto eos_input_flag = eos_input_tp;
 
             if (perturb_temp_true) {
-                Real t0 = s0_p[lev+max_lev*(r + nrf*Temp)];
+                Real t0 = s0_arr(lev,r,Temp);
                 temp = t0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                dens = s0_p[lev+max_lev*(r + nrf*Rho)];
+                dens = s0_arr(lev,r,Rho);
                 eos_input_flag = eos_input_tp;
             } else {
-                Real d0 = s0_p[lev+max_lev*(r + nrf*Rho)];
+                Real d0 = s0_arr(lev,r,Rho);
                 dens = d0 * (1.0 + xrb_pert_factor_loc * std::exp(-dist*dist / rad_pert_loc));
-                temp = s0_p[lev+max_lev*(r + nrf*Temp)];
+                temp = s0_arr(lev,r,Temp);
                 eos_input_flag = eos_input_rp;
             }
 
             eos_t eos_state;
 
             eos_state.T = temp;
-            eos_state.p = p0_init_arr(lev,r);
+            eos_state.p = p0_arr(lev,r);
             eos_state.rho = dens;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = s0_p[lev+max_lev*(r+nrf*(FirstSpec+comp))] / s0_p[lev+max_lev*(r + nrf*Rho)];
+                eos_state.xn[comp] = s0_arr(lev,r,FirstSpec+comp) / s0_arr(lev,r,Rho);
             }
 
             eos(eos_input_flag, eos_state);

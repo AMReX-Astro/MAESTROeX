@@ -3,99 +3,6 @@
 
 using namespace amrex;
 
-// void 
-// Maestro::InitBaseStateGeometry(const int base_geom.max_radial_level_in, 
-//                                const int base_geom.nr_fine_in,
-//                                const Real dr_fine_in,
-//                                const int nr_irreg_in)
-// {
-//     // timer for profiling
-//     BL_PROFILE_VAR("Maestro::InitBaseStateGeometry()", InitBaseStateGeometry); 
-
-//     Print() << "Calling InitBaseStateGeometry()" << std::endl;
-
-//     const auto probLo = geom[0].ProbLoArray();
-//     const auto probHi = geom[0].ProbHiArray();
-
-//     base_geom.max_radial_level = base_geom.max_radial_level_in;
-//     base_geom.finest_radial_level = base_geom.max_radial_level_in; // FIXME - we want to set this after regridding
-//     base_geom.nr_fine = base_geom.nr_fine_in;
-//     dr_fine = dr_fine_in;
-//     nr_irreg = nr_irreg_in;
-
-//     dr.resize(base_geom.max_radial_level+1);
-//     nr.resize(base_geom.max_radial_level+1);
-
-//     base_cutoff_density_coord.resize(base_geom.max_radial_level+1);
-//     anelastic_cutoff_density_coord.resize(base_geom.max_radial_level+1);
-//     burning_cutoff_density_lo_coord.resize(base_geom.max_radial_level+1);
-//     burning_cutoff_density_hi_coord.resize(base_geom.max_radial_level+1);
-
-//     const int max_lev = base_geom.max_radial_level+1;
-
-//     // compute center(:)
-//     if (octant) {
-//         for (auto i = 0; i < 3; ++i) {
-//             if (!(spherical == 1 && AMREX_SPACEDIM == 3 && 
-//                     probLo[i] == 0.0 ) ) {
-//                 Abort("ERROR: octant requires spherical with prob_lo = 0.0");
-//             }
-//             center[i] = 0.0;
-//         }
-//     } else {
-//         for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
-//             center[i] = 0.5*(probLo[i] + probHi[i]);
-//         }
-//     }
-
-//     // compute base_geom.nr(:) and dr(:)
-//     base_geom.nr(base_geom.max_radial_level) = base_geom.nr_fine;
-//     dr(base_geom.max_radial_level) = dr_fine;
-
-//     // computes dr, nr, r_cc_loc, r_edge_loc
-//     if (spherical == 0) {
-//         // cartesian case
-
-//         // compute base_geom.nr(:) and dr(:) assuming refinement ratio = 2
-//         for (auto n = base_geom.max_radial_level-1; n >= 0; --n) {
-//           base_geom.nr(n) = base_geom.nr(n+1) / 2;
-//           dr(n) = dr(n+1) * 2.0;
-//         }
-
-//         // compute r_cc_loc, r_edge_loc
-//         for (auto n = 0; n <= base_geom.max_radial_level; ++n) {
-//             for (auto i = 0; i < base_geom.nr(n); ++i) {
-//                 r_cc_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i)+0.5)*dr(n);
-//             }
-//             for (auto i = 0; i <= base_geom.nr(n); ++i) {
-//                 r_edge_loc_b(n,i) = probLo[AMREX_SPACEDIM-1] + (Real(i))*dr(n);
-//             }
-//         }
-//     } else {
-
-//         // spherical case
-//         // compute r_cc_loc, r_edge_loc
-//         if (use_exact_base_state) {
-//             const Real* dx_fine = geom[max_level].CellSize();
-//             // base_geom.nr_fine = nr_irreg + 1
-//             for (auto i = 0; i < base_geom.nr_fine; ++i) {
-//                 r_cc_loc_b(0,i) = sqrt(0.75+2.0*Real(i))*dx_fine[0];
-//             }
-//             r_edge_loc_b(0,0) = 0.0;
-//             for (auto i = 0; i < base_geom.nr_fine; ++i) {
-//                 r_edge_loc_b(0,i+1) = sqrt(0.75+2.0*(Real(i)+0.5))*dx_fine[0];
-//             }
-//         } else {
-//             for (auto i = 0; i < base_geom.nr_fine; ++i) {
-//                 r_cc_loc_b(0,i) = (Real(i)+0.5)*dr(0);
-//             }
-//             for (auto i = 0; i <= base_geom.nr_fine; ++i) {
-//                 r_edge_loc_b(0,i) = Real(i)*dr(0);
-//             }
-//         }
-//     }
-// }
-
 #if (AMREX_SPACEDIM == 3)
 void 
 Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi, 
@@ -114,10 +21,9 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
     if (use_exact_base_state) {
 
         const Box& tilebox = mfi.tilebox();
-        const Array4<Real> cc_to_r = cell_cc_to_r[lev].array(mfi);
+        const Array4<int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
         const auto probLo = geom[0].ProbLoArray();
-
         const auto center_p = center;
 
         AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
@@ -137,7 +43,6 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state)
 {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
-    const int max_lev = base_geom.max_radial_level + 1;
     int which_lev = 0;
     const auto rho0 = rho0_state.const_array();
 
@@ -319,127 +224,17 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state)
     }
 }
 
-// void 
-// Maestro::InitMultilevel(const int base_geom.finest_radial_level_in) {
-//     // compute numdisjointchunks, r_start_coord, r_end_coord
-//     // FIXME - right now there is one chunk at each level that spans the domain
-
-//     // NOTE: in the Fortran r_start_coord and r_end_coord had the shapes
-//     // r_start_coord(0:base_geom.finest_radial_level,1:maxchunks), so here have offset
-//     // second index by 1 so it can be indexed from 0.
-
-//     // timer for profiling
-//     BL_PROFILE_VAR("Maestro::InitMultilevel()", InitMultilevel); 
-
-//     const int max_lev = base_geom.max_radial_level+1;
-
-//     if (spherical) {
-//         base_geom.finest_radial_level = 0;
-//     } else {
-//         base_geom.finest_radial_level = base_geom.finest_radial_level_in;
-//     }
-
-//     numdisjointchunks.resize(base_geom.finest_radial_level+1);
-
-//     // loop through tag_array first to determine the maximum number of chunks
-//     // to use for allocating r_start_coord and r_end_coord
-//     int maxchunks = 1;
-//     for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
-
-//         // initialize variables
-//         bool chunk_start = false;
-//         int nchunks = 0;
-
-//         // increment nchunks at beginning of each chunk
-//         // (ex. when the tagging index changes from 0 to 1)
-//         for (auto r = 0; r < base_geom.nr(n-1); ++r) {
-//             if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
-//                 chunk_start = true;
-//                 nchunks += 1;
-//             } else if (tag_array[n-1 + max_lev*r] == 0 && chunk_start) {
-//                 chunk_start = false;
-//             }
-//         }
-//         maxchunks = max(nchunks, maxchunks);
-//     }
-
-//     r_start_coord.resize(base_geom.finest_radial_level+1, maxchunks+1);
-//     r_end_coord.resize(base_geom.finest_radial_level+1, maxchunks+1);
-
-//     if (!spherical) {
-
-//         // coarsest grid always has 1 chunk of data
-//         numdisjointchunks(0) = 1;
-//         r_start_coord(0,1) = 0;
-//         r_end_coord(0,1) = base_geom.nr(0)-1;
-
-//         // for > 1 chunks (multilevel)
-//         for (auto n = 1; n <= base_geom.finest_radial_level; ++n) {
-//             // initialize variables
-//             bool chunk_start = false;
-//             numdisjointchunks(n) = 0;
-
-//             // increment numdisjointchunks at beginning of each chunk
-//             // (ex. when the tagging index changes from 0 to 1)
-//             for (auto r = 0; r < base_geom.nr(n-1); ++r) {
-//                 if (tag_array[n-1 + max_lev*r] > 0 && !chunk_start) {
-//                     chunk_start = true;
-//                     numdisjointchunks(n) += 1;
-//                     r_start_coord(n,numdisjointchunks(n)) = 2*r;
-//                 } else if (tag_array[n-1+max_lev*r] == 0 && chunk_start) {
-//                     r_end_coord(n, numdisjointchunks(n)) = 2*r-1;
-//                     chunk_start = false;
-//                 } else if (r==base_geom.nr(n-1)-1 && chunk_start) {
-//                     // if last chunk is at the end of array
-//                     r_end_coord(n, numdisjointchunks(n)) = 2*r-1;
-//                 }
-//             }
-//         }
-//     } else {
-//         numdisjointchunks(0) = 1;
-//         r_start_coord(0,1) = 0;
-//         r_end_coord(0,1) = base_geom.nr(0)-1;
-//     }
-// }
-
 void 
-Maestro::RestrictBase(RealVector& s0, bool is_cell_centered)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
-
-    const int max_lev = base_geom.max_radial_level + 1;
-
-    for (int n = base_geom.finest_radial_level; n >= 1; --n) {        
-        for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
-            if (is_cell_centered) {
-                // for level n, make the coarser cells underneath simply the average of the fine
-                for (auto j = base_geom.r_start_coord(n,i); j < base_geom.r_end_coord(n,i); j+=2) {
-                    s0[n-1 + max_lev*j/2] = 0.5 * (s0[n + max_lev*j] + s0[n + max_lev*(j+1)]);
-                }
-            } else {
-                // for level n, make the coarse edge underneath equal to the fine edge value
-                for (auto j = base_geom.r_start_coord(n,i); j <= base_geom.r_end_coord(n,i)+1; j+=2) {
-                    s0[n-1 + max_lev*j/2] = s0[n + max_lev*j];
-                }
-            }
-        }
-    }
-}
-
-void 
-Maestro::RestrictBase(BaseState<Real>& s0, bool is_cell_centered)
+Maestro::RestrictBase(BaseState<Real>& s0, const bool is_cell_centered)
 {
     RestrictBase(s0.array(), is_cell_centered);
 }
 
 void 
-Maestro::RestrictBase(BaseStateArray<Real> s0, bool is_cell_centered)
+Maestro::RestrictBase(const BaseStateArray<Real>& s0, const bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
-
-    const int max_lev = base_geom.max_radial_level + 1;
 
     for (int n = base_geom.finest_radial_level; n >= 1; --n) {        
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
@@ -459,98 +254,16 @@ Maestro::RestrictBase(BaseStateArray<Real> s0, bool is_cell_centered)
 }
 
 void 
-Maestro::FillGhostBase(RealVector& s0, bool is_cell_centered)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
-
-    const int max_lev = base_geom.max_radial_level + 1;
-
-    for (int n = base_geom.finest_radial_level; n >= 1; --n) {
-        for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
-
-            const int lo = base_geom.r_start_coord(n,i);
-            const int hi = base_geom.r_end_coord(n,i);
-
-            if (is_cell_centered) {
-
-                if (lo != 0) {
-                    int r_crse = lo/2-1;
-                    Real del = 0.5*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*(r_crse-1)]);
-                    Real dpls = 2.0*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*r_crse]);
-                    Real dmin = 2.0*(s0[n-1+max_lev*r_crse]-s0[n-1+max_lev*(r_crse-1)]);
-                    Real slim = min(fabs(dpls),fabs(dmin));
-                    slim = dpls*dmin > 0.0 ? slim : 0.0;
-                    Real slope = copysign(1.0,del)*min(slim,fabs(del));
-                    s0[n+max_lev*(lo-1)] = s0[n-1+max_lev*r_crse] + 0.25*slope;
-                    s0[n+max_lev*(lo-2)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
-
-                    r_crse = lo/2-2;
-                    del = 0.5*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*(r_crse-1)]);
-                    dpls = 2.0*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*r_crse]);
-                    dmin = 2.0*(s0[n-1+max_lev*r_crse]-s0[n-1+max_lev*(r_crse-1)]);
-                    slim = min(fabs(dpls),fabs(dmin));
-                    slim = dpls*dmin > 0.0 ? slim : 0.0;
-                    slope = copysign(1.0,del)*min(slim,fabs(del));
-                    s0[n+max_lev*(lo-3)] = s0[n-1+max_lev*r_crse] + 0.25*slope;
-                    s0[n+max_lev*(lo-4)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
-                }
-
-                if (hi != base_geom.nr(n)-1) {
-                    int r_crse = (hi+1)/2;
-                    Real del = 0.5*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*(r_crse-1)]);
-                    Real dpls = 2.0*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*r_crse]);
-                    Real dmin = 2.0*(s0[n-1+max_lev*r_crse]-s0[n-1+max_lev*(r_crse-1)]);
-                    Real slim = min(fabs(dpls),fabs(dmin));
-                    slim = dpls*dmin > 0.0 ? slim : 0.0;
-                    Real slope = copysign(1.0,del)*min(slim,fabs(del));
-                    s0[n+max_lev*(hi+1)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
-                    s0[n+max_lev*(hi+2)] = s0[n-1+max_lev*r_crse] + 0.25*slope;
-
-                    r_crse = (hi+1)/2+1;
-                    del = 0.5*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*(r_crse-1)]);
-                    dpls = 2.0*(s0[n-1+max_lev*(r_crse+1)]-s0[n-1+max_lev*r_crse]);
-                    dmin = 2.0*(s0[n-1+max_lev*r_crse]-s0[n-1+max_lev*(r_crse-1)]);
-                    slim = min(fabs(dpls),fabs(dmin));
-                    slim = dpls*dmin > 0.0 ? slim : 0.0;
-                    slope = copysign(1.0,del)*min(slim,fabs(del));
-                    s0[n+max_lev*(hi+3)] = s0[n-1+max_lev*r_crse] - 0.25*slope;
-                    s0[n+max_lev*(hi+4)] = s0[n-1+max_lev*r_crse] + 0.25*slope;
-                }
-            } else {
-                if (lo != 0) {
-                    // quadratic interpolation from the three closest points
-                    s0[n+max_lev*(lo-1)] = -s0[n+max_lev*(lo+1)]/3.0
-                        + s0[n+max_lev*lo] + s0[n-1+max_lev*(lo/2-1)]/3.0;
-                    // copy the next ghost cell value directly in from the coarser level
-                    s0[n+max_lev*(lo-2)] = s0[n-1+max_lev*((lo-2)/2)];
-                }
-
-                if (hi+1 != base_geom.nr(n)) {
-                    // quadratic interpolation from the three closest points
-                    s0[n+max_lev*(hi+2)] = -s0[n+max_lev*hi]/3.0
-                        + s0[n+max_lev*(hi+1)] + s0[n-1+max_lev*((hi+3)/2)]/3.0;
-                    // copy the next ghost cell value directly in from the coarser level
-                    s0[n+max_lev*(hi+3)] = s0[n-1+max_lev*((hi+3)/2)];
-                }
-            }
-        }
-    }
-}
-
-void 
-Maestro::FillGhostBase(BaseState<Real>& s0, bool is_cell_centered)
+Maestro::FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered)
 {
     FillGhostBase(s0.array(), is_cell_centered);
 }
 
 void 
-Maestro::FillGhostBase(BaseStateArray<Real> s0, bool is_cell_centered)
+Maestro::FillGhostBase(const BaseStateArray<Real>& s0, const bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 
-
-    const int max_lev = base_geom.max_radial_level + 1;
 
     for (int n = base_geom.finest_radial_level; n >= 1; --n) {
         for (int i = 1; i <= base_geom.numdisjointchunks(n); ++i) {

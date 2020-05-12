@@ -48,7 +48,8 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
+    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+    base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 }
 
 // During initialization of a simulation, Maestro::InitData() calls

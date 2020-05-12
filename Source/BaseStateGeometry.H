@@ -15,7 +15,7 @@ public:
               const int nr_fine_in,
               const amrex::Real dr_fine_in,
               const int nr_irreg_in,
-              const amrex::Vector<amrex::Geometry> geom,
+              const amrex::Vector<amrex::Geometry>& geom,
               const int max_level,
               amrex::GpuArray<amrex::Real,3>& center);
 

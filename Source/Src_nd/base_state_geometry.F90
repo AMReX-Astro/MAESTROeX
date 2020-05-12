@@ -166,7 +166,7 @@ contains
     ! Binds to C function ``init_base_state_map_sphr``
 
     integer          , intent(in   ) :: lo(3), hi(3), c_lo(3), c_hi(3)
-    double precision , intent(inout) :: cc_to_r(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
+    integer          , intent(inout) :: cc_to_r(c_lo(1):c_hi(1),c_lo(2):c_hi(2),c_lo(3):c_hi(3))
     double precision , intent(in   ) :: dx_fine(0:amrex_spacedim-1)
     double precision , intent(in   ) :: dx_lev(3)
 

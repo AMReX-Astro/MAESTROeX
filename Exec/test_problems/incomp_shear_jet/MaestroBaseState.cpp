@@ -15,10 +15,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         Abort("ERROR: Incompressible shear jet base_state is not valid for spherical");
     }
 
-    const Real TINY = 1.e-10;
     const Real SMALL = 1.e-12;
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nr_fine = base_geom.nr_fine;
     const int n = lev;
 
     auto rho0 = rho0_s.array();
@@ -27,6 +24,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     auto tempbar_arr = tempbar.array();
     auto p0_init_arr = p0_init.array();
     auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
 
     Print() << "cutoff densities:" << std::endl;
     Print() << "    low density cutoff (for mapping the model) =      " << 
@@ -121,29 +119,29 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = d_ambient;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = d_ambient * eos_state.h;
+        s0_init_arr(lev,r,Rho) = d_ambient;
+        s0_init_arr(lev,r,RhoH) = d_ambient * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 d_ambient * xn_ambient[comp];
         }
         p0_init_arr(n,r) = p_base;
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init_arr(lev,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init_arr(lev,i);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // Check that the temperature is consistent with the EoS
     Real min_temp = 1.e99;
-    for (auto i = 0; i < nr_fine; ++i) {
-        min_temp = min(min_temp, s0_init[lev+max_lev*(i+nr_fine*Temp)]);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        min_temp = amrex::min(min_temp, s0_init_arr(lev,r,Temp));
     }
 
     if (min_temp < small_temp) {

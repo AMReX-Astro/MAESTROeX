@@ -14,7 +14,7 @@ void
 Maestro::Setup ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Setup()",Setup);
+    BL_PROFILE_VAR("Maestro::Setup()", Setup);
 
     Print() << "Calling Setup()" << std::endl;
 
@@ -62,7 +62,7 @@ Maestro::Setup ()
 
     // define additional module variables in meth_params.F90 that are defined
     // at the top of meth_params.template
-    set_method_params(ZFILL(probLo),ZFILL(probHi));
+    set_method_params(ZFILL(probLo), ZFILL(probHi));
 
     // set up BCRec definitions for BC types
     BCSetup();
@@ -118,7 +118,7 @@ Maestro::Setup ()
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     // base states are stored
-    s0_init      .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*Nscal );
+    s0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine, Nscal);
     p0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     rho0_old     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
     rho0_new     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -141,7 +141,7 @@ Maestro::Setup ()
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    w0        .resize( (base_geom.max_radial_level+1)*(base_geom.nr_fine+1) );
+    w0.resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
     etarho_ec .resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
 
     // tagged box array for multilevel (planar)
@@ -154,24 +154,30 @@ Maestro::Setup ()
     diagfile3_data.resize(diag_buf_size*10);
 
     // make sure C++ is as efficient as possible with memory usage
-    s0_init      .shrink_to_fit();
-    w0           .shrink_to_fit();
     tag_array    .shrink_to_fit();
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
+    // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
+    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
+
     RealVector r_cc_loc_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
     RealVector r_edge_loc_vec((base_geom.max_radial_level+1)*(base_geom.nr_fine+1));
+    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
+            r_cc_loc_vec[l + (base_geom.max_radial_level+1)*r] = base_geom.r_cc_loc(l,r);
+            r_edge_loc_vec[l + (base_geom.max_radial_level+1)*r] = base_geom.r_edge_loc(l,r);
+        }
+        r_edge_loc_vec[l + (base_geom.max_radial_level+1)*(base_geom.nr_fine)] = base_geom.r_edge_loc(l,base_geom.nr_fine);
+    }
     init_base_state_geometry(&base_geom.max_radial_level,&base_geom.nr_fine,&base_geom.dr_fine,
                              r_cc_loc_vec.dataPtr(),
                              r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(),
                              &base_geom.nr_irreg);
-    // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
-    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
 
-    if (use_exact_base_state) average_base_state = 1;
+    if (use_exact_base_state) average_base_state = true;
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -233,7 +239,7 @@ void
 Maestro::ReadParameters ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ReadParameters()",ReadParameters);
+    BL_PROFILE_VAR("Maestro::ReadParameters()", ReadParameters);
 
     Print() << "Calling ReadParameters()" << std::endl;
 
@@ -248,8 +254,8 @@ Maestro::ReadParameters ()
     // read in boundary conditions
     Vector<int> lo_bc(AMREX_SPACEDIM);
     Vector<int> hi_bc(AMREX_SPACEDIM);
-    pp.getarr("lo_bc",lo_bc,0,AMREX_SPACEDIM);
-    pp.getarr("hi_bc",hi_bc,0,AMREX_SPACEDIM);
+    pp.getarr("lo_bc", lo_bc, 0, AMREX_SPACEDIM);
+    pp.getarr("hi_bc", hi_bc, 0, AMREX_SPACEDIM);
 
     // storey boundary conditions in a single array
     // order shall be
@@ -308,23 +314,18 @@ Maestro::BCSetup()
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
     //
-    if (Geom(0).isAnyPeriodic())
-    {
+    if (Geom(0).isAnyPeriodic()) {
         //
         // Do idiot check.  Periodic means interior in those directions.
         //
-        for (int dir = 0; dir<AMREX_SPACEDIM; dir++)
-        {
-            if (Geom(0).isPeriodic(dir))
-            {
-                if (phys_bc[dir] != Interior)
-                {
+        for (int dir = 0; dir<AMREX_SPACEDIM; dir++) {
+            if (Geom(0).isPeriodic(dir)) {
+                if (phys_bc[dir] != Interior) {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but low BC is not Interior\n";
                     Error();
                 }
-                if (phys_bc[AMREX_SPACEDIM+dir] != Interior)
-                {
+                if (phys_bc[AMREX_SPACEDIM+dir] != Interior) {
                     std::cerr << "Maestro::ReadParameters:periodic in direction "
                               << dir << " but high BC is not Interior\n";
                     Error();
@@ -335,16 +336,13 @@ Maestro::BCSetup()
         //
         // Do idiot check.  If not periodic, should be no interior.
         //
-        for (int dir=0; dir<AMREX_SPACEDIM; dir++)
-        {
-            if (phys_bc[dir] == Interior)
-            {
+        for (int dir=0; dir<AMREX_SPACEDIM; dir++) {
+            if (phys_bc[dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
             }
-            if (phys_bc[AMREX_SPACEDIM+dir] == Interior)
-            {
+            if (phys_bc[AMREX_SPACEDIM+dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
@@ -353,8 +351,7 @@ Maestro::BCSetup()
     }
 
     // set up boundary conditions for Fillpatch operations
-    for (int dir = 0; dir < AMREX_SPACEDIM; ++dir)
-    {
+    for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
 
         // lo-side bcs
         if (phys_bc[dir] == Interior) {

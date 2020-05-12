@@ -11,16 +11,14 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
 
-    const int max_lev = base_geom.max_radial_level + 1;
-    const auto nr_fine = base_geom.nr_fine;
-    const int n = lev;
-
+    const auto n = lev;
     auto rho0 = rho0_s.array();
     auto rhoh0 = rhoh0_s.array();
     auto p0 = p0_s.array();
     auto p0_init_arr = p0_init.array();
     auto tempbar_arr = tempbar.array();
     auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
     
     // get species indices
     const int ihe4 = network_spec_index("helium-4");
@@ -49,23 +47,23 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
    
     for (auto r = 0; r < base_geom.nr(n); ++r) {
 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = eos_state.rho;
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = eos_state.rho * eos_state.h;
+        s0_init_arr(n,r,Rho)= eos_state.rho;
+        s0_init_arr(n,r,RhoH) = eos_state.rho * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 eos_state.rho * eos_state.xn[comp];
         }
         p0_init_arr(n,r) = eos_state.p;
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init_arr(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init_arr(lev,i);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // initialize any inlet BC parameters

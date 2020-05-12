@@ -25,6 +25,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     auto p0_init_arr = p0_init.array();
     auto tempbar_arr = tempbar.array();
     auto tempbar_init_arr = tempbar_init.array();
+    auto s0_init_arr = s0_init.array();
 
     // calculate H or dens_base, as necessary
     Real H = 0.0;
@@ -50,13 +51,13 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
     // set p0 and rho0 based on analytical value at the cc coord
     p0_init_arr(n,0) = pres_base * exp(-z0/H);
-    s0_init[n+max_lev*nr_fine*Rho] = dens_base * exp(-z0/H);
+    s0_init_arr(n,0,Rho) = dens_base * exp(-z0/H);
 
     eos_t eos_state;
 
     // use eos call to be consistent
     eos_state.p = p0_init_arr(n,0);
-    eos_state.rho = s0_init[n+max_lev*nr_fine*Rho];
+    eos_state.rho = s0_init_arr(n,0,Rho);
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = xn_zone[comp];
     }
@@ -64,11 +65,11 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     eos(eos_input_rp, eos_state); // (rho, p) --> T, h
 
     // set other base vars
-    s0_init[n+max_lev*nr_fine*RhoH] = dens_base * eos_state.h;
+    s0_init_arr(n,0,RhoH) = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        s0_init[n+max_lev*nr_fine*(FirstSpec+comp)] = dens_base * xn_zone[comp];
+        s0_init_arr(n,0,FirstSpec+comp) = dens_base * xn_zone[comp];
     }
-    s0_init[n+max_lev*nr_fine*Temp] = eos_state.T;
+    s0_init_arr(n,0,Temp) = eos_state.T;
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
 
@@ -78,10 +79,10 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // set rho analytically  
         Real dens_zone = dens_base * exp(-z/H);
         // needs to be set before pressure 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
+        s0_init_arr(n,r,Rho) = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init_arr(n,r) = p0_init_arr(n,r-1) - base_geom.dr(n) * 0.5 * (s0_init[n+max_lev*(r+nr_fine*Rho)] + s0_init[n+max_lev*(r-1+nr_fine*Rho)]) * fabs(grav_const);
+        p0_init_arr(n,r) = p0_init_arr(n,r-1) - base_geom.dr(n) * 0.5 * (s0_init_arr(n,r,Rho) + s0_init_arr(n,r-1,Rho)) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.rho   = dens_zone;
@@ -94,21 +95,21 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // (rho,p) --> T, h
         eos(eos_input_rp, eos_state);
 
-        s0_init[n+max_lev*(r+nr_fine*RhoH)] = dens_zone * eos_state.h;
+        s0_init_arr(n,r,RhoH) = dens_zone * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init[n+max_lev*(r+nr_fine*(FirstSpec+comp))] = 
+            s0_init_arr(n,r,FirstSpec+comp) = 
                 dens_zone * xn_zone[comp];
         }
-        s0_init[n+max_lev*(r+nr_fine*Temp)] = eos_state.T;
+        s0_init_arr(n,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
-    for (auto i = 0; i < nr_fine; ++i) {
-        rho0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Rho)];
-        rhoh0(lev,i) = s0_init[lev+max_lev*(i+nr_fine*RhoH)];
-        tempbar_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        tempbar_init_arr(lev,i) = s0_init[lev+max_lev*(i+nr_fine*Temp)];
-        p0(lev,i) = p0_init_arr(lev,i);
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+        rho0(lev,r) = s0_init_arr(lev,r,Rho);
+        rhoh0(lev,r) = s0_init_arr(lev,r,RhoH);
+        tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        tempbar_init_arr(lev,r) = s0_init_arr(lev,r,Temp);
+        p0(lev,r) = p0_init_arr(lev,r);
     }
 
     // initialize any inlet BC parameters
