@@ -61,7 +61,7 @@ Maestro::DiagFile (const int step,
 
         // put w0 in Cartesian cell-centers as a scalar (the radial
         // expansion velocity)
-        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0, 1);
+        Put1dArrayOnCart(w0, w0r_cart, true, false, bcs_u, 0, 1);
     } 
 #endif
 
@@ -127,7 +127,7 @@ Maestro::DiagFile (const int step,
 
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
-        if (lev == finest_level) finelev = finest_level;
+        if (lev == finest_level) { finelev = finest_level; }
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in[lev], fba, IntVect(2));
@@ -144,7 +144,7 @@ Maestro::DiagFile (const int step,
             const auto lo = amrex::lbound(tileBox);
             const auto hi = amrex::ubound(tileBox);
 
-            int use_mask = !(lev==finest_level);
+            const auto use_mask = !(lev==finest_level);
 
             const Array4<const Real> scal = s_in[lev].array(mfi);
             const Array4<const Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
@@ -180,7 +180,7 @@ Maestro::DiagFile (const int step,
                 // make sure the cell isn't covered by finer cells
                 bool cell_valid = true;
                 if (use_mask) {
-                    if (mask_arr(i,j,k) == 1) cell_valid = false;
+                    if (mask_arr(i,j,k) == 1) { cell_valid = false; }
                 }
                 
                 // For spherical, we only consider cells inside of where the 

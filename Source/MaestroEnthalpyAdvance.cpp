@@ -72,7 +72,7 @@ Maestro::EnthalpyAdvance (int which_step,
         // make force for (rho h)'
         MakeRhoHForce(scal_force, 1, thermal, umac, 1, 1);
 
-        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, 0, 0, bcs_s, RhoH);
+        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, false, false, bcs_s, RhoH);
 
         ModifyScalForce(scal_force, scalold, umac, 
             rhoh0_edge_old, rhoh0_old_cart, RhoH, bcs_s, 0);
@@ -137,10 +137,10 @@ Maestro::EnthalpyAdvance (int which_step,
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,1);
+        MakeEdgeScal(scalold,sedge,umac,scal_force,false,bcs_s,Nscal,pred_comp,pred_comp,1,true);
     } else {
         // use the advective form of the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
+        MakeEdgeScal(scalold,sedge,umac,scal_force,false,bcs_s,Nscal,pred_comp,pred_comp,1,false);
     }
 
     if (enthalpy_pred_type == predict_rhohprime) {
@@ -300,7 +300,7 @@ Maestro::EnthalpyAdvance (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new,p0_new_cart,0,0,bcs_f,0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }
@@ -373,7 +373,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         // make force for (rho h)'
         MakeRhoHForce(scal_force, 1, thermal, umac, 1, 1);
 
-        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, 0, 0, bcs_s, RhoH);
+        Put1dArrayOnCart(rhoh0_old, rhoh0_old_cart, false, false, bcs_s, RhoH);
 
         ModifyScalForce(scal_force, scalold, umac, 
             rhoh0_edge_old, rhoh0_old_cart, RhoH, bcs_s, 0);
@@ -451,10 +451,10 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     if (enthalpy_pred_type == predict_rhoh) {
         // use the conservative form of the prediction
-        MakeEdgeScal(scalold, sedge, umac, scal_force, 0, bcs_s, Nscal, pred_comp, pred_comp, 1, 1);
+        MakeEdgeScal(scalold, sedge, umac, scal_force, false, bcs_s, Nscal, pred_comp, pred_comp, 1, true);
     } else {
         // use the advective form of the prediction
-        MakeEdgeScal(scalold,sedge,umac,scal_force,0,bcs_s,Nscal,pred_comp,pred_comp,1,0);
+        MakeEdgeScal(scalold,sedge,umac,scal_force,false,bcs_s,Nscal,pred_comp,pred_comp,1,false);
     }
 
     if (enthalpy_pred_type == predict_rhohprime) {
@@ -619,7 +619,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

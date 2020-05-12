@@ -84,7 +84,7 @@ Maestro::Regrid ()
         w0_cart[lev].setVal(0.);
     }
     // put w0 on Cartesian cell-centers
-    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho

@@ -47,7 +47,7 @@ Maestro::DensityAdvance (int which_step,
         rho0_old_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(rho0_old, rho0_old_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(rho0_old, rho0_old_cart, false, false, bcs_s, Rho);
 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
@@ -114,26 +114,26 @@ Maestro::DensityAdvance (int which_step,
     // predict species at the edges -- note, either X or (rho X) will be
     // predicted here, depending on species_pred_type
 
-    int is_vel = 0; // false
+    const auto is_vel = false; // false
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
 
         // we are predicting X to the edges, using the advective form of
         // the prediction
         MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s, 
-                     Nscal, FirstSpec, FirstSpec, NumSpec, 0);
+                     Nscal, FirstSpec, FirstSpec, NumSpec, false);
 
     } else if (species_pred_type == predict_rhoX) {
 
         MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s,
-                     Nscal, FirstSpec, FirstSpec, NumSpec, 1);
+                     Nscal, FirstSpec, FirstSpec, NumSpec, true);
     }
 
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
         MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s,
-                     Nscal, Rho, Rho, 1, 0);
+                     Nscal, Rho, Rho, 1, false);
 
     } else if (species_pred_type == predict_rhoX) {
 
@@ -226,7 +226,7 @@ Maestro::DensityAdvance (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, 
@@ -289,7 +289,7 @@ Maestro::DensityAdvanceSDC (int which_step,
         rho0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(rho0_old, rho0_old_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(rho0_old, rho0_old_cart, false, false, bcs_s, Rho);
 
     /////////////////////////////////////////////////////////////////
     // Subtract w0 from MAC velocities (MAC velocities has w0 already).
@@ -352,7 +352,7 @@ Maestro::DensityAdvanceSDC (int which_step,
     // predict species at the edges -- note, either X or (rho X) will be
     // predicted here, depending on species_pred_type
 
-    int is_vel = 0; // false
+    const auto is_vel = false; // false
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
 
@@ -360,19 +360,19 @@ Maestro::DensityAdvanceSDC (int which_step,
         // the prediction
         MakeEdgeScal(scalold, sedge, umac, scal_force, 
                      is_vel, bcs_s, Nscal, FirstSpec,
-                     FirstSpec, NumSpec, 0);
+                     FirstSpec, NumSpec, false);
 
     } else if (species_pred_type == predict_rhoX) {
         MakeEdgeScal(scalold, sedge, umac, scal_force, 
                      is_vel, bcs_s, Nscal, FirstSpec,
-                     FirstSpec, NumSpec, 1);
+                     FirstSpec, NumSpec, true);
     }
     
     // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
         MakeEdgeScal(scalold, sedge, umac, scal_force, 
-                     is_vel, bcs_s, Nscal, Rho, Rho, 1, 0);
+                     is_vel, bcs_s, Nscal, Rho, Rho, 1, false);
 
     } else if (species_pred_type == predict_rhoX) {
 
@@ -468,7 +468,7 @@ Maestro::DensityAdvanceSDC (int which_step,
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new, p0_new_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
 
     // p0 only used in rhoh update so it's an optional parameter
     UpdateScal(scalold, scalnew, sflux, scal_force, 

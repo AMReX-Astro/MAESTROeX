@@ -189,7 +189,7 @@ Maestro::MakeEtarhoSphr (const Vector<MultiFab>& scal_old,
     BaseState<Real> rho0_nph(max_lev, base_geom.nr_fine);
     rho0_nph.copy(0.5*(rho0_old + rho0_new));
 
-    Put1dArrayOnCart(rho0_nph, rho0_nph_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(rho0_nph, rho0_nph_cart, false, false, bcs_f, 0);
 
 #if (AMREX_SPACEDIM == 3)
     for (int lev=0; lev<=finest_level; ++lev) {

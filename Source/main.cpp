@@ -5,7 +5,7 @@
 
 using namespace amrex;
 
-std::string inputs_name = "";
+std::string inputs_name;
 
 int main(int argc, char* argv[])
 {

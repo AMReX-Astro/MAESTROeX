@@ -44,9 +44,9 @@ module meth_params_module
   double precision , allocatable, save :: cfl
   logical          , allocatable, save :: use_soundspeed_firstdt
   logical          , allocatable, save :: use_divu_firstdt
-  integer          , allocatable, save :: spherical
+  logical          , allocatable, save :: spherical
   logical          , allocatable, save :: octant
-  integer          , allocatable, save :: do_2d_planar_octant
+  logical          , allocatable, save :: do_2d_planar_octant
   integer          , allocatable, save :: drdxfac
   logical          , allocatable, save :: use_tpert_in_tagging
   logical          , allocatable, save :: do_sponge
@@ -198,11 +198,11 @@ contains
     allocate(use_divu_firstdt)
     use_divu_firstdt = .false.;
     allocate(spherical)
-    spherical = 0;
+    spherical = .false.;
     allocate(octant)
     octant = .false.;
     allocate(do_2d_planar_octant)
-    do_2d_planar_octant = 0;
+    do_2d_planar_octant = .false.;
     allocate(drdxfac)
     drdxfac = 1;
     allocate(use_tpert_in_tagging)

@@ -32,7 +32,7 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
             Real z = probLo[2] + (static_cast<Real>(k)+0.5)*dx_lev[2] - center_p[2];
 
             Real index = (x*x + y*y + z*z)/(2.0*dx_fine[0]*dx_fine[0]) - 0.375;
-            cc_to_r(i,j,k) = round(index);
+            cc_to_r(i,j,k) = (int)round(index);
         })
     }
 }

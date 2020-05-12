@@ -193,7 +193,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // create mask assuming refinement ratio = 2
             int finelev = lev+1;
-            if (lev == finest_level) finelev = finest_level;
+            if (lev == finest_level) { finelev = finest_level; }
 
             const BoxArray& fba = phi[finelev].boxArray();
             const iMultiFab& mask = makeFineMask(phi_mf, fba, IntVect(2));
@@ -227,7 +227,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
                         Real radius = sqrt(x*x + y*y + z*z);
 
                         // figure out which radii index this point maps into
-                        int index = round(((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0);
+                        auto index = (int)round(((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0);
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg) {

@@ -81,28 +81,28 @@ Maestro::WritePlotFile (const int step,
     for (int lev=0; lev<=finest_level; ++lev) {
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(rho0_in, rho0_cart, 0, 0);
+    Put1dArrayOnCart(rho0_in, rho0_cart, false, false);
 
     // convert rhoh0 to multi-D MultiFab
     Vector<MultiFab> rhoh0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         rhoh0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(rhoh0_in, rhoh0_cart, 0, 0);
+    Put1dArrayOnCart(rhoh0_in, rhoh0_cart, false, false);
 
     // convert p0 to multi-D MultiFab
     Vector<MultiFab> p0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(p0_in, p0_cart, 0, 0);
+    Put1dArrayOnCart(p0_in, p0_cart, false, false);
 
     // convert gamma1bar to multi-D MultiFab
     Vector<MultiFab> gamma1bar_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    Put1dArrayOnCart(gamma1bar_in,gamma1bar_cart,0,0);
+    Put1dArrayOnCart(gamma1bar_in, gamma1bar_cart, false, false);
 
     int nPlot = 0;
     const auto& varnames = PlotFileVarNames(&nPlot);
@@ -130,8 +130,9 @@ Maestro::WritePlotFile (const int step,
                                 small_plot_varnames, Geom(), t_in, step_array,
                                 refRatio());
 
-        for (int i = 0; i <= finest_level; ++i)
+        for (int i = 0; i <= finest_level; ++i) {
             delete small_mf[i];
+        }
     }
 
     WriteJobInfo(plotfilename);
@@ -398,7 +399,7 @@ Maestro::PlotFileMF (const int nPlot,
 
     if (plot_eta) {
         // eta_rho
-        Put1dArrayOnCart(etarho_cc,tempmf,1,0,bcs_u,0,1);
+        Put1dArrayOnCart(etarho_cc, tempmf, true, false, bcs_u, 0, 1);
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
         }
@@ -496,7 +497,7 @@ Maestro::PlotFileMF (const int nPlot,
     // tpert
     {
         Average(s_in, tempbar_plot, Temp);
-        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, false, false, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             plot_mf_data[i]->copy(s_in[i],Temp,dest_comp,1);
@@ -552,7 +553,7 @@ Maestro::PlotFileMF (const int nPlot,
             MakeW0mac(w0mac);
         }
 #endif
-        Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0);
+        Put1dArrayOnCart(w0, w0r_cart, true, false, bcs_u, 0);
     }
 
     // Mach number
@@ -585,7 +586,7 @@ Maestro::PlotFileMF (const int nPlot,
         }
 
         Average(tempmf, tempbar_plot, 0);
-        Put1dArrayOnCart(tempbar_plot, tempmf, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(tempbar_plot, tempmf, false, false, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
             MultiFab::Subtract(*plot_mf_data[i],tempmf[i],0,dest_comp,1,0);
@@ -770,8 +771,9 @@ Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
     for (const auto& it : small_plot_varnames) {
         for (auto n = 0; n < nPlot; n++) {
             if (it == varnames[n]) {
-                for (int i = 0; i <= finest_level; ++i)
+                for (int i = 0; i <= finest_level; ++i) {
                     plot_mf_data[i]->copy(*(mf[i]), n, dest_comp, 1);
+                }
                 ++dest_comp;
                 break;
             }
@@ -779,8 +781,9 @@ Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
     }
 
     // add plot_mf_data[i] to plot_mf
-    for (int i = 0; i <= finest_level; ++i)
+    for (int i = 0; i <= finest_level; ++i) {
         plot_mf.push_back(plot_mf_data[i]);
+    }
 
     return plot_mf;
 }
@@ -802,29 +805,29 @@ Maestro::PlotFileVarNames (int * nPlot) const
 
     (*nPlot) = AMREX_SPACEDIM + Nscal + 19;
 
-    if (plot_spec) (*nPlot) += NumSpec + 1; // X + 1 (abar)
-    if (plot_spec || plot_omegadot) (*nPlot) += NumSpec; // omegadot
+    if (plot_spec) { (*nPlot) += NumSpec + 1; } // X + 1 (abar)
+    if (plot_spec || plot_omegadot) { (*nPlot) += NumSpec; } // omegadot
 
-    if (plot_Hext) (*nPlot)++;
-    if (plot_Hnuc) (*nPlot)++;
-    if (plot_eta) (*nPlot)++;
-    if (plot_gpi) (*nPlot) += AMREX_SPACEDIM;
+    if (plot_Hext) { (*nPlot)++; }
+    if (plot_Hnuc) { (*nPlot)++; }
+    if (plot_eta) { (*nPlot)++; }
+    if (plot_gpi) { (*nPlot) += AMREX_SPACEDIM; }
     // rho0, rhoh0, h0, p0, w0, divw0 (5+AMREX_SPACEDIM)
-    if (plot_base_state) (*nPlot) += AMREX_SPACEDIM + 5;
-    if (plot_cs) (*nPlot)++;
-    if (plot_grav) (*nPlot)++;
-    if (plot_ad_excess) (*nPlot)++;
-    if (plot_pidivu) (*nPlot)++;
-    if (plot_processors) (*nPlot)++;
-    if (spherical) (*nPlot) += 2; // radial_velocity, circ_velocity
-    if (do_sponge) (*nPlot)++;
+    if (plot_base_state) { (*nPlot) += AMREX_SPACEDIM + 5; }
+    if (plot_cs) { (*nPlot)++; }
+    if (plot_grav) { (*nPlot)++; }
+    if (plot_ad_excess) { (*nPlot)++; }
+    if (plot_pidivu) { (*nPlot)++; }
+    if (plot_processors) { (*nPlot)++; }
+    if (spherical) { (*nPlot) += 2; } // radial_velocity, circ_velocity
+    if (do_sponge) { (*nPlot)++; }
 
     Vector<std::string> names(*nPlot);
 
     int cnt = 0;
 
     // add velocities
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
+    for (int i = 0; i < AMREX_SPACEDIM; ++i) {
         std::string x = "vel";
         x += (120+i);
         names[cnt++] = x;
@@ -848,8 +851,9 @@ Maestro::PlotFileVarNames (int * nPlot) const
         //
         get_spec_names(int_spec_names.dataPtr(),&i,&len);
         auto* spec_name = new char[len+1];
-        for (int j = 0; j < len; j++)
+        for (int j = 0; j < len; j++) {
             spec_name[j] = int_spec_names[j];
+        }
         spec_name[len] = '\0';
         std::string spec_string = "rhoX(";
         spec_string += spec_name;
@@ -907,9 +911,9 @@ Maestro::PlotFileVarNames (int * nPlot) const
         }
     }
 
-    if (plot_Hext) names[cnt++] = "Hext";
-    if (plot_Hnuc) names[cnt++] = "Hnuc";
-    if (plot_eta) names[cnt++] = "eta_rho";
+    if (plot_Hext) { names[cnt++] = "Hext"; }
+    if (plot_Hnuc) { names[cnt++] = "Hnuc"; }
+    if (plot_eta) { names[cnt++] = "eta_rho"; }
 
     names[cnt++] = "tfromp";
     names[cnt++] = "tfromh";
@@ -941,14 +945,14 @@ Maestro::PlotFileVarNames (int * nPlot) const
     names[cnt++] = "deltagamma";
     names[cnt++] = "entropy";
     names[cnt++] = "entropypert";
-    if (plot_pidivu) names[cnt++] = "pi_divu";
-    if (plot_processors) names[cnt++] = "processor_number";
-    if (plot_ad_excess) names[cnt++] = "ad_excess";
+    if (plot_pidivu) { names[cnt++] = "pi_divu"; }
+    if (plot_processors) { names[cnt++] = "processor_number"; }
+    if (plot_ad_excess) { names[cnt++] = "ad_excess"; }
     names[cnt++] = "S";
 
-    if (plot_cs) names[cnt++] = "soundspeed";
+    if (plot_cs) { names[cnt++] = "soundspeed"; }
 
-    if (plot_grav) names[cnt++] = "maggrav";
+    if (plot_grav) { names[cnt++] = "maggrav"; }
 
     if (plot_base_state) {
         // w0 and divw0
@@ -1001,9 +1005,9 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
         {
             pp.get("small_plot_vars", nm, i);
 
-            if (nm == "ALL")
+            if (nm == "ALL") {
                 return varnames;
-            else if (nm == "NONE") {
+            } else if (nm == "NONE") {
                 names.clear();
                 return names;
             } else {
@@ -1018,8 +1022,9 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
                     }
                 }
 
-                if (!found_name)
+                if (!found_name) {
                     Print() << "Small plot file variable " << nm << " is invalid\n";
+                }
             }
         }
     } else {
@@ -1039,8 +1044,9 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
                 }
             }
 
-            if (!found_name)
+            if (!found_name) {
                 Print() << "Small plot file variable " << nm << " is invalid\n";
+            }
         }
     }
 
@@ -1048,7 +1054,6 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
     *nPlot = names.size();
 
     return names;
-
 }
 
 void
@@ -1256,8 +1261,9 @@ Maestro::WriteJobInfo (const std::string& dir) const
             //
             get_spec_names(int_spec_names.dataPtr(),&i,&len);
             auto* spec_name = new char[len+1];
-            for (int j = 0; j < len; j++)
+            for (int j = 0; j < len; j++) {
                 spec_name[j] = int_spec_names[j];
+            }
             spec_name[len] = '\0';
 
             // get A and Z
@@ -1285,8 +1291,9 @@ Maestro::WriteJobInfo (const std::string& dir) const
         const int jobinfo_file_length = FullPathJobInfoFile.length();
         Vector<int> jobinfo_file_name(jobinfo_file_length);
 
-        for (int i = 0; i < jobinfo_file_length; i++)
+        for (int i = 0; i < jobinfo_file_length; i++) {
             jobinfo_file_name[i] = FullPathJobInfoFile[i];
+        }
 
         runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
     }
@@ -1687,7 +1694,7 @@ Maestro::MakeGrav (const BaseState<Real>& rho0,
 
     MakeGravCell(grav_cell, rho0);
 
-    Put1dArrayOnCart(grav_cell, grav, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(grav_cell, grav, false, false, bcs_f, 0);
 
     // average down and fill ghost cells
     AverageDown(grav, 0, 1);

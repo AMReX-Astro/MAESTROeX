@@ -119,7 +119,7 @@ Maestro::MakeExplicitThermal(Vector<MultiFab>& thermal,
         mlabec.setScalars(0.0, 1.0);
 
         // set value of phi
-        Put1dArrayOnCart(p0, phi, 0, 0, bcs_f,0);
+        Put1dArrayOnCart(p0, phi, false, false, bcs_f,0);
         FillPatch(t_old, phi, phi, phi, 0, 0, 1, 0,bcs_f);
 
         ApplyThermal(mlabec, resid, pcoeff, phi, bcs_f, 0);
@@ -253,7 +253,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
     }
 
     // average face-centered B coefficients
-    PutDataOnFaces(coeff, face_bcoef, 1);
+    PutDataOnFaces(coeff, face_bcoef, true);
 
     // set coefficient matrix
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -418,7 +418,7 @@ Maestro::ThermalConduct (const Vector<MultiFab>& s1,
     }
 
     // average face-centered Bcoefficients
-    PutDataOnFaces(hcoeff2, face_bcoef, 1);
+    PutDataOnFaces(hcoeff2, face_bcoef, true);
 
     // initialize value of phi to h^(2) as a guess
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -607,10 +607,9 @@ Maestro::ThermalConductSDC (int which_step,
 
     // average face-centered Bcoefficients
     if (which_step == 1) {
-        PutDataOnFaces(hcoeff1, face_bcoef, 1);
-    }
-    else if (which_step == 2) {
-        PutDataOnFaces(hcoeff2, face_bcoef, 1);
+        PutDataOnFaces(hcoeff1, face_bcoef, true);
+    } else if (which_step == 2) {
+        PutDataOnFaces(hcoeff2, face_bcoef, true);
     }
 
     // initialize value of phi to h^(2) as a guess
