@@ -153,9 +153,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="base_state_geometry_f.html">base_state_geometry.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
@@ -306,7 +304,7 @@
 <li><p><strong>p_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>phisum</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>ncell</strong> (<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="base_state_geometry_f.html#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
-<li><p><strong>cc_to_r</strong> (ccr_hi(1)-(ccr_lo(1))+1,ccr_hi(2)-(ccr_lo(2))+1,ccr_hi(3)-(ccr_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
+<li><p><strong>cc_to_r</strong> (ccr_hi(1)-(ccr_lo(1))+1,ccr_hi(2)-(ccr_lo(2))+1,ccr_hi(3)-(ccr_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ccr_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>ccr_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 </ul>
