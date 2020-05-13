@@ -29,11 +29,11 @@ using namespace maestro;
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
-typedef amrex::Gpu::ManagedVector<amrex::Real> RealVector;
-typedef amrex::Gpu::ManagedVector<int> IntVector;
+using RealVector = amrex::Gpu::ManagedVector<amrex::Real>;
+using IntVector = amrex::Gpu::ManagedVector<int>;
 #else
-typedef amrex::Vector< amrex::Real > RealVector;
-typedef amrex::Vector< int > IntVector;
+using RealVector = amrex::Vector< amrex::Real >;
+using IntVector = amrex::Vector< int >;
 #endif
 
 /// hard code a maximum level limit
