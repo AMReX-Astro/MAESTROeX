@@ -56,7 +56,7 @@ struct BaseStateArray
 
     /// access elements. If only 2 arguments are passed in, component is set to 0
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    T& operator() (const int lev, const int i, const int n=0) const noexcept {
+    auto operator() (const int lev, const int i, const int n=0) const noexcept -> decltype(dptr[i]) {
         AMREX_ASSERT(lev >= 0);
         AMREX_ASSERT(i < this->len && i >= 0);
         AMREX_ASSERT(n < this->nvar && n >= 0);

@@ -401,7 +401,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 }
 
@@ -409,7 +409,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 void Maestro::InitProj ()
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitProj()",InitProj);
+    BL_PROFILE_VAR("Maestro::InitProj()", InitProj);
 
     Vector<MultiFab>       rho_omegadot(finest_level+1);
     Vector<MultiFab>            thermal(finest_level+1);

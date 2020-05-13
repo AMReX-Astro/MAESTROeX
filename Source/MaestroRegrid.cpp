@@ -278,7 +278,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 }
 
@@ -314,7 +314,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 
     FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
