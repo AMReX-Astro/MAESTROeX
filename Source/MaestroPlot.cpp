@@ -7,7 +7,7 @@
 using namespace amrex;
 
 // write a small plotfile to disk
-void Maestro::WriteSmallPlotFile (const plotfile_flag step,
+void Maestro::WriteSmallPlotFile (const int step,
                                   const Real t_in,
                                   const Real dt_in,
                                   const BaseState<Real>& rho0_in,
@@ -24,7 +24,7 @@ void Maestro::WriteSmallPlotFile (const plotfile_flag step,
 
 // write plotfile to disk
 void
-Maestro::WritePlotFile (const plotfile_flag step,
+Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
                         const BaseState<Real>& rho0_in,
@@ -50,26 +50,27 @@ Maestro::WritePlotFile (const plotfile_flag step,
         plotfilename = small_plot_base_name;
     }
 
-    if (step == plotfile_flag::plotInitData) {
+    if (step == plotInitData) {
         if (plotfilename.back() == '_') {
             plotfilename += "InitData";
         } else {
             plotfilename += +"_InitData";
         }
 
-    } else if (step == plotfile_flag::plotInitProj) {
+    } else if (step == plotInitProj) {
         if (plotfilename.back() == '_') {
             plotfilename += "after_InitProj";
         } else {
             plotfilename += +"_after_InitProj";
         }
-    } else if (step == plotfile_flag::plotDivuIter) {
+    } else if (step == plotDivuIter) {
         if (plotfilename.back() == '_') {
             plotfilename += "after_DivuIter";
         } else {
             plotfilename += +"_after_DivuIter";
         }
-    } else {
+    }
+    else {
         PlotFileName(step, &plotfilename);
     }
 
