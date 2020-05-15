@@ -9,7 +9,7 @@ class BaseStateGeometry
 {
 public:
 
-    BaseStateGeometry() noexcept {};
+    BaseStateGeometry() {};
 
     void Init(const int max_radial_level_in, 
               const int nr_fine_in,
