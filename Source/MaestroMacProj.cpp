@@ -15,7 +15,7 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                   Vector<MultiFab>& macphi,
                   const Vector<MultiFab>& macrhs,
                   const BaseState<Real>& beta0,
-                  const int& is_predictor)
+                  const bool is_predictor)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MacProj()", MacProj);
@@ -71,7 +71,7 @@ Maestro::MacProj(Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
         // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
         rho[lev].setVal(0.);
     }
-    Real rho_time = (is_predictor == 1) ? t_old : 0.5*(t_old+t_new);
+    Real rho_time = (is_predictor) ? t_old : 0.5*(t_old+t_new);
     FillPatch(rho_time, rho, sold, snew, Rho, 0, 1, Rho, bcs_s);
 
     // coefficients for solver

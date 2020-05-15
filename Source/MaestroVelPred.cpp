@@ -400,7 +400,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    const int ppm_type_local = ppm_type;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -413,7 +412,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     ParallelFor(mxbx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = max(0.0,ufull(i-1,j,k,0));
             Real minu = min(0.0,ufull(i  ,j,k,0));
             // extrapolate both components of velocity to left face
@@ -422,7 +421,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             // extrapolate both components of velocity to right face
             urx(i,j,k,0) = utilde(i  ,j,k,0) - (0.5 + (dt2/hx)*minu)*Ipu(i  ,j,k,0);
             urx(i,j,k,1) = utilde(i  ,j,k,1) - (0.5 + (dt2/hx)*minu)*Ipu(i  ,j,k,1);
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate both components of velocity to left face
             ulx(i,j,k,0) = Ipu(i-1,j,k,0);
             ulx(i,j,k,1) = Ipv(i-1,j,k,0);
@@ -509,7 +508,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     ParallelFor(mybx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = max(0.0,ufull(i,j-1,k,1));
             Real minu = min(0.0,ufull(i,j,k,1));
             // extrapolate both components of velocity to left face
@@ -518,7 +517,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
             // extrapolate both components of velocity to right face
             ury(i,j,k,0) = utilde(i,j,k,0) - (0.5+(dt2/hy)*minu)*Imv(i,j,k,0);
             ury(i,j,k,1) = utilde(i,j,k,1) - (0.5+(dt2/hy)*minu)*Imv(i,j,k,1);
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate both components of velocity to left face
             uly(i,j,k,0) = Ipu(i,j-1,k,1);
             uly(i,j,k,1) = Ipv(i,j-1,k,1);
@@ -636,7 +635,6 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    const int ppm_trace_forces_local = ppm_trace_forces;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -650,8 +648,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i-1,j,k,0) : Ipfx(i-1,j,k,0);
-        Real fr = ppm_trace_forces_local == 0 ? force(i,j,k,0) : Imfx(i,j,k,0);
+        Real fl = ppm_trace_forces == 0 ? force(i-1,j,k,0) : Ipfx(i-1,j,k,0);
+        Real fr = ppm_trace_forces == 0 ? force(i,j,k,0) : Imfx(i,j,k,0);
 
         // extrapolate to edges
         Real umacl = ulx(i,j,k,0) 
@@ -712,8 +710,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i,j-1,k,1) : Ipfy(i,j-1,k,1);
-        Real fr = ppm_trace_forces_local == 0 ? force(i,j,k,1) : Imfy(i,j,k,1);
+        Real fl = ppm_trace_forces == 0 ? force(i,j-1,k,1) : Ipfy(i,j-1,k,1);
+        Real fr = ppm_trace_forces == 0 ? force(i,j,k,1) : Imfy(i,j,k,1);
 
         // extrapolate to edges
         Real vmacl = uly(i,j,k,1) 
@@ -821,7 +819,6 @@ Maestro::VelPredInterface(const MFIter& mfi,
     const Real hy = dx[1];
     const Real hz = dx[2];
 
-    const int ppm_type_local = ppm_type;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -834,7 +831,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     ParallelFor(mxbx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = 0.5 - dt2*max(0.0,ufull(i-1,j,k,0))/hx;
             Real minu = 0.5 + dt2*min(0.0,ufull(i  ,j,k,0))/hx;
 
@@ -844,7 +841,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                 // extrapolate all components of velocity to right face
                 urx(i,j,k,n) = utilde(i,j,k,n) - minu * Ipu(i,j,k,n);
             }
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             ulx(i,j,k,0) = Ipu(i-1,j,k,0);
             ulx(i,j,k,1) = Ipv(i-1,j,k,0);
@@ -940,7 +937,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     ParallelFor(mybx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = (0.5 - dt2*max(0.0,ufull(i,j-1,k,1))/hy);
             Real minu = (0.5 + dt2*min(0.0,ufull(i,j  ,k,1))/hy);
 
@@ -951,7 +948,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                 ury(i,j,k,n) = utilde(i,j,k,n) - minu * Imv(i,j,k,n);
             }
 
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             uly(i,j,k,0) = Ipu(i,j-1,k,1);
             uly(i,j,k,1) = Ipv(i,j-1,k,1);
@@ -1047,7 +1044,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
     ParallelFor(mzbx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = 0.5 - dt2*max(0.0,ufull(i,j,k-1,2))/hz;
             Real minu = 0.5 + dt2*min(0.0,ufull(i,j,k  ,2))/hz;
 
@@ -1058,7 +1055,7 @@ Maestro::VelPredInterface(const MFIter& mfi,
                 urz(i,j,k,n) = utilde(i,j,k,n) - minu * Imw(i,j,k,n);
             }
 
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             ulz(i,j,k,0) = Ipu(i,j,k-1,2);
             ulz(i,j,k,1) = Ipv(i,j,k-1,2);
@@ -1617,16 +1614,13 @@ Maestro::VelPredVelocities(const MFIter& mfi,
         physbc[n] = phys_bc[n];
     } 
 
-    const int ppm_trace_forces_local = ppm_trace_forces;
-    const int spherical_local = spherical;
-
     // x-direction
     ParallelFor(xbx,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i-1,j,k,0) : Ipfx(i-1,j,k,0);
-        Real fr = ppm_trace_forces_local == 0 ? force(i  ,j,k,0) : Imfx(i  ,j,k,0);
+        Real fl = ppm_trace_forces == 0 ? force(i-1,j,k,0) : Ipfx(i-1,j,k,0);
+        Real fr = ppm_trace_forces == 0 ? force(i  ,j,k,0) : Imfx(i  ,j,k,0);
 
         // extrapolate to edges
         Real umacl = ulx(i,j,k,0)
@@ -1642,7 +1636,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (uimhzy(i  ,j  ,k+1)-uimhzy(i  ,j,k))
             + dt2*fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test = (umacl+w0macx(i,j,k) <= 0.0 &&
                          umacr+w0macx(i,j,k) >= 0.0) ||
@@ -1700,8 +1694,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i,j-1,k,1) : Ipfy(i,j-1,k,1);
-        Real fr = ppm_trace_forces_local == 0 ? force(i,j  ,k,1) : Imfy(i,j  ,k,1);
+        Real fl = ppm_trace_forces == 0 ? force(i,j-1,k,1) : Ipfy(i,j-1,k,1);
+        Real fr = ppm_trace_forces == 0 ? force(i,j  ,k,1) : Imfy(i,j  ,k,1);
 
         // extrapolate to edges
         Real vmacl = uly(i,j,k,1)
@@ -1717,7 +1711,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (vimhzx(i  ,j  ,k+1)-vimhzx(i,j  ,k))
             + dt2*fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test = (vmacl+w0macy(i,j,k) <= 0.0 &&
                          vmacr+w0macy(i,j,k) >= 0.0) ||
@@ -1775,8 +1769,8 @@ Maestro::VelPredVelocities(const MFIter& mfi,
     [=] AMREX_GPU_DEVICE (int i, int j, int k)
     {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i,j,k-1,2) : Ipfz(i,j,k-1,2);
-        Real fr = ppm_trace_forces_local == 0 ? force(i,j,k  ,2) : Imfz(i,j,k  ,2); 
+        Real fl = ppm_trace_forces == 0 ? force(i,j,k-1,2) : Ipfz(i,j,k-1,2);
+        Real fr = ppm_trace_forces == 0 ? force(i,j,k  ,2) : Imfz(i,j,k  ,2); 
 
         // extrapolate to edges
         Real wmacl = ulz(i,j,k,2)
@@ -1792,7 +1786,7 @@ Maestro::VelPredVelocities(const MFIter& mfi,
             * (wimhyx(i  ,j+1,k  )-wimhyx(i,j,k  ))
             + dt2*fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test = (wmacl+w0macz(i,j,k) <= 0.0 &&
                          wmacr+w0macz(i,j,k) >= 0.0) ||

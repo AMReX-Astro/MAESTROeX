@@ -5,14 +5,10 @@ using namespace amrex;
 // prototype for pertubation function to be called on the 
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
-void Perturb(const Real p0, 
+void Perturb(const Real p0_init, 
              const Real* s0,
              Real* perturbations,  
-             const Real x, const Real y, const Real z,
-             const Real pert_rad_factor,
-             const Real pert_temp_factor,
-             const bool do_small_domain,
-             bool spherical=false);
+             const Real x, const Real y, const Real z);
 
 // initializes data on a specific level
 void
@@ -54,10 +50,6 @@ Maestro::InitLevelData(const int lev, const Real time,
         const auto prob_lo = geom[lev].ProbLoArray();
         const auto dx = geom[lev].CellSizeArray();
 
-        const auto pert_rad_factor_loc = pert_rad_factor;
-        const auto pert_temp_factor_loc = pert_temp_factor;
-        const auto do_small_domain_loc = do_small_domain;
-
         ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 
@@ -73,10 +65,7 @@ Maestro::InitLevelData(const int lev, const Real time,
             }
 
             Perturb(p0_arr(lev,r), s0, perturbations, 
-                    x, y, z, 
-                    pert_rad_factor_loc, 
-                    pert_temp_factor_loc, 
-                    do_small_domain_loc);
+                    x, y, z);
 
             scal(i,j,k,Rho) = perturbations[Rho];
             scal(i,j,k,RhoH) = perturbations[RhoH];
@@ -140,11 +129,11 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
         }
     }
 
-    Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, Temp);
+    Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s, Temp);
     MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
     
     // initialize p0_cart
-    Put1dArrayOnCart(p0_init, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_init, p0_cart, false, false, bcs_f, 0);
 
     // initialize species 
     for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -153,7 +142,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                 temp_arr(l,r) = s0_init_arr(l,r,FirstSpec+comp);
             }
         }
-        Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec+comp);
+        Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s, FirstSpec+comp);
         MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
     }
 
@@ -192,10 +181,6 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
             const auto prob_lo = geom[lev].ProbLoArray();
             const auto dx = geom[lev].CellSizeArray();
 
-            const auto pert_rad_factor_loc = pert_rad_factor;
-            const auto pert_temp_factor_loc = pert_temp_factor;
-            const auto do_small_domain_loc = do_small_domain;
-
             // add an optional perturbation
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
                 Real x = prob_lo[0] + (Real(i)+0.5) * dx[0];
@@ -210,10 +195,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
                 }
 
                 Perturb(p0_arr(i,j,k), s0, perturbations, 
-                    x, y, z, 
-                    pert_rad_factor_loc, 
-                    pert_temp_factor_loc, 
-                    do_small_domain_loc, true);
+                    x, y, z);
 
                 scal_arr(i,j,k,Rho) = perturbations[Rho];
                 scal_arr(i,j,k,RhoH) = perturbations[RhoH];
@@ -229,11 +211,7 @@ Maestro::InitLevelDataSphr(const int lev, const Real time,
 void Perturb(const Real p0_init, 
              const Real* s0,
              Real* perturbations,  
-             const Real x, const Real y, const Real z,
-             const Real pert_rad_factor,
-             const Real pert_temp_factor,
-             const bool do_small_domain,
-             bool spherical)
+             const Real x, const Real y, const Real z)
 {
     Real t0 = s0[Temp];
 
@@ -275,7 +253,7 @@ void Perturb(const Real p0_init,
 
     Real temp = 0.0;
 
-    if (!spherical) {
+    if (!maestro::spherical) {
         Real x0 = 1.8e7;
         Real y0 = 1.8e7;
         Real z0 = 8.5e7;

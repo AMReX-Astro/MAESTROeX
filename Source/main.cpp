@@ -5,7 +5,7 @@
 
 using namespace amrex;
 
-std::string inputs_name = "";
+std::string inputs_name;
 
 int main(int argc, char* argv[])
 {
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 
     // Save the inputs file name for later.
 
-    if (!strchr(argv[1], '=')) {
+    if (strchr(argv[1], '=') != nullptr) {
         inputs_name = argv[1];
     }
 

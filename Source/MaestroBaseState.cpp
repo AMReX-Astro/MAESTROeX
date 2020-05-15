@@ -112,9 +112,9 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         } else {
 
-            Real d_ambient = input_model.Interpolate(rloc, input_model.idens_model);
-            Real t_ambient = input_model.Interpolate(rloc, input_model.itemp_model);
-            Real p_ambient = input_model.Interpolate(rloc, input_model.ipres_model);
+            Real d_ambient = input_model.Interpolate(rloc, ModelParser::idens_model);
+            Real t_ambient = input_model.Interpolate(rloc, ModelParser::itemp_model);
+            Real p_ambient = input_model.Interpolate(rloc, ModelParser::ipres_model);
 
             RealVector xn_ambient(NumSpec);
 
@@ -122,12 +122,12 @@ Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 xn_ambient[comp] = max(0.0, min(1.0, 
-                    input_model.Interpolate(rloc, input_model.ispec_model+comp)));
+                    input_model.Interpolate(rloc, ModelParser::ispec_model+comp)));
                 sumX += xn_ambient[comp];
             }
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                if (sumX != 0.0) xn_ambient[comp] /= sumX;
+                if (sumX != 0.0) { xn_ambient[comp] /= sumX; }
             }
 
             eos_t eos_state;

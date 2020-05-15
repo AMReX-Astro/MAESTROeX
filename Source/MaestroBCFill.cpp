@@ -51,7 +51,7 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             break;
         }
     }
-    if (!found_ext_boundary) return;
+    if (!found_ext_boundary) { return; }
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
