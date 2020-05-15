@@ -79,7 +79,7 @@ Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         // set rho analytically  
         Real dens_zone = dens_base * exp(-z/H);
         // needs to be set before pressure 
-        s0_init[n+max_lev*(r+nr_fine*Rho)] = dens_zone;
+        s0_init_arr(n,r,Rho) = dens_zone;
 
         // compute the pressure by discretizing HSE
         p0_init_arr(n,r) = p0_init_arr(n,r-1) - base_geom.dr(n) * 0.5 * (s0_init_arr(n,r,Rho) + s0_init_arr(n,r-1,Rho)) * fabs(grav_const);

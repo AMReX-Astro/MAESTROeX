@@ -125,7 +125,9 @@ public:
 
     BaseState() {};
 
-    BaseState(const int num_levs, const int length=1, const int ncomp=1);
+    // BaseState(const int num_levs, const int length=1, const int ncomp=1);
+
+    explicit BaseState(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
     
     /// create a BaseState object from an existing Fortran-friendly base state
     BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length=1, const int ncomp=1);
@@ -166,9 +168,9 @@ public:
     }
 
     /// allocate memory for the BaseState
-    void define(const int num_levs, const int length=1, const int ncomp=1);
+    void define(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
 
-    void resize(const int num_levs, const int length=1, const int ncomp=1);
+    void resize(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
 
     /// set to some scalar value 
     void setVal(const T& val);
@@ -265,11 +267,12 @@ protected:
 };
 
 template <class T>
-BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp) 
+BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp, const T val) 
 : nlev(num_levs), len(length), nvar(ncomp)
 {
     base_data.resize(nlev*len*nvar);
     base_data.shrink_to_fit();
+    std::fill(base_data.begin(), base_data.end(), val);
 }
 
 template <class T>
@@ -323,7 +326,7 @@ BaseState<T>::BaseState(const BaseState<T>& src)
 
 template <class T>
 void
-BaseState<T>::define(const int num_levs, const int length, const int ncomp)
+BaseState<T>::define(const int num_levs, const int length, const int ncomp, const T val)
 {
     nlev = num_levs;
     len = length;
@@ -331,11 +334,12 @@ BaseState<T>::define(const int num_levs, const int length, const int ncomp)
 
     base_data.resize(nlev*length*nvar);
     base_data.shrink_to_fit();
+    std::fill(base_data.begin(), base_data.end(), val);
 }
 
 template <class T>
 void
-BaseState<T>::resize(const int num_levs, const int length, const int ncomp)
+BaseState<T>::resize(const int num_levs, const int length, const int ncomp, const T val)
 {
     if (base_data.size() > 0) {
         base_data.resize(0);

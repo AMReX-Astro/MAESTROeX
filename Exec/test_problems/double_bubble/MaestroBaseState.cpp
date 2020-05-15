@@ -4,9 +4,9 @@
 using namespace amrex;
 
 void 
-Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0, 
+Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
                        BaseState<Real>& p0, 
-                       const int n)
+                       const int lev)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
@@ -55,20 +55,20 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     s0_init_arr(lev,0,Rho) = dens_base;
     s0_init_arr(lev,0,RhoH) = dens_base * eos_state.h;
     for (auto comp = 0; comp < NumSpec; ++comp) {
-        s0_init_arr(n,0,FirstSpec+comp) = dens_base * xn_zone[comp];
+        s0_init_arr(lev,0,FirstSpec+comp) = dens_base * xn_zone[comp];
     }
-    s0_init_arr(n,0,Temp) = eos_state.T;
+    s0_init_arr(lev,0,Temp) = eos_state.T;
 
-    Real z0 = 0.5 * base_geom.dr(n);
+    Real z0 = 0.5 * base_geom.dr(lev);
 
     // set an initial guess for the temperature -- this will be reset
     // by the EOS
     Real temp_zone = 1000.0;
 
-    for (auto r = 1; r < base_geom.nr(n); ++r) {
+    for (auto r = 1; r < base_geom.nr(lev); ++r) {
 
         // height above the bottom of the domain
-        Real z = (Real(r) + 0.5) * base_geom.dr(n);
+        Real z = (Real(r) + 0.5) * base_geom.dr(lev);
 
         Real dens_zone = 0.0;
         if (do_isentropic) {
@@ -82,12 +82,12 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
             dens_zone = dens_base * exp(-z / H);
         }
 
-        s0_init[lev+max_lev*(r+nr_fine*Rho)] = dens_zone;
+        s0_init_arr(lev,r,Rho) = dens_zone;
 
         // compute the pressure by discretizing HSE
-        p0_init_arr(lev,r) = p0_init_arr(lev,r-1) - base_geom.dr(n) * 0.5 *
-            (s0_init_arr(n,r,Rho) + 
-             s0_init_arr(n,r-1,Rho)) * fabs(grav_const);
+        p0_init_arr(lev,r) = p0_init_arr(lev,r-1) - base_geom.dr(lev) * 0.5 *
+            (s0_init_arr(lev,r,Rho) + 
+             s0_init_arr(lev,r-1,Rho)) * fabs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.T     = temp_zone;
@@ -103,14 +103,14 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
         s0_init_arr(lev,r,Rho) = dens_zone;
         s0_init_arr(lev,r,RhoH) = dens_zone * eos_state.h;
         for (auto comp = 0; comp < NumSpec; ++comp) {
-            s0_init_arr(n,r,FirstSpec+comp) = 
+            s0_init_arr(lev,r,FirstSpec+comp) = 
                 dens_zone * xn_zone[comp];
         }
         s0_init_arr(lev,r,Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init_arr into rho0, rhoh0, p0, and tempbar
-    for (auto r = 0; r < nr_fine; ++r) {
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
         rho0_arr(lev,r) = s0_init_arr(lev,r,Rho);
         rhoh0_arr(lev,r) = s0_init_arr(lev,r,RhoH);
         tempbar_arr(lev,r) = s0_init_arr(lev,r,Temp);
@@ -119,12 +119,12 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
     }
 
     Real min_temp = 1.e99;
-    for (auto r = 0; r < nr_fine; ++r) {
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
         min_temp = amrex::min(min_temp, s0_init_arr(lev,r,Temp));
     }
 
     if (min_temp < small_temp) {
-        if (n == 1) {
+        if (lev == 1) {
             Print() << " " << std::endl;
             Print() << "WARNING: minimum model temperature is lower than the EOS cutoff" << std::endl;
             Print() << "         temperature, small_temp" << std::endl;
@@ -133,11 +133,8 @@ Maestro::InitBaseState(RealVector& rho0, BaseState<Real>& rhoh0,
 
     Real max_hse_error = -1.e30;
 
-    for (auto r = 1; r < base_geom.nr(n); ++r) {
-
-        Real rloc = geom[lev].ProbLo(AMREX_SPACEDIM-1) + (Real(r) + 0.5)*base_geom.dr(n);
-
-        Real dpdr = (p0_init_arr(n,r) - p0_init_arr(n,r-1)) / base_geom.dr(n);
+    for (auto r = 1; r < base_geom.nr(lev); ++r) {
+        Real dpdr = (p0_init_arr(lev,r) - p0_init_arr(lev,r-1)) / base_geom.dr(lev);
         Real rhog = 0.5*(s0_init_arr(lev,r,Rho) + 
                          s0_init_arr(lev,r-1,Rho))*grav_const;
 

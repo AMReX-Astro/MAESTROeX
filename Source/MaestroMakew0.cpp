@@ -115,8 +115,6 @@ Maestro::Makew0Planar(const BaseState<Real>& w0_old,
     const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
     const auto Sbar_arr = Sbar_in.const_array();
-    const auto rho0_old_arr = rho0_old_in.const_array();
-    const auto rho0_new_arr = rho0_new_in.const_array();
     const auto p0_old_arr = p0_old_in.const_array();
     const auto p0_new_arr = p0_new_in.const_array();
     const auto gamma1bar_old_arr = gamma1bar_old_in.const_array();
@@ -334,17 +332,10 @@ Maestro::Makew0PlanarVarg(const BaseState<Real>& w0_old,
     ProlongBasetoUniform(etarho_cc, etarho_cc_fine);
     ProlongBasetoUniform(Sbar_in, Sbar_in_fine);
 
-    auto p0_old_fine_arr = p0_old_fine.array();
-    auto p0_new_fine_arr = p0_new_fine.array();
     auto p0_nph_fine_arr = p0_nph_fine.array();
-    auto rho0_old_fine_arr = rho0_old_fine.array();
-    auto rho0_new_fine_arr = rho0_new_fine.array();
-    auto rho0_nph_fine_arr = rho0_nph_fine.array();
     auto w0_fine_arr = w0_fine.array();
     auto deltaw0_fine_arr = deltaw0_fine.array();
     auto w0bar_fine_arr = w0bar_fine.array();
-    auto gamma1bar_old_fine_arr = gamma1bar_old_fine.array();
-    auto gamma1bar_new_fine_arr = gamma1bar_new_fine.array();
     auto gamma1bar_nph_fine_arr = gamma1bar_nph_fine.array();
     auto p0_minus_peosbar_fine_arr = p0_minus_peosbar_fine.array();
     auto etarho_cc_fine_arr = etarho_cc_fine.array();
@@ -911,9 +902,9 @@ Maestro::Makew0SphrIrreg(const BaseState<Real>& w0_old,
 
 
 void
-Maestro::Tridiag(const BaseStateArray<Real> a, const BaseStateArray<Real> b, 
-                 const BaseStateArray<Real> c, const BaseStateArray<Real> r, 
-                 BaseStateArray<Real> u, const int n)
+Maestro::Tridiag(const BaseStateArray<Real>& a, const BaseStateArray<Real>& b, 
+                 const BaseStateArray<Real>& c, const BaseStateArray<Real>& r, 
+                 const BaseStateArray<Real>& u, const int n)
 {
     BaseState<Real> gam_s(n);
     auto gam = gam_s.array();

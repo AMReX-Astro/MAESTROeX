@@ -84,8 +84,7 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
                 MultiFab::Divide(scal[lev],scal[lev],Rho,comp,1,0);
             }
         }
-    }
-    else {
+    } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
                 MultiFab::Multiply(scal[lev],scal[lev],Rho,comp,1,0);
@@ -94,11 +93,10 @@ Maestro::ConvertRhoXToX(Vector<MultiFab>& scal,
     }
 
     // average down data and fill ghost cells
-    AverageDown(scal,FirstSpec,NumSpec);
+    AverageDown(scal, FirstSpec, NumSpec);
     if (flag) {
         FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,0,bcs_f);
-    }
-    else {
+    } else {
         FillPatch(t_old,scal,scal,scal,FirstSpec,FirstSpec,NumSpec,FirstSpec,bcs_s);
     }
 }
@@ -114,8 +112,7 @@ Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Divide(scal[lev],scal[lev],Rho,RhoH,1,0);
         }
-    }
-    else {
+    } else {
         for (int lev=0; lev<=finest_level; ++lev) {
             MultiFab::Multiply(scal[lev],scal[lev],Rho,RhoH,1,0);
         }
@@ -125,8 +122,7 @@ Maestro::ConvertRhoHToH(Vector<MultiFab>& scal,
     AverageDown(scal,RhoH,1);
     if (flag) {
         FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,0,bcs_f);
-    }
-    else {
+    } else {
         FillPatch(t_old,scal,scal,scal,RhoH,RhoH,1,RhoH,bcs_s);
     }
 }

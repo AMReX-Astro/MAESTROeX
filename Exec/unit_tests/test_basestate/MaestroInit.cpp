@@ -18,7 +18,6 @@ Maestro::Init ()
 
 	Print() << "Calling Init()" << std::endl;
 
-
 	start_step = 1;
 
 	// fill in multifab and base state data
@@ -36,17 +35,20 @@ Maestro::Init ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 
+#if (AMREX_SPACEDIM == 3)
 	if (spherical == 1) {
 		MakeNormal();
 		MakeCCtoRadii();
 	}
+#endif
 
 	// make gravity
-	make_grav_cell(grav_cell_old.dataPtr(),
-	               rho0_old.dataPtr(),
-	               base_geom.r_cc_loc.dataPtr(),
-	               base_geom.r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_old, rho0_old);
 
 	// compute initial time step
 	FirstDt();
@@ -88,49 +90,44 @@ Maestro::InitData ()
 	// set finest_radial_level in fortran
 	// compute numdisjointchunks, r_start_coord, r_end_coord
 	init_multilevel(tag_array.dataPtr(),&finest_level);
-
+	// InitMultilevel(finest_level);
+	BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level+1, base_geom.nr_fine);
+	base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+	
 	// first compute cutoff coordinates using initial density profile
 	compute_cutoff_coords(rho0_old.dataPtr());
+	ComputeCutoffCoords(rho0_old);
+	base_geom.ComputeCutoffCoords(rho0_old.array());
 
 	// compute gravity
-	make_grav_cell(grav_cell_old.dataPtr(),
-	               rho0_old.dataPtr(),
-	               base_geom.r_cc_loc.dataPtr(),
-	               base_geom.r_edge_loc.dataPtr());
+	MakeGravCell(grav_cell_old, rho0_old);
 
 	// compute p0 with HSE
-	enforce_HSE(rho0_old.dataPtr(),
-	            p0_old.dataPtr(),
-	            grav_cell_old.dataPtr(),
-	            base_geom.r_cc_loc.dataPtr(),
-	            base_geom.r_edge_loc.dataPtr());
+	EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
 	// set p0^{-1} = p0_old
-	for (int i=0; i<p0_old.size(); ++i) {
-		p0_nm1[i] = p0_old[i];
+	p0_nm1.copy(p0_old);
+
+        rhoX0_old.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
+        rhoX0_new.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
+
+	auto rhoX0_old_arr = rhoX0_old.array();
+	const auto s0_init_arr = s0_init.const_array();
+	
+        for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+	for (auto r = 0; r < base_geom.nr(n); ++r) {
+	    for (auto comp = 0; comp < NumSpec; ++comp) {
+		rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
+	    }
+	}
 	}
 
-    rhoX0_old.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
-    rhoX0_new.resize( (base_geom.max_radial_level+1)*base_geom.nr_fine*NumSpec);
-	rhoX0_old.shrink_to_fit();
-	rhoX0_new.shrink_to_fit();
-
-    make_rhoX0(s0_init.dataPtr(), rhoX0_old.dataPtr());
-
-
 	// set some stuff to zero
-	std::fill(etarho_ec.begin(), etarho_ec.end(), 0.);
-	std::fill(etarho_cc.begin(), etarho_cc.end(), 0.);
-	std::fill(psi.begin(), psi.end(), 0.);
-	std::fill(w0.begin(), w0.end(), 0.);
-
-
-	// free memory in s0_init and p0_init by swapping it
-	// with an empty vector that will go out of scope
-	Vector<Real> s0_swap, p0_swap;
-	std::swap(s0_swap,s0_init);
-	std::swap(p0_swap,p0_init);
-
+        etarho_ec.setVal(0.0);
+	etarho_cc.setVal(0.0);
+	psi.setVal(0.0);
+	w0.setVal(0.);
+	
 }
 
 // During initialization of a simulation, Maestro::InitData() calls
@@ -176,7 +173,9 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	const Real* dx = geom[lev].CellSize();
 	const Real* dx_fine = geom[max_level].CellSize();
 
-	MultiFab& cc_to_r = cell_cc_to_r[lev];
+	MultiFab& scal = sold[lev];
+	MultiFab& vel = uold[lev];
+	iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
 	// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -189,13 +188,10 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 		const int* hi  = tilebox.hiVect();
 
 		if (!spherical) {
-            const Array4<Real> scal_arr = scal.array(mfi);
+                        const Array4<Real> scal_arr = scal.array(mfi);
 			const Array4<Real> vel_arr = vel.array(mfi);
-
-			const Real * AMREX_RESTRICT s0_p = s0_init.dataPtr();
-			const Real * AMREX_RESTRICT p0_p = p0_init.dataPtr();
 		    
-            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr, s0_p, p0_p);
+            InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
 
 		} else {
 #if (AMREX_SPACEDIM == 3)
@@ -207,14 +203,14 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
                     ZFILL(dx_fine),
                     ZFILL(dx));
 
-			InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
+	    InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
 #endif
 		}
 	}
 
 #if (AMREX_SPACEDIM == 3)
 	if (spherical) {
-	    InitLevelDataSphr(lev, t_old, sold[lev], uold[lev]);
+	    InitLevelDataSphr(lev, t_old, scal, vel);
 	}
 #endif
 }

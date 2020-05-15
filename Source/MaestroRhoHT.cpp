@@ -422,7 +422,6 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
 #if (AMREX_SPACEDIM == 3)
             const Box& zbx = amrex::growHi(tileBox,2, 1);
 #endif
-            const Array4<const Real> state = sold[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
             const Array4<const Real> rhoh0_arr = rhoh0_cart[lev].array(mfi);
             const Array4<const Real> tempbar_arr = tempbar_cart[lev].array(mfi);

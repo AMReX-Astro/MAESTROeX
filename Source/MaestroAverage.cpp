@@ -72,7 +72,7 @@ void Maestro::Average (const Vector<MultiFab>& phi,
         ParallelDescriptor::ReduceRealSum(phisum.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        for (int lev = 0; lev < max_lev; ++lev) {
+        for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
             for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) { 
                 const int lo = base_geom.r_start_coord(lev,i);
                 const int hi = base_geom.r_end_coord(lev,i);
@@ -284,8 +284,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             int rcoord_p[MAESTRO_MAX_LEVELS];
 
             // initialize
-            for (auto i = 0; i < MAESTRO_MAX_LEVELS; ++i) {
-                rcoord_p[i] = 0.0;
+            for (int & coord : rcoord_p) {
+                coord = 0.0;
             }
 
             // for each level, find the closest coordinate
@@ -300,21 +300,21 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // make sure closest coordinate is in bounds
             for (auto n = 0; n < fine_lev-1; ++n) {
-                rcoord_p[n] = max(rcoord_p[n],1);
+                rcoord_p[n] = amrex::max(rcoord_p[n],1);
             }
             for (auto n = 0; n < fine_lev; ++n) {
-                rcoord_p[n] = min(rcoord_p[n],nr_irreg-1);
+                rcoord_p[n] = amrex::min(rcoord_p[n],nr_irreg-1);
             }
 
             // choose the level with the largest min over the ncell interpolation points
             which_lev(r) = 0;
 
-            int min_all = min(ncell(0,rcoord_p[0]), 
+            int min_all = amrex::min(ncell(0,rcoord_p[0]), 
                 ncell(0,rcoord_p[0]+1), 
                 ncell(0,rcoord_p[0]+2));
 
             for (auto n = 1; n < fine_lev; ++n) {
-                int min_lev = min(ncell(n,rcoord_p[n]), 
+                int min_lev = amrex::min(ncell(n,rcoord_p[n]), 
                     ncell(n,rcoord_p[n]+1), 
                     ncell(n,rcoord_p[n]+2));
 
@@ -330,8 +330,8 @@ void Maestro::Average (const Vector<MultiFab>& phi,
             while (min_all == 0) {
                 j++;
                 for (auto n = 0; n < fine_lev; ++n) {
-                    int min_lev = max(ncell(n,max(1,rcoord_p[n]-j)+1), 
-                        ncell(n,min(rcoord_p[n]+j,nr_irreg-1)+1));
+                    int min_lev = amrex::max(ncell(n,amrex::max(1,rcoord_p[n]-j)+1), 
+                        ncell(n,amrex::min(rcoord_p[n]+j,nr_irreg-1)+1));
                     if (min_lev != 0) {
                         which_lev(r) = n;
                         min_all = min_lev;
@@ -393,12 +393,12 @@ void Maestro::Average (const Vector<MultiFab>& phi,
 
             // make sure the interpolation points will be in bounds
             if (which_lev(r) != fine_lev-1) {
-                stencil_coord = max(stencil_coord, 1);
+                stencil_coord = amrex::max(stencil_coord, 1);
             }
-            stencil_coord = min(stencil_coord, 
+            stencil_coord = amrex::min(stencil_coord, 
                     max_rcoord(which_lev(r))-1);
 
-            bool limit = (r > nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2))) ? false : true;
+            bool limit = (r <= nrf - 1 - drdxfac_loc*pow(2.0, (fine_lev-2)));
 
             phibar_arr(0,r) = QuadInterp(radius, 
                     radii(which_lev(r),stencil_coord), 

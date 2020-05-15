@@ -27,7 +27,7 @@ Maestro::Evolve ()
 	// the Maestro class, it has to use the same prototype as the original.
 	// We shall therefore create a dummy variable to fill up all the variables
 	// passed into the function that won't be used.
-	Vector<Real> dummy;
+	BaseState<Real> dummy;
 
 	// Model 1: No burning, no heating
 	Print() << "\nModel 1: No burning, no heating\n";

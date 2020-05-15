@@ -25,7 +25,7 @@ Maestro::Evolve ()
     {
         // check to see if we need to regrid, then regrid
         if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
-                Regrid();
+            Regrid();
         }
 
         dtold = dt;
@@ -153,9 +153,9 @@ Maestro::Evolve ()
 
         // move new state into old state by swapping pointers
         for (int lev=0; lev<=finest_level; ++lev) {
-                std::swap(    sold[lev],     snew[lev]);
-                std::swap(    uold[lev],     unew[lev]);
-                std::swap(S_cc_old[lev], S_cc_new[lev]);
+            std::swap(    sold[lev],     snew[lev]);
+            std::swap(    uold[lev],     unew[lev]);
+            std::swap(S_cc_old[lev], S_cc_new[lev]);
         }
 
         rho0_old.swap(rho0_new);

@@ -89,7 +89,7 @@ Maestro::Evolve ()
 	// the Maestro class, it has to use the same prototype as the original.
 	// We shall therefore create a dummy variable to fill up all the variables
 	// passed into the function that won't be used.
-	Vector<Real> dummy;
+	BaseState<Real> dummy;
 
 	// dump initial state
 	WritePlotFile(0,t_new,dt,dummy,dummy,dummy,dummy,sold,analytic,error);
@@ -132,7 +132,7 @@ Maestro::Evolve ()
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-			for ( MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi ) {
+			for (MFIter mfi(analytic[lev], true); mfi.isValid(); ++mfi) {
 
 				const auto tileBox = mfi.tilebox();
 				const auto prob_lo = geom[lev].ProbLoArray();

@@ -35,7 +35,6 @@ Maestro::EnforceHSE(const BaseState<Real>& rho0_s,
     // zero the new pressure so we don't leave a non-zero pressure in
     // fine radial regions that no longer have a corresponding full
     // state
-    // std::fill(p0.begin(), p0.end(), 0.);
     p0_s.setVal(0.0);
 
     // integrate all of level 1 first

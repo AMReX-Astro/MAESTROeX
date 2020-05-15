@@ -236,7 +236,7 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& S_cc_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
+    BL_PROFILE_VAR("Maestro::PlotFileMF()", PlotFileMF);
 
     // MultiFab to hold plotfile data
     Vector<const MultiFab*> plot_mf;
@@ -547,9 +547,11 @@ Maestro::PlotFileMF (const int nPlot,
     }
 
     if (evolve_base_state) {
+#if (AMREX_SPACEDIM == 3)
         if (spherical) {
             MakeW0mac(w0mac);
         }
+#endif
         Put1dArrayOnCart(w0, w0r_cart, 1, 0, bcs_u, 0);
     }
 
@@ -745,8 +747,8 @@ Maestro::PlotFileMF (const int nPlot,
 Vector<const MultiFab*>
 Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
                          Vector<const MultiFab*> mf,
-                         const Vector<std::string> varnames,
-                         const Vector<std::string> small_plot_varnames)
+                         const Vector<std::string>& varnames,
+                         const Vector<std::string>& small_plot_varnames)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SmallPlotFileMF()",SmallPlotFileMF);
@@ -763,14 +765,11 @@ Maestro::SmallPlotFileMF(const int nPlot, const int nSmallPlot,
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i] = new MultiFab(mf[i]->boxArray(),
                                        mf[i]->DistributionMap(),nSmallPlot,0);
-
     }
 
-    for (auto it=small_plot_varnames.begin();
-         it!=small_plot_varnames.end(); ++it) {
-
+    for (const auto& it : small_plot_varnames) {
         for (auto n = 0; n < nPlot; n++) {
-            if (*it == varnames[n]) {
+            if (it == varnames[n]) {
                 for (int i = 0; i <= finest_level; ++i)
                     plot_mf_data[i]->copy(*(mf[i]), n, dest_comp, 1);
                 ++dest_comp;
@@ -974,8 +973,8 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
                 // test to see if it's a valid varname by iterating over
                 // varnames
                 auto found_name = false;
-                for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-                    if (nm == *it) {
+                for (const auto& it : varnames) {
+                    if (nm == it) {
                         names.push_back(nm);
                         found_name = true;
                         break;
@@ -995,8 +994,8 @@ Maestro::SmallPlotFileVarNames (int * nPlot, Vector<std::string> varnames) const
             // test to see if it's a valid varname by iterating over
             // varnames
             auto found_name = false;
-            for (auto it=varnames.begin(); it!=varnames.end(); ++it) {
-                if (nm == *it) {
+            for (const auto& it : varnames) {
+                if (nm == it) {
                     names.push_back(nm);
                     found_name = true;
                     break;
@@ -1063,7 +1062,7 @@ Maestro::WriteJobInfo (const std::string& dir) const
         jobInfoFile << " Plotfile Information\n";
         jobInfoFile << PrettyLine;
 
-        time_t now = time(0);
+        time_t now = time(nullptr);
 
         // Convert now to tm struct for local timezone
         tm* localtm = localtime(&now);

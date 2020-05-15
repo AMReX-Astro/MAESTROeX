@@ -117,8 +117,6 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
             const Array4<Real> sponge_arr = sponge[lev].array(mfi);
             const auto prob_lo = geom[lev].ProbLoArray();
 
-            const auto& center_p = center;
-
             if (!spherical) {
                 const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM-1];
                 const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM-1];
@@ -157,6 +155,7 @@ Maestro::MakeSponge (Vector<MultiFab>& sponge)
 #if (AMREX_SPACEDIM == 3)
                 const Real r_sp_outer_loc = r_sp_outer;
                 const Real r_tp_outer_loc = r_tp_outer;
+                const auto& center_p = center;
 
                 ParallelFor(tileBox,
                 [=] AMREX_GPU_DEVICE (int i, int j, int k) {

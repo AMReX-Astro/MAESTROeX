@@ -15,7 +15,6 @@ Maestro::Regrid ()
     const Real strt_total = ParallelDescriptor::second();
     
     BaseState<Real> rho0_temp(base_geom.max_radial_level+1, base_geom.nr_fine);
-    auto rho0_temp_arr = rho0_temp.array();
 
     if (!spherical) {
         base_geom.finest_radial_level = finest_level;
@@ -104,7 +103,7 @@ Maestro::Regrid ()
 
     if (use_tfromp) {
         // compute full state T = T(rho,p0,X)
-        TfromRhoP(sold, p0_old, 0);
+        TfromRhoP(sold, p0_old, false);
     } else {
         // compute full state T = T(rho,h,X)
         TfromRhoH(sold, p0_old);
@@ -149,7 +148,7 @@ Maestro::TagArray ()
             const Box& validBox = mfi.validbox();
             // re-compute tag_array since the actual grid structure changed due to buffering
             // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
-            RetagArray(validBox, lev, tag_array);
+            RetagArray(validBox, lev);
         }
     }
     ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),(base_geom.max_radial_level+1)*base_geom.nr_fine);
@@ -179,7 +178,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
         // tag cells for refinement
         // for planar problems, we keep track of when a cell at a particular
         // latitude is tagged using tag_array
-        StateError(tags, sold[lev], mfi, lev, tag_array, time);
+        StateError(tags, sold[lev], mfi, lev, time);
     }
 
     // for planar refinement, we need to gather tagged entries in arrays
@@ -195,7 +194,7 @@ Maestro::ErrorEst (int lev, TagBoxArray& tags, Real time, int ng)
 #endif
         for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // tag all cells at a given height if any cells at that height were tagged
-            TagBoxes(tags, mfi, lev, tag_array, time);
+            TagBoxes(tags, mfi, lev, time);
         }
     } // if (!spherical)
 
@@ -215,7 +214,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RemakeLevel()", RemakeLevel);
 
-    const int ng_s = snew[lev].nGrow();
+    const int ng_snew = snew[lev].nGrow();
     const int ng_u = unew[lev].nGrow();
     const int ng_S = S_cc_new[lev].nGrow();
     const int ng_g = gpi[lev].nGrow();
@@ -227,8 +226,8 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     const int ng_i = intra[lev].nGrow();
 #endif
     
-    MultiFab snew_state              (ba, dm,          Nscal, ng_s);
-    MultiFab sold_state              (ba, dm,          Nscal, ng_s);
+    MultiFab snew_state              (ba, dm,          Nscal, ng_snew);
+    MultiFab sold_state              (ba, dm,          Nscal, ng_snew);
     MultiFab unew_state              (ba, dm, AMREX_SPACEDIM, ng_u);
     MultiFab uold_state              (ba, dm, AMREX_SPACEDIM, ng_u);
     MultiFab S_cc_new_state          (ba, dm,              1, ng_S);

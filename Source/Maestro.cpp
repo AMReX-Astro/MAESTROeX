@@ -52,13 +52,9 @@ Real Maestro::previousCPUTimeUsed = 0.0;
 
 Real Maestro::startCPUTime = 0.0;
 
-Maestro::Maestro ()
-{
-}
+Maestro::Maestro () = default;
 
-Maestro::~Maestro ()
-{
-}
+Maestro::~Maestro () = default;
 
 Real
 Maestro::getCPUTime()

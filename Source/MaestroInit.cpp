@@ -18,7 +18,7 @@ Maestro::Init ()
 
     Print() << "Calling Init()" << std::endl;
 
-    if (restart_file == "") {
+    if (restart_file.empty()) {
 
         start_step = 1;
 
@@ -31,6 +31,7 @@ Maestro::Init ()
             if (spherical) { MakeNormal(); }
 
             Print() << "\nWriting plotfile "<< plot_base_name << "InitData after InitData" << std::endl;
+
             WritePlotFile(plotInitData, t_old, 0, rho0_old,
                           rhoh0_old, p0_old, gamma1bar_old,
                           uold, sold, S_cc_old);
@@ -93,8 +94,11 @@ Maestro::Init ()
             unew[lev].setVal(0.);
             snew[lev].setVal(0.);
         }
+
         // put w0 on Cartesian cell-centers
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        if (evolve_base_state) {
+            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        }
         
         if (!spherical) {
             // reset tagging array to include buffer zones
@@ -108,10 +112,12 @@ Maestro::Init ()
         base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
-    if (spherical) { 
+#if (AMREX_SPACEDIM == 3)
+    if (spherical) {
         MakeNormal();
         MakeCCtoRadii();
     }
+#endif
 
     if (do_sponge) {
         SpongeInit(rho0_old);
@@ -120,7 +126,7 @@ Maestro::Init ()
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);
 
-    if (restart_file == "") {
+    if (restart_file.empty()) {
 
         // compute gamma1bar
         MakeGamma1bar(sold, gamma1bar_old, p0_old);
@@ -241,8 +247,8 @@ Maestro::InitData ()
     for (auto lev = 0; lev <= base_geom.max_radial_level; ++lev) {
         InitBaseState(rho0_old, rhoh0_old, p0_old, lev);
     }
-
-    if (use_exact_base_state) {
+    
+    if (use_exact_base_state || !evolve_base_state) {
         psi.setVal(0.0);
     }
 
@@ -291,7 +297,7 @@ Maestro::InitData ()
             EnforceHSE(rho0_old, p0_old, grav_cell_old);
 
             // call eos with r,p as input to recompute T,h
-            TfromRhoP(sold, p0_old, 1);
+            TfromRhoP(sold, p0_old, true);
 
             // set rhoh0 to be the average
             Average(sold, rhoh0_old, RhoH);
@@ -304,6 +310,10 @@ Maestro::InitData ()
 
     // set p0^{-1} = p0_old
     p0_nm1.copy(p0_old);
+
+    // initialize these since an initial plotfile needs valid data in here
+    // gamma1bar_old.setVal(0.);
+    // w0.setVal(0.);
 }
 
 // During initialization of a simulation, Maestro::InitData() calls

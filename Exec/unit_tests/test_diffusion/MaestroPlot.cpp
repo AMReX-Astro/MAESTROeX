@@ -11,17 +11,17 @@ void
 Maestro::WritePlotFile (const int step,
                         const Real t_in,
                         const Real dt_in,
-                        const Vector<Real>& a,
-                        const Vector<Real>& b,
-                        const Vector<Real>& c,
-                        const Vector<Real>& d,
+                        const BaseState<Real>& a,
+                        const BaseState<Real>& b,
+                        const BaseState<Real>& c,
+                        const BaseState<Real>& d,
                         const Vector<MultiFab>& state,
                         Vector<MultiFab>& analytic,
                         const Vector<MultiFab>& err,
-			const bool is_small)
+                        const bool is_small)
 {
 	// timer for profiling
-	BL_PROFILE_VAR("Maestro::WritePlotFile()",WritePlotFile);
+	BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
 
 	// wallclock time
 	const Real strt_total = ParallelDescriptor::second();
@@ -37,11 +37,11 @@ Maestro::WritePlotFile (const int step,
     // make plot mfs
     const Vector<MultiFab> dummy;
 	const auto& state_mf = PlotFileMF(nPlot,0,dt_in,state,dummy,dummy,
-        dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,analytic,b,b,dummy);
 	const auto& analytic_mf = PlotFileMF(nPlot,1,dt_in,dummy,dummy,
-        dummy,dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,dummy,analytic,b,b,dummy);
 	const auto& error_mf = PlotFileMF(nPlot,2,dt_in,err,dummy,dummy,
-        dummy,dummy,analytic,a,a,dummy);
+        dummy,dummy,analytic,b,b,dummy);
 
 	// WriteMultiLevelPlotfile expects an array of step numbers
 	Vector<int> step_array;
@@ -84,12 +84,12 @@ Maestro::PlotFileMF (const int nPlot,
                      const Vector<MultiFab>& a,
                      const Vector<MultiFab>& b,
                      Vector<MultiFab>& analytic,
-                     const Vector<Real>& d,
-                     const Vector<Real>& e,
+                     const BaseState<Real>& d,
+                     const BaseState<Real>& e,
                      const Vector<MultiFab>& f)
 {
 	// timer for profiling
-	BL_PROFILE_VAR("Maestro::PlotFileMF()",PlotFileMF);
+	BL_PROFILE_VAR("Maestro::PlotFileMF()", PlotFileMF);
 
 	// MultiFab to hold plotfile data
 	Vector<const MultiFab*> plot_mf;

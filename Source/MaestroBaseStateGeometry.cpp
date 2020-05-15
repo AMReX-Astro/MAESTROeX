@@ -24,7 +24,6 @@ Maestro::InitBaseStateMapSphr(const int lev, const MFIter& mfi,
         const Array4<int> cc_to_r = cell_cc_to_r[lev].array(mfi);
 
         const auto probLo = geom[0].ProbLoArray();
-
         const auto center_p = center;
 
         ParallelFor(tilebox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
@@ -226,13 +225,13 @@ Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state)
 }
 
 void 
-Maestro::RestrictBase(BaseState<Real>& s0, bool is_cell_centered)
+Maestro::RestrictBase(BaseState<Real>& s0, const bool is_cell_centered)
 {
     RestrictBase(s0.array(), is_cell_centered);
 }
 
 void 
-Maestro::RestrictBase(BaseStateArray<Real> s0, bool is_cell_centered)
+Maestro::RestrictBase(const BaseStateArray<Real>& s0, const bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase); 
@@ -255,13 +254,13 @@ Maestro::RestrictBase(BaseStateArray<Real> s0, bool is_cell_centered)
 }
 
 void 
-Maestro::FillGhostBase(BaseState<Real>& s0, bool is_cell_centered)
+Maestro::FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered)
 {
     FillGhostBase(s0.array(), is_cell_centered);
 }
 
 void 
-Maestro::FillGhostBase(BaseStateArray<Real> s0, bool is_cell_centered)
+Maestro::FillGhostBase(const BaseStateArray<Real>& s0, const bool is_cell_centered)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase); 

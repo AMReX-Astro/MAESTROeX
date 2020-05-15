@@ -19,7 +19,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
-
     for (int lev=0; lev<=finest_level; ++lev) {
 
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -35,11 +34,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
     gradw0.setVal(0.0);
 
-    auto w0_arr = w0.array();
-    const Real dr0 = base_geom.dr_fine;
-    auto gradw0_arr = gradw0.array();
-
     if ( !(use_exact_base_state || average_base_state) ) {
+        auto w0_arr = w0.array();
+        const Real dr0 = base_geom.dr_fine;
+        auto gradw0_arr = gradw0.array();
+
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
             ParallelFor(base_geom.nr_fine,
             [=] AMREX_GPU_DEVICE (int r) {
@@ -205,12 +204,12 @@ Maestro::ModifyScalForce(Vector<MultiFab>& scal_force,
     Vector<MultiFab> divu_cart(finest_level+1);
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto& r_edge_loc = base_geom.r_edge_loc;
-    const auto w0_arr = w0.const_array();
 
     if (spherical) {
         BaseState<Real> divw0(1,base_geom.nr_fine);
         divw0.setVal(0.0);
         auto divw0_arr = divw0.array();
+        const auto w0_arr = w0.const_array();
 
         if (!use_exact_base_state) {
             for (int r=0; r<base_geom.nr_fine-1; ++r) {
@@ -426,9 +425,11 @@ Maestro::MakeRhoHForce(Vector<MultiFab>& scal_force,
     }
 
     Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+#if (AMREX_SPACEDIM == 3)
     if (spherical) {
         MakeS0mac(p0, p0mac);
     } 
+#endif
     Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
     Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
 
@@ -610,7 +611,6 @@ Maestro::MakeTempForce(Vector<MultiFab>& temp_force,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Box& domainBox = geom[lev].Domain();
-            const auto domlo = domainBox.loVect3d();
             const auto domhi = domainBox.hiVect3d();
 
             // Get grid spacing

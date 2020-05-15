@@ -3,21 +3,21 @@
 using namespace amrex;
 
 void 
-SimpleLog::Log(const std::string str, const amrex::Real d)
+SimpleLog::Log(const std::string& str, const amrex::Real d)
 {
     Log(str + std::to_string(d));
 }
 
 
 void 
-SimpleLog::Log(const std::string str, const int i)
+SimpleLog::Log(const std::string& str, const int i)
 {
     Log(str + std::to_string(i));
 }
 
 
 void 
-SimpleLog::Log(const std::string str)
+SimpleLog::Log(const std::string& str)
 {
     if (log_lines >= MAX_LINES) {
         Abort("ERROR: log bugger exceeded in SimpleLog");

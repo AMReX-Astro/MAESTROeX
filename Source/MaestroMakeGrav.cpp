@@ -39,9 +39,7 @@ Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             // level = 0
             m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
             grav_cell_arr(0,0) = -Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
-
-            int nr_lev = base_geom.nr(0);
-
+            
             for (auto r = 1; r < base_geom.nr(0); ++r) {
 
                 // the mass is defined at the cell-centers, so to compute
@@ -285,7 +283,6 @@ Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
             FillGhostBase(grav_edge, false);
         } else {
             // constant gravity
-            // std::fill(grav_edge.begin(), grav_edge.end(), grav_const);
             grav_edge_state.setVal(grav_const);
         }
         
