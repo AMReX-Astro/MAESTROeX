@@ -37,8 +37,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rho0_cart[lev].setVal(0.);
 
-		w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-		w0_cart[lev].setVal(0.);
+                w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
+                w0_cart[lev].setVal(0.);
     }
 
     BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
