@@ -112,6 +112,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
+#ifdef ROTATION
+                    Abort("MakeVelForce: rotation not implemented for planar");
+#endif
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
                     
                     // cutoff the buoyancy term if we are outside of the star
