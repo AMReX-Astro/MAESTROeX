@@ -29,10 +29,7 @@ contains
     integer :: n, r
     double precision :: rloc, starting_rad, xloc(3), rho, T9
     integer :: i, j, k
-
-    if (.not. model_initialized) then 
-        call read_model_file(model_file)
-    endif
+    
 
     ! if (use_analytic_heating) then
 
