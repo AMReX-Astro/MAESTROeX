@@ -23,7 +23,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Vector<MultiFab> gradw0_cart(finest_level+1);
     Vector<MultiFab> grav_cart(finest_level+1);
     Vector<MultiFab> rho0_cart(finest_level+1);
-    Vector<MultiFab> w0_cart(finest_level+1);
     
     // constants in Fortran
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -36,9 +35,6 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rho0_cart[lev].setVal(0.);
-
-                w0_cart[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 1);
-                w0_cart[lev].setVal(0.);
     }
 
     BaseState<Real> gradw0(base_geom.max_radial_level+1,base_geom.nr_fine);
@@ -156,9 +152,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
 #ifdef ROTATION
-                const Array4<const Real> w0macx_arr = w0mac[0][lev].array(mfi);
-                const Array4<const Real> w0macy_arr = w0mac[1][lev].array(mfi);
-                const Array4<const Real> w0cart_arr = w0_cart[lev].array(mfi);
+                const Array4<const Real> w0macx_arr = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy_arr = w0mac[lev][1].array(mfi);
                 const Array4<const Real> uold_arr = uold[lev].array(mfi);
 #endif
 
@@ -186,8 +181,8 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                         coriolis_term[1] = 2.0 * omega * 0.5*(uedge(i,j,k) + w0macx_arr(i,j,k) + uedge(i+1,j,k) + w0macx_arr(i+1,j,k));
                         coriolis_term[2] = 0.0;
                     } else {
-                        coriolis_term[0] = -2.0 * omega * (uold_arr(i,j,k,1) + w0cart_arr(i,j,k,1));
-                        coriolis_term[1] = 2.0 * omega * (uold_arr(i,j,k,0) + w0cart_arr(i,j,k,0));
+                        coriolis_term[0] = -2.0 * omega * (uold_arr(i,j,k,1) + w0_arr(i,j,k,1));
+                        coriolis_term[1] = 2.0 * omega * (uold_arr(i,j,k,0) + w0_arr(i,j,k,0));
                         coriolis_term[2] = 0.0;
                     }         
 #endif
