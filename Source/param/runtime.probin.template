@@ -52,10 +52,12 @@ contains
 
 subroutine runtime_init()
 
+  use amrex_parallel_module, only: amrex_parallel_ioprocessor
+
   implicit none
 
   integer :: status, un
-  character*250, probin_f
+  character(len=250), probin_f
   un = 1
 
   @@allocations@@
@@ -64,16 +66,18 @@ subroutine runtime_init()
 
   ! we're going to write the probin to a file because the PGI compiler doesn't like 
   ! reading namelists from arrays
-  probin_f = "tmp_build_dir/maestroex_sources/probin"
-  open(newunit=un, file=probin_f, action='write')
-  write(un, *) amrex_namelist
-  close(un)
+  probin_f = "probin"
+  if (amrex_parallel_ioprocessor()) then
+    open(newunit=un, file=probin_f, action='write')
+    write(un, *) amrex_namelist
+    close(un)
+  endif
 
   !   print*, amrex_namelist
   !   read (amrex_namelist, nml=probin, iostat=status)
   open(newunit=un, file=probin_f, status='old', action='read')
   read (unit=un, nml=probin, iostat=status)
-  close(un)
+  close(un, status='delete')
 
   if (status .ne. 0) then
      ! some problem in the namelist
