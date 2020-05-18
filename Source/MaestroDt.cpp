@@ -71,7 +71,11 @@ Maestro::EstDt ()
 
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_cart_dummy,do_add_utilde_force);
+                 w0_force_cart_dummy,
+#ifdef ROTATION
+                 w0mac, false,
+#endif   
+                 do_add_utilde_force);
 
 #if (AMREX_SPACEDIM == 3)
     // build and initialize grad_p0 for spherical case
@@ -422,9 +426,34 @@ Maestro::FirstDt ()
         vel_force[lev].setVal(0.);
     }
 
+#ifdef ROTATION
+    // face-centered
+    Vector<std::array< MultiFab, AMREX_SPACEDIM > > w0mac(finest_level+1);
+    // initialize
+    for (int lev=0; lev<=finest_level; ++lev) {
+        w0mac[lev][0].define(convert(grids[lev],nodal_flag_x), dmap[lev], 1, 1);
+        w0mac[lev][1].define(convert(grids[lev],nodal_flag_y), dmap[lev], 1, 1);
+        w0mac[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], 1, 1);
+    }
+
+    for (int lev=0; lev<=finest_level; ++lev) {
+        for (int idim=0; idim<AMREX_SPACEDIM; ++idim) {
+            w0mac[lev][idim].setVal(0.);
+        }
+    }
+
+    if (evolve_base_state && (use_exact_base_state == 0 && average_base_state == 0)) {
+        MakeW0mac(w0mac);
+    }
+#endif
+
     int do_add_utilde_force = 0;
     MakeVelForce(vel_force,umac_dummy,sold,rho0_old,grav_cell_old,
-                 w0_force_cart_dummy,do_add_utilde_force);
+                 w0_force_cart_dummy,
+#ifdef ROTATION
+                 w0mac, false,
+#endif   
+                 do_add_utilde_force);
 
 #if (AMREX_SPACEDIM == 3)
     // build and initialize grad_p0 for spherical case
