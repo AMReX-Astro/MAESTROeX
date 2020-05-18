@@ -290,7 +290,9 @@ Maestro::ExternInit ()
 
     if (ParallelDescriptor::IOProcessor()) {
         std::cout << "reading extern runtime parameters ..." << std::endl;
+        maestro_write_probin();
     }
+    ParallelDescriptor::Barrier();
 
     maestro_extern_init();
 
