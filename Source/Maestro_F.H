@@ -292,6 +292,7 @@ extern "C"
     void maestro_network_init();
     void maestro_eos_init();
     void maestro_extern_init();
+    void maestro_write_probin();
     void maestro_conductivity_init();
     void get_num_spec(int* nspec);
     void get_spec_names(int* spec_names, int* ispec, int* len);

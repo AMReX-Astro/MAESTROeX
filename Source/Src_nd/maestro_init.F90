@@ -79,7 +79,6 @@ contains
     ! initialize the external runtime parameters in
     ! extern_probin_module
     ! Binds to C function ``maestro_extern_init``
-    use amrex_fort_module, only: rt => amrex_real
     !
     call runtime_init()
 

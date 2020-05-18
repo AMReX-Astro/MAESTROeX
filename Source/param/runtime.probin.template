@@ -46,21 +46,55 @@ module runtime_init_module
 
   public :: probin
 
-  public :: runtime_init, runtime_close, runtime_pretty_print
+  public :: write_probin, runtime_init, runtime_close, runtime_pretty_print
 
 contains
 
-subroutine runtime_init()
+subroutine write_probin() bind(C, name="maestro_write_probin")
 
   implicit none
 
-  integer :: status
+  integer :: status, un
+  character(len=250) probin_f
+  un = 1
+
+  ! we're going to write the probin to a file because the PGI compiler doesn't like 
+  ! reading namelists from arrays
+  probin_f = "probin"
+  open(newunit=un, file=probin_f, action='write')
+  write(un, *) amrex_namelist
+  close(un)
+
+end subroutine write_probin
+
+
+subroutine runtime_init()
+
+  use amrex_parallel_module
+
+  implicit none
+
+  integer :: status, un
+  character(len=250) probin_f
+  un = 1
 
   @@allocations@@
 
   @@defaults@@
 
-  read (amrex_namelist, nml=probin, iostat=status)
+  !   print*, amrex_namelist
+  !   read (amrex_namelist, nml=probin, iostat=status)
+
+  probin_f = "probin"
+  open(newunit=un, file=probin_f, status='old', action='read')
+  read (unit=un, nml=probin, iostat=status)
+  close(un)
+
+  ! delete file 
+  if (amrex_parallel_ioprocessor()) then
+    open(newunit=un, file=probin_f, status='old', action='read')
+    close(un, status='delete')
+  endif
 
   if (status .ne. 0) then
      ! some problem in the namelist
