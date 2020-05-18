@@ -706,6 +706,10 @@ public:
                        const BaseState<amrex::Real>& rho0,
                        const BaseState<amrex::Real>& grav,
                        const amrex::Vector<amrex::MultiFab>& w0_force_cart,
+    #ifdef ROTATION
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const bool is_final_update,
+    #endif
                        int do_add_utilde_force);
 
     void ModifyScalForce(amrex::Vector<amrex::MultiFab>& scal_force,
