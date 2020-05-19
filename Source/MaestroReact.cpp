@@ -286,8 +286,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
         }
     } else {
-	// need non-constant basestate to apply toVector()
-	BaseState<Real> p0_var(p0);
+        // need non-constant basestate to apply toVector()
+        BaseState<Real> p0_var(p0);
         p0_var.toVector(p0_vec);
     }
 
