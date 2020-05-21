@@ -74,7 +74,7 @@ Maestro::DiagFile (const int step,
         rho_Hnuc          [lev].define(grids[lev], dmap[lev],       1, 0);
         sdc_source        [lev].define(grids[lev], dmap[lev],   Nscal, 0);
 
-	sdc_source[lev].setVal(0.0);
+        sdc_source[lev].setVal(0.0);
     }
 
 #ifndef SDC
@@ -85,9 +85,9 @@ Maestro::DiagFile (const int step,
     }
 #else
     if (dt < small_dt) {
-	ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_in, sdc_source);
+        ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_in, sdc_source);
     } else {
-	ReactSDC(s_in, stemp, rho_Hext, p0_in, dt*0.5, t_in, sdc_source);
+        ReactSDC(s_in, stemp, rho_Hext, p0_in, dt*0.5, t_in, sdc_source);
     }
 
     MakeReactionRates(rho_omegadot,rho_Hnuc,s_in);
