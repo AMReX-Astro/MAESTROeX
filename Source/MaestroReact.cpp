@@ -18,7 +18,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 const Real time_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::React()",React);
+    BL_PROFILE_VAR("Maestro::React()", React);
 
     // external heating
     if (do_heating) {
@@ -282,9 +282,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             p0_cart[lev].setVal(0.);
         }
 
-        if (drive_initial_convection) {
-            Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        }
+        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
     } else {
         // need non-constant basestate to apply toVector()
         BaseState<Real> p0_var(p0);
