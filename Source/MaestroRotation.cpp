@@ -20,9 +20,7 @@ using namespace amrex;
  rotation for such problems.
  */
 
-void
-Maestro::RotationInit()
-{
+void Maestro::RotationInit() {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RotationInit()", RotationInit);
 
@@ -31,5 +29,5 @@ Maestro::RotationInit()
     sin_theta = std::sin(theta_in_rad);
     cos_theta = std::cos(theta_in_rad);
 
-    omega = 2.0 * M_PI * rotational_frequency;   
+    omega = 2.0 * M_PI * rotational_frequency;
 }

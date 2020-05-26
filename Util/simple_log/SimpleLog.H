@@ -1,12 +1,12 @@
 #ifndef _SIMPLE_LOG_H_
 #define _SIMPLE_LOG_H_
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <state_indices.H>
 #include <AMReX_Print.H>
 #include <MaestroUtil.H>
+#include <state_indices.H>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <vector>
 
 /*
@@ -17,10 +17,8 @@ at the moment, the log size is fixed to MAX_LINES -- in the future
 we can update it reallocate the buffer as needed.
 */
 
-class SimpleLog
-{
-public:
-
+class SimpleLog {
+   public:
     SimpleLog() {
         log_data.resize(MAX_LINES);
         log_lines = 0;
@@ -32,8 +30,7 @@ public:
 
     void LogBreak();
 
-private:
-
+   private:
     static constexpr int MAX_LINES = 128;
 
     int log_lines;
