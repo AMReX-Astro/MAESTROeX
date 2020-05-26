@@ -11,6 +11,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                        const BaseState<Real>& rho0,
                        const BaseState<Real>& grav_cell,
                        const Vector<MultiFab>& w0_force_cart,
+#ifdef ROTATION
+                       const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& w0mac,
+                       const bool is_final_update,
+#endif
                        int do_add_utilde_force)
 {
     // timer for profiling
@@ -54,6 +58,10 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
     Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
     Put1dArrayOnCart(grav_cell, grav_cart, false, true, bcs_f, 0);
 
+#ifdef ROTATION
+    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_f, 0);
+#endif
+
     // Reset vel_force
     for (int lev=0; lev<=finest_level; ++lev) {
         vel_force_cart[lev].setVal(0.);
@@ -63,6 +71,7 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
         
         // Get grid spacing
         const auto dx = geom[lev].CellSizeArray();
+        const auto prob_lo = geom[lev].ProbLoArray();
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -99,6 +108,9 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
 
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
+#ifdef ROTATION
+                    Abort("MakeVelForce: rotation not implemented for planar");
+#endif
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
                     
                     // cutoff the buoyancy term if we are outside of the star
@@ -138,9 +150,42 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
             } else {  // spherical
 #if (AMREX_SPACEDIM == 3)
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
-            
+
+#ifdef ROTATION
+                const Array4<const Real> w0macx_arr = w0mac[lev][0].array(mfi);
+                const Array4<const Real> w0macy_arr = w0mac[lev][1].array(mfi);
+                const Array4<const Real> uold_arr = uold[lev].array(mfi);
+#endif
+
                 AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, 
                 {
+#ifdef ROTATION
+                    const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
+                    const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+                    const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
+
+                    Real centrifugal_term[3];
+                    centrifugal_term[0] = -omega*omega*x;
+                    centrifugal_term[1] = -omega*omega*y;
+                    centrifugal_term[2] = 0.0;
+                    Real coriolis_term[3];
+
+                    if (rho_arr(i,j,k) < buoyancy_cutoff_factor*base_cutoff_density) {
+                        for (auto d = 0; d < AMREX_SPACEDIM; ++d) {
+                            centrifugal_term[d] = 0.0;
+                        }
+                    }
+
+                    if (is_final_update) {
+                        coriolis_term[0] = -2.0 * omega * 0.5*(vedge(i,j,k) + w0macy_arr(i,j,k) + vedge(i,j+1,k) + w0macy_arr(i,j+1,k));
+                        coriolis_term[1] = 2.0 * omega * 0.5*(uedge(i,j,k) + w0macx_arr(i,j,k) + uedge(i+1,j,k) + w0macx_arr(i+1,j,k));
+                        coriolis_term[2] = 0.0;
+                    } else {
+                        coriolis_term[0] = -2.0 * omega * (uold_arr(i,j,k,1) + w0_arr(i,j,k,1));
+                        coriolis_term[1] = 2.0 * omega * (uold_arr(i,j,k,0) + w0_arr(i,j,k,0));
+                        coriolis_term[2] = 0.0;
+                    }         
+#endif
                     Real rhopert = rho_arr(i,j,k) - rho0_arr(i,j,k);
 
                     // cutoff the buoyancy term if we are outside of the star
@@ -153,6 +198,11 @@ Maestro::MakeVelForce (Vector<MultiFab>& vel_force_cart,
                     for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
                         vel_force(i,j,k,dim) = (rhopert*grav(i,j,k,dim) - gpi_arr(i,j,k,dim))/rho_arr(i,j,k) - w0_force(i,j,k,dim);
                     }
+#ifdef ROTATION
+                    for (int dim=0; dim < AMREX_SPACEDIM; ++dim) {
+                        vel_force(i,j,k,dim) += -coriolis_term[dim] - centrifugal_term[dim];
+                    }
+#endif
                     
                     if (do_add_utilde_force == 1) {
                         Real Ut_dot_er = 0.5*(uedge(i,j,k)+uedge(i+1,j  ,k  ))*normal_arr(i,j,k,0) + 

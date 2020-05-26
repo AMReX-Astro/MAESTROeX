@@ -79,7 +79,6 @@ contains
     ! initialize the external runtime parameters in
     ! extern_probin_module
     ! Binds to C function ``maestro_extern_init``
-    use amrex_fort_module, only: rt => amrex_real
     !
     call runtime_init()
 
@@ -200,4 +199,18 @@ contains
 
   end subroutine get_rel_eps
 
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_model_initialized(model_init_in) bind(C,name="get_model_initialized")
+    ! Binds to C function ``get_model_initialized``
+
+    integer, intent(inout) :: model_init_in
+
+    ! note logical type is implicitly converted to int
+    model_init_in = model_initialized
+
+  end subroutine get_model_initialized
+  
 end module maestro_init_module

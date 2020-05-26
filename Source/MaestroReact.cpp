@@ -18,7 +18,7 @@ Maestro::React (const Vector<MultiFab>& s_in,
                 const Real time_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::React()",React);
+    BL_PROFILE_VAR("Maestro::React()", React);
 
     // external heating
     if (do_heating) {
@@ -273,7 +273,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
     Vector<MultiFab> p0_cart(finest_level+1);
 
     // make a Fortran-friendly RealVector of p0
-    RealVector p0_vec((max_radial_level+1)*nr_fine);
+    RealVector p0_vec((base_geom.max_radial_level+1)*base_geom.nr_fine);
 
     if (spherical) {
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -281,11 +281,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in,
             p0_cart[lev].setVal(0.);
         }
 
-        if (drive_initial_convection) {
-            Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
-        }
+        Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
     } else {
-        p0.toVector(p0_vec);
+        // need non-constant basestate to apply toVector()
+        BaseState<Real> p0_var(p0);
+        p0_var.toVector(p0_vec);
     }
 
     for (int lev=0; lev<=finest_level; ++lev) {

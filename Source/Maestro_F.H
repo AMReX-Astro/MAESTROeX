@@ -303,7 +303,8 @@ extern "C"
 
     void set_rel_eps (const amrex::Real* rel_eps_in);
     void get_rel_eps (const amrex::Real* rel_eps_in);
-
+    void get_model_initialized (const int* model_init_in);
+    
     void init_base_state (const amrex::Real* s0_init,
                           const amrex::Real* p0_init,
                           const amrex::Real* rho0,

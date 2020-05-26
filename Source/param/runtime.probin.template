@@ -52,7 +52,7 @@ contains
 
 subroutine runtime_init()
 
-  implicit none
+
 
   integer :: status
 
