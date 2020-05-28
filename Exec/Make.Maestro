@@ -98,7 +98,7 @@ endif
 # directories into VPATH_LOCATIONS and INCLUDE_LOCATIONS for us, so we
 # don't need to do it here
 
-Pdirs 	:= Base Boundary AmrCore LinearSolvers/C_CellMG LinearSolvers/MLMG F_Interfaces/Base
+Pdirs 	:= Base Boundary AmrCore LinearSolvers/C_CellMG LinearSolvers/MLMG
 
 Bpack	+= $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
 
@@ -118,6 +118,20 @@ USE_CONDUCTIVITY := TRUE
 
 USE_CXX_EOS := TRUE
 
+ifeq ($(USE_REACT), TRUE)
+  DEFINES += -DREACTIONS
+  ifeq ($(USE_SDC), TRUE)
+    # we need the compositional derivatives for SDC
+    DEFINES += -DEXTRA_THERMO
+   endif
+endif
+      
+# Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
+ifeq ($(USE_SDC), TRUE)
+  USE_SIMPLIFIED_SDC = TRUE
+  DEFINES += -DSDC -DSIMPLIFIED_SDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
+endif
+      
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)

@@ -3,19 +3,19 @@
 maestro.model_file = "model.hse.cool.coulomb"
 maestro.perturb_model = true
 
-maestro.ppm_type = 2
+maestro.ppm_type = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.0    5.00625e7
-geometry.prob_hi     =  2.16e8 3.740625e8
+geometry.prob_lo     =  0.0    0.0    0.0
+geometry.prob_hi     =  3.6e7  3.6e7  2.88e8
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 0 4
-maestro.hi_bc = 0 2
-geometry.is_periodic =  1 0 0
+maestro.lo_bc = 0 0 4
+maestro.hi_bc = 0 0 2
+geometry.is_periodic =  1 1 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
@@ -24,16 +24,19 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 384 576
-amr.max_grid_size      = 64
+amr.n_cell             = 64 64 512
+amr.max_grid_size      = 32
 amr.max_level          = 0       # maximum level number allowed
-maestro.regrid_int     = 2       # how often to regrid
-amr.ref_ratio          = 2 2 2 2 # refinement ratio
+maestro.regrid_int     = 4       # how often to regrid
+amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
+# TAGGING
+maestro.use_tpert_in_tagging = true
+
 # TIME STEPPING
-maestro.max_step  = 1000000
+maestro.max_step  = 5000
 maestro.stop_time = 2.5
 maestro.cfl       = 0.9    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -42,36 +45,36 @@ maestro.cfl       = 0.9    # cfl number for hyperbolic system
 		           # to satisfy CFL condition.
 
 # ALGORITHMIC OPTIONS
+maestro.spherical = 0
 maestro.evolve_base_state = true
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 3
+maestro.init_divu_iter        = 1
 maestro.init_iter             = 1
+
+maestro.grav_const = -1.5e10
 
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
-
-maestro.use_delta_gamma1_term = false
 
 maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 10.e0
 maestro.sponge_kappa = 10.e0
 
-#maestro.enthalpy_pred_type = 0
-#maestro.species_pred_type = 2
 maestro.use_tfromp = true
+maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = sdc_plt # root name of plot file
+maestro.plot_base_name  = sdc_3d_plt    # root name of plot file
 maestro.plot_int   = 100      # number of timesteps between plot files
 maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
-maestro.check_base_name = sdc_chk
+maestro.check_base_name = sdc_3d_chk
 maestro.chk_int         = 100
 
 # tolerances for the initial projection
-maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_cart = 1.e-8
 maestro.eps_init_proj_sph  = 1.e-10
 # tolerances for the divu iterations
 maestro.eps_divu_cart      = 1.e-12
@@ -114,5 +117,7 @@ maestro.deterministic_nodal_solve = true
   ! in the namelist.
 
   use_eos_coulomb = T
-
+  jacobian = 2
+  
 /
+
