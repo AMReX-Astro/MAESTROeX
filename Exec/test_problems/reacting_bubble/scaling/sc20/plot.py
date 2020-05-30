@@ -59,7 +59,7 @@ def plot():
 
     throughput_arr = throughput_arr / throughput_arr[0] / nnodes_arr
 
-    plt.plot(nnodes_arr, throughput_arr, linestyle='-', lw=4)
+    plt.plot(nnodes_arr, throughput_arr, linestyle='-', lw=4, marker='o', markersize=14)
 
     plt.xlim([0.9 * min(nnodes_arr), 1.1 * max(nnodes_arr)])
     plt.ylim([0, 1.25 * max(throughput_arr)])
