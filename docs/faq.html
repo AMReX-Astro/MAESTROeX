@@ -8,8 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Frequently Asked Questions &mdash; MAESTROeX 20.05
- documentation</title>
+  <title>Frequently Asked Questions &mdash; MAESTROeX  documentation</title>
   
 
   
@@ -66,11 +65,6 @@
 
           
             
-            
-              <div class="version">
-                20.05
-
-              </div>
             
           
 
@@ -327,8 +321,7 @@ any allocated memory, and gracefully exit. Be sure to remove the
 same directory.</p>
 </li>
 <li><p><em>When I run I get the error</em></p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reading</span> <span class="n">extern</span> <span class="n">runtime</span> <span class="n">parameters</span> <span class="o">...</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reading</span> <span class="n">extern</span> <span class="n">runtime</span> <span class="n">parameters</span> <span class="o">...</span>
 <span class="n">ERROR</span><span class="p">:</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">namelist</span>
 </pre></div>
 </div>
@@ -336,7 +329,6 @@ same directory.</p>
 does not understand or is not expecting. A common example is if the problem
 is built with the helmholtz EoS, but the extern namelist has gamma law
 parameters.</p>
-</div></blockquote>
 </li>
 <li><p><em>How can I check the compilation parameters of a MAESTROeX executable?</em></p>
 <p>The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as</p>
@@ -383,6 +375,17 @@ in each. You need to then issue:</p>
 <li><p><em>How can I get more information about floating point exceptions?</em></p>
 <p>AMReX can intercept floating point exceptions and provide a helpful
 backtrace file that shows you where they were generated.</p>
+</li>
+<li><p><em>How can I get information about potential bugs before running the code?</em></p>
+<p>We run <a class="reference external" href="https://clang.llvm.org/extra/clang-tidy/">clang-tidy</a> on all pull requests using a <a class="reference external" href="https://github.com/AMReX-Astro/cpp-linter-action">GitHub action</a>. <code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> analyzes the source code, produces warnings for potential bugs and offers suggestions for performance improvements.</p>
+<p><code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> can also be run locally. This requires the <code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> and <code class="docutils literal notranslate"><span class="pre">bear</span></code> packages (installed using e.g. <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">bear</span> <span class="pre">clang-tidy</span></code> on Ubuntu), and the python script
+<code class="docutils literal notranslate"><span class="pre">run-clang-tidy.py</span></code> (which can be downloaded from <a class="reference external" href="https://github.com/AMReX-Astro/cpp-linter-action/blob/master/run-clang-tidy.py">here</a>). The analysis is performed by first compiling a problem using the <code class="docutils literal notranslate"><span class="pre">bear</span></code> package, then running the python script to analyze the source files. From within a problem directory, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bear make -j <span class="m">20</span> <span class="nv">USE_OMP</span><span class="o">=</span>FALSE <span class="nv">USE_MPI</span><span class="o">=</span>FALSE <span class="nv">DEBUG</span><span class="o">=</span>TRUE
+
+python3 run-clang-tidy.py -header-filter<span class="o">=</span><span class="s1">&#39;MAESTROeX&#39;</span> -ignore-files<span class="o">=</span><span class="s1">&#39;amrex|Microphysics&#39;</span> -j <span class="m">20</span> &gt; clang-tidy-report.txt
+</pre></div>
+</div>
+<p>The compiler flags can be modified to suit the problem to be analyzed, but the <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> flag must be set to <code class="docutils literal notranslate"><span class="pre">TRUE</span></code>. The <code class="docutils literal notranslate"><span class="pre">header-filter</span></code> option for the python script tells the script to only analyze header files containing the given regex pattern, and the <code class="docutils literal notranslate"><span class="pre">ignore-files</span></code> flag tells it to ignore any source files containing the given regex pattern. The <code class="docutils literal notranslate"><span class="pre">-j</span></code> option tells the script to run a given number of processes in parallel. The output is then redirected to a text file.</p>
 </li>
 </ol>
 </div>

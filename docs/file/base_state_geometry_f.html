@@ -8,8 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>base_state_geometry.F90 &mdash; MAESTROeX 20.05
- documentation</title>
+  <title>base_state_geometry.F90 &mdash; MAESTROeX  documentation</title>
   
 
   
@@ -66,11 +65,6 @@
 
           
             
-            
-              <div class="version">
-                20.05
-
-              </div>
             
           
 
@@ -159,9 +153,7 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="enforce_HSE_f.html">enforce_HSE.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="initdata_f.html">initdata.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
@@ -395,7 +387,7 @@ the base state arrays begin with index 0, not 1.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
-<li><p><strong>cc_to_r</strong> (c_hi(1)-(c_lo(1))+1,c_hi(2)-(c_lo(2))+1,c_hi(3)-(c_lo(3))+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
+<li><p><strong>cc_to_r</strong> (c_hi(1)-(c_lo(1))+1,c_hi(2)-(c_lo(2))+1,c_hi(3)-(c_lo(3))+1)<em> [</em><em>integer</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>c_lo</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>c_hi</strong> (3)<em> [</em><em>integer</em><em>,</em><em>in</em><em>]</em></p></li>
 <li><p><strong>dx_fine</strong> (amrex_spacedim-1+1)<em> [</em><em>double precision</em><em>,</em><em>in</em><em>]</em></p></li>
@@ -443,7 +435,7 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="enforce_HSE_f.html#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -459,7 +451,7 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
 </ul>
 </dd>
 <dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="enforce_HSE_f.html#f/enforce_hse_module/enforce_hse" title="f/enforce_hse_module/enforce_hse"><code class="xref f f-func docutils literal notranslate"><span class="pre">enforce_hse()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
+<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
