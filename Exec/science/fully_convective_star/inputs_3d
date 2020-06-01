@@ -19,13 +19,14 @@ geometry.is_periodic =  0 0 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity
-maestro.mg_verbose = 2
+#maestro.mg_verbose = 2
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell = 384 384 384
+#amr.n_cell = 384 384 384
+amr.n_cell = 256 256 256
 amr.max_grid_size      = 128
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid

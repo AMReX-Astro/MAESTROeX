@@ -33,7 +33,7 @@ maestro.plot_base_name  = sdc_plt    # root name of plot file
 maestro.plot_int   = 200     # number of timesteps between plot files
 
 # CHECKPOINT
-maestro.check_base_name = chk
+maestro.check_base_name = sdc_chk
 maestro.chk_int         = 200
 
 # how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
@@ -79,7 +79,7 @@ maestro.use_tfromp = true
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 #SDC
-maestro.sdc_couple_mac_velocity = true
+maestro.sdc_couple_mac_velocity = false
 
 # OMP settings
 amrex.regtest_reduction = 1

@@ -65,12 +65,12 @@ maestro.use_tfromp = true
 maestro.use_thermal_diffusion = false
 
 # PLOTFILES
-maestro.plot_base_name  = sdc_3d_plt    # root name of plot file
+maestro.plot_base_name  = plt    # root name of plot file
 maestro.plot_int   = 100      # number of timesteps between plot files
 maestro.plot_deltat = 0.5e0
 
 # CHECKPOINT
-maestro.check_base_name = sdc_3d_chk
+maestro.check_base_name = chk
 maestro.chk_int         = 100
 
 # tolerances for the initial projection
