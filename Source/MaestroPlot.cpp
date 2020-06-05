@@ -3,6 +3,7 @@
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
 #include <iterator>     // std::istream_iterator
+#include <unistd.h>     // getcwd
 
 using namespace amrex;
 

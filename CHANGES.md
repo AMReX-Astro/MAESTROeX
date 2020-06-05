@@ -1,3 +1,15 @@
+# 20.06
+
+  * Completed converting base state vectors to C indexing
+
+  * SDC bug fixes: use_tfromp=T
+
+  * Fixed probin issue when compiling with PGI
+  
+  * Added AMReX as a submodule
+  
+  * Switch docs build to a Github action instead of Travis
+
 # 20.05
 
   * Created new base state and base state geometry classes
