@@ -316,7 +316,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              Vector<MultiFab>& scal_force,
                              Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                              const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
-			     const BaseState<Real>& p0, 
+                             const BaseState<Real>& p0, 
                              const Vector<MultiFab>& thermal)
 {
     // timer for profiling
