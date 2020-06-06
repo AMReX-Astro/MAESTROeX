@@ -120,7 +120,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	w0_old.copy(w0);
-
+	
 	// compute w0, w0_force, and delta_chi_w0
 	is_predictor = 1;
 	Makew0(w0_old, w0_force, Sbar_old, rho0_old, rho0_old,
