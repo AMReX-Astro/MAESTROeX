@@ -10,13 +10,13 @@ void
 Maestro::AdvanceTimeStep (bool is_initIter) {
 	
 	// // timer for profiling
-	// BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
+    BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
 
 	Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl << std::endl;
 
-        const auto nr_fine = base_geom.nr_fine;
-        const auto max_radial_level = base_geom.max_radial_level;
+    const auto nr_fine = base_geom.nr_fine;
+    const auto max_radial_level = base_geom.max_radial_level;
 
 	// vectors store the multilevel 1D states as one very long array
 	// these are cell-centered
@@ -28,6 +28,8 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	BaseState<Real> delta_chi_w0(max_radial_level+1, nr_fine);
 	BaseState<Real> Hext_bar(max_radial_level+1, nr_fine);
 	BaseState<Real> tempbar_new(max_radial_level+1, nr_fine);
+    BaseState<Real> rhoX0_old(max_radial_level+1, nr_fine, NumSpec);
+    BaseState<Real> rhoX0_new(max_radial_level+1, nr_fine, NumSpec);
 
 	// vectors store the multilevel 1D states as one very long array
 	// these are edge-centered
@@ -49,7 +51,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// ! compute initial gamma1bar_old
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        auto rho0_old_arr = rho0_old.array();
+    auto rho0_old_arr = rho0_old.array();
 	auto p0_old_arr = p0_old.array();
 	auto rhoX0_old_arr = rhoX0_old.array();
 	auto tempbar_arr = tempbar.array();
@@ -72,13 +74,23 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
 	}
 
+    // copy rhoX0_old 
+	auto s0_init_arr = s0_init.array();
+
+    for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
+            }
+        }
+	}
+
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! compute the heating term and Sbar
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	get_heating(Hext_bar.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
 	            rhoX0_old.dataPtr(), t_old, dt, base_geom.r_cc_loc.dataPtr());
-
 
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// ! make Sbar
@@ -108,7 +120,7 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	w0_old.copy(w0);
-
+	
 	// compute w0, w0_force, and delta_chi_w0
 	is_predictor = 1;
 	Makew0(w0_old, w0_force, Sbar_old, rho0_old, rho0_old,
@@ -336,6 +348,15 @@ Maestro::AdvanceTimeStep (bool is_initIter) {
         }
 	}
 
-	rhoX0_old.swap(rhoX0_new);
+	// rhoX0_old.swap(rhoX0_new);
 	tempbar.swap(tempbar_new);
+
+    // copy rhoX0_new into s0_init_arr
+    for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                s0_init_arr(n,r,FirstSpec+comp) = rhoX0_new_arr(n,r,comp);
+            }
+        }
+	}
 }

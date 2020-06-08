@@ -539,15 +539,15 @@ public:
 
     // SDC
     void EnthalpyAdvanceSDC (int which_step,
-			     amrex::Vector<amrex::MultiFab>& scalold,
-			     amrex::Vector<amrex::MultiFab>& scalnew,
-			     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
-			     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
-			     amrex::Vector<amrex::MultiFab>& scal_force,
-			     amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
-			     const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
-			     const BaseState<amrex::Real>& p0,
-			     const amrex::Vector<amrex::MultiFab>& diff);
+                             amrex::Vector<amrex::MultiFab>& scalold,
+                             amrex::Vector<amrex::MultiFab>& scalnew,
+                             amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
+                             amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
+                             amrex::Vector<amrex::MultiFab>& scal_force,
+                             amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+                             const amrex::Vector<std::array< amrex::MultiFab,AMREX_SPACEDIM > >& w0mac,
+                             const BaseState<amrex::Real>& p0,
+                             const amrex::Vector<amrex::MultiFab>& diff);
     ////////////////////////
 
     ////////////////////////
@@ -1962,8 +1962,6 @@ public:
     BaseState<amrex::Real> p0_init;
     BaseState<amrex::Real> rho0_old;
     BaseState<amrex::Real> rho0_new;
-    BaseState<amrex::Real> rhoX0_old; // for test_basestate
-    BaseState<amrex::Real> rhoX0_new; // for test_basestate
     BaseState<amrex::Real> rhoh0_old;
     BaseState<amrex::Real> rhoh0_new;
     BaseState<amrex::Real> p0_old;
