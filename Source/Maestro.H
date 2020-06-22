@@ -1357,6 +1357,13 @@ public:
     void MakeAbar(const amrex::Vector<amrex::MultiFab>& state,
                 amrex::Vector<amrex::MultiFab>& abar);
 
+#ifdef ROTATION
+    /// Brunt-Vaisala frequency, N
+    void MakeNFreq (const BaseState<amrex::Real>& p0_s,
+		    const BaseState<amrex::Real>& rho0_s, 
+		    amrex::Vector<amrex::MultiFab>& frequency);
+#endif
+    
     // end MaestroPlot.cpp functions
     ////////////
 

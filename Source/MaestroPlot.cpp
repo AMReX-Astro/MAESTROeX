@@ -703,6 +703,14 @@ Maestro::PlotFileMF (const int nPlot,
             plot_mf_data[i]->copy(tempmf_scalar1[i],0,dest_comp+1,1);
         }
         dest_comp += 2;
+
+#ifdef ROTATION
+	MakeNFreq(p0_old, rho0_old, tempmf);
+	for (int i = 0; i <= finest_level; ++i) {
+	    plot_mf_data[i]->copy(tempmf[i],0,dest_comp,1);
+	}
+	dest_comp++;
+#endif
     }
 
     if (do_sponge) {
@@ -818,6 +826,9 @@ Maestro::PlotFileVarNames (int * nPlot) const
     if (plot_pidivu) (*nPlot)++;
     if (plot_processors) (*nPlot)++;
     if (spherical) (*nPlot) += 2; // radial_velocity, circ_velocity
+#ifdef ROTATION
+    (*nPlot)++;
+#endif
     if (do_sponge) (*nPlot)++;
 
     Vector<std::string> names(*nPlot);
@@ -967,6 +978,9 @@ Maestro::PlotFileVarNames (int * nPlot) const
     if (spherical) {
         names[cnt++] = "radial_velocity";
         names[cnt++] = "circ_velocity";
+#ifdef ROTATION
+	names[cnt++] = "N_frequency";
+#endif
     }
 
     if (do_sponge) {
@@ -2250,3 +2264,60 @@ Maestro::MakeAbar (const Vector<MultiFab>& state,
     AverageDown(abar, 0, 1);
     FillPatch(t_old, abar, abar, abar, 0, 0, 1, 0, bcs_f);
 }
+
+#ifdef ROTATION
+void
+Maestro::MakeNFreq (const BaseState<Real>& p0_s,
+		    const BaseState<Real>& rho0_s, 
+		    Vector<MultiFab>& frequency)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeNFreq()",MakeNFreq);
+
+    BaseState<Real> entropy_s(1, base_geom.nr_fine);
+    BaseState<Real> grav_s(1, base_geom.nr_fine);
+    MakeGravCell(grav_s,rho0_s);
+    
+    const auto& r_cc_loc = base_geom.r_cc_loc;
+    const auto rho0 = rho0_s.const_array();
+    const auto p0 = p0_s.const_array();
+    const auto grav = grav_s.const_array();
+    auto entropy = entropy_s.array();
+    Real gamma;
+    
+    // dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+	eos_t eos_state;
+	
+	eos_state.rho = rho0(0,r);
+	eos_state.p     = p0(0,r);
+	for (auto comp = 0; comp < NumSpec; ++comp) {
+	    eos_state.xn[comp] = 1.0;
+	}
+	eos(eos_input_rp, eos_state);
+	gamma = eos_state.gam1;
+	
+	// printf("HACK, r = %d, p0 = %f, rho0 = %f\n", r, p0(0,r), rho0(0,r));
+	entropy(0,r) = 1.0/(gamma-1.0) * (log(p0(0,r)) - gamma*log(rho0(0,r)));
+    }
+    
+    BaseState<Real> freq0(1, base_geom.nr_fine);
+    auto freq = freq0.array();
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+	if (r == 0) {
+	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r))/(r_cc_loc(0,r+1)-r_cc_loc(0,r)); 
+	} else if (r < base_geom.base_cutoff_density_coord(0)-1) {
+	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r-1))/(r_cc_loc(0,r+1)-r_cc_loc(0,r-1));
+	} else {
+	    freq(0,r) = 0.0;
+	}
+	freq(0,r) = std::sqrt(fabs(freq(0,r)));
+    }
+
+    Put1dArrayOnCart(freq0,frequency,0,0,bcs_f,0);
+    
+    // average down and fill ghost cells
+    AverageDown(frequency, 0, 1);
+    FillPatch(t_old, frequency, frequency, frequency, 0, 0, 1 ,0, bcs_f);
+}
+#endif
