@@ -44,6 +44,9 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 		           # the 3D test, but need to use 0.7 in 2D
 		           # to satisfy CFL condition.
 
+# how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
+maestro.sum_interval = 1
+
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
 maestro.evolve_base_state = true
