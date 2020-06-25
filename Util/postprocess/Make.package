@@ -1,0 +1,3 @@
+CEXE_headers += Radial.H
+CEXE_sources += Radial.cpp
+CEXE_sources += Average.cpp
