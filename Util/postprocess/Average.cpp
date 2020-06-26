@@ -11,7 +11,6 @@ Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 // Assume we are spherical, and the averaging is done at constant radius.
 
 void Average (const Vector<Geometry>& geom,
-	      const GpuArray<Real,AMREX_SPACEDIM>& center,
 	      const Vector<MultiFab>& phi,
 	      BaseState<Real>& phibar,
 	      int comp)
@@ -103,7 +102,7 @@ void Average (const Vector<Geometry>& geom,
 		    Real radius = sqrt(x*x + y*y + z*z);
 		    
 		    // figure out which radii index this point maps into
-		    int index = round(((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0);
+		    int index = int(round(((radius/dx[0])*(radius/dx[0]) - 0.75) / 2.0));
 
 		    // due to roundoff error, need to ensure that we are in the proper radial bin
 		    if (index < nr_irreg) {

@@ -11,14 +11,18 @@ using namespace amrex;
 void
 WriteRadialFile (const std::string& plotfilename,
 		 const BaseState<Real>& rho0_in,
-		 const BaseState<Real>& rhoh0_in,
-		 const BaseState<Real>& p0_in,
 		 const Vector<MultiFab>& u_in,
 		 const Vector<MultiFab>& w0_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
 
+    BaseState<Real> p0(base_geom.max_radial_level+1,base_geom.nr_fine);
+    BaseState<Real> grav(base_geom.max_radial_level+1,base_geom.nr_fine);
+    
+    // need MakeGrav and enforceHSE to compute p0
+
+    
     std::string radialfilename = "radial_" + plotfilename;
 
     VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
@@ -45,8 +49,8 @@ WriteRadialFile (const std::string& plotfilename,
 
             for (int i=0; i<base_geom.nr(lev); ++i) {
                 RadialFile << base_geom.r_cc_loc(lev,i) << " "
-                           << rho0_in.array()(lev,i) << " "
-                           << p0_in.array()(lev,i) /*<< " "
+                           << rho0_in.array()(lev,i) /*<< " "
+                           << p0.array()(lev,i) << " "
                            << convectvel.array()(lev,i) << " "
                            << Nfreq.array()(lev,i)*/ << "\n";
             }

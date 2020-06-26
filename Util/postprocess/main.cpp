@@ -16,6 +16,7 @@ using namespace amrex;
 std::string inputs_name = "";
 BaseStateGeometry base_geom;
 int finest_level = 0;
+GpuArray<Real,3> center;
 
 // Prototypes
 std::string GetVarFromJobInfo (const std::string pltfile, const std::string& varname);
@@ -116,7 +117,6 @@ int main(int argc, char* argv[])
 	// setup geometry
 	const auto domainBoxFine = pltfile.probDomain(finest_level);
 	const auto dxFine = pltfile.cellSize(finest_level);
-	GpuArray<Real,3> center;
 	
 	// assume spherical
 	int drdxfac = GetdrdxFac(iFile);
@@ -127,9 +127,9 @@ int main(int argc, char* argv[])
 
 	// assume constant dr
 	if (!octant) {
-	    base_geom.nr_irreg = round( (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0 );
+	    base_geom.nr_irreg = int(round( (3*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0 ));
 	} else {
-	    base_geom.nr_irreg = round( (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0 );
+	    base_geom.nr_irreg = int(round( (3*(domhi-0.5)*(domhi-0.5)-0.75)/2.0 ));
 	}
 
 	double lenx, leny, lenz, max_dist;
@@ -151,12 +151,11 @@ int main(int argc, char* argv[])
 	// Radial states
 	BaseState<Real> rho0(base_geom.max_radial_level+1,base_geom.nr_fine);
 	BaseState<Real> rhoh0(base_geom.max_radial_level+1,base_geom.nr_fine);
-	BaseState<Real> p0(base_geom.max_radial_level+1,base_geom.nr_fine);
-	
+
+	Average(geom, rho_mf, rho0, 0);
 	
 	// Write radial output file
-	// WriteRadialFile (iFile,
-	// 		 rho0, rhoh0, p0, u_mf, w0_mf)
+	WriteRadialFile (iFile, rho0, u_mf, w0_mf);
 
 	
 	BL_PROFILE_VAR_STOP(pmain);
