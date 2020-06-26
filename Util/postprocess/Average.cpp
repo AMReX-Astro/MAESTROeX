@@ -10,8 +10,7 @@ Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 // Given a multifab of data (phi), average down to a base state quantity, phibar.
 // Assume we are spherical, and the averaging is done at constant radius.
 
-void Average (const Vector<Geometry>& geom,
-	      const Vector<MultiFab>& phi,
+void Average (const Vector<MultiFab>& phi,
 	      BaseState<Real>& phibar,
 	      int comp)
 {
@@ -45,7 +44,7 @@ void Average (const Vector<Geometry>& geom,
     for (int lev=0; lev<=finest_level; ++lev) {
 	
 	// Get the index space of the domain
-	const auto dx = geom[lev].CellSizeArray();
+	const auto dx = pgeom[lev].CellSizeArray();
 	
 	AMREX_PARALLEL_FOR_1D(nr_irreg+1, r, {
             radii(lev,r+1) = std::sqrt(0.75+2.0*Real(r)) * dx[0];
@@ -60,8 +59,8 @@ void Average (const Vector<Geometry>& geom,
     for (int lev=finest_level; lev>=0; --lev) {
 
 	// Get the grid size of the domain
-	const auto dx = geom[lev].CellSizeArray();
-	const auto prob_lo = geom[lev].ProbLoArray();
+	const auto dx = pgeom[lev].CellSizeArray();
+	const auto prob_lo = pgeom[lev].ProbLoArray();
 	
 	// get references to the MultiFabs at level lev
 	const MultiFab& phi_mf = phi[lev];

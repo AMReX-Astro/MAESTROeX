@@ -6,22 +6,36 @@
 
 using namespace amrex;
 
+Real t0 = 0.0;
 
 // write radial plotfile to disk
 void
 WriteRadialFile (const std::string& plotfilename,
 		 const BaseState<Real>& rho0_in,
+		 const BaseState<Real>& p0_in,
 		 const Vector<MultiFab>& u_in,
 		 const Vector<MultiFab>& w0_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
 
-    BaseState<Real> p0(base_geom.max_radial_level+1,base_geom.nr_fine);
-    BaseState<Real> grav(base_geom.max_radial_level+1,base_geom.nr_fine);
+    // MakeVelrc
+    Vector<MultiFab> rad_vel(finest_level+1);
+    Vector<MultiFab> circ_vel(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	rad_vel[lev]   .define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
+	circ_vel[lev]  .define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
+    }
+    MakeVelrc(u_in, w0_in, rad_vel, circ_vel);
     
-    // need MakeGrav and enforceHSE to compute p0
-
+    // MakeConvectionVel
+    BaseState<Real> convect_vel(base_geom.max_radial_level+1, base_geom.nr_fine);
+    MakeConvectionVel(rad_vel, convect_vel);
+    
+    // MakeRadialNFreq
+    BaseState<Real> Nfreq(base_geom.max_radial_level+1, base_geom.nr_fine);
+    MakeRadialNFreq(plotfilename, p0_in, rho0_in, Nfreq);
+    
     
     std::string radialfilename = "radial_" + plotfilename;
 
@@ -49,48 +63,55 @@ WriteRadialFile (const std::string& plotfilename,
 
             for (int i=0; i<base_geom.nr(lev); ++i) {
                 RadialFile << base_geom.r_cc_loc(lev,i) << " "
-                           << rho0_in.array()(lev,i) /*<< " "
-                           << p0.array()(lev,i) << " "
-                           << convectvel.array()(lev,i) << " "
-                           << Nfreq.array()(lev,i)*/ << "\n";
+                           << rho0_in.array()(lev,i) << " "
+                           << p0_in.array()(lev,i) << " "
+                           << convect_vel.array()(lev,i) << " "
+                           << Nfreq.array()(lev,i) << "\n";
             }
         }
     }
 
 }
 
+// FIXME: Get gamma from the job info file
+Real GetGamma (const std::string pltfile) {
+    auto gamma_str = GetVarFromJobInfo(pltfile, "eos_gamma");
+    // Print() << "gamma_str = " << gamma_str << std::endl;
+    
+    // retrieve first number
+    std::istringstream iss {gamma_str};
+    Real gamma;
+    std::string s;
+    if (std::getline(iss, s, ' '))
+	gamma = stod(s);
+    
+    return gamma;
+}
+
+
 void
-MakeRadialNFreq (const BaseState<Real>& p0_s,
+MakeRadialNFreq (const std::string& plotfilename,
+		 const BaseState<Real>& p0_s,
 		 const BaseState<Real>& rho0_s, 
 		 BaseState<Real>& freq0)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeRadialNFreq()",MakeRadialNFreq);
+    BL_PROFILE_VAR("Postprocessing::MakeRadialNFreq()",MakeRadialNFreq);
 
     BaseState<Real> entropy_s(1, base_geom.nr_fine);
     BaseState<Real> grav_s(1, base_geom.nr_fine);
     // need to compute gravity analogous to Maestro::MakeGravCell(grav_s,rho0_s);
+    
     
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto rho0 = rho0_s.const_array();
     const auto p0 = p0_s.const_array();
     const auto grav = grav_s.const_array();
     auto entropy = entropy_s.array();
-    Real gamma;
+    Real gamma = 5.0/3.0;
     
     // dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
-	eos_t eos_state;
-	
-	eos_state.rho = rho0(0,r);
-	eos_state.p     = p0(0,r);
-	for (auto comp = 0; comp < NumSpec; ++comp) {
-	    eos_state.xn[comp] = 1.0;
-	}
-	eos(eos_input_rp, eos_state);
-	gamma = eos_state.gam1;
-    
-	// printf("HACK, r = %d, p0 = %f, rho0 = %f\n", r, p0(0,r), rho0(0,r));
 	entropy(0,r) = 1.0/(gamma-1.0) * (log(p0(0,r)) - gamma*log(rho0(0,r)));
     }
     
@@ -107,18 +128,72 @@ MakeRadialNFreq (const BaseState<Real>& p0_s,
     }
 }
 
-/*
 void
-Maestro::MakeVelrc (const Vector<MultiFab>& vel,
-                    const Vector<MultiFab>& w0rcart,
-                    Vector<MultiFab>& rad_vel,
-                    Vector<MultiFab>& circ_vel)
+MakeConvectionVel (const Vector<MultiFab>& velr,
+		   BaseState<Real>& vel_conv)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeVelrc()",MakeVelrc);
+    BL_PROFILE_VAR("Postprocessing::MakeConvectionVel()",MakeConvectionVel);
 
+    Vector<MultiFab> vel2(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	vel2[lev].define(velr[lev].boxArray(), velr[lev].DistributionMap(), 1, 0);
+    }
+    
     for (int lev=0; lev<=finest_level; ++lev) {
 
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(velr[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            const Array4<const Real> velr_arr = velr[lev].array(mfi);
+            const Array4<Real> vel2_arr = vel2[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                vel2_arr(i,j,k) = 0.0;
+
+		// square radial vel
+                vel2_arr(i,j,k) = velr_arr(i,j,k)*velr_arr(i,j,k);
+            });
+        }
+    }
+
+    // average down and fill ghost cells
+    // AverageDown(vel2, 0, 1);
+    // FillPatch(t0, vel2, vel2, vel2, 0, 0, 1, 0, bcs_f);
+
+    // radial average of square of radial vel
+    Average(vel2, vel_conv, 0);
+
+    // root-mean-squared radial velocity
+    auto vel_conv_arr = vel_conv.array();
+
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+	vel_conv_arr(0,r) = std::sqrt(vel_conv_arr(0,r));
+    }
+    
+}
+
+void
+MakeVelrc (const Vector<MultiFab>& vel,
+	   const Vector<MultiFab>& w0rcart,
+	   Vector<MultiFab>& rad_vel,
+	   Vector<MultiFab>& circ_vel)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocessing::MakeVelrc()",MakeVelrc);
+
+    const auto& center_p = center;
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+	const auto dx = pgeom[lev].CellSizeArray();
+	const auto prob_lo = pgeom[lev].ProbLoArray();
+	
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -131,18 +206,27 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
             const Array4<Real> radvel_arr = rad_vel[lev].array(mfi);
             const Array4<Real> circvel_arr = circ_vel[lev].array(mfi);
             const Array4<const Real> w0rcart_arr = w0rcart[lev].array(mfi);
-            const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                 circvel_arr(i,j,k) = 0.0;
                 radvel_arr(i,j,k) = 0.0;
 
+		Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
+		Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
+		Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
+		Real inv_radius = 1.0 / sqrt(x*x + y*y + z*z);
+
+		Vector<Real> normal(3);	
+		normal[0] = x * inv_radius;
+		normal[1] = y * inv_radius;
+		normal[2] = z * inv_radius;
+		
                 for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
-                    radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal_arr(i,j,k,n);
+                    radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal[n];
                 }
                 
                 for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
-                    Real circ_comp = vel_arr(i,j,k,n) - radvel_arr(i,j,k) * normal_arr(i,j,k,n);
+                    Real circ_comp = vel_arr(i,j,k,n) - radvel_arr(i,j,k) * normal[n];
                     circvel_arr(i,j,k) += circ_comp * circ_comp;
                 }
 
@@ -155,12 +239,13 @@ Maestro::MakeVelrc (const Vector<MultiFab>& vel,
     }
 
     // average down and fill ghost cells
-    AverageDown(rad_vel, 0, 1);
-    FillPatch(t_old, rad_vel, rad_vel, rad_vel, 0, 0, 1, 0, bcs_f);
-    AverageDown(circ_vel, 0, 1);
-    FillPatch(t_old, circ_vel, circ_vel, circ_vel, 0, 0, 1, 0, bcs_f);
+    // AverageDown(rad_vel, 0, 1);
+    // FillPatch(t0, rad_vel, rad_vel, rad_vel, 0, 0, 1, 0, bcs_f);
+    // AverageDown(circ_vel, 0, 1);
+    // FillPatch(t0, circ_vel, circ_vel, circ_vel, 0, 0, 1, 0, bcs_f);
 }
 
+/*
 void
 Maestro::MakeVorticity (const Vector<MultiFab>& vel,
                         Vector<MultiFab>& vorticity)

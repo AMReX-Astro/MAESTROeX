@@ -16,11 +16,12 @@ using namespace amrex;
 std::string inputs_name = "";
 BaseStateGeometry base_geom;
 int finest_level = 0;
+Vector<BoxArray> grid;
+Vector<DistributionMapping> dmap;
+Vector<Geometry> pgeom;
 GpuArray<Real,3> center;
 
-// Prototypes
-std::string GetVarFromJobInfo (const std::string pltfile, const std::string& varname);
-
+// Helper subroutines
 int GetdrdxFac (const std::string pltfile);
 bool GetOctant (const std::string pltfile);
 
@@ -48,24 +49,24 @@ int main(int argc, char* argv[])
 	const auto probLo = pltfile.probLo();
 	const auto probHi = pltfile.probHi();
 	
-	Vector<BoxArray> grid(finest_level+1);
-	Vector<DistributionMapping> dmap(finest_level+1);
-	Vector<Geometry> geom(finest_level+1);
+	grid.resize(finest_level+1);
+	dmap.resize(finest_level+1);
+	pgeom.resize(finest_level+1);
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    grid[lev] = pltfile.boxArray(lev);
 	    dmap[lev] = pltfile.DistributionMap(lev);
 
 	    Box domain = pltfile.probDomain(lev);
 	    RealBox real_box(probLo, probHi);
-	    geom[lev].define(domain,&real_box);
+	    pgeom[lev].define(domain,&real_box);
 	}
 		
 	// read input MultiFabs
 	Vector<MultiFab> rho_mf(finest_level+1);
-	Vector<MultiFab> rhoh_mf(finest_level+1);
+	Vector<MultiFab> p0_mf(finest_level+1);
 	for (int lev = 0; lev <= finest_level; ++lev) {
 	    rho_mf[lev] = pltfile.get(lev, "rho");
-	    rhoh_mf[lev] = pltfile.get(lev, "rhoh");
+	    p0_mf[lev] = pltfile.get(lev, "p0");
 	}
 
 	Vector<MultiFab> rhoX_mf(finest_level+1);
@@ -79,6 +80,7 @@ int main(int argc, char* argv[])
 
 	// species
 	maestro_network_init();
+	
 	for (int i = 0; i < NumSpec; ++i) {
 	    int len = 20;
 	    Vector<int> int_spec_names(len);
@@ -146,16 +148,17 @@ int main(int argc, char* argv[])
 	base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
 	
 	// Print() << "Check: " << NumSpec << "; " << base_geom.dr_fine << ", " << base_geom.nr_fine << std::endl;
-	base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, finest_level, center);
+	base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, pgeom, finest_level, center);
 
 	// Radial states
 	BaseState<Real> rho0(base_geom.max_radial_level+1,base_geom.nr_fine);
-	BaseState<Real> rhoh0(base_geom.max_radial_level+1,base_geom.nr_fine);
+	BaseState<Real> p0(base_geom.max_radial_level+1,base_geom.nr_fine);
 
-	Average(geom, rho_mf, rho0, 0);
+	Average(rho_mf, rho0, 0);
+	Average(p0_mf, p0, 0);
 	
 	// Write radial output file
-	WriteRadialFile (iFile, rho0, u_mf, w0_mf);
+	WriteRadialFile(iFile, rho0, p0, u_mf, w0_mf);
 
 	
 	BL_PROFILE_VAR_STOP(pmain);
@@ -170,7 +173,7 @@ int main(int argc, char* argv[])
 std::string GetVarFromJobInfo (const std::string pltfile, const std::string& varname) {
     std::string filename = pltfile + "/job_info";
     //std::regex re("(?:[ \\t]*)" + varname + "\\s*:\\s*(.*)\\s*\\n");
-    std::regex re("\\b(" + varname + " = )([^ ]*)\\n");
+    std::regex re(varname + " = ([^ ]*)\\n");
     
     std::smatch m;
 
@@ -181,7 +184,7 @@ std::string GetVarFromJobInfo (const std::string pltfile, const std::string& var
 	std::string file_contents = buf.str();
 
 	if (std::regex_search(file_contents, m, re)) {
-	    return m[2];
+	    return m[1];
 	} else {
 	    Print() << "Unable to find " << varname << " in job_info file!" << std::endl;
 	}
@@ -195,7 +198,7 @@ std::string GetVarFromJobInfo (const std::string pltfile, const std::string& var
 // Get drdxfac from the job info file
 int GetdrdxFac (const std::string pltfile) {
     auto drdxfac_str = GetVarFromJobInfo(pltfile, "maestro.drdxfac");
-    // Print() << "drdxfac_str = " << drdxfac_str << std::endl;
+    Print() << "drdxfac_str = " << drdxfac_str << std::endl;
     
     // retrieve first number
     std::istringstream iss {drdxfac_str};
