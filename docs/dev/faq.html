@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,12 +11,19 @@
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -31,11 +37,6 @@
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Low Density Cutoffs" href="lo_density.html" />
@@ -54,7 +55,7 @@
 
 
           
-            <a href="index.html" class="icon icon-home"> MAESTROeX
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> MAESTROeX
           
 
           
@@ -79,11 +80,12 @@
 
           
     <div class="branch">
-        Branch: <a href="../faq.html">master</a> | <a href="./faq.html">development</a>
+        Branch: <a href="../faq.html">main</a> | <a href="./faq.html">development</a>
     </div>
 
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -157,6 +159,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -195,7 +198,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Frequently Asked Questions</li>
     
@@ -379,7 +382,7 @@ backtrace file that shows you where they were generated.</p>
 <li><p><em>How can I get information about potential bugs before running the code?</em></p>
 <p>We run <a class="reference external" href="https://clang.llvm.org/extra/clang-tidy/">clang-tidy</a> on all pull requests using a <a class="reference external" href="https://github.com/AMReX-Astro/cpp-linter-action">GitHub action</a>. <code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> analyzes the source code, produces warnings for potential bugs and offers suggestions for performance improvements.</p>
 <p><code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> can also be run locally. This requires the <code class="docutils literal notranslate"><span class="pre">clang-tidy</span></code> and <code class="docutils literal notranslate"><span class="pre">bear</span></code> packages (installed using e.g. <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">bear</span> <span class="pre">clang-tidy</span></code> on Ubuntu), and the python script
-<code class="docutils literal notranslate"><span class="pre">run-clang-tidy.py</span></code> (which can be downloaded from <a class="reference external" href="https://github.com/AMReX-Astro/cpp-linter-action/blob/master/run-clang-tidy.py">here</a>). The analysis is performed by first compiling a problem using the <code class="docutils literal notranslate"><span class="pre">bear</span></code> package, then running the python script to analyze the source files. From within a problem directory, run</p>
+<code class="docutils literal notranslate"><span class="pre">run-clang-tidy.py</span></code> (which can be downloaded from <a class="reference external" href="https://github.com/AMReX-Astro/cpp-linter-action/blob/main/run-clang-tidy.py">here</a>). The analysis is performed by first compiling a problem using the <code class="docutils literal notranslate"><span class="pre">bear</span></code> package, then running the python script to analyze the source files. From within a problem directory, run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bear make -j <span class="m">20</span> <span class="nv">USE_OMP</span><span class="o">=</span>FALSE <span class="nv">USE_MPI</span><span class="o">=</span>FALSE <span class="nv">DEBUG</span><span class="o">=</span>TRUE
 
 python3 run-clang-tidy.py -header-filter<span class="o">=</span><span class="s1">&#39;MAESTROeX&#39;</span> -ignore-files<span class="o">=</span><span class="s1">&#39;amrex|Microphysics&#39;</span> -j <span class="m">20</span> &gt; clang-tidy-report.txt
@@ -515,11 +518,19 @@ command line, and outputs the solution to a new plotfile.</p>
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2018-2020, MAESTROeX development tem
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -530,7 +541,6 @@ command line, and outputs the solution to a new plotfile.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
