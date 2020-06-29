@@ -321,7 +321,7 @@ CONDUCTIVITY_TOP_DIR, and NETWORK_TOP_DIR respectively.
 Generally, one does not need to include the problem directory itself
 in EXTRA_DIR, unless there are unique source files found there,
 described in a GPackage.mak file. These variables are
-interpreted by the GMaestro.mak file and used to build a master
+interpreted by the GMaestro.mak file and used to build a main
 list of packages called Fmdirs. The build system will attempt
 to build all of the files listed in the various GPackage.mak
 files found in the Fmdirs directories. Furthermore,
@@ -345,7 +345,7 @@ compiled. This is a Fortran module that holds the values of the
 runtime parameters and makes them available to any routine. By
 default, the build system looks for a file called \_parameters
 in the problem directory and adds those parameters along with the
-master list of MAESTROeX parameters (MAESTROeX/_parameters) to
+main list of MAESTROeX parameters (MAESTROeX/_parameters) to
 the probin_module.
 
 The final line in the GNUmakefile includes the rules to actually

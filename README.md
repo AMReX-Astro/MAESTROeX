@@ -96,13 +96,13 @@ Development generally follows the following ideas:
     change (or if they do, that the changes were expected).
 
     If a change is critical, we can cherry-pick the commit from
-    `development` to `master`.
+    `development` to `main`.
 
   * Contributions are welcomed from anyone.  *Any contributions that
     have the potential to change answers should be done via pull
     requests.*   A pull request should be generated from your fork of
     MAESTROeX and target the `development` branch.  (If you mistakenly
-    target `master`, we can change it for you.)
+    target `main`, we can change it for you.)
 
     If there are a number of small commits making up the PR, we may
     wish to squash commits upon merge to have a clean history.
@@ -110,14 +110,14 @@ Development generally follows the following ideas:
     since these will be used for a squashed commit message.*
 
   * On the first workday of each month, we perform a merge of
-    `development` into `master`, in coordination with `AMReX`,
+    `development` into `main`, in coordination with `AMReX`,
     `MAESTROeX`, and `Microphysics`.  For this merge to take place, we
     need to be passing the regression tests.
 
     To accommodate this need, we close the merge window into
     `development` a few days before the merge day.  While the merge
     window is closed, only bug fixes should be pushed into
-    `development`.  Once the merge from `development` -> `master` is
+    `development`.  Once the merge from `development` -> `main` is
     done, the merge window reopens.
 
 
