@@ -1,7 +1,7 @@
 # 20.07
 
   * The master branch has been renamed the main branch. If you have an
-    existing clone of Castro, then do the following to update for this
+    existing clone of MAESTROeX, then do the following to update for this
     change. First, do `git checkout master` if you're not already on the
     old master branch. Then do `git pull`. This will gather the updates
     to the repo, but will fail with the message `Your configuration specifies
