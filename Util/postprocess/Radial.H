@@ -25,11 +25,31 @@ void WriteRadialFile (const std::string& plotfilename,
 		      const amrex::Vector<amrex::MultiFab>& u_in,
 		      const amrex::Vector<amrex::MultiFab>& w0_in);
 
+// write additional diagnostics from model file
+void WriteModelDiagFile (const std::string& plotfilename);
+
+// read radial file from disk
+void ReadBaseCCFile (const std::string& plotfilename,
+		     BaseState<amrex::Real>& r_in,
+		     BaseState<amrex::Real>& rho0_in,
+		     BaseState<amrex::Real>& p0_in);
+
+// read input model file from disk
+void ReadModelFile (const std::string& plotfilename,
+		     BaseState<amrex::Real>& r_in,
+		     BaseState<amrex::Real>& rho0_in,
+		     BaseState<amrex::Real>& p0_in);
+
 // postprocessing subroutines
 void MakeRadialNFreq (const std::string& plotfilename,
 		      const BaseState<amrex::Real>& p0_s,
 		      const BaseState<amrex::Real>& rho0_s, 
-		      BaseState<amrex::Real>& freq0);
+		      BaseState<amrex::Real>& freq0,
+		      BaseState<amrex::Real>& entropy_s, BaseState<amrex::Real>& grav_s);
+
+void MakeRadialGrav (const BaseState<amrex::Real>& rho0_in,
+		     BaseState<amrex::Real>& grav,
+		     const BaseStateArray<amrex::Real>& r_cc_loc);
 
 void MakeConvectionVel (const amrex::Vector<amrex::MultiFab>& velr,
 			BaseState<amrex::Real>& vel_conv);

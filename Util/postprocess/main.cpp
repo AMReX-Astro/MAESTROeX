@@ -161,6 +161,11 @@ int main(int argc, char* argv[])
 	WriteRadialFile(iFile, rho0, p0, u_mf, w0_mf);
 
 	
+	// Write diag file for initial model
+	Print() << "Writing diag file for initial model" << std::endl;
+	WriteModelDiagFile("convective_M_0.30.hse.1024");
+	
+	
 	BL_PROFILE_VAR_STOP(pmain);
 
 	amrex::Finalize();
@@ -198,7 +203,7 @@ std::string GetVarFromJobInfo (const std::string pltfile, const std::string& var
 // Get drdxfac from the job info file
 int GetdrdxFac (const std::string pltfile) {
     auto drdxfac_str = GetVarFromJobInfo(pltfile, "maestro.drdxfac");
-    Print() << "drdxfac_str = " << drdxfac_str << std::endl;
+    // Print() << "drdxfac_str = " << drdxfac_str << std::endl;
     
     // retrieve first number
     std::istringstream iss {drdxfac_str};

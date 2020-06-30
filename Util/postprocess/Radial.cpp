@@ -17,7 +17,7 @@ WriteRadialFile (const std::string& plotfilename,
 		 const Vector<MultiFab>& w0_in)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::WritePlotFile()", WritePlotFile);
+    BL_PROFILE_VAR("Postprocess::WriteRadialFile()", WriteRadialFile);
 
     // MakeVelrc
     Vector<MultiFab> rad_vel(finest_level+1);
@@ -34,7 +34,9 @@ WriteRadialFile (const std::string& plotfilename,
     
     // MakeRadialNFreq
     BaseState<Real> Nfreq(base_geom.max_radial_level+1, base_geom.nr_fine);
-    MakeRadialNFreq(plotfilename, p0_in, rho0_in, Nfreq);
+    BaseState<Real> s0(base_geom.max_radial_level+1, base_geom.nr_fine);
+    BaseState<Real> grav0(base_geom.max_radial_level+1, base_geom.nr_fine);
+    MakeRadialNFreq(plotfilename, p0_in, rho0_in, Nfreq, s0, grav0);
     
     
     std::string radialfilename = "radial_" + plotfilename;
@@ -48,8 +50,6 @@ WriteRadialFile (const std::string& plotfilename,
 
             std::ofstream RadialFile;
             RadialFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
-            std::string levStr = std::to_string(lev);
-            radialfilename.append(levStr);
             RadialFile.open(radialfilename.c_str(), std::ofstream::out   |
                             std::ofstream::trunc |
                             std::ofstream::binary);
@@ -59,18 +59,202 @@ WriteRadialFile (const std::string& plotfilename,
 
             RadialFile.precision(17);
 
-            RadialFile << "r_cc  rho0  p0  convect_vel  |N| \n";
+            RadialFile << "r_cc  rho0  p0  convect_vel  s0  grav0  |N| \n";
 
             for (int i=0; i<base_geom.nr(lev); ++i) {
                 RadialFile << base_geom.r_cc_loc(lev,i) << " "
                            << rho0_in.array()(lev,i) << " "
                            << p0_in.array()(lev,i) << " "
                            << convect_vel.array()(lev,i) << " "
+                           << s0.array()(lev,i) << " "
+                           << grav0.array()(lev,i) << " "
                            << Nfreq.array()(lev,i) << "\n";
             }
         }
     }
 
+}
+
+// write additional diagnostics from model file
+void
+WriteModelDiagFile (const std::string& plotfilename)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::WriteModelDiagFile()", WriteModelDiagFile);
+
+    // Read from model file
+    BaseState<Real> r_cc, rho0, p0;
+    ReadModelFile(plotfilename, r_cc, rho0, p0);
+
+    int npts = rho0.length();
+    
+    // make dimensionless entropy
+    BaseState<Real> s0(1, npts);
+    const auto rho0_arr = rho0.const_array();
+    const auto p0_arr = p0.const_array();
+    auto entropy = s0.array();
+    Real gamma = 5.0/3.0;
+    for (auto r = 0; r < npts; ++r) {
+	entropy(0,r) = 1.0/(gamma-1.0) * (log(p0_arr(0,r)) - gamma*log(rho0_arr(0,r)));
+    }
+    
+    // make gravity
+    BaseState<Real> grav0(1, npts);
+    MakeRadialGrav(rho0, grav0, r_cc.array());
+    
+    // make B-V frequency
+    BaseState<Real> Nfreq(1, npts);
+    const auto r_cc_loc = r_cc.const_array();
+    const auto grav = grav0.const_array();
+    auto freq = Nfreq.array();
+    for (auto r = 0; r < npts; ++r) {
+	if (r == 0) {
+	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r))/(r_cc_loc(0,r+1)-r_cc_loc(0,r)); 
+	} else if (p0_arr(0,r) > 1.e12) {
+	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r-1))/(r_cc_loc(0,r+1)-r_cc_loc(0,r-1));
+	} else {
+	    freq(0,r) = 0.0;
+	}
+	freq(0,r) = std::sqrt(fabs(freq(0,r)));
+    }
+    
+    
+    std::string diagfilename = "diag_" + plotfilename;
+
+    VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+
+    // write out the cell-centered diagnostics
+    if (ParallelDescriptor::IOProcessor()) {
+
+	std::ofstream DiagFile;
+	DiagFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	DiagFile.open(diagfilename.c_str(), std::ofstream::out   |
+			std::ofstream::trunc |
+			std::ofstream::binary);
+	if(!DiagFile.good()) {
+	    amrex::FileOpenFailed(diagfilename);
+	}
+	
+	DiagFile.precision(17);
+	
+	DiagFile << "r_cc  rho0  p0  s0  grav0  |N| \n";
+
+	for (int i=0; i<npts; ++i) {
+	    DiagFile << r_cc.array()(0,i) << " "
+		     << rho0.array()(0,i) << " "
+		     << p0.array()(0,i) << " "
+		     << s0.array()(0,i) << " "
+		     << grav0.array()(0,i) << " "
+		     << Nfreq.array()(0,i) << "\n";
+	}
+    }
+
+}
+
+
+// read BaseCC file from plotfile directory
+void
+ReadBaseCCFile (const std::string& plotfilename,
+		BaseState<Real>& r_s,
+		BaseState<Real>& rho0_s,
+		BaseState<Real>& p0_s)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::ReadBaseCCFile()", ReadBaseCCFile);
+
+    auto r = r_s.array();
+    auto rho0 = rho0_s.array();
+    auto p0 = p0_s.array();
+    BaseState<Real> rhoh0_s(base_geom.max_radial_level+1, base_geom.nr_fine);
+    
+    // read BaseCC
+    std::string line, word;
+    std::string File(plotfilename + "/BaseCC_0");
+    Vector<char> fileCharPtr;
+    ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+    std::string fileCharPtrString(fileCharPtr.dataPtr());
+    std::istringstream is(fileCharPtrString, std::istringstream::in);
+
+    // read in cell-centered base state
+    std::getline(is, line);  // header line
+    for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
+	std::getline(is, line);
+	std::istringstream lis(line);
+	lis >> word;
+	r(i) = std::stod(word);
+	lis >> word;
+	rho0(i) = std::stod(word);
+	lis >> word;
+	rhoh0_s.array()(i) = std::stod(word);
+	lis >> word;
+	p0(i) = std::stod(word);
+	lis >> word;
+	// gamma1bar isn't needed for now
+    }
+}
+
+// read input model file from disk
+void
+ReadModelFile (const std::string& plotfilename,
+	       BaseState<Real>& r_s,
+	       BaseState<Real>& rho0_s,
+	       BaseState<Real>& p0_s)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::ReadModelFile()", ReadModelFile);
+    
+    // read model file
+    std::string line, word;
+    std::string File(plotfilename);
+    Vector<char> fileCharPtr;
+    ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+    std::string fileCharPtrString(fileCharPtr.dataPtr());
+    std::istringstream is(fileCharPtrString, std::istringstream::in);
+
+    // read in headers
+    // get npts, num vars
+    int npts, nvars, temp;
+    for (int i=0; i<2; ++i) {
+	std::getline(is, line);  
+	std::istringstream lis(line);
+	while (lis) {
+	    lis >> word;
+	    if (std::stringstream(word) >> temp) {
+		if (i == 0)
+		    npts = temp;
+		else if (i == 1)
+		    nvars = temp;
+	    }
+	}
+    }
+    // skip rest of headers
+    for (int i=0; i<nvars; ++i) 
+	std::getline(is, line);  
+    
+    // read in data
+    BaseState<Real> temp0_s(1, npts);
+    r_s.resize(1,npts);
+    rho0_s.resize(1,npts);
+    p0_s.resize(1,npts);
+    auto r = r_s.array();
+    auto rho0 = rho0_s.array();
+    auto p0 = p0_s.array();
+    
+    for (int i=0; i<npts; ++i) {
+	std::getline(is, line);
+	std::istringstream lis(line);
+	lis >> word;
+	r(0,i) = std::stod(word);
+	lis >> word;
+	rho0(0,i) = std::stod(word);
+	lis >> word;
+	temp0_s.array()(0,i) = std::stod(word);
+	lis >> word;
+	p0(0,i) = std::stod(word);
+	// species not needed
+    }
+    
+    // Print() << "HACK: " << r(0,0) << ", " << rho0(0,0) << ", " << p0(0,0) << std::endl;
 }
 
 // FIXME: Get gamma from the job info file
@@ -93,15 +277,18 @@ void
 MakeRadialNFreq (const std::string& plotfilename,
 		 const BaseState<Real>& p0_s,
 		 const BaseState<Real>& rho0_s, 
-		 BaseState<Real>& freq0)
+		 BaseState<Real>& freq0,
+		 BaseState<Real>& entropy_s, BaseState<Real>& grav_s)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Postprocessing::MakeRadialNFreq()",MakeRadialNFreq);
+    BL_PROFILE_VAR("Postprocess::MakeRadialNFreq()",MakeRadialNFreq);
 
-    BaseState<Real> entropy_s(1, base_geom.nr_fine);
-    BaseState<Real> grav_s(1, base_geom.nr_fine);
-    // need to compute gravity analogous to Maestro::MakeGravCell(grav_s,rho0_s);
-    
+    //BaseState<Real> entropy_s(1, base_geom.nr_fine);
+    //BaseState<Real> grav_s(1, base_geom.nr_fine);
+
+    // compute gravity
+    // analogous to Maestro::MakeGravCell(grav_s,rho0_s);
+    MakeRadialGrav(rho0_s,grav_s,base_geom.r_cc_loc);
     
     const auto& r_cc_loc = base_geom.r_cc_loc;
     const auto rho0 = rho0_s.const_array();
@@ -114,12 +301,13 @@ MakeRadialNFreq (const std::string& plotfilename,
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
 	entropy(0,r) = 1.0/(gamma-1.0) * (log(p0(0,r)) - gamma*log(rho0(0,r)));
     }
-    
+
+    // B-V freq = -(gam -1)/gam * g * grad(entropy)
     auto freq = freq0.array();
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
 	if (r == 0) {
 	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r))/(r_cc_loc(0,r+1)-r_cc_loc(0,r)); 
-	} else if (r < base_geom.base_cutoff_density_coord(0)-1) {
+	} else if (p0(0,r) > 1.e12) {
 	    freq(0,r) = -(gamma-1.0)/gamma*grav(0,r)*(entropy(0,r+1) - entropy(0,r-1))/(r_cc_loc(0,r+1)-r_cc_loc(0,r-1));
 	} else {
 	    freq(0,r) = 0.0;
@@ -129,11 +317,66 @@ MakeRadialNFreq (const std::string& plotfilename,
 }
 
 void
+MakeRadialGrav (const BaseState<Real>& rho0_in,
+		BaseState<Real>& grav,
+		const BaseStateArray<Real>& r_cc_loc)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::MakeRadialGrav()",MakeRadialGrav);
+    
+    auto grav_arr = grav.array();
+    const auto rho0 = rho0_in.const_array();
+    
+    // assume spherical
+    BaseState<Real> m_state(1, base_geom.nr_fine);
+    auto m = m_state.array();
+
+    m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
+    grav_arr(0,0) = -C::Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
+
+    for (auto r = 1; r < base_geom.nr_fine; ++r) {
+
+	// the mass is defined at the cell-centers, so to compute
+	// the mass at the current center, we need to add the
+	// contribution of the upper half of the zone below us and
+	// the lower half of the current zone.
+
+	// don't add any contributions from outside the star --
+	// i.e.  rho < base_cutoff_density
+	
+	// assume constant radial spacing, dr
+	Real r_edge_loc = (r_cc_loc(0,r-1) + r_cc_loc(0,r))/2.0;
+	
+	Real term1 = 0.0;
+	if (rho0(0,r-1) > base_cutoff_density) {
+	    term1 = 4.0/3.0*M_PI*rho0(0,r-1) *
+		(r_edge_loc - r_cc_loc(0,r-1)) *
+		(r_edge_loc*r_edge_loc +
+		 r_edge_loc*r_cc_loc(0,r-1) +
+		 r_cc_loc(0,r-1)*r_cc_loc(0,r-1));
+	}
+
+	Real term2 = 0.0;
+	if (rho0(0,r) > base_cutoff_density) {
+	    term2 = 4.0/3.0*M_PI*rho0(0,r)*
+		(r_cc_loc(0,r) - r_edge_loc) *
+		(r_cc_loc(0,r)*r_cc_loc(0,r) +
+		 r_cc_loc(0,r)*r_edge_loc +
+		 r_edge_loc*r_edge_loc);
+	}
+
+	m(0,r) = m(0,r-1) + term1 + term2;
+
+	grav_arr(0,r) = -C::Gconst * m(0,r) / (r_cc_loc(0,r)*r_cc_loc(0,r));
+    }
+}
+
+void
 MakeConvectionVel (const Vector<MultiFab>& velr,
 		   BaseState<Real>& vel_conv)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Postprocessing::MakeConvectionVel()",MakeConvectionVel);
+    BL_PROFILE_VAR("Postprocess::MakeConvectionVel()",MakeConvectionVel);
 
     Vector<MultiFab> vel2(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -185,7 +428,7 @@ MakeVelrc (const Vector<MultiFab>& vel,
 	   Vector<MultiFab>& circ_vel)
 {
     // timer for profiling
-    BL_PROFILE_VAR("Postprocessing::MakeVelrc()",MakeVelrc);
+    BL_PROFILE_VAR("Postprocess::MakeVelrc()",MakeVelrc);
 
     const auto& center_p = center;
     
@@ -246,322 +489,6 @@ MakeVelrc (const Vector<MultiFab>& vel,
 }
 
 /*
-void
-Maestro::MakeVorticity (const Vector<MultiFab>& vel,
-                        Vector<MultiFab>& vorticity)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeVorticity()",MakeVorticity);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        // get references to the MultiFabs at level lev
-        const MultiFab& vel_mf = vel[lev];
-
-        const Real* dx = geom[lev].CellSize();
-        const Box& domainBox = geom[lev].Domain();
-
-        const Real hx = dx[0];
-        const Real hy = dx[1];
-#if (AMREX_SPACEDIM == 3)
-        const Real hz = dx[2];
-#endif
-        const int ilo = domainBox.loVect()[0];
-        const int ihi = domainBox.hiVect()[0];
-        const int jlo = domainBox.loVect()[1];
-        const int jhi = domainBox.hiVect()[1];
-#if (AMREX_SPACEDIM == 3)
-        const int klo = domainBox.loVect()[2];
-        const int khi = domainBox.hiVect()[2];
-#endif
-
-        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(vel_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            Array4<const Real> const u = vel[lev].array(mfi);
-            Array4<Real> const vort = vorticity[lev].array(mfi);
-            GpuArray<int,AMREX_SPACEDIM*2> physbc;
-            for (int n = 0; n < AMREX_SPACEDIM*2; ++n) {
-                physbc[n] = phys_bc[n];
-            } 
-
-#if (AMREX_SPACEDIM == 2)
-
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
-            {
-                Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
-                Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
-
-                if (i == ilo && 
-                    (physbc[0] == Inflow || 
-                     physbc[0] == SlipWall || 
-                     physbc[0] == NoSlipWall)) 
-                {
-                    vx = (u(i+1,j,k,1) + 3.0*u(i,j,k,1) - 
-                          4.0*u(i-1,j,k,1)) / hx;
-                    uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
-
-                } else if (i == ihi+1 &&
-                        (physbc[AMREX_SPACEDIM] == Inflow || 
-                        physbc[AMREX_SPACEDIM] == SlipWall || 
-                        physbc[AMREX_SPACEDIM] == NoSlipWall))
-                {
-                    vx = -(u(i-1,j,k,1) + 3.0*u(i,j,k,1) - 
-                         4.0*u(i+1,j,k,1)) / hx;
-                    uy = 0.5 * (u(i,j+1,k,0) - u(i,j-1,k,0)) / hy;
-                }
-
-                if (j == jlo &&
-                    (physbc[1] == Inflow || 
-                     physbc[1] == SlipWall || 
-                     physbc[1] == NoSlipWall))
-                {
-                    vx = 0.5 * (u(i+1,j,k,1) - u(i-1,j,k,0)) / hx;
-                    uy = (u(i,j+1,k,0) + 3.0*u(i,j,k,0) - 
-                         4.0*u(i,j-1,k,0)) / hy;
-
-                } else if (j == jhi+1 && 
-                           (physbc[AMREX_SPACEDIM+1] == Inflow || 
-                            physbc[AMREX_SPACEDIM+1] == SlipWall || 
-                            physbc[AMREX_SPACEDIM+1] == NoSlipWall))
-                {
-                    vx = 0.5 * (u(i+1,j,k,1) - u(i-1,j,k,1)) / hx;
-                    uy = -(u(i,j-1,k,0) + 3.0*u(i,j,k,0) - 
-                         4.0*u(i,j+1,k,0)) / hy;
-                }
-
-                vort(i,j,k) = vx - uy;
-            });
-
-#else 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
-            {
-                Real uy = 0.5*(u(i,j+1,k,0)-u(i,j-1,k,0))/hy;
-                Real uz = 0.5*(u(i,j,k+1,0)-u(i,j,k-1,0))/hz;
-                Real vx = 0.5*(u(i+1,j,k,1)-u(i-1,j,k,1))/hx;
-                Real vz = 0.5*(u(i,j,k+1,1)-u(i,j,k-1,1))/hz;
-                Real wx = 0.5*(u(i+1,j,k,2)-u(i-1,j,k,2))/hx;
-                Real wy = 0.5*(u(i,j+1,k,2)-u(i,j-1,k,2))/hy;
-
-                bool fix_lo_x = (physbc[0] == Inflow || 
-                                 physbc[0] == NoSlipWall);
-                bool fix_hi_x = (physbc[AMREX_SPACEDIM] == Inflow || 
-                                 physbc[AMREX_SPACEDIM] == NoSlipWall);
-
-                bool fix_lo_y = (physbc[1] == Inflow || 
-                                 physbc[1] == NoSlipWall);
-                bool fix_hi_y = (physbc[AMREX_SPACEDIM+1] == Inflow ||
-                                 physbc[AMREX_SPACEDIM+1] == NoSlipWall);
-
-                bool fix_lo_z = (physbc[2] == Inflow || 
-                                 physbc[2] == NoSlipWall);
-                bool fix_hi_z = (physbc[AMREX_SPACEDIM+2] == Inflow ||
-                                 physbc[AMREX_SPACEDIM+2] == NoSlipWall);
-
-                // First do all the faces
-                if (fix_lo_x && i == ilo) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                } else if (fix_hi_x && i == ihi+1) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                }
-
-                if (fix_lo_y && j == jlo) {
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                } else if (fix_hi_y && j == jhi+1) {
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                }
-
-                if (fix_lo_z && k == klo) {
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_z && k == khi+1) {
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                // Next do all the edges
-                if (fix_lo_x && fix_lo_y && i == ilo && j == jlo) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                }
-
-                if (fix_hi_x && fix_lo_y && i == ihi+1 && j == jlo) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                }
-
-                if (fix_lo_x && fix_hi_y && i == ilo && j == jhi+1) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                }
-
-                if (fix_lo_x && fix_lo_z && i == ilo && k == klo) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_lo_z && i == ihi+1 && k == klo) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_x && fix_hi_z && i == ilo && k == khi+1) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_hi_z && i == ihi+1 && k == khi+1) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_y && fix_lo_z && j == jlo && k == klo) {
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_y && fix_lo_z && j == jhi+1 && k == klo) {
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_y && fix_hi_z && j == jlo && k == khi+1) {
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_y && fix_hi_z && j == jhi+1 && k == khi+1) {
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-                
-                // Finally do all the corners
-                if (fix_lo_x && fix_lo_y && fix_lo_z && 
-                    i == ilo && j == jlo && k == klo) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_lo_y && fix_lo_z &&
-                    i == ihi+1 && j == jlo && k == klo) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_x && fix_hi_y && fix_lo_z &&
-                    i == ilo && j == jhi+1 && k == klo) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_hi_y && fix_lo_z &&
-                    i == ihi+1 && j == jhi+1 && k == klo) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = (u(i,j,k+1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k-1,0))/(3.0*hz);
-                    vz = (u(i,j,k+1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k-1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_x && fix_lo_y && fix_hi_z &&
-                    i == ilo && j == jlo && k == khi+1) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_lo_y && fix_hi_z &&
-                    i == ihi+1 && j == jlo && k == khi+1) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uy = (u(i,j+1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j-1,k,0))/(3.0*hy);
-                    wy = (u(i,j+1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j-1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_lo_x && fix_hi_y && fix_hi_z &&
-                    i == ilo && j == jhi+1 && k == khi+1) {
-                    vx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    wx = (u(i+1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i-1,j,k,1))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                if (fix_hi_x && fix_hi_y && fix_hi_z &&
-                    i == ihi+1 && j == jhi+1 && k == khi+1) {
-                    vx = -(u(i-1,j,k,1)+3.0*u(i,j,k,1)-4.0*u(i+1,j,k,1))/(3.0*hx);
-                    wx = -(u(i-1,j,k,2)+3.0*u(i,j,k,2)-4.0*u(i+1,j,k,2))/(3.0*hx);
-                    uy = -(u(i,j-1,k,0)+3.0*u(i,j,k,0)-4.0*u(i,j+1,k,0))/(3.0*hy);
-                    wy = -(u(i,j-1,k,2)+3.0*u(i,j,k,2)-4.0*u(i,j+1,k,2))/(3.0*hy);
-                    uz = -(u(i,j,k-1,0)+3.0*u(i,j,k,0)-4.0*u(i,j,k+1,0))/(3.0*hz);
-                    vz = -(u(i,j,k-1,1)+3.0*u(i,j,k,1)-4.0*u(i,j,k+1,1))/(3.0*hz);
-                }
-
-                vort(i,j,k) = sqrt((wy-vz)*(wy-vz)+
-                    (uz-wx)*(uz-wx)+(vx-uy)*(vx-uy));
-            });
-#endif
-        }
-    }
-
-    // average down and fill ghost cells
-    AverageDown(vorticity,0,1);
-    FillPatch(t_old,vorticity,vorticity,vorticity,0,0,1,0,bcs_f);
-}
-
 void
 Maestro::MakeEntropy (const Vector<MultiFab>& state,
                       Vector<MultiFab>& entropy)
