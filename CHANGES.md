@@ -11,6 +11,8 @@
     the upstream repo on GitHub. If you like, you can then delete the old
     master branch with `git branch -D master`.
 
+  * Fixed unit test: test_basestate
+
 # 20.06
 
   * Completed converting base state vectors to C indexing
