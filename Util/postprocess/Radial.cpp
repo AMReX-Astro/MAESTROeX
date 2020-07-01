@@ -23,14 +23,25 @@ WriteRadialFile (const std::string& plotfilename,
     Vector<MultiFab> rad_vel(finest_level+1);
     Vector<MultiFab> circ_vel(finest_level+1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	rad_vel[lev]   .define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
-	circ_vel[lev]  .define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
+	rad_vel[lev] .define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
+	circ_vel[lev].define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
     }
     MakeVelrc(u_in, w0_in, rad_vel, circ_vel);
     
     // MakeConvectionVel
     BaseState<Real> convect_vel(base_geom.max_radial_level+1, base_geom.nr_fine);
     MakeConvectionVel(rad_vel, convect_vel);
+
+    // MakeRotationRate
+    Vector<MultiFab> omega(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	omega[lev].define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
+    }
+    MakeRotationRate(plotfilename, u_in, w0_in, omega);
+    
+    // MakeRadialRotationRatio
+    BaseState<Real> ratio_omega(base_geom.max_radial_level+1, base_geom.nr_fine);
+    MakeRadialRotationRatio(p0_in, omega, ratio_omega);
     
     // MakeRadialNFreq
     BaseState<Real> Nfreq(base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -59,15 +70,14 @@ WriteRadialFile (const std::string& plotfilename,
 
             RadialFile.precision(17);
 
-            RadialFile << "r_cc  rho0  p0  convect_vel  s0  grav0  |N| \n";
+            RadialFile << "r_cc  rho0  p0  convect_vel  omega_ratio  |N| \n";
 
             for (int i=0; i<base_geom.nr(lev); ++i) {
                 RadialFile << base_geom.r_cc_loc(lev,i) << " "
                            << rho0_in.array()(lev,i) << " "
                            << p0_in.array()(lev,i) << " "
                            << convect_vel.array()(lev,i) << " "
-                           << s0.array()(lev,i) << " "
-                           << grav0.array()(lev,i) << " "
+                           << ratio_omega.array()(lev,i) << " "
                            << Nfreq.array()(lev,i) << "\n";
             }
         }
@@ -422,6 +432,39 @@ MakeConvectionVel (const Vector<MultiFab>& velr,
 }
 
 void
+MakeRadialRotationRatio (const BaseState<Real>& s0_in,
+			 const Vector<MultiFab>& omega,
+			 BaseState<Real>& ratio_omega)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::RadialRotationRatio()",MakeConvectionVel);
+
+    // radial average of rotation rate
+    Average(omega, ratio_omega, 0);
+
+    // find radius of surface
+    int r_coord_surface = base_geom.nr_fine-1;
+    const auto s0 = s0_in.const_array();
+    for (auto r = 0; r < base_geom.nr_fine-1; ++r) {
+	if (s0(0,r) == s0(0,r+1)) {
+	    r_coord_surface = r;
+	    break;
+	}
+    }
+    
+    // divide by rotation rate at surface
+    auto ratio_omega_arr = ratio_omega.array();
+
+    for (auto r = 0; r < base_geom.nr_fine; ++r) {
+	if (r < r_coord_surface) 
+	    ratio_omega_arr(0,r) /= ratio_omega_arr(0,r_coord_surface);
+	else
+	    ratio_omega_arr(0,r) = 1.0;
+    }
+    
+}
+
+void
 MakeVelrc (const Vector<MultiFab>& vel,
 	   const Vector<MultiFab>& w0rcart,
 	   Vector<MultiFab>& rad_vel,
@@ -486,6 +529,76 @@ MakeVelrc (const Vector<MultiFab>& vel,
     // FillPatch(t0, rad_vel, rad_vel, rad_vel, 0, 0, 1, 0, bcs_f);
     // AverageDown(circ_vel, 0, 1);
     // FillPatch(t0, circ_vel, circ_vel, circ_vel, 0, 0, 1, 0, bcs_f);
+}
+
+// Get rotation frequency from the job info file
+Real GetRotationFreq (const std::string pltfile) {
+    auto rotationfreq_str = GetVarFromJobInfo(pltfile, "maestro.rotational_frequency");
+    // Print() << "rotationfreq_str = " << rotationfreq_str << std::endl;
+    
+    // retrieve first number
+    std::istringstream iss {rotationfreq_str};
+    Real freq0;
+    std::string s;
+    if (std::getline(iss, s, ' '))
+	freq0 = stod(s);
+    
+    return freq0;
+}
+
+void
+MakeRotationRate (const std::string& plotfilename,
+		  const Vector<MultiFab>& vel,
+		  const Vector<MultiFab>& w0cart,
+		  Vector<MultiFab>& omega)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::MakeRotationRate()",MakeRotationRate);
+
+    auto omega0 = GetRotationFreq(plotfilename);
+    const auto& center_p = center;
+    
+    for (int lev=0; lev<=finest_level; ++lev) {
+
+	const auto dx = pgeom[lev].CellSizeArray();
+	const auto prob_lo = pgeom[lev].ProbLoArray();
+	
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<const Real> w0cart_arr = w0cart[lev].array(mfi);
+            const Array4<Real> omega_arr = omega[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                omega_arr(i,j,k) = 0;
+
+		Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
+		Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
+		Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
+		Real inv_radius = 1.0 / sqrt(x*x + y*y + z*z);
+		Real inv_rsin = 1.0 / sqrt(x*x + y*y);
+
+		Real phi_x = -y * inv_radius * inv_rsin;
+		Real phi_y = x * inv_radius * inv_rsin;
+		
+		omega_arr(i,j,k) = phi_x*(vel_arr(i,j,k,0) + w0cart_arr(i,j,k))
+		                 + phi_y*(vel_arr(i,j,k,1) + w0cart_arr(i,j,k));
+                
+                // add constant rotation to get full rotation
+                omega_arr(i,j,k) += omega0;
+            });
+        }
+    }
+
+    // average down and fill ghost cells
+    // AverageDown(omega, 0, 1);
+    // FillPatch(t0, omega, omega, omega, 0, 0, 1, 0, bcs_f);
 }
 
 /*

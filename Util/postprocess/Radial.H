@@ -54,7 +54,16 @@ void MakeRadialGrav (const BaseState<amrex::Real>& rho0_in,
 void MakeConvectionVel (const amrex::Vector<amrex::MultiFab>& velr,
 			BaseState<amrex::Real>& vel_conv);
 
+void MakeRadialRotationRatio (const BaseState<amrex::Real>& s0_in,
+			      const amrex::Vector<amrex::MultiFab>& omega,
+			      BaseState<amrex::Real>& ratio_omega);
+
 void MakeVelrc (const amrex::Vector<amrex::MultiFab>& vel,
 		const amrex::Vector<amrex::MultiFab>& w0rcart,
 		amrex::Vector<amrex::MultiFab>& rad_vel,
 		amrex::Vector<amrex::MultiFab>& circ_vel);
+
+void MakeRotationRate (const std::string& plotfilename,
+		       const amrex::Vector<amrex::MultiFab>& vel,
+		       const amrex::Vector<amrex::MultiFab>& w0cart,
+		       amrex::Vector<amrex::MultiFab>& omega);
