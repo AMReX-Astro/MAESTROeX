@@ -12,11 +12,6 @@ extern amrex::Vector<amrex::Geometry> pgeom;
 // Read parameters from file
 std::string GetVarFromJobInfo (const std::string pltfile, const std::string& varname);
 
-// compute radially-averaged values
-void Average (const amrex::Vector<amrex::MultiFab>& phi,
-	      BaseState<amrex::Real>& phibar,
-	      int comp);
-
 
 // write radial plotfile to disk
 void WriteRadialFile (const std::string& plotfilename,
@@ -67,3 +62,24 @@ void MakeRotationRate (const std::string& plotfilename,
 		       const amrex::Vector<amrex::MultiFab>& vel,
 		       const amrex::Vector<amrex::MultiFab>& w0cart,
 		       amrex::Vector<amrex::MultiFab>& omega);
+
+void MakeMeridionalCirculation (const std::string& plotfilename,
+				const amrex::Vector<amrex::MultiFab>& vel,
+				const amrex::Vector<amrex::MultiFab>& w0rcart,
+				amrex::Vector<amrex::MultiFab>& radii_vel,
+				amrex::Geometry& geomFine);
+
+
+// in Average.cpp
+
+// compute radially-averaged values
+void Average (const amrex::Vector<amrex::MultiFab>& phi,
+	      BaseState<amrex::Real>& phibar,
+	      int comp);
+
+// compute averaged value onto r-theta (x-z) plane
+void Average2d (const amrex::Vector<amrex::MultiFab>& phi,
+		amrex::Vector<amrex::MultiFab>& phibar,
+		int barcomp, 
+		const amrex::Vector<amrex::Box>& bardomain,
+		int comp);

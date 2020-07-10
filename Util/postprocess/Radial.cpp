@@ -1,6 +1,6 @@
 #include <Radial.H>
 #include <Maestro.H>
-//#include <Maestro_F.H>
+//#include <AMReX_Utility.H>
 //#include <iterator>     // std::istream_iterator
 //#include <unistd.h>     // getcwd
 
@@ -19,6 +19,10 @@ WriteRadialFile (const std::string& plotfilename,
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::WriteRadialFile()", WriteRadialFile);
 
+    // ---------------------------------
+    // Write 1D radial diagnostics
+    // ---------------------------------
+    
     // MakeVelrc
     Vector<MultiFab> rad_vel(finest_level+1);
     Vector<MultiFab> circ_vel(finest_level+1);
@@ -42,19 +46,18 @@ WriteRadialFile (const std::string& plotfilename,
     // MakeRadialRotationRatio
     BaseState<Real> ratio_omega(base_geom.max_radial_level+1, base_geom.nr_fine);
     MakeRadialRotationRatio(p0_in, omega, ratio_omega);
-    
+
     // MakeRadialNFreq
     BaseState<Real> Nfreq(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> s0(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> grav0(base_geom.max_radial_level+1, base_geom.nr_fine);
     MakeRadialNFreq(plotfilename, p0_in, rho0_in, Nfreq, s0, grav0);
     
-    
     std::string radialfilename = "radial_" + plotfilename;
 
     VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
 
-    // write out the cell-centered diagnostics
+    // write out the radial cell-centered diagnostics
     if (ParallelDescriptor::IOProcessor()) {
 
         for (int lev=0; lev<=base_geom.max_radial_level; ++lev) {
@@ -83,6 +86,21 @@ WriteRadialFile (const std::string& plotfilename,
         }
     }
 
+
+    
+    // ---------------------------------
+    // Write 2D slice diagnostics
+    // ---------------------------------
+    
+    // MakeMeridionalCirculation
+    Geometry geomFine;
+    Vector<MultiFab> meridion_vel(1);
+    MakeMeridionalCirculation(plotfilename, u_in, w0_in, meridion_vel, geomFine);
+
+    std::string slicefilename = "slice_" + plotfilename;
+    
+    WriteSingleLevelPlotfile(slicefilename, meridion_vel[0], {"vel_radial", "vel_theta"}, geomFine, 0, 0);
+    
 }
 
 // write additional diagnostics from model file
@@ -336,15 +354,16 @@ MakeRadialGrav (const BaseState<Real>& rho0_in,
     
     auto grav_arr = grav.array();
     const auto rho0 = rho0_in.const_array();
+    const auto nr_fine = r_cc_loc.length();
     
     // assume spherical
-    BaseState<Real> m_state(1, base_geom.nr_fine);
+    BaseState<Real> m_state(1, nr_fine);
     auto m = m_state.array();
 
     m(0,0) = 4.0/3.0*M_PI*rho0(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0)*r_cc_loc(0,0);
     grav_arr(0,0) = -C::Gconst * m(0,0) / (r_cc_loc(0,0)*r_cc_loc(0,0));
 
-    for (auto r = 1; r < base_geom.nr_fine; ++r) {
+    for (auto r = 1; r < nr_fine; ++r) {
 
 	// the mass is defined at the cell-centers, so to compute
 	// the mass at the current center, we need to add the
@@ -599,6 +618,133 @@ MakeRotationRate (const std::string& plotfilename,
     // average down and fill ghost cells
     // AverageDown(omega, 0, 1);
     // FillPatch(t0, omega, omega, omega, 0, 0, 1, 0, bcs_f);
+}
+
+// Get max grid size from the job info file
+int GetMaxGridSize (const std::string pltfile) {
+    auto maxgridsize_str = GetVarFromJobInfo(pltfile, "amr.max_grid_size");
+    // Print() << "maxgridsize_str = " << maxgridsize_str << std::endl;
+    
+    // retrieve first number
+    std::istringstream iss {maxgridsize_str};
+    int max_grid_size;
+    std::string s;
+    if (std::getline(iss, s, ' '))
+	max_grid_size = stoi(s);
+    
+    return max_grid_size;
+}
+
+void
+MakeMeridionalCirculation (const std::string& plotfilename,
+			   const Vector<MultiFab>& vel,
+			   const Vector<MultiFab>& w0rcart,
+			   Vector<MultiFab>& circ_vel,
+			   Geometry& geomFine)
+{
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::MakeMeridionalCirculation()",MakeMeridionalCirculation);
+
+    // make circulation velocities
+    Vector<MultiFab> rad_vel(finest_level+1);
+    Vector<MultiFab> ang_vel(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	rad_vel[lev].define(vel[lev].boxArray(), vel[lev].DistributionMap(), 1, 0);
+	ang_vel[lev].define(vel[lev].boxArray(), vel[lev].DistributionMap(), 1, 0);
+    }
+    
+    const auto& center_p = center;
+    
+    for (int lev=finest_level; lev<=finest_level; ++lev) {
+
+	const auto dx = pgeom[lev].CellSizeArray();
+	const auto prob_lo = pgeom[lev].ProbLoArray();
+	
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            const Array4<const Real> vel_arr = vel[lev].array(mfi);
+            const Array4<Real> radvel_arr = rad_vel[lev].array(mfi);
+            const Array4<Real> angvel_arr = ang_vel[lev].array(mfi);
+            const Array4<const Real> w0rcart_arr = w0rcart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                radvel_arr(i,j,k) = 0.0;
+                angvel_arr(i,j,k) = 0.0;
+
+		Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
+		Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
+		Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
+		Real inv_radius = 1.0 / sqrt(x*x + y*y + z*z);
+		Real inv_xy = 1.0 / sqrt(x*x + y*y);
+
+		Vector<Real> normal(3);	
+		normal[0] = x * inv_radius;
+		normal[1] = y * inv_radius;
+		normal[2] = z * inv_radius;
+		
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    radvel_arr(i,j,k) += vel_arr(i,j,k,n) * normal[n];
+                }
+
+		Vector<Real> theta_dir(3);
+		theta_dir[0] = x*inv_radius * z*inv_xy;
+		theta_dir[1] = y*inv_radius * z*inv_xy;
+		theta_dir[2] = -inv_radius / inv_xy;
+		
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    angvel_arr(i,j,k) += vel_arr(i,j,k,n) * theta_dir[n];;
+                }
+
+                // add base state vel to get full radial velocity
+                radvel_arr(i,j,k) += w0rcart_arr(i,j,k);
+            });
+        }
+    }
+
+    // need single-level finest grid for whole domain
+    //  TODO: domain size should be larger than simply half x-z slice
+    //        since its diagonal plane has the largest area
+    const Box& domain0 = pgeom[0].Domain();
+    auto dom0_lo = domain0.loVect();
+    auto dom0_hi = domain0.hiVect();
+    IntVect ncell(0, 1, 0);
+    ncell[0] = (dom0_hi[0]+1)*(finest_level+1)/2 - 1;
+    ncell[2] = (dom0_hi[2]+1)*(finest_level+1)   - 1;
+    
+    IntVect domLo(AMREX_D_DECL(dom0_lo[0], dom0_lo[1], dom0_lo[2]));
+    IntVect domHi(AMREX_D_DECL(ncell[0], ncell[1], ncell[2]));
+    Box domain(domLo, domHi);
+    
+    // we only need half x-z plane because theta is between (0,pi)
+    auto prob_lo = pgeom[0].ProbLo();
+    auto prob_hi = pgeom[0].ProbHi();
+    const auto dx = pgeom[finest_level].CellSizeArray();
+
+    Real probLo[] = {prob_lo[0]+(prob_hi[0]-prob_lo[0])/2.0, prob_lo[1], prob_lo[2]};
+    Real probHi[] = {prob_hi[0], prob_lo[1]+2.0*dx[1], prob_hi[2]};
+    RealBox real_box(probLo, probHi);
+    
+    // make BoxArray and Geometry
+    BoxArray ba(domain);
+    int max_grid_size = GetMaxGridSize(plotfilename);
+    ba.maxSize(max_grid_size); 
+    DistributionMapping dm(ba);
+
+    geomFine.define(domain, &real_box);
+
+    // define velocities on new single-level grid
+    int numcomp = 2;
+    circ_vel[0].define(ba, dm, numcomp, 0);
+
+    // average to 2D r-theta (x-z) plane
+    Average2d(rad_vel, circ_vel, 0, {domain}, 0);
+    Average2d(ang_vel, circ_vel, 1, {domain}, 0);
 }
 
 /*
