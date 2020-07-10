@@ -35,11 +35,12 @@ int main(int argc, char* argv[])
 	BL_PROFILE_VAR("main()", pmain);
 
 	// plotfile names
-	std::string iFile;
+	std::string iFile, imFile;
 
 	// read in parameters from inputs file
 	ParmParse pp;
 	pp.query("infile", iFile);
+	pp.query("modelfile", imFile);  // optional
 	if (iFile.empty()) 
 	    Abort("You must specify plotfile");
 	
@@ -161,9 +162,11 @@ int main(int argc, char* argv[])
 	WriteRadialFile(iFile, rho0, p0, u_mf, w0_mf);
 
 	
-	// Write diag file for initial model
-	Print() << "Writing diag file for initial model" << std::endl;
-	WriteModelDiagFile("convective_M_0.30.hse.1024");
+	// Write diag file for initial model if specified
+	if (!imFile.empty()) {
+	    Print() << "Writing diag file for initial model" << std::endl;
+	    WriteModelDiagFile(imFile);
+	}
 	
 	
 	BL_PROFILE_VAR_STOP(pmain);
