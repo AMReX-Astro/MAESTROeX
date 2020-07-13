@@ -316,6 +316,7 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
                              Vector<MultiFab>& scal_force,
                              Vector<std::array< MultiFab, AMREX_SPACEDIM > >& umac,
                              const Vector<std::array< MultiFab,AMREX_SPACEDIM > >& w0mac,
+                             const BaseState<Real>& p0, 
                              const Vector<MultiFab>& thermal)
 {
     // timer for profiling
@@ -614,12 +615,12 @@ Maestro::EnthalpyAdvanceSDC (int which_step,
 
     Addw0(umac,w0mac,1.);
 
-    Vector<MultiFab> p0_new_cart(finest_level+1);
+    Vector<MultiFab> p0_cart(finest_level+1);
     for (int lev=0; lev<=finest_level; ++lev) {
-        p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 
-    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
+    UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_cart);
 }

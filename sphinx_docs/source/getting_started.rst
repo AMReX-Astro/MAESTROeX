@@ -352,19 +352,19 @@ directly with GNUplot, for example.
 Development Model
 =================
 
-When you clone MAESTROeX from github, you will be on the master
+When you clone MAESTROeX from github, you will be on the main
 branch of the repo. New changes to MAESTROeX are first introduced
 into the development branch in the MAESTROeX git repository.
 Nightly regression tests are run on development to ensure that
 our answers don’t change. Around the first work day of each month, we
-merge from development :math:`\rightarrow` master (assuming
+merge from development :math:`\rightarrow` main (assuming
 tests pass) and tag the state of the code with a date-based tag
 YY-MM. We do this on all the other repos in the AMReX-ecosystem,
 including amrex/, Microphysics/, and Castro/.
 
 If you want to contribute to MAESTROeX’s development, issue a pull-request
 through GitHub from your fork of MAESTROeX and target the development
-branch. (If you mistakenly target master, we can change it for you.)
+branch. (If you mistakenly target main, we can change it for you.)
 
 Parallel Jobs
 =============

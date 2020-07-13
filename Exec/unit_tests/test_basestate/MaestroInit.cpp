@@ -61,7 +61,6 @@ Maestro::Init ()
 
 	dtold = dt;
 	t_new = t_old + dt;
-
 }
 
 // fill in multifab and base state data
@@ -108,22 +107,8 @@ Maestro::InitData ()
 	// set p0^{-1} = p0_old
 	p0_nm1.copy(p0_old);
 
-        rhoX0_old.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
-        rhoX0_new.resize( base_geom.max_radial_level+1, base_geom.nr_fine, NumSpec);
-
-	auto rhoX0_old_arr = rhoX0_old.array();
-	const auto s0_init_arr = s0_init.const_array();
-	
-        for (auto n = 0; n < base_geom.max_radial_level; ++n) {
-	for (auto r = 0; r < base_geom.nr(n); ++r) {
-	    for (auto comp = 0; comp < NumSpec; ++comp) {
-		rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
-	    }
-	}
-	}
-
 	// set some stuff to zero
-        etarho_ec.setVal(0.0);
+    etarho_ec.setVal(0.0);
 	etarho_cc.setVal(0.0);
 	psi.setVal(0.0);
 	w0.setVal(0.);
@@ -150,6 +135,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	S_cc_new          [lev].define(ba, dm,              1,    0);
 	gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
 	dSdt              [lev].define(ba, dm,              1,    0);
+	w0_cart           [lev].define(ba, dm, AMREX_SPACEDIM,    2);
 	rhcc_for_nodalproj[lev].define(ba, dm,              1,    1);
 
 	pi[lev].define(convert(ba,nodal_flag), dm, 1, 0); // nodal
@@ -162,6 +148,7 @@ void Maestro::MakeNewLevelFromScratch (int lev, Real time, const BoxArray& ba,
 	S_cc_new          [lev].setVal(0.);
 	gpi               [lev].setVal(0.);
 	dSdt              [lev].setVal(0.);
+	w0_cart           [lev].setVal(0.);
 	rhcc_for_nodalproj[lev].setVal(0.);
 	pi                [lev].setVal(0.);
 

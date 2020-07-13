@@ -3,6 +3,7 @@
 #include <Maestro_F.H>
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
+#include <unistd.h>     // getcwd
 
 using namespace amrex;
 

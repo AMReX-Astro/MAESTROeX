@@ -416,7 +416,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
         // compute p0_nph
         p0_nph.copy(0.5*(p0_old + p0_new));
-
+                
         // hold dp0/dt in psi for enthalpy advance
         psi.copy((p0_new - p0_old) / dt);
     } else {
@@ -436,7 +436,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvanceSDC(1, sold, shat, sedge, sflux, scal_force, umac, w0mac,diff_old);
+    EnthalpyAdvanceSDC(1, sold, shat, sedge, sflux, scal_force, umac, w0mac, p0_nph, diff_old);
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -535,7 +535,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
-        p0_nph.copy(0.5*(p0_old + p0_new));
+        // p0_nph.copy(0.5*(p0_old + p0_new));
 
         // hold dp0/dt in psi for Make_S_cc
         psi.copy((p0_new - p0_old) / dt);
@@ -679,10 +679,10 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 Average(delta_p_term, peosbar, 0);
 
                 // compute p0_nph
-                p0_nph.copy(0.5*(p0_old + p0_new));
+                // p0_nph.copy(0.5*(p0_old + p0_new));
                 
                 // compute p0_minus_peosbar = p0_nph - peosbar
-                p0_minus_peosbar.copy(p0_nph - peosbar);
+                p0_minus_peosbar.copy(0.5*(p0_old + p0_new) - peosbar);
             
                 // compute peosbar_cart from peosbar
                 Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
@@ -731,7 +731,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
             if (evolve_base_state && !split_projection) {
-                Sbar.copy(1.0/(gamma1bar_nph*p0_nph) * (p0_nph - p0_old)/dt);
+                Sbar.copy(1.0/(gamma1bar_new*p0_new) * (p0_new - p0_old)/dt);
             }
 
             // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -804,13 +804,14 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         
         // base state pressure update
         if (evolve_base_state) {
-            
+        
             // set new p0 through HSE
             p0_new.copy(p0_old);
 
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
             
             p0_nph.copy(0.5*(p0_old + p0_new));
+            // p0_nph.copy(p0_new);
             
             // hold dp0/dt in psi for enthalpy advance
             psi.copy((p0_new - p0_old) / dt);
@@ -821,7 +822,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             Print() << "            : enthalpy_advance >>>" << std::endl;
         }
         
-        EnthalpyAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,umac,w0mac,diff_old);
+        EnthalpyAdvanceSDC(2,sold,shat,sedge,sflux,scal_force,umac,w0mac,p0_nph,diff_old);
 
         // base state enthalpy update
         if (evolve_base_state) {
@@ -934,8 +935,8 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
             // compute p0_nph
-            p0_nph.copy(0.5*(p0_old + p0_new));
-
+            // p0_nph.copy(0.5*(p0_old + p0_new));
+            
             // hold dp0/dt in psi for Make_S_cc
             psi.copy((p0_new - p0_old) / dt);
             

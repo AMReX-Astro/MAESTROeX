@@ -4,6 +4,7 @@
 #include <MaestroPlot.H>
 #include <AMReX_buildInfo.H>
 #include <Problem_F.H>
+#include <unistd.h>     // getcwd
 
 using namespace amrex;
 
