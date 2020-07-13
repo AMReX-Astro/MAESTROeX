@@ -35,14 +35,20 @@ int main(int argc, char* argv[])
 	BL_PROFILE_VAR("main()", pmain);
 
 	// plotfile names
-	std::string iFile, imFile;
+	std::string iFile;
 
 	// read in parameters from inputs file
 	ParmParse pp;
 	pp.query("infile", iFile);
-	pp.query("modelfile", imFile);  // optional
 	if (iFile.empty()) 
 	    Abort("You must specify plotfile");
+
+	// optional parameters
+	std::string imFile;
+	std::string deltat, numfiles;
+	pp.query("modelfile", imFile); 
+	pp.query("dt", deltat);
+	pp.query("nfiles", numfiles);
 	
 	// read input grid 
 	amrex::PlotFileData pltfile(iFile);
@@ -157,11 +163,21 @@ int main(int argc, char* argv[])
 
 	Average(rho_mf, rho0, 0);
 	Average(p0_mf, p0, 0);
-	
-	// Write radial output file
-	WriteRadialFile(iFile, rho0, p0, u_mf, w0_mf);
 
 	
+	// Write radial output file
+	Print() << "Writing radial diag file" << std::endl;
+	WriteRadialFile(iFile, rho0, p0, u_mf, w0_mf);
+
+	// Write 2D slice output file
+	if (deltat.empty() || numfiles.empty()) {
+	    Print() << "Writing 2D slice file for single plot file" << std::endl;
+	    Write2dSliceFile (iFile, u_mf, w0_mf);
+	} else {
+	    Print() << "Writing 2D slice file for " << stoi(numfiles)+1 << " plot files" << std::endl;
+	    Write2dSliceFile (iFile, u_mf, w0_mf, stoi(deltat), stoi(numfiles));
+	}
+
 	// Write diag file for initial model if specified
 	if (!imFile.empty()) {
 	    Print() << "Writing diag file for initial model" << std::endl;
@@ -180,8 +196,8 @@ int main(int argc, char* argv[])
 ///
 std::string GetVarFromJobInfo (const std::string pltfile, const std::string& varname) {
     std::string filename = pltfile + "/job_info";
-    //std::regex re("(?:[ \\t]*)" + varname + "\\s*:\\s*(.*)\\s*\\n");
-    std::regex re(varname + " = ([^ ]*)\\n");
+    std::regex re("(?:[ \\t]*)" + varname + "\\s*=\\s*(.*)\\s*\\n");
+    //std::regex re(varname + " = ([^ ]*)\\n");
     
     std::smatch m;
 

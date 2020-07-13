@@ -4,8 +4,8 @@
 extern BaseStateGeometry base_geom;
 extern int finest_level;
 extern amrex::GpuArray<amrex::Real,3> center;
-//extern amrex::Vector<BoxArray> grid;
-//extern amrex::Vector<DistributionMapping> dmap;
+extern amrex::Vector<amrex::BoxArray> grid;
+extern amrex::Vector<amrex::DistributionMapping> dmap;
 extern amrex::Vector<amrex::Geometry> pgeom;
 
 
@@ -63,14 +63,27 @@ void MakeRotationRate (const std::string& plotfilename,
 		       const amrex::Vector<amrex::MultiFab>& w0cart,
 		       amrex::Vector<amrex::MultiFab>& omega);
 
-void MakeMeridionalCirculation (const std::string& plotfilename,
-				const amrex::Vector<amrex::MultiFab>& vel,
+
+// ----------------------------
+// in Slice.cpp
+// ----------------------------
+
+// write 2d slice plotfile to disk
+void Write2dSliceFile (const std::string& plotfilename,
+		       const amrex::Vector<amrex::MultiFab>& u_in,
+		       const amrex::Vector<amrex::MultiFab>& w0_in, 
+		       const int deltat = 0, const int nfiles = 0);
+
+void MakeMeridionalCirculation (const amrex::Vector<amrex::MultiFab>& vel,
 				const amrex::Vector<amrex::MultiFab>& w0rcart,
 				amrex::Vector<amrex::MultiFab>& radii_vel,
+				const int max_grid_size,
 				amrex::Geometry& geomFine);
 
 
+// ----------------------------
 // in Average.cpp
+// ----------------------------
 
 // compute radially-averaged values
 void Average (const amrex::Vector<amrex::MultiFab>& phi,

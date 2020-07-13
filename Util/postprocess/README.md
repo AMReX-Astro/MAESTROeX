@@ -6,7 +6,7 @@ including:
 - Convection speed
 - Ratio of mean rotation rates to surface rotation
 - Meridional circulation velocities
-- Br\"{u}nt-V\"{a}is\"{a}l\"{a} frequency
+- Brünt-Väisälä frequency
 
 ## Building & running
 
@@ -20,5 +20,7 @@ with the name of the plotfile to be analyzed:
 
 Additional arguments are as follows:
 
-- **model file diagnostics**: extra argument `modelfile=modelfile_name` need to be provided
-
+- **model file diagnostics**: extra argument `modelfile=modelfile_name` needs to be provided
+- **time-averaged values**: two extra arguments need to be provided
+  1. `dt=timesteps_between_plotfiles`, which is an integer value
+  2. `nfiles=num_plotfiles` indicates the number of *additional* plotfiles needed, not including the `infile`.
