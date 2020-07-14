@@ -3,11 +3,10 @@
 #include <AMReX_BLFort.H>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    void ca_read_model_file(int* model_file, const int* namelen);
+void ca_read_model_file(int* model_file, const int* namelen);
 
 #ifdef __cplusplus
 }

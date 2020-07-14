@@ -5,19 +5,14 @@
 #include <AMReX_MultiFab.H>
 #include <BaseState.H>
 
-class BaseStateGeometry
-{
-public:
-
+class BaseStateGeometry {
+   public:
     BaseStateGeometry() noexcept {};
 
-    void Init(const int max_radial_level_in, 
-              const int nr_fine_in,
-              const amrex::Real dr_fine_in,
-              const int nr_irreg_in,
-              const amrex::Vector<amrex::Geometry>& geom,
-              const int max_level,
-              amrex::GpuArray<amrex::Real,3>& center);
+    void Init(const int max_radial_level_in, const int nr_fine_in,
+              const amrex::Real dr_fine_in, const int nr_irreg_in,
+              const amrex::Vector<amrex::Geometry>& geom, const int max_level,
+              amrex::GpuArray<amrex::Real, 3>& center);
 
     void ComputeCutoffCoords(const BaseStateArray<amrex::Real>& rho0);
 
@@ -45,9 +40,8 @@ public:
     BaseStateArray<int> r_start_coord;
     BaseStateArray<int> r_end_coord;
 
-private:
-
-    // these contain the actual data and should not be 
+   private:
+    // these contain the actual data and should not be
     // accessed directly other than by BaseStateGeometry class routines
 
     BaseState<int> nr_d;

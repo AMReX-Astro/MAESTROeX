@@ -4,7 +4,7 @@
 #include <AMReX_BLFort.H>
 
 namespace InletBCs {
-    // put your bcs here
+// put your bcs here
 };
 
 #endif
