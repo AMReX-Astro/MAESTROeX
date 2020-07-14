@@ -29,11 +29,11 @@ using namespace maestro;
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
-typedef amrex::Gpu::ManagedVector<amrex::Real> RealVector;
-typedef amrex::Gpu::ManagedVector<int> IntVector;
+using RealVector = amrex::Gpu::ManagedVector<amrex::Real>;
+using IntVector = amrex::Gpu::ManagedVector<int>;
 #else
-typedef amrex::Vector< amrex::Real > RealVector;
-typedef amrex::Vector< int > IntVector;
+using RealVector = amrex::Vector< amrex::Real >;
+using IntVector = amrex::Vector< int >;
 #endif
 
 /// hard code a maximum level limit
@@ -123,12 +123,12 @@ public:
     ////////////
     // MaestroAdvectBase.cpp functions
     void AdvectBaseDens(BaseState<amrex::Real>& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge);
-    void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge);
+    void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge_state);
+    void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge_state);
 
     void AdvectBaseEnthalpy(BaseState<amrex::Real>& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpyPlanar(BaseState<amrex::Real>& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpySphr(BaseState<amrex::Real>& rhoh0_predicted_edge);
+    void AdvectBaseEnthalpyPlanar(BaseState<amrex::Real>& rhoh0_predicted_edge_state);
+    void AdvectBaseEnthalpySphr(BaseState<amrex::Real>& rhoh0_predicted_edge_state);
     // end MaestroAdvectBase.cpp functions
     ////////////
 
@@ -187,13 +187,13 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const BaseState<amrex::Real>& r0_old,
-                       const BaseState<amrex::Real>& rho0_edge_old,
+                       const BaseState<amrex::Real>& rho0_old_in,
+                       const BaseState<amrex::Real>& rho0_edge_old_state,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const BaseState<amrex::Real>& r0_new,
-                       const BaseState<amrex::Real>& rho0_edge_new,
+                       const BaseState<amrex::Real>& rho0_new_in,
+                       const BaseState<amrex::Real>& rho0_edge_new_state,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const BaseState<amrex::Real>& rho0_predicted_edge,
+                       const BaseState<amrex::Real>& rho0_predicted_edge_state,
                        int start_comp, int num_comp);
 
     /// Calculate `rhoh` flux
@@ -224,17 +224,17 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
-                       const BaseState<amrex::Real>& r0_old,
-                       const BaseState<amrex::Real>& r0_edge_old,
+                       const BaseState<amrex::Real>& rho0_old_in,
+                       const BaseState<amrex::Real>& rho0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_old,
-                       const BaseState<amrex::Real>& r0_new,
-                       const BaseState<amrex::Real>& r0_edge_new,
+                       const BaseState<amrex::Real>& rho0_new_in,
+                       const BaseState<amrex::Real>& rho0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& r0mac_new,
-                       const BaseState<amrex::Real>& rh0_old,
-                       const BaseState<amrex::Real>& rh0_edge_old,
+                       const BaseState<amrex::Real>& rhoh0_old_in,
+                       const BaseState<amrex::Real>& rhoh0_edge_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_old,
-                       const BaseState<amrex::Real>& rh0_new,
-                       const BaseState<amrex::Real>& rh0_edge_new,
+                       const BaseState<amrex::Real>& rhoh0_new_in,
+                       const BaseState<amrex::Real>& rhoh0_edge_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& rh0mac_new,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_old,
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& h0mac_new);
@@ -252,7 +252,7 @@ public:
                      amrex::Vector<amrex::MultiFab>& statenew,
                      const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sflux,
                      const amrex::Vector<amrex::MultiFab>& force,
-                     int start_scomp, int num_comp,
+                     int start_comp, int num_comp,
                      const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Update velocity
@@ -279,7 +279,7 @@ public:
     /// @param mf       MultiFab containing quantity to be averaged
     /// @param phibar   Averaged quantity
     /// @param comp     Index of component of `mf` to average
-    void Average (const amrex::Vector<amrex::MultiFab>& mf,
+    void Average (const amrex::Vector<amrex::MultiFab>& phi,
                   BaseState<amrex::Real>& phibar,
                   int comp);
 
@@ -299,22 +299,18 @@ public:
     ////////////
     // MaestroBaseStateGeometry.cpp functions
 
-    // void InitBaseStateGeometry(const int max_radial_level_in, 
-    //                            const int nr_fine_in,
-    //                            const amrex::Real dr_fine_in,
-    //                            const int nr_irreg_in);
 #if (AMREX_SPACEDIM == 3)
     void InitBaseStateMapSphr(const int lev, const amrex::MFIter& mfi, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_fine, 
                               const amrex::GpuArray<amrex::Real,AMREX_SPACEDIM> dx_lev);
 #endif
-    void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0);
+    void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0_state);
 
-    void RestrictBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
-    void RestrictBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
+    void RestrictBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void RestrictBase(const BaseStateArray<Real>& s0, const bool is_cell_centered);
 
-    void FillGhostBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
-    void FillGhostBase(const BaseStateArray<Real>& s0_vec, const bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void FillGhostBase(const BaseStateArray<Real>& s0, const bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
@@ -348,8 +344,8 @@ public:
     ////////////
     // MaestroCelltoEdge.cpp functions
 
-    void CelltoEdge(const BaseState<amrex::Real>& s0_cell, 
-                    BaseState<amrex::Real>& s0_edge);
+    void CelltoEdge(const BaseState<amrex::Real>& s0_cell_s, 
+                    BaseState<amrex::Real>& s0_edge_s);
 
     // end MaestroCelltoEdge.cpp functions
     ////////////
@@ -381,7 +377,7 @@ public:
     void PutInPertForm (amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        const amrex::Vector<amrex::BCRec>& bcs,
                         bool flag);
 
 
@@ -399,7 +395,7 @@ public:
     void PutInPertForm (int level, amrex::Vector<amrex::MultiFab>& scal,
                         const BaseState<Real>& s0,
                         int comp, int bccomp,
-                        const amrex::Vector<amrex::BCRec>& bcs_in,
+                        const amrex::Vector<amrex::BCRec>& bcs,
                         bool flag);
 
     /// If `flag`, returns species mass fraction `X` given the conserved variable `rhoX`.
@@ -420,7 +416,7 @@ public:
     void PrintBase (const RealVector& base, const bool is_cell_centered=true);
 
     /// Print out the contents of a Vector of MultiFabs
-    void PrintMF   (const amrex::Vector<amrex::MultiFab>& CC);
+    void PrintMF   (const amrex::Vector<amrex::MultiFab>& MF);
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge (const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& EDGE,
@@ -478,7 +474,7 @@ public:
 
     /// Write plotfile to disk
     void DiagFile (const int step,
-                   const amrex::Real dt_in,
+                   const amrex::Real t_in,
                    const BaseState<amrex::Real>& rho0_in,
                    const BaseState<amrex::Real>& p0_in,
                    const amrex::Vector<amrex::MultiFab>& u_in,
@@ -506,9 +502,9 @@ public:
     ////////////
     // MaestroEnforceHSE.cpp
 
-    void EnforceHSE(const BaseState<amrex::Real>& rho0, 
-                    BaseState<amrex::Real>& p0,
-                    const BaseState<amrex::Real>& grav_cell);
+    void EnforceHSE(const BaseState<amrex::Real>& rho0_s, 
+                    BaseState<amrex::Real>& p0_s,
+                    const BaseState<amrex::Real>& grav_cell_s);
 
     // end  MaestroEnforceHSE.cpp functions
     ////////////////////////
@@ -610,7 +606,7 @@ public:
 
     /// Fill in ONE ghost cell for all components of a face-centered (MAC) velocity
     /// field behind physical boundaries.  Does not modify the velocities on the boundary
-    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
+    void FillUmacGhost (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in,
                         int level=-1);
 
     /// Fill in all ghost cells for an edge-based MAC velocity field
@@ -632,10 +628,10 @@ public:
     /// @param sbccomp      start boundary conditions component
     void Put1dArrayOnCart (const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const bool is_input_edge_centered,
+                           const bool is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0, int variable_type=0);                       
+                           const int sbccomp = 0, const int variable_type=0);                       
 
     /// Maps 1d arrays onto multi-D cartesian MultiFabs
     ///
@@ -646,19 +642,19 @@ public:
     /// @param is_output_a_vector       is the output a vector?
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
-    void Put1dArrayOnCart (const int level, const BaseState<amrex::Real>& s0,
+    void Put1dArrayOnCart (const int lev, const BaseState<amrex::Real>& s0,
                            amrex::MultiFab& s0_cart,
-                           const int is_input_edge_centered,
-                           const int is_output_a_vector,
+                           const bool is_input_edge_centered,
+                           const bool is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);
+                           const int sbccomp = 0);
 
-    void Put1dArrayOnCart (int level, const BaseState<amrex::Real>& s0,
+    void Put1dArrayOnCart (const int lev, const BaseState<amrex::Real>& s0,
                            amrex::Vector<amrex::MultiFab>& s0_cart,
-                           int is_input_edge_centered,
-                           int is_output_a_vector,
+                           const bool is_input_edge_centered,
+                           const bool is_output_a_vector,
                            const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-                           int sbccomp = 0);                       
+                           const int sbccomp = 0);                       
 
     AMREX_GPU_DEVICE amrex::Real QuadInterp(const amrex::Real x, 
                         const amrex::Real x0, const amrex::Real x1, 
@@ -673,7 +669,7 @@ public:
     /// @param uedge    edge based velocity
     /// @param w0mac    MAC base state velocity
     /// @param mult     multiplication factor
-    void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge,
+    void Addw0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& u_edge,
                 const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
                 const amrex::Real& mult);
 #if (AMREX_SPACEDIM == 3)
@@ -690,7 +686,7 @@ public:
     /// Put the cell-centered data `s_cc` on faces by averaging adjacent cells
     void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
                         amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM >>& face,
-                        int harmonic_avg);
+                        const bool harmonic_avg);
 #if (AMREX_SPACEDIM == 3)
     void MakeCCtoRadii ();
 #endif
@@ -705,7 +701,7 @@ public:
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& uedge_in,
                        const amrex::Vector<amrex::MultiFab>& rho,
                        const BaseState<amrex::Real>& rho0,
-                       const BaseState<amrex::Real>& grav,
+                       const BaseState<amrex::Real>& grav_cell,
                        const amrex::Vector<amrex::MultiFab>& w0_force_cart,
     #ifdef ROTATION
                        const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& w0mac,
@@ -733,7 +729,7 @@ public:
     void MakeTempForce(amrex::Vector<amrex::MultiFab>& temp_force,
                        const amrex::Vector<amrex::MultiFab>& scal,
                        const amrex::Vector<amrex::MultiFab>& thermal,
-                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac);
+                       const amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac_in);
     ////////////////////////
 
     ////////////
@@ -817,7 +813,7 @@ public:
                   amrex::Vector<amrex::MultiFab>& macphi,
                   const amrex::Vector<amrex::MultiFab>& macrhs,
                   const BaseState<amrex::Real>& beta0,
-                  const int& is_predictor);
+                  const bool is_predictor);
 
     /// Multiply (or divide) face-centered data by `beta0`
     ///
@@ -826,8 +822,8 @@ public:
     /// @param beta0_edge   face-centered \f$\beta_0\f$
     /// @param mult_or_div  do we multiply or divide?
     void MultFacesByBeta0 (amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& edge,
-                           const BaseState<amrex::Real>& beta0,
-                           const BaseState<amrex::Real>& beta0_edge,
+                           const BaseState<amrex::Real>& beta0_s,
+                           const BaseState<amrex::Real>& beta0_edge_s,
                            const int& mult_or_div);
 
     /// Compute the RHS for the solve, `RHS = macrhs - div(beta0*umac)`
@@ -855,11 +851,11 @@ public:
     ////////////
     // MaestroMakeBeta0.cpp functions
 
-    void MakeBeta0(BaseState<amrex::Real>& beta, 
-                   const BaseState<amrex::Real>& rho0,
-                   const BaseState<amrex::Real>& p0,
-                   const BaseState<amrex::Real>& gamma1bar,
-                   const BaseState<amrex::Real>& grav_cell,
+    void MakeBeta0(BaseState<amrex::Real>& beta0_s, 
+                   const BaseState<amrex::Real>& rho0_s,
+                   const BaseState<amrex::Real>& p0_s,
+                   const BaseState<amrex::Real>& gamma1bar_s,
+                   const BaseState<amrex::Real>& grav_cell_s,
                    const bool is_irreg=false);
 
     // end MaestroMakeBeta0.cpp functions
@@ -894,8 +890,8 @@ public:
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& sedge,
                        amrex::Vector<std::array< amrex::MultiFab, AMREX_SPACEDIM > >& umac,
                        amrex::Vector<amrex::MultiFab>& force,
-                       int is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
-                       int start_scomp, int start_bccomp, int num_comp, int is_conservative);
+                       const bool is_vel, const amrex::Vector<amrex::BCRec>& bcs, int nbccomp,
+                       int start_scomp, int start_bccomp, int num_comp, const bool is_conservative);
                        
 #if (AMREX_SPACEDIM == 2)
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
@@ -934,7 +930,7 @@ public:
                             const amrex::Vector<amrex::BCRec>& bcs,
                             const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
-                            bool is_vel, bool is_conservative);
+                            const bool is_vel, const bool is_conservative);
 #else
     void MakeDivU(const amrex::Box& bx, 
                   amrex::Array4<amrex::Real> const divu,
@@ -963,7 +959,7 @@ public:
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
                                const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
-                               int comp, int bccomp, bool is_vel);
+                               int comp, int bccomp, const bool is_vel);
 
     void MakeEdgeScalTransverse(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,
@@ -990,7 +986,7 @@ public:
                                const amrex::Vector<amrex::BCRec>& bcs,
                                const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                                int comp, int bccomp, 
-                               bool is_vel, bool is_conservative);
+                               const bool is_vel, const bool is_conservative);
 
     void MakeEdgeScalEdges(const amrex::MFIter& mfi,
                             amrex::Array4<amrex::Real> const slx,
@@ -1019,7 +1015,7 @@ public:
                             const amrex::Vector<amrex::BCRec>& bcs,
                             const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
                             int comp, int bccomp, 
-                            bool is_vel, bool is_conservative);
+                            const bool is_vel, const bool is_conservative);
 #endif
     // end MaestroMakeEdgeScal.cpp functions
     ////////////
@@ -1029,11 +1025,11 @@ public:
     void MakeEdgeState1d(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
                          BaseState<amrex::Real>& force);
 
-    void MakeEdgeState1dSphr(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
-                             BaseState<amrex::Real>& force);
+    void MakeEdgeState1dSphr(BaseState<amrex::Real>& s_state, BaseState<amrex::Real>& sedge_state, 
+                             BaseState<amrex::Real>& force_state);
 
-    void MakeEdgeState1dPlanar(BaseState<amrex::Real>& s, BaseState<amrex::Real>& sedge, 
-                               BaseState<amrex::Real>& force);
+    void MakeEdgeState1dPlanar(BaseState<amrex::Real>& s_state, BaseState<amrex::Real>& sedge_state, 
+                               BaseState<amrex::Real>& force_state);
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
@@ -1059,10 +1055,10 @@ public:
     // MaestroMakeGrav.cpp functions
 
     void MakeGravCell(BaseState<amrex::Real>& grav_cell, 
-                      const BaseState<amrex::Real>& rho0);
+                      const BaseState<amrex::Real>& rho0_s);
 
-    void MakeGravEdge(BaseState<amrex::Real>& grav_edge, 
-                      const BaseState<amrex::Real>& rho0);
+    void MakeGravEdge(BaseState<amrex::Real>& grav_edge_state, 
+                      const BaseState<amrex::Real>& rho0_state);
 
     // end MaestroMakeGrav.cpp functions
     ////////////
@@ -1094,7 +1090,7 @@ public:
                     const amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                     const amrex::Vector<amrex::MultiFab>& rho_Hext,
                     const amrex::Vector<amrex::MultiFab>& thermal,
-                    const BaseState<amrex::Real>& p0,
+                    const BaseState<amrex::Real>& p0_s,
                     const BaseState<amrex::Real>& gamma1bar,
                     BaseState<amrex::Real>& delta_gamma1_termbar);
 
@@ -1116,7 +1112,7 @@ public:
                                          const BaseState<amrex::Real>& p0,
                              const amrex::Vector<amrex::MultiFab>& delta_p_term,
                                          amrex::Vector<amrex::MultiFab>& delta_chi,
-                             int is_predictor);
+                             const bool is_predictor);
 
     void CorrectRHCCforNodalProj(amrex::Vector<amrex::MultiFab>& rhcc,
                                  const BaseState<amrex::Real>& rho0,
@@ -1213,7 +1209,7 @@ public:
                  const BaseStateArray<Real>& c, const BaseStateArray<Real>& r, 
                  const BaseStateArray<Real>& u, const int n);
 
-    void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml, BaseState<amrex::Real>& base_fine);
+    void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml_s, BaseState<amrex::Real>& base_fine_s);
 
     // end MaestroMakew0.cpp functions
     ////////////
@@ -1350,7 +1346,7 @@ public:
 
     /// Calculate `pi` times the divergence of the velocity
     void MakePiDivu (const amrex::Vector<amrex::MultiFab>& vel,
-                   const amrex::Vector<amrex::MultiFab>& pi_cc,
+                   const amrex::Vector<amrex::MultiFab>& state,
                    amrex::Vector<amrex::MultiFab>& pidivu);
 
     /// Mass fractions of the species
@@ -1363,7 +1359,7 @@ public:
     ////////////
     // MaestroPPM.cpp functions
     void PPM(const amrex::Box& bx, 
-             amrex::Array4<const amrex::Real> const scal,
+             amrex::Array4<const amrex::Real> const s,
              amrex::Array4<const amrex::Real> const u,
              amrex::Array4<const amrex::Real> const v,
 #if (AMREX_SPACEDIM == 3)
@@ -1388,15 +1384,15 @@ public:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const BaseState<amrex::Real>& p0,
-                const amrex::Real dt_react,
-                const amrex::Real time_react);
+                const amrex::Real dt_in,
+                const amrex::Real time_in);
 
     void ReactSDC (const amrex::Vector<amrex::MultiFab>& s_in,
                    amrex::Vector<amrex::MultiFab>& s_out,
                    amrex::Vector<amrex::MultiFab>& rho_Hext,
                    const BaseState<amrex::Real>& p0,
-                   const amrex::Real dt_react,
-                   const amrex::Real time_react,
+                   const amrex::Real dt_in,
+                   const amrex::Real time_in,
                    amrex::Vector<amrex::MultiFab>& source);
 
 #ifndef SDC
@@ -1406,15 +1402,15 @@ public:
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
                 const BaseState<amrex::Real>& p0,
-                const amrex::Real dt_react,
-                const amrex::Real time_react);
+                const amrex::Real dt_in,
+                const amrex::Real time_in);
 
 #else
     void Burner (const amrex::Vector<amrex::MultiFab>& s_in,
                  amrex::Vector<amrex::MultiFab>& s_out,
                  const BaseState<amrex::Real>& p0,
-                 const amrex::Real dt_react,
-                 const amrex::Real time_react,
+                 const amrex::Real dt_in,
+                 const amrex::Real time_in,
                  const amrex::Vector<amrex::MultiFab>& source);
 #endif
     
@@ -1449,7 +1445,7 @@ public:
     /// We copy the coarsest level only, interpolate to all
     /// the other levels and then copy the valid data from
     /// the old arrays onto the new.
-    void RegridBaseState(BaseState<amrex::Real>& base, const bool is_edge=false);
+    void RegridBaseState(BaseState<amrex::Real>& base_s, const bool is_edge=false);
 
     /// Tag all cells for refinement
     ///
@@ -1532,7 +1528,7 @@ public:
     /// @param p0cart   base state pressure on cartesian grid
     /// @param cs       sound speed
     void CsfromRhoH (const amrex::Vector<amrex::MultiFab>& scal,
-                     const amrex::Vector<amrex::MultiFab>& p0cart,
+                     const amrex::Vector<amrex::MultiFab>& p0_cart,
                      amrex::Vector<amrex::MultiFab>& cs);
 
     // Calculate the enthalpy at edges given the density and the temperature
@@ -1571,7 +1567,7 @@ public:
     ////////////
     // MaestroSlopes.cpp function
     void Slopex(const amrex::Box& bx, 
-                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const s,
                 amrex::Array4<amrex::Real> const slx,
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
@@ -1579,7 +1575,7 @@ public:
                 int bc_start_comp);
 
     void Slopey(const amrex::Box& bx, 
-                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const s,
                 amrex::Array4<amrex::Real> const sly,
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
@@ -1587,7 +1583,7 @@ public:
                 int bc_start_comp);
 #if (AMREX_SPACEDIM == 3)
     void Slopez(const amrex::Box& bx, 
-                amrex::Array4<amrex::Real> const scal,
+                amrex::Array4<amrex::Real> const s,
                 amrex::Array4<amrex::Real> const slz,
                 const amrex::Box& domainBox,
                 const amrex::Vector<amrex::BCRec>& bcs,
@@ -1599,7 +1595,7 @@ public:
     ////////////
     // MaestroSponge.cpp functions
 
-    void SpongeInit(const BaseState<amrex::Real>& rho0);
+    void SpongeInit(const BaseState<amrex::Real>& rho0_s);
 
     void MakeSponge (amrex::Vector<amrex::MultiFab>& sponge);
     ////////////

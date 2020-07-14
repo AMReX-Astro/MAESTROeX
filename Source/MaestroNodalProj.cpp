@@ -92,10 +92,10 @@ Maestro::NodalProj (int proj_type,
     // pressure_iters_comp:     (beta0_old+beta0_new)/2
     // regular_timestep_comp:   (beta0_old+beta0_new)/2
     if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-        Put1dArrayOnCart(beta0_old, beta0_cart, 0, 0, bcs_f,0);
+        Put1dArrayOnCart(beta0_old, beta0_cart, false, false, bcs_f,0);
     } else {
         auto beta0_nph = 0.5 * (beta0_old + beta0_new);
-        Put1dArrayOnCart(beta0_nph, beta0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(beta0_nph, beta0_cart, false, false, bcs_f, 0);
     }
 
     // convert Vproj to beta0*Vproj
@@ -253,9 +253,9 @@ Maestro::NodalProj (int proj_type,
     // are in, and other factors including planar vs. spherical, the number
     // of AMR levels, etc.
     if (proj_type == initial_projection_comp) {
-        rel_tol = (spherical==1) ? eps_init_proj_sph : eps_init_proj_cart;
+        rel_tol = (spherical) ? eps_init_proj_sph : eps_init_proj_cart;
     } else if (proj_type == divu_iters_comp) {
-        if (spherical == 1) {
+        if (spherical) {
             if (istep_divu_iter == init_divu_iter) {
                 rel_tol = eps_divu_sph;
             } else if (istep_divu_iter == init_divu_iter-1) {
@@ -531,27 +531,26 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
 
                         for (int odir = 0; odir < BL_SPACEDIM; odir++) {
                             if (odir != idir) {
-                                if (geom[lev].isPeriodic(odir)) bx.grow(odir,1);
-                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) bx.growHi(odir,1);
-                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) bx.growLo(odir,1);
+                                if (geom[lev].isPeriodic(odir)) { bx.grow(odir,1); }
+                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) { bx.growHi(odir,1); }
+                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) { bx.growLo(odir,1); }
                             }
                         }
                         bxlist.push_back(bx);
                     }
 
                     if (phys_bc[AMREX_SPACEDIM+idir] == Inflow && reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
-                        Box bx;                         // bx is the region we *protect* from zero'ing
+                        Box bx; // bx is the region we *protect* from zero'ing
 
                         bx = amrex::adjCellHi(reg, idir);
 
                         for (int odir = 0; odir < BL_SPACEDIM; odir++) {
                             if (odir != idir) {
-                                if (geom[lev].isPeriodic(odir)) bx.grow(odir,1);
-                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) bx.growHi(odir,1);
-                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) bx.growLo(odir,1);
+                                if (geom[lev].isPeriodic(odir)) { bx.grow(odir,1); }
+                                if (reg.bigEnd  (odir) != domainBox.bigEnd  (odir) ) { bx.growHi(odir,1); }
+                                if (reg.smallEnd(odir) != domainBox.smallEnd(odir) ) { bx.growLo(odir,1); }
                             }
                         }
-
                         bxlist.push_back(bx);
                     }
 
@@ -563,12 +562,10 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel)
                             v_fab.setVal<RunOn::Device>(0.0, ovlp, idir, 1);
                         }
                     }
-
-                }                 // end loop over grids
-            }             // end if/else logic for inflow
-        }         // end loop over direction
-    }     // end loop over levels
-
+                } // end loop over grids
+            } // end if/else logic for inflow
+        } // end loop over direction
+    } // end loop over levels
 }
 
 // given a nodal phi, compute grad(phi) at cell centers

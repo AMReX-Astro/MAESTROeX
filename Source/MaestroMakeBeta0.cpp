@@ -197,7 +197,7 @@ Maestro::MakeBeta0(BaseState<Real>& beta0_s,
 
                     for (int i = n-1; i >= 0; --i) {
 
-                        int refrat = round(pow(2, n-i));
+                        auto refrat = (int)round(pow(2, n-i));
 
                         // Offset the centered beta on level i above this point so the total 
                         // integral is consistent

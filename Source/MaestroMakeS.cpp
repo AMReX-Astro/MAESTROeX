@@ -76,7 +76,7 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gradp0, gradp0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(gradp0, gradp0_cart, false, false, bcs_f, 0);
     }
         
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -90,9 +90,9 @@ Maestro::Make_S_cc (Vector<MultiFab>& S_cc,
     }
 
     if (use_delta_gamma1_term) {
-        Put1dArrayOnCart(gamma1bar, gamma1bar_cart ,0, 0, bcs_f, 0);
-        Put1dArrayOnCart(p0_s, p0_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(gamma1bar, gamma1bar_cart, false, false, bcs_f, 0);
+        Put1dArrayOnCart(p0_s, p0_cart, false, false, bcs_f, 0);
+        Put1dArrayOnCart(psi, psi_cart, false, false, bcs_f, 0);
     }
 
     const auto use_omegadot_terms_in_S_loc = use_omegadot_terms_in_S;
@@ -288,8 +288,8 @@ Maestro::MakeRHCCforNodalProj (Vector<MultiFab>& rhcc,
         beta0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(Sbar, Sbar_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(Sbar, Sbar_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, false, false, bcs_f, 0);
 
     for (int lev=0; lev<=finest_level; ++lev) {
 
@@ -356,10 +356,10 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
         rho0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(gamma1bar, gamma1bar_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(gamma1bar, gamma1bar_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
 
     const Real dt_loc = dt;
     const Real dpdt_factor_loc = dpdt_factor;
@@ -414,7 +414,7 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                              const BaseState<Real>& p0,
                              const Vector<MultiFab>& delta_p_term,
                              Vector<MultiFab>& delta_chi,
-                             int is_predictor)
+                             const bool is_predictor)
 {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()", MakeRHCCforMacProj);
@@ -440,13 +440,13 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
         rho0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(Sbar, Sbar_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(beta0, beta0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(Sbar, Sbar_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(beta0, beta0_cart, false, false, bcs_f, 0);
 
     if (dpdt_factor > 0.0) {
-        Put1dArrayOnCart(gamma1bar, gamma1bar_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+        Put1dArrayOnCart(gamma1bar, gamma1bar_cart, false, false, bcs_f, 0);
+        Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
+        Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
     }
 
     const Real base_cutoff_density_loc = base_cutoff_density;

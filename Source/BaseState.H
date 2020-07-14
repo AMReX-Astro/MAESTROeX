@@ -123,9 +123,7 @@ public:
       public member functions
     */
 
-    BaseState() {};
-
-    // BaseState(const int num_levs, const int length=1, const int ncomp=1);
+    BaseState() : nlev(0), len(0), nvar(0) {}
 
     explicit BaseState(const int num_levs, const int length=1, const int ncomp=1, const T val=T());
     
@@ -180,15 +178,15 @@ public:
 
     /// number of levels in base 
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE 
-    int nLevels() const { return nlev; };
+    int nLevels() const noexcept { return nlev; };
 
     /// number of cells in base
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    int length() const { return len; };
+    int length() const noexcept { return len; };
 
     /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE
-    int nComp() const { return nvar; };
+    int nComp() const noexcept { return nvar; };
 
     /// deep copy 
     void copy(const BaseState<T>& src);
@@ -196,8 +194,8 @@ public:
     void copy(const amrex::Gpu::ManagedVector<T>& src);
     void copy(const amrex::Vector<T>& src);
 
-    void toVector(amrex::Vector<T>& vec);
-    void toVector(amrex::Gpu::ManagedVector<T>& vec);
+    void toVector(amrex::Vector<T>& vec) const;
+    void toVector(amrex::Gpu::ManagedVector<T>& vec) const;
 
     /// swap the data with src
     void swap(BaseState<T>& src);
@@ -274,6 +272,10 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp, c
     base_data.shrink_to_fit();
     std::fill(base_data.begin(), base_data.end(), val);
 }
+
+/// make sure that this class is never instantiated with bool
+template <>
+BaseState<bool>::BaseState(const int, const int, const int, const bool) = delete;
 
 template <class T>
 BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src, const int num_levs, const int length, const int ncomp)
@@ -433,7 +435,7 @@ BaseState<T>::copy(const amrex::Vector<T>& src)
 
 template <class T>
 void
-BaseState<T>::toVector(amrex::Vector<T>& vec)
+BaseState<T>::toVector(amrex::Vector<T>& vec) const
 {
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
@@ -446,7 +448,7 @@ BaseState<T>::toVector(amrex::Vector<T>& vec)
 
 template <class T>
 void
-BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec)
+BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec) const
 {
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {

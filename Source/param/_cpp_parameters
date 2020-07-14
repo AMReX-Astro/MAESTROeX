@@ -91,15 +91,15 @@ use_divu_firstdt                    bool            false       y
 # category: grid
 #-----------------------------------------------------------------------------
 
-# Set to 1 if you are doing a spherical problem.
-spherical                           int            0    y
+# Set to true if you are doing a spherical problem.
+spherical                           bool            false    y
 
 # set octant = T if you just want to model an octant of a sphere
 # (note: only takes effect for spherical geometry)
 octant                              bool            false       y
 
-# Set to 1 if using the 2D simplified (planar) model of an octant.
-do_2d_planar_octant                 int            0    y
+# Set to true if using the 2D simplified (planar) model of an octant.
+do_2d_planar_octant                 bool            false       y
 
 # How often we regrid.
 regrid_int                          int            -1

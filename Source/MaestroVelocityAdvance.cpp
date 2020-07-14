@@ -56,8 +56,8 @@ Maestro::VelocityAdvance (const Vector<MultiFab>& rhohalf,
     // Create the edge states of velocity using the MAC velocity plus w0 on edges.
     //////////////////////////////////
 
-    MakeEdgeScal(uold, uedge, umac, vel_force, 1, bcs_u, 
-                 AMREX_SPACEDIM, 0, 0, AMREX_SPACEDIM, 0);
+    MakeEdgeScal(uold, uedge, umac, vel_force, true, bcs_u, 
+                 AMREX_SPACEDIM, 0, 0, AMREX_SPACEDIM, false);
 
     //////////////////////////////////
     // Subtract w0 from MAC velocities.

@@ -144,8 +144,9 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                      sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d)
+        for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+        }
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -247,7 +248,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         p0_minus_peosbar.copy(p0_old - peosbar);
 
         // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_old - peosbar_cart
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -278,7 +279,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                    p0_minus_peosbar, dt, dtold, 
                    is_predictor);
 
-            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)       
             if (spherical) {
                 // put w0 on Cartesian edges
@@ -324,7 +325,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_old,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_old, is_predictor);
 
     // wallclock time
     Real end_total_macproj = ParallelDescriptor::second() - start_total_macproj;
@@ -549,7 +550,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
         p0_minus_peosbar.copy(p0_new - peosbar);
 
         // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_new - peosbar_cart
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -582,7 +583,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
                    p0_minus_peosbar, dt, dtold, 
                    is_predictor);
 
-            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)            
             if (spherical) {
                 // put w0 on Cartesian edges
@@ -610,7 +611,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph, delta_gamma1_term,
-                       gamma1bar_new, p0_new, delta_p_term, delta_chi,is_predictor);
+                       gamma1bar_new, p0_new, delta_p_term, delta_chi, is_predictor);
 
     if (spherical && evolve_base_state && split_projection) {
         // subtract w0mac from umac
@@ -622,7 +623,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
 
     // MAC projection
     // includes spherical option in C++ function
-    MacProj(umac,macphi,macrhs,beta0_nph,is_predictor);
+    MacProj(umac, macphi, macrhs, beta0_nph, is_predictor);
 
     // wallclock time
     end_total_macproj += ParallelDescriptor::second() - start_total_macproj;
@@ -804,11 +805,11 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             // compute w0, w0_force
             is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, 
-                    p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
-                    p0_minus_peosbar, dt, dtold, 
-                    is_predictor);
+                   p0_new, p0_new, gamma1bar_new, gamma1bar_new, 
+                   p0_minus_peosbar, dt, dtold, 
+                   is_predictor);
 
-            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -881,7 +882,7 @@ Maestro::AdvanceTimeStepAverage (bool is_initIter) {
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
             // compute peosbar_cart from peosbar
-            Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
             // compute delta_p_term = peos_new - peosbar_cart
             for (int lev=0; lev<=finest_level; ++lev) {

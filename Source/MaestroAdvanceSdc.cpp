@@ -165,8 +165,9 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                      sflux[lev][2].define(convert(grids[lev],nodal_flag_z), dmap[lev], Nscal, 0); );
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d)
+        for (int d=0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
+        }
 
         // initialize intra_rhoh0
         intra_rhoh0[lev].setVal(0.);
@@ -255,7 +256,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         p0_minus_peosbar.copy(p0_old - peosbar);
 
         // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_old - peosbar_cart
         for (int lev=0; lev<=finest_level; ++lev) {
@@ -545,7 +546,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
         // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
         //                       - (rhoh0_hat - rhoh0_old)/dt
         delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
-        Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, false, false, bcs_f, 0);
     }
 
     // now update temperature
@@ -684,7 +685,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
                 p0_minus_peosbar.copy(0.5*(p0_old + p0_new) - peosbar);
             
                 // compute peosbar_cart from peosbar
-                Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+                Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
                 
                 // compute delta_p_term = peos_new - peosbar_cart
                 for (int lev=0; lev<=finest_level; ++lev) {
@@ -945,7 +946,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             // compute intra_rhoh0 = (rhoh0_new - rhoh0_old)/dt 
             //                       - (rhoh0_hat - rhoh0_old)/dt
             delta_rhoh0.copy((rhoh0_new - rhoh0_old)/dt - delta_rhoh0);
-            Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(delta_rhoh0, intra_rhoh0, false, false, bcs_f, 0);
         }
 
         // now update temperature
@@ -1076,7 +1077,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
 
             if (spherical) {
                 // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0_old, w0cc, 1, 1, bcs_u, 0, 1);
+                Put1dArrayOnCart(w0, w0cc, true, true, bcs_u, 0, 1);
             }
         }
     }
@@ -1149,7 +1150,7 @@ Maestro::AdvanceTimeStepSDC (bool is_initIter) {
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
             // compute peosbar_cart from peosbar
-            Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
             // compute delta_p_term = peos_new - peosbar_cart
             for (int lev=0; lev<=finest_level; ++lev) {

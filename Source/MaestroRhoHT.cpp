@@ -17,7 +17,7 @@ Maestro::TfromRhoH (Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 
     const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
 
@@ -95,7 +95,7 @@ Maestro::TfromRhoP (Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 
     const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
 
@@ -216,7 +216,7 @@ Maestro::MachfromRhoH (const Vector<MultiFab>& scal,
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].setVal(0.);
     }
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 
     const auto use_eos_e_instead_of_h_loc = use_eos_e_instead_of_h;
 
@@ -362,9 +362,9 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     rho0_halftime.copy(0.5*(rho0_old + rho0_new));
     rhoh0_halftime.copy(0.5*(rhoh0_old + rhoh0_new));
     
-    Put1dArrayOnCart(rho0_halftime, rho0_cart, 0, 0, bcs_s, Rho);
-    Put1dArrayOnCart(rhoh0_halftime, rhoh0_cart, 0, 0, bcs_s, RhoH);
-    Put1dArrayOnCart(tempbar, tempbar_cart, 0, 0, bcs_s, Temp);
+    Put1dArrayOnCart(rho0_halftime, rho0_cart, false, false, bcs_s, Rho);
+    Put1dArrayOnCart(rhoh0_halftime, rhoh0_cart, false, false, bcs_s, RhoH);
+    Put1dArrayOnCart(tempbar, tempbar_cart, false, false, bcs_s, Temp);
 
     // edge variables    
     BaseState<Real> rho0_edge(base_geom.max_radial_level+1, base_geom.nr_fine+1);
@@ -391,9 +391,9 @@ Maestro::HfromRhoTedge (Vector<std::array< MultiFab, AMREX_SPACEDIM > >& sedge,
     }
 
     if (!spherical) {
-        Put1dArrayOnCart(rho0_edge, rho0_edge_cart, 1, 0, bcs_s, Rho);
-        Put1dArrayOnCart(rhoh0_edge, rhoh0_edge_cart, 1, 0, bcs_s, RhoH);
-        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, 1, 0, bcs_s, Temp);
+        Put1dArrayOnCart(rho0_edge, rho0_edge_cart, true, false, bcs_s, Rho);
+        Put1dArrayOnCart(rhoh0_edge, rhoh0_edge_cart, true, false, bcs_s, RhoH);
+        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, true, false, bcs_s, Temp);
     }
 
     // make a lot of local copies

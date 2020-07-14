@@ -84,7 +84,7 @@ Maestro::Regrid ()
         w0_cart[lev].setVal(0.);
     }
     // put w0 on Cartesian cell-centers
-    Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
     if (evolve_base_state) {
         // force rho0 to be the average of rho
@@ -278,7 +278,7 @@ Maestro::RemakeLevel (int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 }
 
@@ -314,7 +314,7 @@ Maestro::MakeNewLevelFromCoarse (int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 
     FillCoarsePatch(lev, time,     sold[lev],     sold,     sold, 0, 0,          Nscal, bcs_s);
