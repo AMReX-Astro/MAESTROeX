@@ -1,12 +1,12 @@
 #ifndef _MODEL_PARSER_H_
 #define _MODEL_PARSER_H_
 
-#include <AMReX_Vector.H>
 #include <AMReX_Print.H>
-#include <MaestroUtil.H>
-#include <state_indices.H>
-#include <network_properties.H>
+#include <AMReX_Vector.H>
 #include <BaseState.H>
+#include <MaestroUtil.H>
+#include <network_properties.H>
+#include <state_indices.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -14,20 +14,18 @@
 typedef amrex::Gpu::ManagedVector<amrex::Real> RealVector;
 typedef amrex::Gpu::ManagedVector<int> IntVector;
 #else
-typedef amrex::Vector< amrex::Real > RealVector;
-typedef amrex::Vector< int > IntVector;
+typedef amrex::Vector<amrex::Real> RealVector;
+typedef amrex::Vector<int> IntVector;
 #endif
 
-class ModelParser
-{
-public:
-
-    ModelParser() {model_initialized = false;};
+class ModelParser {
+   public:
+    ModelParser() { model_initialized = false; };
 
     void ReadFile(const std::string& model_file);
 
-    amrex::Real Interpolate(const amrex::Real r, const int ivar, 
-                            bool interpolate_top=false);
+    amrex::Real Interpolate(const amrex::Real r, const int ivar,
+                            bool interpolate_top = false);
 
     // // arrays for storing the model data
     amrex::Vector<RealVector> model_state;
