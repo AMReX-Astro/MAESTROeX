@@ -48,9 +48,10 @@ void Maestro::Put1dArrayOnCart(int lev, const BaseState<Real>& s0,
 }
 
 void Maestro::Put1dArrayOnCart(int lev, const BaseState<Real>& s0,
-                               MultiFab& s0_cart, const bool is_input_edge_centered,
-                               const bool is_output_a_vector, const Vector<BCRec>& bcs,
-                               int sbccomp) {
+                               MultiFab& s0_cart,
+                               const bool is_input_edge_centered,
+                               const bool is_output_a_vector,
+                               const Vector<BCRec>& bcs, int sbccomp) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()", Put1dArrayOnCart);
 
@@ -76,8 +77,7 @@ void Maestro::Put1dArrayOnCart(int lev, const BaseState<Real>& s0,
         const Array4<Real> s0_cart_arr = s0_cart.array(mfi);
 
         if (!spherical) {
-            const int outcomp =
-                is_output_a_vector ? AMREX_SPACEDIM - 1 : 0;
+            const int outcomp = is_output_a_vector ? AMREX_SPACEDIM - 1 : 0;
 
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                 const int r = AMREX_SPACEDIM == 2 ? j : k;
@@ -342,8 +342,12 @@ Real Maestro::QuadInterp(const Real x, const Real x0, const Real x1,
                  (x - x0) * (x - x1);
 
     if (limit) {
-        if (y > max(y0, max(y1, y2))) { y = max(y0, max(y1, y2)); }
-        if (y < min(y0, min(y1, y2))) { y = min(y0, min(y1, y2)); }
+        if (y > max(y0, max(y1, y2))) {
+            y = max(y0, max(y1, y2));
+        }
+        if (y < min(y0, min(y1, y2))) {
+            y = min(y0, min(y1, y2));
+        }
     }
 
     return y;
@@ -764,8 +768,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[0] * dx[0]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[0] * dx[0]) - 0.375);
                         // closest radial index to edge-centered point
 
                         if (radius >= r_cc_loc(0, index)) {
@@ -808,8 +812,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[1] * dx[1]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[1] * dx[1]) - 0.375);
                         // closest radial index to edge-centered point
 
                         if (radius >= r_cc_loc(0, index)) {
@@ -852,8 +856,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[2] * dx[2]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[2] * dx[2]) - 0.375);
                         // closest radial index to edge-centered point
 
                         if (radius >= r_cc_loc(0, index)) {
@@ -897,8 +901,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[0] * dx[0]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[0] * dx[0]) - 0.375);
                         // closest radial index to edge-centered point
 
                         // index refers to the center point in the quadratic stencil.
@@ -923,8 +927,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[1] * dx[1]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[1] * dx[1]) - 0.375);
                         // closest radial index to edge-centered point
 
                         // index refers to the center point in the quadratic stencil.
@@ -949,8 +953,8 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index =
-                            (int)round(radius * radius / (dx[2] * dx[2]) - 0.375);
+                        auto index = (int)round(
+                            radius * radius / (dx[2] * dx[2]) - 0.375);
                         // closest radial index to edge-centered point
 
                         // index refers to the center point in the quadratic stencil.

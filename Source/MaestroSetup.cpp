@@ -186,7 +186,9 @@ void Maestro::Setup() {
                              r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(), &base_geom.nr_irreg);
 
-    if (use_exact_base_state) { average_base_state = true; }
+    if (use_exact_base_state) {
+        average_base_state = true;
+    }
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.

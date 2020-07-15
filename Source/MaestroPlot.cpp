@@ -2,8 +2,8 @@
 #include <Maestro.H>
 #include <MaestroPlot.H>
 #include <Maestro_F.H>
+#include <unistd.h>  // getcwd
 #include <iterator>  // std::istream_iterator
-#include <unistd.h>     // getcwd
 
 using namespace amrex;
 
@@ -788,22 +788,50 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 
     (*nPlot) = AMREX_SPACEDIM + Nscal + 19;
 
-    if (plot_spec) { (*nPlot) += NumSpec + 1; } // X + 1 (abar)
-    if (plot_spec || plot_omegadot) { (*nPlot) += NumSpec; } // omegadot
+    if (plot_spec) {
+        (*nPlot) += NumSpec + 1;
+    }  // X + 1 (abar)
+    if (plot_spec || plot_omegadot) {
+        (*nPlot) += NumSpec;
+    }  // omegadot
 
-    if (plot_Hext) { (*nPlot)++; }
-    if (plot_Hnuc) { (*nPlot)++; }
-    if (plot_eta) { (*nPlot)++; }
-    if (plot_gpi) { (*nPlot) += AMREX_SPACEDIM; }
+    if (plot_Hext) {
+        (*nPlot)++;
+    }
+    if (plot_Hnuc) {
+        (*nPlot)++;
+    }
+    if (plot_eta) {
+        (*nPlot)++;
+    }
+    if (plot_gpi) {
+        (*nPlot) += AMREX_SPACEDIM;
+    }
     // rho0, rhoh0, h0, p0, w0, divw0 (5+AMREX_SPACEDIM)
-    if (plot_base_state) { (*nPlot) += AMREX_SPACEDIM + 5; }
-    if (plot_cs) { (*nPlot)++; }
-    if (plot_grav) { (*nPlot)++; }
-    if (plot_ad_excess) { (*nPlot)++; }
-    if (plot_pidivu) { (*nPlot)++; }
-    if (plot_processors) { (*nPlot)++; }
-    if (spherical) { (*nPlot) += 2; } // radial_velocity, circ_velocity
-    if (do_sponge) { (*nPlot)++; }
+    if (plot_base_state) {
+        (*nPlot) += AMREX_SPACEDIM + 5;
+    }
+    if (plot_cs) {
+        (*nPlot)++;
+    }
+    if (plot_grav) {
+        (*nPlot)++;
+    }
+    if (plot_ad_excess) {
+        (*nPlot)++;
+    }
+    if (plot_pidivu) {
+        (*nPlot)++;
+    }
+    if (plot_processors) {
+        (*nPlot)++;
+    }
+    if (spherical) {
+        (*nPlot) += 2;
+    }  // radial_velocity, circ_velocity
+    if (do_sponge) {
+        (*nPlot)++;
+    }
 
     Vector<std::string> names(*nPlot);
 
@@ -894,9 +922,15 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         }
     }
 
-    if (plot_Hext) { names[cnt++] = "Hext"; }
-    if (plot_Hnuc) { names[cnt++] = "Hnuc"; }
-    if (plot_eta) { names[cnt++] = "eta_rho"; }
+    if (plot_Hext) {
+        names[cnt++] = "Hext";
+    }
+    if (plot_Hnuc) {
+        names[cnt++] = "Hnuc";
+    }
+    if (plot_eta) {
+        names[cnt++] = "eta_rho";
+    }
 
     names[cnt++] = "tfromp";
     names[cnt++] = "tfromh";
@@ -928,14 +962,24 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     names[cnt++] = "deltagamma";
     names[cnt++] = "entropy";
     names[cnt++] = "entropypert";
-    if (plot_pidivu) { names[cnt++] = "pi_divu"; }
-    if (plot_processors) { names[cnt++] = "processor_number"; }
-    if (plot_ad_excess) { names[cnt++] = "ad_excess"; }
+    if (plot_pidivu) {
+        names[cnt++] = "pi_divu";
+    }
+    if (plot_processors) {
+        names[cnt++] = "processor_number";
+    }
+    if (plot_ad_excess) {
+        names[cnt++] = "ad_excess";
+    }
     names[cnt++] = "S";
 
-    if (plot_cs) { names[cnt++] = "soundspeed"; }
+    if (plot_cs) {
+        names[cnt++] = "soundspeed";
+    }
 
-    if (plot_grav) { names[cnt++] = "maggrav"; }
+    if (plot_grav) {
+        names[cnt++] = "maggrav";
+    }
 
     if (plot_base_state) {
         // w0 and divw0
@@ -1002,10 +1046,10 @@ Vector<std::string> Maestro::SmallPlotFileVarNames(
                     }
                 }
 
-		if (!found_name) {
+                if (!found_name) {
                     Print()
                         << "Small plot file variable " << nm << " is invalid\n";
-		}
+                }
             }
         }
     } else {

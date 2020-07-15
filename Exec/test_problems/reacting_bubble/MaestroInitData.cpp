@@ -56,7 +56,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
                 s0[n] = s0_arr(lev, r, n);
             }
 
-            Perturb(p0_arr(lev,r), s0, perturbations, x, y, z);
+            Perturb(p0_arr(lev, r), s0, perturbations, x, y, z);
 
             scal(i, j, k, Rho) = perturbations[Rho];
             scal(i, j, k, RhoH) = perturbations[RhoH];
@@ -129,7 +129,8 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 temp_arr(l, r) = s0_init_arr(l, r, FirstSpec + comp);
             }
         }
-        Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s, FirstSpec + comp);
+        Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s,
+                         FirstSpec + comp);
         MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
     }
 
@@ -181,8 +182,8 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                     s0[n] = scal_arr(i, j, k, n);
                 }
 
-		Perturb(p0_arr(i, j, k), s0, perturbations, x, y, z);
-                
+                Perturb(p0_arr(i, j, k), s0, perturbations, x, y, z);
+
                 scal_arr(i, j, k, Rho) = perturbations[Rho];
                 scal_arr(i, j, k, RhoH) = perturbations[RhoH];
                 scal_arr(i, j, k, Temp) = perturbations[Temp];
@@ -196,8 +197,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
 }
 
 void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
-             const Real x, const Real y, const Real z)
-{
+             const Real x, const Real y, const Real z) {
     Real t0 = s0[Temp];
 
 #if (AMREX_SPACEDIM == 2)

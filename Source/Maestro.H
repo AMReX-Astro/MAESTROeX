@@ -13,18 +13,18 @@
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
-#include <network.H>
-#include <eos.H>
-#include <conductivity.H>
 #include <BaseState.H>
 #include <BaseStateGeometry.H>
+#include <conductivity.H>
+#include <eos.H>
+#include <network.H>
 
-#include <state_indices.H>
 #include <maestro_params.H>
+#include <state_indices.H>
 using namespace maestro;
 #include <ModelParser.H>
-#include <SimpleLog.H>
 #include <PhysBCFunctMaestro.H>
+#include <SimpleLog.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -120,12 +120,15 @@ class Maestro : public amrex::AmrCore {
     ////////////
     // MaestroAdvectBase.cpp functions
     void AdvectBaseDens(BaseState<amrex::Real>& rho0_predicted_edge);
-    void AdvectBaseDensPlanar(BaseState<amrex::Real>& rho0_predicted_edge_state);
+    void AdvectBaseDensPlanar(
+        BaseState<amrex::Real>& rho0_predicted_edge_state);
     void AdvectBaseDensSphr(BaseState<amrex::Real>& rho0_predicted_edge_state);
 
     void AdvectBaseEnthalpy(BaseState<amrex::Real>& rhoh0_predicted_edge);
-    void AdvectBaseEnthalpyPlanar(BaseState<amrex::Real>& rhoh0_predicted_edge_state);
-    void AdvectBaseEnthalpySphr(BaseState<amrex::Real>& rhoh0_predicted_edge_state);
+    void AdvectBaseEnthalpyPlanar(
+        BaseState<amrex::Real>& rhoh0_predicted_edge_state);
+    void AdvectBaseEnthalpySphr(
+        BaseState<amrex::Real>& rhoh0_predicted_edge_state);
     // end MaestroAdvectBase.cpp functions
     ////////////
 
@@ -542,7 +545,7 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& scal_force,
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-	const BaseState<amrex::Real>& p0,
+        const BaseState<amrex::Real>& p0,
         const amrex::Vector<amrex::MultiFab>& diff);
     ////////////////////////
 
@@ -630,8 +633,7 @@ class Maestro : public amrex::AmrCore {
     void Put1dArrayOnCart(
         const BaseState<amrex::Real>& s0,
         amrex::Vector<amrex::MultiFab>& s0_cart,
-	const bool is_input_edge_centered,
-        const bool is_output_a_vector,
+        const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         int sbccomp = 0, int variable_type = 0);
 
@@ -646,8 +648,7 @@ class Maestro : public amrex::AmrCore {
     /// @param sbccomp      start boundary conditions component
     void Put1dArrayOnCart(
         const int level, const BaseState<amrex::Real>& s0,
-        amrex::MultiFab& s0_cart,
-	const bool is_input_edge_centered,
+        amrex::MultiFab& s0_cart, const bool is_input_edge_centered,
         const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         int sbccomp = 0);
@@ -655,8 +656,7 @@ class Maestro : public amrex::AmrCore {
     void Put1dArrayOnCart(
         int level, const BaseState<amrex::Real>& s0,
         amrex::Vector<amrex::MultiFab>& s0_cart,
-	const bool is_input_edge_centered,
-        const bool is_output_a_vector,
+        const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         int sbccomp = 0);
 
@@ -737,7 +737,8 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& temp_force,
         const amrex::Vector<amrex::MultiFab>& scal,
         const amrex::Vector<amrex::MultiFab>& thermal,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac_in);
+        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
+            umac_in);
     ////////////////////////
 
     ////////////

@@ -164,7 +164,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                                             dmap[lev], Nscal, 0););
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d) {
+        for (int d = 0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
         }
     }

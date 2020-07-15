@@ -140,7 +140,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             }
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                if (sumX != 0.0) { xn_ambient[comp] /= sumX; }
+                if (sumX != 0.0) {
+                    xn_ambient[comp] /= sumX;
+                }
             }
 
             eos_t eos_state;

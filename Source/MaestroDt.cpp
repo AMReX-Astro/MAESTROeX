@@ -180,13 +180,19 @@ void Maestro::EstDt() {
                         umax_grid,
                         std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
 
-                    if (spdx > eps) { dt_temp = amrex::min(dt_temp, dx[0] / spdx); }
-                    if (spdy > eps) { dt_temp = amrex::min(dt_temp, dx[1] / spdy); }
-                    if (spdz > eps) { dt_temp = amrex::min(dt_temp, dx[2] / spdz); }
+                    if (spdx > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[0] / spdx);
+                    }
+                    if (spdy > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[1] / spdy);
+                    }
+                    if (spdz > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[2] / spdz);
+                    }
                     if (spdr > eps) {
-			dt_temp =
-			    amrex::min(dt_temp, dx[AMREX_SPACEDIM-1] / spdr);
-		    }
+                        dt_temp =
+                            amrex::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
+                    }
 
                     dt_temp *= cfl;
 
@@ -200,19 +206,19 @@ void Maestro::EstDt() {
                         vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 #endif
 
-	            if (fx > eps) {
+                    if (fx > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
-		    }
-		    if (fy > eps) {
+                    }
+                    if (fy > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
-		    }
+                    }
 #if (AMREX_SPACEDIM == 3)
                     if (fz > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
-		    }
+                    }
 #endif
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
@@ -328,12 +334,18 @@ void Maestro::EstDt() {
                         umax_grid,
                         std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
 
-                    if (spdx > eps) { dt_temp = amrex::min(dt_temp, dx[0] / spdx); }
-                    if (spdy > eps) { dt_temp = amrex::min(dt_temp, dx[1] / spdy); }
-                    if (spdz > eps) { dt_temp = amrex::min(dt_temp, dx[2] / spdz); }
+                    if (spdx > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[0] / spdx);
+                    }
+                    if (spdy > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[1] / spdy);
+                    }
+                    if (spdz > eps) {
+                        dt_temp = amrex::min(dt_temp, dx[2] / spdz);
+                    }
                     if (spdr > eps) {
-			dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
-		    }
+                        dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
+                    }
 
                     dt_temp *= cfl;
 
@@ -348,15 +360,15 @@ void Maestro::EstDt() {
                     if (fx > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
-		    }
+                    }
                     if (fy > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
-		    }
-		    if (fz > eps) {
+                    }
+                    if (fz > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
-		    }
+                    }
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
@@ -668,16 +680,16 @@ void Maestro::FirstDt() {
                 if (pforcex > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
-		}
+                }
                 if (pforcey > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
-		}
+                }
 #if (AMREX_SPACEDIM == 3)
                 if (pforcez > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
-		}
+                }
 #endif
 
                 // divU constraint

@@ -441,7 +441,6 @@ void Maestro::MakeRHCCforMacProj(
     const BaseState<Real>& gamma1bar, const BaseState<Real>& p0,
     const Vector<MultiFab>& delta_p_term, Vector<MultiFab>& delta_chi,
     const bool is_predictor) {
-
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRHCCforMacProj()", MakeRHCCforMacProj);
 

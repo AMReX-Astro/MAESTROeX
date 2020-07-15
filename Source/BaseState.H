@@ -123,8 +123,7 @@ class BaseState {
       public member functions
     */
 
-    BaseState()
-	: nlev(0), len(0), nvar(0) {}
+    BaseState() : nlev(0), len(0), nvar(0) {}
 
     explicit BaseState(const int num_levs, const int length = 1,
                        const int ncomp = 1, const T val = T());
@@ -283,7 +282,8 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp,
 
 /// make sure that this class is never instantiated with bool
 template <>
-BaseState<bool>::BaseState(const int, const int, const int, const bool) = delete;
+BaseState<bool>::BaseState(const int, const int, const int,
+                           const bool) = delete;
 
 template <class T>
 BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src,

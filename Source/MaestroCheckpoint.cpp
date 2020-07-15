@@ -234,7 +234,8 @@ int Maestro::ReadCheckPoint() {
 
             // build FluxRegister data
             if (lev > 0 && reflux_type == 2) {
-                flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
+                flux_reg_s[lev] = std::make_unique<FluxRegister>(
+                    ba, dm, refRatio(lev - 1), lev, Nscal);
             }
         }
     }

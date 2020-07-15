@@ -73,17 +73,16 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
         }
     }
 
-    // copy rhoX0_old 
+    // copy rhoX0_old
     auto s0_init_arr = s0_init.array();
 
     for (auto n = 0; n < base_geom.max_radial_level; ++n) {
         for (auto r = 0; r < base_geom.nr(n); ++r) {
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
+                rhoX0_old_arr(n, r, comp) = s0_init_arr(n, r, FirstSpec + comp);
             }
         }
     }
-
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! compute the heating term and Sbar
@@ -358,7 +357,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     for (auto n = 0; n < base_geom.max_radial_level; ++n) {
         for (auto r = 0; r < base_geom.nr(n); ++r) {
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                s0_init_arr(n,r,FirstSpec+comp) = rhoX0_new_arr(n, r, comp);
+                s0_init_arr(n, r, FirstSpec + comp) = rhoX0_new_arr(n, r, comp);
             }
         }
     }

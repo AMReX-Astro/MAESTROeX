@@ -520,16 +520,17 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
 
                         for (int odir = 0; odir < BL_SPACEDIM; odir++) {
                             if (odir != idir) {
-				if (geom[lev].isPeriodic(odir)) {
+                                if (geom[lev].isPeriodic(odir)) {
                                     bx.grow(odir, 1);
-				}
-                                if (reg.bigEnd(odir) != domainBox.bigEnd(odir)) {
+                                }
+                                if (reg.bigEnd(odir) !=
+                                    domainBox.bigEnd(odir)) {
                                     bx.growHi(odir, 1);
-				}
+                                }
                                 if (reg.smallEnd(odir) !=
                                     domainBox.smallEnd(odir)) {
                                     bx.growLo(odir, 1);
-				}
+                                }
                             }
                         }
                         bxlist.push_back(bx);
@@ -545,14 +546,15 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
                             if (odir != idir) {
                                 if (geom[lev].isPeriodic(odir)) {
                                     bx.grow(odir, 1);
-				}
-                                if (reg.bigEnd(odir) != domainBox.bigEnd(odir)) {
+                                }
+                                if (reg.bigEnd(odir) !=
+                                    domainBox.bigEnd(odir)) {
                                     bx.growHi(odir, 1);
-				}
+                                }
                                 if (reg.smallEnd(odir) !=
                                     domainBox.smallEnd(odir)) {
                                     bx.growLo(odir, 1);
-				}
+                                }
                             }
                         }
                         bxlist.push_back(bx);

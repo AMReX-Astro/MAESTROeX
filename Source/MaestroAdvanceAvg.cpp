@@ -165,7 +165,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                                             dmap[lev], Nscal, 0););
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d) {
+        for (int d = 0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
         }
     }
@@ -308,7 +308,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                    dtold, is_predictor);
 
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-#if (AMREX_SPACEDIM == 3)       
+#if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
@@ -613,7 +613,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                    dtold, is_predictor);
 
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-#if (AMREX_SPACEDIM == 3)            
+#if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);

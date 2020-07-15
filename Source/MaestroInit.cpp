@@ -396,7 +396,8 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(
+            ba, dm, refRatio(lev - 1), lev, Nscal);
     }
 }
 
@@ -463,8 +464,7 @@ void Maestro::InitProj() {
               delta_gamma1_termbar);
 
     // NOTE: not sure if valid for use_exact_base_state
-    if (evolve_base_state &&
-        (!use_exact_base_state && !average_base_state)) {
+    if (evolve_base_state && (!use_exact_base_state && !average_base_state)) {
         // average S into Sbar
         Average(S_cc_old, Sbar, 0);
     } else {

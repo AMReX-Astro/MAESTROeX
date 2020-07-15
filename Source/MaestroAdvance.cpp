@@ -326,7 +326,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
                is_predictor);
 
         Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-        
+
         base_time += ParallelDescriptor::second() - base_time_start;
         ParallelDescriptor::ReduceRealMax(
             base_time, ParallelDescriptor::IOProcessorNumber());

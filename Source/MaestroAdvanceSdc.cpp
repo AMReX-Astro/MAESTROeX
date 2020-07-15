@@ -187,7 +187,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                                             dmap[lev], Nscal, 0););
 
         // initialize umac
-        for (int d=0; d < AMREX_SPACEDIM; ++d) {
+        for (int d = 0; d < AMREX_SPACEDIM; ++d) {
             umac[lev][d].setVal(0.);
         }
 
@@ -572,7 +572,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
         // compute p0_nph
-	// p0_nph.copy(0.5 * (p0_old + p0_new));
+        // p0_nph.copy(0.5 * (p0_old + p0_new));
 
         // hold dp0/dt in psi for Make_S_cc
         psi.copy((p0_new - p0_old) / dt);
@@ -847,7 +847,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
             p0_nph.copy(0.5 * (p0_old + p0_new));
             // p0_nph.copy(p0_new);
-            
+
             // hold dp0/dt in psi for enthalpy advance
             psi.copy((p0_new - p0_old) / dt);
         }

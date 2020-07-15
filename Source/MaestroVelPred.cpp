@@ -552,9 +552,8 @@ void Maestro::VelPredVelocities(
     AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
-                                              : Ipfx(i - 1, j, k, 0);
-        Real fr =
-            ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
+                                        : Ipfx(i - 1, j, k, 0);
+        Real fr = ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
 
         // extrapolate to edges
         Real umacl = ulx(i, j, k, 0) -
@@ -619,9 +618,8 @@ void Maestro::VelPredVelocities(
     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
-                                              : Ipfy(i, j - 1, k, 1);
-        Real fr =
-            ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
+                                        : Ipfy(i, j - 1, k, 1);
+        Real fr = ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
 
         // extrapolate to edges
         Real vmacl = uly(i, j, k, 1) -
@@ -1514,9 +1512,8 @@ void Maestro::VelPredVelocities(
     AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
-                                              : Ipfx(i - 1, j, k, 0);
-        Real fr =
-            ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
+                                        : Ipfx(i - 1, j, k, 0);
+        Real fr = ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
 
         // extrapolate to edges
         Real umacl =
@@ -1592,9 +1589,8 @@ void Maestro::VelPredVelocities(
     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
-                                              : Ipfy(i, j - 1, k, 1);
-        Real fr =
-            ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
+                                        : Ipfy(i, j - 1, k, 1);
+        Real fr = ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
 
         // extrapolate to edges
         Real vmacl =
@@ -1670,9 +1666,8 @@ void Maestro::VelPredVelocities(
     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j, k - 1, 2)
-                                              : Ipfz(i, j, k - 1, 2);
-        Real fr =
-            ppm_trace_forces == 0 ? force(i, j, k, 2) : Imfz(i, j, k, 2);
+                                        : Ipfz(i, j, k - 1, 2);
+        Real fr = ppm_trace_forces == 0 ? force(i, j, k, 2) : Imfz(i, j, k, 2);
 
         // extrapolate to edges
         Real wmacl =

@@ -380,7 +380,8 @@ void Maestro::HfromRhoTedge(
     if (!spherical) {
         Put1dArrayOnCart(rho0_edge, rho0_edge_cart, true, false, bcs_s, Rho);
         Put1dArrayOnCart(rhoh0_edge, rhoh0_edge_cart, true, false, bcs_s, RhoH);
-        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, true, false, bcs_s, Temp);
+        Put1dArrayOnCart(tempbar_edge, tempbar_edge_cart, true, false, bcs_s,
+                         Temp);
     }
 
     // make a lot of local copies

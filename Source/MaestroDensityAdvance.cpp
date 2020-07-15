@@ -108,7 +108,7 @@ void Maestro::DensityAdvance(
     // predict species at the edges -- note, either X or (rho X) will be
     // predicted here, depending on species_pred_type
 
-    const auto is_vel = false; // false
+    const auto is_vel = false;  // false
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
         // we are predicting X to the edges, using the advective form of
@@ -353,7 +353,7 @@ void Maestro::DensityAdvanceSDC(
     // predict species at the edges -- note, either X or (rho X) will be
     // predicted here, depending on species_pred_type
 
-    const auto is_vel = false; // false
+    const auto is_vel = false;  // false
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
         // we are predicting X to the edges, using the advective form of
