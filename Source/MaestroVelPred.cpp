@@ -308,7 +308,6 @@ void Maestro::VelPredInterface(
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    const int ppm_type_local = ppm_type;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -319,7 +318,7 @@ void Maestro::VelPredInterface(
     int bchi = phys_bc[AMREX_SPACEDIM];
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = max(0.0, ufull(i - 1, j, k, 0));
             Real minu = min(0.0, ufull(i, j, k, 0));
             // extrapolate both components of velocity to left face
@@ -332,7 +331,7 @@ void Maestro::VelPredInterface(
                               (0.5 + (dt2 / hx) * minu) * Ipu(i, j, k, 0);
             urx(i, j, k, 1) = utilde(i, j, k, 1) -
                               (0.5 + (dt2 / hx) * minu) * Ipu(i, j, k, 1);
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate both components of velocity to left face
             ulx(i, j, k, 0) = Ipu(i - 1, j, k, 0);
             ulx(i, j, k, 1) = Ipv(i - 1, j, k, 0);
@@ -419,7 +418,7 @@ void Maestro::VelPredInterface(
     bchi = phys_bc[AMREX_SPACEDIM + 1];
 
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = max(0.0, ufull(i, j - 1, k, 1));
             Real minu = min(0.0, ufull(i, j, k, 1));
             // extrapolate both components of velocity to left face
@@ -432,7 +431,7 @@ void Maestro::VelPredInterface(
                               (0.5 + (dt2 / hy) * minu) * Imv(i, j, k, 0);
             ury(i, j, k, 1) = utilde(i, j, k, 1) -
                               (0.5 + (dt2 / hy) * minu) * Imv(i, j, k, 1);
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate both components of velocity to left face
             uly(i, j, k, 0) = Ipu(i, j - 1, k, 1);
             uly(i, j, k, 1) = Ipv(i, j - 1, k, 1);
@@ -541,7 +540,6 @@ void Maestro::VelPredVelocities(
     const Real hx = dx[0];
     const Real hy = dx[1];
 
-    const int ppm_trace_forces_local = ppm_trace_forces;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -553,10 +551,10 @@ void Maestro::VelPredVelocities(
 
     AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i - 1, j, k, 0)
+        Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
                                               : Ipfx(i - 1, j, k, 0);
         Real fr =
-            ppm_trace_forces_local == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
+            ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
 
         // extrapolate to edges
         Real umacl = ulx(i, j, k, 0) -
@@ -620,10 +618,10 @@ void Maestro::VelPredVelocities(
 
     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i, j - 1, k, 1)
+        Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
                                               : Ipfy(i, j - 1, k, 1);
         Real fr =
-            ppm_trace_forces_local == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
+            ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
 
         // extrapolate to edges
         Real vmacl = uly(i, j, k, 1) -
@@ -725,7 +723,6 @@ void Maestro::VelPredInterface(
     const Real hy = dx[1];
     const Real hz = dx[2];
 
-    const int ppm_type_local = ppm_type;
     const auto rel_eps_local = rel_eps;
 
     // x-direction
@@ -736,7 +733,7 @@ void Maestro::VelPredInterface(
     int bchi = phys_bc[AMREX_SPACEDIM];
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = 0.5 - dt2 * max(0.0, ufull(i - 1, j, k, 0)) / hx;
             Real minu = 0.5 + dt2 * min(0.0, ufull(i, j, k, 0)) / hx;
 
@@ -747,7 +744,7 @@ void Maestro::VelPredInterface(
                 // extrapolate all components of velocity to right face
                 urx(i, j, k, n) = utilde(i, j, k, n) - minu * Ipu(i, j, k, n);
             }
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             ulx(i, j, k, 0) = Ipu(i - 1, j, k, 0);
             ulx(i, j, k, 1) = Ipv(i - 1, j, k, 0);
@@ -845,7 +842,7 @@ void Maestro::VelPredInterface(
     bchi = phys_bc[AMREX_SPACEDIM + 1];
 
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = (0.5 - dt2 * max(0.0, ufull(i, j - 1, k, 1)) / hy);
             Real minu = (0.5 + dt2 * min(0.0, ufull(i, j, k, 1)) / hy);
 
@@ -857,7 +854,7 @@ void Maestro::VelPredInterface(
                 ury(i, j, k, n) = utilde(i, j, k, n) - minu * Imv(i, j, k, n);
             }
 
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             uly(i, j, k, 0) = Ipu(i, j - 1, k, 1);
             uly(i, j, k, 1) = Ipv(i, j - 1, k, 1);
@@ -955,7 +952,7 @@ void Maestro::VelPredInterface(
     bchi = phys_bc[AMREX_SPACEDIM + 2];
 
     AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, {
-        if (ppm_type_local == 0) {
+        if (ppm_type == 0) {
             Real maxu = 0.5 - dt2 * max(0.0, ufull(i, j, k - 1, 2)) / hz;
             Real minu = 0.5 + dt2 * min(0.0, ufull(i, j, k, 2)) / hz;
 
@@ -967,7 +964,7 @@ void Maestro::VelPredInterface(
                 urz(i, j, k, n) = utilde(i, j, k, n) - minu * Imw(i, j, k, n);
             }
 
-        } else if (ppm_type_local == 1 || ppm_type_local == 2) {
+        } else if (ppm_type == 1 || ppm_type == 2) {
             // extrapolate all components of velocity to left face
             ulz(i, j, k, 0) = Ipu(i, j, k - 1, 2);
             ulz(i, j, k, 1) = Ipv(i, j, k - 1, 2);
@@ -1513,16 +1510,13 @@ void Maestro::VelPredVelocities(
         physbc[n] = phys_bc[n];
     }
 
-    const int ppm_trace_forces_local = ppm_trace_forces;
-    const int spherical_local = spherical;
-
     // x-direction
     AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i - 1, j, k, 0)
+        Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
                                               : Ipfx(i - 1, j, k, 0);
         Real fr =
-            ppm_trace_forces_local == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
+            ppm_trace_forces == 0 ? force(i, j, k, 0) : Imfx(i, j, k, 0);
 
         // extrapolate to edges
         Real umacl =
@@ -1539,7 +1533,7 @@ void Maestro::VelPredVelocities(
                          (uimhzy(i, j, k + 1) - uimhzy(i, j, k)) +
                      dt2 * fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test =
                 (umacl + w0macx(i, j, k) <= 0.0 &&
@@ -1597,10 +1591,10 @@ void Maestro::VelPredVelocities(
     // y-direction
     AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i, j - 1, k, 1)
+        Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
                                               : Ipfy(i, j - 1, k, 1);
         Real fr =
-            ppm_trace_forces_local == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
+            ppm_trace_forces == 0 ? force(i, j, k, 1) : Imfy(i, j, k, 1);
 
         // extrapolate to edges
         Real vmacl =
@@ -1617,7 +1611,7 @@ void Maestro::VelPredVelocities(
                          (vimhzx(i, j, k + 1) - vimhzx(i, j, k)) +
                      dt2 * fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test =
                 (vmacl + w0macy(i, j, k) <= 0.0 &&
@@ -1675,10 +1669,10 @@ void Maestro::VelPredVelocities(
     // z-direction
     AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
         // use the traced force if ppm_trace_forces = 1
-        Real fl = ppm_trace_forces_local == 0 ? force(i, j, k - 1, 2)
+        Real fl = ppm_trace_forces == 0 ? force(i, j, k - 1, 2)
                                               : Ipfz(i, j, k - 1, 2);
         Real fr =
-            ppm_trace_forces_local == 0 ? force(i, j, k, 2) : Imfz(i, j, k, 2);
+            ppm_trace_forces == 0 ? force(i, j, k, 2) : Imfz(i, j, k, 2);
 
         // extrapolate to edges
         Real wmacl =
@@ -1695,7 +1689,7 @@ void Maestro::VelPredVelocities(
                          (wimhyx(i, j + 1, k) - wimhyx(i, j, k)) +
                      dt2 * fr;
 
-        if (spherical_local == 1) {
+        if (spherical) {
             // solve Riemann problem using full velocity
             bool test =
                 (wmacl + w0macz(i, j, k) <= 0.0 &&

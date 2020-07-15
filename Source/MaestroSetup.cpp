@@ -53,8 +53,9 @@ void Maestro::Setup() {
 #endif
 
     // check max level does not exceed hardcoded limit
-    if (max_level > MAESTRO_MAX_LEVELS)
+    if (max_level > MAESTRO_MAX_LEVELS) {
         Abort("max_level exceeds MAESTROeX's limit!");
+    }
 
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
@@ -78,13 +79,13 @@ void Maestro::Setup() {
         base_geom.dr_fine = dxFine[0] / drdxfac;
 
         // compute base_geom.nr_irreg
-        int domhi = domainBoxFine.bigEnd(0) + 1;
+        const Real domhi = domainBoxFine.bigEnd(0) + 1;
         if (!octant) {
             base_geom.nr_irreg =
-                (3 * (domhi / 2 - 0.5) * (domhi / 2 - 0.5) - 0.75) / 2.0;
+                int((3 * (domhi / 2 - 0.5) * (domhi / 2 - 0.5) - 0.75) / 2.0);
         } else {
             base_geom.nr_irreg =
-                (3 * (domhi - 0.5) * (domhi - 0.5) - 0.75) / 2.0;
+                int((3 * (domhi - 0.5) * (domhi - 0.5) - 0.75) / 2.0);
         }
 
         // compute base_geom.nr_fine
@@ -185,7 +186,7 @@ void Maestro::Setup() {
                              r_edge_loc_vec.dataPtr(),
                              geom[max_level].CellSize(), &base_geom.nr_irreg);
 
-    if (use_exact_base_state) average_base_state = true;
+    if (use_exact_base_state) { average_base_state = true; }
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.

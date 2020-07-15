@@ -236,7 +236,7 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                    (base_geom.r_end_coord(n, j) + 1) / 2);
 
                     for (int i = n - 1; i >= 0; --i) {
-                        int refrat = round(pow(2, n - i));
+                        auto refrat = (int)round(pow(2, n - i));
 
                         // Offset the centered beta on level i above this point so the total
                         // integral is consistent

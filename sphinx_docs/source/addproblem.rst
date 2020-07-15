@@ -93,7 +93,7 @@ override this default search path, you can set ``EOS_TOP_DIR``,
 Generally, one does not need to include the problem directory itself
 in ``Bpack`` and ``Blocs``, unless there are unique source files found there,
 described in a ``Make.package`` file. These variables are
-interpreted by the ``Make.Maestro`` file and used to build a master
+interpreted by the ``Make.Maestro`` file and used to build a main
 list of packages called Bdirs. The build system will attempt
 to build all of the files listed in the various ``Make.package``
 files found in the Bdirs directories. Furthermore,

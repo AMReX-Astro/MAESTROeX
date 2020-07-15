@@ -171,7 +171,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         }
 
         if (drive_initial_convection) {
-            Put1dArrayOnCart(tempbar_init, tempbar_init_cart, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(tempbar_init, tempbar_init_cart, false, false, bcs_f, 0);
         }
     }
 
@@ -192,7 +192,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
-        if (lev == finest_level) finelev = finest_level;
+        if (lev == finest_level) { finelev = finest_level; }
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in_mf, fba, IntVect(2));
@@ -205,7 +205,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            int use_mask = !(lev == finest_level);
+            const bool use_mask = !(lev==finest_level);
 
             // call fortran subroutine
             // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
@@ -221,8 +221,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]),
-                                 dt_in, time_in, BL_TO_FORTRAN_ANYD(mask[mfi]),
-                                 use_mask);
+				 dt_in, time_in, BL_TO_FORTRAN_ANYD(mask[mfi]), 
+                                 (int)use_mask);
             } else {
 #pragma gpu box(tileBox)
                 burner_loop(AMREX_INT_ANYD(tileBox.loVect()),
@@ -232,8 +232,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                             BL_TO_FORTRAN_ANYD(rho_Hext_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
-                            tempbar_init_vec.dataPtr(), dt_in, time_in,
-                            BL_TO_FORTRAN_ANYD(mask[mfi]), use_mask);
+                            tempbar_init_vec.dataPtr(), dt_in, time_in, 
+                            BL_TO_FORTRAN_ANYD(mask[mfi]), (int)use_mask);
             }
         }
     }
@@ -258,7 +258,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             p0_cart[lev].setVal(0.);
         }
 
-        Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
     } else {
         // need non-constant basestate to apply toVector()
         BaseState<Real> p0_var(p0);

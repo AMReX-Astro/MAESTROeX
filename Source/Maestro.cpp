@@ -4,15 +4,6 @@
 
 using namespace amrex;
 
-// default values are overwritten in VariableSetup()
-// int Maestro::Rho       = -1;
-// int Maestro::RhoH      = -1;
-// int Maestro::FirstSpec = -1;
-// int Maestro::NumSpec   = -1;
-// int Maestro::Temp      = -1;
-// int Maestro::Pi        = -1;
-// int Maestro::Nscal     = -1;
-
 // number of ghost cells for sold/new and uold/new
 // overwritten in VariableSetup()
 int Maestro::ng_s = -1;

@@ -49,8 +49,9 @@ void Maestro::Init() {
 
         const int model_file_length = model_file.length();
         Vector<int> model_file_name(model_file_length);
-        for (int i = 0; i < model_file_length; i++)
+        for (int i = 0; i < model_file_length; i++) {
             model_file_name[i] = model_file[i];
+        }
         ca_read_model_file(model_file_name.dataPtr(), &model_file_length);
 
         // read in checkpoint file
@@ -94,7 +95,7 @@ void Maestro::Init() {
 
         // put w0 on Cartesian cell-centers
         if (evolve_base_state) {
-            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
 
         if (!spherical) {
@@ -395,8 +396,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     }
 
     if (lev > 0 && reflux_type == 2) {
-        flux_reg_s[lev].reset(
-            new FluxRegister(ba, dm, refRatio(lev - 1), lev, Nscal));
+        flux_reg_s[lev] = std::make_unique<FluxRegister>(ba, dm, refRatio(lev-1), lev, Nscal);
     }
 }
 
@@ -464,7 +464,7 @@ void Maestro::InitProj() {
 
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state &&
-        (use_exact_base_state == 0 && average_base_state == 0)) {
+        (!use_exact_base_state && !average_base_state)) {
         // average S into Sbar
         Average(S_cc_old, Sbar, 0);
     } else {
@@ -568,13 +568,13 @@ void Maestro::DivuIter(int istep_divu_iter) {
                 Sbar += delta_gamma1_termbar;
             }
 
-            int is_predictor = 1;
+            const auto is_predictor = true;
             Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, p0_old, p0_old,
                    gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dt,
                    is_predictor);
 
             // put w0 on Cartesian cell-centers
-            Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -705,7 +705,7 @@ void Maestro::DivuIterSDC(int istep_divu_iter) {
                 Sbar += delta_gamma1_termbar;
             }
 
-            auto is_predictor = true;
+            const auto is_predictor = true;
             Makew0(w0, w0_force, Sbar, rho0_old, rho0_old, p0_old, p0_old,
                    gamma1bar_old, gamma1bar_old, p0_minus_pthermbar, dt, dt,
                    is_predictor);

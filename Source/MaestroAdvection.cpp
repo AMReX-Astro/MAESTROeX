@@ -51,7 +51,9 @@ void Maestro::AdvancePremac(
         utrans[lev][2].define(convert(grids[lev], nodal_flag_z), dmap[lev], 1,
                               1);
 #endif
-        for (int j = 0; j < AMREX_SPACEDIM; j++) utrans[lev][j].setVal(0.);
+        for (int j=0; j < AMREX_SPACEDIM; j++) {
+            utrans[lev][j].setVal(0.);
+        }
     }
 
     // create utrans

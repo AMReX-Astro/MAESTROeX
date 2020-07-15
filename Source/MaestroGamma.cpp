@@ -21,7 +21,7 @@ void Maestro::MakeGamma1bar(const Vector<MultiFab>& scal,
         p0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 
     const auto use_pprime_in_tfromp_loc = use_pprime_in_tfromp;
 

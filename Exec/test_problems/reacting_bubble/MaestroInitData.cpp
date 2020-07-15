@@ -5,10 +5,8 @@ using namespace amrex;
 // prototype for pertubation function to be called on the
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
-void Perturb(const Real p0, const Real* s0, Real* perturbations, const Real x,
-             const Real y, const Real z, const Real pert_rad_factor,
-             const Real pert_temp_factor, const bool do_small_domain,
-             bool spherical = false);
+void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
+             const Real x, const Real y, const Real z);
 
 // initializes data on a specific level
 void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
@@ -44,10 +42,6 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto prob_lo = geom[lev].ProbLoArray();
         const auto dx = geom[lev].CellSizeArray();
 
-        const auto pert_rad_factor_loc = pert_rad_factor;
-        const auto pert_temp_factor_loc = pert_temp_factor;
-        const auto do_small_domain_loc = do_small_domain;
-
         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 
@@ -62,9 +56,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
                 s0[n] = s0_arr(lev, r, n);
             }
 
-            Perturb(p0_arr(lev, r), s0, perturbations, x, y, z,
-                    pert_rad_factor_loc, pert_temp_factor_loc,
-                    do_small_domain_loc);
+            Perturb(p0_arr(lev,r), s0, perturbations, x, y, z);
 
             scal(i, j, k, Rho) = perturbations[Rho];
             scal(i, j, k, RhoH) = perturbations[RhoH];
@@ -124,11 +116,11 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         }
     }
 
-    Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, Temp);
+    Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s, Temp);
     MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
 
     // initialize p0_cart
-    Put1dArrayOnCart(p0_init, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_init, p0_cart, false, false, bcs_f, 0);
 
     // initialize species
     for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -137,7 +129,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 temp_arr(l, r) = s0_init_arr(l, r, FirstSpec + comp);
             }
         }
-        Put1dArrayOnCart(temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec + comp);
+        Put1dArrayOnCart(temp_vec, temp_mf, false, false, bcs_s, FirstSpec + comp);
         MultiFab::Copy(scal, temp_mf[lev], 0, Temp, 1, scal.nGrow());
     }
 
@@ -176,10 +168,6 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             const auto prob_lo = geom[lev].ProbLoArray();
             const auto dx = geom[lev].CellSizeArray();
 
-            const auto pert_rad_factor_loc = pert_rad_factor;
-            const auto pert_temp_factor_loc = pert_temp_factor;
-            const auto do_small_domain_loc = do_small_domain;
-
             // add an optional perturbation
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
                 Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
@@ -193,10 +181,8 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                     s0[n] = scal_arr(i, j, k, n);
                 }
 
-                Perturb(p0_arr(i, j, k), s0, perturbations, x, y, z,
-                        pert_rad_factor_loc, pert_temp_factor_loc,
-                        do_small_domain_loc, true);
-
+		Perturb(p0_arr(i, j, k), s0, perturbations, x, y, z);
+                
                 scal_arr(i, j, k, Rho) = perturbations[Rho];
                 scal_arr(i, j, k, RhoH) = perturbations[RhoH];
                 scal_arr(i, j, k, Temp) = perturbations[Temp];
@@ -210,9 +196,8 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
 }
 
 void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
-             const Real x, const Real y, const Real z,
-             const Real pert_rad_factor, const Real pert_temp_factor,
-             const bool do_small_domain, bool spherical) {
+             const Real x, const Real y, const Real z)
+{
     Real t0 = s0[Temp];
 
 #if (AMREX_SPACEDIM == 2)
@@ -257,7 +242,7 @@ void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
 
     Real temp = 0.0;
 
-    if (!spherical) {
+    if (!maestro::spherical) {
         Real x0 = 1.8e7;
         Real y0 = 1.8e7;
         Real z0 = 8.5e7;

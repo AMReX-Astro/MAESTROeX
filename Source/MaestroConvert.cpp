@@ -18,7 +18,7 @@ void Maestro::PutInPertForm(Vector<MultiFab>& scal, const BaseState<Real>& s0,
 
     // s0 is not edge centered
     // note that bcs parameter is not used
-    Put1dArrayOnCart(s0, s0_cart, 0, 0);
+    Put1dArrayOnCart(s0, s0_cart, false, false);
 
     if (flag) {
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -46,7 +46,7 @@ void Maestro::PutInPertForm(int level, Vector<MultiFab>& scal,
 
     // s0 is not edge centered
     // note that bcs parameter is not used
-    Put1dArrayOnCart(level, s0, s0_cart, 0, 0);
+    Put1dArrayOnCart(level, s0, s0_cart, false, false);
 
     if (flag) {
         MultiFab::Subtract(scal[level], s0_cart[level], 0, comp, 1, 0);

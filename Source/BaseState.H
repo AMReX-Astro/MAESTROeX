@@ -123,9 +123,8 @@ class BaseState {
       public member functions
     */
 
-    BaseState(){};
-
-    // BaseState(const int num_levs, const int length=1, const int ncomp=1);
+    BaseState()
+	: nlev(0), len(0), nvar(0) {}
 
     explicit BaseState(const int num_levs, const int length = 1,
                        const int ncomp = 1, const T val = T());
@@ -199,8 +198,8 @@ class BaseState {
     void copy(const amrex::Gpu::ManagedVector<T>& src);
     void copy(const amrex::Vector<T>& src);
 
-    void toVector(amrex::Vector<T>& vec);
-    void toVector(amrex::Gpu::ManagedVector<T>& vec);
+    void toVector(amrex::Vector<T>& vec) const;
+    void toVector(amrex::Gpu::ManagedVector<T>& vec) const;
 
     /// swap the data with src
     void swap(BaseState<T>& src);
@@ -281,6 +280,10 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp,
     base_data.shrink_to_fit();
     std::fill(base_data.begin(), base_data.end(), val);
 }
+
+/// make sure that this class is never instantiated with bool
+template <>
+BaseState<bool>::BaseState(const int, const int, const int, const bool) = delete;
 
 template <class T>
 BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src,
@@ -425,7 +428,7 @@ void BaseState<T>::copy(const amrex::Vector<T>& src) {
 }
 
 template <class T>
-void BaseState<T>::toVector(amrex::Vector<T>& vec) {
+void BaseState<T>::toVector(amrex::Vector<T>& vec) const {
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
             for (auto comp = 0; comp < nvar; ++comp) {
@@ -437,7 +440,7 @@ void BaseState<T>::toVector(amrex::Vector<T>& vec) {
 }
 
 template <class T>
-void BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec) {
+void BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec) const {
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
             for (auto comp = 0; comp < nvar; ++comp) {

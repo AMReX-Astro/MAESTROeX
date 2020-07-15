@@ -172,7 +172,7 @@ void Maestro::Makew0Planar(
                     w0_arr(n - 1, (base_geom.r_end_coord(n, j) + 1) / 2);
 
                 for (auto i = n - 1; i >= 0; --i) {
-                    int refrat = round(pow(2, n - i));
+                    auto refrat = (int)round(pow(2, n - i));
 
                     // Restrict w0 from level n to level i
                     for (auto r = base_geom.r_start_coord(n, j);
@@ -933,7 +933,7 @@ void Maestro::Tridiag(const BaseStateArray<Real>& a,
     BaseState<Real> gam_s(n);
     auto gam = gam_s.array();
 
-    if (b(0) == 0) Abort("tridiag: CANT HAVE B(0) = 0.0");
+    if (b(0) == 0) { Abort("tridiag: CANT HAVE B(0) = 0.0"); }
 
     Real bet = b(0);
     u(0) = r(0) / bet;
@@ -941,7 +941,7 @@ void Maestro::Tridiag(const BaseStateArray<Real>& a,
     for (auto j = 1; j < n; j++) {
         gam(j) = c(j - 1) / bet;
         bet = b(j) - a(j) * gam(j);
-        if (bet == 0) Abort("tridiag: TRIDIAG FAILED");
+	if (bet == 0) { Abort("tridiag: TRIDIAG FAILED"); }
         u(j) = (r(j) - a(j) * u(j - 1)) / bet;
     }
 

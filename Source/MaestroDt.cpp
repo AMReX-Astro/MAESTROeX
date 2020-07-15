@@ -60,7 +60,7 @@ void Maestro::EstDt() {
         }
 
         if (evolve_base_state &&
-            (use_exact_base_state == 0 && average_base_state == 0)) {
+            (!use_exact_base_state && !average_base_state)) {
             MakeW0mac(w0mac);
         }
     }
@@ -97,7 +97,7 @@ void Maestro::EstDt() {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
-    Put1dArrayOnCart(gp0, gp0_cart, 1, 1, bcs_f, 0);
+    Put1dArrayOnCart(gp0, gp0_cart, true, true, bcs_f, 0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level + 1);
@@ -107,8 +107,8 @@ void Maestro::EstDt() {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(gamma1bar_old, gamma1bar_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_old, p0_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(gamma1bar_old, gamma1bar_cart, false, false, bcs_f, 0);
 
     Real umax = 0.;
 
@@ -180,12 +180,13 @@ void Maestro::EstDt() {
                         umax_grid,
                         std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
 
-                    if (spdx > eps) dt_temp = amrex::min(dt_temp, dx[0] / spdx);
-                    if (spdy > eps) dt_temp = amrex::min(dt_temp, dx[1] / spdy);
-                    if (spdz > eps) dt_temp = amrex::min(dt_temp, dx[2] / spdz);
-                    if (spdr > eps)
-                        dt_temp =
-                            amrex::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
+                    if (spdx > eps) { dt_temp = amrex::min(dt_temp, dx[0] / spdx); }
+                    if (spdy > eps) { dt_temp = amrex::min(dt_temp, dx[1] / spdy); }
+                    if (spdz > eps) { dt_temp = amrex::min(dt_temp, dx[2] / spdz); }
+                    if (spdr > eps) {
+			dt_temp =
+			    amrex::min(dt_temp, dx[AMREX_SPACEDIM-1] / spdr);
+		    }
 
                     dt_temp *= cfl;
 
@@ -199,16 +200,19 @@ void Maestro::EstDt() {
                         vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 #endif
 
-                    if (fx > eps)
+	            if (fx > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
-                    if (fy > eps)
+		    }
+		    if (fy > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
+		    }
 #if (AMREX_SPACEDIM == 3)
-                    if (fz > eps)
+                    if (fz > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
+		    }
 #endif
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
@@ -324,11 +328,12 @@ void Maestro::EstDt() {
                         umax_grid,
                         std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
 
-                    if (spdx > eps) dt_temp = amrex::min(dt_temp, dx[0] / spdx);
-                    if (spdy > eps) dt_temp = amrex::min(dt_temp, dx[1] / spdy);
-                    if (spdz > eps) dt_temp = amrex::min(dt_temp, dx[2] / spdz);
-                    if (spdr > eps)
-                        dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
+                    if (spdx > eps) { dt_temp = amrex::min(dt_temp, dx[0] / spdx); }
+                    if (spdy > eps) { dt_temp = amrex::min(dt_temp, dx[1] / spdy); }
+                    if (spdz > eps) { dt_temp = amrex::min(dt_temp, dx[2] / spdz); }
+                    if (spdr > eps) {
+			dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
+		    }
 
                     dt_temp *= cfl;
 
@@ -340,15 +345,18 @@ void Maestro::EstDt() {
                     Real fz =
                         vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
-                    if (fx > eps)
+                    if (fx > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
-                    if (fy > eps)
+		    }
+                    if (fy > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
-                    if (fz > eps)
+		    }
+		    if (fz > eps) {
                         dt_temp =
                             amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
+		    }
 
                     dt_grid = amrex::min(dt_grid, dt_temp);
 
@@ -537,7 +545,7 @@ void Maestro::FirstDt() {
         EstDt_Divu(gp0, p0_old, gamma1bar_old);
     }
 
-    Put1dArrayOnCart(gp0, gp0_cart, 1, 1, bcs_f, 0);
+    Put1dArrayOnCart(gp0, gp0_cart, true, true, bcs_f, 0);
 #endif
 
     Vector<MultiFab> p0_cart(finest_level + 1);
@@ -547,8 +555,8 @@ void Maestro::FirstDt() {
         gamma1bar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(gamma1bar_old, gamma1bar_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_old, p0_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(gamma1bar_old, gamma1bar_cart, false, false, bcs_f, 0);
 
     Real umax = 0.;
 
@@ -657,16 +665,19 @@ void Maestro::FirstDt() {
                 }
 
                 // force constraints
-                if (pforcex > eps)
+                if (pforcex > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
-                if (pforcey > eps)
+		}
+                if (pforcey > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
+		}
 #if (AMREX_SPACEDIM == 3)
-                if (pforcez > eps)
+                if (pforcez > eps) {
                     dt_grid =
                         amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
+		}
 #endif
 
                 // divU constraint

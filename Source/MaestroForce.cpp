@@ -49,9 +49,9 @@ void Maestro::MakeVelForce(
         }
     }
 
-    Put1dArrayOnCart(gradw0, gradw0_cart, 0, 0, bcs_u, 0, 1);
-    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
-    Put1dArrayOnCart(grav_cell, grav_cart, 0, 1, bcs_f, 0);
+    Put1dArrayOnCart(gradw0, gradw0_cart, false, false, bcs_u, 0, 1);
+    Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
+    Put1dArrayOnCart(grav_cell, grav_cart, false, true, bcs_f, 0);
 
 #ifdef ROTATION
     Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_f, 0);
@@ -266,7 +266,7 @@ void Maestro::ModifyScalForce(
     }
 
     if (!spherical) {
-        Put1dArrayOnCart(s0_edge, s0_edge_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(s0_edge, s0_edge_cart, false, false, bcs_f, 0);
     }
 
     Vector<MultiFab> divu_cart(finest_level + 1);
@@ -294,7 +294,7 @@ void Maestro::ModifyScalForce(
             divu_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             divu_cart[lev].setVal(0.);
         }
-        Put1dArrayOnCart(divw0, divu_cart, 0, 0, bcs_u, 0);
+        Put1dArrayOnCart(divw0, divu_cart, false, false, bcs_u, 0);
     }
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -514,18 +514,18 @@ void Maestro::MakeRhoHForce(
         p0_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
 #if (AMREX_SPACEDIM == 3)
     if (spherical) {
         MakeS0mac(p0, p0mac);
     }
 #endif
-    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(rho0, rho0_cart, 0, 0, bcs_s, Rho);
+    Put1dArrayOnCart(psi, psi_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
 
     MakeGravCell(grav, rho0);
 
-    Put1dArrayOnCart(grav, grav_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(grav, grav_cart, false, false, bcs_f, 0);
 
     // constants in Fortran
     const int enthalpy_pred_type_in = enthalpy_pred_type;
@@ -694,8 +694,8 @@ void Maestro::MakeTempForce(
         psi_cart[lev].setVal(0.);
     }
 
-    Put1dArrayOnCart(p0_old, p0_cart, 0, 0, bcs_f, 0);
-    Put1dArrayOnCart(psi, psi_cart, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(p0_old, p0_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(psi, psi_cart, false, false, bcs_f, 0);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)

@@ -164,7 +164,9 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                                             dmap[lev], Nscal, 0););
 
         // initialize umac
-        for (int d = 0; d < AMREX_SPACEDIM; ++d) umac[lev][d].setVal(0.);
+        for (int d=0; d < AMREX_SPACEDIM; ++d) {
+            umac[lev][d].setVal(0.);
+        }
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -273,7 +275,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         p0_minus_peosbar.copy(p0_old - peosbar);
 
         // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_old - peosbar_cart
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -302,7 +304,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                is_predictor);
 
         // put w0 on Cartesian cell-centers
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
 #if (AMREX_SPACEDIM == 3)
         if (spherical) {
@@ -573,7 +575,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         p0_minus_peosbar.copy(p0_new - peosbar);
 
         // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_new - peosbar_cart
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -604,7 +606,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                is_predictor);
 
         // put w0 on Cartesian cell-centers
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
 #if (AMREX_SPACEDIM == 3)
         if (spherical) {
@@ -827,7 +829,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                is_predictor);
 
         // put w0 on Cartesian cell-centers
-        Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_u, 0, 1);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -902,7 +904,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
             // no need to compute p0_minus_peosbar since make_w0 is not called after here
 
             // compute peosbar_cart from peosbar
-            Put1dArrayOnCart(peosbar, peosbar_cart, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
 
             // compute delta_p_term = peos_new - peosbar_cart
             for (int lev = 0; lev <= finest_level; ++lev) {

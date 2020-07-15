@@ -27,13 +27,15 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     BaseState<Real> delta_chi_w0(max_radial_level + 1, nr_fine);
     BaseState<Real> Hext_bar(max_radial_level + 1, nr_fine);
     BaseState<Real> tempbar_new(max_radial_level + 1, nr_fine);
+    BaseState<Real> rhoX0_old(max_radial_level + 1, nr_fine, NumSpec);
+    BaseState<Real> rhoX0_new(max_radial_level + 1, nr_fine, NumSpec);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
     BaseState<Real> w0_old(max_radial_level + 1, nr_fine + 1);
     BaseState<Real> rho0_predicted_edge(max_radial_level + 1, nr_fine + 1);
 
-    int is_predictor;
+    bool is_predictor;
 
     p0_minus_peosbar.setVal(0.);
     delta_chi_w0.setVal(0.);
@@ -70,6 +72,18 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
             gamma1bar_old_arr(l, r) = eos_state.gam1;
         }
     }
+
+    // copy rhoX0_old 
+    auto s0_init_arr = s0_init.array();
+
+    for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                rhoX0_old_arr(n,r,comp) = s0_init_arr(n,r,FirstSpec+comp);
+            }
+        }
+    }
+
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! compute the heating term and Sbar
@@ -110,7 +124,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     w0_old.copy(w0);
 
     // compute w0, w0_force, and delta_chi_w0
-    is_predictor = 1;
+    is_predictor = true;
     Makew0(w0_old, w0_force, Sbar_old, rho0_old, rho0_old, p0_old, p0_old,
            gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dtold,
            is_predictor);
@@ -252,7 +266,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     w0_old.copy(w0);
 
-    is_predictor = 0;
+    is_predictor = false;
     Makew0(w0_old, w0_force, Sbar_nph, rho0_old, rho0_new, p0_old, p0_new,
            gamma1bar_old, gamma1bar_new, p0_minus_peosbar, dt, dtold,
            is_predictor);
@@ -337,6 +351,15 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
         }
     }
 
-    rhoX0_old.swap(rhoX0_new);
+    // rhoX0_old.swap(rhoX0_new);
     tempbar.swap(tempbar_new);
+
+    // copy rhoX0_new into s0_init_arr
+    for (auto n = 0; n < base_geom.max_radial_level; ++n) {
+        for (auto r = 0; r < base_geom.nr(n); ++r) {
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                s0_init_arr(n,r,FirstSpec+comp) = rhoX0_new_arr(n, r, comp);
+            }
+        }
+    }
 }
