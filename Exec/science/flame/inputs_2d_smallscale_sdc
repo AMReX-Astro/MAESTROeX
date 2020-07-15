@@ -63,7 +63,7 @@ maestro.init_shrink = 0.1e0
 maestro.max_dt_growth = 1.2e0
 
 maestro.use_tfromp = false
-maestro.dpdt_factor = 0.3e0
+maestro.dpdt_factor = 1.
 
 maestro.sdc_iters = 1
 maestro.sdc_couple_mac_velocity = 1
