@@ -5,26 +5,24 @@
 using namespace amrex;
 
 // advance solution to final time
-void
-Maestro::Evolve ()
-{
+void Maestro::Evolve() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::Evolve()",Evolve);
+    BL_PROFILE_VAR("Maestro::Evolve()", Evolve);
 
     Print() << "Calling Evolve()" << std::endl;
 
     // check to make sure spherical is only used for 3d
     if (spherical && AMREX_SPACEDIM != 3) {
-        Abort ("spherical = 1 and dm != 3");
+        Abort("spherical = 1 and dm != 3");
     }
 
     // index for diag array buffer
-    int diag_index=0;
+    int diag_index = 0;
 
-    for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep)
-    {
+    for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep) {
         // check to see if we need to regrid, then regrid
-        if (max_level > 0 && regrid_int > 0 && (istep-1) % regrid_int == 0 && istep != 1) {
+        if (max_level > 0 && regrid_int > 0 && (istep - 1) % regrid_int == 0 &&
+            istep != 1) {
             Regrid();
         }
 
@@ -34,7 +32,6 @@ Maestro::Evolve ()
         // if this is the first time step we already have a dt from either FirstDt()
         // or EstDt called during the divu_iters
         if (istep > 1) {
-
             EstDt();
 
             if (maestro_verbose > 0) {
@@ -44,16 +41,18 @@ Maestro::Evolve ()
 
             // fixme - add nuclear_dt_scalefac timestep limiter
 
-            if (dt > max_dt_growth*dtold) {
-                dt = max_dt_growth*dtold;
+            if (dt > max_dt_growth * dtold) {
+                dt = max_dt_growth * dtold;
                 if (maestro_verbose > 0) {
-                    Print() << "dt_growth factor limits the new dt = " << dt << std::endl;
+                    Print() << "dt_growth factor limits the new dt = " << dt
+                            << std::endl;
                 }
             }
 
             if (dt > max_dt) {
                 if (maestro_verbose > 0) {
-                    Print() << "max_dt limits the new dt = " << max_dt << std::endl;
+                    Print()
+                        << "max_dt limits the new dt = " << max_dt << std::endl;
                 }
                 dt = max_dt;
             }
@@ -65,8 +64,8 @@ Maestro::Evolve ()
                 }
             }
 
-            if (stop_time >= 0. && t_old+dt > stop_time) {
-                dt = std::min(dt,stop_time-t_old);
+            if (stop_time >= 0. && t_old + dt > stop_time) {
+                dt = std::min(dt, stop_time - t_old);
                 Print() << "Stop time limits dt = " << dt << std::endl;
             }
 
@@ -81,80 +80,80 @@ Maestro::Evolve ()
         AdvanceTimeStepSDC(false);
 #else
         if (use_exact_base_state) {
-                AdvanceTimeStepIrreg(false);
+            AdvanceTimeStepIrreg(false);
         } else if (average_base_state) {
-                AdvanceTimeStepAverage(false);
+            AdvanceTimeStepAverage(false);
         } else {
-                AdvanceTimeStep(false);
+            AdvanceTimeStep(false);
         }
 #endif
-        
+
         t_old = t_new;
 
-        if ( (sum_interval > 0 && istep%sum_interval == 0) ||
-             (sum_per > 0 && std::fmod(t_new, sum_per) < dt) ||
-             ((sum_interval > 0 || sum_per > 0) && t_old >= stop_time))
-        {
-
+        if ((sum_interval > 0 && istep % sum_interval == 0) ||
+            (sum_per > 0 && std::fmod(t_new, sum_per) < dt) ||
+            ((sum_interval > 0 || sum_per > 0) && t_old >= stop_time)) {
             Real diag_start_total = ParallelDescriptor::second();
 
             // save diag output into buffer
-            DiagFile(istep, t_new, rho0_new, p0_new, unew,snew, diag_index);
+            DiagFile(istep, t_new, rho0_new, p0_new, unew, snew, diag_index);
 
             // wallclock time
-            Real diag_end_total = ParallelDescriptor::second() - diag_start_total;
-            ParallelDescriptor::ReduceRealMax(diag_end_total,ParallelDescriptor::IOProcessorNumber());
+            Real diag_end_total =
+                ParallelDescriptor::second() - diag_start_total;
+            ParallelDescriptor::ReduceRealMax(
+                diag_end_total, ParallelDescriptor::IOProcessorNumber());
 
             Print() << "Diagnostic :" << diag_end_total << " seconds\n\n";
         }
 
-
         Real end_total = ParallelDescriptor::second() - start_total;
-        ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::ReduceRealMax(
+            end_total, ParallelDescriptor::IOProcessorNumber());
 
         Print() << "Time to advance time step: " << end_total << '\n';
 
-        if ( (plot_int > 0 && istep % plot_int == 0) ||
-             (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
-             ((plot_int > 0 || plot_deltat > 0) && (istep == max_step || t_old >= stop_time)) )
-        {
-        // write a plotfile
+        if ((plot_int > 0 && istep % plot_int == 0) ||
+            (plot_deltat > 0 && std::fmod(t_new, plot_deltat) < dt) ||
+            ((plot_int > 0 || plot_deltat > 0) &&
+             (istep == max_step || t_old >= stop_time))) {
+            // write a plotfile
             Print() << "\nWriting plotfile " << istep << std::endl;
-            WritePlotFile(istep, t_new, dt, rho0_new,
-                            rhoh0_new, p0_new,
-                            gamma1bar_new, unew, snew, S_cc_new);
+            WritePlotFile(istep, t_new, dt, rho0_new, rhoh0_new, p0_new,
+                          gamma1bar_new, unew, snew, S_cc_new);
         }
 
-        if ( (small_plot_int > 0 && istep % small_plot_int == 0) ||
-             (small_plot_deltat > 0 && std::fmod(t_new, small_plot_deltat) < dt) ||
-             ((small_plot_int > 0 || small_plot_deltat > 0) && (istep == max_step  || t_old >= stop_time)) )
-        {
+        if ((small_plot_int > 0 && istep % small_plot_int == 0) ||
+            (small_plot_deltat > 0 &&
+             std::fmod(t_new, small_plot_deltat) < dt) ||
+            ((small_plot_int > 0 || small_plot_deltat > 0) &&
+             (istep == max_step || t_old >= stop_time))) {
             // write a small plotfile
             Print() << "\nWriting small plotfile " << istep << std::endl;
             WriteSmallPlotFile(istep, t_new, dt, rho0_new, rhoh0_new, p0_new,
-                                gamma1bar_new, unew, snew, S_cc_new);
+                               gamma1bar_new, unew, snew, S_cc_new);
         }
 
-        if ( (chk_int > 0 && istep % chk_int == 0) ||
+        if ((chk_int > 0 && istep % chk_int == 0) ||
             (chk_deltat > 0 && std::fmod(t_new, chk_deltat) < dt) ||
-            ((chk_int > 0 || chk_deltat > 0) && (istep == max_step ||
-            t_old >= stop_time )))
-        {
+            ((chk_int > 0 || chk_deltat > 0) &&
+             (istep == max_step || t_old >= stop_time))) {
             // write a checkpoint file
             Print() << "\nWriting checkpoint " << istep << std::endl;
             WriteCheckPoint(istep);
         }
 
         if ((diag_index == diag_buf_size || istep == max_step ||
-            t_old >= stop_time) && (sum_per > 0.0 || sum_interval > 0)) {
+             t_old >= stop_time) &&
+            (sum_per > 0.0 || sum_interval > 0)) {
             // write out any buffered diagnostic information
             WriteDiagFile(diag_index);
         }
 
         // move new state into old state by swapping pointers
-        for (int lev=0; lev<=finest_level; ++lev) {
-            std::swap(    sold[lev],     snew[lev]);
-            std::swap(    uold[lev],     unew[lev]);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            std::swap(sold[lev], snew[lev]);
+            std::swap(uold[lev], unew[lev]);
             std::swap(S_cc_old[lev], S_cc_new[lev]);
         }
 

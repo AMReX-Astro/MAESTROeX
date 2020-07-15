@@ -24,7 +24,8 @@ void compute_gamma1bar(amrex::Real* gamma1bar, const amrex::Real* rho0,
 void update_temp(const amrex::Real* rho0, amrex::Real* tempbar,
                  const amrex::Real* rhoX0, const amrex::Real* p0);
 
-void update_species(const amrex::Real* rho0, const amrex::Real* rho0_predicted_edge,
+void update_species(const amrex::Real* rho0,
+                    const amrex::Real* rho0_predicted_edge,
                     const amrex::Real* rhoX0_old, amrex::Real* rhoX0_new,
                     const amrex::Real* w0, const amrex::Real* r_cc_loc,
                     const amrex::Real* r_edge_loc, const amrex::Real dt);

@@ -4,35 +4,31 @@
 
 using namespace amrex;
 
-void
-Maestro::PrintBase(const RealVector& base, const bool is_cell_centered)
-{
+void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
 
     const int max_lev = base_geom.max_radial_level + 1;
 
     for (auto lev = 0; lev <= base_geom.finest_radial_level; ++lev) {
-        for (auto i = 0; i <= base_geom.numdisjointchunks(lev,0); ++i) {
-            auto lo = base_geom.r_start_coord(lev,i);
-            auto hi = is_cell_centered ? base_geom.r_end_coord(lev,i) : base_geom.r_end_coord(lev,i)+1;
+        for (auto i = 0; i <= base_geom.numdisjointchunks(lev, 0); ++i) {
+            auto lo = base_geom.r_start_coord(lev, i);
+            auto hi = is_cell_centered ? base_geom.r_end_coord(lev, i)
+                                       : base_geom.r_end_coord(lev, i) + 1;
             for (auto r = lo; r <= hi; ++r) {
-                Print() << "base lev, r " << lev << ", " << r << ", " << base[lev+max_lev*r] << std::endl;
+                Print() << "base lev, r " << lev << ", " << r << ", "
+                        << base[lev + max_lev * r] << std::endl;
             }
         }
     }
 }
 
-
 // print out the contents of a Vector of MultiFabs
-void
-Maestro::PrintMF (const Vector<MultiFab>& MF)
-{
+void Maestro::PrintMF(const Vector<MultiFab>& MF) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintMF()", PrintMF);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
-
+    for (int lev = 0; lev <= finest_level; ++lev) {
         // get references to the MultiFabs at level lev
         const MultiFab& MF_mf = MF[lev];
 
@@ -42,7 +38,6 @@ Maestro::PrintMF (const Vector<MultiFab>& MF)
 
         for (int i = 0; i < ba.size(); ++i) {
             if (dm[i] == myProc) {
-
                 // we want all processors to write, not just the IOProcessor
                 std::cout << "Grid #" << i << std::endl;
                 std::cout << "Processor #" << myProc << std::endl;
@@ -66,9 +61,14 @@ Maestro::PrintMF (const Vector<MultiFab>& MF)
                         for (auto j = lo[1]; j <= hi[1]; ++j) {
                             for (auto ii = lo[0]; ii <= hi[0]; ++ii) {
 #if (AMREX_SPACEDIM == 2)
-                                std::cout << "lev, i, j, comp" << lev << " " << ii << " " << j << " " << comp << " " << MF_arr(ii,j,k,comp);
+                                std::cout << "lev, i, j, comp" << lev << " "
+                                          << ii << " " << j << " " << comp
+                                          << " " << MF_arr(ii, j, k, comp);
 #else
-                                std::cout << "lev, i, j, k, comp" << lev << " " << ii << " " << j << " " << k << " " << comp << " " << MF_arr(ii,j,k,comp);
+                                std::cout << "lev, i, j, k, comp" << lev << " "
+                                          << ii << " " << j << " " << k << " "
+                                          << comp << " "
+                                          << MF_arr(ii, j, k, comp);
 #endif
                             }
                         }
@@ -81,15 +81,12 @@ Maestro::PrintMF (const Vector<MultiFab>& MF)
     }
 }
 
-void
-Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
-                    int dir)
-{
+void Maestro::PrintEdge(
+    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& EDGE, int dir) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintEdge()", PrintEdge);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
-
+    for (int lev = 0; lev <= finest_level; ++lev) {
         // get references to the MultiFabs at level lev
         const MultiFab& EDGE_mf = EDGE[lev][dir];
 
@@ -97,9 +94,8 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
         const DistributionMapping& dm = EDGE_mf.DistributionMap();
         const int myProc = ParallelDescriptor::MyProc();
 
-        for (int i=0; i<ba.size(); ++i) {
+        for (int i = 0; i < ba.size(); ++i) {
             if (dm[i] == myProc) {
-
                 // we want all processors to write, not just the IOProcessor
                 std::cout << "Grid #" << i << std::endl;
                 std::cout << "Processor #" << myProc << std::endl;
@@ -123,9 +119,14 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
                         for (auto j = lo[1]; j <= hi[1]; ++j) {
                             for (auto ii = lo[0]; ii <= hi[0]; ++ii) {
 #if (AMREX_SPACEDIM == 2)
-                                std::cout << "lev, i, j, comp" << lev << " " << ii << " " << j << " " << comp << " " << EDGE_arr(ii,j,k,comp);
+                                std::cout << "lev, i, j, comp" << lev << " "
+                                          << ii << " " << j << " " << comp
+                                          << " " << EDGE_arr(ii, j, k, comp);
 #else
-                                std::cout << "lev, i, j, k, comp" << lev << " " << ii << " " << j << " " << k << " " << comp << " " << EDGE_arr(ii,j,k,comp);
+                                std::cout << "lev, i, j, k, comp" << lev << " "
+                                          << ii << " " << j << " " << k << " "
+                                          << comp << " "
+                                          << EDGE_arr(ii, j, k, comp);
 #endif
                             }
                         }
@@ -139,27 +140,26 @@ Maestro::PrintEdge (const Vector<std::array< MultiFab, AMREX_SPACEDIM > >& EDGE,
 }
 
 // utility to write out a multilevel multifab to a plotfile
-void Maestro::WriteMF (const Vector<MultiFab>& mf,
-                       const std::string& name)
-{
+void Maestro::WriteMF(const Vector<MultiFab>& mf, const std::string& name) {
     int nComp = mf[0].nComp();
 
     Vector<std::string> varnames;
     varnames.resize(nComp);
-    for (int i=0; i<nComp; ++i) {
+    for (int i = 0; i < nComp; ++i) {
         varnames[i] = "MultiFab_" + std::to_string(i);
     }
 
     // temporary MultiFab to hold plotfile data
-    Vector<MultiFab*> plot_mf_data(finest_level+1);
+    Vector<MultiFab*> plot_mf_data(finest_level + 1);
 
     // build temporary MultiFab to hold plotfile data
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i] = new MultiFab((mf[i]).boxArray(),(mf[i]).DistributionMap(),nComp,0);
+        plot_mf_data[i] = new MultiFab((mf[i]).boxArray(),
+                                       (mf[i]).DistributionMap(), nComp, 0);
     }
 
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((mf[i]),0,0,nComp);
+        plot_mf_data[i]->copy((mf[i]), 0, 0, nComp);
     }
 
     // MultiFab to hold plotfile data
@@ -169,8 +169,8 @@ void Maestro::WriteMF (const Vector<MultiFab>& mf,
     }
 
     Vector<int> step_array;
-    step_array.resize(maxLevel()+1, 0);
+    step_array.resize(maxLevel() + 1, 0);
 
-    WriteMultiLevelPlotfile(name, finest_level+1, plot_mf, varnames,
-                            Geom(), 0., step_array, refRatio());
+    WriteMultiLevelPlotfile(name, finest_level + 1, plot_mf, varnames, Geom(),
+                            0., step_array, refRatio());
 }
