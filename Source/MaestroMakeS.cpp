@@ -383,12 +383,23 @@ Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                Real correction_factor = rho0_arr(i,j,k) > base_cutoff_density_loc ? 
-                    beta0_arr(i,j,k) * dpdt_factor_loc / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k)) / dt_loc : 0.0;
+            if (spherical == 1) {
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    Real correction_factor = rho0_arr(i,j,k) > base_cutoff_density_loc ?
+                        beta0_arr(i,j,k) * dpdt_factor_loc / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k)) / dt_loc : 0.0;
 
-                correction_arr(i,j,k) = correction_factor * delta_p_arr(i,j,k);
-            });
+                    correction_arr(i,j,k) = correction_factor * delta_p_arr(i,j,k);
+                });
+            } else {
+                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                    int r = (AMREX_SPACEDIM == 2) ? j : k;
+                    Real correction_factor = (r < base_geom.base_cutoff_density_coord(lev)) ?
+                        beta0_arr(i,j,k) * dpdt_factor_loc / (gamma1bar_arr(i,j,k) * p0_arr(i,j,k)) / dt_loc : 0.0;
+
+                    correction_arr(i,j,k) = correction_factor * delta_p_arr(i,j,k);
+                });
+
+            }
         }
     }
 
@@ -489,14 +500,27 @@ Maestro::MakeRHCCforMacProj (Vector<MultiFab>& rhcc,
                     });
                 } 
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    if (rho0_arr(i,j,k) > base_cutoff_density_loc) {
-                        delta_chi_arr(i,j,k) += dpdt_factor_loc * delta_p_arr(i,j,k) / 
-                            (dt_loc*gamma1bar_arr(i,j,k)*p0_arr(i,j,k));
-                        rhcc_arr(i,j,k) += beta0_arr(i,j,k) * delta_chi_arr(i,j,k);
-                    }
-                });
-            } 
-        }
-    }
+                if (spherical == 1) {
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                        if (rho0_arr(i,j,k) > base_cutoff_density_loc) {
+                            delta_chi_arr(i,j,k) += dpdt_factor_loc * delta_p_arr(i,j,k) / 
+                                (dt_loc*gamma1bar_arr(i,j,k)*p0_arr(i,j,k));
+                            rhcc_arr(i,j,k) += beta0_arr(i,j,k) * delta_chi_arr(i,j,k);
+                        }
+                    });
+                } else {
+                    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+
+                        int r = (AMREX_SPACEDIM == 2) ? j : k;
+
+                        if (r < base_geom.base_cutoff_density_coord(lev)) {
+                            delta_chi_arr(i,j,k) += dpdt_factor_loc * delta_p_arr(i,j,k) / 
+                                (dt_loc*gamma1bar_arr(i,j,k)*p0_arr(i,j,k));
+                            rhcc_arr(i,j,k) += beta0_arr(i,j,k) * delta_chi_arr(i,j,k);
+                        }
+                    });
+                } // if spherical or planar
+            } // if (dpdt_factor > 0)
+        } // end MFIter
+    } // end loop over levels
 }
