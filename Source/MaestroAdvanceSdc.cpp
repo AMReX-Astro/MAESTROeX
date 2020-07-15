@@ -10,43 +10,43 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     BL_PROFILE_VAR("Maestro::AdvanceTimeStepSDC()", AdvanceTimeStepSDC);
 
     // cell-centered MultiFabs needed within the AdvanceTimeStep routine
-    Vector<MultiFab>           shat(finest_level+1);
-    Vector<MultiFab>        rhohalf(finest_level+1);
-    Vector<MultiFab>         cphalf(finest_level+1);
-    Vector<MultiFab>         xihalf(finest_level+1);
-    Vector<MultiFab>         macrhs(finest_level+1);
-    Vector<MultiFab>         macphi(finest_level+1);
-    Vector<MultiFab>       S_cc_nph(finest_level+1);
-    Vector<MultiFab>   rho_omegadot(finest_level+1);
-    Vector<MultiFab>       diff_old(finest_level+1);
-    Vector<MultiFab>       diff_new(finest_level+1);
-    Vector<MultiFab>       diff_hat(finest_level+1);
-    Vector<MultiFab> diff_hterm_new(finest_level+1);
-    Vector<MultiFab> diff_hterm_hat(finest_level+1);
-    Vector<MultiFab>       rho_Hnuc(finest_level+1);
-    Vector<MultiFab>       rho_Hext(finest_level+1);
-    Vector<MultiFab>     sdc_source(finest_level+1);
-    Vector<MultiFab>           aofs(finest_level+1);
-    Vector<MultiFab>    intra_rhoh0(finest_level+1);
-    
-    Vector<MultiFab> delta_gamma1_term(finest_level+1);
-    Vector<MultiFab>      delta_gamma1(finest_level+1);
-    Vector<MultiFab>              peos(finest_level+1);
-    Vector<MultiFab>           p0_cart(finest_level+1);
-    Vector<MultiFab>      delta_p_term(finest_level+1);
-    
-    Vector<MultiFab>      Tcoeff1(finest_level+1);
-    Vector<MultiFab>      hcoeff1(finest_level+1);
-    Vector<MultiFab>     Xkcoeff1(finest_level+1);
-    Vector<MultiFab>      pcoeff1(finest_level+1);
-    Vector<MultiFab>      Tcoeff2(finest_level+1);
-    Vector<MultiFab>      hcoeff2(finest_level+1);
-    Vector<MultiFab>     Xkcoeff2(finest_level+1);
-    Vector<MultiFab>      pcoeff2(finest_level+1);
-    Vector<MultiFab>   scal_force(finest_level+1);
-    Vector<MultiFab>    delta_chi(finest_level+1);
-    Vector<MultiFab>       sponge(finest_level+1);
-    Vector<MultiFab>         w0cc(finest_level+1);
+    Vector<MultiFab> shat(finest_level + 1);
+    Vector<MultiFab> rhohalf(finest_level + 1);
+    Vector<MultiFab> cphalf(finest_level + 1);
+    Vector<MultiFab> xihalf(finest_level + 1);
+    Vector<MultiFab> macrhs(finest_level + 1);
+    Vector<MultiFab> macphi(finest_level + 1);
+    Vector<MultiFab> S_cc_nph(finest_level + 1);
+    Vector<MultiFab> rho_omegadot(finest_level + 1);
+    Vector<MultiFab> diff_old(finest_level + 1);
+    Vector<MultiFab> diff_new(finest_level + 1);
+    Vector<MultiFab> diff_hat(finest_level + 1);
+    Vector<MultiFab> diff_hterm_new(finest_level + 1);
+    Vector<MultiFab> diff_hterm_hat(finest_level + 1);
+    Vector<MultiFab> rho_Hnuc(finest_level + 1);
+    Vector<MultiFab> rho_Hext(finest_level + 1);
+    Vector<MultiFab> sdc_source(finest_level + 1);
+    Vector<MultiFab> aofs(finest_level + 1);
+    Vector<MultiFab> intra_rhoh0(finest_level + 1);
+
+    Vector<MultiFab> delta_gamma1_term(finest_level + 1);
+    Vector<MultiFab> delta_gamma1(finest_level + 1);
+    Vector<MultiFab> peos(finest_level + 1);
+    Vector<MultiFab> p0_cart(finest_level + 1);
+    Vector<MultiFab> delta_p_term(finest_level + 1);
+
+    Vector<MultiFab> Tcoeff1(finest_level + 1);
+    Vector<MultiFab> hcoeff1(finest_level + 1);
+    Vector<MultiFab> Xkcoeff1(finest_level + 1);
+    Vector<MultiFab> pcoeff1(finest_level + 1);
+    Vector<MultiFab> Tcoeff2(finest_level + 1);
+    Vector<MultiFab> hcoeff2(finest_level + 1);
+    Vector<MultiFab> Xkcoeff2(finest_level + 1);
+    Vector<MultiFab> pcoeff2(finest_level + 1);
+    Vector<MultiFab> scal_force(finest_level + 1);
+    Vector<MultiFab> delta_chi(finest_level + 1);
+    Vector<MultiFab> sponge(finest_level + 1);
+    Vector<MultiFab> w0cc(finest_level + 1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level + 1);
@@ -114,38 +114,38 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         // cell-centered MultiFabs
-        shat        [lev].define(grids[lev], dmap[lev],   Nscal, ng_s);
-        rhohalf     [lev].define(grids[lev], dmap[lev],       1,    1);
-        cphalf      [lev].define(grids[lev], dmap[lev],       1,    1);
-        xihalf      [lev].define(grids[lev], dmap[lev], NumSpec,    1);
-        macrhs      [lev].define(grids[lev], dmap[lev],       1,    0);
-        macphi      [lev].define(grids[lev], dmap[lev],       1,    1);
-        S_cc_nph    [lev].define(grids[lev], dmap[lev],       1,    0);
-        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec,    0);
-        diff_old    [lev].define(grids[lev], dmap[lev],       1,    0);
-        diff_new    [lev].define(grids[lev], dmap[lev],       1,    0);
-        diff_hat    [lev].define(grids[lev], dmap[lev],       1,    0);
-        diff_hterm_new[lev].define(grids[lev], dmap[lev],     1,    0);
-        diff_hterm_hat[lev].define(grids[lev], dmap[lev],     1,    0);
-        rho_Hnuc    [lev].define(grids[lev], dmap[lev],       1,    0);
-        rho_Hext    [lev].define(grids[lev], dmap[lev],       1,    0);
-        sdc_source  [lev].define(grids[lev], dmap[lev],   Nscal,    0);
-        aofs        [lev].define(grids[lev], dmap[lev],   Nscal,    0);
-        intra_rhoh0 [lev].define(grids[lev], dmap[lev],       1,    0);
-        delta_gamma1_term[lev].define(grids[lev], dmap[lev],  1,    0);
-        delta_gamma1[lev].define(grids[lev], dmap[lev],       1,    0);
-        peos        [lev].define(grids[lev], dmap[lev],       1,    0);
-        p0_cart     [lev].define(grids[lev], dmap[lev],       1,    0);
-        delta_p_term[lev].define(grids[lev], dmap[lev],       1,    0);
-        Tcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
-        hcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
-        Xkcoeff1    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
-        pcoeff1     [lev].define(grids[lev], dmap[lev],       1,    1);
-        Tcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        hcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        Xkcoeff2    [lev].define(grids[lev], dmap[lev], NumSpec,    1);
-        pcoeff2     [lev].define(grids[lev], dmap[lev],       1,    1);
-        
+        shat[lev].define(grids[lev], dmap[lev], Nscal, ng_s);
+        rhohalf[lev].define(grids[lev], dmap[lev], 1, 1);
+        cphalf[lev].define(grids[lev], dmap[lev], 1, 1);
+        xihalf[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        macrhs[lev].define(grids[lev], dmap[lev], 1, 0);
+        macphi[lev].define(grids[lev], dmap[lev], 1, 1);
+        S_cc_nph[lev].define(grids[lev], dmap[lev], 1, 0);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        diff_old[lev].define(grids[lev], dmap[lev], 1, 0);
+        diff_new[lev].define(grids[lev], dmap[lev], 1, 0);
+        diff_hat[lev].define(grids[lev], dmap[lev], 1, 0);
+        diff_hterm_new[lev].define(grids[lev], dmap[lev], 1, 0);
+        diff_hterm_hat[lev].define(grids[lev], dmap[lev], 1, 0);
+        rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
+        rho_Hext[lev].define(grids[lev], dmap[lev], 1, 0);
+        sdc_source[lev].define(grids[lev], dmap[lev], Nscal, 0);
+        aofs[lev].define(grids[lev], dmap[lev], Nscal, 0);
+        intra_rhoh0[lev].define(grids[lev], dmap[lev], 1, 0);
+        delta_gamma1_term[lev].define(grids[lev], dmap[lev], 1, 0);
+        delta_gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
+        peos[lev].define(grids[lev], dmap[lev], 1, 0);
+        p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+        delta_p_term[lev].define(grids[lev], dmap[lev], 1, 0);
+        Tcoeff1[lev].define(grids[lev], dmap[lev], 1, 1);
+        hcoeff1[lev].define(grids[lev], dmap[lev], 1, 1);
+        Xkcoeff1[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff1[lev].define(grids[lev], dmap[lev], 1, 1);
+        Tcoeff2[lev].define(grids[lev], dmap[lev], 1, 1);
+        hcoeff2[lev].define(grids[lev], dmap[lev], 1, 1);
+        Xkcoeff2[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff2[lev].define(grids[lev], dmap[lev], 1, 1);
+
         if (ppm_trace_forces == 0) {
             scal_force[lev].define(grids[lev], dmap[lev], Nscal, 1);
         } else {
@@ -276,9 +276,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     // compute p0_minus_peosbar = p0_old - peosbar_old (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
     if (dpdt_factor > 0.0) {
-
         // peos now holds "peos_old", the thermodynamic p computed from sold(rho,h,X)
-        PfromRhoH(sold,sold,peos);
+        PfromRhoH(sold, sold, peos);
 
         // compute peosbar = Avg(peos_old)
         Average(peos, peosbar, 0);
@@ -290,9 +289,9 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         Put1dArrayOnCart(p0_old, p0_cart, false, false, bcs_f, 0);
 
         // compute delta_p_term = peos_old - p0_old
-        for (int lev=0; lev<=finest_level; ++lev) {
-            MultiFab::Copy(delta_p_term[lev],peos[lev],0,0,1,0);
-            MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
+            MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
         }
 
     } else {
@@ -702,9 +701,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             // compute p0_minus_peosbar = p0_new - peosbar_new (for making w0) and
             // increment delta_p_term += peos_new - p0_new (for RHS of projection)
             if (dpdt_factor > 0.) {
-
                 // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
-                PfromRhoH(snew,snew,peos);
+                PfromRhoH(snew, snew, peos);
 
                 // compute peosbar = Avg(peos_new)
                 Average(peos, peosbar, 0);
@@ -716,9 +714,10 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                 Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
 
                 // increment delta_p_term += peos_new - p0_new
-                for (int lev=0; lev<=finest_level; ++lev) {
-                    MultiFab::Add(delta_p_term[lev],peos[lev],0,0,1,0);
-                    MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
+                for (int lev = 0; lev <= finest_level; ++lev) {
+                    MultiFab::Add(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
+                    MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1,
+                                       0);
                 }
 
             } else {
@@ -1184,24 +1183,23 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
         // compute delta_p_term = peos_new - p0_new (for RHS of projection)
         if (dpdt_factor > 0.) {
-
             // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
-            PfromRhoH(snew,snew,peos);
+            PfromRhoH(snew, snew, peos);
 
             // compute peosbar = Avg(peos_new)
             Average(delta_p_term, peosbar, 0);
 
-                // put p0_new on cart
-                Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
+            // put p0_new on cart
+            Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
 
-                // compute delta_p_term = peos_new - p0_new
-                for (int lev=0; lev<=finest_level; ++lev) {
-                    MultiFab::Copy(delta_p_term[lev],peos[lev],0,0,1,0);
-                    MultiFab::Subtract(delta_p_term[lev],p0_cart[lev],0,0,1,0);
-                }
-            
-                CorrectRHCCforNodalProj(rhcc_for_nodalproj,rho0_new,beta0_nph,gamma1bar_new,
-                                        p0_new,delta_p_term);
+            // compute delta_p_term = peos_new - p0_new
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab::Copy(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
+                MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
+            }
+
+            CorrectRHCCforNodalProj(rhcc_for_nodalproj, rho0_new, beta0_nph,
+                                    gamma1bar_new, p0_new, delta_p_term);
         }
     }
 
