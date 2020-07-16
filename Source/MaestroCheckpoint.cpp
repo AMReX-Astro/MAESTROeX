@@ -1,19 +1,16 @@
 
-#include <Maestro.H>
 #include <AMReX_VisMF.H>
+#include <Maestro.H>
 #include <Maestro_F.H>
 
 using namespace amrex;
 
-namespace
-{
-    const std::string level_prefix {"Level_"};
+namespace {
+const std::string level_prefix{"Level_"};
 }
 
 // compute S at cell-centers
-void
-Maestro::WriteCheckPoint (int step) {
-
+void Maestro::WriteCheckPoint(int step) {
     // chk00010            write a checkpoint file with this root directory
     // chk00010/Header     this contains information you need to save (e.g., finest_level, t_new, etc.) and also
     //                     the BoxArrays at each level
@@ -22,14 +19,15 @@ Maestro::WriteCheckPoint (int step) {
     // etc.                these subdirectories will hold the MultiFab data at each level of refinement
 
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::WriteCheckPoint()",WriteCheckPoint);
+    BL_PROFILE_VAR("Maestro::WriteCheckPoint()", WriteCheckPoint);
 
     // checkpoint file name, e.g., chk00010
-    const std::string& checkpointname = amrex::Concatenate(check_base_name,step,7);
+    const std::string& checkpointname =
+        amrex::Concatenate(check_base_name, step, 7);
 
     amrex::Print() << "Writing checkpoint " << checkpointname << "\n";
 
-    const int nlevels = finest_level+1;
+    const int nlevels = finest_level + 1;
 
     // ---- prebuild a hierarchy of directories
     // ---- dirName is built first.  if dirName exists, it is renamed.  then build
@@ -43,15 +41,14 @@ Maestro::WriteCheckPoint (int step) {
 
     // write Header file
     if (ParallelDescriptor::IOProcessor()) {
-
         std::ofstream HeaderFile;
         HeaderFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
         std::string HeaderFileName(checkpointname + "/Header");
-        HeaderFile.open(HeaderFileName.c_str(), std::ofstream::out   |
-                        std::ofstream::trunc |
-                        std::ofstream::binary);
+        HeaderFile.open(HeaderFileName.c_str(), std::ofstream::out |
+                                                    std::ofstream::trunc |
+                                                    std::ofstream::binary);
 
-        if( !HeaderFile.good()) {
+        if (!HeaderFile.good()) {
             amrex::FileOpenFailed(HeaderFileName);
         }
 
@@ -99,81 +96,76 @@ Maestro::WriteCheckPoint (int step) {
 
     // write the MultiFab data to, e.g., chk00010/Level_0/
     for (int lev = 0; lev <= finest_level; ++lev) {
-        VisMF::Write(snew[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "snew"));
-        VisMF::Write(unew[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "unew"));
-        VisMF::Write(gpi[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "gpi"));
-        VisMF::Write(dSdt[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "dSdt"));
+        VisMF::Write(snew[lev], amrex::MultiFabFileFullPrefix(
+                                    lev, checkpointname, "Level_", "snew"));
+        VisMF::Write(unew[lev], amrex::MultiFabFileFullPrefix(
+                                    lev, checkpointname, "Level_", "unew"));
+        VisMF::Write(gpi[lev], amrex::MultiFabFileFullPrefix(
+                                   lev, checkpointname, "Level_", "gpi"));
+        VisMF::Write(dSdt[lev], amrex::MultiFabFileFullPrefix(
+                                    lev, checkpointname, "Level_", "dSdt"));
         VisMF::Write(S_cc_new[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "S_cc_new"));
+                     amrex::MultiFabFileFullPrefix(lev, checkpointname,
+                                                   "Level_", "S_cc_new"));
 #ifdef SDC
-        VisMF::Write(intra[lev],
-                     amrex::MultiFabFileFullPrefix(lev, checkpointname, "Level_", "intra"));
+        VisMF::Write(intra[lev], amrex::MultiFabFileFullPrefix(
+                                     lev, checkpointname, "Level_", "intra"));
 #endif
     }
 
     // write out the cell-centered base state
     if (ParallelDescriptor::IOProcessor()) {
-
         std::ofstream BaseCCFile;
         BaseCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
         std::string BaseCCFileName(checkpointname + "/BaseCC");
-        BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out   |
-                        std::ofstream::trunc |
-                        std::ofstream::binary);
-        if( !BaseCCFile.good()) {
+        BaseCCFile.open(BaseCCFileName.c_str(), std::ofstream::out |
+                                                    std::ofstream::trunc |
+                                                    std::ofstream::binary);
+        if (!BaseCCFile.good()) {
             amrex::FileOpenFailed(BaseCCFileName);
         }
 
         BaseCCFile.precision(17);
 
-        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
-            BaseCCFile << rho0_new.array()(i) << " "
-                       << p0_new.array()(i) << " "
+        for (int i = 0;
+             i < (base_geom.max_radial_level + 1) * base_geom.nr_fine; ++i) {
+            BaseCCFile << rho0_new.array()(i) << " " << p0_new.array()(i) << " "
                        << gamma1bar_new.array()(i) << " "
-                       << rhoh0_new.array()(i) << " "
-                       << beta0_new.array()(i) << " "
-                       << psi.array()(i) << " "
-                       << tempbar.array()(i) << " "
-                       << etarho_cc.array()(i) << " "
-                       << tempbar_init.array()(i) << " "
-                       << p0_old.array()(i) << " "
-                       << beta0_nm1.array()(i) << "\n";
+                       << rhoh0_new.array()(i) << " " << beta0_new.array()(i)
+                       << " " << psi.array()(i) << " " << tempbar.array()(i)
+                       << " " << etarho_cc.array()(i) << " "
+                       << tempbar_init.array()(i) << " " << p0_old.array()(i)
+                       << " " << beta0_nm1.array()(i) << "\n";
         }
     }
 
     // write out the face-centered base state
     if (ParallelDescriptor::IOProcessor()) {
-
         std::ofstream BaseFCFile;
         BaseFCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
         std::string BaseFCFileName(checkpointname + "/BaseFC");
-        BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out   |
-                        std::ofstream::trunc |
-                        std::ofstream::binary);
-        if( !BaseFCFile.good()) {
+        BaseFCFile.open(BaseFCFileName.c_str(), std::ofstream::out |
+                                                    std::ofstream::trunc |
+                                                    std::ofstream::binary);
+        if (!BaseFCFile.good()) {
             amrex::FileOpenFailed(BaseFCFileName);
         }
 
         BaseFCFile.precision(17);
 
-        for (int i=0; i<(base_geom.max_radial_level+1)*(base_geom.nr_fine+1); ++i) {
-            BaseFCFile << w0.array()(i) << " "
-                       << etarho_ec.array()(i) << "\n";
+        for (int i = 0;
+             i < (base_geom.max_radial_level + 1) * (base_geom.nr_fine + 1);
+             ++i) {
+            BaseFCFile << w0.array()(i) << " " << etarho_ec.array()(i) << "\n";
         }
     }
 
     WriteJobInfo(checkpointname);
 }
 
-int
-Maestro::ReadCheckPoint ()
-{
+int Maestro::ReadCheckPoint() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::ReadCheckPoint()",ReadCheckPoint);
+    BL_PROFILE_VAR("Maestro::ReadCheckPoint()", ReadCheckPoint);
 
     amrex::Print() << "Restart from checkpoint " << restart_file << "\n";
 
@@ -221,48 +213,49 @@ Maestro::ReadCheckPoint ()
         set_rel_eps(&rel_eps);
 
         for (int lev = 0; lev <= finest_level; ++lev) {
-
             // read in level 'lev' BoxArray from Header
             BoxArray ba;
             ba.readFrom(is);
             GotoNextLine(is);
 
             // create a distribution mapping
-            DistributionMapping dm { ba, ParallelDescriptor::NProcs() };
+            DistributionMapping dm{ba, ParallelDescriptor::NProcs()};
 
             // set BoxArray grids and DistributionMapping dmap in AMReX_AmrMesh.H class
             SetBoxArray(lev, ba);
             SetDistributionMap(lev, dm);
 
             // build MultiFab data
-            sold              [lev].define(ba, dm,          Nscal, ng_s);
-            uold              [lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
-            S_cc_old          [lev].define(ba, dm,              1,    0);
-            gpi               [lev].define(ba, dm, AMREX_SPACEDIM,    0);
-            dSdt              [lev].define(ba, dm,              1,    0);
+            sold[lev].define(ba, dm, Nscal, ng_s);
+            uold[lev].define(ba, dm, AMREX_SPACEDIM, ng_s);
+            S_cc_old[lev].define(ba, dm, 1, 0);
+            gpi[lev].define(ba, dm, AMREX_SPACEDIM, 0);
+            dSdt[lev].define(ba, dm, 1, 0);
 
             // build FluxRegister data
             if (lev > 0 && reflux_type == 2) {
-                flux_reg_s[lev].reset(new FluxRegister(ba, dm, refRatio(lev-1), lev, Nscal));
+                flux_reg_s[lev] = std::make_unique<FluxRegister>(
+                    ba, dm, refRatio(lev - 1), lev, Nscal);
             }
         }
     }
 
     // read in the MultiFab data - put it in the "old" MultiFabs
     for (int lev = 0; lev <= finest_level; ++lev) {
-        VisMF::Read(sold[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "snew"));
-        VisMF::Read(uold[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "unew"));
-        VisMF::Read(gpi[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "gpi"));
-        VisMF::Read(dSdt[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "dSdt"));
+        VisMF::Read(sold[lev], amrex::MultiFabFileFullPrefix(lev, restart_file,
+                                                             "Level_", "snew"));
+        VisMF::Read(uold[lev], amrex::MultiFabFileFullPrefix(lev, restart_file,
+                                                             "Level_", "unew"));
+        VisMF::Read(gpi[lev], amrex::MultiFabFileFullPrefix(lev, restart_file,
+                                                            "Level_", "gpi"));
+        VisMF::Read(dSdt[lev], amrex::MultiFabFileFullPrefix(lev, restart_file,
+                                                             "Level_", "dSdt"));
         VisMF::Read(S_cc_old[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "S_cc_new"));
+                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_",
+                                                  "S_cc_new"));
 #ifdef SDC
-        VisMF::Read(intra[lev],
-                    amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_", "intra"));
+        VisMF::Read(intra[lev], amrex::MultiFabFileFullPrefix(
+                                    lev, restart_file, "Level_", "intra"));
 #endif
     }
 
@@ -281,9 +274,7 @@ Maestro::ReadCheckPoint ()
         is >> previousCPUTimeUsed;
 
         Print() << "read CPU time: " << previousCPUTimeUsed << "\n";
-
     }
-
 
     // BaseCC
     {
@@ -294,7 +285,8 @@ Maestro::ReadCheckPoint ()
         std::istringstream is(fileCharPtrString, std::istringstream::in);
 
         // read in cell-centered base state
-        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine; ++i) {
+        for (int i = 0;
+             i < (base_geom.max_radial_level + 1) * base_geom.nr_fine; ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
@@ -336,9 +328,10 @@ Maestro::ReadCheckPoint ()
         std::string fileCharPtrString(fileCharPtr.dataPtr());
         std::istringstream is(fileCharPtrString, std::istringstream::in);
 
-
         // read in face-centered base state
-        for (int i=0; i<(base_geom.max_radial_level+1)*base_geom.nr_fine+1; ++i) {
+        for (int i = 0;
+             i < (base_geom.max_radial_level + 1) * base_geom.nr_fine + 1;
+             ++i) {
             std::getline(is, line);
             std::istringstream lis(line);
             lis >> word;
@@ -351,14 +344,11 @@ Maestro::ReadCheckPoint ()
     return step;
 }
 
-
 // utility to skip to next line in Header
-void
-Maestro::GotoNextLine (std::istream& is)
-{
+void Maestro::GotoNextLine(std::istream& is) {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::GotoNextLine()",GotoNextLine);
+    BL_PROFILE_VAR("Maestro::GotoNextLine()", GotoNextLine);
 
-    constexpr std::streamsize bl_ignore_max { 100000 };
+    constexpr std::streamsize bl_ignore_max{100000};
     is.ignore(bl_ignore_max, '\n');
 }

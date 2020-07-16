@@ -5,26 +5,21 @@
 using namespace amrex;
 
 // compute heating term, rho_Hext
-void
-Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
-                      const Vector<MultiFab>& scal)
-{
+void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
+                          const Vector<MultiFab>& scal) {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeHeating()",MakeHeating);
+    BL_PROFILE_VAR("Maestro::MakeHeating()", MakeHeating);
 
-    for (int lev=0; lev<=finest_level; ++lev) {
-
+    for (int lev = 0; lev <= finest_level; ++lev) {
         // get references to the MultiFabs at level lev
-              MultiFab& rho_Hext_mf = rho_Hext[lev];
-        const MultiFab&     scal_mf =     scal[lev];
-
+        MultiFab& rho_Hext_mf = rho_Hext[lev];
+        const MultiFab& scal_mf = scal[lev];
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
-        for ( MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
+        for (MFIter mfi(scal_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Real* dx = geom[lev].CellSize();
@@ -40,5 +35,5 @@ Maestro::MakeHeating (Vector<MultiFab>& rho_Hext,
     }
 
     // average down
-    AverageDown(rho_Hext,0,1);
+    AverageDown(rho_Hext, 0, 1);
 }

@@ -3,10 +3,8 @@
 
 using namespace amrex;
 
-void 
-ModelParser::ReadFile(const std::string& model_file_name)
-{
-    // open the model file 
+void ModelParser::ReadFile(const std::string& model_file_name) {
+    // open the model file
     std::ifstream model_file(model_file_name);
     Print() << "model file = " << model_file_name << std::endl;
 
@@ -35,7 +33,7 @@ ModelParser::ReadFile(const std::string& model_file_name)
         varnames_stored[i] = maestro::trim(line.substr(ipos));
     }
 
-    // alocate storage for the model data 
+    // alocate storage for the model data
     model_state.resize(npts_model);
     for (auto i = 0; i < npts_model; ++i) {
         model_state[i].resize(nvars_model);
@@ -44,9 +42,10 @@ ModelParser::ReadFile(const std::string& model_file_name)
 
     Print() << "\n\nreading initial model" << std::endl;
     Print() << npts_model << " points found in the initial model" << std::endl;
-    Print() << nvars_model_file << " variables found in the initial model" << std::endl;
+    Print() << nvars_model_file << " variables found in the initial model"
+            << std::endl;
 
-    // start reading in the data 
+    // start reading in the data
     for (auto i = 0; i < npts_model; ++i) {
         std::getline(model_file, line);
         std::istringstream iss(line);
@@ -70,7 +69,7 @@ ModelParser::ReadFile(const std::string& model_file_name)
         }
 
         for (auto j = 0; j < nvars_model_file; ++j) {
-            // keep track of whether the current variable from the model 
+            // keep track of whether the current variable from the model
             // file is the one that MAESTROeX cares about
 
             bool found_model = false;
@@ -90,7 +89,7 @@ ModelParser::ReadFile(const std::string& model_file_name)
             } else {
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     if (varnames_stored[j] == spec_names_cxx[comp]) {
-                        model_state[i][ispec_model+comp] = vars_stored[j];
+                        model_state[i][ispec_model + comp] = vars_stored[j];
                         found_model = true;
                         found_spec[comp] = true;
                     }
@@ -100,36 +99,40 @@ ModelParser::ReadFile(const std::string& model_file_name)
             // is the current variable from the model file one that we
             // care about?
             if (!found_model && i == 0) {
-                Print() << "WARNING: variable not found: " << maestro::trim(varnames_stored[j]) << std::endl;
+                Print() << "WARNING: variable not found: "
+                        << maestro::trim(varnames_stored[j]) << std::endl;
             }
         }
 
         // were all the variable that we care about provided?
         if (i == 0) {
             if (!found_dens) {
-                Print() << "WARNING: density not provided in inputs file" << std::endl;
+                Print() << "WARNING: density not provided in inputs file"
+                        << std::endl;
             }
             if (!found_temp) {
-                Print() << "WARNING: temperature not provided in inputs file" << std::endl;
+                Print() << "WARNING: temperature not provided in inputs file"
+                        << std::endl;
             }
             if (!found_pres) {
-                Print() << "WARNING: pressure not provided in inputs file" << std::endl;
+                Print() << "WARNING: pressure not provided in inputs file"
+                        << std::endl;
             }
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 if (!found_spec[comp]) {
-                    Print() << "WARNING: " << maestro::trim(spec_names_cxx[comp]) << " not provided in inputs file" << std::endl;
+                    Print()
+                        << "WARNING: " << maestro::trim(spec_names_cxx[comp])
+                        << " not provided in inputs file" << std::endl;
                 }
             }
-        }        
+        }
     }
 
     model_initialized = true;
 }
 
-Real 
-ModelParser::Interpolate(const Real r, const int ivar, 
-                         bool interpolate_top)
-{
+Real ModelParser::Interpolate(const Real r, const int ivar,
+                              bool interpolate_top) {
     // use the module's array of model coordinates (model_r), and
     // variables (model_state), to find the value of model_var at point
     // r using linear interpolation.
@@ -142,7 +145,7 @@ ModelParser::Interpolate(const Real r, const int ivar,
         i++;
     }
     if (i > 0 && i < npts_model) {
-        if (fabs(r - model_r[i-1]) < fabs(r - model_r[i])) {
+        if (fabs(r - model_r[i - 1]) < fabs(r - model_r[i])) {
             i--;
         }
     } else if (i == npts_model) {
@@ -150,42 +153,46 @@ ModelParser::Interpolate(const Real r, const int ivar,
     }
 
     if (i == 0) {
-        Real slope = (model_state[i+1][ivar] - model_state[i][ivar]) / (model_r[i+1] - model_r[i]);
+        Real slope = (model_state[i + 1][ivar] - model_state[i][ivar]) /
+                     (model_r[i + 1] - model_r[i]);
         interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
         // safety check to make sure interpolate lies within the bounding points
-        Real minvar = min(model_state[i+1][ivar], model_state[i][ivar]);
-        Real maxvar = max(model_state[i+1][ivar], model_state[i][ivar]);
+        Real minvar = min(model_state[i + 1][ivar], model_state[i][ivar]);
+        Real maxvar = max(model_state[i + 1][ivar], model_state[i][ivar]);
         interpolate = max(interpolate, minvar);
         interpolate = min(interpolate, maxvar);
     } else if (i == npts_model - 1) {
-        Real slope = (model_state[i][ivar] - model_state[i-1][ivar]) / (model_r[i] - model_r[i-1]);
+        Real slope = (model_state[i][ivar] - model_state[i - 1][ivar]) /
+                     (model_r[i] - model_r[i - 1]);
         interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
         // safety check to make sure interpolate lies within the bounding points
         if (!interpolate_top) {
-            Real minvar = min(model_state[i][ivar], model_state[i-1][ivar]);
-            Real maxvar = max(model_state[i][ivar], model_state[i-1][ivar]);
+            Real minvar = min(model_state[i][ivar], model_state[i - 1][ivar]);
+            Real maxvar = max(model_state[i][ivar], model_state[i - 1][ivar]);
             interpolate = max(interpolate, minvar);
             interpolate = min(interpolate, maxvar);
         }
     } else {
         if (r >= model_r[i]) {
-            Real slope = (model_state[i+1][ivar] - model_state[i][ivar]) / (model_r[i+1] - model_r[i]);
+            Real slope = (model_state[i + 1][ivar] - model_state[i][ivar]) /
+                         (model_r[i + 1] - model_r[i]);
             interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
             // safety check to make sure interpolate lies within the bounding points
-            Real minvar = min(model_state[i+1][ivar], model_state[i][ivar]);
-            Real maxvar = max(model_state[i+1][ivar], model_state[i][ivar]);
+            Real minvar = min(model_state[i + 1][ivar], model_state[i][ivar]);
+            Real maxvar = max(model_state[i + 1][ivar], model_state[i][ivar]);
             interpolate = max(interpolate, minvar);
             interpolate = min(interpolate, maxvar);
         } else {
-            Real slope = (model_state[i][ivar] - model_state[i-1][ivar]) / (model_r[i] - model_r[i-1]);
+            Real slope = (model_state[i][ivar] - model_state[i - 1][ivar]) /
+                         (model_r[i] - model_r[i - 1]);
             interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
             // safety check to make sure interpolate lies within the bounding points
-            Real minvar = min(model_state[i][ivar], model_state[i-1][ivar]);
-            Real maxvar = max(model_state[i][ivar], model_state[i-1][ivar]);
+            Real minvar = min(model_state[i][ivar], model_state[i - 1][ivar]);
+            Real maxvar = max(model_state[i][ivar], model_state[i - 1][ivar]);
             interpolate = max(interpolate, minvar);
             interpolate = min(interpolate, maxvar);
         }

@@ -51,13 +51,13 @@ pp.query("use_soundspeed_firstdt", maestro::use_soundspeed_firstdt);
 maestro::use_divu_firstdt = false;
 pp.query("use_divu_firstdt", maestro::use_divu_firstdt);
 
-maestro::spherical = 0;
+maestro::spherical = false;
 pp.query("spherical", maestro::spherical);
 
 maestro::octant = false;
 pp.query("octant", maestro::octant);
 
-maestro::do_2d_planar_octant = 0;
+maestro::do_2d_planar_octant = false;
 pp.query("do_2d_planar_octant", maestro::do_2d_planar_octant);
 
 maestro::regrid_int = -1;
@@ -478,4 +478,3 @@ pp.query("hg_level_factor", maestro::hg_level_factor);
 
 maestro::eps_hg_bottom = 1.e-4;
 pp.query("eps_hg_bottom", maestro::eps_hg_bottom);
-

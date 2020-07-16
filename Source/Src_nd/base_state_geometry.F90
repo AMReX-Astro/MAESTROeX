@@ -94,7 +94,7 @@ contains
 
     ! compute center(:)
     if (octant) then
-       if (.not. (spherical == 1 .and. amrex_spacedim == 3 .and. &
+       if (.not. (spherical .and. amrex_spacedim == 3 .and. &
             all(prob_lo(1:amrex_spacedim) == 0.d0) ) ) then
           call amrex_error("ERROR: octant requires spherical with prob_lo = 0.0")
        endif
@@ -111,7 +111,7 @@ contains
     dr(max_radial_level) = dr_fine
 
     ! computes dr, nr, r_cc_loc, r_edge_loc
-    if (spherical .eq. 0) then
+    if (.not. spherical) then
        ! cartesian case
 
        ! compute nr(:) and dr(:) assuming refinement ratio = 2
@@ -176,7 +176,7 @@ contains
 
     !$gpu
 
-    if ( spherical .eq. 0 ) then
+    if (.not. spherical) then
 #ifndef AMREX_USE_CUDA
        print*,'init_base_state_map_sphr() does not work for planar'
        call abort()
@@ -410,7 +410,7 @@ contains
     integer :: nchunks, maxchunks
     logical :: chunk_start
 
-    if (spherical .eq. 1) then
+    if (spherical) then
        finest_radial_level = 0
     else
        finest_radial_level = finest_radial_level_in
@@ -455,7 +455,7 @@ contains
     end if
     allocate(r_end_coord(0:finest_radial_level,1:maxchunks))
 
-    if (spherical .eq. 0) then
+    if (.not. spherical) then
 
        ! coarsest grid always has 1 chunk of data
        numdisjointchunks(0) = 1
@@ -680,7 +680,7 @@ contains
     integer, value,   intent(in   ) :: lev
     integer,          intent(inout) :: base_cutoff_density_coord_in
 
-    if (spherical == 1) then
+    if (spherical) then
         base_cutoff_density_coord_in = base_cutoff_density_coord(0)
     else
         base_cutoff_density_coord_in = base_cutoff_density_coord(lev)
