@@ -141,10 +141,15 @@ void Maestro::TagArray() {
         return;
     }
 
+    // grids have not been initialized to tag yet.
+    if (finest_level==0) {
+      return;
+    }
+    
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 
-    for (int lev = 1; lev <= base_geom.max_radial_level; ++lev) {
+    for (int lev = 1; lev <= finest_level; ++lev) {
         for (MFIter mfi(sold[lev], false); mfi.isValid(); ++mfi) {
             const Box& validBox = mfi.validbox();
             // re-compute tag_array since the actual grid structure changed due to buffering
