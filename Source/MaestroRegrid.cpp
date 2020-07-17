@@ -411,7 +411,7 @@ void Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge) {
     }
 
     // copy valid data into temp
-    for (auto n = 1; n < max_lev; ++n) {
+    for (auto n = 1; n < finest_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const auto lo = base_geom.r_start_coord(n, i);
             const auto hi = is_edge ? base_geom.r_end_coord(n, i) + 1
