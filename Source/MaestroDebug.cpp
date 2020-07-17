@@ -63,12 +63,14 @@ void Maestro::PrintMF(const Vector<MultiFab>& MF) {
 #if (AMREX_SPACEDIM == 2)
                                 std::cout << "lev, i, j, comp" << lev << " "
                                           << ii << " " << j << " " << comp
-                                          << " " << MF_arr(ii, j, k, comp);
+                                          << " " << MF_arr(ii, j, k, comp)
+				          << std::endl;
 #else
                                 std::cout << "lev, i, j, k, comp" << lev << " "
                                           << ii << " " << j << " " << k << " "
                                           << comp << " "
-                                          << MF_arr(ii, j, k, comp);
+                                          << MF_arr(ii, j, k, comp)
+				          << std::endl;
 #endif
                             }
                         }
@@ -121,12 +123,14 @@ void Maestro::PrintEdge(
 #if (AMREX_SPACEDIM == 2)
                                 std::cout << "lev, i, j, comp" << lev << " "
                                           << ii << " " << j << " " << comp
-                                          << " " << EDGE_arr(ii, j, k, comp);
+                                          << " " << EDGE_arr(ii, j, k, comp)
+				          << std::endl;
 #else
                                 std::cout << "lev, i, j, k, comp" << lev << " "
                                           << ii << " " << j << " " << k << " "
                                           << comp << " "
-                                          << EDGE_arr(ii, j, k, comp);
+                                          << EDGE_arr(ii, j, k, comp)
+				          << std::endl;
 #endif
                             }
                         }
