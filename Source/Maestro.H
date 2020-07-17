@@ -421,6 +421,9 @@ class Maestro : public amrex::AmrCore {
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF(const amrex::Vector<amrex::MultiFab>& MF);
 
+    /// Print out grid data from a Vector of BoxArrays
+    void PrintBA( const amrex::Vector<amrex::BoxArray>& ba);
+  
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge(
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& EDGE,

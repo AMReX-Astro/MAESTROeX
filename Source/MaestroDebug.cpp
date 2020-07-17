@@ -83,6 +83,36 @@ void Maestro::PrintMF(const Vector<MultiFab>& MF) {
     }
 }
 
+
+void Maestro::PrintBA(const Vector<BoxArray>& ba) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PrintBA()", PrintBA);
+
+    const int myProc = ParallelDescriptor::MyProc();
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+    
+      for (int i = 0; i < ba[lev].size(); ++i) {
+	  std::cout << "Grid #" << i << std::endl;
+	  std::cout << "Processor #" << myProc << std::endl;
+	
+	  const Box& validBox = ba[lev][i];
+	  auto lo = validBox.loVect3d();
+	  auto hi = validBox.hiVect3d();
+
+	  std::cout << "Level " << lev << std::endl;
+	  std::cout << "valid box ";
+	  for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+	      std::cout << "(" << lo[n] << ", " << hi[n] << ")  ";
+	  }
+	  // add this barrier so only one grid gets printed out at a time
+	  ParallelDescriptor::Barrier();
+      }  
+    }
+}
+
+
+
 void Maestro::PrintEdge(
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& EDGE, int dir) {
     // timer for profiling
