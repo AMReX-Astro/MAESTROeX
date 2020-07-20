@@ -26,6 +26,9 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         for (auto comp = 0; comp < NumSpec; ++comp) {
             scal(i, j, k, FirstSpec + comp) = s0_arr(lev, r, FirstSpec + comp);
         }
+        for (auto comp = 0; comp < NumAux; ++comp) {
+            scal(i, j, k, FirstAux + comp) = s0_arr(lev, r, FirstAux + comp);
+        }
         // initialize pi to zero for now
         scal(i, j, k, Pi) = 0.0;
     });
@@ -89,6 +92,17 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         MultiFab::Copy(scal, temp_mf, 0, FirstSpec + comp, 1, 0);
     }
 
+    // initialize aux
+    for (auto comp = 0; comp < NumAux; ++comp) {
+        for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
+            for (auto r = 0; r < base_geom.nr_fine; ++r) {
+                temp_arr(l, r) = s0_init_arr(l, r, FirstAux + comp);
+            }
+        }
+        Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstAux + comp);
+        MultiFab::Copy(scal, temp_mf, 0, FirstAux + comp, 1, 0);
+    }
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -114,6 +128,10 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] =
                     scal_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
+            }
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                eos_state.aux[comp] =
+                    scal_arr(i, j, k, FirstAux + comp) / eos_state.rho;
             }
 
             eos(eos_input_rp, eos_state);
