@@ -99,6 +99,10 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     for (auto comp = 0; comp < NumSpec; ++comp) {
         spec_above_cutoff[comp] = s0_init_arr(n, 0, FirstSpec + comp);
     }
+    RealVector aux_above_cutoff(NumAux);
+    for (auto comp = 0; comp < NumAux; ++comp) {
+        aux_above_cutoff[comp] = s0_init_arr(n, 0, FirstAux + comp);
+    }
     Real temp_above_cutoff = s0_init_arr(n, 0, Temp);
     Real p_above_cutoff = p0_init_arr(n, 0);
 
@@ -116,6 +120,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init_arr(n, r, RhoH) = rhoh_above_cutoff;
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 s0_init_arr(n, r, FirstSpec + comp) = spec_above_cutoff[comp];
+            }
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                s0_init_arr(n, r, FirstAux + comp) = aux_above_cutoff[comp];
             }
             p0_init_arr(n, r) = p_above_cutoff;
             s0_init_arr(n, r, Temp) = temp_above_cutoff;

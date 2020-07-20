@@ -378,6 +378,11 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                     scal(i, j, k, FirstSpec + comp) /
                                     eos_state.rho;
                             }
+                            for (auto comp = 0; comp < NumAux; ++comp) {
+                                eos_state.aux[comp] =
+                                    scal(i, j, k, FirstAux + comp) /
+                                    eos_state.rho;
+                            }
 
                             eos(eos_input_rt, eos_state);
 

@@ -147,6 +147,10 @@ void Maestro::UpdateScal(
                             eos_state.xn[n] = snew_arr(i, j, k, FirstSpec + n) /
                                               eos_state.rho;
                         }
+                        for (auto n = 0; n < NumAux; ++n) {
+                            eos_state.aux[n] = snew_arr(i, j, k, FirstAux + n) /
+                                              eos_state.rho;
+                        }
 
                         eos(eos_input_rp, eos_state);
 

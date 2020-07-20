@@ -135,6 +135,10 @@ void Maestro::Make_S_cc(
                         eos_state.xn[n] =
                             scal_arr(i, j, k, FirstSpec + n) / eos_state.rho;
                     }
+                    for (auto n = 0; n < NumAux; ++n) {
+                        eos_state.aux[n] =
+                            scal_arr(i, j, k, FirstAux + n) / eos_state.rho;
+                    }
 
                     // dens, temp, and xmass are inputs
                     eos(eos_input_rt, eos_state);
@@ -201,6 +205,10 @@ void Maestro::Make_S_cc(
                     for (auto n = 0; n < NumSpec; ++n) {
                         eos_state.xn[n] =
                             scal_arr(i, j, k, FirstSpec + n) / eos_state.rho;
+                    }
+                    for (auto n = 0; n < NumAux; ++n) {
+                        eos_state.aux[n] =
+                            scal_arr(i, j, k, FirstAux + n) / eos_state.rho;
                     }
 
                     // dens, temp, and xmass are inputs
