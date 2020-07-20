@@ -46,7 +46,20 @@ void Maestro::MakeExplicitThermal(
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
+    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
+    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
+    amrex::Vector<amrex::MultiFab> small_rhcc(finest_level+1);
+
+    //If finest_level is lower than the max_radial_level, we need to cut the
+    //geometry to pass to AMR to prevent it from looping over undefined grids.
+    for (int lev=0; lev <=finest_level; ++lev) {
+        small_geom[lev] = geom[lev];
+        small_grids[lev] = grids[lev];
+        small_dmap[lev] = dmap[lev];
+    }
+
+    MLABecLaplacian mlabec(small_geom, small_grids, small_dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -159,7 +172,20 @@ void Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
+    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
+    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
+    amrex::Vector<amrex::MultiFab> small_rhcc(finest_level+1);
+
+    //If finest_level is lower than the max_radial_level, we need to cut the
+    //geometry to pass to AMR to prevent it from looping over undefined grids.
+    for (int lev=0; lev <=finest_level; ++lev) {
+        small_geom[lev] = geom[lev];
+        small_grids[lev] = grids[lev];
+        small_dmap[lev] = dmap[lev];
+    }
+
+    MLABecLaplacian mlabec(small_geom, small_grids, small_dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -432,7 +458,20 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
+    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
+    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
+    amrex::Vector<amrex::MultiFab> small_rhcc(finest_level+1);
+
+    //If finest_level is lower than the max_radial_level, we need to cut the
+    //geometry to pass to AMR to prevent it from looping over undefined grids.
+    for (int lev=0; lev <=finest_level; ++lev) {
+        small_geom[lev] = geom[lev];
+        small_grids[lev] = grids[lev];
+        small_dmap[lev] = dmap[lev];
+    }
+
+    MLABecLaplacian mlabec(small_geom, small_grids, small_dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -624,7 +663,19 @@ void Maestro::ThermalConductSDC(
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
+    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
+    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
+    amrex::Vector<amrex::MultiFab> small_rhcc(finest_level+1);
+
+    //If finest_level is lower than the max_radial_level, we need to cut the
+    //geometry to pass to AMR to prevent it from looping over undefined grids.
+    for (int lev=0; lev <=finest_level; ++lev) {
+        small_geom[lev] = geom[lev];
+        small_grids[lev] = grids[lev];
+        small_dmap[lev] = dmap[lev];
+    }
+    MLABecLaplacian mlabec(small_geom, small_grids, small_dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
