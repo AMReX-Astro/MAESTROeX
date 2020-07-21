@@ -270,8 +270,11 @@ int Maestro::ReadCheckPoint() {
 
         // read in line
         std::getline(is, line);
+        std::istringstream lis(line);
 
-        is >> previousCPUTimeUsed;
+        lis >> word;
+
+        previousCPUTimeUsed = std::stod(word);
 
         Print() << "read CPU time: " << previousCPUTimeUsed << "\n";
     }
