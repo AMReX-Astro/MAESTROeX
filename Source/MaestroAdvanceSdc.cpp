@@ -314,7 +314,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
 
-	    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
@@ -743,7 +743,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                            p0_old, p0_new, gamma1bar_old, gamma1bar_new,
                            p0_minus_peosbar, dt, dtold, is_predictor);
 
-		    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+                    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
                     if (spherical) {
                         // put w0 on Cartesian edges
@@ -1113,7 +1113,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                    p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
                    dtold, is_predictor);
             
-	    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 

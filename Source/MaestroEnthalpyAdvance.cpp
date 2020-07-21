@@ -404,8 +404,8 @@ void Maestro::EnthalpyAdvanceSDC(
     Vector<MultiFab> rhoh0_old_cart(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-	// needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
-	rhoh0_old_cart[lev].setVal(0.);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rhoh0_old_cart[lev].setVal(0.);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ void Maestro::EnthalpyAdvanceSDC(
 
         ModifyScalForce(scal_force, scalold, umac, rhoh0_edge_old,
                         rhoh0_old_cart, RhoH, bcs_s, 0);
-	
+        
     } else if (enthalpy_pred_type == predict_h ||
                enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
