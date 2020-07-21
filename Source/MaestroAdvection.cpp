@@ -148,8 +148,8 @@ void Maestro::UpdateScal(
                                               eos_state.rho;
                         }
                         for (auto n = 0; n < NumAux; ++n) {
-                            eos_state.aux[n] = snew_arr(i, j, k, FirstAux + n) /
-                                              eos_state.rho;
+                            eos_state.aux[n] =
+                                snew_arr(i, j, k, FirstAux + n) / eos_state.rho;
                         }
 
                         eos(eos_input_rp, eos_state);
@@ -205,6 +205,15 @@ void Maestro::UpdateScal(
                                                        snew_arr(i, j, k, Rho);
                         }
                         snew_arr(i, j, k, Rho) = 0.5 * base_cutoff_density;
+                    }
+
+                    // update auxiliary variables
+                    for (int comp = FirstAux; comp < FirstAux + NumAux;
+                         ++comp) {
+                        snew_arr(i, j, k, comp) +=
+                            sold_arr(i, j, k, comp) *
+                            (snew_arr(i, j, k, Rho) / sold_arr(i, j, k, Rho) -
+                             1.0_rt);
                     }
 
                     // do not allow the species to leave here negative.
