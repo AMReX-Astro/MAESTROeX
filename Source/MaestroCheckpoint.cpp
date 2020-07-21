@@ -261,20 +261,15 @@ int Maestro::ReadCheckPoint() {
 
     // get the elapsed CPU time to now;
     {
-        // get ellapsed CPU time
-        std::string CPUFile(restart_file + "/CPUtime");
-        Vector<char> fileCharPtr;
-        ParallelDescriptor::ReadAndBcastFile(CPUFile, fileCharPtr);
-        std::string fileCharPtrString(fileCharPtr.dataPtr());
-        std::istringstream is(fileCharPtrString, std::istringstream::in);
+        // get elapsed CPU time
+        std::string CPUFile = restart_file + "/CPUtime";
+        std::ifstream CPUFileStream;
+        CPUFileStream.open(CPUFile.c_str(), std::istringstream::in);
 
-        // read in line
-        std::getline(is, line);
-        std::istringstream lis(line);
-
-        lis >> word;
-
-        previousCPUTimeUsed = std::stod(word);
+        if (CPUFileStream.good()) {
+            CPUFileStream >> previousCPUTimeUsed;
+            CPUFileStream.close();
+        }
 
         Print() << "read CPU time: " << previousCPUTimeUsed << "\n";
     }
