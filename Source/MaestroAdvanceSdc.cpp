@@ -46,7 +46,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     Vector<MultiFab> scal_force(finest_level + 1);
     Vector<MultiFab> delta_chi(finest_level + 1);
     Vector<MultiFab> sponge(finest_level + 1);
-    Vector<MultiFab> w0cc(finest_level + 1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level + 1);
@@ -154,7 +153,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         }
         delta_chi[lev].define(grids[lev], dmap[lev], 1, 0);
         sponge[lev].define(grids[lev], dmap[lev], 1, 0);
-        w0cc[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
 
         // face-centered in the dm-direction (planar only)
         AMREX_D_TERM(
@@ -316,6 +314,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
 
+	    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
@@ -482,7 +481,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                           sold[lev], 0, 0, Nscal, 0);
         MultiFab::Subtract(aofs[lev], intra[lev], 0, 0, Nscal, 0);
     }
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2B (optional) -- compute diffusive flux divergence
     //////////////////////////////////////////////////////////////////////////////
@@ -490,7 +489,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 2B : compute diffusive flux div >>>" << std::endl;
     }
-
+    
     if (use_thermal_diffusion) {
         // 1 = predictor, 2 = corrector
         ThermalConductSDC(1, sold, shat, snew, p0_old, p0_new, hcoeff1,
@@ -500,7 +499,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         MakeExplicitThermal(diff_hat, shat, Tcoeff1, hcoeff1, Xkcoeff1, pcoeff1,
                             p0_new, temp_diffusion_formulation);
     }
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2C -- advance thermodynamic variables
     //////////////////////////////////////////////////////////////////////////////
@@ -518,7 +517,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                           diff_hat[lev], 0, RhoH, 1, 0);
         MultiFab::Add(sdc_source[lev], aofs[lev], RhoH, RhoH, 1, 0);
     }
-
+    
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
@@ -744,6 +743,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                            p0_old, p0_new, gamma1bar_old, gamma1bar_new,
                            p0_minus_peosbar, dt, dtold, is_predictor);
 
+		    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
                     if (spherical) {
                         // put w0 on Cartesian edges
@@ -912,7 +912,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         for (int lev = 0; lev <= finest_level; ++lev) {
             sdc_source[lev].setVal(0.);
             MultiFab::Copy(sdc_source[lev], diff_old[lev], 0, RhoH, 1, 0);
-            MultiFab::Add(sdc_source[lev], diff_new[lev], 0, RhoH, 1, 0);
+            MultiFab::Add(sdc_source[lev], diff_hat[lev], 0, RhoH, 1, 0);
             MultiFab::Add(sdc_source[lev], diff_hterm_hat[lev], 0, RhoH, 1, 0);
             MultiFab::Subtract(sdc_source[lev], diff_hterm_new[lev], 0, RhoH, 1,
                                0);
@@ -1112,11 +1112,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
                    p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
                    dtold, is_predictor);
-
-            if (spherical) {
-                // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0, w0cc, true, true, bcs_u, 0, 1);
-            }
+            
+	    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -1141,8 +1138,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     if (spherical && evolve_base_state && split_projection) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Subtract(uold[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
-            MultiFab::Subtract(unew[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
+            MultiFab::Subtract(uold[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
+            MultiFab::Subtract(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
         }
     }
 
@@ -1218,7 +1215,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     if (spherical && evolve_base_state && split_projection) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Add(unew[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
+            MultiFab::Add(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
         }
         AverageDown(unew, 0, AMREX_SPACEDIM);
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
