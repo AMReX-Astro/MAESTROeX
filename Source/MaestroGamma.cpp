@@ -53,6 +53,10 @@ void Maestro::MakeGamma1bar(const Vector<MultiFab>& scal,
                     eos_state.xn[n] =
                         scal_arr(i, j, k, FirstSpec + n) / eos_state.rho;
                 }
+                for (auto n = 0; n < NumAux; ++n) {
+                    eos_state.aux[n] =
+                        scal_arr(i, j, k, FirstAux + n) / eos_state.rho;
+                }
 
                 // dens, pres, and xmass are inputs
                 eos(eos_input_rp, eos_state);

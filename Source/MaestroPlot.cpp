@@ -1560,6 +1560,10 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
                     eos_state.xn[comp] =
                         state_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
                 }
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    eos_state.aux[comp] =
+                        state_arr(i, j, k, FirstAux + comp) / eos_state.rho;
+                }
 
                 eos(eos_input_rt, eos_state);
 
@@ -2287,6 +2291,10 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
                     eos_state.xn[comp] =
                         state_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
                 }
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    eos_state.aux[comp] =
+                        state_arr(i, j, k, FirstAux + comp) / eos_state.rho;
+                }
 
                 eos(eos_input_rp, eos_state);
 
@@ -2325,6 +2333,10 @@ void Maestro::MakeEntropy(const Vector<MultiFab>& state,
                 eos_state.T = state_arr(i, j, k, Temp);
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     eos_state.xn[comp] = state_arr(i, j, k, FirstSpec + comp) /
+                                         state_arr(i, j, k, Rho);
+                }
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    eos_state.aux[comp] = state_arr(i, j, k, FirstAux + comp) /
                                          state_arr(i, j, k, Rho);
                 }
 

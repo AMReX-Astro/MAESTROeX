@@ -91,16 +91,17 @@ void Maestro::MakeRhoXFlux(
 
             const auto w0_arr = w0.const_array();
 
+            // reset density flux
+            AMREX_PARALLEL_FOR_3D(xbx, i, j, k,
+                                  { sfluxx(i, j, k, Rho) = 0.0; });
+            AMREX_PARALLEL_FOR_3D(ybx, i, j, k,
+                                  { sfluxy(i, j, k, Rho) = 0.0; });
+
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
             AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
                 int comp = n + start_comp;
-
-                // reset density flux
-                if (n == 0) {
-                    sfluxx(i, j, k, 0) = 0.0;
-                }
 
                 Real rho0_edge =
                     0.5 * (rho0_old_arr(lev, j) + rho0_new_arr(lev, j));
@@ -125,17 +126,12 @@ void Maestro::MakeRhoXFlux(
                 }
 
                 // compute the density fluxes by summing the species fluxes
-                sfluxx(i, j, k, 0) += sfluxx(i, j, k, comp);
+                sfluxx(i, j, k, Rho) += sfluxx(i, j, k, comp);
             });
 
             // y-direction
             AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
                 int comp = n + start_comp;
-
-                // reset density flux
-                if (n == 0) {
-                    sfluxy(i, j, k, 0) = 0.0;
-                }
 
                 Real rho0_edge =
                     0.5 * (rho0_edge_old(lev, j) + rho0_edge_new(lev, j));
@@ -171,20 +167,19 @@ void Maestro::MakeRhoXFlux(
                 }
 
                 // compute the density fluxes by summing the species fluxes
-                sfluxy(i, j, k, 0) += sfluxy(i, j, k, comp);
+                sfluxy(i, j, k, Rho) += sfluxy(i, j, k, comp);
             });
 
 #elif (AMREX_SPACEDIM == 3)
+
+            // reset density flux
+            AMREX_PARALLEL_FOR_3D(zbx, i, j, k,
+                                  { sfluxz(i, j, k, Rho) = 0.0; });
 
             if (!spherical) {
                 // x-direction
                 AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
-
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxx(i, j, k, 0) = 0.0;
-                    }
 
                     Real rho0_edge =
                         0.5 * (rho0_old_arr(lev, k) + rho0_new_arr(lev, k));
@@ -210,17 +205,12 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxx(i, j, k, 0) += sfluxx(i, j, k, comp);
+                    sfluxx(i, j, k, Rho) += sfluxx(i, j, k, comp);
                 });
 
                 // y-direction
                 AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
-
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxy(i, j, k, 0) = 0.0;
-                    }
 
                     Real rho0_edge =
                         0.5 * (rho0_old_arr(lev, k) + rho0_new_arr(lev, k));
@@ -245,24 +235,19 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxy(i, j, k, 0) += sfluxy(i, j, k, comp);
+                    sfluxy(i, j, k, Rho) += sfluxy(i, j, k, comp);
                 });
 
                 // z-direction
                 AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
 
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxz(i, j, k, 0) = 0.0;
-                    }
-
                     Real rho0_edge =
                         0.5 * (rho0_edge_old(lev, k) + rho0_edge_new(lev, k));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
-                        //   ! edge states are rho' and X.  To make the (rho X) flux,
-                        //   ! we need the edge state of rho0
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
                         sfluxz(i, j, k, comp) =
                             wmac(i, j, k) * (rho0_edge + sedgez(i, j, k, Rho)) *
                             sedgez(i, j, k, comp);
@@ -292,7 +277,7 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxz(i, j, k, 0) += sfluxz(i, j, k, comp);
+                    sfluxz(i, j, k, Rho) += sfluxz(i, j, k, comp);
                 });
             } else {
                 const Array4<const Real> rho0_edgex = rho0mac_edgex.array(mfi);
@@ -302,11 +287,6 @@ void Maestro::MakeRhoXFlux(
                 // x-direction
                 AMREX_PARALLEL_FOR_4D(xbx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
-
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxx(i, j, k, 0) = 0.0;
-                    }
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -329,17 +309,12 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxx(i, j, k, 0) += sfluxx(i, j, k, comp);
+                    sfluxx(i, j, k, Rho) += sfluxx(i, j, k, comp);
                 });
 
                 // y-direction
                 AMREX_PARALLEL_FOR_4D(ybx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
-
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxy(i, j, k, 0) = 0.0;
-                    }
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -362,17 +337,12 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxy(i, j, k, 0) += sfluxy(i, j, k, comp);
+                    sfluxy(i, j, k, Rho) += sfluxy(i, j, k, comp);
                 });
 
                 // z-direction
                 AMREX_PARALLEL_FOR_4D(zbx, num_comp, i, j, k, n, {
                     int comp = n + start_comp;
-
-                    // reset density flux
-                    if (n == 0) {
-                        sfluxz(i, j, k, 0) = 0.0;
-                    }
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
                         // edge states are rho' and X.  To make the (rho X) flux,
@@ -395,7 +365,7 @@ void Maestro::MakeRhoXFlux(
                     }
 
                     // compute the density fluxes by summing the species fluxes
-                    sfluxz(i, j, k, 0) += sfluxz(i, j, k, comp);
+                    sfluxz(i, j, k, Rho) += sfluxz(i, j, k, comp);
                 });
             }  // end spherical
 #endif
