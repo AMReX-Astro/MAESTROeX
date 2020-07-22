@@ -1,5 +1,6 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
+#include <actual_network.H>
 
 using namespace amrex;
 
@@ -113,7 +114,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         // that the state stays constant beyond rmax
         rloc = amrex::min(rloc, rmax);
 
-        // also, if we've falled below the cutoff density, just keep the
+        // also, if we've fallen below the cutoff density, just keep the
         // model constant
         if (rloc > base_cutoff_density_loc) {
             s0_init_arr(n, r, Rho) = rho_above_cutoff;
@@ -152,6 +153,22 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 }
             }
 
+            RealVector aux_ambient(NumAux);
+
+            // initialize the aux variables
+#ifdef NSE_THERMO
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                // set the aux quantities
+                aux_ambient[iye] +=
+                    xn_ambient[comp] * zion[comp] * aion_inv[comp];
+                aux_ambient[iabar] += xn_ambient[comp] * aion_inv[comp];
+                aux_ambient[ibea] +=
+                    xn_ambient[comp] * aprox19::bion(comp) * aion_inv[comp];
+            }
+
+            aux_ambient[iabar] = 1.0_rt / aux_ambient[iabar];
+#endif
+
             eos_t eos_state;
 
             // use the EOS to make the state consistent
@@ -160,6 +177,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             eos_state.p = p_ambient;
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] = xn_ambient[comp];
+            }
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                eos_state.aux[comp] = aux_ambient[comp];
             }
 
             // (rho,T) --> p,h
@@ -171,8 +191,16 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 s0_init_arr(n, r, FirstSpec + comp) =
                     d_ambient * xn_ambient[comp];
             }
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                s0_init_arr(n, r, FirstAux + comp) =
+                    d_ambient * aux_ambient[comp];
+            }
             p0_init_arr(n, r) = eos_state.p;  // p_ambient !
             s0_init_arr(n, r, Temp) = t_ambient;
+
+            Print() << "base aux = " << s0_init_arr(n, r, FirstAux + iye) << " "
+                    << s0_init_arr(n, r, FirstAux + iabar) << " "
+                    << s0_init_arr(n, r, FirstAux + ibea) << std::endl;
 
             // keep track of the height where we drop below the cutoff density
             if (s0_init_arr(n, r, Rho) <= base_cutoff_density &&
@@ -188,6 +216,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     spec_above_cutoff[comp] =
                         s0_init_arr(n, r, FirstSpec + comp);
+                }
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    aux_above_cutoff[comp] = s0_init_arr(n, r, FirstAux + comp);
                 }
                 temp_above_cutoff = s0_init_arr(n, r, Temp);
                 p_above_cutoff = p0_init_arr(n, r);

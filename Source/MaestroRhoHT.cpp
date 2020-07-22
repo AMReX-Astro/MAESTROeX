@@ -133,6 +133,10 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
                         state(i, j, k, FirstAux + n) / eos_state.rho;
                 }
 
+                // Print() << "aux = " << eos_state.aux[iye] << " "
+                //         << eos_state.aux[iabar] << " " << eos_state.aux[ibea]
+                //         << std::endl;
+
                 eos(eos_input_rp, eos_state);
 
                 state(i, j, k, Temp) = eos_state.T;

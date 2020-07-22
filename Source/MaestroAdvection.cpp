@@ -196,6 +196,15 @@ void Maestro::UpdateScal(
                             has_negative_species = true;
                     }
 
+                    // update auxiliary variables
+                    for (int comp = FirstAux; comp < FirstAux + NumAux;
+                         ++comp) {
+                        snew_arr(i, j, k, comp) +=
+                            sold_arr(i, j, k, comp) *
+                            (snew_arr(i, j, k, Rho) / sold_arr(i, j, k, Rho) -
+                             1.0_rt);
+                    }
+
                     // enforce a density floor
                     if (snew_arr(i, j, k, Rho) < 0.5 * base_cutoff_density) {
                         for (int comp = start_comp; comp < start_comp + NumSpec;
@@ -205,15 +214,6 @@ void Maestro::UpdateScal(
                                                        snew_arr(i, j, k, Rho);
                         }
                         snew_arr(i, j, k, Rho) = 0.5 * base_cutoff_density;
-                    }
-
-                    // update auxiliary variables
-                    for (int comp = FirstAux; comp < FirstAux + NumAux;
-                         ++comp) {
-                        snew_arr(i, j, k, comp) +=
-                            sold_arr(i, j, k, comp) *
-                            (snew_arr(i, j, k, Rho) / sold_arr(i, j, k, Rho) -
-                             1.0_rt);
                     }
 
                     // do not allow the species to leave here negative.
@@ -261,6 +261,12 @@ void Maestro::UpdateScal(
                 // do the same for density if we updated the species
                 flux_reg_s[lev + 1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1,
                                             geom[lev]);
+
+                // and the aux variables
+                for (int comp = 0; comp < NumAux; ++comp) {
+                    flux_reg_s[lev + 1]->Reflux(statenew[lev], 1.0, FirstAux,
+                                                FirstAux, NumAux, geom[lev]);
+                }
             }
         }
     }
@@ -271,10 +277,14 @@ void Maestro::UpdateScal(
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp,
               num_comp, start_comp, bcs_s);
 
-    // do the same for density if we updated the species
+    // do the same for density and aux if we updated the species
     if (start_comp == FirstSpec) {
         AverageDown(statenew, Rho, 1);
         FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
+
+        AverageDown(statenew, FirstAux, NumAux);
+        FillPatch(t_old, statenew, statenew, statenew, FirstAux, FirstAux,
+                  NumAux, FirstAux, bcs_s);
     }
 }
 

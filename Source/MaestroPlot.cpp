@@ -794,7 +794,10 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_spec || plot_omegadot) {
         (*nPlot) += NumSpec;
     }  // omegadot
-
+    // auxiliary variables
+    if (!plot_aux) {
+        (*nPlot) -= NumAux;
+    }
     if (plot_Hext) {
         (*nPlot)++;
     }
@@ -2337,7 +2340,7 @@ void Maestro::MakeEntropy(const Vector<MultiFab>& state,
                 }
                 for (auto comp = 0; comp < NumAux; ++comp) {
                     eos_state.aux[comp] = state_arr(i, j, k, FirstAux + comp) /
-                                         state_arr(i, j, k, Rho);
+                                          state_arr(i, j, k, Rho);
                 }
 
                 eos(eos_input_rt, eos_state);
