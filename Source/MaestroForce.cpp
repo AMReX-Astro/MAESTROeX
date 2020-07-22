@@ -794,11 +794,14 @@ void Maestro::MakeTempForce(
                         eos_state.xn[comp] =
                             scal_arr(i, j, k, FirstSpec + comp) /
                             scal_arr(i, j, k, Rho);
+<<<<<<< HEAD
                     }
                     for (auto comp = 0; comp < NumAux; ++comp) {
                         eos_state.aux[comp] =
                             scal_arr(i, j, k, FirstAux + comp) /
                             scal_arr(i, j, k, Rho);
+=======
+>>>>>>> c3d670820f4403e6ec598663d8b0780a0cdc0dc2
                     }
 
                     // dens, temp, xmass inputs
