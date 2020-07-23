@@ -31,7 +31,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
     Vector<MultiFab> delta_gamma1_term(finest_level + 1);
     Vector<MultiFab> delta_gamma1(finest_level + 1);
-    Vector<MultiFab> peos(finest_level + 1);
     Vector<MultiFab> p0_cart(finest_level + 1);
     Vector<MultiFab> delta_p_term(finest_level + 1);
 
@@ -133,7 +132,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         intra_rhoh0[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_gamma1_term[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
-        peos[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_p_term[lev].define(grids[lev], dmap[lev], 1, 0);
         Tcoeff1[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -274,11 +272,11 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     // compute p0_minus_peosbar = p0_old - peosbar_old (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
     if (dpdt_factor > 0.0) {
-        // peos now holds "peos_old", the thermodynamic p computed from sold(rho,h,X)
-        PfromRhoH(sold, sold, peos);
+        // peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
+        PfromRhoH(sold, sold, delta_p_term);
 
         // compute peosbar = Avg(peos_old)
-        Average(peos, peosbar, 0);
+        Average(delta_p_term, peosbar, 0);
 
         // compute p0_minus_peosbar = p0_old - peosbar
         p0_minus_peosbar.copy(p0_old - peosbar);
@@ -288,7 +286,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
         // compute delta_p_term = peos_old - p0_old
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Copy(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
             MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
         }
 
@@ -701,10 +698,10 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             // set delta_p_term = peos_new - p0_new (for RHS of projection)
             if (dpdt_factor > 0.) {
                 // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
-                PfromRhoH(snew, snew, peos);
+                PfromRhoH(snew, snew, delta_p_term);
 
                 // compute peosbar = Avg(peos_new)
-                Average(peos, peosbar, 0);
+                Average(delta_p_term, peosbar, 0);
 
                 // compute p0_minus_peosbar = p0_new - peosbar
                 p0_minus_peosbar.copy(p0_new - peosbar);
@@ -714,7 +711,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
                 // set delta_p_term = peos_new - p0_new
                 for (int lev = 0; lev <= finest_level; ++lev) {
-                    MultiFab::Copy(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
                     MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
                 }
 
@@ -1180,14 +1176,13 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         // compute delta_p_term = peos_new - p0_new (for RHS of projection)
         if (dpdt_factor > 0.) {
             // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
-            PfromRhoH(snew, snew, peos);
+            PfromRhoH(snew, snew, delta_p_term);
 
             // put p0_new on cart
             Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
 
             // compute delta_p_term = peos_new - p0_new
             for (int lev = 0; lev <= finest_level; ++lev) {
-                MultiFab::Copy(delta_p_term[lev], peos[lev], 0, 0, 1, 0);
                 MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
             }
 
