@@ -400,16 +400,16 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
 
             InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
 
-            const Box& tileBox = mfi.tilebox();
+            // const Box& tileBox = mfi.tilebox();
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                if (i == 5) {
-                    Print()
-                        << "init aux = " << scal_arr(i, j, k, FirstAux + iye)
-                        << " " << scal_arr(i, j, k, FirstAux + iabar) << " "
-                        << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
-                }
-            });
+            // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            //     if (i == 5) {
+            //         Print()
+            //             << "init aux = " << scal_arr(i, j, k, FirstAux + iye)
+            //             << " " << scal_arr(i, j, k, FirstAux + iabar) << " "
+            //             << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
+            //     }
+            // });
         }
     } else {
 #if (AMREX_SPACEDIM == 3)
