@@ -198,10 +198,6 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             p0_init_arr(n, r) = eos_state.p;  // p_ambient !
             s0_init_arr(n, r, Temp) = t_ambient;
 
-            // Print() << "base aux = " << s0_init_arr(n, r, FirstAux + iye) << " "
-            //         << s0_init_arr(n, r, FirstAux + iabar) << " "
-            //         << s0_init_arr(n, r, FirstAux + ibea) << std::endl;
-
             // keep track of the height where we drop below the cutoff density
             if (s0_init_arr(n, r, Rho) <= base_cutoff_density &&
                 base_cutoff_density_loc == 1.e99) {

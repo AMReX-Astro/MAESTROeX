@@ -39,10 +39,6 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
             scal(i, j, k, FirstAux + comp) = s0_arr(lev, r, FirstAux + comp);
         }
 
-        // Print() << "init aux = " << scal(i, j, k, FirstAux + iye) << " "
-        //         << scal(i, j, k, FirstAux + iabar) << " "
-        //         << scal(i, j, k, FirstAux + ibea) << std::endl;
-
         // initialize pi to zero for now
         scal(i, j, k, Pi) = 0.0;
     });

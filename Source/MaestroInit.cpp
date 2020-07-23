@@ -260,26 +260,6 @@ void Maestro::InitData() {
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
 
-    //     for (int lev = 0; lev <= finest_level; ++lev) {
-    //         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-    // #ifdef _OPENMP
-    // #pragma omp parallel
-    // #endif
-    //         for (MFIter mfi(sold[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-    //             // Get the index space of the valid region
-    //             const Box& tileBox = mfi.tilebox();
-    //             const Array4<Real> state = sold[lev].array(mfi);
-
-    //             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-    //                 if (j == 0 && k == 0) {
-    //                     Print() << "init aux = " << state(i, j, k, FirstAux + iye)
-    //                             << " " << state(i, j, k, FirstAux + iabar) << " "
-    //                             << state(i, j, k, FirstAux + ibea) << std::endl;
-    //                 }
-    //             });
-    //         }
-    //     }
-
     if (!spherical) {
         // reset tagging array to include buffer zones
         TagArray();
@@ -399,17 +379,6 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
             const Array4<Real> vel_arr = uold[lev].array(mfi);
 
             InitLevelData(lev, t_old, mfi, scal_arr, vel_arr);
-
-            // const Box& tileBox = mfi.tilebox();
-
-            // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-            //     if (i == 5) {
-            //         Print()
-            //             << "init aux = " << scal_arr(i, j, k, FirstAux + iye)
-            //             << " " << scal_arr(i, j, k, FirstAux + iabar) << " "
-            //             << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
-            //     }
-            // });
         }
     } else {
 #if (AMREX_SPACEDIM == 3)

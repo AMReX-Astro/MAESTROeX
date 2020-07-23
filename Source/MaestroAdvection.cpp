@@ -131,14 +131,6 @@ void Maestro::UpdateScal(
                                dx[2]
 #endif
                         );
-                    // if (do_eos_h_above_cutoff &&
-                    //     snew_arr(i, j, k, Rho) <= base_cutoff_density) {
-                    //     AllPrint()
-                    //         << "before break = "
-                    //         << snew_arr(i, j, k, FirstAux + iye) << " "
-                    //         << snew_arr(i, j, k, FirstAux + iabar) << " "
-                    //         << snew_arr(i, j, k, FirstAux + ibea) << std::endl;
-                    // }
 
                     snew_arr(i, j, k, RhoH) =
                         sold_arr(i, j, k, RhoH) +
@@ -211,14 +203,6 @@ void Maestro::UpdateScal(
                                                   snew_arr(i, j, k, Rho) /
                                                   sold_arr(i, j, k, Rho);
                     }
-
-                    // if (i == 5) {
-                    //     AllPrint()
-                    //         << "after update in advection = "
-                    //         << snew_arr(i, j, k, FirstAux + iye) << " "
-                    //         << snew_arr(i, j, k, FirstAux + iabar) << " "
-                    //         << snew_arr(i, j, k, FirstAux + ibea) << std::endl;
-                    // }
 
                     // enforce a density floor
                     if (snew_arr(i, j, k, Rho) < 0.5 * base_cutoff_density) {

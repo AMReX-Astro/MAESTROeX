@@ -240,24 +240,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     ParallelDescriptor::Bcast(&react_time, 1,
                               ParallelDescriptor::IOProcessorNumber());
 
-    //     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-    // #ifdef _OPENMP
-    // #pragma omp parallel
-    // #endif
-    //     for (MFIter mfi(s1[0], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-    //         const Array4<Real> scal_arr = s1[0].array(mfi);
-    //         const Box& tileBox = mfi.tilebox();
-
-    //         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-    //             if (i == 5) {
-    //                 Print() << "after react aux = "
-    //                         << scal_arr(i, j, k, FirstAux + iye) << " "
-    //                         << scal_arr(i, j, k, FirstAux + iabar) << " "
-    //                         << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
-    //             }
-    //         });
-    //     }
-
     //////////////////////////////////////////////////////////////////////////////
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
@@ -471,24 +453,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     DensityAdvance(1, s1, s2, sedge, sflux, scal_force, etarhoflux, umac, w0mac,
                    rho0_predicted_edge);
 
-    //     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-    // #ifdef _OPENMP
-    // #pragma omp parallel
-    // #endif
-    //     for (MFIter mfi(s1[0], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-    //         const Array4<Real> scal_arr = s1[0].array(mfi);
-    //         const Box& tileBox = mfi.tilebox();
-
-    //         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-    //             if (i == 5) {
-    //                 Print() << "after density advance aux = "
-    //                         << scal_arr(i, j, k, FirstAux + iye) << " "
-    //                         << scal_arr(i, j, k, FirstAux + iabar) << " "
-    //                         << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
-    //             }
-    //         });
-    //     }
-
     // subtract w0mac from umac
     Addw0(umac, w0mac, -1.);
 
@@ -577,24 +541,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     // need full UMAC velocities for EnthalpyAdvance
     Addw0(umac, w0mac, 1.);
-
-    //     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-    // #ifdef _OPENMP
-    // #pragma omp parallel
-    // #endif
-    //     for (MFIter mfi(s2[0], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
-    //         const Array4<Real> scal_arr = s2[0].array(mfi);
-    //         const Box& tileBox = mfi.tilebox();
-
-    //         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-    //             if (i == 5) {
-    //                 Print() << "enthalpy advance aux = "
-    //                         << scal_arr(i, j, k, FirstAux + iye) << " "
-    //                         << scal_arr(i, j, k, FirstAux + iabar) << " "
-    //                         << scal_arr(i, j, k, FirstAux + ibea) << std::endl;
-    //             }
-    //         });
-    //     }
 
     EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
 
