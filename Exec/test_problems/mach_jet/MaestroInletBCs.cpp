@@ -53,5 +53,10 @@ void Maestro::SetInletBCs() {
     InletBCs::INLET_RHOH = eos_state.rho * eos_state.h;
     InletBCs::INLET_TEMP = eos_state.T;
 
-    InletBCs::INLET_dr_fine = base_geom.dr_fine;
+    if (finest_level < max_level) {
+	auto dx = geom[finest_level].CellSizeArray();
+	InletBCs::INLET_dr_fine = dx[0];
+    } else {
+	InletBCs::INLET_dr_fine = base_geom.dr_fine;
+    }
 }
