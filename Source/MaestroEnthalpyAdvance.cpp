@@ -426,7 +426,7 @@ void Maestro::EnthalpyAdvanceSDC(
 
         ModifyScalForce(scal_force, scalold, umac, rhoh0_edge_old,
                         rhoh0_old_cart, RhoH, bcs_s, 0);
-        
+
     } else if (enthalpy_pred_type == predict_h ||
                enthalpy_pred_type == predict_rhoh) {
         // make force for (rho h)
