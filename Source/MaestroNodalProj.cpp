@@ -172,19 +172,8 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     info.setConsolidation(true);
     info.setMetricTerm(false);
 
-    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
-    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
-    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
-
-    //If finest_level is lower than the max_radial_level, we need to cut the
-    //geometry to pass to AMR to prevent it from looping over undefined grids.
-    for (int lev=0; lev <=finest_level; ++lev) {
-        small_geom[lev] = geom[lev];
-	small_grids[lev] = grids[lev];
-	small_dmap[lev] = dmap[lev];
-    }
-	
-    MLNodeLaplacian mlndlap(small_geom, small_grids, small_dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLNodeLaplacian mlndlap(Geom(0,finest_level), grids, dmap, info);
     mlndlap.setGaussSeidel(true);
     mlndlap.setHarmonicAverage(false);
 

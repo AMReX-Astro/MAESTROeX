@@ -345,8 +345,8 @@ class Maestro : public amrex::AmrCore {
 
     static void FillExtBC(const amrex::Array4<amrex::Real>& q,
                           const amrex::Box& bx, const amrex::Box& domainBox,
-                          const amrex::BCRec bcs, const int comp,
-                          const bool is_vel = false);
+                          const amrex::Real* dx, const amrex::BCRec bcs,
+			  const int comp, const bool is_vel = false);
 
     // end MaestroBCFill.cpp functions
     ////////////

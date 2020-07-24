@@ -97,7 +97,7 @@ void Maestro::Init() {
         if (evolve_base_state) {
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
-	
+
         if (!spherical) {
             // reset tagging array to include buffer zones
             TagArray();
@@ -277,7 +277,7 @@ void Maestro::InitData() {
     FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
     AverageDown(uold, 0, AMREX_SPACEDIM);
     FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-        
+
     if (fix_base_state) {
         // compute cutoff coordinates
         ComputeCutoffCoords(rho0_old);
@@ -317,7 +317,7 @@ void Maestro::InitData() {
     }
     // set p0^{-1} = p0_old
     p0_nm1.copy(p0_old);
-    
+
     // initialize these since an initial plotfile needs valid data in here
     // gamma1bar_old.setVal(0.);
     // w0.setVal(0.);
@@ -419,30 +419,18 @@ void Maestro::InitProj() {
     BaseState<Real> delta_gamma1_termbar(base_geom.max_radial_level + 1,
                                          base_geom.nr_fine);
 
-    amrex::Vector<amrex::Geometry> small_geom(finest_level+1);
-    amrex::Vector<amrex::BoxArray> small_grids(finest_level+1);
-    amrex::Vector<amrex::DistributionMapping> small_dmap(finest_level+1);
-
-    //If finest_level is lower than the max_radial_level, we need to cut the
-    //geometry to pass to AMR to prevent it from looping over undefined grids.                                
-    for (int lev=0; lev <=finest_level; ++lev) {
-        small_geom[lev] = geom[lev];
-        small_grids[lev] = grids[lev];
-        small_dmap[lev] = dmap[lev];
-    }
-
     for (int lev = 0; lev <= finest_level; ++lev) {
-        rho_omegadot[lev].define(small_grids[lev], small_dmap[lev], NumSpec, 0);
-        thermal[lev].define(     small_grids[lev], small_dmap[lev], 1, 0);
-        rho_Hnuc[lev].define(    small_grids[lev], small_dmap[lev], 1, 0);
-        rho_Hext[lev].define(    small_grids[lev], small_dmap[lev], 1, 0);
-        rhohalf[lev].define(     small_grids[lev], small_dmap[lev], 1, 1);
-        Tcoeff[lev].define(      small_grids[lev], small_dmap[lev], 1, 1);
-        hcoeff[lev].define(      small_grids[lev], small_dmap[lev], 1, 1);
-        Xkcoeff[lev].define(     small_grids[lev], small_dmap[lev], NumSpec, 1);
-        pcoeff[lev].define(      small_grids[lev], small_dmap[lev], 1, 1);
-        delta_gamma1[lev].define(small_grids[lev], small_dmap[lev], 1, 1);
-        delta_gamma1_term[lev].define(small_grids[lev], small_dmap[lev], 1, 1);
+        rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
+        thermal[lev].define(grids[lev], dmap[lev], 1, 0);
+        rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
+        rho_Hext[lev].define(grids[lev], dmap[lev], 1, 0);
+        rhohalf[lev].define(grids[lev], dmap[lev], 1, 1);
+        Tcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
+        hcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
+        Xkcoeff[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        pcoeff[lev].define(grids[lev], dmap[lev], 1, 1);
+        delta_gamma1[lev].define(grids[lev], dmap[lev], 1, 1);
+        delta_gamma1_term[lev].define(grids[lev], dmap[lev], 1, 1);
 
         // we don't have a legit timestep yet, so we set rho_omegadot,
         // rho_Hnuc, and rho_Hext to 0
