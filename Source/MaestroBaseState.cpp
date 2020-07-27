@@ -100,10 +100,12 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     for (auto comp = 0; comp < NumSpec; ++comp) {
         spec_above_cutoff[comp] = s0_init_arr(n, 0, FirstSpec + comp);
     }
+#if NAUX_NET > 0
     RealVector aux_above_cutoff(NumAux);
     for (auto comp = 0; comp < NumAux; ++comp) {
         aux_above_cutoff[comp] = s0_init_arr(n, 0, FirstAux + comp);
     }
+#endif
     Real temp_above_cutoff = s0_init_arr(n, 0, Temp);
     Real p_above_cutoff = p0_init_arr(n, 0);
 
@@ -122,9 +124,11 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 s0_init_arr(n, r, FirstSpec + comp) = spec_above_cutoff[comp];
             }
+#if NAUX_NET > 0
             for (auto comp = 0; comp < NumAux; ++comp) {
                 s0_init_arr(n, r, FirstAux + comp) = aux_above_cutoff[comp];
             }
+#endif
             p0_init_arr(n, r) = p_above_cutoff;
             s0_init_arr(n, r, Temp) = temp_above_cutoff;
 
@@ -152,8 +156,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                     xn_ambient[comp] /= sumX;
                 }
             }
-
+#if NAUX_NET > 0
             RealVector aux_ambient(NumAux);
+#endif
 
             // initialize the aux variables
 #ifdef NSE_THERMO
@@ -178,9 +183,11 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 eos_state.xn[comp] = xn_ambient[comp];
             }
+#if NAUX_NET > 0
             for (auto comp = 0; comp < NumAux; ++comp) {
                 eos_state.aux[comp] = aux_ambient[comp];
             }
+#endif
 
             // (rho,T) --> p,h
             eos(eos_input_rt, eos_state);
@@ -191,10 +198,12 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 s0_init_arr(n, r, FirstSpec + comp) =
                     d_ambient * xn_ambient[comp];
             }
+#if NAUX_NET > 0
             for (auto comp = 0; comp < NumAux; ++comp) {
                 s0_init_arr(n, r, FirstAux + comp) =
                     d_ambient * aux_ambient[comp];
             }
+#endif
             p0_init_arr(n, r) = eos_state.p;  // p_ambient !
             s0_init_arr(n, r, Temp) = t_ambient;
 
@@ -213,9 +222,11 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                     spec_above_cutoff[comp] =
                         s0_init_arr(n, r, FirstSpec + comp);
                 }
+#if NAUX_NET > 0
                 for (auto comp = 0; comp < NumAux; ++comp) {
                     aux_above_cutoff[comp] = s0_init_arr(n, r, FirstAux + comp);
                 }
+#endif
                 temp_above_cutoff = s0_init_arr(n, r, Temp);
                 p_above_cutoff = p0_init_arr(n, r);
             }

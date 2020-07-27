@@ -41,10 +41,12 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
                         eos_state.xn[n] =
                             state(i, j, k, FirstSpec + n) / eos_state.rho;
                     }
+#if NAUX_NET > 0
                     for (auto n = 0; n < NumAux; ++n) {
                         eos_state.aux[n] =
                             state(i, j, k, FirstAux + n) / eos_state.rho;
                     }
+#endif
 
                     // e = (rhoh - p)/rho
                     eos_state.e = (state(i, j, k, RhoH) - p0_arr(i, j, k)) /
@@ -65,10 +67,12 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
                         eos_state.xn[n] =
                             state(i, j, k, FirstSpec + n) / eos_state.rho;
                     }
+#if NAUX_NET > 0
                     for (auto n = 0; n < NumAux; ++n) {
                         eos_state.aux[n] =
                             state(i, j, k, FirstAux + n) / eos_state.rho;
                     }
+#endif
 
                     eos_state.h = state(i, j, k, RhoH) / state(i, j, k, Rho);
 
@@ -128,10 +132,12 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
                     eos_state.xn[n] =
                         state(i, j, k, FirstSpec + n) / eos_state.rho;
                 }
+#if NAUX_NET > 0
                 for (auto n = 0; n < NumAux; ++n) {
                     eos_state.aux[n] =
                         state(i, j, k, FirstAux + n) / eos_state.rho;
                 }
+#endif
 
                 eos(eos_input_rp, eos_state);
 
@@ -183,10 +189,12 @@ void Maestro::PfromRhoH(const Vector<MultiFab>& state,
                     eos_state.xn[n] =
                         state_arr(i, j, k, FirstSpec + n) / eos_state.rho;
                 }
+#if NAUX_NET > 0
                 for (auto n = 0; n < NumAux; ++n) {
                     eos_state.aux[n] =
                         state_arr(i, j, k, FirstAux + n) / eos_state.rho;
                 }
+#endif
 
                 eos_state.h =
                     state_arr(i, j, k, RhoH) / state_arr(i, j, k, Rho);
@@ -257,10 +265,12 @@ void Maestro::MachfromRhoH(const Vector<MultiFab>& scal,
                     eos_state.xn[n] =
                         state(i, j, k, FirstSpec + n) / eos_state.rho;
                 }
+#if NAUX_NET > 0
                 for (auto n = 0; n < NumAux; ++n) {
                     eos_state.aux[n] =
                         state(i, j, k, FirstAux + n) / eos_state.rho;
                 }
+#endif
 
                 if (use_eos_e_instead_of_h_loc) {
                     // e = h - p/rho
@@ -314,10 +324,12 @@ void Maestro::CsfromRhoH(const Vector<MultiFab>& scal,
                     eos_state.xn[n] =
                         state(i, j, k, FirstSpec + n) / eos_state.rho;
                 }
+#if NAUX_NET > 0
                 for (auto n = 0; n < NumAux; ++n) {
                     eos_state.aux[n] =
                         state(i, j, k, FirstAux + n) / eos_state.rho;
                 }
+#endif
 
                 if (use_eos_e_instead_of_h_loc) {
                     // e = h - p/rho
@@ -472,9 +484,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgex(i, j, k, FirstAux + n);
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
@@ -484,10 +498,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgex(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgex(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
@@ -496,9 +512,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgex(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);
@@ -543,9 +561,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgey(i, j, k, FirstAux + n);
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
@@ -555,10 +575,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgey(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgey(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
@@ -567,9 +589,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgey(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);
@@ -612,9 +636,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgez(i, j, k, FirstAux + n);
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
@@ -624,10 +650,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgez(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgez(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
 
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
@@ -636,9 +664,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgez(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);
@@ -681,9 +711,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgex(i, j, k, FirstAux + n);
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgex(i, j, k, Rho);
@@ -692,10 +724,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgex(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgex(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgex(i, j, k, Rho);
@@ -703,9 +737,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgex(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgex(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);
@@ -748,9 +784,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgey(i, j, k, FirstAux + n);
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgey(i, j, k, Rho);
@@ -759,10 +797,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgey(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgey(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgey(i, j, k, Rho);
@@ -770,9 +810,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgey(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgey(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);
@@ -815,9 +857,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgez(i, j, k, FirstAux + n);
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rhoX_loc) {
                         // interface states are rho and (rho X)
                         eos_state.rho = sedgez(i, j, k, Rho);
@@ -826,10 +870,12 @@ void Maestro::HfromRhoTedge(
                             eos_state.xn[n] =
                                 sedgez(i, j, k, FirstSpec + n) / eos_state.rho;
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] =
                                 sedgez(i, j, k, FirstAux + n) / eos_state.rho;
                         }
+#endif
                     } else if (species_pred_type_loc == predict_rho_and_X_loc) {
                         // interface states are rho and X
                         eos_state.rho = sedgez(i, j, k, Rho);
@@ -837,9 +883,11 @@ void Maestro::HfromRhoTedge(
                         for (auto n = 0; n < NumSpec; ++n) {
                             eos_state.xn[n] = sedgez(i, j, k, FirstSpec + n);
                         }
+#if NAUX_NET > 0
                         for (auto n = 0; n < NumAux; ++n) {
                             eos_state.aux[n] = sedgez(i, j, k, FirstAux + n);
                         }
+#endif
                     }
 
                     eos(eos_input_rt, eos_state);

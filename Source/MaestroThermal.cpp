@@ -312,10 +312,12 @@ void Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
                         eos_state.xn[comp] =
                             scal_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
                     }
+#if NAUX_NET > 0
                     for (auto comp = 0; comp < NumAux; ++comp) {
                         eos_state.aux[comp] =
                             scal_arr(i, j, k, FirstAux + comp) / eos_state.rho;
                     }
+#endif
 
                     // dens, temp and xmass are inputs
                     eos(eos_input_rt, eos_state);
