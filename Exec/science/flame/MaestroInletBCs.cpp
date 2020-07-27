@@ -18,11 +18,9 @@ As these are problem-specific, any problem needing inlet boundary
 conditions should create its own version of this module, using this
 outline.
 */
-void 
-Maestro::SetInletBCs()
-{
+void Maestro::SetInletBCs() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs); 
+    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs);
 
     // here we initialize the parameters that are module variables.
     // this routine is called when the base state is defined initially,
@@ -39,7 +37,7 @@ Maestro::SetInletBCs()
     eos_t eos_state;
 
     eos_state.rho = dens_fuel;
-    eos_state.T   = temp_fuel;
+    eos_state.T = temp_fuel;
 
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = 0.0;
@@ -49,12 +47,12 @@ Maestro::SetInletBCs()
 
     eos(eos_input_rt, eos_state);
 
-    InletBCs::INLET_RHO     = dens_fuel;
-    InletBCs::INLET_RHOH    = dens_fuel * eos_state.h;
-    InletBCs::INLET_TEMP    = temp_fuel;
+    InletBCs::INLET_RHO = dens_fuel;
+    InletBCs::INLET_RHOH = dens_fuel * eos_state.h;
+    InletBCs::INLET_TEMP = temp_fuel;
     InletBCs::INLET_RHOX.resize(NumSpec);
     for (auto comp = 0; comp < NumSpec; ++comp) {
         InletBCs::INLET_RHOX[comp] = dens_fuel * eos_state.xn[comp];
     }
-    InletBCs::INLET_VEL     = vel_fuel;
+    InletBCs::INLET_VEL = vel_fuel;
 }

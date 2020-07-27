@@ -7,12 +7,9 @@
 using namespace amrex;
 using namespace InletBCs;
 
-void
-Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx, 
-                    const Box& domainBox, const Real* dx, 
-                    const BCRec bcs, 
-                    const Real* gridlo, const int comp)
-{
+void Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
+                         const Box& domainBox, const Real* dx, const BCRec bcs,
+                         const Real* gridlo, const int comp) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ScalarFill()", ScalarFill);
 
@@ -21,12 +18,9 @@ Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
     FillExtBC(scal, bx, domainBox, bcs, comp, false);
 }
 
-void
-Maestro::VelFill(const Array4<Real>& vel, 
-                 const Box& bx, const Box& domainBox, 
-                 const Real* dx, 
-                 const BCRec bcs, const Real * gridlo, const int comp)
-{
+void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
+                      const Box& domainBox, const Real* dx, const BCRec bcs,
+                      const Real* gridlo, const int comp) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelFill()", VelFill);
 
@@ -35,11 +29,9 @@ Maestro::VelFill(const Array4<Real>& vel,
     FillExtBC(vel, bx, domainBox, bcs, comp, true);
 }
 
-void
-Maestro::FillExtBC(const Array4<Real>& q, const Box& bx, 
-                   const Box& domainBox, const BCRec bcs, 
-                   const int comp, const bool is_vel)
-{
+void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
+                        const Box& domainBox, const BCRec bcs, const int comp,
+                        const bool is_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillExtBC()", FillExtBC);
 
@@ -51,7 +43,9 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             break;
         }
     }
-    if (!found_ext_boundary) return;
+    if (!found_ext_boundary) {
+        return;
+    }
 
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
@@ -66,28 +60,32 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (i < imax) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[0,0] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[0,0] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 
     if (hi[0] > domhi[0]) {
-        auto imin = domhi[0]+1;
+        auto imin = domhi[0] + 1;
 
         if (bcs.hi(0) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (i > imin) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[0,1] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[0,1] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 
@@ -98,28 +96,32 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (j < jmax) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[1,0] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[1,0] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 
     if (hi[1] > domhi[1]) {
-        auto jmin = domhi[1]+1;
+        auto jmin = domhi[1] + 1;
 
         if (bcs.hi(1) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (j > jmin) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[1,1] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[1,1] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 
@@ -132,28 +134,32 @@ Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (k < kmax) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[2,0] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[2,0] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 
     if (hi[2] > domhi[2]) {
-        auto kmin = domhi[2]+1;
+        auto kmin = domhi[2] + 1;
 
         if (bcs.hi(2) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
                 AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
                     if (k > kmin) {
-                        q(i,j,k) = 0.0;
+                        q(i, j, k) = 0.0;
                     }
                 });
             } else {
-                Abort("MaestroBCFill bc[2,1] - must supply Dirichlet boundary conditions for scalar");
-            } 
+                Abort(
+                    "MaestroBCFill bc[2,1] - must supply Dirichlet boundary "
+                    "conditions for scalar");
+            }
         }
     }
 #endif

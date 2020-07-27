@@ -8,7 +8,13 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Get submodules 
-        run: git submodule update --init
+        run: |
+          git submodule update --init
+          cd external/Microphysics
+          git fetch; git checkout development
+          cd ../amrex 
+          git fetch; git checkout development
+          cd ../..
 
       - name: Run cpp linter
         uses: AMReX-Astro/cpp-linter-action@master
@@ -17,6 +23,7 @@ jobs:
           make_options: '-j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3 DEBUG=TRUE'
           ignore_files: 'amrex|Microphysics'
           header_filter: 'MAESTROeX'
+          checks: 'bugprone-*,performance-*,portability-*,modernize-*,clang-analyzer-*,cppcoreguidelines-*,readability-*,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-bounds-constant-array-index,-clang-diagnostic-unknown-warning-option,-clang-diagnostic-unknown-pragmas,-readability-avoid-const-params-in-decls,-cppcoreguidelines-owning-memory'
       
       - name: Archive clang tidy report
         uses: actions/upload-artifact@v1

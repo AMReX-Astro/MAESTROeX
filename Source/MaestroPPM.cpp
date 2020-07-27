@@ -4,21 +4,15 @@
 
 using namespace amrex;
 
-void
-Maestro::PPM (const Box& bx, 
-              Array4<const Real> const s,
-              Array4<const Real> const u,
-              Array4<const Real> const v,
+void Maestro::PPM(const Box& bx, Array4<const Real> const s,
+                  Array4<const Real> const u, Array4<const Real> const v,
 #if (AMREX_SPACEDIM == 3)
-              Array4<const Real> const w,
+                  Array4<const Real> const w,
 #endif
-              Array4<Real> const Ip,
-              Array4<Real> const Im,
-              const Box& domainBox,
-              const Vector<BCRec>& bcs,
-              const amrex::GpuArray<Real,AMREX_SPACEDIM> dx,
-              const bool is_umac, const int comp, const int bccomp)
-{
+                  Array4<Real> const Ip, Array4<Real> const Im,
+                  const Box& domainBox, const Vector<BCRec>& bcs,
+                  const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
+                  const bool is_umac, const int comp, const int bccomp) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PPM()", PPM);
 
@@ -38,161 +32,159 @@ Maestro::PPM (const Box& bx,
     int bchi = bcs[bccomp].hi()[0];
 
     if (ppm_type == 1) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
-            // Compute van Leer slopes in x-direction 
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+            // Compute van Leer slopes in x-direction
 
             // sm
             Real dsvl_l = 0.0;
             Real dsvl_r = 0.0;
 
-            // left side 
-            Real dsc = 0.5 * (s(i,j,k,n) - s(i-2,j,k,n));
-            Real dsl = 2.0 * (s(i-1,j,k,n) - s(i-2,j,k,n));
-            Real dsr = 2.0 * (s(i,j,k,n) - s(i-1,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            // left side
+            Real dsc = 0.5 * (s(i, j, k, n) - s(i - 2, j, k, n));
+            Real dsl = 2.0 * (s(i - 1, j, k, n) - s(i - 2, j, k, n));
+            Real dsr = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i+1,j,k,n) - s(i-1,j,k,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i-1,j,k,n));
-            dsr = 2.0 * (s(i+1,j,k,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i + 1, j, k, n) - s(i - 1, j, k, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
+            dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to x-edges.
-            Real sm = 0.5*(s(i,j,k,n)+s(i-1,j,k,n)) - (dsvl_r-dsvl_l)/6.0;
-            
+            Real sm = 0.5 * (s(i, j, k, n) + s(i - 1, j, k, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
+
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)));
-            sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)));
+            sm = max(sm, min(s(i, j, k, n), s(i - 1, j, k, n)));
+            sm = min(sm, max(s(i, j, k, n), s(i - 1, j, k, n)));
 
             // sp
             dsvl_l = 0.0;
             dsvl_r = 0.0;
 
             // left side
-            dsc = 0.5 * (s(i+1,j,k,n) - s(i-1,j,k,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i-1,j,k,n));
-            dsr = 2.0 * (s(i+1,j,k,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i + 1, j, k, n) - s(i - 1, j, k, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
+            dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i+2,j,k,n) - s(i,j,k,n));
-            dsl = 2.0 * (s(i+1,j,k,n) - s(i,j,k,n));
-            dsr = 2.0 * (s(i+2,j,k,n) - s(i+1,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
-            
-            // Interpolate s to x-edges.
-            Real sp = 0.5*(s(i+1,j,k,n)+s(i,j,k,n)) - (dsvl_r-dsvl_l) / 6.0;
-            
-            // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)));
-            sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
+            dsc = 0.5 * (s(i + 2, j, k, n) - s(i, j, k, n));
+            dsl = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
+            dsr = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
-            // save for later 
+            // Interpolate s to x-edges.
+            Real sp = 0.5 * (s(i + 1, j, k, n) + s(i, j, k, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
+
+            // Make sure sedge lies in between adjacent cell-centered values.
+            sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
+            sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
+
+            // save for later
             Real sedgel = sp;
             Real sedger = sm;
-            
+
             // Modify using quadratic limiters.
-            if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                sp = s(i,j,k,n);
-                sm = s(i,j,k,n);
-            } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                sp = 3.0*s(i,j,k,n) - 2.0*sm;
-            } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                sm = 3.0*s(i,j,k,n) - 2.0*sp;
+            if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                sp = s(i, j, k, n);
+                sm = s(i, j, k, n);
+            } else if (fabs(sp - s(i, j, k, n)) >=
+                       2.0 * fabs(sm - s(i, j, k, n))) {
+                sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+            } else if (fabs(sm - s(i, j, k, n)) >=
+                       2.0 * fabs(sp - s(i, j, k, n))) {
+                sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
 
             // Different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (i == domlo[0]) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i-1,j,k,n);
-                    
+                    sm = s(i - 1, j, k, n);
+
                     // Use a modified stencil to get sp on the first interior edge.
-                    sp = -0.2 *s(i-1,j,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i+1,j,k,n) 
-                        - 0.05*s(i+2,j,k,n);
-                    
+                    sp = -0.2 * s(i - 1, j, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i + 1, j, k, n) - 0.05 * s(i + 2, j, k, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
+                    sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
                 }
 
-            } else if (i == domlo[0]+1) {
+            } else if (i == domlo[0] + 1) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-                    
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sm = -0.2 *s(i-2,j,k,n) 
-                        + 0.75*s(i-1,j,k,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i+1,j,k,n);
-                    
+                    sm = -0.2 * s(i - 2, j, k, n) + 0.75 * s(i - 1, j, k, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i + 1, j, k, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j,k,n),s(i-1,j,k,n)));
-                    sm = min(sm,max(s(i,j,k,n),s(i-1,j,k,n)));
+                    sm = max(sm, min(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sm = min(sm, max(s(i, j, k, n), s(i - 1, j, k, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
-                    
+
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
 
             } else if (i == domhi[0]) {
                 if (bchi == EXT_DIR || bchi == HOEXTRAP) {
-
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i+1,j,k,n);
+                    sp = s(i + 1, j, k, n);
 
                     // Use a modified stencil to get sm on the first interior edge.
-                    sm = -0.2 *s(i+1,j,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i-1,j,k,n) 
-                        - 0.05*s(i-2,j,k,n);
-                    
+                    sm = -0.2 * s(i + 1, j, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i - 1, j, k, n) - 0.05 * s(i - 2, j, k, n);
+
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)));
+                    sm = max(sm, min(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i - 1, j, k, n), s(i, j, k, n)));
                 }
 
-            } else if (i == domhi[0]-1) {
-                if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-                    
+            } else if (i == domhi[0] - 1) {
+                if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                     // Use a modified stencil to get sp on the first interior edge.
-                    sp = -0.2 *s(i+2,j,k,n) 
-                        + 0.75*s(i+1,j,k,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i-1,j,k,n);
-                    
+                    sp = -0.2 * s(i + 2, j, k, n) + 0.75 * s(i + 1, j, k, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i - 1, j, k, n);
+
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j,k,n),s(i+1,j,k,n)));
-                    sp = min(sp,max(s(i,j,k,n),s(i+1,j,k,n)));
+                    sp = max(sp, min(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sp = min(sp, max(s(i, j, k, n), s(i + 1, j, k, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
 
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
             }
@@ -200,131 +192,162 @@ Maestro::PPM (const Box& bx,
             ////////////////////////////////////
             // Compute x-component of Ip and Im.
             ////////////////////////////////////
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i+1,j,k)) * dt_local / dx[0];
-                if (u(i+1,j,k) > rel_eps_local) {
-                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(u(i + 1, j, k)) * dt_local / dx[0];
+                if (u(i + 1, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 0) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,0) = s(i,j,k,n);
+                    Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i,j,k)) * dt_local / dx[0];
-                if (u(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                if (u(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 0) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,0) = s(i,j,k,n);
-               }
+                    Im(i, j, k, 0) = s(i, j, k, n);
+                }
 
             } else {
-
-                Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
-                if (u(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                if (u(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 0) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,0) = s(i,j,k,n);
+                    Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/dx[0];
-                if (u(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                if (u(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 0) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,0) = s(i,j,k,n);
+                    Im(i, j, k, 0) = s(i, j, k, n);
                 }
             }
         });
 
     } else if (ppm_type == 2) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
             // -1
             // Interpolate s to x-edges.
-            Real sedgel = (7.0/12.0)*(s(i-2,j,k,n)+s(i-1,j,k,n)) 
-                    - (1.0/12.0)*(s(i-3,j,k,n)+s(i,j,k,n));
+            Real sedgel =
+                (7.0 / 12.0) * (s(i - 2, j, k, n) + s(i - 1, j, k, n)) -
+                (1.0 / 12.0) * (s(i - 3, j, k, n) + s(i, j, k, n));
 
             // Limit sedge.
-            if ((sedgel-s(i-2,j,k,n))*(s(i-1,j,k,n)-sedgel) < 0.0) {
-                Real D2  = 3.0*(s(i-2,j,k,n)-2.0*sedgel+s(i-1,j,k,n));
-                Real D2L = s(i-3,j,k,n)-2.0*s(i-2,j,k,n)+s(i-1,j,k,n);
-                Real D2R = s(i-2,j,k,n)-2.0*s(i-1,j,k,n)+s(i,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgel = 0.5*(s(i-2,j,k,n)+s(i-1,j,k,n)) - D2LIM/6.0;
+            if ((sedgel - s(i - 2, j, k, n)) * (s(i - 1, j, k, n) - sedgel) <
+                0.0) {
+                Real D2 = 3.0 * (s(i - 2, j, k, n) - 2.0 * sedgel +
+                                 s(i - 1, j, k, n));
+                Real D2L = s(i - 3, j, k, n) - 2.0 * s(i - 2, j, k, n) +
+                           s(i - 1, j, k, n);
+                Real D2R =
+                    s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgel =
+                    0.5 * (s(i - 2, j, k, n) + s(i - 1, j, k, n)) - D2LIM / 6.0;
             }
 
             // 0
             // Interpolate s to x-edges.
-            Real sedge = (7.0/12.0)*(s(i-1,j,k,n)+s(i,j,k,n)) 
-                    - (1.0/12.0)*(s(i-2,j,k,n)+s(i+1,j,k,n));
+            Real sedge = (7.0 / 12.0) * (s(i - 1, j, k, n) + s(i, j, k, n)) -
+                         (1.0 / 12.0) * (s(i - 2, j, k, n) + s(i + 1, j, k, n));
 
             // Limit sedge.
-            if ((sedge-s(i-1,j,k,n))*(s(i,j,k,n)-sedge) < 0.0) { 
-                Real D2  = 3.0*(s(i-1,j,k,n)-2.0*sedge+s(i,j,k,n));
-                Real D2L = s(i-2,j,k,n)-2.0*s(i-1,j,k,n)+s(i,j,k,n);
-                Real D2R = s(i-1,j,k,n)-2.0*s(i,j,k,n)+s(i+1,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedge = 0.5*(s(i-1,j,k,n)+s(i,j,k,n)) - D2LIM/6.0;
+            if ((sedge - s(i - 1, j, k, n)) * (s(i, j, k, n) - sedge) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i - 1, j, k, n) - 2.0 * sedge + s(i, j, k, n));
+                Real D2L =
+                    s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedge = 0.5 * (s(i - 1, j, k, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
             // +1
             // Interpolate s to x-edges.
-            Real sedger = (7.0/12.0)*(s(i,j,k,n)+s(i+1,j,k,n)) 
-                    - (1.0/12.0)*(s(i-1,j,k,n)+s(i+2,j,k,n));
+            Real sedger =
+                (7.0 / 12.0) * (s(i, j, k, n) + s(i + 1, j, k, n)) -
+                (1.0 / 12.0) * (s(i - 1, j, k, n) + s(i + 2, j, k, n));
 
             // Limit sedge.
-            if ((sedger-s(i,j,k,n))*(s(i+1,j,k,n)-sedger) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k,n)-2.0*sedger+s(i+1,j,k,n));
-                Real D2L = s(i-1,j,k,n)-2.0*s(i,j,k,n)+s(i+1,j,k,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i+1,j,k,n)+s(i+2,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedger = 0.5*(s(i,j,k,n)+s(i+1,j,k,n)) - D2LIM/6.0;
+            if ((sedger - s(i, j, k, n)) * (s(i + 1, j, k, n) - sedger) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i, j, k, n) - 2.0 * sedger + s(i + 1, j, k, n));
+                Real D2L =
+                    s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedger =
+                    0.5 * (s(i, j, k, n) + s(i + 1, j, k, n)) - D2LIM / 6.0;
             }
 
             // +2
             // Interpolate s to x-edges.
-            Real sedgerr = (7.0/12.0)*(s(i+1,j,k,n)+s(i+2,j,k,n)) 
-                    - (1.0/12.0)*(s(i,j,k,n)+s(i+3,j,k,n));
+            Real sedgerr =
+                (7.0 / 12.0) * (s(i + 1, j, k, n) + s(i + 2, j, k, n)) -
+                (1.0 / 12.0) * (s(i, j, k, n) + s(i + 3, j, k, n));
 
             // Limit sedge.
-            if ((sedgerr-s(i+1,j,k,n))*(s(i+2,j,k,n)-sedgerr) < 0.0) {
-                Real D2  = 3.0*(s(i+1,j,k,n)-2.0*sedgerr+s(i+2,j,k,n));
-                Real D2L = s(i,j,k,n)-2.0*s(i+1,j,k,n)+s(i+2,j,k,n);
-                Real D2R = s(i+1,j,k,n)-2.0*s(i+2,j,k,n)+s(i+3,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgerr = 0.5*(s(i+1,j,k,n)+s(i+2,j,k,n)) - D2LIM/6.0;
+            if ((sedgerr - s(i + 1, j, k, n)) * (s(i + 2, j, k, n) - sedgerr) <
+                0.0) {
+                Real D2 = 3.0 * (s(i + 1, j, k, n) - 2.0 * sedgerr +
+                                 s(i + 2, j, k, n));
+                Real D2L =
+                    s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
+                Real D2R = s(i + 1, j, k, n) - 2.0 * s(i + 2, j, k, n) +
+                           s(i + 3, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgerr =
+                    0.5 * (s(i + 1, j, k, n) + s(i + 2, j, k, n)) - D2LIM / 6.0;
             }
 
             // use Colella 2008 limiters
             // This is a new version of the algorithm
             // to eliminate sensitivity to roundoff.
 
-            Real alphap = sedger-s(i,j,k,n);
-            Real alpham = sedge-s(i,j,k,n);
-            bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0*fabs(alphap);
+            Real alphap = sedger - s(i, j, k, n);
+            Real alpham = sedge - s(i, j, k, n);
+            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
+            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
             bool extremum = false;
 
-            if (alpham*alphap >= 0.0) {
+            if (alpham * alphap >= 0.0) {
                 extremum = true;
             } else if (bigp || bigm) {
-            
                 // Possible extremum. We look at cell centered values and face
                 // centered values for a change in sign in the differences adjacent to
                 // the cell. We use the pair of differences whose minimum magnitude is the
                 // largest, and thus least susceptible to sensitivity to roundoff.
                 Real dafacem = sedge - sedgel;
                 Real dafacep = sedgerr - sedger;
-                Real dabarm = s(i,j,k,n) - s(i-1,j,k,n);
-                Real dabarp = s(i+1,j,k,n) - s(i,j,k,n);
-                Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                Real dabarmin = min(fabs(dabarm),fabs(dabarp));
+                Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
+                Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
+                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
 
@@ -335,103 +358,108 @@ Maestro::PPM (const Box& bx,
                     dachkm = dabarm;
                     dachkp = dabarp;
                 }
-                extremum = (dachkm*dachkp <= 0.0);
+                extremum = (dachkm * dachkp <= 0.0);
             }
 
             if (extremum) {
-                Real D2  = 6.0*(alpham + alphap);
-                Real D2L = s(i-2,j,k,n)-2.0*s(i-1,j,k,n)+s(i,j,k,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i+1,j,k,n)+s(i+2,j,k,n);
-                Real D2C = s(i-1,j,k,n)-2.0*s(i,j,k,n)+s(i+1,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                Real D2ABS = max(fabs(D2),1.e-10);
-                alpham = alpham*D2LIM/D2ABS;
-                alphap = alphap*D2LIM/D2ABS;
+                Real D2 = 6.0 * (alpham + alphap);
+                Real D2L =
+                    s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
+                Real D2C =
+                    s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM = max(
+                    min(sgn * D2,
+                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                    0.0);
+                Real D2ABS = max(fabs(D2), 1.e-10);
+                alpham = alpham * D2LIM / D2ABS;
+                alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0,alpham);
-                    Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                    Real delam = s(i-1,j,k,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delam) {
-                        if (sgn*(delam - alpham) >= 1.e-10) {
-                            alphap = -2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham);
+                    Real sgn = copysign(1.0, alpham);
+                    Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
+                    Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delam) {
+                        if (sgn * (delam - alpham) >= 1.e-10) {
+                            alphap = -2.0 * delam -
+                                     2.0 * sgn *
+                                         sqrt(delam * delam - delam * alpham);
                         } else {
-                            alphap = -2.0*alpham;
+                            alphap = -2.0 * alpham;
                         }
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0,alphap);
-                    Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                    Real delap = s(i+1,j,k,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delap) {
-                        if (sgn*(delap - alphap) >= 1.e-10) {
-                            alpham = (-2.0*delap -2.0*sgn*sqrt(delap*delap - delap*alphap));
+                    Real sgn = copysign(1.0, alphap);
+                    Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
+                    Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delap) {
+                        if (sgn * (delap - alphap) >= 1.e-10) {
+                            alpham = (-2.0 * delap -
+                                      2.0 * sgn *
+                                          sqrt(delap * delap - delap * alphap));
                         } else {
-                            alpham = -2.0*alphap;
+                            alpham = -2.0 * alphap;
                         }
                     }
                 }
             }
 
-            Real sm = s(i,j,k,n) + alpham;
-            Real sp = s(i,j,k,n) + alphap;
+            Real sm = s(i, j, k, n) + alpham;
+            Real sp = s(i, j, k, n) + alphap;
 
             // different stencil needed for x-component of EXT_DIR and HOEXTRAP adv_bc's
             if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                 if (i == domlo[0]) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i-1,j,k,n);
+                    sm = s(i - 1, j, k, n);
 
                     // use a modified stencil to get sedge on the first interior edge
-                    sp = -0.2 *s(i-1,j,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i+1,j,k,n) 
-                        - 0.05*s(i+2,j,k,n);
+                    sp = -0.2 * s(i - 1, j, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i + 1, j, k, n) - 0.05 * s(i + 2, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sp = max(sp,min(s(i+1,j,k,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i+1,j,k,n),s(i,j,k,n)));
+                    sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
 
-                } else if (i == domlo[0]+1) {
-
-                    sedgel = s(i-2,j,k,n);
+                } else if (i == domlo[0] + 1) {
+                    sedgel = s(i - 2, j, k, n);
 
                     // use a modified stencil to get sedge on the first interior edge
-                    sedge = -0.2 *s(i-2,j,k,n) 
-                           + 0.75*s(i-1,j,k,n) 
-                           + 0.5 *s(i,j,k,n) 
-                           - 0.05*s(i+1,j,k,n);
+                    sedge = -0.2 * s(i - 2, j, k, n) +
+                            0.75 * s(i - 1, j, k, n) + 0.5 * s(i, j, k, n) -
+                            0.05 * s(i + 1, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sedge = max(sedge,min(s(i,j,k,n),s(i-1,j,k,n)));
-                    sedge = min(sedge,max(s(i,j,k,n),s(i-1,j,k,n)));
+                    sedge = max(sedge, min(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sedge = min(sedge, max(s(i, j, k, n), s(i - 1, j, k, n)));
 
-                } else if (i == domlo[0]+2) {
-
+                } else if (i == domlo[0] + 2) {
                     // use a modified stencil to get sedge on the first interior edge
-                    sedgel = -0.2 *s(i-3,j,k,n) 
-                            + 0.75*s(i-2,j,k,n) 
-                            + 0.5 *s(i-1,j,k,n) 
-                            - 0.05*s(i,j,k,n);
+                    sedgel = -0.2 * s(i - 3, j, k, n) +
+                             0.75 * s(i - 2, j, k, n) +
+                             0.5 * s(i - 1, j, k, n) - 0.05 * s(i, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sedgel = max(sedgel,min(s(i-1,j,k,n),s(i-2,j,k,n)));
-                    sedgel = min(sedgel,max(s(i-1,j,k,n),s(i-2,j,k,n)));
+                    sedgel =
+                        max(sedgel, min(s(i - 1, j, k, n), s(i - 2, j, k, n)));
+                    sedgel =
+                        min(sedgel, max(s(i - 1, j, k, n), s(i - 2, j, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (i == domlo[0]+1 || i == domlo[0]+2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (i == domlo[0] + 1 || i == domlo[0] + 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
                         // Possible extremum. We look at cell centered values and face
@@ -440,10 +468,10 @@ Maestro::PPM (const Box& bx,
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i-1,j,k,n);
-                        Real dabarp = s(i+1,j,k,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
+                        Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
 
@@ -454,100 +482,112 @@ Maestro::PPM (const Box& bx,
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i-2,j,k,n)-2.0*s(i-1,j,k,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i+1,j,k,n)+s(i+2,j,k,n);
-                        Real D2C = s(i-1,j,k,n)-2.0*s(i,j,k,n)+s(i+1,j,k,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) +
+                                   s(i + 2, j, k, n);
+                        Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
+                                   s(i + 1, j, k, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i-1,j,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i+1,j,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap) >= 1.e10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
+                                    alpham = -2.0 * alphap;
                                 }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
-            if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
+            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                 if (i == domhi[0]) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i+1,j,k,n);
+                    sp = s(i + 1, j, k, n);
 
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sm = -0.2 *s(i+1,j,k,n) 
-                        + 0.75*s(i,j,k,n)
-                        + 0.5 *s(i-1,j,k,n) 
-                        - 0.05*s(i-2,j,k,n);
-      
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i-1,j,k,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i-1,j,k,n),s(i,j,k,n)));
+                    sm = -0.2 * s(i + 1, j, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i - 1, j, k, n) - 0.05 * s(i - 2, j, k, n);
 
-                } else if (i == domhi[0]-1) {
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sedger = -0.2 *s(i+2,j,k,n) 
-                            + 0.75*s(i+1,j,k,n) 
-                            + 0.5 *s(i,j,k,n) 
-                            - 0.05*s(i-1,j,k,n);
-                    
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger,min(s(i,j,k,n),s(i+1,j,k,n)));
-                    sedger = min(sedger,max(s(i,j,k,n),s(i+1,j,k,n)));
+                    sm = max(sm, min(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i - 1, j, k, n), s(i, j, k, n)));
 
-                } else if (i == domhi[0]-2) {
+                } else if (i == domhi[0] - 1) {
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sedgerr = -0.2 *s(i+3,j,k,n) 
-                             + 0.75*s(i+2,j,k,n) 
-                             + 0.5 *s(i+1,j,k,n) 
-                             - 0.05*s(i,j,k,n);
-                    
+                    sedger = -0.2 * s(i + 2, j, k, n) +
+                             0.75 * s(i + 1, j, k, n) + 0.5 * s(i, j, k, n) -
+                             0.05 * s(i - 1, j, k, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr = max(sedgerr,min(s(i+1,j,k,n),s(i+2,j,k,n)));
-                    sedgerr = min(sedgerr,max(s(i+1,j,k,n),s(i+2,j,k,n)));
+                    sedger = max(sedger, min(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sedger = min(sedger, max(s(i, j, k, n), s(i + 1, j, k, n)));
+
+                } else if (i == domhi[0] - 2) {
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedgerr = -0.2 * s(i + 3, j, k, n) +
+                              0.75 * s(i + 2, j, k, n) +
+                              0.5 * s(i + 1, j, k, n) - 0.05 * s(i, j, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedgerr =
+                        max(sedgerr, min(s(i + 1, j, k, n), s(i + 2, j, k, n)));
+                    sedgerr =
+                        min(sedgerr, max(s(i + 1, j, k, n), s(i + 2, j, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (i == domhi[0]-1 || i == domhi[0]-2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (i == domhi[0] - 1 || i == domhi[0] - 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
                         // Possible extremum. We look at cell centered values and face
@@ -556,10 +596,10 @@ Maestro::PPM (const Box& bx,
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i-1,j,k,n);
-                        Real dabarp = s(i+1,j,k,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
+                        Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -569,48 +609,63 @@ Maestro::PPM (const Box& bx,
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i-2,j,k,n)-2.0*s(i-1,j,k,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i+1,j,k,n)+s(i+2,j,k,n);
-                        Real D2C = s(i-1,j,k,n)-2.0*s(i,j,k,n)+s(i+1,j,k,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) +
+                                   s(i + 2, j, k, n);
+                        Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
+                                   s(i + 1, j, k, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i-1,j,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i+1,j,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap) >= 1.e-10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e-10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
-                               }
+                                    alpham = -2.0 * alphap;
+                                }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
@@ -618,42 +673,48 @@ Maestro::PPM (const Box& bx,
             // Compute x-component of Ip and Im.
             ////////////////////////////////////
 
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i+1,j,k))*dt_local/dx[0];
-                
-                if (u(i+1,j,k) > rel_eps_local) {
-                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(u(i + 1, j, k)) * dt_local / dx[0];
+
+                if (u(i + 1, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 0) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,0) = s(i,j,k,n);
+                    Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/dx[0];
+                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
 
-                if (u(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                if (u(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 0) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,0) = s(i,j,k,n);
+                    Im(i, j, k, 0) = s(i, j, k, n);
                 }
             } else {
+                Real sigma = fabs(u(i, j, k)) * dt_local / dx[0];
 
-                Real sigma = fabs(u(i,j,k))*dt_local/dx[0];
-
-                if (u(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,0) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                if (u(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 0) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,0) = s(i,j,k,n);
+                    Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i,j,k))*dt_local/dx[0];
+                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
 
-                if (u(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,0) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                if (u(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 0) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,0) = s(i,j,k,n);
+                    Im(i, j, k, 0) = s(i, j, k, n);
                 }
             }
         });
@@ -666,9 +727,7 @@ Maestro::PPM (const Box& bx,
     bchi = bcs[bccomp].hi()[1];
 
     if (ppm_type == 1) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
             // Compute van Leer slopes in y-direction.
 
             // sm
@@ -676,151 +735,151 @@ Maestro::PPM (const Box& bx,
             Real dsvl_r = 0.0;
 
             // left side
-            Real dsc = 0.5 * (s(i,j,k,n) - s(i,j-2,k,n));
-            Real dsl = 2.0 * (s(i,j-1,k,n) - s(i,j-2,k,n));
-            Real dsr = 2.0 * (s(i,j,k,n) - s(i,j-1,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            Real dsc = 0.5 * (s(i, j, k, n) - s(i, j - 2, k, n));
+            Real dsl = 2.0 * (s(i, j - 1, k, n) - s(i, j - 2, k, n));
+            Real dsr = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i,j+1,k,n) - s(i,j-1,k,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i,j-1,k,n));
-            dsr = 2.0 * (s(i,j+1,k,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j + 1, k, n) - s(i, j - 1, k, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
+            dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to y-edges.
-            Real sm = 0.5*(s(i,j,k,n)+s(i,j-1,k,n)) - (dsvl_r-dsvl_l)/6.0;
+            Real sm = 0.5 * (s(i, j, k, n) + s(i, j - 1, k, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)));
-            sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)));
+            sm = max(sm, min(s(i, j, k, n), s(i, j - 1, k, n)));
+            sm = min(sm, max(s(i, j, k, n), s(i, j - 1, k, n)));
 
             // sp
             dsvl_l = 0.0;
             dsvl_r = 0.0;
 
             // left side
-            dsc = 0.5 * (s(i,j+1,k,n) - s(i,j-1,k,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i,j-1,k,n));
-            dsr = 2.0 * (s(i,j+1,k,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j + 1, k, n) - s(i, j - 1, k, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
+            dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i,j+2,k,n) - s(i,j,k,n));
-            dsl = 2.0 * (s(i,j+1,k,n) - s(i,j,k,n));
-            dsr = 2.0 * (s(i,j+2,k,n) - s(i,j+1,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j + 2, k, n) - s(i, j, k, n));
+            dsl = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
+            dsr = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to y-edges.
-            Real sp = 0.5*(s(i,j+1,k,n)+s(i,j,k,n)) - (dsvl_r-dsvl_l) / 6.0;
-           
-            // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)));
-            sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
+            Real sp = 0.5 * (s(i, j + 1, k, n) + s(i, j, k, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
 
-            // save for later 
+            // Make sure sedge lies in between adjacent cell-centered values.
+            sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
+            sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
+
+            // save for later
             Real sedgel = sp;
             Real sedger = sm;
 
             // Modify using quadratic limiters.
-            if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                sp = s(i,j,k,n);
-                sm = s(i,j,k,n);
-            } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                sp = 3.0*s(i,j,k,n) - 2.0*sm;
-            } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                sm = 3.0*s(i,j,k,n) - 2.0*sp;
+            if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                sp = s(i, j, k, n);
+                sm = s(i, j, k, n);
+            } else if (fabs(sp - s(i, j, k, n)) >=
+                       2.0 * fabs(sm - s(i, j, k, n))) {
+                sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+            } else if (fabs(sm - s(i, j, k, n)) >=
+                       2.0 * fabs(sp - s(i, j, k, n))) {
+                sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
-            
+
             // Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (j == domlo[1]) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-                  
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i,j-1,k,n);
-                   
+                    sm = s(i, j - 1, k, n);
+
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sp = -0.2 *s(i,j-1,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j+1,k,n) 
-                        - 0.05*s(i,j+2,k,n);
-                
+                    sp = -0.2 * s(i, j - 1, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j + 2, k, n);
+
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
+                    sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
                 }
 
-            } else if (j == domlo[1]+1) {
+            } else if (j == domlo[1] + 1) {
                 if (bclo == EXT_DIR || bclo == HOEXTRAP) {
-
                     // Use a modified stencil to get sm on the first interior edge.
-                    sm = -0.2 *s(i,j-2,k,n) 
-                        + 0.75*s(i,j-1,k,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i,j+1,k,n);
-                   
+                    sm = -0.2 * s(i, j - 2, k, n) + 0.75 * s(i, j - 1, k, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i, j + 1, k, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j,k,n),s(i,j-1,k,n)));
-                    sm = min(sm,max(s(i,j,k,n),s(i,j-1,k,n)));
+                    sm = max(sm, min(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sm = min(sm, max(s(i, j, k, n), s(i, j - 1, k, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
-                    
+
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
 
             } else if (j == domhi[1]) {
-                if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-            
+                if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i,j+1,k,n);
-             
+                    sp = s(i, j + 1, k, n);
+
                     // Use a modified stencil to get sm on the first interior edge.
-                    sm = -0.2 *s(i,j+1,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j-1,k,n) 
-                        - 0.05*s(i,j-2,k,n);
-                  
+                    sm = -0.2 * s(i, j + 1, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j - 2, k, n);
+
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)));
+                    sm = max(sm, min(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i, j - 1, k, n), s(i, j, k, n)));
                 }
 
-            } else if (j == domhi[1]-1) {
-                if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-
+            } else if (j == domhi[1] - 1) {
+                if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                     // Use a modified stencil to get sp on the first interior edge.
-                    sp = -0.2 *s(i,j+2,k,n) 
-                        + 0.75*s(i,j+1,k,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i,j-1,k,n);
-                    
+                    sp = -0.2 * s(i, j + 2, k, n) + 0.75 * s(i, j + 1, k, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i, j - 1, k, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j,k,n),s(i,j+1,k,n)));
-                    sp = min(sp,max(s(i,j,k,n),s(i,j+1,k,n)));
+                    sp = max(sp, min(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sp = min(sp, max(s(i, j, k, n), s(i, j + 1, k, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
 
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
             }
@@ -828,117 +887,149 @@ Maestro::PPM (const Box& bx,
             ////////////////////////////////////
             // Compute y-component of Ip and Im.
             ////////////////////////////////////
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
-                if (v(i,j+1,k) > rel_eps_local) {
-                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(v(i, j + 1, k)) * dt_local / dx[1];
+                if (v(i, j + 1, k) > rel_eps_local) {
+                    Ip(i, j, k, 1) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,1) = s(i,j,k,n);
+                    Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 1) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,1) = s(i,j,k,n);
+                    Im(i, j, k, 1) = s(i, j, k, n);
                 }
 
             } else {
-
-                Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 1) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,1) = s(i,j,k,n);
+                    Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 1) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,1) = s(i,j,k,n);
+                    Im(i, j, k, 1) = s(i, j, k, n);
                 }
             }
         });
 
     } else if (ppm_type == 2) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
             // -1
             // Interpolate s to y-edges.
-            Real sedgel = (7.0/12.0)*(s(i,j-2,k,n)+s(i,j-1,k,n)) 
-                    - (1.0/12.0)*(s(i,j-3,k,n)+s(i,j,k,n));
-            
+            Real sedgel =
+                (7.0 / 12.0) * (s(i, j - 2, k, n) + s(i, j - 1, k, n)) -
+                (1.0 / 12.0) * (s(i, j - 3, k, n) + s(i, j, k, n));
+
             // Limit sedge.
-            if ((sedgel-s(i,j-2,k,n))*(s(i,j-1,k,n)-sedgel) < 0.0) {
-                Real D2  = 3.0*(s(i,j-2,k,n)-2.0*sedgel+s(i,j-1,k,n));
-                Real D2L = s(i,j-3,k,n)-2.0*s(i,j-2,k,n)+s(i,j-1,k,n);
-                Real D2R = s(i,j-2,k,n)-2.0*s(i,j-1,k,n)+s(i,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgel = 0.5*(s(i,j-2,k,n)+s(i,j-1,k,n)) - D2LIM/6.0;
+            if ((sedgel - s(i, j - 2, k, n)) * (s(i, j - 1, k, n) - sedgel) <
+                0.0) {
+                Real D2 = 3.0 * (s(i, j - 2, k, n) - 2.0 * sedgel +
+                                 s(i, j - 1, k, n));
+                Real D2L = s(i, j - 3, k, n) - 2.0 * s(i, j - 2, k, n) +
+                           s(i, j - 1, k, n);
+                Real D2R =
+                    s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgel =
+                    0.5 * (s(i, j - 2, k, n) + s(i, j - 1, k, n)) - D2LIM / 6.0;
             }
 
             // 0
             // Interpolate s to y-edges.
-            Real sedge = (7.0/12.0)*(s(i,j-1,k,n)+s(i,j,k,n)) 
-                    - (1.0/12.0)*(s(i,j-2,k,n)+s(i,j+1,k,n));
-            
+            Real sedge = (7.0 / 12.0) * (s(i, j - 1, k, n) + s(i, j, k, n)) -
+                         (1.0 / 12.0) * (s(i, j - 2, k, n) + s(i, j + 1, k, n));
+
             // Limit sedge.
-            if ((sedge-s(i,j-1,k,n))*(s(i,j,k,n)-sedge) < 0.0) {
-                Real D2  = 3.0*(s(i,j-1,k,n)-2.0*sedge+s(i,j,k,n));
-                Real D2L = s(i,j-2,k,n)-2.0*s(i,j-1,k,n)+s(i,j,k,n);
-                Real D2R = s(i,j-1,k,n)-2.0*s(i,j,k,n)+s(i,j+1,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedge = 0.5*(s(i,j-1,k,n)+s(i,j,k,n)) - D2LIM/6.0;
+            if ((sedge - s(i, j - 1, k, n)) * (s(i, j, k, n) - sedge) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i, j - 1, k, n) - 2.0 * sedge + s(i, j, k, n));
+                Real D2L =
+                    s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedge = 0.5 * (s(i, j - 1, k, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
             // +1
             // Interpolate s to y-edges.
-            Real sedger = (7.0/12.0)*(s(i,j,k,n)+s(i,j+1,k,n)) 
-                    - (1.0/12.0)*(s(i,j-1,k,n)+s(i,j+2,k,n));
-            
+            Real sedger =
+                (7.0 / 12.0) * (s(i, j, k, n) + s(i, j + 1, k, n)) -
+                (1.0 / 12.0) * (s(i, j - 1, k, n) + s(i, j + 2, k, n));
+
             // Limit sedge.
-            if ((sedger-s(i,j,k,n))*(s(i,j+1,k,n)-sedger) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k,n)-2.0*sedger+s(i,j+1,k,n));
-                Real D2L = s(i,j-1,k,n)-2.0*s(i,j,k,n)+s(i,j+1,k,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i,j+1,k,n)+s(i,j+2,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedger = 0.5*(s(i,j,k,n)+s(i,j+1,k,n)) - D2LIM/6.0;
+            if ((sedger - s(i, j, k, n)) * (s(i, j + 1, k, n) - sedger) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i, j, k, n) - 2.0 * sedger + s(i, j + 1, k, n));
+                Real D2L =
+                    s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedger =
+                    0.5 * (s(i, j, k, n) + s(i, j + 1, k, n)) - D2LIM / 6.0;
             }
 
             // +2
             // Interpolate s to y-edges.
-            Real sedgerr = (7.0/12.0)*(s(i,j+1,k,n)+s(i,j+2,k,n)) 
-                    - (1.0/12.0)*(s(i,j,k,n)+s(i,j+3,k,n));
-            
+            Real sedgerr =
+                (7.0 / 12.0) * (s(i, j + 1, k, n) + s(i, j + 2, k, n)) -
+                (1.0 / 12.0) * (s(i, j, k, n) + s(i, j + 3, k, n));
+
             // Limit sedge.
-            if ((sedgerr-s(i,j+1,k,n))*(s(i,j+2,k,n)-sedgerr) < 0.0) {
-                Real D2  = 3.0*(s(i,j+1,k,n)-2.0*sedgerr+s(i,j+2,k,n));
-                Real D2L = s(i,j,k,n)-2.0*s(i,j+1,k,n)+s(i,j+2,k,n);
-                Real D2R = s(i,j+1,k,n)-2.0*s(i,j+2,k,n)+s(i,j+3,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgerr = 0.5*(s(i,j+1,k,n)+s(i,j+2,k,n)) - D2LIM/6.0;
+            if ((sedgerr - s(i, j + 1, k, n)) * (s(i, j + 2, k, n) - sedgerr) <
+                0.0) {
+                Real D2 = 3.0 * (s(i, j + 1, k, n) - 2.0 * sedgerr +
+                                 s(i, j + 2, k, n));
+                Real D2L =
+                    s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
+                Real D2R = s(i, j + 1, k, n) - 2.0 * s(i, j + 2, k, n) +
+                           s(i, j + 3, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgerr =
+                    0.5 * (s(i, j + 1, k, n) + s(i, j + 2, k, n)) - D2LIM / 6.0;
             }
 
             // Use Colella 2008 limiters.
             // This is a new version of the algorithm
             // to eliminate sensitivity to roundoff.
-            Real alphap = sedger-s(i,j,k,n);
-            Real alpham = sedge-s(i,j,k,n);
-            bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0*fabs(alphap);
+            Real alphap = sedger - s(i, j, k, n);
+            Real alpham = sedge - s(i, j, k, n);
+            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
+            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
             bool extremum = false;
 
-            if (alpham*alphap >= 0.0) {
+            if (alpham * alphap >= 0.0) {
                 extremum = true;
             } else if (bigp || bigm) {
                 // Possible extremum. We look at cell centered values and face
@@ -947,235 +1038,251 @@ Maestro::PPM (const Box& bx,
                 // largest, and thus least susceptible to sensitivity to roundoff.
                 Real dafacem = sedge - sedgel;
                 Real dafacep = sedgerr - sedger;
-                Real dabarm = s(i,j,k,n) - s(i,j-1,k,n);
-                Real dabarp = s(i,j+1,k,n) - s(i,j,k,n);
-                Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                Real dabarmin= min(fabs(dabarm),fabs(dabarp));
+                Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
+                Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
+                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
-                if (dafacemin>=dabarmin) {
+                if (dafacemin >= dabarmin) {
                     dachkm = dafacem;
                     dachkp = dafacep;
                 } else {
                     dachkm = dabarm;
                     dachkp = dabarp;
                 }
-                extremum = (dachkm*dachkp <= 0.0);
+                extremum = (dachkm * dachkp <= 0.0);
             }
 
             if (extremum) {
-                Real D2  = 6.0*(alpham + alphap);
-                Real D2L = s(i,j-2,k,n)-2.0*s(i,j-1,k,n)+s(i,j,k,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i,j+1,k,n)+s(i,j+2,k,n);
-                Real D2C = s(i,j-1,k,n)-2.0*s(i,j,k,n)+s(i,j+1,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                Real D2ABS = max(fabs(D2),1.e-10);
-                alpham = alpham*D2LIM/D2ABS;
-                alphap = alphap*D2LIM/D2ABS;
+                Real D2 = 6.0 * (alpham + alphap);
+                Real D2L =
+                    s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
+                Real D2C =
+                    s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM = max(
+                    min(sgn * D2,
+                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                    0.0);
+                Real D2ABS = max(fabs(D2), 1.e-10);
+                alpham = alpham * D2LIM / D2ABS;
+                alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0,alpham);
-                    Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                    Real delam = s(i,j-1,k,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delam) {
-                        if (sgn*(delam - alpham) >= 1.e-10) {
-                            alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                    Real sgn = copysign(1.0, alpham);
+                    Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
+                    Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delam) {
+                        if (sgn * (delam - alpham) >= 1.e-10) {
+                            alphap = (-2.0 * delam -
+                                      2.0 * sgn *
+                                          sqrt(delam * delam - delam * alpham));
                         } else {
-                            alphap = -2.0*alpham;
+                            alphap = -2.0 * alpham;
                         }
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0,alphap);
-                    Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                    Real delap = s(i,j+1,k,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delap) {
-                        if (sgn*(delap - alphap) >= 1.e-10) {
-                            alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                    Real sgn = copysign(1.0, alphap);
+                    Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
+                    Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delap) {
+                        if (sgn * (delap - alphap) >= 1.e-10) {
+                            alpham = (-2.0 * delap -
+                                      2.0 * sgn *
+                                          sqrt(delap * delap - delap * alphap));
                         } else {
-                            alpham = -2.0*alphap;
+                            alpham = -2.0 * alphap;
                         }
                     }
                 }
             }
 
-            Real sm = s(i,j,k,n) + alpham;
-            Real sp = s(i,j,k,n) + alphap;
+            Real sm = s(i, j, k, n) + alpham;
+            Real sp = s(i, j, k, n) + alphap;
 
             // Different stencil needed for y-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                 if (j == domlo[1]) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i,j-1,k,n);
-                    sedge = s(i,j-1,k,n);
-                   
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sp = -0.2 *s(i,j-1,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j+1,k,n) 
-                        - 0.05*s(i,j+2,k,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j+1,k,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i,j+1,k,n),s(i,j,k,n)));
+                    sm = s(i, j - 1, k, n);
+                    sedge = s(i, j - 1, k, n);
 
-                } else if (j == domlo[1]+1) {
-
-                    sedgel = s(i,j-2,k,n);
-                    
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sedge = -0.2 *s(i,j-2,k,n) 
-                           + 0.75*s(i,j-1,k,n) 
-                           + 0.5 *s(i,j,k,n) 
-                           - 0.05*s(i,j+1,k,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sedge = max(sedge,min(s(i,j,k,n),s(i,j-1,k,n)));
-                    sedge = min(sedge,max(s(i,j,k,n),s(i,j-1,k,n)));
+                    sp = -0.2 * s(i, j - 1, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j + 2, k, n);
 
-                } else if (j == domlo[1]+2) {
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sedgel = -0.2*s(i,j-3,k,n) 
-                           + 0.75*s(i,j-2,k,n) 
-                           + 0.5 *s(i,j-1,k,n) 
-                           - 0.05*s(i,j,k,n);
-                    
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgel = max(sedgel,min(s(i,j-1,k,n),s(i,j-2,k,n)));
-                    sedgel = min(sedgel,max(s(i,j-1,k,n),s(i,j-2,k,n)));
+                    sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
+
+                } else if (j == domlo[1] + 1) {
+                    sedgel = s(i, j - 2, k, n);
+
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedge = -0.2 * s(i, j - 2, k, n) +
+                            0.75 * s(i, j - 1, k, n) + 0.5 * s(i, j, k, n) -
+                            0.05 * s(i, j + 1, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedge = max(sedge, min(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sedge = min(sedge, max(s(i, j, k, n), s(i, j - 1, k, n)));
+
+                } else if (j == domlo[1] + 2) {
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedgel = -0.2 * s(i, j - 3, k, n) +
+                             0.75 * s(i, j - 2, k, n) +
+                             0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedgel =
+                        max(sedgel, min(s(i, j - 1, k, n), s(i, j - 2, k, n)));
+                    sedgel =
+                        min(sedgel, max(s(i, j - 1, k, n), s(i, j - 2, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (j == domlo[1]+1 || j == domlo[1]+2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (j == domlo[1] + 1 || j == domlo[1] + 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
-                        
                         // Possible extremum. We look at cell centered values and face
                         // centered values for a change in sign in the differences adjacent to
                         // the cell. We use the pair of differences whose minimum magnitude is
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i,j-1,k,n);
-                        Real dabarp = s(i,j+1,k,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin= min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
+                        Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
-                        if (dafacemin>=dabarmin) {
+                        if (dafacemin >= dabarmin) {
                             dachkm = dafacem;
                             dachkp = dafacep;
                         } else {
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i,j-2,k,n)-2.0*s(i,j-1,k,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i,j+1,k,n)+s(i,j+2,k,n);
-                        Real D2C = s(i,j-1,k,n)-2.0*s(i,j,k,n)+s(i,j+1,k,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) +
+                                   s(i, j + 2, k, n);
+                        Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
+                                   s(i, j + 1, k, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i,j-1,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i,j+1,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap) >= 1.e-10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e-10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
+                                    alpham = -2.0 * alphap;
                                 }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
-            if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
+            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                 if (j == domhi[1]) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i,j+1,k,n);
-                    
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sm  = -0.2*s(i,j+1,k,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j-1,k,n) 
-                        - 0.05*s(i,j-2,k,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j-1,k,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i,j-1,k,n),s(i,j,k,n)));
+                    sp = s(i, j + 1, k, n);
 
-                } else if (j == domhi[1]-1) {
-
-                    sedgerr = s(i,j+2,k,n);
-                    
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sedger = -0.2*s(i,j+2,k,n) 
-                           + 0.75*s(i,j+1,k,n) 
-                           + 0.5 *s(i,j,k,n) 
-                           - 0.05*s(i,j-1,k,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger,min(s(i,j,k,n),s(i,j+1,k,n)));
-                    sedger = min(sedger,max(s(i,j,k,n),s(i,j+1,k,n)));
+                    sm = -0.2 * s(i, j + 1, k, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j - 2, k, n);
 
-                } else if (j == domhi[1]-2) {
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sedgerr = -0.2*s(i,j+3,k,n) 
-                            + 0.75*s(i,j+2,k,n) 
-                            + 0.5 *s(i,j+1,k,n) 
-                            - 0.05*s(i,j,k,n);
-                    
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr = max(sedgerr,min(s(i,j+1,k,n),s(i,j+2,k,n)));
-                    sedgerr = min(sedgerr,max(s(i,j+1,k,n),s(i,j+2,k,n)));
+                    sm = max(sm, min(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i, j - 1, k, n), s(i, j, k, n)));
+
+                } else if (j == domhi[1] - 1) {
+                    sedgerr = s(i, j + 2, k, n);
+
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedger = -0.2 * s(i, j + 2, k, n) +
+                             0.75 * s(i, j + 1, k, n) + 0.5 * s(i, j, k, n) -
+                             0.05 * s(i, j - 1, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedger = max(sedger, min(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sedger = min(sedger, max(s(i, j, k, n), s(i, j + 1, k, n)));
+
+                } else if (j == domhi[1] - 2) {
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedgerr = -0.2 * s(i, j + 3, k, n) +
+                              0.75 * s(i, j + 2, k, n) +
+                              0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedgerr =
+                        max(sedgerr, min(s(i, j + 1, k, n), s(i, j + 2, k, n)));
+                    sedgerr =
+                        min(sedgerr, max(s(i, j + 1, k, n), s(i, j + 2, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (j == domhi[1]-1 || j == domhi[1]-2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (j == domhi[1] - 1 || j == domhi[1] - 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
                         // Possible extremum. We look at cell centered values and face
@@ -1184,100 +1291,121 @@ Maestro::PPM (const Box& bx,
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i,j-1,k,n);
-                        Real dabarp = s(i,j+1,k,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin= min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
+                        Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
-                        if (dafacemin>=dabarmin) {
+                        if (dafacemin >= dabarmin) {
                             dachkm = dafacem;
                             dachkp = dafacep;
                         } else {
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i,j-2,k,n)-2.0*s(i,j-1,k,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i,j+1,k,n)+s(i,j+2,k,n);
-                        Real D2C = s(i,j-1,k,n)-2.0*s(i,j,k,n)+s(i,j+1,k,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) +
+                                   s(i, j + 2, k, n);
+                        Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
+                                   s(i, j + 1, k, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i,j-1,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i,j+1,k,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap)>=1.e-10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e-10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
+                                    alpham = -2.0 * alphap;
                                 }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
             ////////////////////////////////////
             // Compute y-component of Ip and Im.
             ////////////////////////////////////
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i,j+1,k))*dt_local/dx[1];
-                if (v(i,j+1,k) > rel_eps_local) {
-                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(v(i, j + 1, k)) * dt_local / dx[1];
+                if (v(i, j + 1, k) > rel_eps_local) {
+                    Ip(i, j, k, 1) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,1) = s(i,j,k,n);
+                    Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 1) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,1) = s(i,j,k,n);
+                    Im(i, j, k, 1) = s(i, j, k, n);
                 }
 
             } else {
-
-                Real sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,1) = sp - 0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 1) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,1) = s(i,j,k,n);
+                    Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i,j,k))*dt_local/dx[1];
-                if (v(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,1) = sm + 0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                if (v(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 1) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,1) = s(i,j,k,n);
+                    Im(i, j, k, 1) = s(i, j, k, n);
                 }
             }
         });
@@ -1291,9 +1419,7 @@ Maestro::PPM (const Box& bx,
     bchi = bcs[bccomp].hi()[2];
 
     if (ppm_type == 1) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
             // Compute van Leer slopes in z-direction.
 
             // sm
@@ -1301,151 +1427,151 @@ Maestro::PPM (const Box& bx,
             Real dsvl_r = 0.0;
 
             // left side
-            Real dsc = 0.5 * (s(i,j,k,n) - s(i,j,k-2,n));
-            Real dsl = 2.0 * (s(i,j,k-1,n) - s(i,j,k-2,n));
-            Real dsr = 2.0 * (s(i,j,k,n) - s(i,j,k-1,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            Real dsc = 0.5 * (s(i, j, k, n) - s(i, j, k - 2, n));
+            Real dsl = 2.0 * (s(i, j, k - 1, n) - s(i, j, k - 2, n));
+            Real dsr = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i,j,k+1,n) - s(i,j,k-1,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i,j,k-1,n));
-            dsr = 2.0 * (s(i,j,k+1,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j, k + 1, n) - s(i, j, k - 1, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
+            dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to z-edges.
-            Real sm = 0.5*(s(i,j,k,n)+s(i,j,k-1,n)) - (dsvl_r-dsvl_l)/6.0;
-            
+            Real sm = 0.5 * (s(i, j, k, n) + s(i, j, k - 1, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
+
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm,min(s(i,j,k,n),s(i,j,k-1,n)));
-            sm = min(sm,max(s(i,j,k,n),s(i,j,k-1,n)));
+            sm = max(sm, min(s(i, j, k, n), s(i, j, k - 1, n)));
+            sm = min(sm, max(s(i, j, k, n), s(i, j, k - 1, n)));
 
             // sp
             dsvl_l = 0.0;
             dsvl_r = 0.0;
 
             // left side
-            dsc = 0.5 * (s(i,j,k+1,n) - s(i,j,k-1,n));
-            dsl = 2.0 * (s(i,j,k,n) - s(i,j,k-1,n));
-            dsr = 2.0 * (s(i,j,k+1,n) - s(i,j,k,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_l = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j, k + 1, n) - s(i, j, k - 1, n));
+            dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
+            dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
+            if (dsl * dsr > 0.0)
+                dsvl_l = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
-            dsc = 0.5 * (s(i,j,k+2,n) - s(i,j,k,n));
-            dsl = 2.0 * (s(i,j,k+1,n) - s(i,j,k,n));
-            dsr = 2.0 * (s(i,j,k+2,n) - s(i,j,k+1,n));
-            if (dsl*dsr > 0.0) 
-                dsvl_r = copysign(1.0,dsc)*min(fabs(dsc),min(fabs(dsl),fabs(dsr)));
+            dsc = 0.5 * (s(i, j, k + 2, n) - s(i, j, k, n));
+            dsl = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
+            dsr = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
+            if (dsl * dsr > 0.0)
+                dsvl_r = copysign(1.0, dsc) *
+                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to z-edges.
-            Real sp = 0.5*(s(i,j,k+1,n)+s(i,j,k,n)) - (dsvl_r-dsvl_l)/6.0;
-            
-            // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)));
-            sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)));
+            Real sp = 0.5 * (s(i, j, k + 1, n) + s(i, j, k, n)) -
+                      (dsvl_r - dsvl_l) / 6.0;
 
-            // save for later 
+            // Make sure sedge lies in between adjacent cell-centered values.
+            sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
+            sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+
+            // save for later
             Real sedgel = sp;
             Real sedger = sm;
 
             // Modify using quadratic limiters.
-            if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                sp = s(i,j,k,n);
-                sm = s(i,j,k,n);
-            } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                sp = 3.0*s(i,j,k,n) - 2.0*sm;
-            } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                sm = 3.0*s(i,j,k,n) - 2.0*sp;
+            if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                sp = s(i, j, k, n);
+                sm = s(i, j, k, n);
+            } else if (fabs(sp - s(i, j, k, n)) >=
+                       2.0 * fabs(sm - s(i, j, k, n))) {
+                sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+            } else if (fabs(sm - s(i, j, k, n)) >=
+                       2.0 * fabs(sp - s(i, j, k, n))) {
+                sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
-            
+
             // Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
             if (k == domlo[2]) {
-                if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
-
+                if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i,j,k-1,n);
+                    sm = s(i, j, k - 1, n);
 
                     // Use a modified stencil to get sp on the first interior edge.
-                    sp = -0.2 *s(i,j,k-1,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j,k+1,n) 
-                        - 0.05*s(i,j,k+2,n);
-                    
-                    // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)));
-                }
-                    
-            } else if (k == domlo[2]+1) {
-                if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+                    sp = -0.2 * s(i, j, k - 1, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k + 2, n);
 
+                    // Make sure sp lies in between adjacent cell-centered values.
+                    sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+                }
+
+            } else if (k == domlo[2] + 1) {
+                if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                     // Use a modified stencil to get sm on the first interior edge.
-                    sm = -0.2 *s(i,j,k-2,n) 
-                        + 0.75*s(i,j,k-1,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i,j,k+1,n);
-                    
+                    sm = -0.2 * s(i, j, k - 2, n) + 0.75 * s(i, j, k - 1, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i, j, k + 1, n);
+
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j,k,n),s(i,j,k-1,n)));
-                    sm = min(sm,max(s(i,j,k,n),s(i,j,k-1,n)));
+                    sm = max(sm, min(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sm = min(sm, max(s(i, j, k, n), s(i, j, k - 1, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
-                    
+
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
 
             } else if (k == domhi[2]) {
-                if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-
+                if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i,j,k+1,n);
+                    sp = s(i, j, k + 1, n);
 
                     // Use a modified stencil to get sm on the first interior edge.
-                    sm = -0.2 *s(i,j,k+1,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j,k-1,n) 
-                        - 0.05*s(i,j,k-2,n);
-                    
+                    sm = -0.2 * s(i, j, k + 1, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k - 2, n);
+
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)));
+                    sm = max(sm, min(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i, j, k - 1, n), s(i, j, k, n)));
                 }
 
-            } else if (k == domhi[2]-1) {
-                if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
-
+            } else if (k == domhi[2] - 1) {
+                if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sp = -0.2 *s(i,j,k+2,n) 
-                        + 0.75*s(i,j,k+1,n) 
-                        + 0.5 *s(i,j,k,n) 
-                        - 0.05*s(i,j,k-1,n);
-                    
+                    sp = -0.2 * s(i, j, k + 2, n) + 0.75 * s(i, j, k + 1, n) +
+                         0.5 * s(i, j, k, n) - 0.05 * s(i, j, k - 1, n);
+
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j,k,n),s(i,j,k+1,n)));
-                    sp = min(sp,max(s(i,j,k,n),s(i,j,k+1,n)));
+                    sp = max(sp, min(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sp = min(sp, max(s(i, j, k, n), s(i, j, k + 1, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
 
                     // Modify using quadratic limiters.
-                    if ((sp-s(i,j,k,n))*(s(i,j,k,n)-sm) <= 0.0) {
-                        sp = s(i,j,k,n);
-                        sm = s(i,j,k,n);
-                    } else if (fabs(sp-s(i,j,k,n)) >= 2.0*fabs(sm-s(i,j,k,n))) {
-                        sp = 3.0*s(i,j,k,n) - 2.0*sm;
-                    } else if (fabs(sm-s(i,j,k,n)) >= 2.0*fabs(sp-s(i,j,k,n))) {
-                        sm = 3.0*s(i,j,k,n) - 2.0*sp;
+                    if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
+                        sp = s(i, j, k, n);
+                        sm = s(i, j, k, n);
+                    } else if (fabs(sp - s(i, j, k, n)) >=
+                               2.0 * fabs(sm - s(i, j, k, n))) {
+                        sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
+                    } else if (fabs(sm - s(i, j, k, n)) >=
+                               2.0 * fabs(sp - s(i, j, k, n))) {
+                        sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
             }
@@ -1453,121 +1579,149 @@ Maestro::PPM (const Box& bx,
             ////////////////////////////////////
             // Compute z-component of Ip and Im.
             ////////////////////////////////////
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
-                
-                if (w(i,j,k+1) > rel_eps_local) {
-                    Ip(i,j,k,2) = sp - 
-                        0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(w(i, j, k + 1)) * dt_local / dx[2];
+
+                if (w(i, j, k + 1) > rel_eps_local) {
+                    Ip(i, j, k, 2) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/dx[2];
+                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
 
-                if (w(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,2) = sm + 
-                        0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                if (w(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 2) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i, j, k, 2) = s(i, j, k, n);
                 }
             } else {
+                Real sigma = fabs(w(i, j, k)) * dt_local / dx[2];
 
-                Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
-                
-                if (w(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,2) = sp - 
-                        0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                if (w(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 2) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/dx[2];
-                
-                if (w(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,2) = sm + 
-                        0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+
+                if (w(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 2) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i, j, k, 2) = s(i, j, k, n);
                 }
             }
         });
 
     } else if (ppm_type == 2) {
-
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, 
-        {
+        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
             // -1
             // Interpolate s to z-edges.
-            Real sedgel = (7.0/12.0)*(s(i,j,k-2,n)+s(i,j,k-1,n)) 
-                    - (1.0/12.0)*(s(i,j,k-3,n)+s(i,j,k,n));
-            
+            Real sedgel =
+                (7.0 / 12.0) * (s(i, j, k - 2, n) + s(i, j, k - 1, n)) -
+                (1.0 / 12.0) * (s(i, j, k - 3, n) + s(i, j, k, n));
+
             // Limit sedge.
-            if ((sedgel-s(i,j,k-2,n))*(s(i,j,k-1,n)-sedgel) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k-2,n)-2.0*sedgel+s(i,j,k-1,n));
-                Real D2L = s(i,j,k-3,n)-2.0*s(i,j,k-2,n)+s(i,j,k-1,n);
-                Real D2R = s(i,j,k-2,n)-2.0*s(i,j,k-1,n)+s(i,j,k,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgel = 0.5*(s(i,j,k-2,n)+s(i,j,k-1,n)) - D2LIM/6.0;
+            if ((sedgel - s(i, j, k - 2, n)) * (s(i, j, k - 1, n) - sedgel) <
+                0.0) {
+                Real D2 = 3.0 * (s(i, j, k - 2, n) - 2.0 * sedgel +
+                                 s(i, j, k - 1, n));
+                Real D2L = s(i, j, k - 3, n) - 2.0 * s(i, j, k - 2, n) +
+                           s(i, j, k - 1, n);
+                Real D2R =
+                    s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgel =
+                    0.5 * (s(i, j, k - 2, n) + s(i, j, k - 1, n)) - D2LIM / 6.0;
             }
 
             // 0
             // Interpolate s to z-edges.
-            Real sedge = (7.0/12.0)*(s(i,j,k-1,n)+s(i,j,k,n)) 
-                    - (1.0/12.0)*(s(i,j,k-2,n)+s(i,j,k+1,n));
-            
+            Real sedge = (7.0 / 12.0) * (s(i, j, k - 1, n) + s(i, j, k, n)) -
+                         (1.0 / 12.0) * (s(i, j, k - 2, n) + s(i, j, k + 1, n));
+
             // Limit sedge.
-            if ((sedge-s(i,j,k-1,n))*(s(i,j,k,n)-sedge) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k-1,n)-2.0*sedge+s(i,j,k,n));
-                Real D2L = s(i,j,k-2,n)-2.0*s(i,j,k-1,n)+s(i,j,k,n);
-                Real D2R = s(i,j,k-1,n)-2.0*s(i,j,k,n)+s(i,j,k+1,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedge = 0.5*(s(i,j,k-1,n)+s(i,j,k,n)) - D2LIM/6.0;
+            if ((sedge - s(i, j, k - 1, n)) * (s(i, j, k, n) - sedge) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i, j, k - 1, n) - 2.0 * sedge + s(i, j, k, n));
+                Real D2L =
+                    s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedge = 0.5 * (s(i, j, k - 1, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
             // +1
             // Interpolate s to z-edges.
-            Real sedger = (7.0/12.0)*(s(i,j,k,n)+s(i,j,k+1,n)) 
-                    - (1.0/12.0)*(s(i,j,k-1,n)+s(i,j,k+2,n));
-            
+            Real sedger =
+                (7.0 / 12.0) * (s(i, j, k, n) + s(i, j, k + 1, n)) -
+                (1.0 / 12.0) * (s(i, j, k - 1, n) + s(i, j, k + 2, n));
+
             // Limit sedge.
-            if ((sedger-s(i,j,k,n))*(s(i,j,k+1,n)-sedger) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k,n)-2.0*sedger+s(i,j,k+1,n));
-                Real D2L = s(i,j,k-1,n)-2.0*s(i,j,k,n)+s(i,j,k+1,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i,j,k+1,n)+s(i,j,k+2,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedger = 0.5*(s(i,j,k,n)+s(i,j,k+1,n)) - D2LIM/6.0;
+            if ((sedger - s(i, j, k, n)) * (s(i, j, k + 1, n) - sedger) < 0.0) {
+                Real D2 =
+                    3.0 * (s(i, j, k, n) - 2.0 * sedger + s(i, j, k + 1, n));
+                Real D2L =
+                    s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedger =
+                    0.5 * (s(i, j, k, n) + s(i, j, k + 1, n)) - D2LIM / 6.0;
             }
 
             // +2
             // Interpolate s to z-edges.
-            Real sedgerr = (7.0/12.0)*(s(i,j,k+1,n)+s(i,j,k+2,n)) 
-                    - (1.0/12.0)*(s(i,j,k,n)+s(i,j,k+3,n));
-            
+            Real sedgerr =
+                (7.0 / 12.0) * (s(i, j, k + 1, n) + s(i, j, k + 2, n)) -
+                (1.0 / 12.0) * (s(i, j, k, n) + s(i, j, k + 3, n));
+
             // Limit sedge.
-            if ((sedgerr-s(i,j,k+1,n))*(s(i,j,k+2,n)-sedgerr) < 0.0) {
-                Real D2  = 3.0*(s(i,j,k+1,n)-2.0*sedgerr+s(i,j,k+2,n));
-                Real D2L = s(i,j,k,n)-2.0*s(i,j,k+1,n)+s(i,j,k+2,n);
-                Real D2R = s(i,j,k+1,n)-2.0*s(i,j,k+2,n)+s(i,j,k+3,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = sgn*max(min(C*sgn*D2L,min(C*sgn*D2R,sgn*D2)),0.0);
-                sedgerr = 0.5*(s(i,j,k+1,n)+s(i,j,k+2,n)) - D2LIM/6.0;
+            if ((sedgerr - s(i, j, k + 1, n)) * (s(i, j, k + 2, n) - sedgerr) <
+                0.0) {
+                Real D2 = 3.0 * (s(i, j, k + 1, n) - 2.0 * sedgerr +
+                                 s(i, j, k + 2, n));
+                Real D2L =
+                    s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
+                Real D2R = s(i, j, k + 1, n) - 2.0 * s(i, j, k + 2, n) +
+                           s(i, j, k + 3, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM =
+                    sgn *
+                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                sedgerr =
+                    0.5 * (s(i, j, k + 1, n) + s(i, j, k + 2, n)) - D2LIM / 6.0;
             }
 
-            Real alphap = sedger-s(i,j,k,n);
-            Real alpham = sedge-s(i,j,k,n);
-            bool bigp = fabs(alphap) > 2.0*fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0*fabs(alphap);
+            Real alphap = sedger - s(i, j, k, n);
+            Real alpham = sedge - s(i, j, k, n);
+            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
+            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
             bool extremum = false;
 
-            if (alpham*alphap >= 0.0) {
+            if (alpham * alphap >= 0.0) {
                 extremum = true;
             } else if (bigp || bigm) {
                 //
@@ -1578,10 +1732,10 @@ Maestro::PPM (const Box& bx,
                 //
                 Real dafacem = sedge - sedgel;
                 Real dafacep = sedgerr - sedger;
-                Real dabarm = s(i,j,k,n) - s(i,j,k-1,n);
-                Real dabarp = s(i,j,k+1,n) - s(i,j,k,n);
-                Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                Real dabarmin = min(fabs(dabarm),fabs(dabarp));
+                Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
+                Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
+                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -1591,104 +1745,108 @@ Maestro::PPM (const Box& bx,
                     dachkm = dabarm;
                     dachkp = dabarp;
                 }
-                extremum = (dachkm*dachkp <= 0.0);
+                extremum = (dachkm * dachkp <= 0.0);
             }
 
             if (extremum) {
-                Real D2  = 6.0*(alpham + alphap);
-                Real D2L = s(i,j,k-2,n)-2.0*s(i,j,k-1,n)+s(i,j,k,n);
-                Real D2R = s(i,j,k,n)-2.0*s(i,j,k+1,n)+s(i,j,k+2,n);
-                Real D2C = s(i,j,k-1,n)-2.0*s(i,j,k,n)+s(i,j,k+1,n);
-                Real sgn = copysign(1.0,D2);
-                Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                Real D2ABS = max(fabs(D2),1.e-10);
-                alpham = alpham*D2LIM/D2ABS;
-                alphap = alphap*D2LIM/D2ABS;
+                Real D2 = 6.0 * (alpham + alphap);
+                Real D2L =
+                    s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
+                Real D2R =
+                    s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
+                Real D2C =
+                    s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
+                Real sgn = copysign(1.0, D2);
+                Real D2LIM = max(
+                    min(sgn * D2,
+                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                    0.0);
+                Real D2ABS = max(fabs(D2), 1.e-10);
+                alpham = alpham * D2LIM / D2ABS;
+                alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0,alpham);
-                    Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                    Real delam = s(i,j,k-1,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delam) {
-                        if (sgn*(delam - alpham) >= 1.e-10) {
-                            alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                    Real sgn = copysign(1.0, alpham);
+                    Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
+                    Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delam) {
+                        if (sgn * (delam - alpham) >= 1.e-10) {
+                            alphap = (-2.0 * delam -
+                                      2.0 * sgn *
+                                          sqrt(delam * delam - delam * alpham));
                         } else {
-                            alphap = -2.0*alpham;
+                            alphap = -2.0 * alpham;
                         }
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0,alphap);
-                    Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                    Real delap = s(i,j,k+1,n) - s(i,j,k,n);
-                    if (sgn*amax >= sgn*delap) {
-                        if (sgn*(delap - alphap) >= 1.e-10) {
-                            alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                    Real sgn = copysign(1.0, alphap);
+                    Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
+                    Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
+                    if (sgn * amax >= sgn * delap) {
+                        if (sgn * (delap - alphap) >= 1.e-10) {
+                            alpham = (-2.0 * delap -
+                                      2.0 * sgn *
+                                          sqrt(delap * delap - delap * alphap));
                         } else {
-                            alpham = -2.0*alphap;
+                            alpham = -2.0 * alphap;
                         }
                     }
                 }
             }
 
-            Real sm = s(i,j,k,n) + alpham;
-            Real sp = s(i,j,k,n) + alphap;
+            Real sm = s(i, j, k, n) + alpham;
+            Real sp = s(i, j, k, n) + alphap;
 
             // Different stencil needed for z-component of EXT_DIR and HOEXTRAP adv_bc's.
-            if (bclo == EXT_DIR  || bclo == HOEXTRAP) {
+            if (bclo == EXT_DIR || bclo == HOEXTRAP) {
                 if (k == domlo[2]) {
-
                     // The value in the first cc ghost cell represents the edge value.
-                    sm = s(i,j,k-1,n);
-                    
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sp = -0.2 *s(i,j,k-1,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j,k+1,n) 
-                        - 0.05*s(i,j,k+2,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp,min(s(i,j,k+1,n),s(i,j,k,n)));
-                    sp = min(sp,max(s(i,j,k+1,n),s(i,j,k,n)));
-
-                } else if (k == domlo[2]+1) {
-
-                    sedgel = s(i,j,k-2,n);
-                    
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sedge = -0.2 *s(i,j,k-2,n) 
-                           + 0.75*s(i,j,k-1,n) 
-                           + 0.5 *s(i,j,k,n) 
-                           - 0.05*s(i,j,k+1,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sedge = max(sedge,min(s(i,j,k,n),s(i,j,k-1,n)));
-                    sedge = min(sedge,max(s(i,j,k,n),s(i,j,k-1,n)));
-
-                } else if (k == domlo[2]+2) {
+                    sm = s(i, j, k - 1, n);
 
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sedgel = -0.2 *s(i,j,k-3,n) 
-                            + 0.75*s(i,j,k-2,n) 
-                            + 0.5 *s(i,j,k-1,n) 
-                            - 0.05*s(i,j,k,n);
-                    
+                    sp = -0.2 * s(i, j, k - 1, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k + 2, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgel = max(sedgel,min(s(i,j,k-1,n),s(i,j,k-2,n)));
-                    sedgel = min(sedgel,max(s(i,j,k-1,n),s(i,j,k-2,n)));
+                    sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+
+                } else if (k == domlo[2] + 1) {
+                    sedgel = s(i, j, k - 2, n);
+
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedge = -0.2 * s(i, j, k - 2, n) +
+                            0.75 * s(i, j, k - 1, n) + 0.5 * s(i, j, k, n) -
+                            0.05 * s(i, j, k + 1, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedge = max(sedge, min(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sedge = min(sedge, max(s(i, j, k, n), s(i, j, k - 1, n)));
+
+                } else if (k == domlo[2] + 2) {
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedgel = -0.2 * s(i, j, k - 3, n) +
+                             0.75 * s(i, j, k - 2, n) +
+                             0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedgel =
+                        max(sedgel, min(s(i, j, k - 1, n), s(i, j, k - 2, n)));
+                    sedgel =
+                        min(sedgel, max(s(i, j, k - 1, n), s(i, j, k - 2, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (k == domlo[2]+1 || k == domlo[2]+2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (k == domlo[2] + 1 || k == domlo[2] + 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
                         // Possible extremum. We look at cell centered values and face
@@ -1697,10 +1855,10 @@ Maestro::PPM (const Box& bx,
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i,j,k-1,n);
-                        Real dabarp = s(i,j,k+1,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin= min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
+                        Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1710,105 +1868,114 @@ Maestro::PPM (const Box& bx,
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i,j,k-2,n)-2.0*s(i,j,k-1,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i,j,k+1,n)+s(i,j,k+2,n);
-                        Real D2C = s(i,j,k-1,n)-2.0*s(i,j,k,n)+s(i,j,k+1,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) +
+                                   s(i, j, k + 2, n);
+                        Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
+                                   s(i, j, k + 1, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i,j,k-1,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i,j,k+1,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap) >= 1.e-10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e-10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
+                                    alpham = -2.0 * alphap;
                                 }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
-            if (bchi == EXT_DIR  || bchi == HOEXTRAP) {
+            if (bchi == EXT_DIR || bchi == HOEXTRAP) {
                 if (k == domhi[2]) {
-
                     // The value in the first cc ghost cell represents the edge value.
-                    sp = s(i,j,k+1,n);
-                    
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sm = -0.2 *s(i,j,k+1,n) 
-                        + 0.75*s(i,j,k,n) 
-                        + 0.5 *s(i,j,k-1,n) 
-                        - 0.05*s(i,j,k-2,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm,min(s(i,j,k-1,n),s(i,j,k,n)));
-                    sm = min(sm,max(s(i,j,k-1,n),s(i,j,k,n)));
-
-                } else if (k == domhi[2]-1) {
-
-                    sedgerr = s(i,j,k+2,n);
-                    
-                    // Use a modified stencil to get sedge on the first interior edge.
-                    sedger = -0.2 *s(i,j,k+2,n) 
-                            + 0.75*s(i,j,k+1,n) 
-                            + 0.5 *s(i,j,k,n) 
-                            - 0.05*s(i,j,k-1,n);
-                    
-                    // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger,min(s(i,j,k,n),s(i,j,k+1,n)));
-                    sedger = min(sedger,max(s(i,j,k,n),s(i,j,k+1,n)));
-
-                } else if (k == domhi[2]-2) {
+                    sp = s(i, j, k + 1, n);
 
                     // Use a modified stencil to get sedge on the first interior edge.
-                    sedgerr = -0.2 *s(i,j,k+3,n) 
-                             + 0.75*s(i,j,k+2,n) 
-                             + 0.5 *s(i,j,k+1,n) 
-                             - 0.05*s(i,j,k,n);
-                    
+                    sm = -0.2 * s(i, j, k + 1, n) + 0.75 * s(i, j, k, n) +
+                         0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k - 2, n);
+
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr = max(sedgerr,min(s(i,j,k+1,n),s(i,j,k+2,n)));
-                    sedgerr = min(sedgerr,max(s(i,j,k+1,n),s(i,j,k+2,n)));
+                    sm = max(sm, min(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = min(sm, max(s(i, j, k - 1, n), s(i, j, k, n)));
+
+                } else if (k == domhi[2] - 1) {
+                    sedgerr = s(i, j, k + 2, n);
+
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedger = -0.2 * s(i, j, k + 2, n) +
+                             0.75 * s(i, j, k + 1, n) + 0.5 * s(i, j, k, n) -
+                             0.05 * s(i, j, k - 1, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedger = max(sedger, min(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sedger = min(sedger, max(s(i, j, k, n), s(i, j, k + 1, n)));
+
+                } else if (k == domhi[2] - 2) {
+                    // Use a modified stencil to get sedge on the first interior edge.
+                    sedgerr = -0.2 * s(i, j, k + 3, n) +
+                              0.75 * s(i, j, k + 2, n) +
+                              0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k, n);
+
+                    // Make sure sedge lies in between adjacent cell-centered values.
+                    sedgerr =
+                        max(sedgerr, min(s(i, j, k + 1, n), s(i, j, k + 2, n)));
+                    sedgerr =
+                        min(sedgerr, max(s(i, j, k + 1, n), s(i, j, k + 2, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
                 // and third inner cells.
-                if (k == domhi[2]-1 || k == domhi[2]-2) {
-
-                    alphap = sedger-s(i,j,k,n);
-                    alpham = sedge-s(i,j,k,n);
-                    bigp = fabs(alphap) > 2.0*fabs(alpham);
-                    bigm = fabs(alpham) > 2.0*fabs(alphap);
+                if (k == domhi[2] - 1 || k == domhi[2] - 2) {
+                    alphap = sedger - s(i, j, k, n);
+                    alpham = sedge - s(i, j, k, n);
+                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
+                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
                     extremum = false;
 
-                    if (alpham*alphap >= 0.0) {
+                    if (alpham * alphap >= 0.0) {
                         extremum = true;
                     } else if (bigp || bigm) {
                         // Possible extremum. We look at cell centered values and face
@@ -1817,10 +1984,10 @@ Maestro::PPM (const Box& bx,
                         // the largest, and thus least susceptible to sensitivity to roundoff.
                         Real dafacem = sedge - sedgel;
                         Real dafacep = sedgerr - sedger;
-                        Real dabarm = s(i,j,k,n) - s(i,j,k-1,n);
-                        Real dabarp = s(i,j,k+1,n) - s(i,j,k,n);
-                        Real dafacemin = min(fabs(dafacem),fabs(dafacep));
-                        Real dabarmin= min(fabs(dabarm),fabs(dabarp));
+                        Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
+                        Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
+                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
+                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1830,48 +1997,63 @@ Maestro::PPM (const Box& bx,
                             dachkm = dabarm;
                             dachkp = dabarp;
                         }
-                        extremum = (dachkm*dachkp <= 0.0);
+                        extremum = (dachkm * dachkp <= 0.0);
                     }
 
                     if (extremum) {
-                        Real D2  = 6.0*(alpham + alphap);
-                        Real D2L = s(i,j,k-2,n)-2.0*s(i,j,k-1,n)+s(i,j,k,n);
-                        Real D2R = s(i,j,k,n)-2.0*s(i,j,k+1,n)+s(i,j,k+2,n);
-                        Real D2C = s(i,j,k-1,n)-2.0*s(i,j,k,n)+s(i,j,k+1,n);
-                        Real sgn = copysign(1.0,D2);
-                        Real D2LIM = max(min(sgn*D2,min(C*sgn*D2L,min(C*sgn*D2R,C*sgn*D2C))),0.0);
-                        Real D2ABS = max(fabs(D2),1.e-10);
-                        alpham = alpham*D2LIM/D2ABS;
-                        alphap = alphap*D2LIM/D2ABS;
+                        Real D2 = 6.0 * (alpham + alphap);
+                        Real D2L = s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) +
+                                   s(i, j, k, n);
+                        Real D2R = s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) +
+                                   s(i, j, k + 2, n);
+                        Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
+                                   s(i, j, k + 1, n);
+                        Real sgn = copysign(1.0, D2);
+                        Real D2LIM =
+                            max(min(sgn * D2,
+                                    min(C * sgn * D2L,
+                                        min(C * sgn * D2R, C * sgn * D2C))),
+                                0.0);
+                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        alpham = alpham * D2LIM / D2ABS;
+                        alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0,alpham);
-                            Real amax = -alphap*alphap / (4.0*(alpham + alphap));
-                            Real delam = s(i,j,k-1,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delam) {
-                                if (sgn*(delam - alpham) >= 1.e-10) {
-                                    alphap = (-2.0*delam - 2.0*sgn*sqrt(delam*delam - delam*alpham));
+                            Real sgn = copysign(1.0, alpham);
+                            Real amax =
+                                -alphap * alphap / (4.0 * (alpham + alphap));
+                            Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delam) {
+                                if (sgn * (delam - alpham) >= 1.e-10) {
+                                    alphap = (-2.0 * delam -
+                                              2.0 * sgn *
+                                                  sqrt(delam * delam -
+                                                       delam * alpham));
                                 } else {
-                                    alphap = -2.0*alpham;
+                                    alphap = -2.0 * alpham;
                                 }
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0,alphap);
-                            Real amax = -alpham*alpham / (4.0*(alpham + alphap));
-                            Real delap = s(i,j,k+1,n) - s(i,j,k,n);
-                            if (sgn*amax >= sgn*delap) {
-                                if (sgn*(delap - alphap) >= 1.e-10) {
-                                    alpham = (-2.0*delap - 2.0*sgn*sqrt(delap*delap - delap*alphap));
+                            Real sgn = copysign(1.0, alphap);
+                            Real amax =
+                                -alpham * alpham / (4.0 * (alpham + alphap));
+                            Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
+                            if (sgn * amax >= sgn * delap) {
+                                if (sgn * (delap - alphap) >= 1.e-10) {
+                                    alpham = (-2.0 * delap -
+                                              2.0 * sgn *
+                                                  sqrt(delap * delap -
+                                                       delap * alphap));
                                 } else {
-                                    alpham = -2.0*alphap;
+                                    alpham = -2.0 * alphap;
                                 }
                             }
                         }
                     }
 
-                    sm = s(i,j,k,n) + alpham;
-                    sp = s(i,j,k,n) + alphap;
+                    sm = s(i, j, k, n) + alpham;
+                    sp = s(i, j, k, n) + alphap;
                 }
             }
 
@@ -1879,48 +2061,51 @@ Maestro::PPM (const Box& bx,
             // Compute z-component of Ip and Im.
             ////////////////////////////////////
 
-            Real s6 = 6.0*s(i,j,k,n) - 3.0*(sm+sp);
+            Real s6 = 6.0 * s(i, j, k, n) - 3.0 * (sm + sp);
 
             if (is_umac) {
-
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i,j,k+1))*dt_local/dx[2];
-                
-                if (w(i,j,k+1) > rel_eps_local) {
-                    Ip(i,j,k,2) = sp - 
-                        0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(w(i, j, k + 1)) * dt_local / dx[2];
+
+                if (w(i, j, k + 1) > rel_eps_local) {
+                    Ip(i, j, k, 2) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/dx[2];
-                
-                if (w(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,2) = sm + 
-                        0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+
+                if (w(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 2) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i, j, k, 2) = s(i, j, k, n);
                 }
             } else {
-                Real sigma = fabs(w(i,j,k))*dt_local/dx[2];
-                
-                if (w(i,j,k) > rel_eps_local) {
-                    Ip(i,j,k,2) = sp - 
-                        0.5*sigma*(sp-sm-(1.0-2.0/3.0*sigma)*s6);
+                Real sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+
+                if (w(i, j, k) > rel_eps_local) {
+                    Ip(i, j, k, 2) =
+                        sp - 0.5 * sigma *
+                                 (sp - sm - (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Ip(i,j,k,2) = s(i,j,k,n);
+                    Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i,j,k))*dt_local/dx[2];
-                
-                if (w(i,j,k) < -rel_eps_local) {
-                    Im(i,j,k,2) = sm + 
-                        0.5*sigma*(sp-sm+(1.0-2.0/3.0*sigma)*s6);
+                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+
+                if (w(i, j, k) < -rel_eps_local) {
+                    Im(i, j, k, 2) =
+                        sm + 0.5 * sigma *
+                                 (sp - sm + (1.0 - 2.0 / 3.0 * sigma) * s6);
                 } else {
-                    Im(i,j,k,2) = s(i,j,k,n);
+                    Im(i, j, k, 2) = s(i, j, k, n);
                 }
             }
-        });  
+        });
     }
 #endif
 }

@@ -32,7 +32,7 @@ contains
 
     call bl_proffortfuncstart("Maestro::make_grav_cell")
 
-    if (spherical .eq. 0) then
+    if (.not. spherical) then
 
        if (do_planar_invsq_grav)  then
 
@@ -46,7 +46,7 @@ contains
              enddo
           enddo
 
-       else if (do_2d_planar_octant .eq. 1) then
+       else if (do_2d_planar_octant) then
 
           ! compute gravity as in the spherical case
 
@@ -250,7 +250,7 @@ contains
 
     call bl_proffortfuncstart("Maestro::make_grav_edge")
 
-    if (spherical .eq. 0) then
+    if (.not. spherical) then
 
        if (do_planar_invsq_grav)  then
 
@@ -264,7 +264,7 @@ contains
              enddo
           enddo
 
-       else if (do_2d_planar_octant .eq. 1) then
+       else if (do_2d_planar_octant) then
 
           ! compute gravity as in spherical geometry
 

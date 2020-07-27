@@ -26,8 +26,8 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
 #amr.n_cell = 384 384 384
-amr.n_cell = 256 256 256
-amr.max_grid_size      = 128
+amr.n_cell = 192 192 192
+amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2      # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
@@ -36,7 +36,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.octant = false
 
 # TIME STEPPING
-maestro.max_step  = 200000
+maestro.max_step  = 0
 maestro.stop_time = 3000000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -108,7 +108,7 @@ maestro.small_temp = 1.e2
 maestro.sdc_couple_velocity = false
 
 # ROTATION
-maestro.rotational_frequency = 4.e-6
+maestro.rotational_frequency = 0.0 #4.e-6
 maestro.rotation_radius = 0.0
 
 &probin
