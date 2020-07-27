@@ -481,4 +481,3 @@ pp.query("hg_level_factor", maestro::hg_level_factor);
 
 maestro::eps_hg_bottom = 1.e-4;
 pp.query("eps_hg_bottom", maestro::eps_hg_bottom);
-
