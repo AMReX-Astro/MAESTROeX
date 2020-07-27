@@ -17,7 +17,6 @@ Real InletBCs::INLET_RHO;
 Real InletBCs::INLET_RHOH;
 Real InletBCs::INLET_TEMP;
 Real InletBCs::INLET_CS;
-Real InletBCs::INLET_dr_fine;
 
 void Maestro::SetInletBCs() {
     // timer for profiling
@@ -52,6 +51,4 @@ void Maestro::SetInletBCs() {
     InletBCs::INLET_RHO = eos_state.rho;
     InletBCs::INLET_RHOH = eos_state.rho * eos_state.h;
     InletBCs::INLET_TEMP = eos_state.T;
-    auto dx = geom[base_geom.finest_radial_level].CellSizeArray();
-    InletBCs::INLET_dr_fine = dx[0];    
 }

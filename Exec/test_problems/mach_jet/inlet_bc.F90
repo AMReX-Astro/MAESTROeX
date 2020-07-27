@@ -58,16 +58,14 @@ contains
   subroutine get_inlet_bcs(params) bind(C, name="get_inlet_bcs")
 
     use probin_module, only: inlet_mach
-    use base_state_geometry_module, only: dr_fine
     
-    double precision, intent(inout) :: params(6)
+    double precision, intent(inout) :: params(5)
     
     params(1) = INLET_RHO
     params(2) = INLET_RHOH
     params(3) = INLET_TEMP
     params(4) = INLET_CS
     params(5) = inlet_mach
-    params(6) = dr_fine
     
   end subroutine get_inlet_bcs
   
