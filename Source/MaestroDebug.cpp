@@ -97,8 +97,8 @@ void Maestro::PrintBA(const Vector<BoxArray>& ba) {
 	  auto lo = validBox.loVect3d();
 	  auto hi = validBox.hiVect3d();
 
-	  std::cout << "Level " << lev << std::endl;
-	  std::cout << "valid box ";
+	  Print() << "Level " << lev << std::endl;
+	  Print() << "valid box ";
 	  for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
 	    Print() << "(" << lo[n] << ", " << hi[n] << ")  ";
 	  }
