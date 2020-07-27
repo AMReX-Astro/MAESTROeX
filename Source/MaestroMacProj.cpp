@@ -132,8 +132,6 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
         }
     }
 
-
-
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;

@@ -272,6 +272,7 @@ void Maestro::InitData() {
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
+
     // average down data and fill ghost cells
     AverageDown(sold, 0, Nscal);
     FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
@@ -315,6 +316,7 @@ void Maestro::InitData() {
         Average(sold, tempbar, Temp);
         tempbar_init.copy(tempbar);
     }
+
     // set p0^{-1} = p0_old
     p0_nm1.copy(p0_old);
 
@@ -460,7 +462,7 @@ void Maestro::InitProj() {
     Make_S_cc(S_cc_old, delta_gamma1_term, delta_gamma1, sold, uold,
               rho_omegadot, rho_Hnuc, rho_Hext, thermal, p0_old, gamma1bar_old,
               delta_gamma1_termbar);
-  
+
     // NOTE: not sure if valid for use_exact_base_state
     if (evolve_base_state && (!use_exact_base_state && !average_base_state)) {
         // average S into Sbar
