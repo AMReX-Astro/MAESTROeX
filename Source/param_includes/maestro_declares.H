@@ -39,6 +39,7 @@ AMREX_GPU_MANAGED amrex::Real maestro::chk_deltat;
 AMREX_GPU_MANAGED bool maestro::plot_h_with_use_tfromp;
 AMREX_GPU_MANAGED bool maestro::plot_spec;
 AMREX_GPU_MANAGED bool maestro::plot_omegadot;
+AMREX_GPU_MANAGED bool maestro::plot_aux;
 AMREX_GPU_MANAGED bool maestro::plot_Hext;
 AMREX_GPU_MANAGED bool maestro::plot_Hnuc;
 AMREX_GPU_MANAGED bool maestro::plot_eta;

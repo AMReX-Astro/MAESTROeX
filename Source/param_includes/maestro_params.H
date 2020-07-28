@@ -41,6 +41,7 @@ extern AMREX_GPU_MANAGED amrex::Real chk_deltat;
 extern AMREX_GPU_MANAGED bool plot_h_with_use_tfromp;
 extern AMREX_GPU_MANAGED bool plot_spec;
 extern AMREX_GPU_MANAGED bool plot_omegadot;
+extern AMREX_GPU_MANAGED bool plot_aux;
 extern AMREX_GPU_MANAGED bool plot_Hext;
 extern AMREX_GPU_MANAGED bool plot_Hnuc;
 extern AMREX_GPU_MANAGED bool plot_eta;

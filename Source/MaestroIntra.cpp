@@ -37,6 +37,12 @@ void Maestro::MakeIntraCoeffs(const Vector<MultiFab>& scal1,
                     eos_state.xn[comp] =
                         scalold(i, j, k, FirstSpec + comp) / eos_state.rho;
                 }
+#if NAUX_NET > 0
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    eos_state.aux[comp] =
+                        scalold(i, j, k, FirstAux + comp) / eos_state.rho;
+                }
+#endif
 
                 // dens, temp, and xmass are inputs
                 eos(eos_input_rt, eos_state);
@@ -56,6 +62,12 @@ void Maestro::MakeIntraCoeffs(const Vector<MultiFab>& scal1,
                     eos_state.xn[comp] =
                         scalnew(i, j, k, FirstSpec + comp) / eos_state.rho;
                 }
+#if NAUX_NET > 0
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    eos_state.aux[comp] =
+                        scalnew(i, j, k, FirstAux + comp) / eos_state.rho;
+                }
+#endif
 
                 // dens, temp, and xmass are inputs
                 eos(eos_input_rt, eos_state);
