@@ -159,6 +159,9 @@ plot_spec                           bool            true
 # plot omegadot in plotfile
 plot_omegadot                       bool            true
 
+# plot auxiliary variables in plotfile 
+plot_aux                            bool            false
+
 # plot external heating (Hext) in plotfile
 plot_Hext                           bool            false
 
