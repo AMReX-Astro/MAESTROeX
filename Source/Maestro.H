@@ -345,8 +345,8 @@ class Maestro : public amrex::AmrCore {
 
     static void FillExtBC(const amrex::Array4<amrex::Real>& q,
                           const amrex::Box& bx, const amrex::Box& domainBox,
-                          const amrex::BCRec bcs, const int comp,
-                          const bool is_vel = false);
+                          const amrex::Real* dx, const amrex::BCRec bcs,
+			  const int comp, const bool is_vel = false);
 
     // end MaestroBCFill.cpp functions
     ////////////
@@ -421,6 +421,9 @@ class Maestro : public amrex::AmrCore {
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF(const amrex::Vector<amrex::MultiFab>& MF);
 
+    /// Print out grid data from a Vector of BoxArrays
+    void PrintBA( const amrex::Vector<amrex::BoxArray>& ba);
+  
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge(
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& EDGE,

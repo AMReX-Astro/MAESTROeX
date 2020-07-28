@@ -1,3 +1,4 @@
+
 #ifndef _MaestroInletBCs_H_
 #define _MaestroInletBCs_H_
 
@@ -8,7 +9,6 @@ extern amrex::Real INLET_RHO;
 extern amrex::Real INLET_RHOH;
 extern amrex::Real INLET_TEMP;
 extern amrex::Real INLET_CS;
-extern amrex::Real INLET_dr_fine;
 };  // namespace InletBCs
 
 #endif

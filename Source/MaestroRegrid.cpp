@@ -141,10 +141,15 @@ void Maestro::TagArray() {
         return;
     }
 
+    // grids have not been initialized to tag yet.
+    if (finest_level==0) {
+      return;
+    }
+    
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 
-    for (int lev = 1; lev <= base_geom.max_radial_level; ++lev) {
+    for (int lev = 1; lev <= finest_level; ++lev) {
         for (MFIter mfi(sold[lev], false); mfi.isValid(); ++mfi) {
             const Box& validBox = mfi.validbox();
             // re-compute tag_array since the actual grid structure changed due to buffering
@@ -406,7 +411,7 @@ void Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge) {
     }
 
     // copy valid data into temp
-    for (auto n = 1; n < max_lev; ++n) {
+    for (auto n = 1; n <= finest_level; ++n) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const auto lo = base_geom.r_start_coord(n, i);
             const auto hi = is_edge ? base_geom.r_end_coord(n, i) + 1
