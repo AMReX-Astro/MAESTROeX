@@ -144,19 +144,19 @@ void Maestro::MakeRhoXFlux(
                         0.5 * (rho0_edge_old(lev, j) + rho0_edge_new(lev, j));
 
                     if (species_pred_type_loc == pred_rhoprime_and_X) {
-                        //   ! edge states are rho' and X.  To make the (rho X) flux,
-                        //   ! we need the edge state of rho0
+                        // edge states are rho' and X.  To make the (rho X) flux,
+                        // we need the edge state of rho0
                         sfluxy(i, j, k, comp) =
                             vmac(i, j, k) * (rho0_edge + sedgey(i, j, k, Rho)) *
                             sedgey(i, j, k, comp);
 
                     } else if (species_pred_type_loc == pred_rhoX) {
-                        // ! edge states are (rho X)
+                        // edge states are (rho X)
                         sfluxy(i, j, k, comp) =
                             vmac(i, j, k) * sedgey(i, j, k, comp);
 
                     } else if (species_pred_type_loc == pred_rho_and_X) {
-                        // ! edge state are rho and X
+                        // edge state are rho and X
                         sfluxy(i, j, k, comp) = vmac(i, j, k) *
                                                 sedgey(i, j, k, Rho) *
                                                 sedgey(i, j, k, comp);
@@ -268,13 +268,13 @@ void Maestro::MakeRhoXFlux(
                                     sedgez(i, j, k, comp);
 
                             } else if (species_pred_type_loc == pred_rhoX) {
-                                // ! edge states are (rho X)
+                                // edge states are (rho X)
                                 sfluxz(i, j, k, comp) =
                                     wmac(i, j, k) * sedgez(i, j, k, comp);
 
                             } else if (species_pred_type_loc ==
                                        pred_rho_and_X) {
-                                // ! edge state are rho and X
+                                // edge state are rho and X
                                 sfluxz(i, j, k, comp) = wmac(i, j, k) *
                                                         sedgez(i, j, k, Rho) *
                                                         sedgez(i, j, k, comp);
@@ -383,13 +383,13 @@ void Maestro::MakeRhoXFlux(
                                                         sedgez(i, j, k, comp);
 
                             } else if (species_pred_type_loc == pred_rhoX) {
-                                // ! edge states are (rho X)
+                                // edge states are (rho X)
                                 sfluxz(i, j, k, comp) =
                                     wmac(i, j, k) * sedgez(i, j, k, comp);
 
                             } else if (species_pred_type_loc ==
                                        pred_rho_and_X) {
-                                // ! edge state are rho and X
+                                // edge state are rho and X
                                 sfluxz(i, j, k, comp) = wmac(i, j, k) *
                                                         sedgez(i, j, k, Rho) *
                                                         sedgez(i, j, k, comp);
@@ -609,7 +609,7 @@ void Maestro::MakeRhoHFlux(
 
                 } else if (enthalpy_pred_type_loc == pred_rhohprime ||
                            enthalpy_pred_type_loc == pred_T_then_rhohprime) {
-                    //   ! enthalpy edge state is (rho h)'
+                    // enthalpy edge state is (rho h)'
                     Real rhoh0_edge =
                         0.5 * (rhoh0_old_arr(lev, j) + rhoh0_new_arr(lev, j));
 
@@ -684,7 +684,7 @@ void Maestro::MakeRhoHFlux(
                     } else if (enthalpy_pred_type_loc == pred_rhohprime ||
                                enthalpy_pred_type_loc ==
                                    pred_T_then_rhohprime) {
-                        //   ! enthalpy edge state is (rho h)'
+                        // enthalpy edge state is (rho h)'
                         Real rhoh0_edge = 0.5 * (rhoh0_old_arr(lev, k) +
                                                  rhoh0_new_arr(lev, k));
 
@@ -722,7 +722,7 @@ void Maestro::MakeRhoHFlux(
                     } else if (enthalpy_pred_type_loc == pred_rhohprime ||
                                enthalpy_pred_type_loc ==
                                    pred_T_then_rhohprime) {
-                        //   ! enthalpy edge state is (rho h)'
+                        // enthalpy edge state is (rho h)'
                         Real rhoh0_edge = 0.5 * (rhoh0_old_arr(lev, k) +
                                                  rhoh0_new_arr(lev, k));
 
