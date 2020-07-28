@@ -105,9 +105,8 @@ void Maestro::MakeRhoXFlux(
                 xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
                     // loop over components cannot be part of the ParallelFor
                     // due to race condition on sflux for the Rho component
-                    for (int n = 0; n < num_comp; ++n) {
-                        int comp = n + start_comp;
-
+                    for (int comp = start_comp; comp < num_comp + start_comp;
+                         ++comp) {
                         Real rho0_edge =
                             0.5 * (rho0_old_arr(lev, j) + rho0_new_arr(lev, j));
 
@@ -139,9 +138,8 @@ void Maestro::MakeRhoXFlux(
             // y-direction
             amrex::ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j,
                                                          int k) noexcept {
-                for (int n = 0; n < num_comp; ++n) {
-                    int comp = n + start_comp;
-
+                for (int comp = start_comp; comp < num_comp + start_comp;
+                     ++comp) {
                     Real rho0_edge =
                         0.5 * (rho0_edge_old(lev, j) + rho0_edge_new(lev, j));
 
@@ -190,9 +188,8 @@ void Maestro::MakeRhoXFlux(
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         // loop over components cannot be part of the ParallelFor
                         // due to race condition on sflux for the Rho component
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             Real rho0_edge = 0.5 * (rho0_old_arr(lev, k) +
                                                     rho0_new_arr(lev, k));
 
@@ -224,9 +221,8 @@ void Maestro::MakeRhoXFlux(
 
                     // y-direction
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             Real rho0_edge = 0.5 * (rho0_old_arr(lev, k) +
                                                     rho0_new_arr(lev, k));
 
@@ -258,9 +254,8 @@ void Maestro::MakeRhoXFlux(
 
                     // z-direction
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             Real rho0_edge = 0.5 * (rho0_edge_old(lev, k) +
                                                     rho0_edge_new(lev, k));
 
@@ -317,9 +312,8 @@ void Maestro::MakeRhoXFlux(
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         // loop over components cannot be part of the ParallelFor
                         // due to race condition on sflux for the Rho component
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // edge states are rho' and X.  To make the (rho X) flux,
                                 // we need the edge state of rho0
@@ -348,9 +342,8 @@ void Maestro::MakeRhoXFlux(
 
                     // y-direction
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // edge states are rho' and X.  To make the (rho X) flux,
                                 // we need the edge state of rho0
@@ -379,9 +372,8 @@ void Maestro::MakeRhoXFlux(
 
                     // z-direction
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        for (int n = 0; n < num_comp; ++n) {
-                            int comp = n + start_comp;
-
+                        for (int comp = start_comp;
+                             comp < num_comp + start_comp; ++comp) {
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
                                 // edge states are rho' and X.  To make the (rho X) flux,
                                 // we need the edge state of rho0
