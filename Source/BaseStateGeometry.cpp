@@ -381,7 +381,6 @@ void BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
                 } else if (r == nr(n - 1) - 1 && chunk_start) {
                     // if last chunk is at the end of array
                     r_end_coord(n,numdisjointchunks(n)) = 2*r+1;
-
                 }
             }
         }
