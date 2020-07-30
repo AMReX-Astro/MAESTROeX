@@ -64,13 +64,13 @@ void Maestro::PrintMF(const Vector<MultiFab>& MF) {
                                 std::cout << "lev, i, j, comp" << lev << " "
                                           << ii << " " << j << " " << comp
                                           << " " << MF_arr(ii, j, k, comp)
-				          << std::endl;
+                                          << std::endl;
 #else
                                 std::cout << "lev, i, j, k, comp" << lev << " "
                                           << ii << " " << j << " " << k << " "
                                           << comp << " "
                                           << MF_arr(ii, j, k, comp)
-				          << std::endl;
+                                          << std::endl;
 #endif
                             }
                         }
@@ -91,17 +91,17 @@ void Maestro::PrintBA(const Vector<BoxArray>& ba) {
     for (int lev = 0; lev <= finest_level; ++lev) {
     
       for (int i = 0; i < ba[lev].size(); ++i) {
-	  Print() << "Grid #" << i << std::endl;
-	
-	  const Box& validBox = ba[lev][i];
-	  auto lo = validBox.loVect3d();
-	  auto hi = validBox.hiVect3d();
+          Print() << "Grid #" << i << std::endl;
+        
+          const Box& validBox = ba[lev][i];
+          auto lo = validBox.loVect3d();
+          auto hi = validBox.hiVect3d();
 
-	  Print() << "Level " << lev << std::endl;
-	  Print() << "valid box ";
-	  for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
-	    Print() << "(" << lo[n] << ", " << hi[n] << ")  ";
-	  }
+          Print() << "Level " << lev << std::endl;
+          Print() << "valid box ";
+          for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+            Print() << "(" << lo[n] << ", " << hi[n] << ")  ";
+          }
       }  
     }
 }
@@ -149,13 +149,13 @@ void Maestro::PrintEdge(
                                 std::cout << "lev, i, j, comp" << lev << " "
                                           << ii << " " << j << " " << comp
                                           << " " << EDGE_arr(ii, j, k, comp)
-				          << std::endl;
+                                          << std::endl;
 #else
                                 std::cout << "lev, i, j, k, comp" << lev << " "
                                           << ii << " " << j << " " << k << " "
                                           << comp << " "
                                           << EDGE_arr(ii, j, k, comp)
-				          << std::endl;
+                                          << std::endl;
 #endif
                             }
                         }

@@ -31,7 +31,7 @@ void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
 
 void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                         const Box& domainBox, const Real* dx, const BCRec bcs,
-			const int comp, const bool is_vel) {
+                        const int comp, const bool is_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillExtBC()", FillExtBC);
 
