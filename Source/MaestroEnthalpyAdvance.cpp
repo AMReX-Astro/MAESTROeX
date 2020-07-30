@@ -398,12 +398,14 @@ void Maestro::EnthalpyAdvanceSDC(
     //////////////////////////////////
 
     for (int lev = 0; lev <= finest_level; ++lev) {
-        scal_force[lev].setVal(0., RhoH, 1, 1);
+        scal_force[lev].setVal(0.);
     }
 
     Vector<MultiFab> rhoh0_old_cart(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
         rhoh0_old_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        // needed to avoid NaNs in filling corner ghost cells with 2 physical boundaries
+        rhoh0_old_cart[lev].setVal(0.);
     }
 
     /////////////////////////////////////////////////////////////////
@@ -507,7 +509,7 @@ void Maestro::EnthalpyAdvanceSDC(
     } else {
         // use the advective form of the prediction
         MakeEdgeScal(scalold, sedge, umac, scal_force, false, bcs_s, Nscal,
-                     pred_comp, pred_comp, 1, false);
+                     pred_comp, pred_comp, 1, true);
     }
 
     if (enthalpy_pred_type == predict_rhohprime) {
@@ -715,7 +717,7 @@ void Maestro::EnthalpyAdvanceSDC(
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(p0, p0_new_cart, false, false, bcs_f, 0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }

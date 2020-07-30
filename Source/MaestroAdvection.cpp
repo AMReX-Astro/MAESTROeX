@@ -147,6 +147,12 @@ void Maestro::UpdateScal(
                             eos_state.xn[n] = snew_arr(i, j, k, FirstSpec + n) /
                                               eos_state.rho;
                         }
+#if NAUX_NET > 0
+                        for (auto n = 0; n < NumAux; ++n) {
+                            eos_state.aux[n] =
+                                snew_arr(i, j, k, FirstAux + n) / eos_state.rho;
+                        }
+#endif
 
                         eos(eos_input_rp, eos_state);
 
@@ -193,6 +199,16 @@ void Maestro::UpdateScal(
                         if (snew_arr(i, j, k, comp) < 0.0)
                             has_negative_species = true;
                     }
+
+// update auxiliary variables
+#if NAUX_NET > 0
+                    for (int comp = FirstAux; comp < FirstAux + NumAux;
+                         ++comp) {
+                        snew_arr(i, j, k, comp) = sold_arr(i, j, k, comp) *
+                                                  snew_arr(i, j, k, Rho) /
+                                                  sold_arr(i, j, k, Rho);
+                    }
+#endif
 
                     // enforce a density floor
                     if (snew_arr(i, j, k, Rho) < 0.5 * base_cutoff_density) {
@@ -250,6 +266,14 @@ void Maestro::UpdateScal(
                 // do the same for density if we updated the species
                 flux_reg_s[lev + 1]->Reflux(statenew[lev], 1.0, Rho, Rho, 1,
                                             geom[lev]);
+
+// and the aux variables
+#if NAUX_NET > 0
+                for (int comp = 0; comp < NumAux; ++comp) {
+                    flux_reg_s[lev + 1]->Reflux(statenew[lev], 1.0, FirstAux,
+                                                FirstAux, NumAux, geom[lev]);
+                }
+#endif
             }
         }
     }
@@ -260,10 +284,16 @@ void Maestro::UpdateScal(
     FillPatch(t_old, statenew, statenew, statenew, start_comp, start_comp,
               num_comp, start_comp, bcs_s);
 
-    // do the same for density if we updated the species
+    // do the same for density and aux if we updated the species
     if (start_comp == FirstSpec) {
         AverageDown(statenew, Rho, 1);
         FillPatch(t_old, statenew, statenew, statenew, Rho, Rho, 1, Rho, bcs_s);
+
+#if NAUX_NET > 0
+        AverageDown(statenew, FirstAux, NumAux);
+        FillPatch(t_old, statenew, statenew, statenew, FirstAux, FirstAux,
+                  NumAux, FirstAux, bcs_s);
+#endif
     }
 }
 

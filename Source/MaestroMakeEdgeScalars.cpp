@@ -174,7 +174,6 @@ void Maestro::MakeEdgeScal(Vector<MultiFab>& state,
                            scal_mf.nGrow());
         }
 
-        // Be careful to pass in comp+1 for fortran indexing
         for (int scomp = start_scomp; scomp < start_scomp + num_comp; ++scomp) {
             int vcomp = scomp - start_scomp;
             int bccomp = start_bccomp + scomp - start_scomp;

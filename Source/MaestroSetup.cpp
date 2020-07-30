@@ -346,6 +346,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::int_dir);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::int_dir);
+            }
             bcs_s[Temp].setLo(dir, BCType::int_dir);
             bcs_s[Pi].setLo(dir, BCType::int_dir);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -361,6 +364,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::ext_dir);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::ext_dir);
+            }
             bcs_s[Temp].setLo(dir, BCType::ext_dir);
             bcs_s[Pi].setLo(dir, BCType::foextrap);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -374,6 +380,9 @@ void Maestro::BCSetup() {
             bcs_s[Rho].setLo(dir, BCType::foextrap);
             bcs_s[RhoH].setLo(dir, BCType::foextrap);
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::foextrap);
+            }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::foextrap);
             }
             bcs_s[Temp].setLo(dir, BCType::foextrap);
@@ -392,6 +401,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::reflect_even);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::reflect_even);
+            }
             bcs_s[Temp].setLo(dir, BCType::reflect_even);
             bcs_s[Pi].setLo(dir, BCType::reflect_even);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -408,6 +420,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::hoextrap);
+            }
             bcs_s[Temp].setLo(dir, BCType::hoextrap);
             bcs_s[Pi].setLo(dir, BCType::foextrap);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -421,6 +436,9 @@ void Maestro::BCSetup() {
             bcs_s[Rho].setLo(dir, BCType::hoextrap);
             bcs_s[RhoH].setLo(dir, BCType::hoextrap);
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
+                bcs_s[comp].setLo(dir, BCType::hoextrap);
+            }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
             bcs_s[Temp].setLo(dir, BCType::hoextrap);
@@ -443,6 +461,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::int_dir);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::int_dir);
+            }
             bcs_s[Temp].setHi(dir, BCType::int_dir);
             bcs_s[Pi].setHi(dir, BCType::int_dir);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -458,6 +479,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::ext_dir);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::ext_dir);
+            }
             bcs_s[Temp].setHi(dir, BCType::ext_dir);
             bcs_s[Pi].setHi(dir, BCType::foextrap);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -471,6 +495,9 @@ void Maestro::BCSetup() {
             bcs_s[Rho].setHi(dir, BCType::foextrap);
             bcs_s[RhoH].setHi(dir, BCType::foextrap);
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::foextrap);
+            }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::foextrap);
             }
             bcs_s[Temp].setHi(dir, BCType::foextrap);
@@ -489,6 +516,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::reflect_even);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::reflect_even);
+            }
             bcs_s[Temp].setHi(dir, BCType::reflect_even);
             bcs_s[Pi].setHi(dir, BCType::reflect_even);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -505,6 +535,9 @@ void Maestro::BCSetup() {
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::hoextrap);
+            }
             bcs_s[Temp].setHi(dir, BCType::hoextrap);
             bcs_s[Pi].setHi(dir, BCType::foextrap);
             for (int comp = 0; comp < Nscal; ++comp) {
@@ -518,6 +551,9 @@ void Maestro::BCSetup() {
             bcs_s[Rho].setHi(dir, BCType::hoextrap);
             bcs_s[RhoH].setHi(dir, BCType::hoextrap);
             for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
+                bcs_s[comp].setHi(dir, BCType::hoextrap);
+            }
+            for (int comp = FirstAux; comp < FirstAux + NumAux; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
             bcs_s[Temp].setHi(dir, BCType::hoextrap);

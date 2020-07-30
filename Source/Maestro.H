@@ -21,7 +21,6 @@
 #include <eos.H>
 #include <network.H>
 
-#include <BaseState.H>
 #include <maestro_params.H>
 #include <state_indices.H>
 using namespace maestro;
@@ -348,8 +347,8 @@ class Maestro : public amrex::AmrCore {
 
     static void FillExtBC(const amrex::Array4<amrex::Real>& q,
                           const amrex::Box& bx, const amrex::Box& domainBox,
-                          const amrex::BCRec bcs, const int comp,
-                          const bool is_vel = false);
+                          const amrex::Real* dx, const amrex::BCRec bcs,
+                          const int comp, const bool is_vel = false);
 
     // end MaestroBCFill.cpp functions
     ////////////
@@ -423,6 +422,9 @@ class Maestro : public amrex::AmrCore {
 
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF(const amrex::Vector<amrex::MultiFab>& MF);
+
+    /// Print out grid data from a Vector of BoxArrays
+    void PrintBA(const amrex::Vector<amrex::BoxArray>& ba);
 
     /// Print out the contents of a Vector of edge-based MultiFabs
     void PrintEdge(
@@ -649,14 +651,14 @@ class Maestro : public amrex::AmrCore {
     /// @param bcs          boundary conditions
     /// @param sbccomp      start boundary conditions component
     void Put1dArrayOnCart(
-        const int lev, const BaseState<amrex::Real>& s0,
+        const int level, const BaseState<amrex::Real>& s0,
         amrex::MultiFab& s0_cart, const bool is_input_edge_centered,
         const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         const int sbccomp = 0);
 
     void Put1dArrayOnCart(
-        const int lev, const BaseState<amrex::Real>& s0,
+        const int level, const BaseState<amrex::Real>& s0,
         amrex::Vector<amrex::MultiFab>& s0_cart,
         const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),

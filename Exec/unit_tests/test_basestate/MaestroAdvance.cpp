@@ -35,7 +35,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     BaseState<Real> w0_old(max_radial_level + 1, nr_fine + 1);
     BaseState<Real> rho0_predicted_edge(max_radial_level + 1, nr_fine + 1);
 
-    int is_predictor;
+    bool is_predictor;
 
     p0_minus_peosbar.setVal(0.);
     delta_chi_w0.setVal(0.);
@@ -123,7 +123,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     w0_old.copy(w0);
 
     // compute w0, w0_force, and delta_chi_w0
-    is_predictor = 1;
+    is_predictor = true;
     Makew0(w0_old, w0_force, Sbar_old, rho0_old, rho0_old, p0_old, p0_old,
            gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dtold,
            is_predictor);
@@ -265,7 +265,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     w0_old.copy(w0);
 
-    is_predictor = 0;
+    is_predictor = false;
     Makew0(w0_old, w0_force, Sbar_nph, rho0_old, rho0_new, p0_old, p0_new,
            gamma1bar_old, gamma1bar_new, p0_minus_peosbar, dt, dtold,
            is_predictor);

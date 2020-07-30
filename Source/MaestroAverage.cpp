@@ -72,7 +72,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             (base_geom.max_radial_level + 1) * base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+        for (int lev = 0; lev <= finest_level; ++lev) {
             for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) {
                 const int lo = base_geom.r_start_coord(lev, i);
                 const int hi = base_geom.r_end_coord(lev, i);
@@ -106,10 +106,6 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
         // loop is over the existing levels (up to finest_level)
         for (int lev = 0; lev <= finest_level; ++lev) {
-// // get references to the MultiFabs at level lev
-// const MultiFab& phi_mf = phi[lev];
-// const iMultiFab& cc_to_r = cell_cc_to_r[lev];
-
 // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel if (!system::regtest_reduction)

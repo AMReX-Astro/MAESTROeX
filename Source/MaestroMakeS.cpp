@@ -135,6 +135,12 @@ void Maestro::Make_S_cc(
                         eos_state.xn[n] =
                             scal_arr(i, j, k, FirstSpec + n) / eos_state.rho;
                     }
+#if NAUX_NET > 0
+                    for (auto n = 0; n < NumAux; ++n) {
+                        eos_state.aux[n] =
+                            scal_arr(i, j, k, FirstAux + n) / eos_state.rho;
+                    }
+#endif
 
                     // dens, temp, and xmass are inputs
                     eos(eos_input_rt, eos_state);
@@ -202,6 +208,12 @@ void Maestro::Make_S_cc(
                         eos_state.xn[n] =
                             scal_arr(i, j, k, FirstSpec + n) / eos_state.rho;
                     }
+#if NAUX_NET > 0
+                    for (auto n = 0; n < NumAux; ++n) {
+                        eos_state.aux[n] =
+                            scal_arr(i, j, k, FirstAux + n) / eos_state.rho;
+                    }
+#endif
 
                     // dens, temp, and xmass are inputs
                     eos(eos_input_rt, eos_state);
@@ -408,17 +420,32 @@ void Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
 
-            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                Real correction_factor =
-                    rho0_arr(i, j, k) > base_cutoff_density_loc
-                        ? beta0_arr(i, j, k) * dpdt_factor_loc /
-                              (gamma1bar_arr(i, j, k) * p0_arr(i, j, k)) /
-                              dt_loc
-                        : 0.0;
+            if (spherical) {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+                    Real correction_factor =
+                        rho0_arr(i, j, k) > base_cutoff_density_loc
+                            ? beta0_arr(i, j, k) * dpdt_factor_loc /
+                                  (gamma1bar_arr(i, j, k) * p0_arr(i, j, k)) /
+                                  dt_loc
+                            : 0.0;
 
-                correction_arr(i, j, k) =
-                    correction_factor * delta_p_arr(i, j, k);
-            });
+                    correction_arr(i, j, k) =
+                        correction_factor * delta_p_arr(i, j, k);
+                });
+            } else {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+                    int r = (AMREX_SPACEDIM == 2) ? j : k;
+                    Real correction_factor =
+                        (r < base_geom.base_cutoff_density_coord(lev))
+                            ? beta0_arr(i, j, k) * dpdt_factor_loc /
+                                  (gamma1bar_arr(i, j, k) * p0_arr(i, j, k)) /
+                                  dt_loc
+                            : 0.0;
+
+                    correction_arr(i, j, k) =
+                        correction_factor * delta_p_arr(i, j, k);
+                });
+            }
         }
     }
 
@@ -516,15 +543,32 @@ void Maestro::MakeRHCCforMacProj(
                                 });
                 }
 
-                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    if (rho0_arr(i, j, k) > base_cutoff_density_loc) {
-                        delta_chi_arr(i, j, k) +=
-                            dpdt_factor_loc * delta_p_arr(i, j, k) /
-                            (dt_loc * gamma1bar_arr(i, j, k) * p0_arr(i, j, k));
-                        rhcc_arr(i, j, k) +=
-                            beta0_arr(i, j, k) * delta_chi_arr(i, j, k);
-                    }
-                });
+                if (spherical) {
+                    ParallelFor(
+                        tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+                            if (rho0_arr(i, j, k) > base_cutoff_density_loc) {
+                                delta_chi_arr(i, j, k) +=
+                                    dpdt_factor_loc * delta_p_arr(i, j, k) /
+                                    (dt_loc * gamma1bar_arr(i, j, k) *
+                                     p0_arr(i, j, k));
+                                rhcc_arr(i, j, k) +=
+                                    beta0_arr(i, j, k) * delta_chi_arr(i, j, k);
+                            }
+                        });
+                } else {
+                    ParallelFor(
+                        tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+                            int r = (AMREX_SPACEDIM == 2) ? j : k;
+                            if (r < base_geom.base_cutoff_density_coord(lev)) {
+                                delta_chi_arr(i, j, k) +=
+                                    dpdt_factor_loc * delta_p_arr(i, j, k) /
+                                    (dt_loc * gamma1bar_arr(i, j, k) *
+                                     p0_arr(i, j, k));
+                                rhcc_arr(i, j, k) +=
+                                    beta0_arr(i, j, k) * delta_chi_arr(i, j, k);
+                            }
+                        });
+                }
             }
         }
     }

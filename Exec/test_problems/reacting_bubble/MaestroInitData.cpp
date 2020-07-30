@@ -1,5 +1,7 @@
 
 #include <Maestro.H>
+#include <actual_network.H>
+#include <network_properties.H>
 using namespace amrex;
 
 // prototype for pertubation function to be called on the
@@ -35,6 +37,12 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         for (auto comp = 0; comp < NumSpec; ++comp) {
             scal(i, j, k, FirstSpec + comp) = s0_arr(lev, r, FirstSpec + comp);
         }
+#if NAUX_NET > 0
+        for (auto comp = 0; comp < NumAux; ++comp) {
+            scal(i, j, k, FirstAux + comp) = s0_arr(lev, r, FirstAux + comp);
+        }
+#endif
+
         // initialize pi to zero for now
         scal(i, j, k, Pi) = 0.0;
     });
@@ -63,10 +71,16 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
             scal(i, j, k, Rho) = perturbations[Rho];
             scal(i, j, k, RhoH) = perturbations[RhoH];
             scal(i, j, k, Temp) = perturbations[Temp];
+
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 scal(i, j, k, FirstSpec + comp) =
                     perturbations[FirstSpec + comp];
             }
+#if NAUX_NET > 0
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                scal(i, j, k, FirstAux + comp) = perturbations[FirstAux + comp];
+            }
+#endif
         });
     }
 }
@@ -155,6 +169,32 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 scal_arr(i, j, k, Rho) += scal_arr(i, j, k, FirstSpec + comp);
             }
 
+            // initialize the aux variables
+#ifdef NSE_THERMO
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                scal_arr(i, j, k, FirstAux + comp) = 0.0;
+            }
+
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                // set the aux quantities
+                scal_arr(i, j, k, FirstAux + iye) +=
+                    scal_arr(i, j, k, FirstSpec + comp) * zion[comp] *
+                    aion_inv[comp];
+                scal_arr(i, j, k, FirstAux + iabar) +=
+                    scal_arr(i, j, k, FirstSpec + comp) * aion_inv[comp];
+                scal_arr(i, j, k, FirstAux + ibea) +=
+                    scal_arr(i, j, k, FirstSpec + comp) * aprox19::bion(comp) *
+                    aion_inv[comp];
+            }
+
+            scal_arr(i, j, k, FirstAux + iabar) =
+                1.0_rt / scal_arr(i, j, k, FirstAux + iabar);
+
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                scal_arr(i, j, k, FirstAux + comp) *= scal_arr(i, j, k, Rho);
+            }
+#endif
+
             // initialize (rho h) and T using the EOS
             eos_t eos_state;
             eos_state.T = scal_arr(i, j, k, Temp);
@@ -164,6 +204,12 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 eos_state.xn[comp] =
                     scal_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
             }
+#if NAUX_NET > 0
+            for (auto comp = 0; comp < NumAux; ++comp) {
+                eos_state.aux[comp] =
+                    scal_arr(i, j, k, FirstAux + comp) / eos_state.rho;
+            }
+#endif
 
             eos(eos_input_rp, eos_state);
 
@@ -193,9 +239,35 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 scal_arr(i, j, k, Rho) = perturbations[Rho];
                 scal_arr(i, j, k, RhoH) = perturbations[RhoH];
                 scal_arr(i, j, k, Temp) = perturbations[Temp];
+#ifdef NSE_THERMO
+                // initialize the aux quantities
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    scal_arr(i, j, k, FirstAux + comp) = 0.0;
+                }
+#endif
+
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     scal_arr(i, j, k, FirstSpec + comp) =
                         perturbations[FirstSpec + comp];
+#ifdef NSE_THERMO
+                    // set the aux quantities
+                    scal_arr(i, j, k, FirstAux + iye) +=
+                        scal_arr(i, j, k, FirstSpec + comp) * zion[comp] *
+                        aion_inv[comp];
+                    scal_arr(i, j, k, FirstAux + iabar) +=
+                        scal_arr(i, j, k, FirstSpec + comp) * aion_inv[comp];
+                    scal_arr(i, j, k, FirstAux + ibea) +=
+                        scal_arr(i, j, k, FirstSpec + comp) *
+                        aprox19::bion(comp) * aion_inv[comp];
+                }
+
+                scal_arr(i, j, k, FirstAux + iabar) =
+                    1.0_rt / scal_arr(i, j, k, FirstAux + iabar);
+
+                for (auto comp = 0; comp < NumAux; ++comp) {
+                    scal_arr(i, j, k, FirstAux + comp) *=
+                        scal_arr(i, j, k, Rho);
+#endif
                 }
             });
         }
@@ -284,6 +356,11 @@ void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = s0[FirstSpec + comp] / s0[Rho];
     }
+#if NAUX_NET > 0
+    for (auto comp = 0; comp < NumAux; ++comp) {
+        eos_state.aux[comp] = s0[FirstAux + comp] / s0[Rho];
+    }
+#endif
 
     eos(eos_input_tp, eos_state);
 
@@ -292,6 +369,11 @@ void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
     for (auto comp = 0; comp < NumSpec; ++comp) {
         perturbations[FirstSpec + comp] = eos_state.rho * eos_state.xn[comp];
     }
+#if NAUX_NET > 0
+    for (auto comp = 0; comp < NumAux; ++comp) {
+        perturbations[FirstAux + comp] = eos_state.rho * eos_state.aux[comp];
+    }
+#endif
 
     perturbations[Temp] = temp;
 }

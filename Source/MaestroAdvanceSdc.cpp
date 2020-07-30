@@ -31,8 +31,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
     Vector<MultiFab> delta_gamma1_term(finest_level + 1);
     Vector<MultiFab> delta_gamma1(finest_level + 1);
-    Vector<MultiFab> peos_old(finest_level + 1);
-    Vector<MultiFab> peosbar_cart(finest_level + 1);
     Vector<MultiFab> p0_cart(finest_level + 1);
     Vector<MultiFab> delta_p_term(finest_level + 1);
 
@@ -47,7 +45,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     Vector<MultiFab> scal_force(finest_level + 1);
     Vector<MultiFab> delta_chi(finest_level + 1);
     Vector<MultiFab> sponge(finest_level + 1);
-    Vector<MultiFab> w0cc(finest_level + 1);
 
     // face-centered in the dm-direction (planar only)
     Vector<MultiFab> etarhoflux_dummy(finest_level + 1);
@@ -135,8 +132,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         intra_rhoh0[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_gamma1_term[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_gamma1[lev].define(grids[lev], dmap[lev], 1, 0);
-        peos_old[lev].define(grids[lev], dmap[lev], 1, 0);
-        peosbar_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
         delta_p_term[lev].define(grids[lev], dmap[lev], 1, 0);
         Tcoeff1[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -147,6 +142,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         hcoeff2[lev].define(grids[lev], dmap[lev], 1, 1);
         Xkcoeff2[lev].define(grids[lev], dmap[lev], NumSpec, 1);
         pcoeff2[lev].define(grids[lev], dmap[lev], 1, 1);
+
         if (ppm_trace_forces == 0) {
             scal_force[lev].define(grids[lev], dmap[lev], Nscal, 1);
         } else {
@@ -155,7 +151,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         }
         delta_chi[lev].define(grids[lev], dmap[lev], 1, 0);
         sponge[lev].define(grids[lev], dmap[lev], 1, 0);
-        w0cc[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, 0);
 
         // face-centered in the dm-direction (planar only)
         AMREX_D_TERM(
@@ -274,11 +269,11 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     // no ghost cells for S_cc_nph
     AverageDown(S_cc_nph, 0, 1);
 
-    // compute p0_minus_peosbar = p0_old - peosbar (for making w0) and
+    // compute p0_minus_peosbar = p0_old - peosbar_old (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
     if (dpdt_factor > 0.0) {
         // peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
-        PfromRhoH(sold, sold, peos_old);
+        PfromRhoH(sold, sold, delta_p_term);
 
         // compute peosbar = Avg(peos_old)
         Average(delta_p_term, peosbar, 0);
@@ -286,14 +281,14 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         // compute p0_minus_peosbar = p0_old - peosbar
         p0_minus_peosbar.copy(p0_old - peosbar);
 
-        // compute peosbar_cart from peosbar
-        Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
+        // put p0_old on cart
+        Put1dArrayOnCart(p0_old, p0_cart, false, false, bcs_f, 0);
 
-        // compute delta_p_term = peos_old - peosbar_cart
+        // compute delta_p_term = peos_old - p0_old
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::LinComb(delta_p_term[lev], 1.0, peos_old[lev], 0, -1.0,
-                              peosbar_cart[lev], 0, 0, 1, 0);
+            MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
         }
+
     } else {
         // these should have no effect if dpdt_factor <= 0
         p0_minus_peosbar.setVal(0.0);
@@ -316,6 +311,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
 
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
@@ -571,9 +567,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
-        // compute p0_nph
-        p0_nph.copy(0.5 * (p0_old + p0_new));
-
         // hold dp0/dt in psi for Make_S_cc
         psi.copy((p0_new - p0_old) / dt);
 
@@ -698,34 +691,27 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             }
             AverageDown(S_cc_nph, 0, 1);
 
-            // and delta_p_term = peos_new - p0_new (for RHS of projection)
+            // compute p0_minus_peosbar = p0_new - peosbar_new (for making w0) and
+            // set delta_p_term = peos_new - p0_new (for RHS of projection)
             if (dpdt_factor > 0.) {
-                // peos_new now holds the thermodynamic p computed from snew(rho,h,X)
+                // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
                 PfromRhoH(snew, snew, delta_p_term);
-
-                // compute peos_nph = (1/2)*(peos_old+peos_new)
-                for (int lev = 0; lev <= finest_level; ++lev) {
-                    MultiFab::Add(delta_p_term[lev], peos_old[lev], 0, 0, 1, 0);
-                    delta_p_term[lev].mult(0.5);
-                }
 
                 // compute peosbar = Avg(peos_new)
                 Average(delta_p_term, peosbar, 0);
 
-                // compute p0_nph
-                p0_nph.copy(0.5 * (p0_old + p0_new));
+                // compute p0_minus_peosbar = p0_new - peosbar
+                p0_minus_peosbar.copy(p0_new - peosbar);
 
-                // compute p0_minus_peosbar = p0_nph - peosbar
-                p0_minus_peosbar.copy(p0_nph - peosbar);
+                // put p0_new on cart
+                Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
 
-                // compute peosbar_cart from peosbar
-                Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
-
-                // compute delta_p_term = peos_new - peosbar_cart
+                // set delta_p_term = peos_new - p0_new
                 for (int lev = 0; lev <= finest_level; ++lev) {
-                    MultiFab::Subtract(delta_p_term[lev], peosbar_cart[lev], 0,
-                                       0, 1, 0);
+                    MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1,
+                                       0);
                 }
+
             } else {
                 // these should have no effect if dpdt_factor <= 0
                 p0_minus_peosbar.setVal(0.);
@@ -750,6 +736,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                            p0_old, p0_new, gamma1bar_old, gamma1bar_new,
                            p0_minus_peosbar, dt, dtold, is_predictor);
 
+                    Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
                     if (spherical) {
                         // put w0 on Cartesian edges
@@ -917,7 +904,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         for (int lev = 0; lev <= finest_level; ++lev) {
             sdc_source[lev].setVal(0.);
             MultiFab::Copy(sdc_source[lev], diff_old[lev], 0, RhoH, 1, 0);
-            MultiFab::Add(sdc_source[lev], diff_new[lev], 0, RhoH, 1, 0);
+            MultiFab::Add(sdc_source[lev], diff_hat[lev], 0, RhoH, 1, 0);
             MultiFab::Add(sdc_source[lev], diff_hterm_hat[lev], 0, RhoH, 1, 0);
             MultiFab::Subtract(sdc_source[lev], diff_hterm_new[lev], 0, RhoH, 1,
                                0);
@@ -977,9 +964,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             MakeGravCell(grav_cell_new, rho0_new);
 
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
-
-            // compute p0_nph
-            p0_nph.copy(0.5 * (p0_old + p0_new));
 
             // hold dp0/dt in psi for Make_S_cc
             psi.copy((p0_new - p0_old) / dt);
@@ -1118,10 +1102,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                    p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
                    dtold, is_predictor);
 
-            if (spherical) {
-                // put w0 on Cartesian cell-centers
-                Put1dArrayOnCart(w0, w0cc, true, true, bcs_u, 0, 1);
-            }
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -1146,8 +1127,10 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     if (spherical && evolve_base_state && split_projection) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Subtract(uold[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
-            MultiFab::Subtract(unew[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
+            MultiFab::Subtract(uold[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
+                               0);
+            MultiFab::Subtract(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
+                               0);
         }
     }
 
@@ -1188,21 +1171,15 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
         // compute delta_p_term = peos_new - p0_new (for RHS of projection)
         if (dpdt_factor > 0.) {
-            // peos_new now holds the thermodynamic p computed from snew(rho h X)
+            // peos now holds "peos_new", the thermodynamic p computed from snew(rho,h,X)
             PfromRhoH(snew, snew, delta_p_term);
 
-            // compute peosbar = Avg(peos_new)
-            Average(delta_p_term, peosbar, 0);
+            // put p0_new on cart
+            Put1dArrayOnCart(p0_new, p0_cart, false, false, bcs_f, 0);
 
-            // no need to compute p0_minus_peosbar since make_w0 is not called after here
-
-            // compute peosbar_cart from peosbar
-            Put1dArrayOnCart(peosbar, peosbar_cart, false, false, bcs_f, 0);
-
-            // compute delta_p_term = peos_new - peosbar_cart
+            // compute delta_p_term = peos_new - p0_new
             for (int lev = 0; lev <= finest_level; ++lev) {
-                MultiFab::Subtract(delta_p_term[lev], peosbar_cart[lev], 0, 0,
-                                   1, 0);
+                MultiFab::Subtract(delta_p_term[lev], p0_cart[lev], 0, 0, 1, 0);
             }
 
             CorrectRHCCforNodalProj(rhcc_for_nodalproj, rho0_new, beta0_nph,
@@ -1225,7 +1202,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     if (spherical && evolve_base_state && split_projection) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Add(unew[lev], w0cc[lev], 0, 0, AMREX_SPACEDIM, 0);
+            MultiFab::Add(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
         }
         AverageDown(unew, 0, AMREX_SPACEDIM);
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);

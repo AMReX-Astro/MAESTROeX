@@ -105,6 +105,9 @@ pp.query("plot_spec", maestro::plot_spec);
 maestro::plot_omegadot = true;
 pp.query("plot_omegadot", maestro::plot_omegadot);
 
+maestro::plot_aux = false;
+pp.query("plot_aux", maestro::plot_aux);
+
 maestro::plot_Hext = false;
 pp.query("plot_Hext", maestro::plot_Hext);
 

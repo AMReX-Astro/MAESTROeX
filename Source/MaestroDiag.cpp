@@ -35,6 +35,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
     Vector<MultiFab> rho_Hext(finest_level + 1);
     Vector<MultiFab> rho_omegadot(finest_level + 1);
     Vector<MultiFab> rho_Hnuc(finest_level + 1);
+    Vector<MultiFab> sdc_source(finest_level + 1);
 
 #if (AMREX_SPACEDIM == 3)
     if (spherical) {
@@ -70,8 +71,12 @@ void Maestro::DiagFile(const int step, const Real t_in,
         rho_Hext[lev].define(grids[lev], dmap[lev], 1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
+        sdc_source[lev].define(grids[lev], dmap[lev], Nscal, 0);
+
+        sdc_source[lev].setVal(0.0);
     }
 
+#ifndef SDC
     if (dt < small_dt) {
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt,
               t_in);
@@ -79,6 +84,15 @@ void Maestro::DiagFile(const int step, const Real t_in,
         React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt * 0.5,
               t_in);
     }
+#else
+    if (dt < small_dt) {
+        ReactSDC(s_in, stemp, rho_Hext, p0_in, small_dt, t_in, sdc_source);
+    } else {
+        ReactSDC(s_in, stemp, rho_Hext, p0_in, dt * 0.5, t_in, sdc_source);
+    }
+
+    MakeReactionRates(rho_omegadot, rho_Hnuc, s_in);
+#endif
 
     // initialize diagnosis variables
     // diag_temp.out
@@ -187,9 +201,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
                         // make sure the cell isn't covered by finer cells
                         bool cell_valid = true;
                         if (use_mask) {
-                            if (mask_arr(i, j, k) == 1) {
-                                cell_valid = false;
-                            }
+                            if (mask_arr(i, j, k) == 1) cell_valid = false;
                         }
 
                         // For spherical, we only consider cells inside of where the
@@ -366,6 +378,13 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                     scal(i, j, k, FirstSpec + comp) /
                                     eos_state.rho;
                             }
+#if NAUX_NET > 0
+                            for (auto comp = 0; comp < NumAux; ++comp) {
+                                eos_state.aux[comp] =
+                                    scal(i, j, k, FirstAux + comp) /
+                                    eos_state.rho;
+                            }
+#endif
 
                             eos(eos_input_rt, eos_state);
 

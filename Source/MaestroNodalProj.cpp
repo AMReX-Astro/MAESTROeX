@@ -172,7 +172,8 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     info.setConsolidation(true);
     info.setMetricTerm(false);
 
-    MLNodeLaplacian mlndlap(geom, grids, dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLNodeLaplacian mlndlap(Geom(0, finest_level), grids, dmap, info);
     mlndlap.setGaussSeidel(true);
     mlndlap.setHarmonicAverage(false);
 
