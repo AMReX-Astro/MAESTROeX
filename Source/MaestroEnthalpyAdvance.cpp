@@ -717,7 +717,7 @@ void Maestro::EnthalpyAdvanceSDC(
         p0_new_cart[lev].define(grids[lev], dmap[lev], 1, 1);
     }
 
-    Put1dArrayOnCart(p0, p0_new_cart, false, false, bcs_f, 0);
+    Put1dArrayOnCart(p0_new, p0_new_cart, false, false, bcs_f, 0);
 
     UpdateScal(scalold, scalnew, sflux, scal_force, RhoH, 1, p0_new_cart);
 }
