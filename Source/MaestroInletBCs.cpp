@@ -15,15 +15,11 @@ outline.
 
 // Inlet BCs defined in header file should go here
 
-
-void 
-Maestro::SetInletBCs()
-{
+void Maestro::SetInletBCs() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs); 
+    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs);
 
     // here we would initialize the parameters that are module variables.
     // this routine is called when the base state is defined initially,
     // and upon restart, just after the base state is read in.
-
 }

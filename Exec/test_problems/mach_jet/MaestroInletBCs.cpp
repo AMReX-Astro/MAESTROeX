@@ -17,13 +17,10 @@ Real InletBCs::INLET_RHO;
 Real InletBCs::INLET_RHOH;
 Real InletBCs::INLET_TEMP;
 Real InletBCs::INLET_CS;
-Real InletBCs::INLET_dr_fine;
 
-void 
-Maestro::SetInletBCs()
-{
+void Maestro::SetInletBCs() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs); 
+    BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs);
 
     // here we initialize the parameters that are module variables.
     // this routine is called when the base state is defined initially,
@@ -31,9 +28,9 @@ Maestro::SetInletBCs()
 
     eos_t eos_state;
 
-    eos_state.T     = 10.0;
-    eos_state.rho   = 1.e-3;
-    eos_state.p     = 1.e6;
+    eos_state.T = 10.0;
+    eos_state.rho = 1.e-3;
+    eos_state.p = 1.e6;
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = 1.0 / NumSpec;
     }
@@ -42,18 +39,16 @@ Maestro::SetInletBCs()
 
     InletBCs::INLET_CS = eos_state.cs;
 
-    eos_state.T     = 10.e0;
-    eos_state.rho   = 5.e-4;
-    eos_state.p     = 1.e6;
+    eos_state.T = 10.e0;
+    eos_state.rho = 5.e-4;
+    eos_state.p = 1.e6;
     for (auto comp = 0; comp < NumSpec; ++comp) {
         eos_state.xn[comp] = 1.0 / NumSpec;
     }
 
     eos(eos_input_rp, eos_state);
 
-    InletBCs::INLET_RHO  = eos_state.rho;
+    InletBCs::INLET_RHO = eos_state.rho;
     InletBCs::INLET_RHOH = eos_state.rho * eos_state.h;
     InletBCs::INLET_TEMP = eos_state.T;
-
-    InletBCs::INLET_dr_fine = base_geom.dr_fine;
 }

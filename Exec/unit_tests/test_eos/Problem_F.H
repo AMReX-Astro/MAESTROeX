@@ -8,10 +8,10 @@
 extern "C" {
 #endif
 
-void do_tests(const int* lo, const int* hi,
-              amrex::Real* scal, const int* s_lo, const int* s_hi,
-              amrex::Real* error, const int* e_lo, const int* e_hi, const int* nc_e,
-              const int* dom_lo, const int* dom_hi);
+void do_tests(const int* lo, const int* hi, amrex::Real* scal, const int* s_lo,
+              const int* s_hi, amrex::Real* error, const int* e_lo,
+              const int* e_hi, const int* nc_e, const int* dom_lo,
+              const int* dom_hi);
 
 #ifdef __cplusplus
 }

@@ -23,9 +23,9 @@ extern AMREX_GPU_MANAGED amrex::Real fixed_dt;
 extern AMREX_GPU_MANAGED amrex::Real nuclear_dt_fac;
 extern AMREX_GPU_MANAGED bool use_soundspeed_firstdt;
 extern AMREX_GPU_MANAGED bool use_divu_firstdt;
-extern AMREX_GPU_MANAGED int spherical;
+extern AMREX_GPU_MANAGED bool spherical;
 extern AMREX_GPU_MANAGED bool octant;
-extern AMREX_GPU_MANAGED int do_2d_planar_octant;
+extern AMREX_GPU_MANAGED bool do_2d_planar_octant;
 extern AMREX_GPU_MANAGED int regrid_int;
 extern AMREX_GPU_MANAGED int amr_buf_width;
 extern AMREX_GPU_MANAGED int drdxfac;
@@ -41,6 +41,7 @@ extern AMREX_GPU_MANAGED amrex::Real chk_deltat;
 extern AMREX_GPU_MANAGED bool plot_h_with_use_tfromp;
 extern AMREX_GPU_MANAGED bool plot_spec;
 extern AMREX_GPU_MANAGED bool plot_omegadot;
+extern AMREX_GPU_MANAGED bool plot_aux;
 extern AMREX_GPU_MANAGED bool plot_Hext;
 extern AMREX_GPU_MANAGED bool plot_Hnuc;
 extern AMREX_GPU_MANAGED bool plot_eta;
@@ -163,6 +164,6 @@ extern AMREX_GPU_MANAGED amrex::Real eps_hg;
 extern AMREX_GPU_MANAGED amrex::Real eps_hg_max;
 extern AMREX_GPU_MANAGED amrex::Real hg_level_factor;
 extern AMREX_GPU_MANAGED amrex::Real eps_hg_bottom;
-};
+};  // namespace maestro
 
 #endif

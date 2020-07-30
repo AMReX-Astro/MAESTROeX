@@ -3,13 +3,10 @@
 
 using namespace amrex;
 
-void 
-Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0, 
-                       BaseState<Real>& p0, 
-                       const int lev)
-{
+void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
+                            BaseState<Real>& p0, const int lev) {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState); 
+    BL_PROFILE_VAR("Maestro::InitBaseState()", InitBaseState);
 
     s0_init.setVal(0.0);
     rho0.setVal(0.0);

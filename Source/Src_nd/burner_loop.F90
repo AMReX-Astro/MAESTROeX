@@ -3,8 +3,8 @@ module burner_loop_module
   use amrex_error_module
   use burner_module
   use burn_type_module, only: burn_t
-  use network, only: nspec, network_species_index
-  use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, &
+  use network, only: naux, nspec, network_species_index
+  use meth_params_module, only: rho_comp, rhoh_comp, temp_comp, spec_comp, aux_comp, &
        pi_comp, nscal, burner_threshold_cutoff, burner_threshold_species, &
        burning_cutoff_density_lo, burning_cutoff_density_hi, reaction_sum_tol, &
        drive_initial_convection
@@ -73,6 +73,10 @@ contains
 
     double precision :: x_in(nspec)
     double precision :: x_out(nspec)
+#if NAUX_NET > 0
+    double precision :: aux_in(naux)
+    double precision :: aux_out(naux)
+#endif
     double precision :: rhowdot(nspec)
     double precision :: rhoH
     double precision :: x_test
@@ -98,6 +102,11 @@ contains
                 do n = 1, nspec
                    x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
                 enddo
+#if NAUX_NET > 0                
+                do n = 1, naux
+                   aux_in(n) = s_in(i,j,k,n+aux_comp-1) / rho
+                enddo
+#endif
 
                 if (drive_initial_convection) then
 #if (AMREX_SPACEDIM == 2)
@@ -132,6 +141,11 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+#if NAUX_NET > 0
+                   do n = 1, naux
+                      state_in % aux(n) = aux_in(n)
+                   enddo
+#endif
                    state_in % i = i
                    state_in % j = j
                    state_in % k = k
@@ -141,6 +155,11 @@ contains
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
                    enddo
+#if NAUX_NET > 0
+                   do n = 1, naux
+                      aux_out(n) = state_out % aux(n)
+                   enddo
+#endif
                    do n = 1, nspec
                       rhowdot(n) = state_out % rho * &
                            (state_out % xn(n) - state_in % xn(n)) / dt_in
@@ -148,6 +167,9 @@ contains
                    rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
                 else
                    x_out = x_in
+#if NAUX_NET > 0
+                   aux_out = aux_in
+#endif
                    rhowdot = 0.d0
                    rhoH = 0.d0
                 endif
@@ -174,6 +196,13 @@ contains
                 do n = 1, nspec
                    s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
                 enddo
+
+#if NAUX_NET > 0
+                ! update the auxiliary variables 
+                do n = 1, naux
+                    s_out(i,j,k,n+aux_comp-1) = aux_out(n) * rho
+                enddo
+#endif
 
                 ! store the energy generation and species create quantities
                 do n = 1, nspec
@@ -231,6 +260,10 @@ contains
 
     double precision :: x_in(nspec)
     double precision :: x_out(nspec)
+#if NAUX_NET > 0
+    double precision :: aux_in(naux)
+    double precision :: aux_out(naux)
+#endif
     double precision :: rhowdot(nspec)
     double precision :: rhoH
     double precision :: x_test
@@ -256,6 +289,11 @@ contains
                 do n = 1, nspec
                    x_in(n) = s_in(i,j,k,n+spec_comp-1) / rho
                 enddo
+#if NAUX_NET > 0
+                do n = 1, naux
+                   aux_in(n) = s_in(i,j,k,n+aux_comp-1) / rho
+                enddo
+#endif
 
                 if (drive_initial_convection) then
                    T_in = tempbar_init_cart(i,j,k)
@@ -285,6 +323,11 @@ contains
                    do n = 1, nspec
                       state_in % xn(n) = x_in(n)
                    enddo
+#if NAUX_NET > 0
+                   do n = 1, naux
+                      state_in % aux(n) = aux_in(n)
+                   enddo
+#endif
                    state_in % i = i
                    state_in % j = j
                    state_in % k = k
@@ -294,6 +337,11 @@ contains
                    do n = 1, nspec
                       x_out(n) = state_out % xn(n)
                    enddo
+#if NAUX_NET > 0
+                   do n = 1, naux
+                      aux_out(n) = state_out % aux(n)
+                   enddo
+#endif
                    do n = 1, nspec
                       rhowdot(n) = state_out % rho * &
                            (state_out % xn(n) - state_in % xn(n)) / dt_in
@@ -301,6 +349,9 @@ contains
                    rhoH = state_out % rho * (state_out % e - state_in % e) / dt_in
                 else
                    x_out = x_in
+#if NAUX_NET > 0
+                   aux_out = aux_in
+#endif
                    rhowdot = 0.d0
                    rhoH = 0.d0
 
@@ -327,6 +378,13 @@ contains
                 do n = 1, nspec
                    s_out(i,j,k,n+spec_comp-1) = x_out(n) * rho
                 enddo
+
+#if NAUX_NET > 0
+                ! update the auxiliary variables 
+                do n = 1, naux
+                    s_out(i,j,k,n+aux_comp-1) = aux_out(n) * rho
+                enddo
+#endif
 
                 ! store the energy generation and species create quantities
                 do n = 1, nspec
@@ -378,6 +436,10 @@ contains
     double precision :: rho_in, rho_out, rhoh_in, rhoh_out
     double precision :: rhox_in(nspec)
     double precision :: rhox_out(nspec)
+#if NAUX_NET > 0
+    double precision :: rhoaux_in(naux)
+    double precision :: rhoaux_out(naux)
+#endif
     double precision :: x_test
     logical          :: cell_valid
 
@@ -412,6 +474,9 @@ contains
                 
                 rho_in = s_in(i,j,k,rho_comp)
                 rhox_in(1:nspec) = s_in(i,j,k,spec_comp:spec_comp+nspec-1)
+#if NAUX_NET > 0
+                rhoaux_in(1:naux) = s_in(i,j,k,aux_comp:aux_comp+naux-1)
+#endif
                 rhoh_in = s_in(i,j,k,rhoh_comp)
                 
                 ! Fortran doesn't guarantee short-circuit evaluation of logicals
@@ -436,6 +501,9 @@ contains
                    state_in % y(nspec+1) = rhoh_in
                    state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
                    state_in % ydot_a(nspec+1) = sdc_rhoh
+#if NAUX_NET > 0
+                   state_in % aux(1:aux) = rhoaux_in(1:nspec) / rho_in
+#endif
                    state_in % i = i
                    state_in % j = j
                    state_in % k = k
@@ -446,10 +514,16 @@ contains
                    rho_out  = sum(state_out % y(1:nspec))
                    rhox_out = state_out % y(1:nspec)
                    rhoh_out = state_out % y(nspec+1)
+#if NAUX_NET > 0
+                   rhoaux_out = rho_out * state_out % aux(1:naux)
+#endif
                 else
                    rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
                    rhox_out = rhox_in + sdc_rhoX*dt_in
                    rhoh_out = rhoh_in + sdc_rhoh*dt_in
+#if NAUX_NET > 0
+                   rhoaux_out = rho_out / rho_in * rhoaux_in
+#endif
                 endif
 
                 ! update the density
@@ -457,6 +531,11 @@ contains
 
                 ! update the species
                 s_out(i,j,k,spec_comp:spec_comp+nspec-1) = rhox_out(1:nspec)
+
+#if NAUX_NET > 0
+                ! update the auxiliary variables 
+                s_out(i,j,k,aux_comp:aux_comp+nspec-1) = rhoaux_out(1:naux)
+#endif
 
                 ! update the enthalpy -- include the change due to external heating
                 s_out(i,j,k,rhoh_comp) = rhoh_out
@@ -501,6 +580,10 @@ contains
     double precision :: rho_in, rho_out, rhoh_in, rhoh_out
     double precision :: rhox_in(nspec)
     double precision :: rhox_out(nspec)
+#if NAUX_NET > 0
+    double precision :: rhoaux_in(naux)
+    double precision :: rhoaux_out(naux)
+#endif
     double precision :: x_test
     logical          :: cell_valid
 
@@ -531,6 +614,9 @@ contains
                 
                 rho_in = s_in(i,j,k,rho_comp)
                 rhox_in(1:nspec) = s_in(i,j,k,spec_comp:spec_comp+nspec-1)
+#if NAUX_NET > 0
+                rhoaux_in(1:naux) = s_in(i,j,k,aux_comp:aux_comp+naux-1)
+#endif
                 rhoh_in = s_in(i,j,k,rhoh_comp)
                 
                 ! Fortran doesn't guarantee short-circuit evaluation of logicals
@@ -555,6 +641,9 @@ contains
                    state_in % y(nspec+1) = rhoh_in
                    state_in % ydot_a(1:nspec) = sdc_rhoX(1:nspec)
                    state_in % ydot_a(nspec+1) = sdc_rhoh
+#if NAUX_NET > 0
+                   state_in % aux(1:naux) = rhoaux_in(1:naux) / rho_in
+#endif
                    state_in % i = i
                    state_in % j = j
                    state_in % k = k
@@ -562,6 +651,9 @@ contains
                    call integrator(state_in, state_out, dt_in, time_in)
 
                    rho_out  = sum(state_out % y(1:nspec))
+#if NAUX_NET > 0
+                   rhoaux_out = state_out % rho * state_out % aux(1:naux)
+#endif
                    rhox_out = state_out % y(1:nspec)
                    rhoh_out = state_out % y(nspec+1)
                    
@@ -569,6 +661,9 @@ contains
                    rho_out = rho_in + sum(sdc_rhoX(1:nspec))*dt_in
                    rhox_out = rhox_in + sdc_rhoX*dt_in
                    rhoh_out = rhoh_in + sdc_rhoh*dt_in
+#if NAUX_NET > 0
+                   rhoaux_out = rho_out / rho_in * rhoaux_in
+#endif
                 endif
 
                 ! update the density
@@ -576,6 +671,11 @@ contains
 
                 ! update the species
                 s_out(i,j,k,spec_comp:spec_comp+nspec-1) = rhox_out(1:nspec)
+
+#if NAUX_NET > 0
+                ! update the auxiliary variables 
+                s_out(i,j,k,aux_comp:aux_comp+naux-1) = rhoaux_out(1:naux)
+#endif
 
                 ! update the enthalpy -- include the change due to external heating
                 s_out(i,j,k,rhoh_comp) = rhoh_out

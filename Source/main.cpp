@@ -1,15 +1,13 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 #include <MaestroPlot.H>
+#include <Maestro_F.H>
 
 using namespace amrex;
 
-std::string inputs_name = "";
+std::string inputs_name;
 
-int main(int argc, char* argv[])
-{
-
+int main(int argc, char* argv[]) {
     // check to see if it contains --describe
     if (argc >= 2) {
         for (auto i = 1; i < argc; i++) {
@@ -21,7 +19,7 @@ int main(int argc, char* argv[])
     }
 
     // in AMReX.cpp
-    Initialize(argc,argv);
+    Initialize(argc, argv);
 
     // Refuse to continue if we did not provide an inputs file.
 
@@ -31,7 +29,7 @@ int main(int argc, char* argv[])
 
     // Save the inputs file name for later.
 
-    if (!strchr(argv[1], '=')) {
+    if (strchr(argv[1], '=') != nullptr) {
         inputs_name = argv[1];
     }
 
@@ -66,10 +64,10 @@ int main(int argc, char* argv[])
         Real end_total = ParallelDescriptor::second() - strt_total;
 
         // print wallclock time
-        ParallelDescriptor::ReduceRealMax(end_total,ParallelDescriptor::IOProcessorNumber());
+        ParallelDescriptor::ReduceRealMax(
+            end_total, ParallelDescriptor::IOProcessorNumber());
         Print() << "\nTotal Time: " << end_total << '\n';
     }
-
 
     // destroy timer for profiling
     BL_PROFILE_VAR_STOP(main);
