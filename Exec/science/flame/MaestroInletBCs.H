@@ -5,11 +5,11 @@
 
 namespace InletBCs {
 
-    extern amrex::Real INLET_RHO;
-    extern amrex::Real INLET_RHOH;
-    extern amrex::Real INLET_TEMP;
-    extern RealVector INLET_RHOX;
-    extern amrex::Real INLET_VEL;
-};
+extern amrex::Real INLET_RHO;
+extern amrex::Real INLET_RHOH;
+extern amrex::Real INLET_TEMP;
+extern RealVector INLET_RHOX;
+extern amrex::Real INLET_VEL;
+};  // namespace InletBCs
 
 #endif

@@ -3,28 +3,28 @@
 #include <AMReX_BLFort.H>
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    // these are interfaces to fortran subroutines
-    void runtime_pretty_print(int* jobinfo_file_name, const int* jobinfo_file_length);
-    void runtime_init();
+// these are interfaces to fortran subroutines
+void runtime_pretty_print(int* jobinfo_file_name,
+                          const int* jobinfo_file_length);
+void runtime_init();
 
-    //////////////////////
-    // in maestro_init.f90
+//////////////////////
+// in maestro_init.f90
 
-    void maestro_network_init();
-    void maestro_eos_init();
-    //////////////////////
+void maestro_network_init();
+void maestro_eos_init();
+//////////////////////
 
-    //////////////////////
-    // in meth_params.F90
+//////////////////////
+// in meth_params.F90
 
-    // read in shared C++/Fortran parameters from inputs file
-    void read_method_params();
+// read in shared C++/Fortran parameters from inputs file
+void read_method_params();
 
-    //////////////////////
+//////////////////////
 
 #ifdef __cplusplus
 }

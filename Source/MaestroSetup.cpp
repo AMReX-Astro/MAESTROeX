@@ -10,9 +10,7 @@ using namespace amrex;
 // initialize base state geometry parameters
 // set istep, t_new, t_old
 // allocate MultiFabs and base state arrays
-void
-Maestro::Setup ()
-{
+void Maestro::Setup() {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Setup()", Setup);
 
@@ -52,8 +50,10 @@ Maestro::Setup ()
     RotationInit();
 #endif
 
-    // check max level does not exceed hardcoded limit 
-    if (max_level > MAESTRO_MAX_LEVELS) { Abort("max_level exceeds MAESTROeX's limit!"); }
+    // check max level does not exceed hardcoded limit
+    if (max_level > MAESTRO_MAX_LEVELS) {
+        Abort("max_level exceeds MAESTROeX's limit!");
+    }
 
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
@@ -73,14 +73,16 @@ Maestro::Setup ()
         base_geom.dr_fine = dxFine[0] / drdxfac;
 
         // compute base_geom.nr_irreg
-        const Real domhi = domainBoxFine.bigEnd(0)+1;
+        const Real domhi = domainBoxFine.bigEnd(0) + 1;
         if (!octant) {
-            base_geom.nr_irreg = int((3.0*(domhi/2-0.5)*(domhi/2-0.5)-0.75)/2.0);
+            base_geom.nr_irreg =
+                int((3.0 * (domhi / 2 - 0.5) * (domhi / 2 - 0.5) - 0.75) / 2.0);
         } else {
-            base_geom.nr_irreg = int((3.0*(domhi-0.5)*(domhi-0.5)-0.75)/2.0);
+            base_geom.nr_irreg =
+                int((3.0 * (domhi - 0.5) * (domhi - 0.5) - 0.75) / 2.0);
         }
 
-            // compute base_geom.nr_fine
+        // compute base_geom.nr_fine
         if (use_exact_base_state) {
             base_geom.nr_fine = base_geom.nr_irreg + 1;
         } else {
@@ -90,11 +92,11 @@ Maestro::Setup ()
                 leny = probHi[1] - probLo[1];
                 lenz = probHi[2] - probLo[2];
             } else {
-                lenx = 0.5*(probHi[0] - probLo[0]);
-                leny = 0.5*(probHi[1] - probLo[1]);
-                lenz = 0.5*(probHi[2] - probLo[2]);
+                lenx = 0.5 * (probHi[0] - probLo[0]);
+                leny = 0.5 * (probHi[1] - probLo[1]);
+                lenz = 0.5 * (probHi[2] - probLo[2]);
             }
-            max_dist = sqrt(lenx*lenx + leny*leny + lenz*lenz);
+            max_dist = sqrt(lenx * lenx + leny * leny + lenz * lenz);
             base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
         }
 #endif
@@ -103,60 +105,64 @@ Maestro::Setup ()
         base_geom.max_radial_level = max_level;
 
         // compute base_geom.dr_fine
-        base_geom.dr_fine = dxFine[AMREX_SPACEDIM-1];
+        base_geom.dr_fine = dxFine[AMREX_SPACEDIM - 1];
 
         // compute base_geom.nr_fine
-        base_geom.nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM-1] + 1;
+        base_geom.nr_fine = domainBoxFine.bigEnd()[AMREX_SPACEDIM - 1] + 1;
     }
 
     // vectors store the multilevel 1D states as one very long array
     // these are cell-centered
     // base states are stored
-    s0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine, Nscal);
-    p0_init      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    rho0_old     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    rho0_new     .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    rhoh0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    rhoh0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    p0_old       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    p0_new       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    p0_nm1       .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    tempbar      .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    tempbar_init .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    beta0_old    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    beta0_new    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    beta0_nm1    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    gamma1bar_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    gamma1bar_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    grav_cell_old.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    grav_cell_new.resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    etarho_cc    .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
-    psi          .resize(base_geom.max_radial_level+1, base_geom.nr_fine);
+    s0_init.resize(base_geom.max_radial_level + 1, base_geom.nr_fine, Nscal);
+    p0_init.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    rho0_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    rho0_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    rhoh0_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    rhoh0_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    p0_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    p0_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    p0_nm1.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    tempbar.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    tempbar_init.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    beta0_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    beta0_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    beta0_nm1.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    gamma1bar_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    gamma1bar_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    grav_cell_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    grav_cell_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    etarho_cc.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    psi.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered
-    w0.resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
-    etarho_ec .resize(base_geom.max_radial_level+1, base_geom.nr_fine+1);
+    w0.resize(base_geom.max_radial_level + 1, base_geom.nr_fine + 1);
+    etarho_ec.resize(base_geom.max_radial_level + 1, base_geom.nr_fine + 1);
 
     // tagged box array for multilevel (planar)
-    tag_array .resize( (base_geom.max_radial_level+1)*base_geom.nr_fine );
+    tag_array.resize((base_geom.max_radial_level + 1) * base_geom.nr_fine);
     // tag_array_b.resize(base_geom.max_radial_level+1,base_geom.nr_fine);
 
     // diag file data arrays
-    diagfile1_data.resize(diag_buf_size*11);
-    diagfile2_data.resize(diag_buf_size*11);
-    diagfile3_data.resize(diag_buf_size*10);
+    diagfile1_data.resize(diag_buf_size * 11);
+    diagfile2_data.resize(diag_buf_size * 11);
+    diagfile3_data.resize(diag_buf_size * 10);
 
     // make sure C++ is as efficient as possible with memory usage
-    tag_array    .shrink_to_fit();
+    tag_array.shrink_to_fit();
     diagfile1_data.shrink_to_fit();
     diagfile2_data.shrink_to_fit();
     diagfile3_data.shrink_to_fit();
 
     // InitBaseStateGeometry(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg);
-    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine, base_geom.dr_fine, base_geom.nr_irreg, geom, max_level, center);
+    base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine,
+                   base_geom.dr_fine, base_geom.nr_irreg, geom, max_level,
+                   center);
 
-    if (use_exact_base_state) { average_base_state = true; }
+    if (use_exact_base_state) {
+        average_base_state = true;
+    }
 
     // No valid BoxArray and DistributionMapping have been defined.
     // But the arrays for them have been resized.
@@ -170,27 +176,27 @@ Maestro::Setup ()
     dt = 1.e100;
     dtold = 1.e100;
 
-    sold              .resize(max_level+1);
-    snew              .resize(max_level+1);
-    uold              .resize(max_level+1);
-    unew              .resize(max_level+1);
-    S_cc_old          .resize(max_level+1);
-    S_cc_new          .resize(max_level+1);
-    gpi               .resize(max_level+1);
-    dSdt              .resize(max_level+1);
-    pi                .resize(max_level+1);
-    intra             .resize(max_level+1);
-    w0_cart           .resize(max_level+1);
-    rhcc_for_nodalproj.resize(max_level+1);
-    normal            .resize(max_level+1);
-    cell_cc_to_r      .resize(max_level+1);
+    sold.resize(max_level + 1);
+    snew.resize(max_level + 1);
+    uold.resize(max_level + 1);
+    unew.resize(max_level + 1);
+    S_cc_old.resize(max_level + 1);
+    S_cc_new.resize(max_level + 1);
+    gpi.resize(max_level + 1);
+    dSdt.resize(max_level + 1);
+    pi.resize(max_level + 1);
+    intra.resize(max_level + 1);
+    w0_cart.resize(max_level + 1);
+    rhcc_for_nodalproj.resize(max_level + 1);
+    normal.resize(max_level + 1);
+    cell_cc_to_r.resize(max_level + 1);
 
     // stores fluxes at coarse-fine interface for synchronization
     // this will be sized "max_level+2"
     // NOTE: the flux register associated with flux_reg[lev] is associated
     // with the lev/lev-1 interface (and has grid spacing associated with lev-1)
     // therefore flux_reg[0] is never actually used in the reflux operation
-    flux_reg_s.resize(max_level+2);
+    flux_reg_s.resize(max_level + 2);
 
     // number of ghost cells needed for hyperbolic step
     if (ppm_type == 2 || bds_type == 1) {
@@ -205,18 +211,19 @@ Maestro::Setup ()
     // if do_smallscale check other parameters for consistency
 
     if (do_smallscale && (beta0_type != 3 || evolve_base_state)) {
-      std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and evolve_base_state = F" << std::endl;
-      std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
-      std::cerr << "    beta0_type = " << beta0_type << std::endl;
-      std::cerr << "    evolve_base_state = " << evolve_base_state << std::endl;
-      Error();
+        std::cerr << "Error: do_smallscale = T requires beta0_type = 3 and "
+                     "evolve_base_state = F"
+                  << std::endl;
+        std::cerr << "    do_smallscale = " << do_smallscale << std::endl;
+        std::cerr << "    beta0_type = " << beta0_type << std::endl;
+        std::cerr << "    evolve_base_state = " << evolve_base_state
+                  << std::endl;
+        Error();
     }
 }
 
 // read in some parameters from inputs file
-void
-Maestro::ReadParameters ()
-{
+void Maestro::ReadParameters() {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReadParameters()", ReadParameters);
 
@@ -239,18 +246,17 @@ Maestro::ReadParameters ()
     // storey boundary conditions in a single array
     // order shall be
     // LO_X, LO_Y, (LO_Z), HI_X, HI_Y, (HI_Z)
-    phys_bc.resize(2*AMREX_SPACEDIM);
-    for (int i=0; i<AMREX_SPACEDIM; ++i) {
-        phys_bc[i]                = lo_bc[i];
-        phys_bc[i+AMREX_SPACEDIM] = hi_bc[i];
+    phys_bc.resize(2 * AMREX_SPACEDIM);
+    for (int i = 0; i < AMREX_SPACEDIM; ++i) {
+        phys_bc[i] = lo_bc[i];
+        phys_bc[i + AMREX_SPACEDIM] = hi_bc[i];
     }
 }
 
 // define variable mappings (Rho, RhoH, ..., Nscal, etc.)
-void Maestro::VariableSetup ()
-{
+void Maestro::VariableSetup() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::VariableSetup()",VariableSetup);
+    BL_PROFILE_VAR("Maestro::VariableSetup()", VariableSetup);
 
     Print() << "Calling VariableSetup()" << std::endl;
 
@@ -261,9 +267,7 @@ void Maestro::VariableSetup ()
     }
 }
 
-void
-Maestro::ExternInit ()
-{
+void Maestro::ExternInit() {
     // initialize the external runtime parameters -- these will
     // live in the probin
 
@@ -278,17 +282,15 @@ Maestro::ExternInit ()
 }
 
 // set up BCRec definitions for BC types
-void
-Maestro::BCSetup()
-{
+void Maestro::BCSetup() {
     // timer for profiling
-    BL_PROFILE_VAR("Maestro::BCSetup()",BCSetup);
+    BL_PROFILE_VAR("Maestro::BCSetup()", BCSetup);
 
     Print() << "Calling BCSetup()" << std::endl;
 
-    bcs_s.resize(Nscal);          // scalars
-    bcs_u.resize(AMREX_SPACEDIM); // velocitiy
-    bcs_f.resize(Nscal);          // a vector of "first-order extrap"
+    bcs_s.resize(Nscal);           // scalars
+    bcs_u.resize(AMREX_SPACEDIM);  // velocitiy
+    bcs_f.resize(Nscal);           // a vector of "first-order extrap"
 
     // Check phys_bc against possible periodic geometry
     // if periodic, must have internal BC marked.
@@ -297,16 +299,18 @@ Maestro::BCSetup()
         //
         // Do idiot check.  Periodic means interior in those directions.
         //
-        for (int dir = 0; dir<AMREX_SPACEDIM; dir++) {
+        for (int dir = 0; dir < AMREX_SPACEDIM; dir++) {
             if (Geom(0).isPeriodic(dir)) {
                 if (phys_bc[dir] != Interior) {
-                    std::cerr << "Maestro::ReadParameters:periodic in direction "
-                              << dir << " but low BC is not Interior\n";
+                    std::cerr
+                        << "Maestro::ReadParameters:periodic in direction "
+                        << dir << " but low BC is not Interior\n";
                     Error();
                 }
-                if (phys_bc[AMREX_SPACEDIM+dir] != Interior) {
-                    std::cerr << "Maestro::ReadParameters:periodic in direction "
-                              << dir << " but high BC is not Interior\n";
+                if (phys_bc[AMREX_SPACEDIM + dir] != Interior) {
+                    std::cerr
+                        << "Maestro::ReadParameters:periodic in direction "
+                        << dir << " but high BC is not Interior\n";
                     Error();
                 }
             }
@@ -315,13 +319,13 @@ Maestro::BCSetup()
         //
         // Do idiot check.  If not periodic, should be no interior.
         //
-        for (int dir=0; dir<AMREX_SPACEDIM; dir++) {
+        for (int dir = 0; dir < AMREX_SPACEDIM; dir++) {
             if (phys_bc[dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
             }
-            if (phys_bc[AMREX_SPACEDIM+dir] == Interior) {
+            if (phys_bc[AMREX_SPACEDIM + dir] == Interior) {
                 std::cerr << "Maestro::ReadParameters:interior bc in direction "
                           << dir << " but not periodic\n";
                 Error();
@@ -331,98 +335,97 @@ Maestro::BCSetup()
 
     // set up boundary conditions for Fillpatch operations
     for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
-
         // lo-side bcs
         if (phys_bc[dir] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::int_dir);
-                bcs_s[RhoH].setLo(dir, BCType::int_dir);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setLo(dir, BCType::int_dir);
+            bcs_s[RhoH].setLo(dir, BCType::int_dir);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::int_dir);
             }
-                bcs_s[Temp].setLo(dir, BCType::int_dir);
-                bcs_s[Pi  ].setLo(dir, BCType::int_dir);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::int_dir);
+            bcs_s[Pi].setLo(dir, BCType::int_dir);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::int_dir);
             }
         } else if (phys_bc[dir] == Inflow) {
             // inflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::ext_dir);
-                bcs_s[RhoH].setLo(dir, BCType::ext_dir);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setLo(dir, BCType::ext_dir);
+            bcs_s[RhoH].setLo(dir, BCType::ext_dir);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Temp].setLo(dir, BCType::ext_dir);
-                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::ext_dir);
+            bcs_s[Pi].setLo(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         } else if (phys_bc[dir] == Outflow) {
             // outflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setLo(dir, BCType::foextrap);
-                bcs_s[RhoH].setLo(dir, BCType::foextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setLo(dir, BCType::foextrap);
+            bcs_s[RhoH].setLo(dir, BCType::foextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setLo(dir, BCType::foextrap);
-                bcs_s[Pi  ].setLo(dir, BCType::ext_dir);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::foextrap);
+            bcs_s[Pi].setLo(dir, BCType::ext_dir);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         } else if (phys_bc[dir] == Symmetry) {
             // symmetry
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::reflect_even);
             }
-                bcs_u[dir ].setLo(dir, BCType::reflect_odd);
-                bcs_s[Rho ].setLo(dir, BCType::reflect_even);
-                bcs_s[RhoH].setLo(dir, BCType::reflect_even);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_u[dir].setLo(dir, BCType::reflect_odd);
+            bcs_s[Rho].setLo(dir, BCType::reflect_even);
+            bcs_s[RhoH].setLo(dir, BCType::reflect_even);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::reflect_even);
             }
-                bcs_s[Temp].setLo(dir, BCType::reflect_even);
-                bcs_s[Pi  ].setLo(dir, BCType::reflect_even);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::reflect_even);
+            bcs_s[Pi].setLo(dir, BCType::reflect_even);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::reflect_even);
             }
         } else if (phys_bc[dir] == SlipWall) {
             // slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::hoextrap);
             }
-                bcs_u[dir ].setLo(dir, BCType::ext_dir);
-                bcs_s[Rho ].setLo(dir, BCType::hoextrap);
-                bcs_s[RhoH].setLo(dir, BCType::hoextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_u[dir].setLo(dir, BCType::ext_dir);
+            bcs_s[Rho].setLo(dir, BCType::hoextrap);
+            bcs_s[RhoH].setLo(dir, BCType::hoextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setLo(dir, BCType::hoextrap);
-                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::hoextrap);
+            bcs_s[Pi].setLo(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         } else if (phys_bc[dir] == NoSlipWall) {
             // no-slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setLo(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setLo(dir, BCType::hoextrap);
-                bcs_s[RhoH].setLo(dir, BCType::hoextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setLo(dir, BCType::hoextrap);
+            bcs_s[RhoH].setLo(dir, BCType::hoextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setLo(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setLo(dir, BCType::hoextrap);
-                bcs_s[Pi  ].setLo(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setLo(dir, BCType::hoextrap);
+            bcs_s[Pi].setLo(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setLo(dir, BCType::foextrap);
             }
         } else {
@@ -430,100 +433,100 @@ Maestro::BCSetup()
         }
 
         // hi-side bcs
-        if (phys_bc[AMREX_SPACEDIM+dir] == Interior) {
+        if (phys_bc[AMREX_SPACEDIM + dir] == Interior) {
             // periodic uses "internal Dirichlet"
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::int_dir);
-                bcs_s[RhoH].setHi(dir, BCType::int_dir);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setHi(dir, BCType::int_dir);
+            bcs_s[RhoH].setHi(dir, BCType::int_dir);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::int_dir);
             }
-                bcs_s[Temp].setHi(dir, BCType::int_dir);
-                bcs_s[Pi  ].setHi(dir, BCType::int_dir);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::int_dir);
+            bcs_s[Pi].setHi(dir, BCType::int_dir);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::int_dir);
             }
-        } else if (phys_bc[AMREX_SPACEDIM+dir] == Inflow) {
+        } else if (phys_bc[AMREX_SPACEDIM + dir] == Inflow) {
             // inflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::ext_dir);
-                bcs_s[RhoH].setHi(dir, BCType::ext_dir);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setHi(dir, BCType::ext_dir);
+            bcs_s[RhoH].setHi(dir, BCType::ext_dir);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Temp].setHi(dir, BCType::ext_dir);
-                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::ext_dir);
+            bcs_s[Pi].setHi(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        } else if (phys_bc[AMREX_SPACEDIM+dir] == Outflow) {
+        } else if (phys_bc[AMREX_SPACEDIM + dir] == Outflow) {
             // outflow
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Rho ].setHi(dir, BCType::foextrap);
-                bcs_s[RhoH].setHi(dir, BCType::foextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setHi(dir, BCType::foextrap);
+            bcs_s[RhoH].setHi(dir, BCType::foextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::foextrap);
             }
-                bcs_s[Temp].setHi(dir, BCType::foextrap);
-                bcs_s[Pi  ].setHi(dir, BCType::ext_dir);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::foextrap);
+            bcs_s[Pi].setHi(dir, BCType::ext_dir);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        } else if (phys_bc[AMREX_SPACEDIM+dir] == Symmetry) {
+        } else if (phys_bc[AMREX_SPACEDIM + dir] == Symmetry) {
             // symmetry
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::reflect_even);
             }
-                bcs_u[dir].setHi(dir, BCType::reflect_odd);
-                bcs_s[Rho ].setHi(dir, BCType::reflect_even);
-                bcs_s[RhoH].setHi(dir, BCType::reflect_even);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_u[dir].setHi(dir, BCType::reflect_odd);
+            bcs_s[Rho].setHi(dir, BCType::reflect_even);
+            bcs_s[RhoH].setHi(dir, BCType::reflect_even);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::reflect_even);
             }
-                bcs_s[Temp].setHi(dir, BCType::reflect_even);
-                bcs_s[Pi  ].setHi(dir, BCType::reflect_even);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::reflect_even);
+            bcs_s[Pi].setHi(dir, BCType::reflect_even);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::reflect_even);
             }
-        } else if (phys_bc[AMREX_SPACEDIM+dir] == SlipWall) {
+        } else if (phys_bc[AMREX_SPACEDIM + dir] == SlipWall) {
             // slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::hoextrap);
             }
-                bcs_u[dir].setHi(dir, BCType::ext_dir);
-                bcs_s[Rho ].setHi(dir, BCType::hoextrap);
-                bcs_s[RhoH].setHi(dir, BCType::hoextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_u[dir].setHi(dir, BCType::ext_dir);
+            bcs_s[Rho].setHi(dir, BCType::hoextrap);
+            bcs_s[RhoH].setHi(dir, BCType::hoextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setHi(dir, BCType::hoextrap);
-                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::hoextrap);
+            bcs_s[Pi].setHi(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
-        } else if (phys_bc[AMREX_SPACEDIM+dir] == NoSlipWall) {
+        } else if (phys_bc[AMREX_SPACEDIM + dir] == NoSlipWall) {
             // no-slip wall
-            for (int comp=0; comp<AMREX_SPACEDIM; ++comp) {
+            for (int comp = 0; comp < AMREX_SPACEDIM; ++comp) {
                 bcs_u[comp].setHi(dir, BCType::ext_dir);
             }
-                bcs_s[Rho ].setHi(dir, BCType::hoextrap);
-                bcs_s[RhoH].setHi(dir, BCType::hoextrap);
-            for (int comp=FirstSpec; comp<FirstSpec+NumSpec; ++comp) {
+            bcs_s[Rho].setHi(dir, BCType::hoextrap);
+            bcs_s[RhoH].setHi(dir, BCType::hoextrap);
+            for (int comp = FirstSpec; comp < FirstSpec + NumSpec; ++comp) {
                 bcs_s[comp].setHi(dir, BCType::hoextrap);
             }
-                bcs_s[Temp].setHi(dir, BCType::hoextrap);
-                bcs_s[Pi  ].setHi(dir, BCType::foextrap);
-            for (int comp=0; comp<Nscal; ++comp) {
+            bcs_s[Temp].setHi(dir, BCType::hoextrap);
+            bcs_s[Pi].setHi(dir, BCType::foextrap);
+            for (int comp = 0; comp < Nscal; ++comp) {
                 bcs_f[comp].setHi(dir, BCType::foextrap);
             }
         } else {
             Abort("Invalid hi_bc");
         }
-    } // end loop over directions
+    }  // end loop over directions
 }

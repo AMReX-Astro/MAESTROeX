@@ -2,7 +2,5 @@
 
 namespace maestro {
 
-std::string 
-trim(const std::string& str);
-
+std::string trim(const std::string& str);
 }
