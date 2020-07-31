@@ -15,7 +15,7 @@ void Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
 
     fab_filcc(bx, scal, 1, domainBox, dx, gridlo, &bcs);
 
-    FillExtBC(scal, bx, domainBox, bcs, comp, false);
+    FillExtBC(scal, bx, domainBox, dx, bcs, comp, false);
 }
 
 void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
@@ -26,12 +26,12 @@ void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
 
     fab_filcc(bx, vel, 1, domainBox, dx, gridlo, &bcs);
 
-    FillExtBC(vel, bx, domainBox, bcs, comp, true);
+    FillExtBC(vel, bx, domainBox, dx, bcs, comp, true);
 }
 
 void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
-                        const Box& domainBox, const BCRec bcs, const int comp,
-                        const bool is_vel) {
+                        const Box& domainBox, const Real* dx, const BCRec bcs,
+                        const int comp, const bool is_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillExtBC()", FillExtBC);
 
@@ -72,7 +72,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[0] > domhi[0]) {
-        auto imin = domhi[0] + 1;
+        auto imin = domhi[0];
 
         if (bcs.hi(0) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
@@ -108,7 +108,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[1] > domhi[1]) {
-        auto jmin = domhi[1] + 1;
+        auto jmin = domhi[1];
 
         if (bcs.hi(1) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
@@ -146,7 +146,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[2] > domhi[2]) {
-        auto kmin = domhi[2] + 1;
+        auto kmin = domhi[2];
 
         if (bcs.hi(2) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {

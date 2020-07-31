@@ -81,7 +81,7 @@ contains
     allocate(nr_irreg)
 
     max_radial_level = max_radial_level_in
-    finest_radial_level = max_radial_level ! FIXME - we want to set this after regridding
+    finest_radial_level = 0
     nr_fine = nr_fine_in
     dr_fine = dr_fine_in
     nr_irreg = nr_irreg_in

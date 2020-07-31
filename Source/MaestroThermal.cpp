@@ -46,7 +46,8 @@ void Maestro::MakeExplicitThermal(
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -159,7 +160,8 @@ void Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -312,6 +314,12 @@ void Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
                         eos_state.xn[comp] =
                             scal_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
                     }
+#if NAUX_NET > 0
+                    for (auto comp = 0; comp < NumAux; ++comp) {
+                        eos_state.aux[comp] =
+                            scal_arr(i, j, k, FirstAux + comp) / eos_state.rho;
+                    }
+#endif
 
                     // dens, temp and xmass are inputs
                     eos(eos_input_rt, eos_state);
@@ -432,7 +440,9 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -624,7 +634,9 @@ void Maestro::ThermalConductSDC(
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
