@@ -408,7 +408,7 @@ void Maestro::VelPredInterface(
         // Note: utrans already contains w0
         uimhx(i, j, k, 1) =
             utrans(i, j, k) > 0.0 ? ulx(i, j, k, 1) : urx(i, j, k, 1);
-        uimhx(i, j, k, 1) = fabs(utrans(i, j, k)) < rel_eps_local
+        uimhx(i, j, k, 1) = amrex::Math::abs(utrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (ulx(i, j, k, 1) + urx(i, j, k, 1))
                                 : uimhx(i, j, k, 1);
     });
@@ -507,7 +507,7 @@ void Maestro::VelPredInterface(
         // Note: utrans already contains w0
         uimhy(i, j, k, 0) =
             vtrans(i, j, k) > 0.0 ? uly(i, j, k, 0) : ury(i, j, k, 0);
-        uimhy(i, j, k, 0) = fabs(vtrans(i, j, k)) < rel_eps_local
+        uimhy(i, j, k, 0) = amrex::Math::abs(vtrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (uly(i, j, k, 0) + ury(i, j, k, 0))
                                 : uimhy(i, j, k, 0);
     });
@@ -569,7 +569,7 @@ void Maestro::VelPredVelocities(
         // solve Riemann problem using full velocity
         umac(i, j, k) = 0.5 * (umacl + umacr) > 0.0 ? umacl : umacr;
         umac(i, j, k) = (umacl <= 0.0 && umacr >= 0.0) ||
-                                (fabs(umacl + umacr) < rel_eps_local)
+                                (amrex::Math::abs(umacl + umacr) < rel_eps_local)
                             ? 0.0
                             : umac(i, j, k);
 
@@ -636,7 +636,7 @@ void Maestro::VelPredVelocities(
         bool test =
             (vmacl + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
              vmacr + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-            (fabs(vmacl + vmacr + 2 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
+            (amrex::Math::abs(vmacl + vmacr + 2 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
              rel_eps_local);
         vmac(i, j, k) =
             0.5 * (vmacl + vmacr) + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >
@@ -824,13 +824,13 @@ void Maestro::VelPredInterface(
         // Note: utrans already contains w0
         uimhx(i, j, k, 1) =
             utrans(i, j, k) > 0.0 ? ulx(i, j, k, 1) : urx(i, j, k, 1);
-        uimhx(i, j, k, 1) = fabs(utrans(i, j, k)) < rel_eps_local
+        uimhx(i, j, k, 1) = amrex::Math::abs(utrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (ulx(i, j, k, 1) + urx(i, j, k, 1))
                                 : uimhx(i, j, k, 1);
 
         uimhx(i, j, k, 2) =
             utrans(i, j, k) > 0.0 ? ulx(i, j, k, 2) : urx(i, j, k, 2);
-        uimhx(i, j, k, 2) = fabs(utrans(i, j, k)) < rel_eps_local
+        uimhx(i, j, k, 2) = amrex::Math::abs(utrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (ulx(i, j, k, 2) + urx(i, j, k, 2))
                                 : uimhx(i, j, k, 2);
     });
@@ -934,13 +934,13 @@ void Maestro::VelPredInterface(
         // Note: vtrans already contains w0
         uimhy(i, j, k, 0) =
             vtrans(i, j, k) > 0.0 ? uly(i, j, k, 0) : ury(i, j, k, 0);
-        uimhy(i, j, k, 0) = fabs(vtrans(i, j, k)) < rel_eps_local
+        uimhy(i, j, k, 0) = amrex::Math::abs(vtrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (uly(i, j, k, 0) + ury(i, j, k, 0))
                                 : uimhy(i, j, k, 0);
 
         uimhy(i, j, k, 2) =
             vtrans(i, j, k) > 0.0 ? uly(i, j, k, 2) : ury(i, j, k, 2);
-        uimhy(i, j, k, 2) = fabs(vtrans(i, j, k)) < rel_eps_local
+        uimhy(i, j, k, 2) = amrex::Math::abs(vtrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (uly(i, j, k, 2) + ury(i, j, k, 2))
                                 : uimhy(i, j, k, 2);
     });
@@ -1044,13 +1044,13 @@ void Maestro::VelPredInterface(
         // Note: wtrans already contains w0
         uimhz(i, j, k, 0) =
             wtrans(i, j, k) > 0.0 ? ulz(i, j, k, 0) : urz(i, j, k, 0);
-        uimhz(i, j, k, 0) = fabs(wtrans(i, j, k)) < rel_eps_local
+        uimhz(i, j, k, 0) = amrex::Math::abs(wtrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (ulz(i, j, k, 0) + urz(i, j, k, 0))
                                 : uimhz(i, j, k, 0);
 
         uimhz(i, j, k, 1) =
             wtrans(i, j, k) > 0.0 ? ulz(i, j, k, 1) : urz(i, j, k, 1);
-        uimhz(i, j, k, 1) = fabs(wtrans(i, j, k)) < rel_eps_local
+        uimhz(i, j, k, 1) = amrex::Math::abs(wtrans(i, j, k)) < rel_eps_local
                                 ? 0.5 * (ulz(i, j, k, 1) + urz(i, j, k, 1))
                                 : uimhz(i, j, k, 1);
     });
@@ -1146,7 +1146,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         uimhyz(i, j, k) = vtrans(i, j, k) > 0.0 ? ulyz : uryz;
-        uimhyz(i, j, k) = fabs(vtrans(i, j, k)) < rel_eps_local
+        uimhyz(i, j, k) = amrex::Math::abs(vtrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (ulyz + uryz)
                               : uimhyz(i, j, k);
     });
@@ -1208,7 +1208,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         uimhzy(i, j, k) = wtrans(i, j, k) > 0.0 ? ulzy : urzy;
-        uimhzy(i, j, k) = fabs(wtrans(i, j, k)) < rel_eps_local
+        uimhzy(i, j, k) = amrex::Math::abs(wtrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (ulzy + urzy)
                               : uimhzy(i, j, k);
     });
@@ -1270,7 +1270,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         vimhxz(i, j, k) = utrans(i, j, k) > 0.0 ? vlxz : vrxz;
-        vimhxz(i, j, k) = fabs(utrans(i, j, k)) < rel_eps_local
+        vimhxz(i, j, k) = amrex::Math::abs(utrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (vlxz + vrxz)
                               : vimhxz(i, j, k);
     });
@@ -1332,7 +1332,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         vimhzx(i, j, k) = wtrans(i, j, k) > 0.0 ? vlzx : vrzx;
-        vimhzx(i, j, k) = fabs(wtrans(i, j, k)) < rel_eps_local
+        vimhzx(i, j, k) = amrex::Math::abs(wtrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (vlzx + vrzx)
                               : vimhzx(i, j, k);
     });
@@ -1394,7 +1394,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         wimhxy(i, j, k) = utrans(i, j, k) > 0.0 ? wlxy : wrxy;
-        wimhxy(i, j, k) = fabs(utrans(i, j, k)) < rel_eps_local
+        wimhxy(i, j, k) = amrex::Math::abs(utrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (wlxy + wrxy)
                               : wimhxy(i, j, k);
     });
@@ -1456,7 +1456,7 @@ void Maestro::VelPredTransverse(
 
         // upwind using full velocity
         wimhyx(i, j, k) = vtrans(i, j, k) > 0.0 ? wlyx : wryx;
-        wimhyx(i, j, k) = fabs(vtrans(i, j, k)) < rel_eps_local
+        wimhyx(i, j, k) = amrex::Math::abs(vtrans(i, j, k)) < rel_eps_local
                               ? 0.5 * (wlyx + wryx)
                               : wimhyx(i, j, k);
     });
@@ -1535,14 +1535,14 @@ void Maestro::VelPredVelocities(
             bool test =
                 (umacl + w0macx(i, j, k) <= 0.0 &&
                  umacr + w0macx(i, j, k) >= 0.0) ||
-                (fabs(umacl + umacr + 2.0 * w0macx(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(umacl + umacr + 2.0 * w0macx(i, j, k)) < rel_eps_local);
             umac(i, j, k) =
                 0.5 * (umacl + umacr) + w0macx(i, j, k) > 0.0 ? umacl : umacr;
             umac(i, j, k) = test ? 0.0 : umac(i, j, k);
         } else {
             // solve Riemann problem using full velocity
             bool test = (umacl <= 0.0 && umacr >= 0.0) ||
-                        (fabs(umacl + umacr) < rel_eps_local);
+                        (amrex::Math::abs(umacl + umacr) < rel_eps_local);
             umac(i, j, k) = 0.5 * (umacl + umacr) > 0.0 ? umacl : umacr;
             umac(i, j, k) = test ? 0.0 : umac(i, j, k);
         }
@@ -1612,14 +1612,14 @@ void Maestro::VelPredVelocities(
             bool test =
                 (vmacl + w0macy(i, j, k) <= 0.0 &&
                  vmacr + w0macy(i, j, k) >= 0.0) ||
-                (fabs(vmacl + vmacr + 2.0 * w0macy(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(vmacl + vmacr + 2.0 * w0macy(i, j, k)) < rel_eps_local);
             vmac(i, j, k) =
                 0.5 * (vmacl + vmacr) + w0macy(i, j, k) > 0.0 ? vmacl : vmacr;
             vmac(i, j, k) = test ? 0.0 : vmac(i, j, k);
         } else {
             // solve Riemann problem using full velocity
             bool test = (vmacl <= 0.0 && vmacr >= 0.0) ||
-                        (fabs(vmacl + vmacr) < rel_eps_local);
+                        (amrex::Math::abs(vmacl + vmacr) < rel_eps_local);
             vmac(i, j, k) = 0.5 * (vmacl + vmacr) > 0.0 ? vmacl : vmacr;
             vmac(i, j, k) = test ? 0.0 : vmac(i, j, k);
         }
@@ -1689,7 +1689,7 @@ void Maestro::VelPredVelocities(
             bool test =
                 (wmacl + w0macz(i, j, k) <= 0.0 &&
                  wmacr + w0macz(i, j, k) >= 0.0) ||
-                (fabs(wmacl + wmacr + 2.0 * w0macz(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(wmacl + wmacr + 2.0 * w0macz(i, j, k)) < rel_eps_local);
             wmac(i, j, k) =
                 0.5 * (wmacl + wmacr) + w0macz(i, j, k) > 0.0 ? wmacl : wmacr;
             wmac(i, j, k) = test ? 0.0 : wmac(i, j, k);
@@ -1698,7 +1698,7 @@ void Maestro::VelPredVelocities(
             bool test =
                 (wmacl + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                  wmacr + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-                (fabs(wmacl + wmacr +
+                (amrex::Math::abs(wmacl + wmacr +
                       2.0 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
                  rel_eps_local);
             wmac(i, j, k) =

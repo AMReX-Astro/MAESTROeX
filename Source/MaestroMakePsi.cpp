@@ -17,7 +17,7 @@ void Maestro::MakePsiPlanar() {
             for (auto r = base_geom.r_start_coord(n, i);
                  r <= base_geom.r_end_coord(n, i); ++r) {
                 if (r < base_geom.base_cutoff_density_coord(n)) {
-                    psi_arr(n, r) = etarho_cc_arr(n, r) * fabs(grav_const);
+                    psi_arr(n, r) = etarho_cc_arr(n, r) * amrex::Math::abs(grav_const);
                 }
             }
         }

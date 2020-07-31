@@ -315,10 +315,10 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             if (print_init_hse_diag) {
                 Print() << "r, dpdr, rhog, err: " << rloc << ", " << dpdr
                         << ", " << rhog << ", "
-                        << fabs(dpdr - rhog) / fabs(rhog) << std::endl;
+                        << amrex::Math::abs(dpdr - rhog) / amrex::Math::abs(rhog) << std::endl;
             }
 
-            max_hse_error = max(max_hse_error, fabs(dpdr - rhog) / fabs(rhog));
+            max_hse_error = max(max_hse_error, amrex::Math::abs(dpdr - rhog) / amrex::Math::abs(rhog));
         }
     }
 

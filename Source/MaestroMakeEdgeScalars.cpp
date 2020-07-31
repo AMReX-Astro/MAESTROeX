@@ -383,7 +383,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhx by solving Riemann problem
         simhx(i, j, k) = (umac(i, j, k) > 0.0) ? slx(i, j, k) : srx(i, j, k);
-        simhx(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhx(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                              ? simhx(i, j, k)
                              : 0.5 * (slx(i, j, k) + srx(i, j, k));
     });
@@ -442,7 +442,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhy by solving Riemann problem
         simhy(i, j, k) = (vmac(i, j, k) > 0.0) ? sly(i, j, k) : sry(i, j, k);
-        simhy(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhy(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                              ? simhy(i, j, k)
                              : 0.5 * (sly(i, j, k) + sry(i, j, k));
     });
@@ -520,7 +520,7 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (fabs(umac(i, j, k)) > rel_eps_local)
+        sedgex(i, j, k, comp) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                                     ? sedgex(i, j, k, comp)
                                     : 0.5 * (sedgelx + sedgerx);
 
@@ -599,7 +599,7 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        sedgey(i, j, k, comp) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                                     ? sedgey(i, j, k, comp)
                                     : 0.5 * (sedgely + sedgery);
 
@@ -738,7 +738,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhx by solving Riemann problem
         simhx(i, j, k) = (umac(i, j, k) > 0.0) ? slx(i, j, k) : srx(i, j, k);
-        simhx(i, j, k) = (fabs(umac(i, j, k)) > 0.0)
+        simhx(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > 0.0)
                              ? simhx(i, j, k)
                              : 0.5 * (slx(i, j, k) + srx(i, j, k));
     });
@@ -795,7 +795,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhy by solving Riemann problem
         simhy(i, j, k) = (vmac(i, j, k) > 0.0) ? sly(i, j, k) : sry(i, j, k);
-        simhy(i, j, k) = (fabs(vmac(i, j, k)) > 0.0)
+        simhy(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > 0.0)
                              ? simhy(i, j, k)
                              : 0.5 * (sly(i, j, k) + sry(i, j, k));
     });
@@ -851,7 +851,7 @@ void Maestro::MakeEdgeScalPredictor(
         }
 
         simhz(i, j, k) = (wmac(i, j, k) > 0.0) ? slz(i, j, k) : srz(i, j, k);
-        simhz(i, j, k) = (fabs(wmac(i, j, k)) > 0.0)
+        simhz(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > 0.0)
                              ? simhz(i, j, k)
                              : 0.5 * (slz(i, j, k) + srz(i, j, k));
     });
@@ -961,7 +961,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhxy(i, j, k) = (umac(i, j, k) > 0.0) ? slxy : srxy;
-        simhxy(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhxy(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                               ? simhxy(i, j, k)
                               : 0.5 * (slxy + srxy);
     });
@@ -1037,7 +1037,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhxz(i, j, k) = (umac(i, j, k) > 0.0) ? slxz : srxz;
-        simhxz(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhxz(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                               ? simhxz(i, j, k)
                               : 0.5 * (slxz + srxz);
     });
@@ -1116,7 +1116,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhyx(i, j, k) = (vmac(i, j, k) > 0.0) ? slyx : sryx;
-        simhyx(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhyx(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                               ? simhyx(i, j, k)
                               : 0.5 * (slyx + sryx);
     });
@@ -1192,7 +1192,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhyz by solving Riemann problem
         simhyz(i, j, k) = (vmac(i, j, k) > 0.0) ? slyz : sryz;
-        simhyz(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhyz(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                               ? simhyz(i, j, k)
                               : 0.5 * (slyz + sryz);
     });
@@ -1271,7 +1271,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhzx by solving Riemann problem
         simhzx(i, j, k) = (wmac(i, j, k) > 0.0) ? slzx : srzx;
-        simhzx(i, j, k) = (fabs(wmac(i, j, k)) > rel_eps_local)
+        simhzx(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
                               ? simhzx(i, j, k)
                               : 0.5 * (slzx + srzx);
     });
@@ -1347,7 +1347,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhzy by solving Riemann problem
         simhzy(i, j, k) = (wmac(i, j, k) > 0.0) ? slzy : srzy;
-        simhzy(i, j, k) = (fabs(wmac(i, j, k)) > rel_eps_local)
+        simhzy(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
                               ? simhzy(i, j, k)
                               : 0.5 * (slzy + srzy);
     });
@@ -1441,7 +1441,7 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (fabs(umac(i, j, k)) > rel_eps_local)
+        sedgex(i, j, k, comp) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                                     ? sedgex(i, j, k, comp)
                                     : 0.5 * (sedgelx + sedgerx);
 
@@ -1530,7 +1530,7 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        sedgey(i, j, k, comp) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                                     ? sedgey(i, j, k, comp)
                                     : 0.5 * (sedgely + sedgery);
 
@@ -1619,7 +1619,7 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgez by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgez(i, j, k, comp) = (wmac(i, j, k) > 0.0) ? sedgelz : sedgerz;
-        sedgez(i, j, k, comp) = (fabs(wmac(i, j, k)) > rel_eps_local)
+        sedgez(i, j, k, comp) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
                                     ? sedgez(i, j, k, comp)
                                     : 0.5 * (sedgelz + sedgerz);
 

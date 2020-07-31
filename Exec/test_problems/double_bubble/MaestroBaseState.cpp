@@ -30,7 +30,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     // compute the pressure scale height (for an isothermal, ideal-gas
     // atmosphere)
-    Real H = pres_base / dens_base / fabs(grav_const);
+    Real H = pres_base / dens_base / amrex::Math::abs(grav_const);
 
     eos_t eos_state;
 
@@ -86,7 +86,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             p0_init_arr(lev, r - 1) -
             base_geom.dr(lev) * 0.5 *
                 (s0_init_arr(lev, r, Rho) + s0_init_arr(lev, r - 1, Rho)) *
-                fabs(grav_const);
+                amrex::Math::abs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.T = temp_zone;
@@ -141,7 +141,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                     grav_const;
 
         max_hse_error =
-            std::max(max_hse_error, fabs(dpdr - rhog) / fabs(dpdr));
+            std::max(max_hse_error, amrex::Math::abs(dpdr - rhog) / amrex::Math::abs(dpdr));
     }
 
     Print() << " " << std::endl;

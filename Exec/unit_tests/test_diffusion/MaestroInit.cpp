@@ -157,7 +157,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
 
                 temp_zone += del_temp;
 
-                if (fabs(del_temp) < tol * temp_zone) {
+                if (amrex::Math::abs(del_temp) < tol * temp_zone) {
                     converged = true;
                     break;
                 }

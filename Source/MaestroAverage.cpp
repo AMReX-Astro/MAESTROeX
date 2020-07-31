@@ -238,8 +238,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg) {
-                            if (fabs(radius - radii(lev, index + 1)) >
-                                fabs(radius - radii(lev, index + 2))) {
+                            if (amrex::Math::abs(radius - radii(lev, index + 1)) >
+                                amrex::Math::abs(radius - radii(lev, index + 2))) {
                                 index++;
                             }
                         }
@@ -295,8 +295,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
                 for (auto j = rcoord_p[n]; j <= nr_irreg; ++j) {
-                    if (fabs(radius - radii(n, j + 1)) <
-                        fabs(radius - radii(n, j + 2))) {
+                    if (amrex::Math::abs(radius - radii(n, j + 1)) <
+                        amrex::Math::abs(radius - radii(n, j + 2))) {
                         rcoord_p[n] = j;
                         break;
                     }
@@ -391,8 +391,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             // find the closest coordinate
             for (auto j = stencil_coord; j <= max_rcoord(which_lev(r)); ++j) {
-                if (fabs(radius - radii(which_lev(r), j + 1)) <
-                    fabs(radius - radii(which_lev(r), j + 2))) {
+                if (amrex::Math::abs(radius - radii(which_lev(r), j + 1)) <
+                    amrex::Math::abs(radius - radii(which_lev(r), j + 2))) {
                     stencil_coord = j;
                     break;
                 }
