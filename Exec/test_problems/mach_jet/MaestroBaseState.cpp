@@ -71,7 +71,8 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
             if (r == 0) {
                 p0_init_arr(n, r) -= base_geom.dr(n) * 0.5 *
-                                     s0_init_arr(n, r, Rho) * amrex::Math::abs(grav_const);
+                                     s0_init_arr(n, r, Rho) *
+                                     amrex::Math::abs(grav_const);
             } else {
                 p0_init_arr(n, r) =
                     p0_init_arr(n, r - 1) -

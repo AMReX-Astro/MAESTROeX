@@ -71,13 +71,18 @@ int main(int argc, char* argv[]) {
 #if (AMREX_SPACEDIM == 1)
     double maxdist = amrex::Math::abs(probhi[0] - problo[0]);
 #elif (AMREX_SPACEDIM == 2)
-    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr), amrex::Math::abs(problo[0] - xctr));
-    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr), amrex::Math::abs(problo[1] - yctr));
+    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr),
+                           amrex::Math::abs(problo[0] - xctr));
+    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr),
+                           amrex::Math::abs(problo[1] - yctr));
     double maxdist = sqrt(x_maxdist * x_maxdist + y_maxdist * y_maxdist);
 #else
-    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr), amrex::Math::abs(problo[0] - xctr));
-    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr), amrex::Math::abs(problo[1] - yctr));
-    double z_maxdist = max(amrex::Math::abs(probhi[2] - zctr), amrex::Math::abs(problo[2] - zctr));
+    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr),
+                           amrex::Math::abs(problo[0] - xctr));
+    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr),
+                           amrex::Math::abs(problo[1] - yctr));
+    double z_maxdist = max(amrex::Math::abs(probhi[2] - zctr),
+                           amrex::Math::abs(problo[2] - zctr));
     double maxdist = sqrt(x_maxdist * x_maxdist + y_maxdist * y_maxdist +
                           z_maxdist * z_maxdist);
 #endif

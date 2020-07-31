@@ -137,7 +137,7 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     LPInfo info;
 
     // Only pass up to defined level to prevent looping over undefined grids.
-    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;

@@ -568,10 +568,11 @@ void Maestro::VelPredVelocities(
 
         // solve Riemann problem using full velocity
         umac(i, j, k) = 0.5 * (umacl + umacr) > 0.0 ? umacl : umacr;
-        umac(i, j, k) = (umacl <= 0.0 && umacr >= 0.0) ||
-                                (amrex::Math::abs(umacl + umacr) < rel_eps_local)
-                            ? 0.0
-                            : umac(i, j, k);
+        umac(i, j, k) =
+            (umacl <= 0.0 && umacr >= 0.0) ||
+                    (amrex::Math::abs(umacl + umacr) < rel_eps_local)
+                ? 0.0
+                : umac(i, j, k);
 
         // impose lo side bc's
         if (i == domlo[0]) {
@@ -636,7 +637,8 @@ void Maestro::VelPredVelocities(
         bool test =
             (vmacl + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
              vmacr + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-            (amrex::Math::abs(vmacl + vmacr + 2 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
+            (amrex::Math::abs(vmacl + vmacr +
+                              2 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
              rel_eps_local);
         vmac(i, j, k) =
             0.5 * (vmacl + vmacr) + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >
@@ -1535,7 +1537,8 @@ void Maestro::VelPredVelocities(
             bool test =
                 (umacl + w0macx(i, j, k) <= 0.0 &&
                  umacr + w0macx(i, j, k) >= 0.0) ||
-                (amrex::Math::abs(umacl + umacr + 2.0 * w0macx(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(umacl + umacr + 2.0 * w0macx(i, j, k)) <
+                 rel_eps_local);
             umac(i, j, k) =
                 0.5 * (umacl + umacr) + w0macx(i, j, k) > 0.0 ? umacl : umacr;
             umac(i, j, k) = test ? 0.0 : umac(i, j, k);
@@ -1612,7 +1615,8 @@ void Maestro::VelPredVelocities(
             bool test =
                 (vmacl + w0macy(i, j, k) <= 0.0 &&
                  vmacr + w0macy(i, j, k) >= 0.0) ||
-                (amrex::Math::abs(vmacl + vmacr + 2.0 * w0macy(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(vmacl + vmacr + 2.0 * w0macy(i, j, k)) <
+                 rel_eps_local);
             vmac(i, j, k) =
                 0.5 * (vmacl + vmacr) + w0macy(i, j, k) > 0.0 ? vmacl : vmacr;
             vmac(i, j, k) = test ? 0.0 : vmac(i, j, k);
@@ -1689,7 +1693,8 @@ void Maestro::VelPredVelocities(
             bool test =
                 (wmacl + w0macz(i, j, k) <= 0.0 &&
                  wmacr + w0macz(i, j, k) >= 0.0) ||
-                (amrex::Math::abs(wmacl + wmacr + 2.0 * w0macz(i, j, k)) < rel_eps_local);
+                (amrex::Math::abs(wmacl + wmacr + 2.0 * w0macz(i, j, k)) <
+                 rel_eps_local);
             wmac(i, j, k) =
                 0.5 * (wmacl + wmacr) + w0macz(i, j, k) > 0.0 ? wmacl : wmacr;
             wmac(i, j, k) = test ? 0.0 : wmac(i, j, k);
@@ -1699,7 +1704,8 @@ void Maestro::VelPredVelocities(
                 (wmacl + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                  wmacr + w0_cart_in(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
                 (amrex::Math::abs(wmacl + wmacr +
-                      2.0 * w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
+                                  2.0 *
+                                      w0_cart_in(i, j, k, AMREX_SPACEDIM - 1)) <
                  rel_eps_local);
             wmac(i, j, k) =
                 0.5 * (wmacl + wmacr) +

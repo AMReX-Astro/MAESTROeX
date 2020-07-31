@@ -238,8 +238,10 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg) {
-                            if (amrex::Math::abs(radius - radii(lev, index + 1)) >
-                                amrex::Math::abs(radius - radii(lev, index + 2))) {
+                            if (amrex::Math::abs(radius -
+                                                 radii(lev, index + 1)) >
+                                amrex::Math::abs(radius -
+                                                 radii(lev, index + 2))) {
                                 index++;
                             }
                         }
@@ -315,8 +317,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             which_lev(r) = 0;
 
             int min_all =
-                std::min({ncell(0, rcoord_p[0]),
-                          ncell(0, rcoord_p[0] + 1),
+                std::min({ncell(0, rcoord_p[0]), ncell(0, rcoord_p[0] + 1),
                           ncell(0, rcoord_p[0] + 2)});
 
             for (auto n = 1; n < fine_lev; ++n) {
@@ -338,8 +339,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 for (auto n = 0; n < fine_lev; ++n) {
                     int min_lev = std::max(
                         ncell(n, std::max(1, rcoord_p[n] - j) + 1),
-                        ncell(n,
-                              std::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
+                        ncell(n, std::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
                     if (min_lev != 0) {
                         which_lev(r) = n;
                         min_all = min_lev;

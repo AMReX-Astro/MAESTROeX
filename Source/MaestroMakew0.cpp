@@ -131,7 +131,8 @@ void Maestro::Makew0Planar(
             AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord) {
-                    psi_planar(r) = etarho_cc_arr(n, r) * amrex::Math::abs(grav_const_loc);
+                    psi_planar(r) =
+                        etarho_cc_arr(n, r) * amrex::Math::abs(grav_const_loc);
                 }
             });
             Gpu::synchronize();

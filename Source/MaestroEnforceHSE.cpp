@@ -181,8 +181,8 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
                 // subtract the offset for all values at and above this point
                 if (r_end_coord(n, i) != base_geom.nr(n) - 1) {
                     for (auto l = n - 1; l >= 0; --l) {
-                        for (auto r = (int)amrex::Math::round((r_end_coord(n, i) + 1) /
-                                                 pow(2, n - l));
+                        for (auto r = (int)amrex::Math::round(
+                                 (r_end_coord(n, i) + 1) / pow(2, n - l));
                              r <= base_geom.nr(l) - 1; ++r) {
                             p0(l, r) -= offset;
                         }

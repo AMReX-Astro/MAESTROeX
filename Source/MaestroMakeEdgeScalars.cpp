@@ -520,9 +520,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
-                                    ? sedgex(i, j, k, comp)
-                                    : 0.5 * (sedgelx + sedgerx);
+        sedgex(i, j, k, comp) =
+            (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
+                ? sedgex(i, j, k, comp)
+                : 0.5 * (sedgelx + sedgerx);
 
         // impose lo side bc's
         if (i == domlo[0]) {
@@ -599,9 +600,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
-                                    ? sedgey(i, j, k, comp)
-                                    : 0.5 * (sedgely + sedgery);
+        sedgey(i, j, k, comp) =
+            (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
+                ? sedgey(i, j, k, comp)
+                : 0.5 * (sedgely + sedgery);
 
         // impose lo side bc's
         if (j == domlo[1]) {
@@ -1441,9 +1443,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
-                                    ? sedgex(i, j, k, comp)
-                                    : 0.5 * (sedgelx + sedgerx);
+        sedgex(i, j, k, comp) =
+            (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
+                ? sedgex(i, j, k, comp)
+                : 0.5 * (sedgelx + sedgerx);
 
         // impose lo side bc's
         if (i == domlo[0]) {
@@ -1530,9 +1533,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
-                                    ? sedgey(i, j, k, comp)
-                                    : 0.5 * (sedgely + sedgery);
+        sedgey(i, j, k, comp) =
+            (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
+                ? sedgey(i, j, k, comp)
+                : 0.5 * (sedgely + sedgery);
 
         // impose lo side bc's
         if (j == domlo[1]) {
@@ -1619,9 +1623,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgez by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgez(i, j, k, comp) = (wmac(i, j, k) > 0.0) ? sedgelz : sedgerz;
-        sedgez(i, j, k, comp) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
-                                    ? sedgez(i, j, k, comp)
-                                    : 0.5 * (sedgelz + sedgerz);
+        sedgez(i, j, k, comp) =
+            (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
+                ? sedgez(i, j, k, comp)
+                : 0.5 * (sedgelz + sedgerz);
 
         // impose lo side bc's
         if (k == domlo[2]) {

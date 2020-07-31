@@ -91,11 +91,10 @@ void Maestro::MakeUtrans(
                 Real urx = 0.0;
 
                 if (ppm_type_local == 0) {
-                    ulx =
-                        utilde_arr(i - 1, j, k, 0) +
-                        (0.5 - (dt2 / dx[0]) *
-                                   std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
-                            Ip_arr(i - 1, j, k, 0);
+                    ulx = utilde_arr(i - 1, j, k, 0) +
+                          (0.5 - (dt2 / dx[0]) *
+                                     std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                              Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
                                      std::min(0.0, ufull_arr(i, j, k, 0))) *
@@ -192,11 +191,10 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // // extrapolate to edges
-                    vly =
-                        utilde_arr(i, j - 1, k, 1) +
-                        (0.5 - (dt2 / dx[1]) *
-                                   std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
-                            Ip_arr(i, j - 1, k, 0);
+                    vly = utilde_arr(i, j - 1, k, 1) +
+                          (0.5 - (dt2 / dx[1]) *
+                                     std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                              Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
                                      std::min(0.0, ufull_arr(i, j, k, 1))) *
@@ -256,7 +254,8 @@ void Maestro::MakeUtrans(
                     (vly + w0_arr(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                      vry + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
                     (amrex::Math::abs(vly + vry +
-                          2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
+                                      2.0 *
+                                          w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
                      rel_eps_local);
                 vtrans_arr(i, j, k) =
                     0.5 * (vly + vry) + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >
@@ -307,11 +306,10 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    ulx =
-                        utilde_arr(i - 1, j, k, 0) +
-                        (0.5 - (dt2 / dx[0]) *
-                                   std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
-                            Ip_arr(i - 1, j, k, 0);
+                    ulx = utilde_arr(i - 1, j, k, 0) +
+                          (0.5 - (dt2 / dx[0]) *
+                                     std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                              Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
                                      std::min(0.0, ufull_arr(i, j, k, 0))) *
@@ -367,10 +365,11 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (ulx + w0macx(i, j, k) <= 0.0 &&
-                                 urx + w0macx(i, j, k) >= 0.0) ||
-                                (amrex::Math::abs(ulx + urx + 2.0 * w0macx(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (ulx + w0macx(i, j, k) <= 0.0 &&
+                         urx + w0macx(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(ulx + urx + 2.0 * w0macx(i, j, k)) <
+                         rel_eps_local);
                     utrans_arr(i, j, k) =
                         0.5 * (ulx + urx) + w0macx(i, j, k) > 0.0 ? ulx : urx;
                     utrans_arr(i, j, k) = test ? 0.0 : utrans_arr(i, j, k);
@@ -421,11 +420,10 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    vly =
-                        utilde_arr(i, j - 1, k, 1) +
-                        (0.5 - (dt2 / dx[1]) *
-                                   std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
-                            Ip_arr(i, j - 1, k, 0);
+                    vly = utilde_arr(i, j - 1, k, 1) +
+                          (0.5 - (dt2 / dx[1]) *
+                                     std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                              Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
                                      std::min(0.0, ufull_arr(i, j, k, 1))) *
@@ -482,10 +480,11 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (vly + w0macy(i, j, k) <= 0.0 &&
-                                 vry + w0macy(i, j, k) >= 0.0) ||
-                                (amrex::Math::abs(vly + vry + 2.0 * w0macy(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (vly + w0macy(i, j, k) <= 0.0 &&
+                         vry + w0macy(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(vly + vry + 2.0 * w0macy(i, j, k)) <
+                         rel_eps_local);
                     vtrans_arr(i, j, k) =
                         0.5 * (vly + vry) + w0macy(i, j, k) > 0.0 ? vly : vry;
                     vtrans_arr(i, j, k) = test ? 0.0 : vtrans_arr(i, j, k);
@@ -536,11 +535,10 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    wlz =
-                        utilde_arr(i, j, k - 1, 2) +
-                        (0.5 - (dt2 / dx[2]) *
-                                   std::max(0.0, ufull_arr(i, j, k - 1, 2))) *
-                            Ip_arr(i, j, k - 1, 0);
+                    wlz = utilde_arr(i, j, k - 1, 2) +
+                          (0.5 - (dt2 / dx[2]) *
+                                     std::max(0.0, ufull_arr(i, j, k - 1, 2))) *
+                              Ip_arr(i, j, k - 1, 0);
                     wrz = utilde_arr(i, j, k, 2) -
                           (0.5 + (dt2 / dx[2]) *
                                      std::min(0.0, ufull_arr(i, j, k, 2))) *
@@ -596,10 +594,11 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (wlz + w0macz(i, j, k) <= 0.0 &&
-                                 wrz + w0macz(i, j, k) >= 0.0) ||
-                                (amrex::Math::abs(wlz + wrz + 2.0 * w0macz(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (wlz + w0macz(i, j, k) <= 0.0 &&
+                         wrz + w0macz(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(wlz + wrz + 2.0 * w0macz(i, j, k)) <
+                         rel_eps_local);
                     wtrans_arr(i, j, k) =
                         0.5 * (wlz + wrz) + w0macz(i, j, k) > 0.0 ? wlz : wrz;
                     wtrans_arr(i, j, k) = test ? 0.0 : wtrans_arr(i, j, k);
@@ -608,8 +607,9 @@ void Maestro::MakeUtrans(
                     bool test =
                         (wlz + w0_arr(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                          wrz + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-                        (amrex::Math::abs(wlz + wrz +
-                              2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
+                        (amrex::Math::abs(
+                             wlz + wrz +
+                             2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
                          rel_eps_local);
                     wtrans_arr(i, j, k) =
                         0.5 * (wlz + wrz) +

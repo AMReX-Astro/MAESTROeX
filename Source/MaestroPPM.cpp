@@ -45,7 +45,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsr = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i + 1, j, k, n) - s(i - 1, j, k, n));
@@ -53,7 +54,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to x-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i - 1, j, k, n)) -
@@ -73,7 +75,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i + 2, j, k, n) - s(i, j, k, n));
@@ -81,7 +84,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to x-edges.
             Real sp = 0.5 * (s(i + 1, j, k, n) + s(i, j, k, n)) -
@@ -196,7 +200,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
+                Real sigma =
+                    amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
                 if (u(i + 1, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
                         sp - 0.5 * sigma *
@@ -331,8 +336,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-            bool bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -346,8 +353,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                 Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                Real dafacemin =
+                    min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
+                Real dabarmin =
+                    min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
 
@@ -455,8 +464,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (i == domlo[0] + 1 || i == domlo[0] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -470,8 +481,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                         Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
 
@@ -583,8 +596,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (i == domhi[0] - 1 || i == domhi[0] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -598,8 +613,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                         Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -677,7 +694,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
+                Real sigma =
+                    amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
 
                 if (u(i + 1, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
@@ -740,7 +758,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j + 1, k, n) - s(i, j - 1, k, n));
@@ -748,7 +767,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to y-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i, j - 1, k, n)) -
@@ -768,7 +788,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j + 2, k, n) - s(i, j, k, n));
@@ -776,7 +797,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to y-edges.
             Real sp = 0.5 * (s(i, j + 1, k, n) + s(i, j, k, n)) -
@@ -891,7 +913,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
+                Real sigma =
+                    amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
                 if (v(i, j + 1, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -1025,8 +1048,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             // to eliminate sensitivity to roundoff.
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-            bool bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -1040,8 +1065,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                 Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                Real dafacemin =
+                    min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
+                Real dabarmin =
+                    min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -1149,8 +1176,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (j == domlo[1] + 1 || j == domlo[1] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1164,8 +1193,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                         Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1278,8 +1309,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (j == domhi[1] - 1 || j == domhi[1] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1293,8 +1326,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                         Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1371,7 +1406,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
+                Real sigma =
+                    amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
                 if (v(i, j + 1, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -1432,7 +1468,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j, k + 1, n) - s(i, j, k - 1, n));
@@ -1440,7 +1477,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to z-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i, j, k - 1, n)) -
@@ -1460,7 +1498,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
                 dsvl_l = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j, k + 2, n) - s(i, j, k, n));
@@ -1468,7 +1507,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsr = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
             if (dsl * dsr > 0.0)
                 dsvl_r = amrex::Math::copysign(1.0, dsc) *
-                         min(amrex::Math::abs(dsc), min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
+                         min(amrex::Math::abs(dsc),
+                             min(amrex::Math::abs(dsl), amrex::Math::abs(dsr)));
 
             // Interpolate s to z-edges.
             Real sp = 0.5 * (s(i, j, k + 1, n) + s(i, j, k, n)) -
@@ -1583,7 +1623,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
+                Real sigma =
+                    amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
 
                 if (w(i, j, k + 1) > rel_eps_local) {
                     Ip(i, j, k, 2) =
@@ -1717,8 +1758,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-            bool bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -1734,8 +1777,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                 Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                Real dafacemin =
+                    min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
+                Real dabarmin =
+                    min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -1842,8 +1887,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (k == domlo[2] + 1 || k == domlo[2] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1857,8 +1904,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                         Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1971,8 +2020,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (k == domhi[2] - 1 || k == domhi[2] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
-                    bigm = amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1986,8 +2037,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                         Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                        Real dafacemin = min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                        Real dabarmin = min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                        Real dafacemin = min(amrex::Math::abs(dafacem),
+                                             amrex::Math::abs(dafacep));
+                        Real dabarmin = min(amrex::Math::abs(dabarm),
+                                            amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -2065,7 +2118,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
+                Real sigma =
+                    amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
 
                 if (w(i, j, k + 1) > rel_eps_local) {
                     Ip(i, j, k, 2) =

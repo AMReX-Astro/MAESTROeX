@@ -142,10 +142,10 @@ void Maestro::TagArray() {
     }
 
     // grids have not been initialized to tag yet.
-    if (finest_level==0) {
-      return;
+    if (finest_level == 0) {
+        return;
     }
-    
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagArray()", TagArray);
 

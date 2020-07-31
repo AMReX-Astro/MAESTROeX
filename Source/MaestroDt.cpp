@@ -643,8 +643,7 @@ void Maestro::FirstDt() {
                         ? 0.1 * uy
                         : uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
-                umax_grid =
-                    std::max(umax_grid, std::max(ux, std::max(uy, uz)));
+                umax_grid = std::max(umax_grid, std::max(ux, std::max(uy, uz)));
 
                 ux /= dx[0];
                 Real spdx = spd.max<RunOn::Device>(tileBox, 0) / dx[0];
@@ -665,8 +664,8 @@ void Maestro::FirstDt() {
                 // use advective constraint unless velocities are zero everywhere
                 // in which case we use the sound speed
                 if (ux != 0.0 || uy != 0.0 || uz != 0.0) {
-                    dt_grid = std::min(dt_grid,
-                                         cfl / std::max(ux, std::max(uy, uz)));
+                    dt_grid =
+                        std::min(dt_grid, cfl / std::max(ux, std::max(uy, uz)));
                 } else if (spdx != 0.0 && spdy != 0.0 && spdz != 0.0) {
                     dt_grid = std::min(
                         dt_grid, cfl / std::max(spdx, std::max(spdy, spdz)));

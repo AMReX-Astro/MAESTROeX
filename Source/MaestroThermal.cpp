@@ -47,7 +47,7 @@ void Maestro::MakeExplicitThermal(
     info.setMaxCoarseningLevel(0);
 
     // Only pass up to defined level to prevent looping over undefined grids.
-    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -161,7 +161,7 @@ void Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
     info.setMaxCoarseningLevel(0);
 
     // Only pass up to defined level to prevent looping over undefined grids.
-    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -442,7 +442,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
     LPInfo info;
 
     // Only pass up to defined level to prevent looping over undefined grids.
-    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -636,7 +636,7 @@ void Maestro::ThermalConductSDC(
     LPInfo info;
 
     // Only pass up to defined level to prevent looping over undefined grids.
-    MLABecLaplacian mlabec(Geom(0,finest_level), grids, dmap, info);
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;

@@ -94,7 +94,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                 2.0 * (rho0(n, r + 1) - rho0(n, r)) / drp;
                             Real dmin =
                                 2.0 * (rho0(n, r) - rho0(n, r - 1)) / drm;
-                            Real slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
+                            Real slim = min(amrex::Math::abs(dpls),
+                                            amrex::Math::abs(dmin));
                             slim = slim == slim ? slim : 0.0;
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             Real sflag = amrex::Math::copysign(1.0, del);
@@ -109,7 +110,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                             dmin = 2.0 *
                                    (gamma1bar(n, r) - gamma1bar(n, r - 1)) /
                                    drm;
-                            slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
+                            slim = min(amrex::Math::abs(dpls),
+                                       amrex::Math::abs(dmin));
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             sflag = amrex::Math::copysign(1.0, del);
                             mu = sflag * min(slim, amrex::Math::abs(del));
@@ -117,7 +119,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                             del = 0.5 * (p0(n, r + 1) - p0(n, r - 1)) / drc;
                             dpls = 2.0 * (p0(n, r + 1) - p0(n, r)) / drp;
                             dmin = 2.0 * (p0(n, r) - p0(n, r - 1)) / drm;
-                            slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
+                            slim = min(amrex::Math::abs(dpls),
+                                       amrex::Math::abs(dmin));
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             sflag = amrex::Math::copysign(1.0, del);
                             nu = sflag * min(slim, amrex::Math::abs(del));
@@ -140,8 +143,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                             ((p0(n, r) + 0.5 * nu * drp) /
                              (p0(n, r) - 0.5 * nu * drm)) <= 0.0) {
                             // just do piecewise constant integration
-                            integral = amrex::Math::abs(grav_cell(n, r)) * rho0(n, r) *
-                                       0.5 * (drp + drm) /
+                            integral = amrex::Math::abs(grav_cell(n, r)) *
+                                       rho0(n, r) * 0.5 * (drp + drm) /
                                        (p0(n, r) * gamma1bar(n, r));
 
                         } else {
@@ -160,18 +163,21 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                     2.0 *
                                     (grav_cell(n, r) - grav_cell(n, r - 1)) /
                                     dr(n);
-                                Real slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
+                                Real slim = min(amrex::Math::abs(dpls),
+                                                amrex::Math::abs(dmin));
                                 slim = dpls * dmin > 0.0 ? slim : 0.0;
                                 Real sflag = amrex::Math::copysign(1.0, del);
-                                Real kappa = sflag * min(slim, amrex::Math::abs(del));
+                                Real kappa =
+                                    sflag * min(slim, amrex::Math::abs(del));
 
                                 Real denom =
                                     nu * gamma1bar(n, r) - mu * p0(n, r);
-                                Real coeff1 = (lambda * gamma1bar(n, r) -
-                                               mu * rho0(n, r)) *
-                                              (kappa * gamma1bar(n, r) +
-                                               mu * amrex::Math::abs(grav_cell(n, r))) /
-                                              (mu * mu * denom);
+                                Real coeff1 =
+                                    (lambda * gamma1bar(n, r) -
+                                     mu * rho0(n, r)) *
+                                    (kappa * gamma1bar(n, r) +
+                                     mu * amrex::Math::abs(grav_cell(n, r))) /
+                                    (mu * mu * denom);
                                 Real coeff2 =
                                     (lambda * p0(n, r) - nu * rho0(n, r)) *
                                     (-kappa * p0(n, r) -
@@ -199,7 +205,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                     lambda * p0(n, r) / nu - rho0(n, r);
 
                                 integral =
-                                    (amrex::Math::abs(grav_cell(n, r)) / denom) *
+                                    (amrex::Math::abs(grav_cell(n, r)) /
+                                     denom) *
                                     (coeff1 * log((gamma1bar(n, r) +
                                                    0.5 * mu * drp) /
                                                   (gamma1bar(n, r) -
