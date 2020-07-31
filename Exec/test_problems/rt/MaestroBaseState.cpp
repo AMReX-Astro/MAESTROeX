@@ -143,7 +143,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
     Real min_temp = 1.e99;
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
-        min_temp = amrex::min(min_temp, s0_init_arr(lev, r, Temp));
+        min_temp = std::min(min_temp, s0_init_arr(lev, r, Temp));
     }
 
     if (min_temp < small_temp) {

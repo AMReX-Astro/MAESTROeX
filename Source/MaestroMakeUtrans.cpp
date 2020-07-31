@@ -94,11 +94,11 @@ void Maestro::MakeUtrans(
                     ulx =
                         utilde_arr(i - 1, j, k, 0) +
                         (0.5 - (dt2 / dx[0]) *
-                                   amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                                   std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
                             Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
-                                     amrex::min(0.0, ufull_arr(i, j, k, 0))) *
+                                     std::min(0.0, ufull_arr(i, j, k, 0))) *
                               Ip_arr(i, j, k, 0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
@@ -121,7 +121,7 @@ void Maestro::MakeUtrans(
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = amrex::min(urx, 0.0);
+                            ulx = std::min(urx, 0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -142,7 +142,7 @@ void Maestro::MakeUtrans(
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = amrex::max(ulx, 0.0);
+                            ulx = std::max(ulx, 0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -195,11 +195,11 @@ void Maestro::MakeUtrans(
                     vly =
                         utilde_arr(i, j - 1, k, 1) +
                         (0.5 - (dt2 / dx[1]) *
-                                   amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                                   std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
                             Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
-                                     amrex::min(0.0, ufull_arr(i, j, k, 1))) *
+                                     std::min(0.0, ufull_arr(i, j, k, 1))) *
                               Ip_arr(i, j, k, 0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
@@ -222,7 +222,7 @@ void Maestro::MakeUtrans(
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = amrex::min(vry, 0.0);
+                            vly = std::min(vry, 0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -243,7 +243,7 @@ void Maestro::MakeUtrans(
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = amrex::max(vly, 0.0);
+                            vly = std::max(vly, 0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -310,11 +310,11 @@ void Maestro::MakeUtrans(
                     ulx =
                         utilde_arr(i - 1, j, k, 0) +
                         (0.5 - (dt2 / dx[0]) *
-                                   amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                                   std::max(0.0, ufull_arr(i - 1, j, k, 0))) *
                             Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
-                                     amrex::min(0.0, ufull_arr(i, j, k, 0))) *
+                                     std::min(0.0, ufull_arr(i, j, k, 0))) *
                               Ip_arr(i, j, k, 0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -336,7 +336,7 @@ void Maestro::MakeUtrans(
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = amrex::min(urx, 0.0);
+                            ulx = std::min(urx, 0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -357,7 +357,7 @@ void Maestro::MakeUtrans(
                             urx = 0.0;
                             break;
                         case Outflow:
-                            ulx = amrex::max(ulx, 0.0);
+                            ulx = std::max(ulx, 0.0);
                             urx = ulx;
                             break;
                         case Interior:
@@ -424,11 +424,11 @@ void Maestro::MakeUtrans(
                     vly =
                         utilde_arr(i, j - 1, k, 1) +
                         (0.5 - (dt2 / dx[1]) *
-                                   amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                                   std::max(0.0, ufull_arr(i, j - 1, k, 1))) *
                             Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
-                                     amrex::min(0.0, ufull_arr(i, j, k, 1))) *
+                                     std::min(0.0, ufull_arr(i, j, k, 1))) *
                               Ip_arr(i, j, k, 0);
 
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
@@ -451,7 +451,7 @@ void Maestro::MakeUtrans(
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = amrex::min(vry, 0.0);
+                            vly = std::min(vry, 0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -472,7 +472,7 @@ void Maestro::MakeUtrans(
                             vry = 0.0;
                             break;
                         case Outflow:
-                            vly = amrex::max(vly, 0.0);
+                            vly = std::max(vly, 0.0);
                             vry = vly;
                             break;
                         case Interior:
@@ -539,11 +539,11 @@ void Maestro::MakeUtrans(
                     wlz =
                         utilde_arr(i, j, k - 1, 2) +
                         (0.5 - (dt2 / dx[2]) *
-                                   amrex::max(0.0, ufull_arr(i, j, k - 1, 2))) *
+                                   std::max(0.0, ufull_arr(i, j, k - 1, 2))) *
                             Ip_arr(i, j, k - 1, 0);
                     wrz = utilde_arr(i, j, k, 2) -
                           (0.5 + (dt2 / dx[2]) *
-                                     amrex::min(0.0, ufull_arr(i, j, k, 2))) *
+                                     std::min(0.0, ufull_arr(i, j, k, 2))) *
                               Ip_arr(i, j, k, 0);
                 } else if (ppm_type_local == 1 || ppm_type_local == 2) {
                     // extrapolate to edges
@@ -565,7 +565,7 @@ void Maestro::MakeUtrans(
                             wrz = 0.0;
                             break;
                         case Outflow:
-                            wlz = amrex::min(wrz, 0.0);
+                            wlz = std::min(wrz, 0.0);
                             wrz = wlz;
                             break;
                         case Interior:
@@ -586,7 +586,7 @@ void Maestro::MakeUtrans(
                             wrz = 0.0;
                             break;
                         case Outflow:
-                            wlz = amrex::max(wlz, 0.0);
+                            wlz = std::max(wlz, 0.0);
                             wrz = wlz;
                             break;
                         case Interior:

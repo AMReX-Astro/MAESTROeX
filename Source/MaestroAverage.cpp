@@ -305,23 +305,24 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             // make sure closest coordinate is in bounds
             for (auto n = 0; n < fine_lev - 1; ++n) {
-                rcoord_p[n] = amrex::max(rcoord_p[n], 1);
+                rcoord_p[n] = std::max(rcoord_p[n], 1);
             }
             for (auto n = 0; n < fine_lev; ++n) {
-                rcoord_p[n] = amrex::min(rcoord_p[n], nr_irreg - 1);
+                rcoord_p[n] = std::min(rcoord_p[n], nr_irreg - 1);
             }
 
             // choose the level with the largest min over the ncell interpolation points
             which_lev(r) = 0;
 
             int min_all =
-                amrex::min(ncell(0, rcoord_p[0]), ncell(0, rcoord_p[0] + 1),
-                           ncell(0, rcoord_p[0] + 2));
+                std::min({ncell(0, rcoord_p[0]),
+                          ncell(0, rcoord_p[0] + 1),
+                          ncell(0, rcoord_p[0] + 2)});
 
             for (auto n = 1; n < fine_lev; ++n) {
                 int min_lev =
-                    amrex::min(ncell(n, rcoord_p[n]), ncell(n, rcoord_p[n] + 1),
-                               ncell(n, rcoord_p[n] + 2));
+                    std::min({ncell(n, rcoord_p[n]), ncell(n, rcoord_p[n] + 1),
+                              ncell(n, rcoord_p[n] + 2)});
 
                 if (min_lev > min_all) {
                     min_all = min_lev;
@@ -335,10 +336,10 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             while (min_all == 0) {
                 j++;
                 for (auto n = 0; n < fine_lev; ++n) {
-                    int min_lev = amrex::max(
-                        ncell(n, amrex::max(1, rcoord_p[n] - j) + 1),
+                    int min_lev = std::max(
+                        ncell(n, std::max(1, rcoord_p[n] - j) + 1),
                         ncell(n,
-                              amrex::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
+                              std::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
                     if (min_lev != 0) {
                         which_lev(r) = n;
                         min_all = min_lev;
@@ -399,7 +400,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             // make sure the interpolation points will be in bounds
             if (which_lev(r) != fine_lev - 1) {
-                stencil_coord = amrex::max(stencil_coord, 1);
+                stencil_coord = std::max(stencil_coord, 1);
             }
             stencil_coord =
                 amrex::min(stencil_coord, max_rcoord(which_lev(r)) - 1);

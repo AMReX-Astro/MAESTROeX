@@ -396,9 +396,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                             nuc_ener_level += weight * rho_Hnuc_arr(i, j, k);
 
                             // max vel and Mach number
-                            U_max_level = amrex::max(U_max_level, vel);
+                            U_max_level = std::max(U_max_level, vel);
                             Mach_max_level =
-                                amrex::max(Mach_max_level, vel / eos_state.cs);
+                                std::max(Mach_max_level, vel / eos_state.cs);
                         }
                     }
                 }
