@@ -33,7 +33,7 @@ void Maestro::InitBaseStateMapSphr(
             Real index =
                 (x * x + y * y + z * z) / (2.0 * dx_fine[0] * dx_fine[0]) -
                 0.375;
-            cc_to_r(i, j, k) = (int)round(index);
+            cc_to_r(i, j, k) = (int)amrex::Math::round(index);
         })
     }
 }

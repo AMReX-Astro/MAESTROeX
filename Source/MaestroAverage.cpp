@@ -233,7 +233,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                         Real radius = sqrt(x * x + y * y + z * z);
 
                         // figure out which radii index this point maps into
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             ((radius / dx[0]) * (radius / dx[0]) - 0.75) / 2.0);
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin

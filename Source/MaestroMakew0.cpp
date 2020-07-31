@@ -172,7 +172,7 @@ void Maestro::Makew0Planar(
                     w0_arr(n - 1, (base_geom.r_end_coord(n, j) + 1) / 2);
 
                 for (auto i = n - 1; i >= 0; --i) {
-                    auto refrat = (int)round(pow(2, n - i));
+                    auto refrat = (int)amrex::Math::round(pow(2, n - i));
 
                     // Restrict w0 from level n to level i
                     for (auto r = base_geom.r_start_coord(n, j);
