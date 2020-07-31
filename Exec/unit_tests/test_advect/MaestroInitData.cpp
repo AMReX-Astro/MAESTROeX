@@ -32,7 +32,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         Real dist = std::sqrt(x * x + y * y + z * z);
 
         scal(i, j, k, Rho) =
-            std::max(std::exp(-dist * dist / (W * W)), base_cutoff_density_l);
+            amrex::max(std::exp(-dist * dist / (W * W)), base_cutoff_density_l);
         scal(i, j, k, FirstSpec) = scal(i, j, k, Rho);
     });
 }

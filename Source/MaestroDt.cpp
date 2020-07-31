@@ -176,22 +176,22 @@ void Maestro::EstDt() {
                     Real spdr = w0_cart[lev][mfi].maxabs<RunOn::Device>(
                         tileBox, AMREX_SPACEDIM - 1);
 
-                    umax_grid = std::max(
+                    umax_grid = amrex::max(
                         umax_grid,
-                        std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
+                        amrex::max(spdx, amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
-                        dt_temp = std::min(dt_temp, dx[0] / spdx);
+                        dt_temp = amrex::min(dt_temp, dx[0] / spdx);
                     }
                     if (spdy > eps) {
-                        dt_temp = std::min(dt_temp, dx[1] / spdy);
+                        dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     }
                     if (spdz > eps) {
-                        dt_temp = std::min(dt_temp, dx[2] / spdz);
+                        dt_temp = amrex::min(dt_temp, dx[2] / spdz);
                     }
                     if (spdr > eps) {
                         dt_temp =
-                            std::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
+                            amrex::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
                     }
 
                     dt_temp *= cfl;
@@ -208,20 +208,20 @@ void Maestro::EstDt() {
 
                     if (fx > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
                     }
                     if (fy > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
                     }
 #if (AMREX_SPACEDIM == 3)
                     if (fz > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
                     }
 #endif
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
 
                     const auto nr_lev = base_geom.nr(lev);
 
@@ -267,7 +267,7 @@ void Maestro::EstDt() {
 
                     dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 1);
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
 
                     tmp[mfi].setVal<RunOn::Device>(1.e99, tileBox, 2, 1);
 
@@ -292,7 +292,7 @@ void Maestro::EstDt() {
 
                     dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 2);
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
                 } else {
 #if (AMREX_SPACEDIM == 3)
 
@@ -330,21 +330,21 @@ void Maestro::EstDt() {
                     Real spdr =
                         w0_cart[lev][mfi].maxabs<RunOn::Device>(tileBox, 0);
 
-                    umax_grid = std::max(
+                    umax_grid = amrex::max(
                         umax_grid,
-                        std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
+                        amrex::max(spdx, amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
-                        dt_temp = std::min(dt_temp, dx[0] / spdx);
+                        dt_temp = amrex::min(dt_temp, dx[0] / spdx);
                     }
                     if (spdy > eps) {
-                        dt_temp = std::min(dt_temp, dx[1] / spdy);
+                        dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     }
                     if (spdz > eps) {
-                        dt_temp = std::min(dt_temp, dx[2] / spdz);
+                        dt_temp = amrex::min(dt_temp, dx[2] / spdz);
                     }
                     if (spdr > eps) {
-                        dt_temp = std::min(dt_temp, base_geom.dr(0) / spdr);
+                        dt_temp = amrex::min(dt_temp, base_geom.dr(0) / spdr);
                     }
 
                     dt_temp *= cfl;
@@ -359,18 +359,18 @@ void Maestro::EstDt() {
 
                     if (fx > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[0] / fx));
                     }
                     if (fy > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[1] / fy));
                     }
                     if (fz > eps) {
                         dt_temp =
-                            std::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
+                            amrex::min(dt_temp, std::sqrt(2.0 * dx[2] / fz));
                     }
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
 
                     tmp[mfi].setVal<RunOn::Device>(1.e50, tileBox, 3, 2);
 
@@ -392,7 +392,7 @@ void Maestro::EstDt() {
 
                     dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 3);
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
 
                     // An additional dS/dt timestep constraint originally
                     // used in nova
@@ -415,14 +415,14 @@ void Maestro::EstDt() {
 
                     dt_temp = tmp[mfi].min<RunOn::Device>(tileBox, 4);
 
-                    dt_grid = std::min(dt_grid, dt_temp);
+                    dt_grid = amrex::min(dt_grid, dt_temp);
 #else
                     Abort("EstDt: Spherical is not valid for DIM < 3");
 #endif
                 }
             }
-            dt_lev = std::min(dt_lev, dt_grid);
-            umax_lev = std::max(umax_lev, umax_grid);
+            dt_lev = amrex::min(dt_lev, dt_grid);
+            umax_lev = amrex::max(umax_lev, umax_grid);
         }  //end openmp
 
         // find the smallest dt over all processors
@@ -432,7 +432,7 @@ void Maestro::EstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to estdt for level " << lev
@@ -440,7 +440,7 @@ void Maestro::EstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
     }  // end loop over levels
 
     if (maestro_verbose > 0) {
@@ -643,7 +643,7 @@ void Maestro::FirstDt() {
                         ? 0.1 * uy
                         : uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
-                umax_grid = std::max(umax_grid, std::max(ux, std::max(uy, uz)));
+                umax_grid = amrex::max(umax_grid, amrex::max(ux, amrex::max(uy, uz)));
 
                 ux /= dx[0];
                 Real spdx = spd.max<RunOn::Device>(tileBox, 0) / dx[0];
@@ -665,10 +665,10 @@ void Maestro::FirstDt() {
                 // in which case we use the sound speed
                 if (ux != 0.0 || uy != 0.0 || uz != 0.0) {
                     dt_grid =
-                        std::min(dt_grid, cfl / std::max(ux, std::max(uy, uz)));
+                        amrex::min(dt_grid, cfl / amrex::max(ux, amrex::max(uy, uz)));
                 } else if (spdx != 0.0 && spdy != 0.0 && spdz != 0.0) {
-                    dt_grid = std::min(
-                        dt_grid, cfl / std::max(spdx, std::max(spdy, spdz)));
+                    dt_grid = amrex::min(
+                        dt_grid, cfl / amrex::max(spdx, amrex::max(spdy, spdz)));
                 }
 
                 // sound speed constraint
@@ -677,24 +677,24 @@ void Maestro::FirstDt() {
                     if (spdx == 0.0 && spdy == 0.0 && spdz == 0.0) {
                         dt_sound = 1.e99;
                     } else {
-                        dt_sound = cfl / std::max(spdx, std::max(spdy, spdz));
+                        dt_sound = cfl / amrex::max(spdx, amrex::max(spdy, spdz));
                     }
-                    dt_grid = std::min(dt_grid, dt_sound);
+                    dt_grid = amrex::min(dt_grid, dt_sound);
                 }
 
                 // force constraints
                 if (pforcex > eps) {
                     dt_grid =
-                        std::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
+                        amrex::min(dt_grid, std::sqrt(2.0 * dx[0] / pforcex));
                 }
                 if (pforcey > eps) {
                     dt_grid =
-                        std::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
+                        amrex::min(dt_grid, std::sqrt(2.0 * dx[1] / pforcey));
                 }
 #if (AMREX_SPACEDIM == 3)
                 if (pforcez > eps) {
                     dt_grid =
-                        std::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
+                        amrex::min(dt_grid, std::sqrt(2.0 * dx[2] / pforcez));
                 }
 #endif
 
@@ -775,11 +775,11 @@ void Maestro::FirstDt() {
                         dt_divu = tmp[mfi].min<RunOn::Device>(tileBox, 0);
 #endif
                     }
-                    dt_grid = std::min(dt_grid, dt_divu);
+                    dt_grid = amrex::min(dt_grid, dt_divu);
                 }
             }
-            dt_lev = std::min(dt_lev, dt_grid);
-            umax_lev = std::max(umax_lev, umax_grid);
+            dt_lev = amrex::min(dt_lev, dt_grid);
+            umax_lev = amrex::max(umax_lev, umax_grid);
         }  //end openmp
 
         // find the smallest dt over all processors
@@ -789,7 +789,7 @@ void Maestro::FirstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to firstdt for level " << lev
@@ -805,7 +805,7 @@ void Maestro::FirstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
 
     }  // end loop over levels
 

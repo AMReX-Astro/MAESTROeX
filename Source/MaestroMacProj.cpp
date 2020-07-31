@@ -169,7 +169,7 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     // tolerance parameters taken from original MAESTRO fortran code
     const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel =
-        std::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
+        amrex::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
 
     // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs),

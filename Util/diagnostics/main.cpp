@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
                           z_maxdist * z_maxdist);
 #endif
 
-    double dx_fine = *(std::min_element(dx.begin(), dx.end()));
+    double dx_fine = *(amrex::min_element(dx.begin(), dx.end()));
 
     int nbins = int(maxdist / dx_fine);
 
