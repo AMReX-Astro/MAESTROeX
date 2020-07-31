@@ -113,7 +113,7 @@ void Maestro::EstDt() {
 
                     dr_fine_loc = (prob_hi - prob_lo) / base_geom.nr_fine;
                     dt_grid = amrex::min(1.1 * dt_grid,
-                                       cfl * dr_fine_loc / (maxw0 + SMALL));
+                                         cfl * dr_fine_loc / (maxw0 + SMALL));
 
                 } else {
 #if (AMREX_SPACEDIM == 3)
@@ -129,7 +129,7 @@ void Maestro::EstDt() {
                     }
 
                     dt_grid = amrex::min(1.1 * dt_grid,
-                                       cfl * dr_fine_loc / (maxw0 + SMALL));
+                                         cfl * dr_fine_loc / (maxw0 + SMALL));
 #endif
                 }
 

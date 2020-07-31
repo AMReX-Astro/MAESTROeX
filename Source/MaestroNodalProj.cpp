@@ -262,14 +262,14 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
                     eps_divu_cart * pow(divu_level_factor, 2));
             } else if (istep_divu_iter == init_divu_iter - 1) {
                 rel_tol = amrex::min(eps_divu_cart * divu_iter_factor *
-                                       pow(divu_level_factor, finest_level),
-                                   eps_divu_cart * divu_iter_factor *
-                                       pow(divu_level_factor, 2));
+                                         pow(divu_level_factor, finest_level),
+                                     eps_divu_cart * divu_iter_factor *
+                                         pow(divu_level_factor, 2));
             } else if (istep_divu_iter <= init_divu_iter - 2) {
                 rel_tol = amrex::min(eps_divu_cart * pow(divu_iter_factor, 2) *
-                                       pow(divu_level_factor, finest_level),
-                                   eps_divu_cart * pow(divu_iter_factor, 2) *
-                                       pow(divu_level_factor, 2));
+                                         pow(divu_level_factor, finest_level),
+                                     eps_divu_cart * pow(divu_iter_factor, 2) *
+                                         pow(divu_level_factor, 2));
             }
         }
     } else if (proj_type == pressure_iters_comp ||

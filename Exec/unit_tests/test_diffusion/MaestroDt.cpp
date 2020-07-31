@@ -75,7 +75,7 @@ void Maestro::EstDt() {
                 // calculate the timestep
                 for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
                     dt_grid = amrex::min(dt_grid,
-                                       dx[i] * dx[i] / diffusion_coefficient);
+                                         dx[i] * dx[i] / diffusion_coefficient);
                 }
             }
 
@@ -165,7 +165,7 @@ void Maestro::FirstDt() {
                 // local variables
                 for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
                     dt_grid = amrex::min(dt_grid,
-                                       dx[i] * dx[i] / diffusion_coefficient);
+                                         dx[i] * dx[i] / diffusion_coefficient);
                 }
             }
 

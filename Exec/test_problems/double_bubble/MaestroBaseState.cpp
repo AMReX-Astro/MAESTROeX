@@ -140,8 +140,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                     (s0_init_arr(lev, r, Rho) + s0_init_arr(lev, r - 1, Rho)) *
                     grav_const;
 
-        max_hse_error = amrex::max(max_hse_error, amrex::Math::abs(dpdr - rhog) /
-                                                    amrex::Math::abs(dpdr));
+        max_hse_error =
+            amrex::max(max_hse_error,
+                       amrex::Math::abs(dpdr - rhog) / amrex::Math::abs(dpdr));
     }
 
     Print() << " " << std::endl;

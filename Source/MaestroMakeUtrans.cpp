@@ -91,10 +91,11 @@ void Maestro::MakeUtrans(
                 Real urx = 0.0;
 
                 if (ppm_type_local == 0) {
-                    ulx = utilde_arr(i - 1, j, k, 0) +
-                          (0.5 - (dt2 / dx[0]) *
-                                     amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
-                              Ip_arr(i - 1, j, k, 0);
+                    ulx =
+                        utilde_arr(i - 1, j, k, 0) +
+                        (0.5 - (dt2 / dx[0]) *
+                                   amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                            Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
                                      amrex::min(0.0, ufull_arr(i, j, k, 0))) *
@@ -191,10 +192,11 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // // extrapolate to edges
-                    vly = utilde_arr(i, j - 1, k, 1) +
-                          (0.5 - (dt2 / dx[1]) *
-                                     amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
-                              Ip_arr(i, j - 1, k, 0);
+                    vly =
+                        utilde_arr(i, j - 1, k, 1) +
+                        (0.5 - (dt2 / dx[1]) *
+                                   amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                            Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
                                      amrex::min(0.0, ufull_arr(i, j, k, 1))) *
@@ -306,10 +308,11 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    ulx = utilde_arr(i - 1, j, k, 0) +
-                          (0.5 - (dt2 / dx[0]) *
-                                     amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
-                              Ip_arr(i - 1, j, k, 0);
+                    ulx =
+                        utilde_arr(i - 1, j, k, 0) +
+                        (0.5 - (dt2 / dx[0]) *
+                                   amrex::max(0.0, ufull_arr(i - 1, j, k, 0))) *
+                            Ip_arr(i - 1, j, k, 0);
                     urx = utilde_arr(i, j, k, 0) -
                           (0.5 + (dt2 / dx[0]) *
                                      amrex::min(0.0, ufull_arr(i, j, k, 0))) *
@@ -420,10 +423,11 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    vly = utilde_arr(i, j - 1, k, 1) +
-                          (0.5 - (dt2 / dx[1]) *
-                                     amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
-                              Ip_arr(i, j - 1, k, 0);
+                    vly =
+                        utilde_arr(i, j - 1, k, 1) +
+                        (0.5 - (dt2 / dx[1]) *
+                                   amrex::max(0.0, ufull_arr(i, j - 1, k, 1))) *
+                            Ip_arr(i, j - 1, k, 0);
                     vry = utilde_arr(i, j, k, 1) -
                           (0.5 + (dt2 / dx[1]) *
                                      amrex::min(0.0, ufull_arr(i, j, k, 1))) *
@@ -535,10 +539,11 @@ void Maestro::MakeUtrans(
 
                 if (ppm_type_local == 0) {
                     // extrapolate to edges
-                    wlz = utilde_arr(i, j, k - 1, 2) +
-                          (0.5 - (dt2 / dx[2]) *
-                                     amrex::max(0.0, ufull_arr(i, j, k - 1, 2))) *
-                              Ip_arr(i, j, k - 1, 0);
+                    wlz =
+                        utilde_arr(i, j, k - 1, 2) +
+                        (0.5 - (dt2 / dx[2]) *
+                                   amrex::max(0.0, ufull_arr(i, j, k - 1, 2))) *
+                            Ip_arr(i, j, k - 1, 0);
                     wrz = utilde_arr(i, j, k, 2) -
                           (0.5 + (dt2 / dx[2]) *
                                      amrex::min(0.0, ufull_arr(i, j, k, 2))) *

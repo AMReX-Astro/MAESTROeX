@@ -178,7 +178,8 @@ void Maestro::EstDt() {
 
                     umax_grid = amrex::max(
                         umax_grid,
-                        amrex::max(spdx, amrex::max(spdy, amrex::max(spdz, spdr))));
+                        amrex::max(spdx,
+                                   amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
                         dt_temp = amrex::min(dt_temp, dx[0] / spdx);
@@ -332,7 +333,8 @@ void Maestro::EstDt() {
 
                     umax_grid = amrex::max(
                         umax_grid,
-                        amrex::max(spdx, amrex::max(spdy, amrex::max(spdz, spdr))));
+                        amrex::max(spdx,
+                                   amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
                         dt_temp = amrex::min(dt_temp, dx[0] / spdx);
@@ -643,7 +645,8 @@ void Maestro::FirstDt() {
                         ? 0.1 * uy
                         : uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
-                umax_grid = amrex::max(umax_grid, amrex::max(ux, amrex::max(uy, uz)));
+                umax_grid =
+                    amrex::max(umax_grid, amrex::max(ux, amrex::max(uy, uz)));
 
                 ux /= dx[0];
                 Real spdx = spd.max<RunOn::Device>(tileBox, 0) / dx[0];
@@ -664,11 +667,12 @@ void Maestro::FirstDt() {
                 // use advective constraint unless velocities are zero everywhere
                 // in which case we use the sound speed
                 if (ux != 0.0 || uy != 0.0 || uz != 0.0) {
-                    dt_grid =
-                        amrex::min(dt_grid, cfl / amrex::max(ux, amrex::max(uy, uz)));
+                    dt_grid = amrex::min(
+                        dt_grid, cfl / amrex::max(ux, amrex::max(uy, uz)));
                 } else if (spdx != 0.0 && spdy != 0.0 && spdz != 0.0) {
                     dt_grid = amrex::min(
-                        dt_grid, cfl / amrex::max(spdx, amrex::max(spdy, spdz)));
+                        dt_grid,
+                        cfl / amrex::max(spdx, amrex::max(spdy, spdz)));
                 }
 
                 // sound speed constraint
@@ -677,7 +681,8 @@ void Maestro::FirstDt() {
                     if (spdx == 0.0 && spdy == 0.0 && spdz == 0.0) {
                         dt_sound = 1.e99;
                     } else {
-                        dt_sound = cfl / amrex::max(spdx, amrex::max(spdy, spdz));
+                        dt_sound =
+                            cfl / amrex::max(spdx, amrex::max(spdy, spdz));
                     }
                     dt_grid = amrex::min(dt_grid, dt_sound);
                 }

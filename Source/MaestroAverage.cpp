@@ -318,12 +318,12 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             int min_all =
                 amrex::min({ncell(0, rcoord_p[0]), ncell(0, rcoord_p[0] + 1),
-                          ncell(0, rcoord_p[0] + 2)});
+                            ncell(0, rcoord_p[0] + 2)});
 
             for (auto n = 1; n < fine_lev; ++n) {
-                int min_lev =
-                    amrex::min({ncell(n, rcoord_p[n]), ncell(n, rcoord_p[n] + 1),
-                              ncell(n, rcoord_p[n] + 2)});
+                int min_lev = amrex::min({ncell(n, rcoord_p[n]),
+                                          ncell(n, rcoord_p[n] + 1),
+                                          ncell(n, rcoord_p[n] + 2)});
 
                 if (min_lev > min_all) {
                     min_all = min_lev;
@@ -339,7 +339,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 for (auto n = 0; n < fine_lev; ++n) {
                     int min_lev = amrex::max(
                         ncell(n, amrex::max(1, rcoord_p[n] - j) + 1),
-                        ncell(n, amrex::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
+                        ncell(n,
+                              amrex::min(rcoord_p[n] + j, nr_irreg - 1) + 1));
                     if (min_lev != 0) {
                         which_lev(r) = n;
                         min_all = min_lev;
