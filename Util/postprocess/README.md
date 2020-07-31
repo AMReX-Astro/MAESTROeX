@@ -6,6 +6,7 @@ including:
 - Convection speed
 - Ratio of mean rotation rates to surface rotation
 - Meridional circulation velocities
+- Latitudinal shear
 - Brünt-Väisälä frequency
 
 ## Building & running

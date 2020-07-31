@@ -63,6 +63,9 @@ void MakeRotationRate (const std::string& plotfilename,
 		       const amrex::Vector<amrex::MultiFab>& w0cart,
 		       amrex::Vector<amrex::MultiFab>& omega);
 
+void MakeLatShear (const amrex::Vector<amrex::MultiFab>& omega_in,
+		   BaseState<amrex::Real>& shear,
+		   const BaseStateArray<amrex::Real>& r_cc_loc);
 
 // ----------------------------
 // in Slice.cpp
