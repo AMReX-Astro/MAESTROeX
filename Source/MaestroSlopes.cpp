@@ -42,7 +42,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
             Real dmin = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             Real slim = min(fabs(dpls), fabs(dmin));
             slim = dpls * dmin > 0.0 ? slim : 0.0;
-            Real sflag = copysign(1.0, del);
+            Real sflag = amrex::Math::copysign(1.0, del);
             slx(i, j, k, n) = sflag * min(slim, fabs(del));
 
             if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
@@ -56,7 +56,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     slx(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -72,7 +72,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     slx(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -88,7 +88,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
             Real dpls = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             Real dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            Real dflag = copysign(1.0, dcen);
+            Real dflag = amrex::Math::copysign(1.0, dcen);
             Real dxl = dflag * min(dlim, fabs(dcen));
 
             // right
@@ -97,7 +97,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
             Real dxr = dflag * min(dlim, fabs(dcen));
 
             // center
@@ -106,7 +106,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
 
             Real ds = 4.0 / 3.0 * dcen - (dxr + dxl) / 6.0;
             slx(i, j, k, n) = dflag * min(fabs(ds), dlim);
@@ -122,7 +122,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? dlim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     slx(i, j, k, n) = sflag * min(slim, fabs(del));
                 } else if (i == ilo + 1) {
                     // Recalculate the slope at lo(1)+1 using the revised dxl
@@ -134,7 +134,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? dlim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     dxl = sflag * min(slim, fabs(del));
 
                     ds = 4.0 / 3.0 * dcen - (dxr + dxl) / 6.0;
@@ -154,7 +154,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? dlim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     slx(i, j, k, n) = sflag * min(slim, fabs(del));
                 } else if (i == ihi - 1) {
                     // Recalculate the slope at hi(1)-1 using the revised dxr
@@ -166,7 +166,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? dlim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     dxr = sflag * min(slim, fabs(del));
 
                     ds = 4.0 / 3.0 * dcen - (dxl + dxr) / 6.0;
@@ -216,7 +216,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
             Real dmin = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             Real slim = min(fabs(dpls), fabs(dmin));
             slim = dpls * dmin > 0.0 ? slim : 0.0;
-            Real sflag = copysign(1.0, del);
+            Real sflag = amrex::Math::copysign(1.0, del);
             sly(i, j, k, n) = sflag * min(slim, fabs(del));
 
             if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
@@ -230,7 +230,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     sly(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -246,7 +246,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     sly(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -262,7 +262,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
             Real dpls = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             Real dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            Real dflag = copysign(1.0, dcen);
+            Real dflag = amrex::Math::copysign(1.0, dcen);
             Real dyl = dflag * min(dlim, fabs(dcen));
 
             // right
@@ -271,7 +271,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
             Real dyr = dflag * min(dlim, fabs(dcen));
 
             // center
@@ -280,7 +280,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
 
             Real ds = 4.0 / 3.0 * dcen - (dyr + dyl) / 6.0;
             sly(i, j, k, n) = dflag * min(fabs(ds), dlim);
@@ -296,7 +296,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     sly(i, j, k, n) = sflag * min(slim, fabs(del));
                 } else if (j == jlo + 1) {
                     // Recalculate the slope at lo(2)+1 using the revised dyl
@@ -308,7 +308,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     dyl = sflag * min(slim, fabs(del));
                     ds = 4.0 / 3.0 * dcen - (dyr + dyl) / 6.0;
                     sly(i, j, k, n) = dflag * min(fabs(ds), dlim);
@@ -327,7 +327,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     sly(i, j, k, n) = sflag * min(slim, fabs(del));
                 } else if (j == jhi - 1) {
                     // Recalculate the slope at lo(2)+1 using the revised dyr
@@ -339,7 +339,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     dyr = sflag * min(slim, fabs(del));
                     ds = 4.0 / 3.0 * dcen - (dyl + dyr) / 6.0;
                     sly(i, j, k, n) = dflag * min(fabs(ds), dlim);
@@ -389,7 +389,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
             Real dmin = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             Real slim = min(fabs(dpls), fabs(dmin));
             slim = dpls * dmin > 0.0 ? slim : 0.0;
-            Real sflag = copysign(1.0, del);
+            Real sflag = amrex::Math::copysign(1.0, del);
             slz(i, j, k, n) = sflag * min(slim, fabs(del));
 
             if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
@@ -403,7 +403,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     slz(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -419,7 +419,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     dmin = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
                     slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    sflag = copysign(1.0, del);
+                    sflag = amrex::Math::copysign(1.0, del);
                     slz(i, j, k, n) = sflag * min(slim, fabs(del));
                 }
             }
@@ -435,7 +435,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
             Real dpls = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             Real dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            Real dflag = copysign(1.0, dcen);
+            Real dflag = amrex::Math::copysign(1.0, dcen);
             Real dzl = dflag * min(dlim, fabs(dcen));
 
             // right
@@ -444,7 +444,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
             Real dzr = dflag * min(dlim, fabs(dcen));
 
             // center
@@ -453,7 +453,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
             dpls = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             dlim = min(fabs(dmin), fabs(dpls));
             dlim = dpls * dmin > 0.0 ? dlim : 0.0;
-            dflag = copysign(1.0, dcen);
+            dflag = amrex::Math::copysign(1.0, dcen);
 
             Real ds = 4.0 / 3.0 * dcen - (dzr + dzl) / 6.0;
             slz(i, j, k, n) = dflag * min(fabs(ds), dlim);
@@ -469,7 +469,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     slz(i, j, k, n) = sflag * min(slim, fabs(del));
 
                 } else if (k == klo + 1) {
@@ -496,7 +496,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     dpls = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
                     Real slim = min(fabs(dpls), fabs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real sflag = copysign(1.0, del);
+                    Real sflag = amrex::Math::copysign(1.0, del);
                     slz(i, j, k, n) = sflag * min(slim, fabs(del));
 
                 } else if (k == khi - 1) {

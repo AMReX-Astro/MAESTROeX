@@ -44,7 +44,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i - 1, j, k, n) - s(i - 2, j, k, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -52,7 +52,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to x-edges.
@@ -72,7 +72,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -80,7 +80,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to x-edges.
@@ -252,7 +252,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i - 1, j, k, n);
                 Real D2R =
                     s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -273,7 +273,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
                 Real D2R =
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -294,7 +294,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -317,7 +317,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
                 Real D2R = s(i + 1, j, k, n) - 2.0 * s(i + 2, j, k, n) +
                            s(i + 3, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -369,7 +369,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
                 Real D2C =
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM = max(
                     min(sgn * D2,
                         min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
@@ -379,7 +379,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -393,7 +393,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -493,7 +493,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i + 2, j, k, n);
                         Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i + 1, j, k, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -504,7 +504,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
@@ -520,7 +520,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
@@ -620,7 +620,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i + 2, j, k, n);
                         Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i + 1, j, k, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -631,7 +631,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
@@ -647,7 +647,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
@@ -739,7 +739,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i, j - 1, k, n) - s(i, j - 2, k, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -747,7 +747,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to y-edges.
@@ -767,7 +767,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -775,7 +775,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to y-edges.
@@ -947,7 +947,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i, j - 1, k, n);
                 Real D2R =
                     s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -968,7 +968,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
                 Real D2R =
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -989,7 +989,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1012,7 +1012,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
                 Real D2R = s(i, j + 1, k, n) - 2.0 * s(i, j + 2, k, n) +
                            s(i, j + 3, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1062,7 +1062,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
                 Real D2C =
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM = max(
                     min(sgn * D2,
                         min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
@@ -1072,7 +1072,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -1086,7 +1086,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -1186,7 +1186,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j + 2, k, n);
                         Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j + 1, k, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -1197,7 +1197,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
@@ -1213,7 +1213,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
@@ -1315,7 +1315,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j + 2, k, n);
                         Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j + 1, k, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -1326,7 +1326,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
@@ -1342,7 +1342,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
@@ -1431,7 +1431,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i, j, k - 1, n) - s(i, j, k - 2, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -1439,7 +1439,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to z-edges.
@@ -1459,7 +1459,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // right side
@@ -1467,7 +1467,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
                          min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
 
             // Interpolate s to z-edges.
@@ -1642,7 +1642,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i, j, k - 1, n);
                 Real D2R =
                     s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1663,7 +1663,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
                 Real D2R =
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1684,7 +1684,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1707,7 +1707,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
                 Real D2R = s(i, j, k + 1, n) - 2.0 * s(i, j, k + 2, n) +
                            s(i, j, k + 3, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
                     max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
@@ -1756,7 +1756,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
                 Real D2C =
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM = max(
                     min(sgn * D2,
                         min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
@@ -1766,7 +1766,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -1780,7 +1780,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -1879,7 +1879,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j, k + 2, n);
                         Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j, k + 1, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -1890,7 +1890,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
@@ -1906,7 +1906,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
@@ -2008,7 +2008,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j, k + 2, n);
                         Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j, k + 1, n);
-                        Real sgn = copysign(1.0, D2);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
                         Real D2LIM =
                             max(min(sgn * D2,
                                     min(C * sgn * D2L,
@@ -2019,7 +2019,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
@@ -2035,7 +2035,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
