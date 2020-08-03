@@ -19,7 +19,9 @@ void Maestro::Evolve() {
     // index for diag array buffer
     int diag_index = 0;
 
-    for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep) {
+    for (istep = start_step; ((istep <= max_step || max_step < 0) &&
+			     (t_old < stop_time  || stop_time < 0.0)); ++istep)
+    {
         // check to see if we need to regrid, then regrid
         if (max_level > 0 && regrid_int > 0 && (istep - 1) % regrid_int == 0 &&
             istep != 1) {
