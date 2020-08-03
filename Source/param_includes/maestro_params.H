@@ -164,6 +164,6 @@ extern AMREX_GPU_MANAGED amrex::Real eps_hg;
 extern AMREX_GPU_MANAGED amrex::Real eps_hg_max;
 extern AMREX_GPU_MANAGED amrex::Real hg_level_factor;
 extern AMREX_GPU_MANAGED amrex::Real eps_hg_bottom;
-};  // namespace maestro
+};
 
 #endif

@@ -21,7 +21,7 @@ pp.query("print_init_hse_diag", maestro::print_init_hse_diag);
 maestro::stop_time = -1.0;
 pp.query("stop_time", maestro::stop_time);
 
-maestro::max_step = 1;
+maestro::max_step = -1;
 pp.query("max_step", maestro::max_step);
 
 maestro::cfl = 0.5;
@@ -481,3 +481,4 @@ pp.query("hg_level_factor", maestro::hg_level_factor);
 
 maestro::eps_hg_bottom = 1.e-4;
 pp.query("eps_hg_bottom", maestro::eps_hg_bottom);
+

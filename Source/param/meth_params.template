@@ -56,6 +56,10 @@ contains
 
     @@set_maestro_params@@
 
+    if ((max_step < 0) .AND. (stop_time < 0.0)) then
+       call amrex_error("must supply either a positive stop_time or positive max_step")
+    end if
+
     if (base_cutoff_density .eq. -1.d0) then
        call amrex_error("must supply base_cutoff_density")
     end if

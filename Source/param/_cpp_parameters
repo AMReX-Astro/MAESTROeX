@@ -48,10 +48,10 @@ print_init_hse_diag                 bool        false          y
 #-----------------------------------------------------------------------------
 
 # simulation stop time
-stop_time                           Real        -1.0
+stop_time                           Real        -1.0           y
 
 # Maximum number of steps in the simulation.
-max_step                            int         1
+max_step                            int         -1             y
 
 # CFL factor to use in the computation of the advection timestep constraint
 cfl                                 Real              0.5        y

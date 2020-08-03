@@ -41,6 +41,8 @@ module meth_params_module
   character (len=:), allocatable, save :: model_file
   logical          , allocatable, save :: perturb_model
   logical          , allocatable, save :: print_init_hse_diag
+  double precision , allocatable, save :: stop_time
+  integer          , allocatable, save :: max_step
   double precision , allocatable, save :: cfl
   logical          , allocatable, save :: use_soundspeed_firstdt
   logical          , allocatable, save :: use_divu_firstdt
@@ -104,6 +106,8 @@ module meth_params_module
 
   attributes(managed) :: perturb_model
   attributes(managed) :: print_init_hse_diag
+  attributes(managed) :: stop_time
+  attributes(managed) :: max_step
   attributes(managed) :: cfl
   attributes(managed) :: use_soundspeed_firstdt
   attributes(managed) :: use_divu_firstdt
@@ -191,6 +195,10 @@ contains
     perturb_model = .false.;
     allocate(print_init_hse_diag)
     print_init_hse_diag = .false.;
+    allocate(stop_time)
+    stop_time = -1.0d0;
+    allocate(max_step)
+    max_step = -1;
     allocate(cfl)
     cfl = 0.5d0;
     allocate(use_soundspeed_firstdt)
@@ -311,6 +319,8 @@ contains
     call pp%query("model_file", model_file)
     call pp%query("perturb_model", perturb_model)
     call pp%query("print_init_hse_diag", print_init_hse_diag)
+    call pp%query("stop_time", stop_time)
+    call pp%query("max_step", max_step)
     call pp%query("cfl", cfl)
     call pp%query("use_soundspeed_firstdt", use_soundspeed_firstdt)
     call pp%query("use_divu_firstdt", use_divu_firstdt)
@@ -372,6 +382,10 @@ contains
 
 
 
+    if ((max_step < 0) .AND. (stop_time < 0.0)) then
+       call amrex_error("must supply either a positive stop_time or positive max_step")
+    end if
+
     if (base_cutoff_density .eq. -1.d0) then
        call amrex_error("must supply base_cutoff_density")
     end if
@@ -409,6 +423,12 @@ contains
     end if
     if (allocated(print_init_hse_diag)) then
         deallocate(print_init_hse_diag)
+    end if
+    if (allocated(stop_time)) then
+        deallocate(stop_time)
+    end if
+    if (allocated(max_step)) then
+        deallocate(max_step)
     end if
     if (allocated(cfl)) then
         deallocate(cfl)
