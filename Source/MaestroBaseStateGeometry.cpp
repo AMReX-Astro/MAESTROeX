@@ -33,7 +33,7 @@ void Maestro::InitBaseStateMapSphr(
             Real index =
                 (x * x + y * y + z * z) / (2.0 * dx_fine[0] * dx_fine[0]) -
                 0.375;
-            cc_to_r(i, j, k) = (int)round(index);
+            cc_to_r(i, j, k) = (int)amrex::Math::round(index);
         })
     }
 }
@@ -289,9 +289,11 @@ void Maestro::FillGhostBase(const BaseStateArray<Real>& s0,
                         2.0 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse));
                     Real dmin =
                         2.0 * (s0(n - 1, r_crse) - s0(n - 1, r_crse - 1));
-                    Real slim = min(fabs(dpls), fabs(dmin));
+                    Real slim =
+                        min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real slope = copysign(1.0, del) * min(slim, fabs(del));
+                    Real slope = amrex::Math::copysign(1.0, del) *
+                                 min(slim, amrex::Math::abs(del));
                     s0(n, lo - 1) = s0(n - 1, r_crse) + 0.25 * slope;
                     s0(n, lo - 2) = s0(n - 1, r_crse) - 0.25 * slope;
 
@@ -299,9 +301,10 @@ void Maestro::FillGhostBase(const BaseStateArray<Real>& s0,
                     del = 0.5 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse - 1));
                     dpls = 2.0 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse));
                     dmin = 2.0 * (s0(n - 1, r_crse) - s0(n - 1, r_crse - 1));
-                    slim = min(fabs(dpls), fabs(dmin));
+                    slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    slope = copysign(1.0, del) * min(slim, fabs(del));
+                    slope = amrex::Math::copysign(1.0, del) *
+                            min(slim, amrex::Math::abs(del));
                     s0(n, lo - 3) = s0(n - 1, r_crse) + 0.25 * slope;
                     s0(n, lo - 4) = s0(n - 1, r_crse) - 0.25 * slope;
                 }
@@ -314,9 +317,11 @@ void Maestro::FillGhostBase(const BaseStateArray<Real>& s0,
                         2.0 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse));
                     Real dmin =
                         2.0 * (s0(n - 1, r_crse) - s0(n - 1, r_crse - 1));
-                    Real slim = min(fabs(dpls), fabs(dmin));
+                    Real slim =
+                        min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    Real slope = copysign(1.0, del) * min(slim, fabs(del));
+                    Real slope = amrex::Math::copysign(1.0, del) *
+                                 min(slim, amrex::Math::abs(del));
                     s0(n, hi + 1) = s0(n - 1, r_crse) - 0.25 * slope;
                     s0(n, hi + 2) = s0(n - 1, r_crse) + 0.25 * slope;
 
@@ -324,9 +329,10 @@ void Maestro::FillGhostBase(const BaseStateArray<Real>& s0,
                     del = 0.5 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse - 1));
                     dpls = 2.0 * (s0(n - 1, r_crse + 1) - s0(n - 1, r_crse));
                     dmin = 2.0 * (s0(n - 1, r_crse) - s0(n - 1, r_crse - 1));
-                    slim = min(fabs(dpls), fabs(dmin));
+                    slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
                     slim = dpls * dmin > 0.0 ? slim : 0.0;
-                    slope = copysign(1.0, del) * min(slim, fabs(del));
+                    slope = amrex::Math::copysign(1.0, del) *
+                            min(slim, amrex::Math::abs(del));
                     s0(n, hi + 3) = s0(n - 1, r_crse) - 0.25 * slope;
                     s0(n, hi + 4) = s0(n - 1, r_crse) + 0.25 * slope;
                 }

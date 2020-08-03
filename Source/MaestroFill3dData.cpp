@@ -768,7 +768,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[0] * dx[0]) - 0.375);
                         // closest radial index to edge-centered point
 
@@ -812,7 +812,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[1] * dx[1]) - 0.375);
                         // closest radial index to edge-centered point
 
@@ -856,7 +856,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[2] * dx[2]) - 0.375);
                         // closest radial index to edge-centered point
 
@@ -901,7 +901,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[0] * dx[0]) - 0.375);
                         // closest radial index to edge-centered point
 
@@ -927,7 +927,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[1] * dx[1]) - 0.375);
                         // closest radial index to edge-centered point
 
@@ -953,7 +953,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                         Real z = prob_lo[2] + Real(k) * dx[2] - center_p[2];
 
                         Real radius = sqrt(x * x + y * y + z * z);
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             radius * radius / (dx[2] * dx[2]) - 0.375);
                         // closest radial index to edge-centered point
 

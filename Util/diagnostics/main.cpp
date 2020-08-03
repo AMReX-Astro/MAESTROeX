@@ -69,20 +69,25 @@ int main(int argc, char* argv[]) {
     // compute the size of the radially-binned array -- we'll do it to
     // the furtherest corner of the domain
 #if (AMREX_SPACEDIM == 1)
-    double maxdist = fabs(probhi[0] - problo[0]);
+    double maxdist = amrex::Math::abs(probhi[0] - problo[0]);
 #elif (AMREX_SPACEDIM == 2)
-    double x_maxdist = max(fabs(probhi[0] - xctr), fabs(problo[0] - xctr));
-    double y_maxdist = max(fabs(probhi[1] - yctr), fabs(problo[1] - yctr));
+    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr),
+                           amrex::Math::abs(problo[0] - xctr));
+    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr),
+                           amrex::Math::abs(problo[1] - yctr));
     double maxdist = sqrt(x_maxdist * x_maxdist + y_maxdist * y_maxdist);
 #else
-    double x_maxdist = max(fabs(probhi[0] - xctr), fabs(problo[0] - xctr));
-    double y_maxdist = max(fabs(probhi[1] - yctr), fabs(problo[1] - yctr));
-    double z_maxdist = max(fabs(probhi[2] - zctr), fabs(problo[2] - zctr));
+    double x_maxdist = max(amrex::Math::abs(probhi[0] - xctr),
+                           amrex::Math::abs(problo[0] - xctr));
+    double y_maxdist = max(amrex::Math::abs(probhi[1] - yctr),
+                           amrex::Math::abs(problo[1] - yctr));
+    double z_maxdist = max(amrex::Math::abs(probhi[2] - zctr),
+                           amrex::Math::abs(problo[2] - zctr));
     double maxdist = sqrt(x_maxdist * x_maxdist + y_maxdist * y_maxdist +
                           z_maxdist * z_maxdist);
 #endif
 
-    double dx_fine = *(std::min_element(dx.begin(), dx.end()));
+    double dx_fine = *(amrex::min_element(dx.begin(), dx.end()));
 
     int nbins = int(maxdist / dx_fine);
 
@@ -236,9 +241,9 @@ int main(int argc, char* argv[]) {
     // write the data in columns
     const auto SMALL = 1.e-20;
     for (auto i = 0; i < nbins; i++) {
-        if (fabs(dens_bin[i]) < SMALL) dens_bin[i] = 0.0;
-        if (fabs(vel_bin[i]) < SMALL) vel_bin[i] = 0.0;
-        if (fabs(X_bin[i]) < SMALL) X_bin[i] = 0.0;
+        if (amrex::Math::abs(dens_bin[i]) < SMALL) dens_bin[i] = 0.0;
+        if (amrex::Math::abs(vel_bin[i]) < SMALL) vel_bin[i] = 0.0;
+        if (amrex::Math::abs(X_bin[i]) < SMALL) X_bin[i] = 0.0;
 
         slicefile << std::setw(w) << r[i] << std::setw(w) << dens_bin[i]
                   << std::setw(w) << vel_bin[i] << std::setw(w) << X_bin[i]

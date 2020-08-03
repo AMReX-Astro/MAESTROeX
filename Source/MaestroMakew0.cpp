@@ -49,7 +49,7 @@ void Maestro::Makew0(const BaseState<Real>& w0_old, BaseState<Real>& w0_force,
             Real max_w0 = 0.0;
             for (auto r = base_geom.r_start_coord(n, 1);
                  r <= base_geom.r_end_coord(n, 1) + 1; ++r) {
-                max_w0 = max(max_w0, fabs(w0_arr(n, r)));
+                max_w0 = max(max_w0, amrex::Math::abs(w0_arr(n, r)));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / base_geom.dr(n)
                     << std::endl;
@@ -131,7 +131,8 @@ void Maestro::Makew0Planar(
             AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord) {
-                    psi_planar(r) = etarho_cc_arr(n, r) * fabs(grav_const_loc);
+                    psi_planar(r) =
+                        etarho_cc_arr(n, r) * amrex::Math::abs(grav_const_loc);
                 }
             });
             Gpu::synchronize();
@@ -172,7 +173,7 @@ void Maestro::Makew0Planar(
                     w0_arr(n - 1, (base_geom.r_end_coord(n, j) + 1) / 2);
 
                 for (auto i = n - 1; i >= 0; --i) {
-                    auto refrat = (int)round(pow(2, n - i));
+                    auto refrat = (int)amrex::Math::round(pow(2, n - i));
 
                     // Restrict w0 from level n to level i
                     for (auto r = base_geom.r_start_coord(n, j);

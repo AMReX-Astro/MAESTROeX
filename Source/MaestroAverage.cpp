@@ -233,13 +233,15 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                         Real radius = sqrt(x * x + y * y + z * z);
 
                         // figure out which radii index this point maps into
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             ((radius / dx[0]) * (radius / dx[0]) - 0.75) / 2.0);
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg) {
-                            if (fabs(radius - radii(lev, index + 1)) >
-                                fabs(radius - radii(lev, index + 2))) {
+                            if (amrex::Math::abs(radius -
+                                                 radii(lev, index + 1)) >
+                                amrex::Math::abs(radius -
+                                                 radii(lev, index + 2))) {
                                 index++;
                             }
                         }
@@ -295,8 +297,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
                 for (auto j = rcoord_p[n]; j <= nr_irreg; ++j) {
-                    if (fabs(radius - radii(n, j + 1)) <
-                        fabs(radius - radii(n, j + 2))) {
+                    if (amrex::Math::abs(radius - radii(n, j + 1)) <
+                        amrex::Math::abs(radius - radii(n, j + 2))) {
                         rcoord_p[n] = j;
                         break;
                     }
@@ -315,13 +317,13 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             which_lev(r) = 0;
 
             int min_all =
-                amrex::min(ncell(0, rcoord_p[0]), ncell(0, rcoord_p[0] + 1),
-                           ncell(0, rcoord_p[0] + 2));
+                amrex::min(ncell(0, rcoord_p[0]), amrex::min(ncell(0, rcoord_p[0] + 1),
+                                                             ncell(0, rcoord_p[0] + 2)));
 
             for (auto n = 1; n < fine_lev; ++n) {
-                int min_lev =
-                    amrex::min(ncell(n, rcoord_p[n]), ncell(n, rcoord_p[n] + 1),
-                               ncell(n, rcoord_p[n] + 2));
+                int min_lev = amrex::min(ncell(n, rcoord_p[n]), 
+                                         amrex::min(ncell(n, rcoord_p[n] + 1),
+                                                    ncell(n, rcoord_p[n] + 2)));
 
                 if (min_lev > min_all) {
                     min_all = min_lev;
@@ -390,8 +392,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             // find the closest coordinate
             for (auto j = stencil_coord; j <= max_rcoord(which_lev(r)); ++j) {
-                if (fabs(radius - radii(which_lev(r), j + 1)) <
-                    fabs(radius - radii(which_lev(r), j + 2))) {
+                if (amrex::Math::abs(radius - radii(which_lev(r), j + 1)) <
+                    amrex::Math::abs(radius - radii(which_lev(r), j + 2))) {
                     stencil_coord = j;
                     break;
                 }

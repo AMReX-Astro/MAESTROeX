@@ -54,7 +54,7 @@ void Maestro::Init() {
     FirstDt();
 
     if (stop_time >= 0. && t_old + dt > stop_time) {
-        dt = std::min(dt, stop_time - t_old);
+        dt = amrex::min(dt, stop_time - t_old);
         Print() << "Stop time limits dt = " << dt << std::endl;
     }
 

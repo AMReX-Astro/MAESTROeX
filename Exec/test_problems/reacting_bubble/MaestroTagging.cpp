@@ -64,7 +64,7 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
             Real height = (Real(r) + 0.5) * dr_lev;
 
             if ((height > 5.4e7 && height < 1.8e8) &&
-                fabs(state(i, j, k, Temp)) > 3.e7) {
+                amrex::Math::abs(state(i, j, k, Temp)) > 3.e7) {
                 tag(i, j, k) = TagBox::SET;
                 tag_array_p[lev + max_lev * r] = TagBox::SET;
             }

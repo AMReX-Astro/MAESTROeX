@@ -178,7 +178,8 @@ void Maestro::EstDt() {
 
                     umax_grid = amrex::max(
                         umax_grid,
-                        std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
+                        amrex::max(spdx,
+                                   amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
                         dt_temp = amrex::min(dt_temp, dx[0] / spdx);
@@ -332,7 +333,8 @@ void Maestro::EstDt() {
 
                     umax_grid = amrex::max(
                         umax_grid,
-                        std::max(spdx, std::max(spdy, std::max(spdz, spdr))));
+                        amrex::max(spdx,
+                                   amrex::max(spdy, amrex::max(spdz, spdr))));
 
                     if (spdx > eps) {
                         dt_temp = amrex::min(dt_temp, dx[0] / spdx);
@@ -421,8 +423,8 @@ void Maestro::EstDt() {
 #endif
                 }
             }
-            dt_lev = std::min(dt_lev, dt_grid);
-            umax_lev = std::max(umax_lev, umax_grid);
+            dt_lev = amrex::min(dt_lev, dt_grid);
+            umax_lev = amrex::max(umax_lev, umax_grid);
         }  //end openmp
 
         // find the smallest dt over all processors
@@ -432,7 +434,7 @@ void Maestro::EstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to estdt for level " << lev
@@ -440,7 +442,7 @@ void Maestro::EstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
     }  // end loop over levels
 
     if (maestro_verbose > 0) {
@@ -644,7 +646,7 @@ void Maestro::FirstDt() {
                         : uold[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 
                 umax_grid =
-                    amrex::max(umax_grid, std::max(ux, std::max(uy, uz)));
+                    amrex::max(umax_grid, amrex::max(ux, amrex::max(uy, uz)));
 
                 ux /= dx[0];
                 Real spdx = spd.max<RunOn::Device>(tileBox, 0) / dx[0];
@@ -665,11 +667,12 @@ void Maestro::FirstDt() {
                 // use advective constraint unless velocities are zero everywhere
                 // in which case we use the sound speed
                 if (ux != 0.0 || uy != 0.0 || uz != 0.0) {
-                    dt_grid = amrex::min(dt_grid,
-                                         cfl / std::max(ux, std::max(uy, uz)));
+                    dt_grid = amrex::min(
+                        dt_grid, cfl / amrex::max(ux, amrex::max(uy, uz)));
                 } else if (spdx != 0.0 && spdy != 0.0 && spdz != 0.0) {
                     dt_grid = amrex::min(
-                        dt_grid, cfl / std::max(spdx, std::max(spdy, spdz)));
+                        dt_grid,
+                        cfl / amrex::max(spdx, amrex::max(spdy, spdz)));
                 }
 
                 // sound speed constraint
@@ -678,7 +681,8 @@ void Maestro::FirstDt() {
                     if (spdx == 0.0 && spdy == 0.0 && spdz == 0.0) {
                         dt_sound = 1.e99;
                     } else {
-                        dt_sound = cfl / std::max(spdx, std::max(spdy, spdz));
+                        dt_sound =
+                            cfl / amrex::max(spdx, amrex::max(spdy, spdz));
                     }
                     dt_grid = amrex::min(dt_grid, dt_sound);
                 }
@@ -779,8 +783,8 @@ void Maestro::FirstDt() {
                     dt_grid = amrex::min(dt_grid, dt_divu);
                 }
             }
-            dt_lev = std::min(dt_lev, dt_grid);
-            umax_lev = std::max(umax_lev, umax_grid);
+            dt_lev = amrex::min(dt_lev, dt_grid);
+            umax_lev = amrex::max(umax_lev, umax_grid);
         }  //end openmp
 
         // find the smallest dt over all processors
@@ -790,7 +794,7 @@ void Maestro::FirstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to firstdt for level " << lev
@@ -806,7 +810,7 @@ void Maestro::FirstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
 
     }  // end loop over levels
 
