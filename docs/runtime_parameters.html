@@ -385,8 +385,8 @@ step.</p></td>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">spherical</span></code></p></td>
-<td><p>Set to 1 if you are doing a spherical problem.</p></td>
-<td><p>0</p></td>
+<td><p>Set to true if you are doing a spherical problem.</p></td>
+<td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">octant</span></code></p></td>
 <td><p>set octant = T if you just want to model an octant of a
@@ -394,9 +394,9 @@ sphere (note: only takes effect for spherical geometry)</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_2d_planar_octant</span></code></p></td>
-<td><p>Set to 1 if using the 2D simplified (planar) model of
-an octant.</p></td>
-<td><p>0</p></td>
+<td><p>Set to true if using the 2D simplified (planar) model
+of an octant.</p></td>
+<td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">regrid_int</span></code></p></td>
 <td><p>How often we regrid.</p></td>
@@ -487,72 +487,76 @@ IMPLEMENTED YET</p></td>
 <td><p>plot omegadot in plotfile</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_Hext</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_aux</span></code></p></td>
+<td><p>plot auxiliary variables in plotfile</p></td>
+<td><p>false</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_Hext</span></code></p></td>
 <td><p>plot external heating (Hext) in plotfile</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_Hnuc</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_Hnuc</span></code></p></td>
 <td><p>plot nuclear energy generation rate (Hnuc) in plotfile</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_eta</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_eta</span></code></p></td>
 <td><p>plot $etarho$ in plotfile</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_trac</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_trac</span></code></p></td>
 <td><p>plot tracers in plotfile NOT IMPLEMENTED YET</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_base_state</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_base_state</span></code></p></td>
 <td><p>plot w0_x, w0_y, w0_z, divw0, rho0, rhoh0, h0, and
 p0 in plotfile</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_gpi</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_gpi</span></code></p></td>
 <td><p>plot pi and grad(pi)</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_cs</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_cs</span></code></p></td>
 <td><p>plot soundspeed</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_grav</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_grav</span></code></p></td>
 <td><p>plot gravitational acceleration</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_base_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_base_name</span></code></p></td>
 <td><p>prefix to use in plotfile file names</p></td>
 <td><p>“plt”</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">small_plot_base_name</span></code></p></td>
 <td><p>prefix to use in small plotfile file names</p></td>
 <td><p>“smallplt”</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">check_base_name</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">check_base_name</span></code></p></td>
 <td><p>prefix to use in checkpoint file names</p></td>
 <td><p>“chk”</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">diag_buf_size</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">diag_buf_size</span></code></p></td>
 <td><p>number of timesteps to buffer diagnostic output
 information before writing (note: not implemented for
 all problems)</p></td>
 <td><p>10</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_ad_excess</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_ad_excess</span></code></p></td>
 <td><p>plot the adiabatic excess</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_processors</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_processors</span></code></p></td>
 <td><p>create a field in the plotfile storing the processor
 number for each zone</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_pidivu</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_pidivu</span></code></p></td>
 <td><p>plot pi * div(U) – this is a measure of conservation
 of energy</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">small_plot_vars</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">small_plot_vars</span></code></p></td>
 <td><p>small plot file variables</p></td>
 <td><p>“rho</p></td>
 </tr>

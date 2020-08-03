@@ -91,13 +91,13 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
-| ``spherical``                          | Set to 1 if you are doing a spherical problem.          | 0             |
+| ``spherical``                          | Set to true if you are doing a spherical problem.       | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``octant``                             | set octant = T if you just want to model an octant of a | false         |
 |                                        | sphere (note: only takes effect for spherical geometry) |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``do_2d_planar_octant``                | Set to 1 if using the 2D simplified (planar) model of   | 0             |
-|                                        | an octant.                                              |               |
+| ``do_2d_planar_octant``                | Set to true if using the 2D simplified (planar) model   | false         |
+|                                        | of an octant.                                           |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``regrid_int``                         | How often we regrid.                                    | -1            |
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -149,6 +149,8 @@ namespace: ``maestro``
 | ``plot_spec``                          | plot species and omegadot in plotfile                   | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_omegadot``                      | plot omegadot in plotfile                               | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``plot_aux``                           | plot auxiliary variables in plotfile                    | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``plot_Hext``                          | plot external heating (Hext) in plotfile                | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
