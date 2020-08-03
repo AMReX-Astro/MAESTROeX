@@ -629,9 +629,9 @@ MakeLatShear (const Vector<MultiFab>& omega_in,
     Real dx_fine;
     const auto probLo = pgeom[0].ProbLoArray();
     const auto probHi = pgeom[0].ProbHiArray();
-    Real halfdom = std::min(probHi[0]-probLo[0],probHi[1]-probLo[1]);
+    Real halfdom = amrex::min(probHi[0]-probLo[0],probHi[1]-probLo[1]);
 #if AMREX_SPACEDIM == 3
-    halfdom = std::min(halfdom, probHi[2]-probLo[2]);
+    halfdom = amrex::min(halfdom, probHi[2]-probLo[2]);
 #endif
     
     for (int r = 0; r < nr_fine; ++r) {
@@ -685,7 +685,7 @@ MakeLatShear (const Vector<MultiFab>& omega_in,
 			Real Y20 = 0.25*std::sqrt(5.0/M_PI)*(2*z*z - x*x - y*y) / (radius*radius);
 		    
 			// normalized Gaussian
-			Real width = std::min(maxfac,rr/halfdom)*dx_fine*dx_fine;
+			Real width = amrex::min(maxfac,rr/halfdom)*dx_fine*dx_fine;
 			Real kernel = std::exp(-(radius - rr)*(radius - r)/width) /
 			    std::sqrt(M_PI*width);
 		
