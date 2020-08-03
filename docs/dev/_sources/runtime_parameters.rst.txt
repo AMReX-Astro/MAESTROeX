@@ -49,7 +49,7 @@ namespace: ``maestro``
 +========================================+=========================================================+===============+
 | ``stop_time``                          | simulation stop time                                    | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``max_step``                           | Maximum number of steps in the simulation.              | 1             |
+| ``max_step``                           | Maximum number of steps in the simulation.              | -1            |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``cfl``                                | CFL factor to use in the computation of the advection   | 0.5           |
 |                                        | timestep constraint                                     |               |
