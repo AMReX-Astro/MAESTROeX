@@ -30,10 +30,10 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
     if (use_p_dens_g && use_p_H_g) {
         Abort("ERROR: use_p_dens_g AND use_p_H_g cannot both be true");
     } else if (use_p_dens_g) {
-        H = pres_base / dens_base / fabs(grav_const);
+        H = pres_base / dens_base / amrex::Math::abs(grav_const);
     } else if (use_p_H_g) {
         H = scale_height;
-        dens_base = pres_base / H / fabs(grav_const);
+        dens_base = pres_base / H / amrex::Math::abs(grav_const);
     } else {
         Abort("ERROR: either use_p_dens_g or use_p_H_g must be true");
     }
@@ -83,7 +83,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
             p0_init_arr(n, r - 1) -
             base_geom.dr(n) * 0.5 *
                 (s0_init_arr(n, r, Rho) + s0_init_arr(n, r - 1, Rho)) *
-                fabs(grav_const);
+                amrex::Math::abs(grav_const);
 
         // use the EOS to make the state consistent
         eos_state.rho = dens_zone;

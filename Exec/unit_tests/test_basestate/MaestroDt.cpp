@@ -112,8 +112,8 @@ void Maestro::EstDt() {
                         tileBox, AMREX_SPACEDIM - 1);
 
                     dr_fine_loc = (prob_hi - prob_lo) / base_geom.nr_fine;
-                    dt_grid = std::min(1.1 * dt_grid,
-                                       cfl * dr_fine_loc / (maxw0 + SMALL));
+                    dt_grid = amrex::min(1.1 * dt_grid,
+                                         cfl * dr_fine_loc / (maxw0 + SMALL));
 
                 } else {
 #if (AMREX_SPACEDIM == 3)
@@ -128,13 +128,13 @@ void Maestro::EstDt() {
                         dr_fine_loc = prob_hi * dx[0] / drdxfac;
                     }
 
-                    dt_grid = std::min(1.1 * dt_grid,
-                                       cfl * dr_fine_loc / (maxw0 + SMALL));
+                    dt_grid = amrex::min(1.1 * dt_grid,
+                                         cfl * dr_fine_loc / (maxw0 + SMALL));
 #endif
                 }
 
-                dt_lev = std::min(dt_lev, dt_grid);
-                umax_lev = std::max(umax_lev, umax_grid);
+                dt_lev = amrex::min(dt_lev, dt_grid);
+                umax_lev = amrex::max(umax_lev, umax_grid);
             }  // end openmp
         }
 
@@ -145,7 +145,7 @@ void Maestro::EstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to estdt for level " << lev
@@ -153,7 +153,7 @@ void Maestro::EstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
 
     }  // end loop over levels
 
@@ -278,8 +278,8 @@ void Maestro::FirstDt() {
             Real dt_grid = initial_dt;
             Real umax_grid = 0.;
 
-            dt_lev = std::min(dt_lev, dt_grid);
-            umax_lev = std::max(umax_lev, umax_grid);
+            dt_lev = amrex::min(dt_lev, dt_grid);
+            umax_lev = amrex::max(umax_lev, umax_grid);
         }
 
         // find the smallest dt over all processors
@@ -289,7 +289,7 @@ void Maestro::FirstDt() {
         ParallelDescriptor::ReduceRealMax(umax_lev);
 
         // update umax over all levels
-        umax = std::max(umax, umax_lev);
+        umax = amrex::max(umax, umax_lev);
 
         if (maestro_verbose > 0) {
             Print() << "Call to firstdt for level " << lev
@@ -305,7 +305,7 @@ void Maestro::FirstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
 
     }  // end loop over levels
 

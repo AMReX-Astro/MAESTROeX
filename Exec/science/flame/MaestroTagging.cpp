@@ -7,7 +7,6 @@ using namespace amrex;
 void Maestro::RetagArray(const Box& bx, const int lev) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RetagArray()", RetagArray);
-
     // re-compute tag_array since the actual grid structure changed due to buffering
     // this is required in order to compute numdisjointchunks, r_start_coord, r_end_coord
 
@@ -26,9 +25,8 @@ void Maestro::TagBoxes(TagBoxArray& tags, const MFIter& mfi, const int lev,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagBoxes()", TagBoxes);
 
-    // tag all cells at a given height if any cells at that height were tagged
-
-    const Array4<TagBox::TagType> tag = tags.array(mfi);
+    // Tag on regions of high temperature
+    const Array4<char> tag = tags.array(mfi);
     const int* AMREX_RESTRICT tag_array_p = tag_array.dataPtr();
     const int max_lev = base_geom.max_radial_level + 1;
 
@@ -48,36 +46,21 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::StateError()", StateError);
 
-    const Box& tileBox = mfi.tilebox();
-
-    const auto tag = tags.array(mfi);
+    // Tag on regions of high temperature
+    const Array4<char> tag = tags.array(mfi);
     const Array4<const Real> state = state_mf.array(mfi);
     int* AMREX_RESTRICT tag_array_p = tag_array.dataPtr();
     const int max_lev = base_geom.max_radial_level + 1;
 
-    const Real dr_lev = base_geom.dr(lev);
+    const Box& tilebox = mfi.tilebox();
 
-    if (use_tpert_in_tagging) {
-        // Tag on regions with largest temperature perturbation
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    // Tag on regions of high temperature
+    AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+        if (state(i, j, k, Temp) >= 6.5e8 && state(i, j, k, Temp) <= 2.4e9) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
-            Real height = (Real(r) + 0.5) * dr_lev;
 
-            if ((height > 5.4e7 && height < 1.8e8) &&
-                amrex::Math::abs(state(i, j, k, Temp)) > 3.e7) {
-                tag(i, j, k) = TagBox::SET;
-                tag_array_p[lev + max_lev * r] = TagBox::SET;
-            }
-        });
-    } else {
-        // Tag on regions of high temperature
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-            if (state(i, j, k, Temp) >= 6.5e8) {
-                int r = AMREX_SPACEDIM == 2 ? j : k;
-
-                tag(i, j, k) = TagBox::SET;
-                tag_array_p[lev + max_lev * r] = TagBox::SET;
-            }
-        });
-    }
+            tag(i, j, k) = TagBox::SET;
+            tag_array_p[lev + max_lev * r] = TagBox::SET;
+        }
+    });
 }

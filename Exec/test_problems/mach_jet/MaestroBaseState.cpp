@@ -45,7 +45,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
         p0_init_arr(n, 0) = pres_zone;
 
         // H = pres_base / dens_base / abs(grav_const)
-        Real H = 1.e6 / 1.e-3 / fabs(grav_const);
+        Real H = 1.e6 / 1.e-3 / amrex::Math::abs(grav_const);
 
         // set an initial guess for the temperature -- this will be reset
         // ! by the EOS
@@ -71,13 +71,14 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
 
             if (r == 0) {
                 p0_init_arr(n, r) -= base_geom.dr(n) * 0.5 *
-                                     s0_init_arr(n, r, Rho) * fabs(grav_const);
+                                     s0_init_arr(n, r, Rho) *
+                                     amrex::Math::abs(grav_const);
             } else {
                 p0_init_arr(n, r) =
                     p0_init_arr(n, r - 1) -
                     base_geom.dr(n) * 0.5 *
                         (s0_init_arr(n, r, Rho) + s0_init_arr(n, r - 1, Rho)) *
-                        fabs(grav_const);
+                        amrex::Math::abs(grav_const);
             }
 
             pres_zone = p0_init_arr(n, r);

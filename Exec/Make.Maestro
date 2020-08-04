@@ -184,11 +184,9 @@ PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
 
-MANAGED_PROBIN_FLAG :=
 ifdef USE_CUDA
   ifeq ($(USE_CUDA), TRUE)
     USE_GPU_PRAGMA = TRUE
-    MANAGED_PROBIN_FLAG := --managed
     DEFINES += -DCUDA
   endif
 endif
@@ -199,9 +197,9 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	@echo " "
 	@echo "${bold}WRITING extern.F90${normal}"
-	$(AMREX_HOME)/Tools/F_scripts/write_probin.py \
+	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           -t $(PROBIN_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90 -n probin \
-          --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" $(MANAGED_PROBIN_FLAG) \
+          --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
 

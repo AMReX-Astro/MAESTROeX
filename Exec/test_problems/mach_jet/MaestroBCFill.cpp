@@ -15,7 +15,7 @@ void Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
 
     fab_filcc(bx, scal, 1, domainBox, dx, gridlo, &bcs);
 
-    FillExtBC(scal, bx, domainBox, bcs, comp, false);
+    FillExtBC(scal, bx, domainBox, dx, bcs, comp, false);
 }
 
 void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
@@ -26,12 +26,12 @@ void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
 
     fab_filcc(bx, vel, 1, domainBox, dx, gridlo, &bcs);
 
-    FillExtBC(vel, bx, domainBox, bcs, comp, true);
+    FillExtBC(vel, bx, domainBox, dx, bcs, comp, true);
 }
 
 void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
-                        const Box& domainBox, const BCRec bcs, const int comp,
-                        const bool is_vel) {
+                        const Box& domainBox, const Real* dx, const BCRec bcs,
+                        const int comp, const bool is_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillExtBC()", FillExtBC);
 
@@ -51,7 +51,6 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     const Real INLET_TEMP_l = INLET_TEMP;
     const Real INLET_CS_l = INLET_CS;
     // const Real inlet_mach = inlet_mach;
-    const Real dr_fine_loc = INLET_dr_fine;
 
     const Real A = 4.5e-2;
     const Real B = 1.e2;
@@ -75,7 +74,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[0] > domhi[0]) {
-        auto imin = domhi[0] + 1;
+        auto imin = domhi[0];
 
         if (bcs.hi(0) == BCType::ext_dir) {
             AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
@@ -99,7 +98,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     });
                 } else if (comp == 1) {
                     AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                        Real x = (Real(i) + 0.5) * dr_fine_loc;
+                        Real x = (Real(i) + 0.5) * dx[0];
 
                         if (j < jmax) {
                             q(i, j, k) = (inlet_mach / 1.e-1) * INLET_CS_l *
@@ -111,7 +110,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
             } else {
                 if (comp == Rho) {
                     AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                        Real x = (Real(i) + 0.5) * dr_fine_loc;
+                        Real x = (Real(i) + 0.5) * dx[0];
                         Real vy = (inlet_mach / 1.e-1) * INLET_CS_l *
                                   (1.e-2 + A * (tanh(B * (x - 0.40)) +
                                                 tanh(B * (0.6 - x))));
@@ -124,7 +123,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     });
                 } else if (comp == RhoH) {
                     AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                        Real x = (Real(i) + 0.5) * dr_fine_loc;
+                        Real x = (Real(i) + 0.5) * dx[0];
                         Real vy = (inlet_mach / 1.e-1) * INLET_CS_l *
                                   (1.e-2 + A * (tanh(B * (x - 0.40)) +
                                                 tanh(B * (0.6 - x))));
@@ -137,7 +136,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     });
                 } else if (comp == FirstSpec) {
                     AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                        Real x = (Real(i) + 0.5) * dr_fine_loc;
+                        Real x = (Real(i) + 0.5) * dx[0];
                         Real vy = (inlet_mach / 1.e-1) * INLET_CS_l *
                                   (1.e-2 + A * (tanh(B * (x - 0.40)) +
                                                 tanh(B * (0.6 - x))));
@@ -150,7 +149,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
                     });
                 } else if (comp == Temp) {
                     AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
-                        Real x = (Real(i) + 0.5) * dr_fine_loc;
+                        Real x = (Real(i) + 0.5) * dx[0];
                         Real vy = (inlet_mach / 1.e-1) * INLET_CS_l *
                                   (1.e-2 + A * (tanh(B * (x - 0.40)) +
                                                 tanh(B * (0.6 - x))));
@@ -173,7 +172,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[1] > domhi[1]) {
-        auto jmin = domhi[1] + 1;
+        auto jmin = domhi[1];
 
         if (bcs.hi(1) == BCType::ext_dir) {
             AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
@@ -199,7 +198,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[2] > domhi[2]) {
-        auto kmin = domhi[2] + 1;
+        auto kmin = domhi[2];
 
         if (bcs.hi(2) == BCType::ext_dir) {
             AMREX_PARALLEL_FOR_3D(bx, i, j, k, {

@@ -145,7 +145,8 @@ Real ModelParser::Interpolate(const Real r, const int ivar,
         i++;
     }
     if (i > 0 && i < npts_model) {
-        if (fabs(r - model_r[i - 1]) < fabs(r - model_r[i])) {
+        if (amrex::Math::abs(r - model_r[i - 1]) <
+            amrex::Math::abs(r - model_r[i])) {
             i--;
         }
     } else if (i == npts_model) {

@@ -132,11 +132,12 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
         }
     }
 
-    //
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -168,7 +169,7 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     // tolerance parameters taken from original MAESTRO fortran code
     const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel =
-        std::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
+        amrex::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
 
     // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs),

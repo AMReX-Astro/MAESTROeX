@@ -12,10 +12,10 @@ module probin_module
 
   private
 
-  @@declarationsA@@
+  @@declarations@@
 
 #ifdef AMREX_USE_CUDA
-  @@cudaattributesA@@
+  @@cudaattributes@@
 #endif
 
 end module probin_module

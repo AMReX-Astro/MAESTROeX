@@ -19,8 +19,7 @@ void BaseStateGeometry::Init(const int max_radial_level_in,
     const auto probHi = geom[0].ProbHiArray();
 
     max_radial_level = max_radial_level_in;
-    finest_radial_level =
-        max_radial_level_in;  // FIXME - we want to set this after regridding
+    finest_radial_level = 0;  // This will be reset after regridding.
     nr_fine = nr_fine_in;
     dr_fine = dr_fine_in;
     nr_irreg = nr_irreg_in;
@@ -381,7 +380,7 @@ void BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
                     chunk_start = false;
                 } else if (r == nr(n - 1) - 1 && chunk_start) {
                     // if last chunk is at the end of array
-                    r_end_coord(n, numdisjointchunks(n)) = 2 * r - 1;
+                    r_end_coord(n, numdisjointchunks(n)) = 2 * r + 1;
                 }
             }
         }

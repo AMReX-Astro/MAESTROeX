@@ -46,7 +46,8 @@ void Maestro::MakeExplicitThermal(
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -159,7 +160,8 @@ void Maestro::MakeExplicitThermalHterm(Vector<MultiFab>& thermal,
     // turn off multigrid coarsening since no actual solve is performed
     info.setMaxCoarseningLevel(0);
 
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int stencil_order = 2;
@@ -438,7 +440,9 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -497,7 +501,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
     for (int lev = 0; lev <= finest_level; ++lev) {
-        thermal_tol_abs = std::max(thermal_tol_abs, phi[lev].norm0());
+        thermal_tol_abs = amrex::max(thermal_tol_abs, phi[lev].norm0());
     }
     const Real solver_tol_abs = eps_mac * thermal_tol_abs;
     const Real solver_tol_rel = eps_mac;
@@ -630,7 +634,9 @@ void Maestro::ThermalConductSDC(
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
-    MLABecLaplacian mlabec(geom, grids, dmap, info);
+
+    // Only pass up to defined level to prevent looping over undefined grids.
+    MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
 
     // order of stencil
     int linop_maxorder = 2;
@@ -694,7 +700,7 @@ void Maestro::ThermalConductSDC(
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
     for (int lev = 0; lev <= finest_level; ++lev) {
-        thermal_tol_abs = std::max(thermal_tol_abs, phi[lev].norm0());
+        thermal_tol_abs = amrex::max(thermal_tol_abs, phi[lev].norm0());
     }
     const Real solver_tol_abs = eps_mac * thermal_tol_abs;
     const Real solver_tol_rel = eps_mac;
