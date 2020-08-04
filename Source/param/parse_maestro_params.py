@@ -96,7 +96,7 @@ class Param(object):
 
     def __init__(self, name, dtype, default,
                  cpp_var_name=None,
-                 namespace=None, cpp_class=None, 
+                 namespace=None, cpp_class=None,
                  debug_default=None,
                  in_fortran=0, f90_name=None, f90_dtype=None,
                  ifdef=None):
@@ -132,13 +132,17 @@ class Param(object):
         # into Maestro.cpp
 
         if self.dtype == "int":
-            tstr = "AMREX_GPU_MANAGED int {}::{}".format(self.namespace, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED int {}::{}".format(
+                self.namespace, self.cpp_var_name)
         elif self.dtype == "Real":
-            tstr = "AMREX_GPU_MANAGED amrex::Real {}::{}".format(self.namespace, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED amrex::Real {}::{}".format(
+                self.namespace, self.cpp_var_name)
         elif self.dtype == "bool":
-            tstr = "AMREX_GPU_MANAGED bool {}::{}".format(self.namespace, self.cpp_var_name)
+            tstr = "AMREX_GPU_MANAGED bool {}::{}".format(
+                self.namespace, self.cpp_var_name)
         elif self.dtype == "string":
-            tstr = "std::string {}::{}".format(self.namespace, self.cpp_var_name)
+            tstr = "std::string {}::{}".format(
+                self.namespace, self.cpp_var_name)
         else:
             sys.exit("invalid data type for parameter {}".format(self.name))
 
@@ -155,12 +159,15 @@ class Param(object):
 
         if not self.debug_default is None:
             ostr += "#ifdef AMREX_DEBUG\n"
-            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.debug_default)
+            ostr += "{}::{} = {};\n".format(self.namespace,
+                                            self.cpp_var_name, self.debug_default)
             ostr += "#else\n"
-            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.default)
+            ostr += "{}::{} = {};\n".format(self.namespace,
+                                            self.cpp_var_name, self.default)
             ostr += "#endif\n"
         else:
-            ostr += "{}::{} = {};\n".format(self.namespace, self.cpp_var_name, self.default)
+            ostr += "{}::{} = {};\n".format(self.namespace,
+                                            self.cpp_var_name, self.default)
 
         if not self.ifdef is None:
             ostr += "#endif\n"
@@ -231,9 +238,11 @@ class Param(object):
             ostr += "#ifdef {}\n".format(self.ifdef)
 
         if language == "C++":
-            ostr += "pp.query(\"{}\", {}::{});\n".format(self.name, self.namespace, self.cpp_var_name)
+            ostr += "pp.query(\"{}\", {}::{});\n".format(self.name,
+                                                         self.namespace, self.cpp_var_name)
         elif language == "F90":
-            ostr += "    call pp%query(\"{}\", {})\n".format(self.name, self.f90_name)
+            ostr += "    call pp%query(\"{}\", {})\n".format(self.name,
+                                                             self.f90_name)
         else:
             sys.exit("invalid language choice in get_query_string")
 
@@ -242,16 +251,33 @@ class Param(object):
 
         return ostr
 
+    def default_format(self):
+        """return the variable in a format that it can be recognized in C++ code"""
+        if self.dtype == "string":
+            return f'{self.default}'
+
+        return self.default
+
+    def get_job_info_test(self):
+        # this is the output in C++ in the job_info writing
+
+        ostr = f'jobInfoFile << ({self.namespace}::{self.cpp_var_name} == {self.default_format()} ? "    " : "[*] ") << "{self.namespace}.{self.cpp_var_name} = " << {self.namespace}::{self.cpp_var_name} << std::endl;\n'
+
+        return ostr
+
     def get_decl_string(self):
         # this is the line that goes into maestro_params.H included
         # into Maestro.H
 
         if self.dtype == "int":
-            tstr = "extern AMREX_GPU_MANAGED int {};\n".format(self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED int {};\n".format(
+                self.cpp_var_name)
         elif self.dtype == "Real":
-            tstr = "extern AMREX_GPU_MANAGED amrex::Real {};\n".format(self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED amrex::Real {};\n".format(
+                self.cpp_var_name)
         elif self.dtype == "bool":
-            tstr = "extern AMREX_GPU_MANAGED bool {};\n".format(self.cpp_var_name)
+            tstr = "extern AMREX_GPU_MANAGED bool {};\n".format(
+                self.cpp_var_name)
         elif self.dtype == "string":
             tstr = "extern std::string {};\n".format(self.cpp_var_name)
         else:
@@ -276,13 +302,17 @@ class Param(object):
             return None
 
         if self.f90_dtype == "int":
-            tstr = "integer          , allocatable, save :: {}\n".format(self.f90_name)
+            tstr = "integer          , allocatable, save :: {}\n".format(
+                self.f90_name)
         elif self.f90_dtype == "Real":
-            tstr = "double precision , allocatable, save :: {}\n".format(self.f90_name)
+            tstr = "double precision , allocatable, save :: {}\n".format(
+                self.f90_name)
         elif self.f90_dtype == "bool":
-            tstr = "logical          , allocatable, save :: {}\n".format(self.f90_name)
+            tstr = "logical          , allocatable, save :: {}\n".format(
+                self.f90_name)
         elif self.f90_dtype == "string":
-            tstr = "character (len=:), allocatable, save :: {}\n".format(self.f90_name)
+            tstr = "character (len=:), allocatable, save :: {}\n".format(
+                self.f90_name)
             print("warning: string parameter {} will not be available on the GPU".format(
                 self.f90_name))
         else:
@@ -304,20 +334,21 @@ class Param(object):
             return cstr
 
 
-def write_meth_module(plist, meth_template):
+def write_meth_module(plist, meth_template, out_directory):
     """this writes the meth_params_module, starting with the meth_template
        and inserting the runtime parameter declaration in the correct
        place
     """
 
-    try: mt = open(meth_template, "r")
+    try:
+        mt = open(meth_template, "r")
     except:
         sys.exit("invalid template file")
 
-    try: mo = open("../param_includes/meth_params.F90", "w")
+    try:
+        mo = open(f"{out_directory}/meth_params.F90", "w")
     except:
         sys.exit("unable to open meth_params.F90 for writing")
-
 
     mo.write(FWARNING)
 
@@ -327,13 +358,14 @@ def write_meth_module(plist, meth_template):
     decls = ""
 
     for p in param_decls:
-        decls += "  {}".format(p)
+        decls += f"  {p}"
 
-    cuda_managed_decls = [p.get_cuda_managed_string() for p in plist if p.in_fortran == 1]
+    cuda_managed_decls = [p.get_cuda_managed_string()
+                          for p in plist if p.in_fortran == 1]
 
     cuda_managed_string = ""
     for p in cuda_managed_decls:
-        cuda_managed_string += "{}".format(p)
+        cuda_managed_string += f"{p}"
 
     for line in mt:
         if line.find("@@f90_declarations@@") > 0:
@@ -418,7 +450,6 @@ def write_meth_module(plist, meth_template):
 
             mo.write("\n\n")
 
-
         else:
             mo.write(line)
 
@@ -426,17 +457,17 @@ def write_meth_module(plist, meth_template):
     mt.close()
 
 
-def parse_params(infile, meth_template):
+def parse_params(infile, meth_template, out_directory):
 
     params = []
 
     namespace = None
     cpp_class = None
 
-    try: f = open(infile)
+    try:
+        f = open(infile)
     except:
-        sys.exit("error openning the input file")
-
+        sys.exit("error opening the input file")
 
     for line in f:
         if line[0] == "#":
@@ -460,7 +491,8 @@ def parse_params(infile, meth_template):
 
         # this splits the line into separate fields.  A field is a
         # single word or a pair in parentheses like "(a, b)"
-        fields = re.findall(r'".+"|[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
+        fields = re.findall(
+            r'".+"|[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
         name = fields[0]
         if name[0] == "(":
@@ -476,22 +508,30 @@ def parse_params(infile, meth_template):
         else:
             debug_default = None
 
-        try: in_fortran_string = fields[3]
-        except: in_fortran = 0
+        try:
+            in_fortran_string = fields[3]
+        except:
+            in_fortran = 0
         else:
             if in_fortran_string.lower().strip() == "y":
                 in_fortran = 1
             else:
                 in_fortran = 0
 
-        try: ifdef = fields[4]
-        except: ifdef = None
+        try:
+            ifdef = fields[4]
+        except:
+            ifdef = None
 
-        try: f90_name = fields[5]
-        except: f90_name = None
+        try:
+            f90_name = fields[5]
+        except:
+            f90_name = None
 
-        try: f90_dtype = fields[6]
-        except: f90_dtype = None
+        try:
+            f90_dtype = fields[6]
+        except:
+            f90_dtype = None
 
         if namespace is None:
             sys.exit("namespace not set")
@@ -504,8 +544,6 @@ def parse_params(infile, meth_template):
                             in_fortran=in_fortran, f90_name=f90_name, f90_dtype=f90_dtype,
                             ifdef=ifdef))
 
-
-
     # output
 
     # find all the namespaces
@@ -514,31 +552,40 @@ def parse_params(infile, meth_template):
     for nm in namespaces:
 
         params_nm = [q for q in params if q.namespace == nm]
+        ifdefs = {q.ifdef for q in params_nm}
 
         # write name_declares.H
-        try: cd = open("{}/{}_declares.H".format(param_include_dir, nm), "w")
+        try:
+            cd = open(f"{out_directory}/{nm}_declares.H", "w")
         except:
-            sys.exit("unable to open {}_declares.H for writing".format(nm))
+            sys.exit(f"unable to open {nm}_declares.H for writing")
 
         cd.write(CWARNING)
-        cd.write("#ifndef _{}_DECLARES_H_\n".format(nm.upper()))
-        cd.write("#define _{}_DECLARES_H_\n".format(nm.upper()))
+        cd.write(f"#ifndef _{nm.upper()}_DECLARES_H_\n")
+        cd.write(f"#define _{nm.upper()}_DECLARES_H_\n")
 
-        for p in params_nm:
-            cd.write(p.get_declare_string())
+        for ifdef in ifdefs:
+            if ifdef is None:
+                for p in [q for q in params_nm if q.ifdef is None]:
+                    cd.write(p.get_declare_string())
+            else:
+                cd.write("#ifdef {}\n".format(ifdef))
+                for p in [q for q in params_nm if q.ifdef == ifdef]:
+                    cd.write(p.get_declare_string())
+                cd.write("#endif\n")
 
         cd.write("#endif\n")
         cd.close()
 
         # write name_params.H
-        try: 
-            cp = open("{}/{}_params.H".format(param_include_dir, nm), "w")
+        try:
+            cp = open(f"{out_directory}/{nm}_params.H", "w")
         except:
-            sys.exit("unable to open {}_params.H for writing".format(nm))
+            sys.exit(f"unable to open {nm}_params.H for writing")
 
         cp.write(CWARNING)
-        cp.write("#ifndef _{}_PARAMS_H_\n".format(nm.upper()))
-        cp.write("#define _{}_PARAMS_H_\n".format(nm.upper()))
+        cp.write(f"#ifndef _{nm.upper()}_PARAMS_H_\n")
+        cp.write(f"#define _{nm.upper()}_PARAMS_H_\n")
 
         cp.write("\n")
         cp.write("namespace {} {{\n".format(nm))
@@ -551,9 +598,10 @@ def parse_params(infile, meth_template):
         cp.close()
 
         # write maestro_queries.H
-        try: cq = open("{}/{}_queries.H".format(param_include_dir, nm), "w")
+        try:
+            cq = open(f"{out_directory}/{nm}_queries.H", "w")
         except:
-            sys.exit("unable to open {}_queries.H for writing".format(nm))
+            sys.exit(f"unable to open {nm}_queries.H for writing")
 
         cq.write(CWARNING)
 
@@ -564,19 +612,42 @@ def parse_params(infile, meth_template):
 
         cq.close()
 
+        # write the job info tests
+        try:
+            jo = open(f"{out_directory}/{nm}_job_info_tests.H", "w")
+        except IOError:
+            sys.exit(f"unable to open {nm}_job_info_tests.H")
+
+        for ifdef in ifdefs:
+            if ifdef is None:
+                for p in [q for q in params_nm if q.ifdef is None]:
+                    jo.write(p.get_job_info_test())
+            else:
+                jo.write(f"#ifdef {ifdef}\n")
+                for p in [q for q in params_nm if q.ifdef == ifdef]:
+                    jo.write(p.get_job_info_test())
+                jo.write("#endif\n")
+
+        jo.close()
 
     # write the Fortran module
-    write_meth_module(params, meth_template)
+    write_meth_module(params, meth_template, out_directory)
 
 
-if __name__ == "__main__":
-
+def main():
+    """the main driver"""
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", type=str, default=None,
                         help="template for the meth_params module")
+    parser.add_argument("-o", type=str, default=None,
+                        help="output directory for the generated files")
     parser.add_argument("input_file", type=str, nargs=1,
                         help="input file containing the list of parameters we will define")
 
     args = parser.parse_args()
 
-    parse_params(args.input_file[0], args.m)
+    parse_params(args.input_file[0], args.m, args.o)
+
+
+if __name__ == "__main__":
+    main()
