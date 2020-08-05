@@ -73,7 +73,6 @@ endif
 
 Bdirs 	:= Source \
            Source/Src_nd \
-           Source/param_includes \
            constants \
            Util/model_parser \
            Util/simple_log \
@@ -203,6 +202,35 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
 
+#------------------------------------------------------------------------------
+# MAESTROeX C++ parameters
+#------------------------------------------------------------------------------
+
+CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
+METH_PARAMS_TEMPLATE := $(TOP)/Source/param/meth_params.template
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90: $(CPP_PARAMETERS) $(METH_PARAMS_TEMPLATE)
+	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
+	$(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
+
+# for debugging
+test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
+
+#------------------------------------------------------------------------------
+# state variable info
+#-------------------------------------------------------------------------------
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
+	echo "state_indices.H will be generated at the same time as state_indices_nd.F90"
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90:
+	$(MAESTROEX_HOME)/Source/param/set_variables.py \
+           --defines "$(DEFINES)" \
+           --odir $(MAESTROEX_AUTO_SOURCE_DIR) \
+           $(MAESTROEX_HOME)/Source/param/_variables
+
+# for debugging
+test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
 
 
 #------------------------------------------------------------------------------
