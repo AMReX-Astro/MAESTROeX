@@ -235,9 +235,12 @@ and how to look at the output.</p>
 <p>MAESTROeX requires a C++ compiler that supports the C++11 standard, a
 Fortran compiler that supports the Fortran 2003 standard, and a C compiler
 that supports the C99 standard. Several compiler suites are supported,
-including GNU, Intel, PGI and Cray. GNU Make is also required, as is Python
-(&gt;= 2.7, including 3) and standard tools available in any Unix-like
+including GNU, Intel, PGI and Cray. GNU Make (&gt;= 3.81) is also required,
+as is Python (&gt;= 3.6) and standard tools available in any Unix-like
 environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
+<p>For running in parallel, an MPI library and/or OpenMP is required.
+For running on GPUs, CUDA 10 or later is required (see <a class="reference internal" href="gpu.html#sec-gpu"><span class="std std-ref">GPU</span></a> for
+more information).</p>
 </div>
 <div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
