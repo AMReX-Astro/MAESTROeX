@@ -316,12 +316,12 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // choose the level with the largest min over the ncell interpolation points
             which_lev(r) = 0;
 
-            int min_all =
-                amrex::min(ncell(0, rcoord_p[0]), amrex::min(ncell(0, rcoord_p[0] + 1),
-                                                             ncell(0, rcoord_p[0] + 2)));
+            int min_all = amrex::min(ncell(0, rcoord_p[0]),
+                                     amrex::min(ncell(0, rcoord_p[0] + 1),
+                                                ncell(0, rcoord_p[0] + 2)));
 
             for (auto n = 1; n < fine_lev; ++n) {
-                int min_lev = amrex::min(ncell(n, rcoord_p[n]), 
+                int min_lev = amrex::min(ncell(n, rcoord_p[n]),
                                          amrex::min(ncell(n, rcoord_p[n] + 1),
                                                     ncell(n, rcoord_p[n] + 2)));
 
