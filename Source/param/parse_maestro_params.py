@@ -1,6 +1,4 @@
-#!/usr/bin/env python
-
-from __future__ import print_function
+#!/usr/bin/env python3
 
 # This script parses the list of C++ runtime parameters and writes the
 # necessary header files and Fortran routines to make them available
