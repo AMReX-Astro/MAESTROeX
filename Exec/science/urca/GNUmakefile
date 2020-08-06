@@ -1,7 +1,7 @@
 DEBUG      = FALSE
 DIM        = 3
 COMP	   = gnu
-USE_MPI    = FALSE
+USE_MPI    = TRUE
 USE_OMP    = TRUE
 USE_REACT  = TRUE
 
