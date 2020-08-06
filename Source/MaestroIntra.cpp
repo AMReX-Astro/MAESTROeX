@@ -83,4 +83,10 @@ void Maestro::MakeIntraCoeffs(const Vector<MultiFab>& scal1,
             });
         }
     }
+
+    // average down and fill ghost cells
+    AverageDown(cp, 0, 1);
+    FillPatch(t_old, cp, cp, cp, 0, 0, 1, 0, bcs_f);
+    AverageDown(xi, 0, 1);
+    FillPatch(t_old, xi, xi, xi, 0, 0, 1, 0, bcs_f);
 }

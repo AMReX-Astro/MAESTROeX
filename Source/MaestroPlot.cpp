@@ -317,7 +317,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     Vector<MultiFab> sdc_source(finest_level + 1);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
-        stemp[lev].define(grids[lev], dmap[lev], Nscal, 0);
+        stemp[lev].define(grids[lev], dmap[lev], Nscal, ng_s);
         rho_Hext[lev].define(grids[lev], dmap[lev], 1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
