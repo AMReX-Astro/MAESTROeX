@@ -1,0 +1,150 @@
+# INITIAL MODEL
+maestro.model_file = "WD_urca_nuc_M-1.0_rc4.5e9_Tc6.0e8_speceq.hse.5120"
+maestro.drdxfac = 20
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 1       # maximum level number allowed
+
+# with 2048 MPI ranks, this is 2 grids per rank
+amr.n_cell             = 128 128 128
+amr.max_grid_size      = 32
+
+amr.refine_grid_layout = 1       # chop grids up into smaller grids if nprocs > ngrids
+
+maestro.anelastic_cutoff_density = 1.e6
+maestro.base_cutoff_density = 1.e5
+
+maestro.do_sponge = 1
+maestro.sponge_center_density = 3.e6
+maestro.sponge_start_factor = 3.333e0
+maestro.sponge_kappa = 10.e0
+
+maestro.spherical = 1
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0    0.0
+geometry.prob_hi     =  5.12e8  5.12e8   5.12e8
+
+# TIME STEPPING
+maestro.max_step  = 1000000
+maestro.init_iter = 1
+
+maestro.stop_time = 36000.
+
+# how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
+maestro.sum_interval = 1
+
+# PLOTFILES
+maestro.plot_file  = plt     # root name of plot file
+maestro.plot_int   = 1000000 # number of timesteps between plot files
+maestro.plot_deltat = 5.0
+
+# Write out plotfile data in single precision
+fab.format = NATIVE_32
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = 100
+
+maestro.cfl       = 0.8    # cfl number for hyperbolic system
+
+maestro.init_shrink = 0.1e0
+maestro.max_dt_growth = 1.1e0
+maestro.use_soundspeed_firstdt = true
+maestro.use_divu_firstdt = true
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 2 2 2
+maestro.hi_bc = 2 2 2
+geometry.is_periodic =  0 0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+maestro.mg_verbose     = 1
+maestro.cg_verbose     = 0
+
+# ALGORITHMIC OPTIONS
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 3
+
+maestro.do_burning = true
+
+maestro.evolve_base_state = true
+
+maestro.dpdt_factor = 0.0e0
+
+maestro.use_tfromp = true
+
+# trace forces to the interfaces per Mike's recommendation
+maestro.ppm_trace_forces = 1
+
+# Andy and Mike recommend predicting rho and X separately
+maestro.species_pred_type = 3
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-12
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-10
+maestro.eps_hg_max         = 1.e-9
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  velpert_amplitude = 1.e2
+  velpert_radius = 2.5e7
+  velpert_scale = 1.e7
+  velpert_steep = 1.e5
+  tag_density_1 = 5.e7
+  tag_density_2 = 5.e7
+  tag_density_3 = 5.e7
+  particle_temp_cutoff = 6.e8
+  particle_tpert_threshold = 2.e7
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  use_eos_coulomb = T
+
+  ! VODE Reactions ODE settings
+  burner_verbose = .false.
+
+  ! Set which jacobian to use
+  ! 1 = analytic jacobian
+  ! 2 = numerical jacobian
+  jacobian   = 1
+
+  retry_burn = .false.
+  renormalize_abundances = .true.
+
+  rtol_spec = 1.0d-12
+  rtol_enuc = 1.0d-9
+  rtol_temp = 1.0d-9
+  atol_spec = 1.0d-12
+  atol_enuc = 1.0d-9
+  atol_temp = 1.0d-9
+
+/
