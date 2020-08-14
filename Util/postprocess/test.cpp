@@ -1,5 +1,6 @@
 #include <Radial.H>
 #include <Maestro.H>
+#include <Maestro_F.H>
 #include "AMReX_PlotFileUtil.H"
 
 using namespace amrex;
@@ -30,7 +31,7 @@ void test ()
 	RealBox real_box({AMREX_D_DECL(-100.0_rt,-100.0_rt,-100.0_rt)},
 		         {AMREX_D_DECL( 100.0_rt, 100.0_rt, 100.0_rt)});
 
-	tgeom.define(domain, real_box);
+	tgeom.define(domain, &real_box);
     }
     DistributionMapping dm(ba);
 
@@ -50,10 +51,10 @@ void test ()
 
     const auto& center_p = center;
 
-    const auto dx = pgeom[lev].CellSizeArray();
-    const auto prob_lo = pgeom[lev].ProbLoArray();
+    const auto dx = tgeom.CellSizeArray();
+    const auto prob_lo = tgeom.ProbLoArray();
 
-    for ( MFIter mfi(vel[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
+    for ( MFIter mfi(u_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
 
 	// Get the index space of the valid region
 	const Box& tileBox = mfi.tilebox();
@@ -124,12 +125,133 @@ void test ()
     }
 
     // write plotfile
-    std::string testfilename = "test_plt";
+    std::string basefilename = "test_plt";
+    std::string testfilename = basefilename + "0000000";
     
     WriteSingleLevelPlotfile(testfilename,
 			     s0, varnames,
 			     tgeom, 0, 0);
 
-    WriteJobInfo(testfilename);
+    WriteTestJobInfo(testfilename, basefilename, max_grid_size);
+}
+
+
+void WriteTestJobInfo(const std::string& dir,
+		      const std::string& base, const int maxgridsize) {
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::WritePartJobInfo()", WritePartJobInfo);
+
+    if (ParallelDescriptor::IOProcessor()) {
+        // job_info file with details about the run
+        std::ofstream jobInfoFile;
+        std::string FullPathJobInfoFile = dir;
+
+        std::string PrettyLine = std::string(78, '=') + "\n";
+        std::string OtherLine = std::string(78, '-') + "\n";
+        std::string SkipSpace = std::string(8, ' ');
+
+        FullPathJobInfoFile += "/job_info";
+        jobInfoFile.open(FullPathJobInfoFile.c_str(), std::ios::out);
+
+        // job information
+        jobInfoFile << PrettyLine;
+        jobInfoFile << " MAESTROeX Job Information\n";
+        jobInfoFile << PrettyLine;
+
+        // // grid information
+        // jobInfoFile << PrettyLine;
+        // jobInfoFile << " Grid Information\n";
+        // jobInfoFile << PrettyLine;
+
+        // for (int i = 0; i <= finest_level; i++) {
+        //     jobInfoFile << " level: " << i << "\n";
+        //     jobInfoFile << "   number of boxes = " << grids[i].size() << "\n";
+        //     jobInfoFile << "   maximum zones   = ";
+        //     for (int n = 0; n < BL_SPACEDIM; n++) {
+        //         jobInfoFile << geom_in[i].Domain().length(n) << " ";
+        //     }
+        //     jobInfoFile << "\n\n";
+        // }
+
+        // jobInfoFile << " Boundary conditions\n";
+        // Vector<int> lo_bc_out(BL_SPACEDIM), hi_bc_out(BL_SPACEDIM);
+        // ParmParse pp("maestro");
+        // pp.getarr("lo_bc", lo_bc_out, 0, BL_SPACEDIM);
+        // pp.getarr("hi_bc", hi_bc_out, 0, BL_SPACEDIM);
+
+        // // these names correspond to the integer flags setup in the
+        // // Castro_setup.cpp
+        // const char* names_bc[] = {"interior", "inflow",   "outflow",
+        //                           "symmetry", "slipwall", "noslipwall"};
+
+        // jobInfoFile << "   -x: " << names_bc[lo_bc_out[0]] << "\n";
+        // jobInfoFile << "   +x: " << names_bc[hi_bc_out[0]] << "\n";
+        // if (BL_SPACEDIM >= 2) {
+        //     jobInfoFile << "   -y: " << names_bc[lo_bc_out[1]] << "\n";
+        //     jobInfoFile << "   +y: " << names_bc[hi_bc_out[1]] << "\n";
+        // }
+        // if (BL_SPACEDIM == 3) {
+        //     jobInfoFile << "   -z: " << names_bc[lo_bc_out[2]] << "\n";
+        //     jobInfoFile << "   +z: " << names_bc[hi_bc_out[2]] << "\n";
+        // }
+
+        // jobInfoFile << "\n\n";
+
+        // // species info
+        // Real Aion = 0.0;
+        // Real Zion = 0.0;
+
+        // int mlen = 20;
+
+        // jobInfoFile << PrettyLine;
+        // jobInfoFile << " Species Information\n";
+        // jobInfoFile << PrettyLine;
+
+        // jobInfoFile << std::setw(6) << "index" << SkipSpace
+        //             << std::setw(mlen + 1) << "name" << SkipSpace
+        //             << std::setw(7) << "A" << SkipSpace << std::setw(7) << "Z"
+        //             << "\n";
+        // jobInfoFile << OtherLine;
+
+        // for (int i = 0; i < NumSpec; i++) {
+        //     int len = mlen;
+        //     Vector<int> int_spec_names(len);
+        //     //
+        //     // This call return the actual length of each string in "len"
+        //     //
+        //     get_spec_names(int_spec_names.dataPtr(), &i, &len);
+        //     auto* spec_name = new char[len + 1];
+        //     for (int j = 0; j < len; j++) {
+        //         spec_name[j] = int_spec_names[j];
+        //     }
+        //     spec_name[len] = '\0';
+
+        //     // get A and Z
+        //     get_spec_az(&i, &Aion, &Zion);
+
+        //     jobInfoFile << std::setw(6) << i << SkipSpace << std::setw(mlen + 1)
+        //                 << std::setfill(' ') << spec_name << SkipSpace
+        //                 << std::setw(7) << Aion << SkipSpace << std::setw(7)
+        //                 << Zion << "\n";
+        //     delete[] spec_name;
+        // }
+        // jobInfoFile << "\n\n";
+
+        // runtime parameters
+        jobInfoFile << PrettyLine;
+        jobInfoFile << " Inputs File Parameters\n";
+        jobInfoFile << PrettyLine;
+
+        ParmParse::dumpTable(jobInfoFile, true);
+
+	jobInfoFile << "eos_gamma = 1.666666667\n";
+	jobInfoFile << "amr.max_grid_size = " << maxgridsize << "\n";
+	jobInfoFile << "maestro.plot_base_name = " << base << "\n";
+	jobInfoFile << "maestro.drdxfac = 5\n";
+	jobInfoFile << "maestro.octant = false\n";
+	jobInfoFile << "maestro.rotational_frequency = 1.e-6\n";
+	
+        jobInfoFile.close();
+    }
 }
 

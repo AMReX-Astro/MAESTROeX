@@ -99,3 +99,14 @@ void Average2d (const amrex::Vector<amrex::MultiFab>& phi,
 		int barcomp, 
 		const amrex::Vector<amrex::Box>& bardomain,
 		int comp);
+
+
+// ----------------------------
+// in test.cpp
+// ----------------------------
+
+// write plot file for exact solution test case
+void test ();
+
+void WriteTestJobInfo (const std::string& dir,
+		       const std::string& base, const int maxgridsize);

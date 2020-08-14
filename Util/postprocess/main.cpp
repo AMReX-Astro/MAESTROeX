@@ -223,6 +223,10 @@ std::string GetVarFromJobInfo (const std::string pltfile, const std::string& var
 int GetdrdxFac (const std::string pltfile) {
     auto drdxfac_str = GetVarFromJobInfo(pltfile, "maestro.drdxfac");
     // Print() << "drdxfac_str = " << drdxfac_str << std::endl;
+
+    if (drdxfac_str == "") {
+	return 5;
+    }
     
     // retrieve first number
     std::istringstream iss {drdxfac_str};
