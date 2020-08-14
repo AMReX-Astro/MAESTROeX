@@ -22,6 +22,7 @@ def split_pair(pair_string):
     val2"""
     return pair_string.replace("(", "").replace(")", "").replace(" ", "").split(",")
 
+
 class Index:
     """an index that we want to set"""
 
@@ -68,7 +69,8 @@ class Index:
         a string value (like nspec) is 0
 
         """
-        sstr = "   integer, parameter :: {} = {}\n".format(self.F90_var, self.value)
+        sstr = "   integer, parameter :: {} = {}\n".format(
+            self.F90_var, self.value)
         return sstr
 
     def get_cxx_set_string(self, set_default=None):
@@ -76,7 +78,8 @@ class Index:
         is 0-based, we subtract 1, so we sync with the Fortran
         value
         """
-        sstr = "  constexpr int {} = {};\n".format(self.cpp_var, self.cxx_value)
+        sstr = "  constexpr int {} = {};\n".format(
+            self.cpp_var, self.cxx_value)
         return sstr
 
 
@@ -114,7 +117,8 @@ class Counter:
     def get_value(self, offset=0):
         """return the current value of the counter"""
         if self.strings:
-            val = "{} + {}".format(self.numeric - offset, " + ".join(self.strings))
+            val = "{} + {}".format(self.numeric - offset,
+                                   " + ".join(self.strings))
         else:
             val = "{}".format(self.numeric - offset)
 
@@ -123,7 +127,8 @@ class Counter:
     def get_cxx_value(self, offset=0):
         """return the current value of the counter for C++ (0-based)"""
         if self.strings:
-            val = "{} + {}".format(self.numeric - offset - 1, " + ".join(self.cxx_strings))
+            val = "{} + {}".format(self.numeric - offset - 1,
+                                   " + ".join(self.cxx_strings))
         else:
             val = "{}".format(self.numeric - offset - 1)
 
@@ -165,7 +170,8 @@ def doit(variables_file, odir, defines):
 
                 # this splits the line into separate fields.  A field is a
                 # single word or a pair in parentheses like "(a, b)"
-                fields = re.findall(r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
+                fields = re.findall(
+                    r'[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
                 name = fields[0]
                 cpp_var = fields[1]
@@ -231,7 +237,6 @@ def doit(variables_file, odir, defines):
                     if ca.name == i.adds_to:
                         ca.add_index(i)
 
-
         # store the counters for later writing
         all_counters += [counter_main]
         all_counters += counter_adds
@@ -259,7 +264,6 @@ def doit(variables_file, odir, defines):
                 f.write(i.get_f90_set_string(set_default=0))
 
         f.write("\nend module state_indices_module\n")
-
 
     # now the C++
     with open(os.path.join(odir, "state_indices.H"), "w") as f:
@@ -294,7 +298,7 @@ def main():
     # https://stackoverflow.com/questions/16174992/cant-get-argparse-to-read-quoted-string-with-dashes-in-it
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--odir", type=str, default="../param_includes",
+    parser.add_argument("--odir", type=str, default="",
                         help="output directory")
     parser.add_argument("--defines", type=str, default="",
                         help="preprocessor defines to interpret")

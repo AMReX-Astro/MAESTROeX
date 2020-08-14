@@ -12,6 +12,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                                 MultiFab& vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
+    const int max_lev = base_geom.max_radial_level + 1;
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -38,16 +39,16 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
     // make a temporary MultiFab and RealVector to hold the cartesian data then copy it back to scal
     MultiFab temp_mf(scal.boxArray(), scal.DistributionMap(), 1, 0);
 
-    // initialize temperature
     BaseState<Real> temp_vec(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    temp_vec.setVal(0.0);
     auto temp_arr = temp_vec.array();
 
-    const auto s0_arr = s0_init.const_array();
+    const auto s0_init_arr = s0_init.const_array();
 
     // initialize temperature
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto r = 0; r < base_geom.nr_fine; ++r) {
-            temp_arr(l, r) = s0_arr(l, r, Temp);
+        for (auto r = 0; r < base_geom.nr(l); ++r) {
+            temp_arr(l, r) = s0_init_arr(l, r, Temp);
         }
     }
 
@@ -60,8 +61,8 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
     // initialize species
     for (auto comp = 0; comp < NumSpec; ++comp) {
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                temp_arr(l, r) = s0_arr(l, r, FirstSpec + comp);
+            for (auto r = 0; r < base_geom.nr(l); ++r) {
+                temp_arr(l, r) = s0_init_arr(l, r, FirstSpec + comp);
             }
         }
         Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec + comp);

@@ -214,9 +214,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                             if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                                 // is it one of the 8 zones surrounding the center?
-                                if (fabs(x - center[0]) < dx[0] &&
-                                    fabs(y - center[1]) < dx[1] &&
-                                    fabs(z - center[2]) < dx[2]) {
+                                if (amrex::Math::abs(x - center[0]) < dx[0] &&
+                                    amrex::Math::abs(y - center[1]) < dx[1] &&
+                                    amrex::Math::abs(z - center[2]) < dx[2]) {
                                     ncenter_level++;
 
                                     T_center_level += scal(i, j, k, Temp);

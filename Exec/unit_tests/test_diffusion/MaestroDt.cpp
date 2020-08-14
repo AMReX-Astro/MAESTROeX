@@ -74,12 +74,12 @@ void Maestro::EstDt() {
 
                 // calculate the timestep
                 for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
-                    dt_grid = std::min(dt_grid,
-                                       dx[i] * dx[i] / diffusion_coefficient);
+                    dt_grid = amrex::min(dt_grid,
+                                         dx[i] * dx[i] / diffusion_coefficient);
                 }
             }
 
-            dt_lev = std::min(dt_lev, dt_mult_factor * dt_grid);
+            dt_lev = amrex::min(dt_lev, dt_mult_factor * dt_grid);
         }  //end openmp
 
         // find the smallest dt over all processors
@@ -91,7 +91,7 @@ void Maestro::EstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
     }  // end loop over levels
 
     if (maestro_verbose > 0) {
@@ -164,12 +164,12 @@ void Maestro::FirstDt() {
 
                 // local variables
                 for (auto i = 0; i < AMREX_SPACEDIM; ++i) {
-                    dt_grid = std::min(dt_grid,
-                                       dx[i] * dx[i] / diffusion_coefficient);
+                    dt_grid = amrex::min(dt_grid,
+                                         dx[i] * dx[i] / diffusion_coefficient);
                 }
             }
 
-            dt_lev = std::min(dt_lev, dt_mult_factor * dt_grid);
+            dt_lev = amrex::min(dt_lev, dt_mult_factor * dt_grid);
         }  // end openmp
 
         // find the smallest dt over all processors
@@ -189,7 +189,7 @@ void Maestro::FirstDt() {
         }
 
         // update dt over all levels
-        dt = std::min(dt, dt_lev);
+        dt = amrex::min(dt, dt_lev);
 
     }  // end loop over levels
 

@@ -19,7 +19,9 @@ void Maestro::Evolve() {
     // index for diag array buffer
     int diag_index = 0;
 
-    for (istep = start_step; istep <= max_step && t_old < stop_time; ++istep) {
+    for (istep = start_step; ((istep <= max_step || max_step < 0) &&
+                              (t_old < stop_time || stop_time < 0.0));
+         ++istep) {
         // check to see if we need to regrid, then regrid
         if (max_level > 0 && regrid_int > 0 && (istep - 1) % regrid_int == 0 &&
             istep != 1) {
@@ -65,7 +67,7 @@ void Maestro::Evolve() {
             }
 
             if (stop_time >= 0. && t_old + dt > stop_time) {
-                dt = std::min(dt, stop_time - t_old);
+                dt = amrex::min(dt, stop_time - t_old);
                 Print() << "Stop time limits dt = " << dt << std::endl;
             }
 

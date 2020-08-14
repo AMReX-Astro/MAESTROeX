@@ -1,3 +1,15 @@
+# 20.08
+
+  * Bug fix: taggin issues are resolved when finest_level < max_radial_level
+
+  * Fixed dpdt implementation and SDC algorithm for thermal diffusion
+
+  * Various bug fixes
+  
+  * Implemented clang-format
+
+  * Added Github actions: version release, checkout submodule development branches
+
 # 20.07
 
   * The master branch has been renamed the main branch. If you have an
