@@ -39,6 +39,7 @@ WriteRadialFile (const std::string& plotfilename,
 	omega[lev].define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
     }
     MakeRotationRate(plotfilename, u_in, w0_in, omega);
+    // VisMF::Write(omega[0],"a_omega");
     
     // MakeRadialRotationRatio
     BaseState<Real> ratio_omega(base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -629,9 +630,9 @@ MakeLatShear (const Vector<MultiFab>& omega_in,
     Real dx_fine;
     const auto probLo = pgeom[0].ProbLoArray();
     const auto probHi = pgeom[0].ProbHiArray();
-    Real halfdom = amrex::min(probHi[0]-probLo[0],probHi[1]-probLo[1]);
+    Real halfdom = 0.5*amrex::min(probHi[0]-probLo[0],probHi[1]-probLo[1]);
 #if AMREX_SPACEDIM == 3
-    halfdom = amrex::min(halfdom, probHi[2]-probLo[2]);
+    halfdom = amrex::min(halfdom, 0.5*(probHi[2]-probLo[2]));
 #endif
     
     for (int r = 0; r < nr_fine; ++r) {
@@ -686,7 +687,7 @@ MakeLatShear (const Vector<MultiFab>& omega_in,
 		    
 			// normalized Gaussian
 			Real width = amrex::min(maxfac,rr/halfdom)*dx_fine*dx_fine;
-			Real kernel = std::exp(-(radius - rr)*(radius - r)/width) /
+			Real kernel = std::exp(-(radius - rr)*(radius - rr)/width) /
 			    std::sqrt(M_PI*width);
 		
 			amrex::HostDevice::Atomic::Add(&(shear_arr(0,r)), omega_arr(i,j,k)*Y20*kernel);
@@ -707,110 +708,3 @@ MakeLatShear (const Vector<MultiFab>& omega_in,
     }
     
 }
-/*
-void
-Maestro::MakeEntropy (const Vector<MultiFab>& state,
-                      Vector<MultiFab>& entropy)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeEntropy()",MakeEntropy);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-        for ( MFIter mfi(state[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-            // Get the index space of the valid region
-            const Box& tileBox = mfi.tilebox();
-
-            const Array4<const Real> state_arr = state[lev].array(mfi);
-            const Array4<Real> entropy_arr = entropy[lev].array(mfi);
-
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j ,k, {
-                eos_t eos_state;
-
-                eos_state.rho = state_arr(i,j,k,Rho);
-                eos_state.T = state_arr(i,j,k,Temp);
-                for (auto comp = 0; comp < NumSpec; ++comp) {
-                    eos_state.xn[comp] = state_arr(i,j,k,FirstSpec+comp) / state_arr(i,j,k,Rho);
-                }
-
-                eos(eos_input_rt, eos_state);
-
-                entropy_arr(i,j,k) = eos_state.s;
-            });
-        }
-    }
-
-    // average down and fill ghost cells
-    AverageDown(entropy,0,1);
-    FillPatch(t_old,entropy,entropy,entropy,0,0,1,0,bcs_f);
-}
-
-void
-Maestro::MakeDivw0 (const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
-                    Vector<MultiFab>& divw0)
-{
-    // timer for profiling
-    BL_PROFILE_VAR("Maestro::MakeDivw0()", MakeDivw0);
-
-    for (int lev=0; lev<=finest_level; ++lev) {
-
-        if (!spherical) {
-
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-                const auto dx = geom[lev].CellSizeArray();
-                
-                const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
-                const Array4<Real> divw0_arr = divw0[lev].array(mfi);
-
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-#if (AMREX_SPACEDIM == 2)
-                    divw0_arr(i,j,k) = (w0_arr(i,j+1,k,1) - w0_arr(i,j,k,1)) / dx[1];
-#else
-                    divw0_arr(i,j,k) = (w0_arr(i,j,k+1,2) - w0_arr(i,j,k,2)) / dx[2];
-#endif
-                });
-            }
-
-        } else {
-
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-#ifdef _OPENMP
-#pragma omp parallel
-#endif
-            for ( MFIter mfi(divw0[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi ) {
-
-                // Get the index space of the valid region
-                const Box& tileBox = mfi.tilebox();
-                const auto dx = geom[lev].CellSizeArray();
-                
-                const Array4<const Real> w0macx = w0mac[lev][0].array(mfi);
-                const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
-                const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
-                const Array4<Real> divw0_arr = divw0[lev].array(mfi);
-
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                    divw0_arr(i,j,k) = (w0macx(i+1,j,k) - w0macx(i,j,k)) / dx[0] + 
-                        (w0macy(i,j+1,k) - w0macy(i,j,k)) / dx[1] + 
-                        (w0macz(i,j,k+1) - w0macz(i,j,k)) / dx[2];
-                });
-            }
-        }
-    }
-
-    // average down and fill ghost cells
-    AverageDown(divw0, 0, 1);
-    FillPatch(t_old, divw0, divw0, divw0, 0, 0, 1, 0, bcs_f);
-}
-*/

@@ -22,6 +22,7 @@ with the name of the plotfile to be analyzed:
 Additional arguments are as follows:
 
 - **model file diagnostics**: extra argument `modelfile=modelfile_name` needs to be provided
+- **exact solution test problem**: if `plotfile_name` is not provided, the code will write and evaluate a test problem with an exact solution.
 - **time-averaged values**: two extra arguments need to be provided
   1. `dt=timesteps_between_plotfiles`, which is an integer value
   2. `nfiles=num_plotfiles` indicates the number of *additional* plotfiles needed, not including the `infile`.

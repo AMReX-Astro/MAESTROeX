@@ -40,8 +40,15 @@ int main(int argc, char* argv[])
 	// read in parameters from inputs file
 	ParmParse pp;
 	pp.query("infile", iFile);
-	if (iFile.empty()) 
-	    Abort("You must specify plotfile");
+	if (iFile.empty()) {
+	    Print() << "WARNING: Plotfile was not specified!\n";
+	    Print() << "Running exact solution test problem" << std::endl;
+	    test();
+	    iFile = "test_plt0000000";
+	} else {
+	    // initialize species
+	    maestro_network_init();
+	}
 
 	// optional parameters
 	std::string imFile;
@@ -85,9 +92,6 @@ int main(int argc, char* argv[])
 	    w0_mf[lev]  .define(grid[lev], dmap[lev], AMREX_SPACEDIM, 0);
 	}
 
-	// species
-	maestro_network_init();
-	
 	for (int i = 0; i < NumSpec; ++i) {
 	    int len = 20;
 	    Vector<int> int_spec_names(len);

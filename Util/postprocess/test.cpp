@@ -27,9 +27,9 @@ void test ()
 	ba.define(domain);
 	ba.maxSize(max_grid_size);
 
-	// define physical box, [-100, 100] in each direction
-	RealBox real_box({AMREX_D_DECL(-100.0_rt,-100.0_rt,-100.0_rt)},
-		         {AMREX_D_DECL( 100.0_rt, 100.0_rt, 100.0_rt)});
+	// define physical box, [0, 200] in each direction
+	RealBox real_box({AMREX_D_DECL(  0.0_rt,   0.0_rt,   0.0_rt)},
+		         {AMREX_D_DECL(200.0_rt, 200.0_rt, 200.0_rt)});
 
 	tgeom.define(domain, &real_box);
     }
@@ -38,11 +38,13 @@ void test ()
     // define density and pressure
     MultiFab rho0(ba, dm,       1, 0);
     MultiFab p0  (ba, dm,       1, 0);
-    MultiFab rhoX(ba, dm, NumSpec, 0);
     rho0.setVal(1.);
     p0.setVal(1.);
+    
+    // define species
+    maestro_network_init();
+    MultiFab rhoX(ba, dm, NumSpec, 0);
     rhoX.setVal(0.);
-    rhoX.setVal(1., 0);  // first species: rhoX = 1
     
     // define velocities
     MultiFab u_mf(ba, dm, AMREX_SPACEDIM, 0);
@@ -58,19 +60,35 @@ void test ()
 
 	// Get the index space of the valid region
 	const Box& tileBox = mfi.tilebox();
-	
+
+	const Array4<Real> rhoX_arr = rhoX.array(mfi);
 	const Array4<Real> vel_arr = u_mf.array(mfi);
 	
-	AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {	
+	AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+	    // first species: rhoX = 1
+	    rhoX_arr(i,j,k,0) = 1.0;
+
+	    // initialize velocity
 	    Real x = prob_lo[0] + (Real(i)+0.5) * dx[0] - center_p[0];
 	    Real y = prob_lo[1] + (Real(j)+0.5) * dx[1] - center_p[1];
 	    Real z = prob_lo[2] + (Real(k)+0.5) * dx[2] - center_p[2];
 	    Real radius = std::sqrt(x*x + y*y + z*z);
 
+	    Vector<Real> norm(3);	
+	    norm[0] = x / radius;
+	    norm[1] = y / radius;
+	    norm[2] = z / radius;
+
+	    // v_r = 1/r       if r < 50
+	    // v_r = 50*(50/r) if r >= 50
 	    if (radius < 50.0) {
-		vel_arr(i,j,k) = radius;
+		for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		    vel_arr(i,j,k,dim) = radius * norm[dim];
+		}
 	    } else {
-		vel_arr(i,j,k) = 50.0*50.0/radius;
+		for (int dim = 0; dim < AMREX_SPACEDIM; ++dim) {
+		    vel_arr(i,j,k,dim) = 50.0*50.0/radius * norm[dim];
+		}
 	    }
 	});
     }        
@@ -125,6 +143,8 @@ void test ()
     }
 
     // write plotfile
+    Print() << "Writing exact solution plotfile" << std::endl;
+
     std::string basefilename = "test_plt";
     std::string testfilename = basefilename + "0000000";
     
