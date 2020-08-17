@@ -120,14 +120,14 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     // apply burning term
     if (do_burning) {
+        // copy s_in into s_out to fill coarse grids that are masked
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(s_out[lev], s_in[lev], 0, 0, Nscal, 0);
+        }
 #ifdef SDC
         // do the burning, update s_out
         Burner(s_in, s_out, p0, dt_in, time_in, source);
 #endif
-        // pass temperature through for seeding the temperature update eos call
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Copy(s_out[lev], s_in[lev], Temp, Temp, 1, 0);
-        }
     }
 
     // if we aren't doing any heating/burning, then just copy the old to the new
@@ -142,7 +142,9 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     FillPatch(t_old, s_out, s_out, s_out, 0, 0, Nscal, 0, bcs_s);
 
     // average down (no ghost cells)
-    AverageDown(rho_Hext, 0, 1);
+    if (do_heating) {
+        AverageDown(rho_Hext, 0, 1);
+    }
 
     // now update temperature
     if (use_tfromp) {
@@ -253,7 +255,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     Vector<MultiFab> p0_cart(finest_level + 1);
 
     // make a Fortran-friendly RealVector of p0
-    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine);
+    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine,
+                      0.0);
 
     if (spherical) {
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -263,9 +266,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
         Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
     } else {
-        // need non-constant basestate to apply toVector()
-        BaseState<Real> p0_var(p0);
-        p0_var.toVector(p0_vec);
+        p0.toVector(p0_vec);
     }
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -357,5 +358,11 @@ void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
                     BL_TO_FORTRAN_ANYD(scal_mf[mfi]));
             }
         }
+    }
+
+    if (do_burning) {
+        // average down (no ghost cells)
+        AverageDown(rho_omegadot, 0, NumSpec);
+        AverageDown(rho_Hnuc, 0, 1);
     }
 }
