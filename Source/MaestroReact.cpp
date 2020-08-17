@@ -120,7 +120,7 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     // apply burning term
     if (do_burning) {
-	// copy s_in into s_out to fill coarse grids that are masked
+        // copy s_in into s_out to fill coarse grids that are masked
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Copy(s_out[lev], s_in[lev], 0, 0, Nscal, 0);
         }
@@ -144,7 +144,7 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     // average down (no ghost cells)
     if (do_heating) {
-	AverageDown(rho_Hext, 0, 1);
+        AverageDown(rho_Hext, 0, 1);
     }
 
     // now update temperature
@@ -361,8 +361,8 @@ void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
     }
 
     if (do_burning) {
-	// average down (no ghost cells)
-	AverageDown(rho_omegadot, 0, NumSpec);
-	AverageDown(rho_Hnuc, 0, 1);
+        // average down (no ghost cells)
+        AverageDown(rho_omegadot, 0, NumSpec);
+        AverageDown(rho_Hnuc, 0, 1);
     }
 }
