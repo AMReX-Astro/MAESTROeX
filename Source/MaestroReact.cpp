@@ -128,7 +128,6 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         // do the burning, update s_out
         Burner(s_in, s_out, p0, dt_in, time_in, source);
 #endif
-        
     }
 
     // if we aren't doing any heating/burning, then just copy the old to the new
@@ -256,7 +255,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     Vector<MultiFab> p0_cart(finest_level + 1);
 
     // make a Fortran-friendly RealVector of p0
-    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine, 0.0);
+    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine,
+                      0.0);
 
     if (spherical) {
         for (int lev = 0; lev <= finest_level; ++lev) {
