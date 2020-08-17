@@ -114,8 +114,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         // cell-centered MultiFabs
         shat[lev].define(grids[lev], dmap[lev], Nscal, ng_s);
         rhohalf[lev].define(grids[lev], dmap[lev], 1, 1);
-        cphalf[lev].define(grids[lev], dmap[lev], 1, 1);
-        xihalf[lev].define(grids[lev], dmap[lev], NumSpec, 1);
+        cphalf[lev].define(grids[lev], dmap[lev], 1, 0);
+        xihalf[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         macrhs[lev].define(grids[lev], dmap[lev], 1, 0);
         macphi[lev].define(grids[lev], dmap[lev], 1, 1);
         S_cc_nph[lev].define(grids[lev], dmap[lev], 1, 0);

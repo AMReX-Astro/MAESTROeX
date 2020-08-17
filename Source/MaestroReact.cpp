@@ -107,8 +107,7 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             // s_out = s_in + dt_in * rho_Hext
             for (int lev = 0; lev <= finest_level; ++lev) {
                 MultiFab::Copy(s_out[lev], s_in[lev], 0, 0, Nscal, 0);
-                MultiFab::Saxpy(s_out[lev], dt_in, rho_Hext[lev], 0, RhoH, 1,
-                                0);
+                MultiFab::Saxpy(s_out[lev], dt_in, rho_Hext[lev], 0, RhoH, 1, 0);
             }
         }
     } else {
@@ -255,8 +254,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     Vector<MultiFab> p0_cart(finest_level + 1);
 
     // make a Fortran-friendly RealVector of p0
-    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine,
-                      0.0);
+    RealVector p0_vec((base_geom.max_radial_level + 1) * base_geom.nr_fine, 0.0);
 
     if (spherical) {
         for (int lev = 0; lev <= finest_level; ++lev) {
