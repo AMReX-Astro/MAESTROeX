@@ -319,8 +319,8 @@ void Maestro::VelPredInterface(
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
         if (ppm_type == 0) {
-            Real maxu = max(0.0, ufull(i - 1, j, k, 0));
-            Real minu = min(0.0, ufull(i, j, k, 0));
+            Real maxu = amrex::max(0.0, ufull(i - 1, j, k, 0));
+            Real minu = amrex::min(0.0, ufull(i, j, k, 0));
             // extrapolate both components of velocity to left face
             ulx(i, j, k, 0) = utilde(i - 1, j, k, 0) +
                               (0.5 - (dt2 / hx) * maxu) * Ipu(i - 1, j, k, 0);
@@ -362,7 +362,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    urx(i, j, k, 0) = min(urx(i, j, k, 0), 0.0);
+                    urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i, j, k, n) = ulx(i, j, k, n);
                     }
@@ -393,7 +393,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    ulx(i, j, k, 0) = max(ulx(i, j, k, 0), 0.0);
+                    ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i, j, k, n) = ulx(i, j, k, n);
                     }
@@ -419,8 +419,8 @@ void Maestro::VelPredInterface(
 
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
         if (ppm_type == 0) {
-            Real maxu = max(0.0, ufull(i, j - 1, k, 1));
-            Real minu = min(0.0, ufull(i, j, k, 1));
+            Real maxu = amrex::max(0.0, ufull(i, j - 1, k, 1));
+            Real minu = amrex::min(0.0, ufull(i, j, k, 1));
             // extrapolate both components of velocity to left face
             uly(i, j, k, 0) = utilde(i, j - 1, k, 0) +
                               (0.5 - (dt2 / hy) * maxu) * Imv(i, j - 1, k, 0);
@@ -462,7 +462,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    ury(i, j, k, 1) = min(ury(i, j, k, 1), 0.0);
+                    ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i, j, k, n) = ury(i, j, k, n);
                     }
@@ -493,7 +493,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    uly(i, j, k, 1) = max(uly(i, j, k, 1), 0.0);
+                    uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ury(i, j, k, n) = uly(i, j, k, n);
                     }
@@ -586,7 +586,7 @@ void Maestro::VelPredVelocities(
                     umac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    umac(i, j, k) = min(umacr, 0.0);
+                    umac(i, j, k) = amrex::min(umacr, 0.0);
                     break;
                 case Interior:
                     break;
@@ -604,7 +604,7 @@ void Maestro::VelPredVelocities(
                     umac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    umac(i, j, k) = max(umacl, 0.0);
+                    umac(i, j, k) = amrex::max(umacl, 0.0);
                     break;
                 case Interior:
                     break;
@@ -659,7 +659,7 @@ void Maestro::VelPredVelocities(
                     vmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    vmac(i, j, k) = min(vmacr, 0.0);
+                    vmac(i, j, k) = amrex::min(vmacr, 0.0);
                     break;
                 case Interior:
                     break;
@@ -677,7 +677,7 @@ void Maestro::VelPredVelocities(
                     vmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    vmac(i, j, k) = max(vmacl, 0.0);
+                    vmac(i, j, k) = amrex::max(vmacl, 0.0);
                     break;
                 case Interior:
                     break;
@@ -734,8 +734,8 @@ void Maestro::VelPredInterface(
 
     AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
         if (ppm_type == 0) {
-            Real maxu = 0.5 - dt2 * max(0.0, ufull(i - 1, j, k, 0)) / hx;
-            Real minu = 0.5 + dt2 * min(0.0, ufull(i, j, k, 0)) / hx;
+            Real maxu = 0.5 - dt2 * amrex::max(0.0, ufull(i - 1, j, k, 0)) / hx;
+            Real minu = 0.5 + dt2 * amrex::min(0.0, ufull(i, j, k, 0)) / hx;
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                 // extrapolate all components of velocity to left face
@@ -779,7 +779,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    urx(i, j, k, 0) = min(urx(i, j, k, 0), 0.0);
+                    urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulx(i, j, k, n) = urx(i, j, k, n);
                     }
@@ -811,7 +811,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    ulx(i, j, k, 0) = max(ulx(i, j, k, 0), 0.0);
+                    ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urx(i, j, k, n) = ulx(i, j, k, n);
                     }
@@ -843,8 +843,9 @@ void Maestro::VelPredInterface(
 
     AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
         if (ppm_type == 0) {
-            Real maxu = (0.5 - dt2 * max(0.0, ufull(i, j - 1, k, 1)) / hy);
-            Real minu = (0.5 + dt2 * min(0.0, ufull(i, j, k, 1)) / hy);
+            Real maxu =
+                (0.5 - dt2 * amrex::max(0.0, ufull(i, j - 1, k, 1)) / hy);
+            Real minu = (0.5 + dt2 * amrex::min(0.0, ufull(i, j, k, 1)) / hy);
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                 // extrapolate all components of velocity to left face
@@ -889,7 +890,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    ury(i, j, k, 1) = min(ury(i, j, k, 1), 0.0);
+                    ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         uly(i, j, k, n) = ury(i, j, k, n);
                     }
@@ -921,7 +922,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    uly(i, j, k, 1) = max(uly(i, j, k, 1), 0.0);
+                    uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ury(i, j, k, n) = uly(i, j, k, n);
                     }
@@ -953,8 +954,8 @@ void Maestro::VelPredInterface(
 
     AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, {
         if (ppm_type == 0) {
-            Real maxu = 0.5 - dt2 * max(0.0, ufull(i, j, k - 1, 2)) / hz;
-            Real minu = 0.5 + dt2 * min(0.0, ufull(i, j, k, 2)) / hz;
+            Real maxu = 0.5 - dt2 * amrex::max(0.0, ufull(i, j, k - 1, 2)) / hz;
+            Real minu = 0.5 + dt2 * amrex::min(0.0, ufull(i, j, k, 2)) / hz;
 
             for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                 // extrapolate all components of velocity to left face
@@ -999,7 +1000,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    urz(i, j, k, 2) = min(urz(i, j, k, 2), 0.0);
+                    urz(i, j, k, 2) = amrex::min(urz(i, j, k, 2), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         ulz(i, j, k, n) = urz(i, j, k, n);
                     }
@@ -1031,7 +1032,7 @@ void Maestro::VelPredInterface(
                     }
                     break;
                 case Outflow:
-                    ulz(i, j, k, 2) = max(ulz(i, j, k, 2), 0.0);
+                    ulz(i, j, k, 2) = amrex::max(ulz(i, j, k, 2), 0.0);
                     for (int n = 0; n < AMREX_SPACEDIM; ++n) {
                         urz(i, j, k, n) = ulz(i, j, k, n);
                     }
@@ -1562,7 +1563,7 @@ void Maestro::VelPredVelocities(
                     umac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    umac(i, j, k) = min(umacr, 0.0);
+                    umac(i, j, k) = amrex::min(umacr, 0.0);
                     break;
                 case Interior:
                     break;
@@ -1580,7 +1581,7 @@ void Maestro::VelPredVelocities(
                     umac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    umac(i, j, k) = max(umacl, 0.0);
+                    umac(i, j, k) = amrex::max(umacl, 0.0);
                     break;
                 case Interior:
                     break;
@@ -1640,7 +1641,7 @@ void Maestro::VelPredVelocities(
                     vmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    vmac(i, j, k) = min(vmacr, 0.0);
+                    vmac(i, j, k) = amrex::min(vmacr, 0.0);
                     break;
                 case Interior:
                     break;
@@ -1658,7 +1659,7 @@ void Maestro::VelPredVelocities(
                     vmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    vmac(i, j, k) = max(vmacl, 0.0);
+                    vmac(i, j, k) = amrex::max(vmacl, 0.0);
                     break;
                 case Interior:
                     break;
@@ -1728,7 +1729,7 @@ void Maestro::VelPredVelocities(
                     wmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    wmac(i, j, k) = min(wmacr, 0.0);
+                    wmac(i, j, k) = amrex::min(wmacr, 0.0);
                     break;
                 case Interior:
                     break;
@@ -1746,7 +1747,7 @@ void Maestro::VelPredVelocities(
                     wmac(i, j, k) = 0.0;
                     break;
                 case Outflow:
-                    wmac(i, j, k) = max(wmacl, 0.0);
+                    wmac(i, j, k) = amrex::max(wmacl, 0.0);
                     break;
                 case Interior:
                     break;

@@ -342,11 +342,11 @@ Real Maestro::QuadInterp(const Real x, const Real x0, const Real x1,
                  (x - x0) * (x - x1);
 
     if (limit) {
-        if (y > max(y0, max(y1, y2))) {
-            y = max(y0, max(y1, y2));
+        if (y > amrex::max(y0, amrex::max(y1, y2))) {
+            y = amrex::max(y0, amrex::max(y1, y2));
         }
-        if (y < min(y0, min(y1, y2))) {
-            y = min(y0, min(y1, y2));
+        if (y < amrex::min(y0, amrex::min(y1, y2))) {
+            y = amrex::min(y0, amrex::min(y1, y2));
         }
     }
 

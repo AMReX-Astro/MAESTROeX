@@ -42,8 +42,9 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
     // now integrate upwards from the bottom later, we will offset the
     // entire pressure so we have effectively integrated from the "top"
     if (use_exact_base_state && spherical) {
-        for (auto r = 1; r <= min(r_end_coord(0, 1),
-                                  base_geom.base_cutoff_density_coord(0));
+        for (auto r = 1;
+             r <= amrex::min(r_end_coord(0, 1),
+                             base_geom.base_cutoff_density_coord(0));
              ++r) {
             // uneven grid spacing
             Real dr1 =
@@ -54,8 +55,9 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
                 (dr1 * rho0(0, r - 1) + dr2 * rho0(0, r)) * grav_edge(0, r);
         }
     } else {
-        for (auto r = 1; r <= min(r_end_coord(0, 1),
-                                  base_geom.base_cutoff_density_coord(0));
+        for (auto r = 1;
+             r <= amrex::min(r_end_coord(0, 1),
+                             base_geom.base_cutoff_density_coord(0));
              r++) {
             // assume even grid spacing
             p0(0, r) = p0(0, r - 1) + 0.5 * dr(0) *
@@ -116,8 +118,8 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
 
                 // integrate upwards as normal
                 for (auto r = r_start_coord(n, i) + 1;
-                     r <= min(r_end_coord(n, i),
-                              base_geom.base_cutoff_density_coord(n));
+                     r <= amrex::min(r_end_coord(n, i),
+                                     base_geom.base_cutoff_density_coord(n));
                      ++r) {
                     p0(n, r) = p0(n, r - 1) +
                                0.5 * dr(n) * (rho0(n, r) + rho0(n, r - 1)) *

@@ -76,10 +76,11 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                 Real del = 0.5 * (s_ghost(g + 1) - s_ghost(g - 1));
                 Real dpls = 2.0 * (s_ghost(g + 1) - s_ghost(g));
                 Real dmin = 2.0 * (s_ghost(g) - s_ghost(g - 1));
-                Real slim = min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
+                Real slim =
+                    amrex::min(amrex::Math::abs(dpls), amrex::Math::abs(dmin));
                 slim = dpls * dmin > 0.0 ? slim : 0.0;
                 Real sflag = amrex::Math::copysign(1.0, del);
-                slope = sflag * min(slim, amrex::Math::abs(del));
+                slope = sflag * amrex::min(slim, amrex::Math::abs(del));
             } else if (slope_order_loc == 4) {
                 for (int i = 0; i < 3; ++i) {
                     // index of ghost array offset by ng
@@ -89,23 +90,23 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                         0.5 * (s_ghost(g + 1) - s_ghost(g - 1));
                     Real dpls = 2.0 * (s_ghost(g + 1) - s_ghost(g));
                     Real dmin = 2.0 * (s_ghost(g) - s_ghost(g - 1));
-                    dsscr[i * 4 + lim] =
-                        min(amrex::Math::abs(dmin), amrex::Math::abs(dpls));
+                    dsscr[i * 4 + lim] = amrex::min(amrex::Math::abs(dmin),
+                                                    amrex::Math::abs(dpls));
                     dsscr[i * 4 + lim] =
                         dpls * dmin > 0.0 ? dsscr[i * 4 + lim] : 0.0;
                     dsscr[i * 4 + flag] =
                         amrex::Math::copysign(1.0, dsscr[i * 4 + cen]);
                     dsscr[i * 4 + fromm] =
                         dsscr[i * 4 + flag] *
-                        min(dsscr[i * 4 + lim],
-                            amrex::Math::abs(dsscr[i * 4 + cen]));
+                        amrex::min(dsscr[i * 4 + lim],
+                                   amrex::Math::abs(dsscr[i * 4 + cen]));
                 }
 
                 // fourth-order limited slopes
                 Real ds = 4.0 / 3.0 * dsscr[1 * 4 + cen] -
                           (dsscr[2 * 4 + fromm] + dsscr[fromm]) / 6.0;
                 slope = dsscr[1 * 4 + flag] *
-                        min(amrex::Math::abs(ds), dsscr[1 * 4 + lim]);
+                        amrex::min(amrex::Math::abs(ds), dsscr[1 * 4 + lim]);
             }
 
             // compute sedgel and sedger
@@ -130,11 +131,12 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
             Real del = 0.5 * (s_ghost(g + 1) - s_ghost(g - 1));
             Real dmin = 2.0 * (s_ghost(g) - s_ghost(g - 1));
             Real dpls = 2.0 * (s_ghost(g + 1) - s_ghost(g));
-            Real dsscrr = dmin * dpls > 0.0 ? amrex::Math::copysign(1.0, del) *
-                                                  min(amrex::Math::abs(del),
-                                                      amrex::Math::abs(dmin),
-                                                      amrex::Math::abs(dpls))
-                                            : 0.0;
+            Real dsscrr = dmin * dpls > 0.0
+                              ? amrex::Math::copysign(1.0, del) *
+                                    amrex::min(amrex::Math::abs(del),
+                                               amrex::Math::abs(dmin),
+                                               amrex::Math::abs(dpls))
+                              : 0.0;
 
             // left side
             g = r + ng - 1;
@@ -142,11 +144,12 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
             del = 0.5 * (s_ghost(g + 1) - s_ghost(g - 1));
             dmin = 2.0 * (s_ghost(g) - s_ghost(g - 1));
             dpls = 2.0 * (s_ghost(g + 1) - s_ghost(g));
-            Real dsscrl = dmin * dpls > 0.0 ? amrex::Math::copysign(1.0, del) *
-                                                  min(amrex::Math::abs(del),
-                                                      amrex::Math::abs(dmin),
-                                                      amrex::Math::abs(dpls))
-                                            : 0.0;
+            Real dsscrl = dmin * dpls > 0.0
+                              ? amrex::Math::copysign(1.0, del) *
+                                    amrex::min(amrex::Math::abs(del),
+                                               amrex::Math::abs(dmin),
+                                               amrex::Math::abs(dpls))
+                              : 0.0;
 
             // sm
             g = r + ng;
@@ -154,8 +157,8 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
             Real sm =
                 0.5 * (s_ghost(g) + s_ghost(g - 1)) - (dsscrr - dsscrl) / 6.0;
             // make sure sm lies in between adjacent cell-centered values
-            sm = max(sm, min(s_ghost(g), s_ghost(g - 1)));
-            sm = min(sm, max(s_ghost(g), s_ghost(g - 1)));
+            sm = amrex::max(sm, amrex::min(s_ghost(g), s_ghost(g - 1)));
+            sm = amrex::min(sm, amrex::max(s_ghost(g), s_ghost(g - 1)));
 
             // sp
 
@@ -169,9 +172,9 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
             dmin = 2.0 * (s_ghost(g) - s_ghost(g - 1));
             dpls = 2.0 * (s_ghost(g + 1) - s_ghost(g));
             dsscrr = dmin * dpls > 0.0 ? amrex::Math::copysign(1.0, del) *
-                                             min(amrex::Math::abs(del),
-                                                 amrex::Math::abs(dmin),
-                                                 amrex::Math::abs(dpls))
+                                             amrex::min(amrex::Math::abs(del),
+                                                        amrex::Math::abs(dmin),
+                                                        amrex::Math::abs(dpls))
                                        : 0.0;
 
             // sp
@@ -180,8 +183,8 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
             Real sp =
                 0.5 * (s_ghost(g) + s_ghost(g - 1)) - (dsscrr - dsscrl) / 6.0;
             // make sure sp lies in between adjacent cell-centered values
-            sp = max(sp, min(s_ghost(g), s_ghost(g - 1)));
-            sp = min(sp, max(s_ghost(g), s_ghost(g - 1)));
+            sp = amrex::max(sp, amrex::min(s_ghost(g), s_ghost(g - 1)));
+            sp = amrex::min(sp, amrex::max(s_ghost(g), s_ghost(g - 1)));
 
             // modify using quadratic limiters
             if ((sp - s(0, r)) * (s(0, r) - sm) <= 0.0) {
@@ -240,9 +243,11 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                     Real D2R =
                         s_ghost(g - 1) - 2.0 * s_ghost(g) + s_ghost(g + 1);
                     Real sgn = amrex::Math::copysign(1.0, D2);
-                    Real D2LIM = sgn * max(min(C * sgn * D2L,
-                                               min(C * sgn * D2R, sgn * D2)),
-                                           0.0);
+                    Real D2LIM =
+                        sgn * amrex::max(amrex::min(C * sgn * D2L,
+                                                    amrex::min(C * sgn * D2R,
+                                                               sgn * D2)),
+                                         0.0);
                     sedget[j] =
                         0.5 * (s_ghost(g - 1) + s_ghost(g)) - D2LIM / 6.0;
                 }
@@ -272,10 +277,10 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                 Real dafacep = sedget[3] - sedget[2];
                 Real dabarm = s_ghost(g) - s_ghost(g - 1);
                 Real dabarp = s_ghost(g + 1) - s_ghost(g);
-                Real dafacemin =
-                    min(amrex::Math::abs(dafacem), amrex::Math::abs(dafacep));
-                Real dabarmin =
-                    min(amrex::Math::abs(dabarm), amrex::Math::abs(dabarp));
+                Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                            amrex::Math::abs(dafacep));
+                Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                           amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -294,11 +299,12 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                 Real D2R = s_ghost(g) - 2.0 * s_ghost(g + 1) + s_ghost(g + 2);
                 Real D2C = s_ghost(g - 1) - 2.0 * s_ghost(g) + s_ghost(g + 1);
                 Real sgn = amrex::Math::copysign(1.0, D2);
-                Real D2LIM = max(
-                    min(sgn * D2,
-                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                Real D2LIM = amrex::max(
+                    amrex::min(sgn * D2, amrex::min(C * sgn * D2L,
+                                                    amrex::min(C * sgn * D2R,
+                                                               C * sgn * D2C))),
                     0.0);
-                Real D2ABS = max(amrex::Math::abs(D2), 1.e-10);
+                Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                 alpham = alpham * D2LIM / D2ABS;
                 alphap = alphap * D2LIM / D2ABS;
             } else {
@@ -457,11 +463,12 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             Real del = 0.5 * (s(n, r + 1) - s(n, r - 1));
                             Real dpls = 2.0 * (s(n, r + 1) - s(n, r));
                             Real dmin = 2.0 * (s(n, r) - s(n, r - 1));
-                            Real slim = min(amrex::Math::abs(dpls),
-                                            amrex::Math::abs(dmin));
+                            Real slim = amrex::min(amrex::Math::abs(dpls),
+                                                   amrex::Math::abs(dmin));
                             slim = dpls * dmin > 0.0 ? slim : 0.0;
                             Real sflag = amrex::Math::copysign(1.0, del);
-                            slope = sflag * min(slim, amrex::Math::abs(del));
+                            slope =
+                                sflag * amrex::min(slim, amrex::Math::abs(del));
                         }
 
                     } else if (slope_order_loc == 4) {
@@ -482,14 +489,14 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             dxscr[cen] = 0.5 * (s(n, rm + 1) - s(n, rm - 1));
                             Real dpls = 2.0 * (s(n, rm + 1) - s(n, rm));
                             Real dmin = 2.0 * (s(n, rm) - s(n, rm - 1));
-                            dxscr[lim] = min(amrex::Math::abs(dmin),
-                                             amrex::Math::abs(dpls));
+                            dxscr[lim] = amrex::min(amrex::Math::abs(dmin),
+                                                    amrex::Math::abs(dpls));
                             dxscr[lim] = dpls * dmin > 0.0 ? dxscr[lim] : 0.0;
                             dxscr[flag] =
                                 amrex::Math::copysign(1.0, dxscr[cen]);
-                            dxscrm =
-                                dxscr[flag] *
-                                min(dxscr[lim], amrex::Math::abs(dxscr[cen]));
+                            dxscrm = dxscr[flag] *
+                                     amrex::min(dxscr[lim],
+                                                amrex::Math::abs(dxscr[cen]));
                         }
 
                         int rp = r + 1;
@@ -505,14 +512,14 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             dxscr[cen] = 0.5 * (s(n, rp + 1) - s(n, rp - 1));
                             Real dpls = 2.0 * (s(n, rp + 1) - s(n, rp));
                             Real dmin = 2.0 * (s(n, rp) - s(n, rp - 1));
-                            dxscr[lim] = min(amrex::Math::abs(dmin),
-                                             amrex::Math::abs(dpls));
+                            dxscr[lim] = amrex::min(amrex::Math::abs(dmin),
+                                                    amrex::Math::abs(dpls));
                             dxscr[lim] = dpls * dmin > 0.0 ? dxscr[lim] : 0.0;
                             dxscr[flag] =
                                 amrex::Math::copysign(1.0, dxscr[cen]);
-                            dxscrp =
-                                dxscr[flag] *
-                                min(dxscr[lim], amrex::Math::abs(dxscr[cen]));
+                            dxscrp = dxscr[flag] *
+                                     amrex::min(dxscr[lim],
+                                                amrex::Math::abs(dxscr[cen]));
                         }
 
                         // now find dxscr for r
@@ -521,8 +528,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             dxscr[cen] = 0.5 * (s(n, r + 1) - s(n, r - 1));
                             Real dpls = 2.0 * (s(n, r + 1) - s(n, r));
                             Real dmin = 2.0 * (s(n, r) - s(n, r - 1));
-                            dxscr[lim] = min(amrex::Math::abs(dmin),
-                                             amrex::Math::abs(dpls));
+                            dxscr[lim] = amrex::min(amrex::Math::abs(dmin),
+                                                    amrex::Math::abs(dpls));
                             dxscr[lim] = dpls * dmin > 0.0 ? dxscr[lim] : 0.0;
                             dxscr[flag] =
                                 amrex::Math::copysign(1.0, dxscr[cen]);
@@ -538,8 +545,9 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             // fourth-order limited slopes on interior
                             Real ds = 4.0 / 3.0 * dxscr[cen] -
                                       (dxscrp + dxscrm) / 6.0;
-                            slope = dxscr[flag] *
-                                    min(amrex::Math::abs(ds), dxscr[lim]);
+                            slope =
+                                dxscr[flag] *
+                                amrex::min(amrex::Math::abs(ds), dxscr[lim]);
                         }
                     }  // which slope order
 
@@ -575,12 +583,14 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                         Real del = 0.5 * (s(n, rm + 1) - s(n, rm - 1));
                         Real dmin = 2.0 * (s(n, rm) - s(n, rm - 1));
                         Real dpls = 2.0 * (s(n, rm + 1) - s(n, rm));
-                        dsvlm = dmin * dpls > 0.0
-                                    ? amrex::Math::copysign(1.0, del) *
-                                          min(amrex::Math::abs(del),
-                                              min(amrex::Math::abs(dmin),
-                                                  amrex::Math::abs(dpls)))
-                                    : 0.0;
+                        dsvlm =
+                            dmin * dpls > 0.0
+                                ? amrex::Math::copysign(1.0, del) *
+                                      amrex::min(
+                                          amrex::Math::abs(del),
+                                          amrex::min(amrex::Math::abs(dmin),
+                                                     amrex::Math::abs(dpls)))
+                                : 0.0;
                     }
 
                     // r
@@ -597,9 +607,10 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                         Real dpls = 2.0 * (s(n, r + 1) - s(n, r));
                         dsvl = dmin * dpls > 0.0
                                    ? amrex::Math::copysign(1.0, del) *
-                                         min(amrex::Math::abs(del),
-                                             min(amrex::Math::abs(dmin),
-                                                 amrex::Math::abs(dpls)))
+                                         amrex::min(
+                                             amrex::Math::abs(del),
+                                             amrex::min(amrex::Math::abs(dmin),
+                                                        amrex::Math::abs(dpls)))
                                    : 0.0;
                     }
 
@@ -615,8 +626,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                         sm = 0.5 * (s(n, r) + s(n, r - 1)) -
                              (dsvl - dsvlm) / 6.0;
                         // make sure sm lies in between adjacent cell-centered values
-                        sm = max(sm, min(s(n, r), s(n, r - 1)));
-                        sm = min(sm, max(s(n, r), s(n, r - 1)));
+                        sm = amrex::max(sm, amrex::min(s(n, r), s(n, r - 1)));
+                        sm = amrex::min(sm, amrex::max(s(n, r), s(n, r - 1)));
                     }
 
                     // calculate sp
@@ -639,9 +650,10 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                         Real dpls = 2.0 * (s(n, rp + 1) - s(n, rp));
                         dsvl = dmin * dpls > 0.0
                                    ? amrex::Math::copysign(1.0, del) *
-                                         min(amrex::Math::abs(del),
-                                             min(amrex::Math::abs(dmin),
-                                                 amrex::Math::abs(dpls)))
+                                         amrex::min(
+                                             amrex::Math::abs(del),
+                                             amrex::min(amrex::Math::abs(dmin),
+                                                        amrex::Math::abs(dpls)))
                                    : 0.0;
                     }
 
@@ -657,8 +669,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                         sp = 0.5 * (s(n, rp) + s(n, rp - 1)) -
                              (dsvl - dsvlm) / 6.0;
                         // make sure sedgel lies in between adjacent cell-centered values
-                        sp = max(sp, min(s(n, rp), s(n, rp - 1)));
-                        sp = min(sp, max(s(n, rp), s(n, rp - 1)));
+                        sp = amrex::max(sp, amrex::min(s(n, rp), s(n, rp - 1)));
+                        sp = amrex::min(sp, amrex::max(s(n, rp), s(n, rp - 1)));
                     }
 
                     // modify using quadratic limiters
@@ -759,9 +771,12 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     s(n, r - 1) - 2.0 * s(n, r) + s(n, r + 1);
                                 Real sgn = amrex::Math::copysign(1.0, D2);
                                 Real D2LIM =
-                                    sgn * max(min(C * sgn * D2L,
-                                                  min(C * sgn * D2R, sgn * D2)),
-                                              0.0);
+                                    sgn *
+                                    amrex::max(
+                                        amrex::min(C * sgn * D2L,
+                                                   amrex::min(C * sgn * D2R,
+                                                              sgn * D2)),
+                                        0.0);
                                 sedget(r) =
                                     0.5 * (s(n, r - 1) + s(n, r)) - D2LIM / 6.0;
                             }
@@ -799,10 +814,12 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             Real dafacep = sedget(r + 2) - sedget(r + 1);
                             Real dabarm = s(n, r) - s(n, r - 1);
                             Real dabarp = s(n, r + 1) - s(n, r);
-                            Real dafacemin = min(amrex::Math::abs(dafacem),
-                                                 amrex::Math::abs(dafacep));
-                            Real dabarmin = min(amrex::Math::abs(dabarm),
-                                                amrex::Math::abs(dabarp));
+                            Real dafacemin =
+                                amrex::min(amrex::Math::abs(dafacem),
+                                           amrex::Math::abs(dafacep));
+                            Real dabarmin =
+                                amrex::min(amrex::Math::abs(dabarm),
+                                           amrex::Math::abs(dabarp));
                             Real dachkm = 0.0;
                             Real dachkp = 0.0;
                             if (dafacemin >= dabarmin) {
@@ -824,12 +841,15 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                             Real D2C =
                                 s(n, r - 1) - 2.0 * s(n, r) + s(n, r + 1);
                             Real sgn = amrex::Math::copysign(1.0, D2);
-                            Real D2LIM =
-                                max(min(sgn * D2,
-                                        min(C * sgn * D2L,
-                                            min(C * sgn * D2R, C * sgn * D2C))),
-                                    0.0);
-                            Real D2ABS = max(amrex::Math::abs(D2), 1.e-10);
+                            Real D2LIM = amrex::max(
+                                amrex::min(
+                                    sgn * D2,
+                                    amrex::min(C * sgn * D2L,
+                                               amrex::min(C * sgn * D2R,
+                                                          C * sgn * D2C))),
+                                0.0);
+                            Real D2ABS =
+                                amrex::max(amrex::Math::abs(D2), 1.e-10);
                             alpham = alpham * D2LIM / D2ABS;
                             alphap = alphap * D2LIM / D2ABS;
                         } else {
