@@ -20,7 +20,7 @@ void Maestro::MakeIntraCoeffs(const Vector<MultiFab>& scal1,
 #endif
         for (MFIter mfi(scal1[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the valid region
-            const Box& gtbx = mfi.growntilebox(1);
+            const Box& gtbx = mfi.tilebox();
 
             const Array4<const Real> scalold = scal1[lev].array(mfi);
             const Array4<const Real> scalnew = scal2[lev].array(mfi);
@@ -83,4 +83,8 @@ void Maestro::MakeIntraCoeffs(const Vector<MultiFab>& scal1,
             });
         }
     }
+
+    // average down
+    AverageDown(cp, 0, 1);
+    AverageDown(xi, 0, 1);
 }
