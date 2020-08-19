@@ -68,8 +68,7 @@ void Maestro::Regrid() {
     }
     init_multilevel(tag_array.dataPtr(), &finest_level);
     // InitMultilevel(finest_level);
-    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
-                               base_geom.nr_fine);
+    BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1, base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     if (spherical) {
@@ -119,15 +118,13 @@ void Maestro::Regrid() {
     MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
     // beta0_old needs to be recomputed
-    MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old,
-              use_exact_base_state);
+    MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old, use_exact_base_state);
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;
 
     // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total,
-                                      ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::ReduceRealMax(end_total, ParallelDescriptor::IOProcessorNumber());
     if (maestro_verbose > 0) {
         Print() << "Time to regrid: " << end_total << '\n';
     }
@@ -157,9 +154,8 @@ void Maestro::TagArray() {
             RetagArray(validBox, lev);
         }
     }
-    ParallelDescriptor::ReduceIntMax(
-        tag_array.dataPtr(),
-        (base_geom.max_radial_level + 1) * base_geom.nr_fine);
+    ParallelDescriptor::ReduceIntMax(tag_array.dataPtr(),
+                                     (base_geom.max_radial_level + 1) * base_geom.nr_fine);
 }
 
 // tag all cells for refinement
@@ -250,8 +246,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     std::swap(sold_state, sold[lev]);
     std::swap(snew_state, snew[lev]);
 
-    FillPatch(lev, time, uold_state, uold, uold, 0, 0, AMREX_SPACEDIM, 0,
-              bcs_u);
+    FillPatch(lev, time, uold_state, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
     std::swap(uold_state, uold[lev]);
     std::swap(unew_state, unew[lev]);
 
@@ -269,6 +264,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     std::swap(rhcc_for_nodalproj_state, rhcc_for_nodalproj[lev]);
     std::swap(pi_state, pi[lev]);
 #ifdef SDC
+    FillPatch(lev, time, intra_state, intra, intra, 0, 0, Nscal, 0, bcs_f);
     std::swap(intra_state, intra[lev]);
 #endif
 
@@ -322,10 +318,8 @@ void Maestro::MakeNewLevelFromCoarse(int lev, Real time, const BoxArray& ba,
     }
 
     FillCoarsePatch(lev, time, sold[lev], sold, sold, 0, 0, Nscal, bcs_s);
-    FillCoarsePatch(lev, time, uold[lev], uold, uold, 0, 0, AMREX_SPACEDIM,
-                    bcs_u, 1);
-    FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_old, 0, 0, 1,
-                    bcs_f);
+    FillCoarsePatch(lev, time, uold[lev], uold, uold, 0, 0, AMREX_SPACEDIM, bcs_u, 1);
+    FillCoarsePatch(lev, time, S_cc_old[lev], S_cc_old, S_cc_old, 0, 0, 1, bcs_f);
     FillCoarsePatch(lev, time, gpi[lev], gpi, gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time, dSdt[lev], dSdt, dSdt, 0, 0, 1, bcs_f);
 #ifdef SDC
