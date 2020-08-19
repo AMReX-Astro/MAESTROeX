@@ -1,11 +1,11 @@
 PRECISION = DOUBLE
 PROFILE = FALSE
-DEBUG = TRUE
+DEBUG = FALSE
 DIM = 3
 
 COMP = gnu
 
-USE_MPI = FALSE
+USE_MPI = TRUE
 USE_OMP = FALSE
 
 USE_REACT = TRUE
@@ -22,7 +22,7 @@ Blocs   := .
 MAESTROEX_HOME := ../..
 
 EOS_DIR := gamma_law_general
-CONDUCTIVITY_DIR := stellar
+CONDUCTIVITY_DIR := constant
 NETWORK_DIR := general_null
 NETWORK_INPUTS := H_He.net
 
