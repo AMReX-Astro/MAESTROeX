@@ -1,31 +1,23 @@
 #include <Maestro.H>
-#include <Radial.H>
+#include <Postprocess.H>
 #include "AMReX_PlotFileUtil.H"
-//#include <iterator>     // std::istream_iterator
-//#include <unistd.h>     // getcwd
 
 using namespace amrex;
-
-void PlotFileName (const int timestep, std::string* basefilename,
-		   std::string* plotfilename);
-int GetTimeStep(const std::string plotfile, const std::string basefile);
-int GetMaxGridSize (const std::string pltfile);
 
 
 // ------------------------------------------
 // Write 2D r-theta slice diagnostics
 // ------------------------------------------
 void
-Write2dSliceFile (const std::string& plotfilename,
-		  const Vector<MultiFab>& u_in,
-		  const Vector<MultiFab>& w0_in, 
-		  const int deltat, const int nfiles)
+Postprocess::Write2dSliceFile (const Vector<MultiFab>& u_in,
+			       const Vector<MultiFab>& w0_in, 
+			       const int deltat, const int nfiles)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::Write2dSliceFile()", Write2dSliceFile);
 
     // MakeMeridionalCirculation
-    int max_grid_size = GetMaxGridSize(plotfilename);
+    int max_grid_size = GetMaxGridSize(iFile);
     Geometry geomFine;
     Vector<MultiFab> meridion_vel(1);
     MakeMeridionalCirculation(u_in, w0_in, meridion_vel,
@@ -35,11 +27,11 @@ Write2dSliceFile (const std::string& plotfilename,
     // time-averaged circulation need multiple files
     if (deltat > 0 && nfiles > 0) {
 
-	amrex::PlotFileData pltfile(plotfilename);
+	amrex::PlotFileData pltfile(iFile);
 	
 	// read in base file name to get time step
-	std::string basefilename = GetVarFromJobInfo(plotfilename, "maestro.plot_base_name");
-	int tn = GetTimeStep(plotfilename,basefilename);
+	std::string basefilename = GetVarFromJobInfo(iFile, "maestro.plot_base_name");
+	int tn = GetTimeStep(iFile,basefilename);
 	// Print() << "basefilename = " << basefilename << ", timestep = " << tn << std::endl;
 	
 	// save initial time
@@ -143,7 +135,7 @@ Write2dSliceFile (const std::string& plotfilename,
 
     
     // write to disk
-    std::string slicefilename = "slice_" + plotfilename;
+    std::string slicefilename = "slice_" + iFile;
     
     WriteSingleLevelPlotfile(slicefilename, meridion_vel[0],
 			     {"vel_radial", "vel_theta"},
@@ -152,42 +144,19 @@ Write2dSliceFile (const std::string& plotfilename,
 }
 
 // get plotfile name
-void PlotFileName (const int timestep, std::string* basefilename,
-		   std::string* plotfilename)
+void Postprocess::PlotFileName (const int timestep, std::string* basefilename,
+				std::string* plotfilename)
 {
     *plotfilename = Concatenate(*basefilename, timestep, 7);
 }
 
-// Get time step of plot file
-int GetTimeStep(const std::string plotfilename,
-		const std::string basefilename) {
-    int base = basefilename.length();
-    std::string timestep_str = plotfilename.substr(base, 7);
-    
-    return stoi(timestep_str);
-}
-
-// Get max grid size from the job info file
-int GetMaxGridSize (const std::string pltfile) {
-    auto maxgridsize_str = GetVarFromJobInfo(pltfile, "amr.max_grid_size");
-    // Print() << "maxgridsize_str = " << maxgridsize_str << std::endl;
-    
-    // retrieve first number
-    std::istringstream iss {maxgridsize_str};
-    int max_grid_size;
-    std::string s;
-    if (std::getline(iss, s, ' '))
-	max_grid_size = stoi(s);
-    
-    return max_grid_size;
-}
 
 void
-MakeMeridionalCirculation (const Vector<MultiFab>& vel,
-			   const Vector<MultiFab>& w0rcart,
-			   Vector<MultiFab>& circ_vel,
-			   const int max_grid_size, 
-			   Geometry& geomFine)
+Postprocess::MakeMeridionalCirculation (const Vector<MultiFab>& vel,
+					const Vector<MultiFab>& w0rcart,
+					Vector<MultiFab>& circ_vel,
+					const int max_grid_size, 
+					Geometry& geomFine)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeMeridionalCirculation()",MakeMeridionalCirculation);

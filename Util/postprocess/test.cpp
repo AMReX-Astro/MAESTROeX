@@ -1,4 +1,4 @@
-#include <Radial.H>
+#include <Postprocess.H>
 #include <Maestro.H>
 #include <Maestro_F.H>
 #include "AMReX_PlotFileUtil.H"
@@ -9,7 +9,7 @@ using namespace amrex;
 // ---------------------------------
 // Write 1D radial diagnostics
 // ---------------------------------
-void test ()
+void Postprocess::test ()
 {
     // exact-solution problem to test subroutines that compute
     // diagnostics dependent on velocity only;
@@ -51,7 +51,10 @@ void test ()
     MultiFab w0_mf(ba, dm, AMREX_SPACEDIM, 0);
     w0_mf.setVal(0.);
 
-    const auto& center_p = center;
+    Vector<Real> center_p(3);	
+    center_p[0] = 100.0;
+    center_p[1] = 100.0;
+    center_p[2] = 100.0;
 
     const auto dx = tgeom.CellSizeArray();
     const auto prob_lo = tgeom.ProbLoArray();
@@ -156,8 +159,9 @@ void test ()
 }
 
 
-void WriteTestJobInfo(const std::string& dir,
-		      const std::string& base, const int maxgridsize) {
+void Postprocess::WriteTestJobInfo(const std::string& dir,
+				   const std::string& base,
+				   const int maxgridsize) {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::WritePartJobInfo()", WritePartJobInfo);
 

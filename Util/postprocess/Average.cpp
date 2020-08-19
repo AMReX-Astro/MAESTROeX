@@ -1,5 +1,5 @@
 #include <Maestro.H>
-#include <Radial.H>
+#include <Postprocess.H>
 
 using namespace amrex;
 
@@ -10,9 +10,9 @@ Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 // Given a multifab of data (phi), average down to a base state quantity, phibar.
 // Assume we are spherical, and the averaging is done at constant radius.
 
-void Average (const Vector<MultiFab>& phi,
-	      BaseState<Real>& phibar,
-	      int comp)
+void Postprocess::Average (const Vector<MultiFab>& phi,
+			   BaseState<Real>& phibar,
+			   int comp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocessing::Average()", PAverage);
@@ -300,11 +300,11 @@ QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 // Assume spherical case, and averaging is done in the psi direction,
 // resulting in averages on an x-z plane cutting through the north and south poles.
 
-void Average2d (const Vector<MultiFab>& phi,
-		Vector<MultiFab>& phibar,
-		int barcomp, 
-		const Vector<Box>& bardomain,
-		int comp)
+void Postprocess::Average2d (const Vector<MultiFab>& phi,
+			     Vector<MultiFab>& phibar,
+			     int barcomp, 
+			     const Vector<Box>& bardomain,
+			     int comp)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocessing::Average2d()", PAverage2d);

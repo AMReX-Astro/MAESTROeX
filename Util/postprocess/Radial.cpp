@@ -1,8 +1,6 @@
-#include <Radial.H>
+#include <Postprocess.H>
 #include <Maestro.H>
 #include "AMReX_PlotFileUtil.H"
-//#include <iterator>     // std::istream_iterator
-//#include <unistd.h>     // getcwd
 
 using namespace amrex;
 
@@ -11,11 +9,10 @@ using namespace amrex;
 // Write 1D radial diagnostics
 // ---------------------------------
 void
-WriteRadialFile (const std::string& plotfilename,
-		 const BaseState<Real>& rho0_in,
-		 const BaseState<Real>& p0_in,
-		 const Vector<MultiFab>& u_in,
-		 const Vector<MultiFab>& w0_in)
+Postprocess::WriteRadialFile (const BaseState<Real>& rho0_in,
+			      const BaseState<Real>& p0_in,
+			      const Vector<MultiFab>& u_in,
+			      const Vector<MultiFab>& w0_in)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::WriteRadialFile()", WriteRadialFile);
@@ -38,8 +35,7 @@ WriteRadialFile (const std::string& plotfilename,
     for (int lev = 0; lev <= finest_level; ++lev) {
 	omega[lev].define(u_in[lev].boxArray(), u_in[lev].DistributionMap(), 1, 0);
     }
-    MakeRotationRate(plotfilename, u_in, w0_in, omega);
-    // VisMF::Write(omega[0],"a_omega");
+    MakeRotationRate(u_in, w0_in, omega);
     
     // MakeRadialRotationRatio
     BaseState<Real> ratio_omega(base_geom.max_radial_level+1, base_geom.nr_fine);
@@ -53,9 +49,9 @@ WriteRadialFile (const std::string& plotfilename,
     BaseState<Real> Nfreq(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> s0(base_geom.max_radial_level+1, base_geom.nr_fine);
     BaseState<Real> grav0(base_geom.max_radial_level+1, base_geom.nr_fine);
-    MakeRadialNFreq(plotfilename, p0_in, rho0_in, Nfreq, s0, grav0);
+    MakeRadialNFreq(p0_in, rho0_in, Nfreq, s0, grav0);
     
-    std::string radialfilename = "radial_" + plotfilename;
+    std::string radialfilename = "radial_" + iFile;
 
     VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
 
@@ -94,7 +90,7 @@ WriteRadialFile (const std::string& plotfilename,
 
 // write additional diagnostics from model file
 void
-WriteModelDiagFile (const std::string& plotfilename)
+Postprocess::WriteModelDiagFile (const std::string& plotfilename)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::WriteModelDiagFile()", WriteModelDiagFile);
@@ -171,10 +167,9 @@ WriteModelDiagFile (const std::string& plotfilename)
 
 // read BaseCC file from plotfile directory
 void
-ReadBaseCCFile (const std::string& plotfilename,
-		BaseState<Real>& r_s,
-		BaseState<Real>& rho0_s,
-		BaseState<Real>& p0_s)
+Postprocess::ReadBaseCCFile (BaseState<Real>& r_s,
+			     BaseState<Real>& rho0_s,
+			     BaseState<Real>& p0_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::ReadBaseCCFile()", ReadBaseCCFile);
@@ -186,7 +181,7 @@ ReadBaseCCFile (const std::string& plotfilename,
     
     // read BaseCC
     std::string line, word;
-    std::string File(plotfilename + "/BaseCC_0");
+    std::string File(iFile + "/BaseCC_0");
     Vector<char> fileCharPtr;
     ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
     std::string fileCharPtrString(fileCharPtr.dataPtr());
@@ -212,10 +207,10 @@ ReadBaseCCFile (const std::string& plotfilename,
 
 // read input model file from disk
 void
-ReadModelFile (const std::string& plotfilename,
-	       BaseState<Real>& r_s,
-	       BaseState<Real>& rho0_s,
-	       BaseState<Real>& p0_s)
+Postprocess::ReadModelFile (const std::string& plotfilename, 
+			    BaseState<Real>& r_s,
+			    BaseState<Real>& rho0_s,
+			    BaseState<Real>& p0_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::ReadModelFile()", ReadModelFile);
@@ -270,32 +265,14 @@ ReadModelFile (const std::string& plotfilename,
 	p0(0,i) = std::stod(word);
 	// species not needed
     }
-    
-    // Print() << "HACK: " << r(0,0) << ", " << rho0(0,0) << ", " << p0(0,0) << std::endl;
-}
-
-// Get gamma from the job info file
-Real GetGamma (const std::string pltfile) {
-    auto gamma_str = GetVarFromJobInfo(pltfile, "eos_gamma");
-    // Print() << "gamma_str = " << gamma_str << std::endl;
-    
-    // retrieve first number
-    std::istringstream iss {gamma_str};
-    Real gamma;
-    std::string s;
-    if (std::getline(iss, s, ' '))
-	gamma = stod(s);
-    
-    return gamma;
 }
 
 
 void
-MakeRadialNFreq (const std::string& plotfilename,
-		 const BaseState<Real>& p0_s,
-		 const BaseState<Real>& rho0_s, 
-		 BaseState<Real>& freq0,
-		 BaseState<Real>& entropy_s, BaseState<Real>& grav_s)
+Postprocess::MakeRadialNFreq (const BaseState<Real>& p0_s,
+			      const BaseState<Real>& rho0_s, 
+			      BaseState<Real>& freq0,
+			      BaseState<Real>& entropy_s, BaseState<Real>& grav_s)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeRadialNFreq()",MakeRadialNFreq);
@@ -312,7 +289,7 @@ MakeRadialNFreq (const std::string& plotfilename,
     const auto p0 = p0_s.const_array();
     const auto grav = grav_s.const_array();
     auto entropy = entropy_s.array();
-    Real gamma = GetGamma(plotfilename);
+    Real gamma = GetGamma(iFile);
     
     // dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
@@ -334,9 +311,9 @@ MakeRadialNFreq (const std::string& plotfilename,
 }
 
 void
-MakeRadialGrav (const BaseState<Real>& rho0_in,
-		BaseState<Real>& grav,
-		const BaseStateArray<Real>& r_cc_loc)
+Postprocess::MakeRadialGrav (const BaseState<Real>& rho0_in,
+			     BaseState<Real>& grav,
+			     const BaseStateArray<Real>& r_cc_loc)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeRadialGrav()",MakeRadialGrav);
@@ -390,8 +367,8 @@ MakeRadialGrav (const BaseState<Real>& rho0_in,
 }
 
 void
-MakeConvectionVel (const Vector<MultiFab>& velr,
-		   BaseState<Real>& vel_conv)
+Postprocess::MakeConvectionVel (const Vector<MultiFab>& velr,
+				BaseState<Real>& vel_conv)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeConvectionVel()",MakeConvectionVel);
@@ -440,9 +417,9 @@ MakeConvectionVel (const Vector<MultiFab>& velr,
 }
 
 void
-MakeRadialRotationRatio (const BaseState<Real>& s0_in,
-			 const Vector<MultiFab>& omega,
-			 BaseState<Real>& ratio_omega)
+Postprocess::MakeRadialRotationRatio (const BaseState<Real>& s0_in,
+				      const Vector<MultiFab>& omega,
+				      BaseState<Real>& ratio_omega)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::RadialRotationRatio()",MakeConvectionVel);
@@ -473,10 +450,10 @@ MakeRadialRotationRatio (const BaseState<Real>& s0_in,
 }
 
 void
-MakeVelrc (const Vector<MultiFab>& vel,
-	   const Vector<MultiFab>& w0rcart,
-	   Vector<MultiFab>& rad_vel,
-	   Vector<MultiFab>& circ_vel)
+Postprocess::MakeVelrc (const Vector<MultiFab>& vel,
+			const Vector<MultiFab>& w0rcart,
+			Vector<MultiFab>& rad_vel,
+			Vector<MultiFab>& circ_vel)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeVelrc()",MakeVelrc);
@@ -539,31 +516,15 @@ MakeVelrc (const Vector<MultiFab>& vel,
     // FillPatch(t0, circ_vel, circ_vel, circ_vel, 0, 0, 1, 0, bcs_f);
 }
 
-// Get rotation frequency from the job info file
-Real GetRotationFreq (const std::string pltfile) {
-    auto rotationfreq_str = GetVarFromJobInfo(pltfile, "maestro.rotational_frequency");
-    // Print() << "rotationfreq_str = " << rotationfreq_str << std::endl;
-    
-    // retrieve first number
-    std::istringstream iss {rotationfreq_str};
-    Real freq0;
-    std::string s;
-    if (std::getline(iss, s, ' '))
-	freq0 = stod(s);
-    
-    return freq0;
-}
-
 void
-MakeRotationRate (const std::string& plotfilename,
-		  const Vector<MultiFab>& vel,
-		  const Vector<MultiFab>& w0cart,
-		  Vector<MultiFab>& omega)
+Postprocess::MakeRotationRate (const Vector<MultiFab>& vel,
+			       const Vector<MultiFab>& w0cart,
+			       Vector<MultiFab>& omega)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeRotationRate()",MakeRotationRate);
 
-    auto omega0 = GetRotationFreq(plotfilename);
+    auto omega0 = GetRotationFreq(iFile);
     const auto& center_p = center;
     
     for (int lev=0; lev<=finest_level; ++lev) {
@@ -610,9 +571,9 @@ MakeRotationRate (const std::string& plotfilename,
 }
 
 void
-MakeLatShear (const Vector<MultiFab>& omega_in,
-	      BaseState<Real>& shear,
-	      const BaseStateArray<Real>& r_cc_loc)
+Postprocess::MakeLatShear (const Vector<MultiFab>& omega_in,
+			   BaseState<Real>& shear,
+			   const BaseStateArray<Real>& r_cc_loc)
 {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeLatShear()",MakeLatShear);
