@@ -296,6 +296,8 @@ void Maestro::FillUmacGhost(
                 }
             });
 
+            Gpu::synchronize();
+
             AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
                 // lo y-faces
                 if (j == domlo[1] - 1) {
@@ -375,6 +377,8 @@ void Maestro::FillUmacGhost(
             });
 
 #if (AMREX_SPACEDIM == 3)
+
+            Gpu::synchronize();
 
             AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                 // lo z-faces

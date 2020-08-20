@@ -136,12 +136,16 @@ void Maestro::VelPred(
                 }
             }
 
+            Gpu::synchronize();
+
             VelPredInterface(mfi, utilde_mf.array(mfi), ufull_mf.array(mfi),
                              utrans_mf.array(mfi), vtrans_mf.array(mfi),
                              Imu.array(mfi), Ipu.array(mfi), Imv.array(mfi),
                              Ipv.array(mfi), ulx.array(mfi), urx.array(mfi),
                              uimhx.array(mfi), uly.array(mfi), ury.array(mfi),
                              uimhy.array(mfi), domainBox, dx);
+
+            Gpu::synchronize();
 
             VelPredVelocities(mfi, utilde_mf.array(mfi), utrans_mf.array(mfi),
                               vtrans_mf.array(mfi), umac_mf.array(mfi),
@@ -240,6 +244,8 @@ void Maestro::VelPred(
                 }
             }
 
+            Gpu::synchronize();
+
             VelPredInterface(mfi, utilde_mf.array(mfi), ufull_mf.array(mfi),
                              utrans_mf.array(mfi), vtrans_mf.array(mfi),
                              wtrans_mf.array(mfi), Imu.array(mfi),
@@ -249,6 +255,8 @@ void Maestro::VelPred(
                              ury.array(mfi), uimhy.array(mfi), ulz.array(mfi),
                              urz.array(mfi), uimhz.array(mfi), domainBox, dx);
 
+            Gpu::synchronize();
+
             VelPredTransverse(
                 mfi, utilde_mf.array(mfi), utrans_mf.array(mfi),
                 vtrans_mf.array(mfi), wtrans_mf.array(mfi), ulx.array(mfi),
@@ -257,6 +265,8 @@ void Maestro::VelPred(
                 urz.array(mfi), uimhz.array(mfi), uimhyz.array(mfi),
                 uimhzy.array(mfi), vimhxz.array(mfi), vimhzx.array(mfi),
                 wimhxy.array(mfi), wimhyx.array(mfi), domainBox, dx);
+
+            Gpu::synchronize();
 
             VelPredVelocities(
                 mfi, utilde_mf.array(mfi), utrans_mf.array(mfi),

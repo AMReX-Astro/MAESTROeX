@@ -142,12 +142,16 @@ void Maestro::MakeEdgeScal(Vector<MultiFab>& state,
                     }
                 }
 
+                Gpu::synchronize();
+
                 // Create s_{\i-\half\e_x}^x, etc.
 
                 MakeEdgeScalPredictor(
                     mfi, slx_arr, srx_arr, sly_arr, sry_arr, scal_arr,
                     Ip.array(mfi), Im.array(mfi), umac_arr, vmac_arr, simhx_arr,
                     simhy_arr, domainBox, bcs, dx, scomp, bccomp, is_vel);
+
+                Gpu::synchronize();
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
                 Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
