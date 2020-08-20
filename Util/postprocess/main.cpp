@@ -4,31 +4,27 @@
 #include <fstream>
 #include <iostream>
 
+#include <Postprocess.H>
 #include "AMReX_ParmParse.H"
 #include "AMReX_PlotFileUtil.H"
-#include <Postprocess.H>
 
 using namespace amrex;
 
 std::string inputs_name = "";
 
+int main(int argc, char* argv[]) {
+    amrex::Initialize(argc, argv);
 
-int main(int argc, char* argv[])
-{
+    // timer for profiling
+    BL_PROFILE_VAR("main()", pmain);
 
-	amrex::Initialize(argc, argv);
+    Postprocess postproc;
 
-	// timer for profiling
-	BL_PROFILE_VAR("main()", pmain);
+    postproc.init();
 
-	Postprocess postproc;
+    postproc.diag();
 
-	postproc.init();
+    BL_PROFILE_VAR_STOP(pmain);
 
-	postproc.diag();
-	
-	BL_PROFILE_VAR_STOP(pmain);
-
-	amrex::Finalize();
+    amrex::Finalize();
 }
-
