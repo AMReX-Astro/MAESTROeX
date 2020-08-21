@@ -159,10 +159,11 @@ Real ModelParser::Interpolate(const Real r, const int ivar,
         interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
         // safety check to make sure interpolate lies within the bounding points
-        Real minvar = min(model_state[i + 1][ivar], model_state[i][ivar]);
+        Real minvar =
+            amrex::min(model_state[i + 1][ivar], model_state[i][ivar]);
         Real maxvar = max(model_state[i + 1][ivar], model_state[i][ivar]);
         interpolate = max(interpolate, minvar);
-        interpolate = min(interpolate, maxvar);
+        interpolate = amrex::min(interpolate, maxvar);
     } else if (i == npts_model - 1) {
         Real slope = (model_state[i][ivar] - model_state[i - 1][ivar]) /
                      (model_r[i] - model_r[i - 1]);
@@ -170,10 +171,11 @@ Real ModelParser::Interpolate(const Real r, const int ivar,
 
         // safety check to make sure interpolate lies within the bounding points
         if (!interpolate_top) {
-            Real minvar = min(model_state[i][ivar], model_state[i - 1][ivar]);
+            Real minvar =
+                amrex::min(model_state[i][ivar], model_state[i - 1][ivar]);
             Real maxvar = max(model_state[i][ivar], model_state[i - 1][ivar]);
             interpolate = max(interpolate, minvar);
-            interpolate = min(interpolate, maxvar);
+            interpolate = amrex::min(interpolate, maxvar);
         }
     } else {
         if (r >= model_r[i]) {
@@ -182,20 +184,22 @@ Real ModelParser::Interpolate(const Real r, const int ivar,
             interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
             // safety check to make sure interpolate lies within the bounding points
-            Real minvar = min(model_state[i + 1][ivar], model_state[i][ivar]);
+            Real minvar =
+                amrex::min(model_state[i + 1][ivar], model_state[i][ivar]);
             Real maxvar = max(model_state[i + 1][ivar], model_state[i][ivar]);
             interpolate = max(interpolate, minvar);
-            interpolate = min(interpolate, maxvar);
+            interpolate = amrex::min(interpolate, maxvar);
         } else {
             Real slope = (model_state[i][ivar] - model_state[i - 1][ivar]) /
                          (model_r[i] - model_r[i - 1]);
             interpolate = slope * (r - model_r[i]) + model_state[i][ivar];
 
             // safety check to make sure interpolate lies within the bounding points
-            Real minvar = min(model_state[i][ivar], model_state[i - 1][ivar]);
+            Real minvar =
+                amrex::min(model_state[i][ivar], model_state[i - 1][ivar]);
             Real maxvar = max(model_state[i][ivar], model_state[i - 1][ivar]);
             interpolate = max(interpolate, minvar);
-            interpolate = min(interpolate, maxvar);
+            interpolate = amrex::min(interpolate, maxvar);
         }
     }
 

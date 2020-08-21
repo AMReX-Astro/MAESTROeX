@@ -345,7 +345,7 @@ void BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
                     chunk_start = false;
                 }
             }
-            maxchunks = max(nchunks, maxchunks);
+            maxchunks = amrex::max(nchunks, maxchunks);
         }
     }
 

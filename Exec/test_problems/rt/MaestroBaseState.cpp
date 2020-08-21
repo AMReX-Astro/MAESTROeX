@@ -34,12 +34,12 @@ void Maestro::InitBaseState(BaseState<Real>& rho0_s, BaseState<Real>& rhoh0_s,
             << anelastic_cutoff_density << std::endl;
     Print() << " " << std::endl;
 
-    const Real min_dens = min(rho_1, rho_2);
+    const Real min_dens = amrex::min(rho_1, rho_2);
 
     if (anelastic_cutoff_density > min_dens || base_cutoff_density > min_dens) {
         Abort(
             "ERROR: for the RT problem, the anelastic and base cutoff "
-            "densities > min(rho)");
+            "densities > amrex::min(rho)");
     }
 
     if (min_dens < small_dens) {
