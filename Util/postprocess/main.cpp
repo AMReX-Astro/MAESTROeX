@@ -31,7 +31,8 @@ int main(int argc, char* argv[]) {
     Real end_total = ParallelDescriptor::second() - strt_total;
 
     // print wallclock time
-    ParallelDescriptor::ReduceRealMax(end_total, ParallelDescriptor::IOProcessorNumber());
+    ParallelDescriptor::ReduceRealMax(end_total,
+                                      ParallelDescriptor::IOProcessorNumber());
     Print() << "Total Time: " << end_total << '\n';
 
     BL_PROFILE_VAR_STOP(pmain);
