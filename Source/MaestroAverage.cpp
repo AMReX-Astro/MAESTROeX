@@ -55,14 +55,29 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
-                    int r = AMREX_SPACEDIM == 2 ? j : k;
-#if (AMREX_SPACEDIM == 2)
-                    if (k == 0)
+#ifdef AMREX_USE_CUDA
+                // Atomic::Add is non-deterministic on the GPU. If this flag is true,
+                // run on the CPU instead
+                bool launched;
+                if (deterministic_nodal_solve) {
+                    launched = !Gpu::notInLaunchRegion();
+                    // turn off GPU
+                    if (launched) Gpu::setLaunchRegion(false);
+                }
 #endif
-                        amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, r)),
-                                                       phi_arr(i, j, k));
+
+                AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
+                    int r = AMREX_SPACEDIM == 2 ? j : k;
+                    amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, r)),
+                                                   phi_arr(i, j, k));
                 });
+
+#ifdef AMREX_USE_CUDA
+                if (deterministic_nodal_solve) {
+                    // turn GPU back on
+                    if (launched) Gpu::setLaunchRegion(true);
+                }
+#endif
             }
         }
 
@@ -217,7 +232,18 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                 bool use_mask = !(lev == fine_lev - 1);
 
-                AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+#ifdef AMREX_USE_CUDA
+                // Atomic::Add is non-deterministic on the GPU. If this flag is true,
+                // run on the CPU instead
+                bool launched;
+                if (deterministic_nodal_solve) {
+                    launched = !Gpu::notInLaunchRegion();
+                    // turn off GPU
+                    if (launched) Gpu::setLaunchRegion(false);
+                }
+#endif
+
+                AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
@@ -252,6 +278,13 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                                                        1);
                     }
                 });
+
+#ifdef AMREX_USE_CUDA
+                if (deterministic_nodal_solve) {
+                    // turn GPU back on
+                    if (launched) Gpu::setLaunchRegion(true);
+                }
+#endif
             }
         }
 

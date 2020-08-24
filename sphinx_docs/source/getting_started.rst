@@ -12,7 +12,7 @@ Requirements
 MAESTROeX requires a C++ compiler that supports the C++11 standard, a 
 Fortran compiler that supports the Fortran 2003 standard, and a C compiler 
 that supports the C99 standard. Several compiler suites are supported, 
-including GNU, Intel, PGI and Cray. GNU Make (>= 3.81) is also required, 
+including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also required, 
 as is Python (>= 3.6) and standard tools available in any Unix-like 
 environments (e.g., Perl and ``sed``). 
 
