@@ -18,11 +18,21 @@ int main(int argc, char* argv[]) {
     // timer for profiling
     BL_PROFILE_VAR("main()", pmain);
 
+    // wallclock time
+    const Real strt_total = ParallelDescriptor::second();
+
     Postprocess postproc;
 
     postproc.init();
 
     postproc.diag();
+
+    // wallclock time
+    Real end_total = ParallelDescriptor::second() - strt_total;
+
+    // print wallclock time
+    ParallelDescriptor::ReduceRealMax(end_total, ParallelDescriptor::IOProcessorNumber());
+    Print() << "Total Time: " << end_total << '\n';
 
     BL_PROFILE_VAR_STOP(pmain);
 
