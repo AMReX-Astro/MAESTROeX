@@ -28,7 +28,7 @@ The instantaneous circulation components are computed by neglecting the time-ave
 
 using a normalized Gaussian kernel 
 
-<img src="https://render.githubusercontent.com/render/math?math=K(r%27-r,\delta r) = \dfrac{1}{\sqrt{\pi\delta r}} \exp[-(r%27-r)^2/\delta r \quad,\quad r%27=\sqrt{x^2%2By^2%2Bz^2]">
+<img src="https://render.githubusercontent.com/render/math?math=K(r%27-r,\delta r) = \dfrac{1}{\sqrt{\pi\delta r}} \exp[-(r%27-r)^2/\delta r \quad,\quad r%27=\sqrt{x^2%2By^2%2Bz^2}">
 
 with kernel width
 
