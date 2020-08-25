@@ -342,11 +342,11 @@ Real Maestro::QuadInterp(const Real x, const Real x0, const Real x1,
                  (x - x0) * (x - x1);
 
     if (limit) {
-        if (y > max(y0, max(y1, y2))) {
-            y = max(y0, max(y1, y2));
+        if (y > amrex::max(y0, amrex::max(y1, y2))) {
+            y = amrex::max(y0, amrex::max(y1, y2));
         }
-        if (y < min(y0, min(y1, y2))) {
-            y = min(y0, min(y1, y2));
+        if (y < amrex::min(y0, amrex::min(y1, y2))) {
+            y = amrex::min(y0, amrex::min(y1, y2));
         }
     }
 
@@ -420,6 +420,17 @@ void Maestro::Addw0(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& u_edge,
     }
 
     if (finest_level == 0) {
+#ifdef AMREX_USE_CUDA
+        // FillBoundary can be non-deterministic on the GPU for non-cell
+        // centered data (like u_edge here). If this flag is true, run
+        // on the CPU instead
+        bool launched;
+        if (deterministic_nodal_solve) {
+            launched = !Gpu::notInLaunchRegion();
+            // turn off GPU
+            if (launched) Gpu::setLaunchRegion(false);
+        }
+#endif
         // fill periodic ghost cells
         for (int lev = 0; lev <= finest_level; ++lev) {
             for (int d = 0; d < AMREX_SPACEDIM; ++d) {
@@ -427,8 +438,16 @@ void Maestro::Addw0(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& u_edge,
             }
         }
 
+#ifdef AMREX_USE_CUDA
+        if (deterministic_nodal_solve) {
+            // turn GPU back on
+            if (launched) Gpu::setLaunchRegion(true);
+        }
+#endif
+
         // fill ghost cells behind physical boundaries
         FillUmacGhost(u_edge);
+
     } else {
         // edge_restriction
         AverageDownFaces(u_edge);

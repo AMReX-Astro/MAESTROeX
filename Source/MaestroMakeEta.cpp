@@ -52,7 +52,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
 
 #if (AMREX_SPACEDIM == 2)
             int zlo = tilebox.loVect3d()[2];
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
                 if (k == zlo) {
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev, j)),
                                                    etarhoflux_arr(i, j, k));
@@ -75,7 +75,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
                 const int lo = ybx.loVect3d()[0];
                 const int hi = ybx.hiVect3d()[0];
 
-                AMREX_PARALLEL_FOR_1D(hi - lo + 1, n, {
+                AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, n, {
                     int i = n + lo;
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev, j)),
                                                    etarhoflux_arr(i, j, k));
@@ -83,7 +83,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
                 Gpu::synchronize();
             }
 #else
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
                 amrex::HostDevice::Atomic::Add(&(etarhosum(lev, k)),
                                                etarhoflux_arr(i, j, k));
             });
@@ -101,7 +101,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
             if (top_edge) {
                 const auto zbx = mfi.nodaltilebox(2);
                 int zhi = zbx.hiVect3d()[2];
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                AMREX_HOST_DEVICE_FOR_3D(zbx, i, j, k, {
                     if (k == zhi) {
                         amrex::HostDevice::Atomic::Add(&(etarhosum(lev, k)),
                                                        etarhoflux_arr(i, j, k));
@@ -128,7 +128,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
             const int lo = base_geom.r_start_coord(n, i);
             const int hi = base_geom.r_end_coord(n, i) + 1;
             const auto ncell_lev = ncell(n);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, j, {
                 int r = j + lo;
                 etarho_ec_arr(n, r) = etarhosum_arr(n, r) / Real(ncell_lev);
             });
@@ -147,7 +147,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const int lo = base_geom.r_start_coord(n, i);
             const int hi = base_geom.r_end_coord(n, i);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, j, {
                 int r = j + lo;
                 etarho_cc_arr(n, r) =
                     0.5 * (etarho_ec_arr(n, r) + etarho_ec_arr(n, r + 1));

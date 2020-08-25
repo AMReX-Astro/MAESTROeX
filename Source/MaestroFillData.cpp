@@ -296,6 +296,8 @@ void Maestro::FillUmacGhost(
                 }
             });
 
+            Gpu::synchronize();
+
             AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
                 // lo y-faces
                 if (j == domlo[1] - 1) {
@@ -375,6 +377,8 @@ void Maestro::FillUmacGhost(
             });
 
 #if (AMREX_SPACEDIM == 3)
+
+            Gpu::synchronize();
 
             AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
                 // lo z-faces
@@ -660,8 +664,9 @@ void Maestro::FillPatchUedge(
                                         Real val =
                                             fine(i, j, k, n) +
                                             df * Real(M) / Real(ratio[dir]);
-                                        for (auto P = max(j, flo[1]);
-                                             P <= min(j + ratio[1] - 1, fhi[1]);
+                                        for (auto P = amrex::max(j, flo[1]);
+                                             P <= amrex::min(j + ratio[1] - 1,
+                                                             fhi[1]);
                                              ++P) {
                                             fine(i + M, P, k, n) = val;
                                         }
@@ -681,8 +686,9 @@ void Maestro::FillPatchUedge(
                                         Real val =
                                             fine(i, j, k, n) +
                                             df * Real(M) / Real(ratio[dir]);
-                                        for (auto P = max(i, flo[0]);
-                                             P <= min(i + ratio[0] - 1, fhi[0]);
+                                        for (auto P = amrex::max(i, flo[0]);
+                                             P <= amrex::min(i + ratio[0] - 1,
+                                                             fhi[0]);
                                              ++P) {
                                             fine(P, j + M, k, n) = val;
                                         }
@@ -707,12 +713,15 @@ void Maestro::FillPatchUedge(
                                             Real val =
                                                 fine(i, j, k, n) +
                                                 df * Real(M) / Real(ratio[dir]);
-                                            for (auto P = max(j, flo[1]);
+                                            for (auto P = amrex::max(j, flo[1]);
                                                  P <=
-                                                 min(j + ratio[1] - 1, fhi[1]);
+                                                 amrex::min(j + ratio[1] - 1,
+                                                            fhi[1]);
                                                  ++P) {
-                                                for (auto L = max(k, flo[2]);
-                                                     L <= min(k + ratio[2] - 1,
+                                                for (auto L =
+                                                         amrex::max(k, flo[2]);
+                                                     L <= amrex::min(
+                                                              k + ratio[2] - 1,
                                                               fhi[2]);
                                                      ++L) {
                                                     fine(i + M, P, L, n) = val;
@@ -737,12 +746,15 @@ void Maestro::FillPatchUedge(
                                             Real val =
                                                 fine(i, j, k, n) +
                                                 df * Real(M) / Real(ratio[dir]);
-                                            for (auto P = max(i, flo[0]);
+                                            for (auto P = amrex::max(i, flo[0]);
                                                  P <=
-                                                 min(i + ratio[0] - 1, fhi[0]);
+                                                 amrex::min(i + ratio[0] - 1,
+                                                            fhi[0]);
                                                  ++P) {
-                                                for (auto L = max(k, flo[2]);
-                                                     L <= min(k + ratio[2] - 1,
+                                                for (auto L =
+                                                         amrex::max(k, flo[2]);
+                                                     L <= amrex::min(
+                                                              k + ratio[2] - 1,
                                                               fhi[2]);
                                                      ++L) {
                                                     fine(P, j + M, L, n) = val;
@@ -768,12 +780,15 @@ void Maestro::FillPatchUedge(
                                             Real val =
                                                 fine(i, j, k, n) +
                                                 df * Real(M) / Real(ratio[dir]);
-                                            for (auto P = max(i, flo[0]);
+                                            for (auto P = amrex::max(i, flo[0]);
                                                  P <=
-                                                 min(i + ratio[0] - 1, fhi[0]);
+                                                 amrex::min(i + ratio[0] - 1,
+                                                            fhi[0]);
                                                  ++P) {
-                                                for (auto L = max(j, flo[1]);
-                                                     L <= min(j + ratio[1] - 1,
+                                                for (auto L =
+                                                         amrex::max(j, flo[1]);
+                                                     L <= amrex::min(
+                                                              j + ratio[1] - 1,
                                                               fhi[1]);
                                                      ++L) {
                                                     fine(P, L, k + M, n) = val;

@@ -49,7 +49,7 @@ void Maestro::Makew0(const BaseState<Real>& w0_old, BaseState<Real>& w0_force,
             Real max_w0 = 0.0;
             for (auto r = base_geom.r_start_coord(n, 1);
                  r <= base_geom.r_end_coord(n, 1) + 1; ++r) {
-                max_w0 = max(max_w0, amrex::Math::abs(w0_arr(n, r)));
+                max_w0 = amrex::max(max_w0, amrex::Math::abs(w0_arr(n, r)));
             }
             Print() << "... max CFL of w0: " << max_w0 * dt_in / base_geom.dr(n)
                     << std::endl;
@@ -630,7 +630,8 @@ void Maestro::Makew0Sphr(
 
     // Note that we are solving for (r^2 delta w0), not just w0.
 
-    int max_cutoff = min(base_cutoff_density_coord, base_geom.nr_fine - 1);
+    int max_cutoff =
+        amrex::min(base_cutoff_density_coord, base_geom.nr_fine - 1);
 
     lo = 1;
     hi = max_cutoff;

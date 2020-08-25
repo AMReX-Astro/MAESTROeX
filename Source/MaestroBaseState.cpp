@@ -147,8 +147,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             Real sumX = 0.0;
 
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                xn_ambient[comp] = max(
-                    0.0, min(1.0, input_model.Interpolate(
+                xn_ambient[comp] = amrex::max(
+                    0.0, amrex::min(
+                             1.0, input_model.Interpolate(
                                       rloc, ModelParser::ispec_model + comp)));
                 sumX += xn_ambient[comp];
             }
@@ -267,7 +268,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
         Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
-        rloc = min(rloc, rmax);
+        rloc = amrex::min(rloc, rmax);
 
         if (rloc < base_cutoff_density_loc) {
             Real r_r = starting_rad;
@@ -320,8 +321,9 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                         << std::endl;
             }
 
-            max_hse_error = max(max_hse_error, amrex::Math::abs(dpdr - rhog) /
-                                                   amrex::Math::abs(rhog));
+            max_hse_error =
+                amrex::max(max_hse_error, amrex::Math::abs(dpdr - rhog) /
+                                              amrex::Math::abs(rhog));
         }
     }
 

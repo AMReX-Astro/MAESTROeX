@@ -269,6 +269,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     std::swap(rhcc_for_nodalproj_state, rhcc_for_nodalproj[lev]);
     std::swap(pi_state, pi[lev]);
 #ifdef SDC
+    FillPatch(lev, time, intra_state, intra, intra, 0, 0, Nscal, 0, bcs_f);
     std::swap(intra_state, intra[lev]);
 #endif
 

@@ -42,9 +42,9 @@ void Maestro::CelltoEdge(const BaseState<Real>& s0_cell_s,
                     Real tmp =
                         7.0 / 12.0 * (s0_cell(n, r) + s0_cell(n, r - 1)) -
                         1.0 / 12.0 * (s0_cell(n, r + 1) + s0_cell(n, r - 2));
-                    Real s0min = min(s0_cell(n, r), s0_cell(n, r - 1));
-                    Real s0max = max(s0_cell(n, r), s0_cell(n, r - 1));
-                    s0_edge(n, r) = min(max(tmp, s0min), s0max);
+                    Real s0min = amrex::min(s0_cell(n, r), s0_cell(n, r - 1));
+                    Real s0max = amrex::max(s0_cell(n, r), s0_cell(n, r - 1));
+                    s0_edge(n, r) = amrex::min(amrex::max(tmp, s0min), s0max);
                 }
             });
             Gpu::synchronize();
