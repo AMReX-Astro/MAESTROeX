@@ -78,17 +78,18 @@ void Postprocess::WriteRadialFile(const BaseState<Real>& rho0_in,
                        << "convect_vel        "
                        << "omega_ratio        "
                        << "lat_shear          "
-                       <<"|N|\n";
+                       << "|N|\n";
 
             for (int i = 0; i < base_geom.nr(lev); ++i) {
-                RadialFile << std::left
-                           << std::setw(18) << base_geom.r_cc_loc(lev, i) << " "
-                           << std::setw(18) << rho0_in.array()(lev, i) << " "
-                           << std::setw(18) << p0_in.array()(lev, i) << " "
-                           << std::setw(18) << convect_vel.array()(lev, i) << " "
-                           << std::setw(18) << ratio_omega.array()(lev, i) << " "
-                           << std::setw(18) << latshear.array()(lev, i) << " "
-                           << std::setw(18) << Nfreq.array()(lev, i) << "\n";
+                RadialFile << std::left << std::setw(18)
+                           << base_geom.r_cc_loc(lev, i) << " " << std::setw(18)
+                           << rho0_in.array()(lev, i) << " " << std::setw(18)
+                           << p0_in.array()(lev, i) << " " << std::setw(18)
+                           << convect_vel.array()(lev, i) << " "
+                           << std::setw(18) << ratio_omega.array()(lev, i)
+                           << " " << std::setw(18) << latshear.array()(lev, i)
+                           << " " << std::setw(18) << Nfreq.array()(lev, i)
+                           << "\n";
             }
         }
     }
