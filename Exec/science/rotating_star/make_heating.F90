@@ -36,7 +36,7 @@ contains
 
     ! if (use_analytic_heating) then
 
-    if (spherical .eq. 0) then
+    if (.not. spherical) then
         starting_rad = prob_lo(AMREX_SPACEDIM)
     else
         starting_rad = ZERO
@@ -52,7 +52,7 @@ contains
                 if (AMREX_SPACEDIM .eq. 2) then
                     rloc = xloc(2)
                 else if (AMREX_SPACEDIM .eq. 3) then
-                    if (spherical .eq. 0) then
+                    if (.not. spherical) then
                         rloc = xloc(3)
                     else
                         ! compute distance to the center of the star

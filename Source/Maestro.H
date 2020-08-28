@@ -25,6 +25,7 @@ using namespace maestro;
 #include <ModelParser.H>
 #include <PhysBCFunctMaestro.H>
 #include <SimpleLog.H>
+#include <Problem.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -1849,6 +1850,25 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Box& domainBox,
                            const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
 #endif
+    ////////////////////////
+    
+    ////////////////////////
+    // Problem.cpp functions
+    ////////////////////////
+    
+    /// Problem-specific outputs
+#ifdef DO_PROBLEM_POST_TIMESTEP
+    void ProblemPostTimestep();
+#endif
+
+#ifdef DO_PROBLEM_POST_RESTART
+    void ProblemPostRestart();
+#endif
+
+#ifdef DO_PROBLEM_POST_INIT
+    void ProblemPostInit();
+#endif
+
     ////////////////////////
 
     /*
