@@ -46,7 +46,8 @@ void Postprocess::WriteRadialFile(const BaseState<Real>& rho0_in,
     // MakeLatitudinalShear
     BaseState<Real> latshear(base_geom.max_radial_level + 1, base_geom.nr_fine);
     MakeLatShear(omega, latshear, base_geom.r_cc_loc);
-
+    //MakeLatShearAvg(omega, latshear);
+    
     // MakeRadialNFreq
     BaseState<Real> Nfreq(base_geom.max_radial_level + 1, base_geom.nr_fine);
     BaseState<Real> s0(base_geom.max_radial_level + 1, base_geom.nr_fine);
@@ -414,7 +415,7 @@ void Postprocess::MakeRadialRotationRatio(const BaseState<Real>& s0_in,
                                           const Vector<MultiFab>& omega,
                                           BaseState<Real>& ratio_omega) {
     // timer for profiling
-    BL_PROFILE_VAR("Postprocess::RadialRotationRatio()", MakeConvectionVel);
+    BL_PROFILE_VAR("Postprocess::RadialRotationRatio()", MakeRadialRotationRatio);
 
     // radial average of rotation rate
     Average(omega, ratio_omega, 0);
@@ -659,4 +660,57 @@ void Postprocess::MakeLatShear(const Vector<MultiFab>& omega_in,
             shear_arr(0, r) /= totkernel;
         }
     }
+}
+
+void Postprocess::MakeLatShearAvg(const Vector<MultiFab>& omega_in,
+				  BaseState<Real>& shear) {
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::MakeLatShearAvg()", MakeLatShearAvg);
+
+    Vector<MultiFab> omegaY(finest_level + 1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        omegaY[lev].define(omega_in[lev].boxArray(), omega_in[lev].DistributionMap(), 1,
+                         0);
+    }
+
+    const auto& center_p = center;
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	// Get grid size of domain
+	const auto dx = pgeom[lev].CellSizeArray();
+	const auto prob_lo = pgeom[lev].ProbLoArray();
+
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(omega_in[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            const Array4<const Real> omega_arr = omega_in[lev].array(mfi);
+            const Array4<Real> omegaY_arr = omegaY[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+		Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
+		Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
+		Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
+		Real radius = std::sqrt(x * x + y * y + z * z);
+
+		// Y_{2,0} spherical harmonic
+		Real Y20 = 0.25 * std::sqrt(5.0 / M_PI) *
+		    (2 * z * z - x * x - y * y) /
+		    (radius * radius);
+
+                // square radial vel
+                omegaY_arr(i, j, k) = omega_arr(i, j, k) * Y20;
+            });
+        }
+    }
+
+    // average down and fill ghost cells
+    // AverageDown(omegaY, 0, 1);
+    // FillPatch(t0, omegaY, omegaY, omegaY, 0, 0, 1, 0, bcs_f);
+
+    // radial average of omega*Y20
+    Average(omegaY, shear, 0);
 }
