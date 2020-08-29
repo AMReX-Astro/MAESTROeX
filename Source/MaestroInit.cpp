@@ -32,9 +32,9 @@ void Maestro::Init() {
 
             WritePlotFile(plotInitData, t_old, 0, rho0_old, rhoh0_old, p0_old,
                           gamma1bar_old, uold, sold, S_cc_old);
-	    
+            
 #ifdef DO_PROBLEM_POST_INIT
-	    ProblemPostInit();
+            ProblemPostInit();
 #endif
         } else if (small_plot_int > 0 || small_plot_deltat > 0) {
             // Need to fill normal vector to compute velrc in plotfile
