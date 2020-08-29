@@ -2034,6 +2034,9 @@ class Maestro : public amrex::AmrCore {
     amrex::Vector<amrex::Real> diagfile2_data;
     amrex::Vector<amrex::Real> diagfile3_data;
 
+    // post problem file array
+    BaseState<amrex::Real> postfile_data;
+
     // problem information
     amrex::GpuArray<Real, 3> center;
 
