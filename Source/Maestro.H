@@ -1870,9 +1870,9 @@ class Maestro : public amrex::AmrCore {
 #endif
 
     void MakeConvectionVel(const amrex::Vector<amrex::MultiFab>& velr,
-			   BaseState<amrex::Real>& vel_conv,
-			   BaseState<amrex::Real>& totsum, const int comp,
-			   const amrex::Real t_interval);
+                           BaseState<amrex::Real>& vel_conv,
+                           BaseState<amrex::Real>& totsum, const int comp,
+                           const amrex::Real t_interval);
 
     ////////////////////////
 

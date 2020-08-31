@@ -221,7 +221,7 @@ void Maestro::Init() {
         }
             
 #ifdef DO_PROBLEM_POST_INIT
-	ProblemPostInit();
+        ProblemPostInit();
 #endif
 
         if (chk_int > 0 || chk_deltat > 0) {
