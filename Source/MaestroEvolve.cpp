@@ -90,17 +90,6 @@ void Maestro::Evolve() {
         }
 #endif
 
-#ifdef DO_PROBLEM_POST_TIMESTEP
-
-        // Provide a hook for the user to do things after all of
-        // the normal updates have been applied. The user is
-        // responsible for any actions after this point, like
-        // doing a computeTemp call if they change the state data.
-
-        ProblemPostTimestep();
-
-#endif
-
         t_old = t_new;
 
         if ((sum_interval > 0 && istep % sum_interval == 0) ||
@@ -162,6 +151,17 @@ void Maestro::Evolve() {
             // write out any buffered diagnostic information
             WriteDiagFile(diag_index);
         }
+
+#ifdef DO_PROBLEM_POST_TIMESTEP
+
+        // Provide a hook for the user to do things after all of
+        // the normal updates have been applied. The user is
+        // responsible for any actions after this point, like
+        // doing a computeTemp call if they change the state data.
+
+        ProblemPostTimestep();
+
+#endif
 
         // move new state into old state by swapping pointers
         for (int lev = 0; lev <= finest_level; ++lev) {

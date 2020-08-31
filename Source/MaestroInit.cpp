@@ -32,10 +32,6 @@ void Maestro::Init() {
 
             WritePlotFile(plotInitData, t_old, 0, rho0_old, rhoh0_old, p0_old,
                           gamma1bar_old, uold, sold, S_cc_old);
-            
-#ifdef DO_PROBLEM_POST_INIT
-            ProblemPostInit();
-#endif
         } else if (small_plot_int > 0 || small_plot_deltat > 0) {
             // Need to fill normal vector to compute velrc in plotfile
             if (spherical) {
@@ -223,6 +219,10 @@ void Maestro::Init() {
             WriteSmallPlotFile(0, t_old, dt, rho0_old, rhoh0_old, p0_old,
                                gamma1bar_old, uold, sold, S_cc_old);
         }
+            
+#ifdef DO_PROBLEM_POST_INIT
+	ProblemPostInit();
+#endif
 
         if (chk_int > 0 || chk_deltat > 0) {
             Print() << "\nWriting checkpoint 0 after all initialization"

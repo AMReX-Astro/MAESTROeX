@@ -1869,6 +1869,11 @@ class Maestro : public amrex::AmrCore {
     void ProblemPostInit();
 #endif
 
+    void MakeConvectionVel(const amrex::Vector<amrex::MultiFab>& velr,
+			   BaseState<amrex::Real>& vel_conv,
+			   BaseState<amrex::Real>& totsum, const int comp,
+			   const amrex::Real t_interval);
+
     ////////////////////////
 
     /*
@@ -2036,7 +2041,7 @@ class Maestro : public amrex::AmrCore {
 
     // post problem file array
     BaseState<amrex::Real> postfile_data;
-
+    
     // problem information
     amrex::GpuArray<Real, 3> center;
 
