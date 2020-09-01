@@ -458,10 +458,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 // Assume spherical case, and averaging is done in the psi direction,
 // resulting in averages on an x-z plane cutting through the north and south poles.
 
-void Maestro::Average2d(const Vector<MultiFab>& phi,
-			Vector<MultiFab>& phibar,
-			int barcomp, int comp,
-			const Vector<Box>& bardomain) {
+void Maestro::Average2d(const Vector<MultiFab>& phi, Vector<MultiFab>& phibar,
+                        int barcomp, int comp, const Vector<Box>& bardomain) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average2d()", Average2d);
 

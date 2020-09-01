@@ -43,7 +43,7 @@ void Maestro::Init() {
             WriteSmallPlotFile(plotInitData, t_old, 0, rho0_old, rhoh0_old,
                                p0_old, gamma1bar_old, uold, sold, S_cc_old);
         }
-      
+
     } else {
         Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
@@ -219,7 +219,7 @@ void Maestro::Init() {
             WriteSmallPlotFile(0, t_old, dt, rho0_old, rhoh0_old, p0_old,
                                gamma1bar_old, uold, sold, S_cc_old);
         }
-            
+
 #ifdef DO_PROBLEM_POST_INIT
         ProblemPostInit();
 #endif

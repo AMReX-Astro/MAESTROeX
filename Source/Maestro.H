@@ -24,8 +24,8 @@
 using namespace maestro;
 #include <ModelParser.H>
 #include <PhysBCFunctMaestro.H>
-#include <SimpleLog.H>
 #include <Problem.H>
+#include <SimpleLog.H>
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
@@ -297,9 +297,8 @@ class Maestro : public amrex::AmrCore {
                  BaseState<amrex::Real>& phibar, int comp);
 
     void Average2d(const amrex::Vector<amrex::MultiFab>& phi,
-		   amrex::Vector<amrex::MultiFab>& phibar,
-		   int barcomp, int comp,
-		   const amrex::Vector<amrex::Box>& bardomain);
+                   amrex::Vector<amrex::MultiFab>& phibar, int barcomp,
+                   int comp, const amrex::Vector<amrex::Box>& bardomain);
     // end MaestroAverage.cpp functions
     ////////////
 
@@ -1335,10 +1334,10 @@ class Maestro : public amrex::AmrCore {
 
     /// Calculate the radial and theta-dir components of the velocity
     void MakeVelrth(const amrex::Vector<amrex::MultiFab>& vel,
-		    const amrex::Vector<amrex::MultiFab>& w0rcart,
-		    amrex::Vector<amrex::MultiFab>& rad_vel,
-		    amrex::Vector<amrex::MultiFab>& theta_vel);
-    
+                    const amrex::Vector<amrex::MultiFab>& w0rcart,
+                    amrex::Vector<amrex::MultiFab>& rad_vel,
+                    amrex::Vector<amrex::MultiFab>& theta_vel);
+
     /// Calculate the adiabatic excess
     void MakeAdExcess(const amrex::Vector<amrex::MultiFab>& state,
                       amrex::Vector<amrex::MultiFab>& ad_excess);
@@ -1861,11 +1860,11 @@ class Maestro : public amrex::AmrCore {
                            const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
 #endif
     ////////////////////////
-    
+
     ////////////////////////
     // Problem.cpp functions
     ////////////////////////
-    
+
     /// Problem-specific outputs
 #ifdef DO_PROBLEM_POST_TIMESTEP
     void ProblemPostTimestep();
@@ -1885,11 +1884,11 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Real t_interval);
 
     void MakeMeridionalCirculation(const amrex::Vector<amrex::MultiFab>& velr,
-				   const amrex::Vector<amrex::MultiFab>& velth,
-				   amrex::Vector<amrex::MultiFab>& vel_circ,
-				   amrex::Vector<amrex::MultiFab>& sum_circ,
-				   const amrex::Real t_interval);
-    
+                                   const amrex::Vector<amrex::MultiFab>& velth,
+                                   amrex::Vector<amrex::MultiFab>& vel_circ,
+                                   amrex::Vector<amrex::MultiFab>& sum_circ,
+                                   const amrex::Real t_interval);
+
     ////////////////////////
 
     /*
@@ -2064,7 +2063,7 @@ class Maestro : public amrex::AmrCore {
     amrex::DistributionMapping dmFine;
     amrex::Geometry geomFine;
 #endif
-    
+
     // problem information
     amrex::GpuArray<Real, 3> center;
 

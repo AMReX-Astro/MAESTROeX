@@ -93,7 +93,7 @@ class Postprocess {
                       const BaseStateArray<amrex::Real>& r_cc_loc);
 
     void MakeLatShearAvg(const amrex::Vector<amrex::MultiFab>& omega_in,
-			 BaseState<amrex::Real>& shear);
+                         BaseState<amrex::Real>& shear);
 
     // ----------------------------
     // Slice.cpp functions

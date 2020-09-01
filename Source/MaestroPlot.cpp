@@ -1529,14 +1529,15 @@ void Maestro::MakeVelrc(const Vector<MultiFab>& vel,
 
 void Maestro::MakeVelrth(const Vector<MultiFab>& vel,
                          const Vector<MultiFab>& w0rcart,
-                         Vector<MultiFab>& rad_vel, Vector<MultiFab>& theta_vel) {
+                         Vector<MultiFab>& rad_vel,
+                         Vector<MultiFab>& theta_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeVelrth()", MakeVelrth);
 
     const auto& center_p = center;
-    
+
     for (int lev = 0; lev <= finest_level; ++lev) {
-	const auto dx = geom[lev].CellSizeArray();
+        const auto dx = geom[lev].CellSizeArray();
         const auto prob_lo = geom[lev].ProbLoArray();
 
 #ifdef _OPENMP
@@ -1561,20 +1562,20 @@ void Maestro::MakeVelrth(const Vector<MultiFab>& vel,
                         vel_arr(i, j, k, n) * normal_arr(i, j, k, n);
                 }
 
-		Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
-		Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
-		Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
-		Real inv_radius = 1.0 / sqrt(x * x + y * y + z * z);
-		Real inv_xy = 1.0 / sqrt(x * x + y * y);
+                Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
+                Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
+                Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
+                Real inv_radius = 1.0 / sqrt(x * x + y * y + z * z);
+                Real inv_xy = 1.0 / sqrt(x * x + y * y);
 
-		Vector<Real> theta_dir(3);
-		theta_dir[0] = x * inv_radius * z * inv_xy;
-		theta_dir[1] = y * inv_radius * z * inv_xy;
-		theta_dir[2] = -inv_radius / inv_xy;
+                Vector<Real> theta_dir(3);
+                theta_dir[0] = x * inv_radius * z * inv_xy;
+                theta_dir[1] = y * inv_radius * z * inv_xy;
+                theta_dir[2] = -inv_radius / inv_xy;
 
-		for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
-		    thetavel_arr(i, j, k) += vel_arr(i, j, k, n) * theta_dir[n];
-		}
+                for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
+                    thetavel_arr(i, j, k) += vel_arr(i, j, k, n) * theta_dir[n];
+                }
 
                 // add base state vel to get full radial velocity
                 radvel_arr(i, j, k) += w0rcart_arr(i, j, k);
