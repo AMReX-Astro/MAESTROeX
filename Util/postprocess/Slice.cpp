@@ -208,7 +208,6 @@ void Postprocess::MakeMeridionalCirculation(const Vector<MultiFab>& vel,
 
                 for (auto n = 0; n < AMREX_SPACEDIM; ++n) {
                     angvel_arr(i, j, k) += vel_arr(i, j, k, n) * theta_dir[n];
-                    ;
                 }
 
                 // add base state vel to get full radial velocity

@@ -13,21 +13,67 @@ void Maestro::ProblemPostInit() {
     postfile_data.resize(base_geom.max_radial_level+1, base_geom.nr_fine, 2);
     postfile_data.setVal(0.);
 
+    // initialize multifab diagnostics
+ 
+    // need single-level finest grid for whole domain
+    const Box& domain0 = geom[0].Domain();
+    auto dom0_lo = domain0.loVect();
+    auto dom0_hi = domain0.hiVect();
+    IntVect ncell(0, 1, 0);
+    ncell[0] = (dom0_hi[0] + 1) * (finest_level + 1) / 2 - 1;
+    ncell[2] = (dom0_hi[2] + 1) * (finest_level + 1) - 1;
+
+    IntVect domLo(AMREX_D_DECL(dom0_lo[0], dom0_lo[1], dom0_lo[2]));
+    IntVect domHi(AMREX_D_DECL(ncell[0], ncell[1], ncell[2]));
+    Box domain(domLo, domHi);
+
+    // we only need half x-z plane because theta is between (0,pi)
+    auto prob_lo = geom[0].ProbLo();
+    auto prob_hi = geom[0].ProbHi();
+    const auto dx = geom[finest_level].CellSizeArray();
+
+    Real probLo[] = {prob_lo[0] + (prob_hi[0] - prob_lo[0]) / 2.0, prob_lo[1],
+                     prob_lo[2]};
+    Real probHi[] = {prob_hi[0], prob_lo[1] + 2.0 * dx[1], prob_hi[2]};
+    RealBox real_box(probLo, probHi);
+
+    // get max_grid_size
+    ParmParse pp("amr");
+    int max_grid_size;
+    pp.get("max_grid_size", max_grid_size);
+
+    // make BoxArray and Geometry for single-level finest grid
+    // previously declared in Maestro.H
+    baFine.define(domain);
+    baFine.maxSize(max_grid_size);
+    dmFine.define(baFine);
+    geomFine.define(domain, &real_box);
+
+    // define multifab velocities on new single-level grid
+    postfile_mf.resize(1);
+    postfile_mf[0].define(baFine, dmFine, 2, 0);
+    postfile_mf[0].setVal(0.);
+    
     // compute diagnostics for initial state
-    // make radial and circumferential velocity
+    // make radial and theta-component velocity
     Vector<MultiFab> rad_vel(finest_level + 1);
-    Vector<MultiFab> circ_vel(finest_level + 1);
+    Vector<MultiFab> ang_vel(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	rad_vel[lev] .define(grids[lev], dmap[lev], 1, 0);
-	circ_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	rad_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	ang_vel[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    MakeVelrc(uold, w0_cart, rad_vel, circ_vel);
+    MakeVelrth(uold, w0_cart, rad_vel, ang_vel);
 
     // make convection velocity
     BaseState<Real> convect_vel(base_geom.max_radial_level + 1,
 				base_geom.nr_fine);
     MakeConvectionVel(rad_vel, convect_vel, postfile_data, 0, t_new);
 
+    // make meridional circulation
+    Vector<MultiFab> circ_vel(1);
+    circ_vel[0].define(baFine, dmFine, 2, 0);
+    MakeMeridionalCirculation(rad_vel, ang_vel, circ_vel, postfile_mf, t_new);
+    
     // wrote a plotfile
     if (plot_int > 0 || plot_deltat > 0) {
 	std::string plotfilename = plot_base_name + "0000000";
@@ -60,6 +106,11 @@ void Maestro::ProblemPostInit() {
 		}
 	    }
         }
+	
+	// write out the planar-averaged diagnostics
+	std::string PostFileName(plotfilename + "/PostTimestep");
+	WriteSingleLevelPlotfile(PostFileName, circ_vel[0],
+				 {"vel_radial", "vel_theta"}, geomFine, 0, 0);
     }
 }
 
@@ -72,19 +123,24 @@ void Maestro::ProblemPostTimestep() {
     BL_PROFILE_VAR("Maestro::ProblemPostInit()", ProblemPostInit);
 
     // compute diagnostics after every time step
-    // make radial and circumferential velocity
+    // make radial and theta-component velocity
     Vector<MultiFab> rad_vel(finest_level + 1);
-    Vector<MultiFab> circ_vel(finest_level + 1);
+    Vector<MultiFab> ang_vel(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	rad_vel[lev] .define(grids[lev], dmap[lev], 1, 0);
-	circ_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	rad_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	ang_vel[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    MakeVelrc(unew, w0_cart, rad_vel, circ_vel);
+    MakeVelrth(unew, w0_cart, rad_vel, ang_vel);
 
     // make convection velocity
     BaseState<Real> convect_vel(base_geom.max_radial_level + 1,
 				base_geom.nr_fine);
     MakeConvectionVel(rad_vel, convect_vel, postfile_data, 0, t_new);
+    
+    // make meridional circulation
+    Vector<MultiFab> circ_vel(1);
+    circ_vel[0].define(baFine, dmFine, 2, 0);
+    MakeMeridionalCirculation(rad_vel, ang_vel, circ_vel, postfile_mf, t_new);
     
     // wrote a plotfile       
     if ((plot_int > 0 && istep % plot_int == 0) ||
@@ -123,6 +179,11 @@ void Maestro::ProblemPostTimestep() {
 		}
 	    }
 	}
+	
+	// write out the planar-averaged diagnostics
+	std::string PostFileName(plotfilename + "/PostTimestep");
+	WriteSingleLevelPlotfile(PostFileName, circ_vel[0],
+				 {"vel_radial", "vel_theta"}, geomFine, 0, 0);
     }
 }
 
@@ -137,8 +198,7 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
     
     Vector<MultiFab> vel2(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        vel2[lev].define(velr[lev].boxArray(), velr[lev].DistributionMap(), 1,
-                         0);
+        vel2[lev].define(grids[lev], dmap[lev], 1, 0);
     }
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -178,4 +238,39 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
 	// root-mean-squared radial velocity
         vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r) / t_interval);
     }
+}
+
+void Maestro::MakeMeridionalCirculation(const Vector<MultiFab>& velr,
+					const Vector<MultiFab>& velth,
+					Vector<MultiFab>& vel_circ,
+					Vector<MultiFab>& sum_circ,
+					const Real t_interval) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeMeridionalCirculation()",
+                   MakeMeridionalCirculation);
+
+    vel_circ[0].setVal(0.);
+    
+    // average to 2D r-theta (x-z) plane
+    Average2d(velr, vel_circ, 0, 0, {geomFine.Domain()});
+    Average2d(velth, vel_circ, 1, 0, {geomFine.Domain()});
+    
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+    for (MFIter mfi(vel_circ[0], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+	// Get the index space of the valid region
+	const Box& tileBox = mfi.tilebox();
+
+	const Array4<Real> circvel_arr = vel_circ[0].array(mfi);
+	const Array4<Real> circsum_arr = sum_circ[0].array(mfi);
+	
+	AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+	    for (int n = 0; n < 2; ++n) {
+		circsum_arr(i, j, k, n) += dt*circvel_arr(i, j, k, n);
+		circvel_arr(i, j, k, n) = circsum_arr(i, j, k, n) / t_interval;
+	    }
+        });
+    }
+
 }
