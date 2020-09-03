@@ -36,7 +36,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.octant = false
 
 # TIME STEPPING
-maestro.max_step  = 0
+maestro.max_step  = 10
 maestro.stop_time = 3000000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -71,7 +71,7 @@ maestro.do_heating = true
 
 # PLOTFILES
 maestro.plot_base_name  = plt    # root name of plot file
-maestro.plot_int   = 100      # number of timesteps between plot files
+maestro.plot_int   = 5      # number of timesteps between plot files
 maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 maestro.plot_Hext = true
