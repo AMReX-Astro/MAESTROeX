@@ -7,7 +7,7 @@ MAESTROeX Build System
 Build Process Overview
 ======================
 
-The MAESTROeX build system uses features of GNU make (version 3.81 or
+The MAESTROeX build system uses features of GNU make (version 3.82 or
 later), which is typically the default on systems. The MAESTROeX
 executable is built in the problem’s directory (one of the directories
 under ``SCIENCE/``, ``TEST_PROBLEMS/``, or ``UNIT_TESTS/``). This
