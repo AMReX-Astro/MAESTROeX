@@ -7,7 +7,7 @@ maestro.drdxfac = 5
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0      0.0
-geometry.prob_hi     =  0.625e0  5.e0
+geometry.prob_hi     =  0.3125e0  2.5e0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -24,7 +24,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 128 1024
+amr.n_cell             = 64 512
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -70,7 +70,7 @@ maestro.sdc_couple_mac_velocity = 1
 
 # PLOTFILES
 maestro.plot_base_name  = sdc_flame_    # root name of plot file
-maestro.plot_int   = 10      # number of timesteps between plot files
+maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 1.e-5
 
 # CHECKPOINT
