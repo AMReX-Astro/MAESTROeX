@@ -147,7 +147,8 @@ void Postprocess::diag() {
     } else {
         Print() << "Writing 2D slice file for " << stoi(numfiles) + 1
                 << " plot files" << std::endl;
-        Write2dSliceFile(rho_mf, p0_mf, u_mf, w0_mf, stoi(deltat), stoi(numfiles));
+        Write2dSliceFile(rho_mf, p0_mf, u_mf, w0_mf, stoi(deltat),
+                         stoi(numfiles));
     }
 
     // Write diag file for initial model if specified

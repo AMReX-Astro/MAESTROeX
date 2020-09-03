@@ -91,19 +91,20 @@ void Postprocess::PutDataOnFaces(
     AverageDownFaces(face);
 }
 
-void Postprocess::AverageDownFaces(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& edge) {
+void Postprocess::AverageDownFaces(
+    Vector<std::array<MultiFab, AMREX_SPACEDIM> >& edge) {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::AverageDownFaces()", AverageDownFaces);
 
     for (int lev = finest_level - 1; lev >= 0; --lev) {
-	Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
-	Vector<MultiFab*> edge_c(AMREX_SPACEDIM);
+        Vector<const MultiFab*> edge_f(AMREX_SPACEDIM);
+        Vector<MultiFab*> edge_c(AMREX_SPACEDIM);
 
-	for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
-	    edge_f[dir] = &(edge[lev + 1][dir]);
-	    edge_c[dir] = &(edge[lev][dir]);
-	}
+        for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+            edge_f[dir] = &(edge[lev + 1][dir]);
+            edge_c[dir] = &(edge[lev][dir]);
+        }
 
-	amrex::average_down_faces(edge_f, edge_c, IntVect(2));
+        amrex::average_down_faces(edge_f, edge_c, IntVect(2));
     }
-} 
+}

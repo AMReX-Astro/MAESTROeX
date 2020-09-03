@@ -101,8 +101,8 @@ class Postprocess {
 
     // write 2d slice plotfile to disk
     void Write2dSliceFile(const amrex::Vector<amrex::MultiFab>& rho_in,
-			  const amrex::Vector<amrex::MultiFab>& p_in,
-			  const amrex::Vector<amrex::MultiFab>& u_in,
+                          const amrex::Vector<amrex::MultiFab>& p_in,
+                          const amrex::Vector<amrex::MultiFab>& u_in,
                           const amrex::Vector<amrex::MultiFab>& w0_in,
                           const int deltat = 0, const int nfiles = 0);
 
@@ -112,15 +112,14 @@ class Postprocess {
     void MakeMeridionalCirculation(
         const amrex::Vector<amrex::MultiFab>& vel,
         const amrex::Vector<amrex::MultiFab>& w0rcart,
-        amrex::Vector<amrex::MultiFab>& radii_vel, 
+        amrex::Vector<amrex::MultiFab>& radii_vel,
         const amrex::Vector<amrex::Box>& domFine);
 
     void MakeBaroclinity(const amrex::Vector<amrex::MultiFab>& rho_s,
-			 const amrex::Vector<amrex::MultiFab>& p_s,
-			 amrex::Vector<amrex::MultiFab>& baroclinity, 
-			 const amrex::Vector<amrex::Box>& domFine);
+                         const amrex::Vector<amrex::MultiFab>& p_s,
+                         amrex::Vector<amrex::MultiFab>& baroclinity,
+                         const amrex::Vector<amrex::Box>& domFine);
 
-    
     // ----------------------------
     // Average.cpp functions
     // ----------------------------
@@ -138,12 +137,14 @@ class Postprocess {
     // Fill3dData.cpp functions
     // ----------------------------
 
-    void PutDataOnFaces(const amrex::Vector<amrex::MultiFab>& s_cc,
-			amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM> >& face,
-			const bool harmonic_avg);
-    
-    void AverageDownFaces(amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM> >& edge);
-    
+    void PutDataOnFaces(
+        const amrex::Vector<amrex::MultiFab>& s_cc,
+        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM> >& face,
+        const bool harmonic_avg);
+
+    void AverageDownFaces(
+        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM> >& edge);
+
     // ----------------------------
     // test.cpp functions
     // ----------------------------
@@ -161,7 +162,7 @@ class Postprocess {
     static amrex::IntVect nodal_flag_x;
     static amrex::IntVect nodal_flag_y;
     static amrex::IntVect nodal_flag_z;
-    
+
     // plotfile name
     std::string iFile;
 

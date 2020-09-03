@@ -8,8 +8,8 @@ using namespace amrex;
 // Write 2D r-theta slice diagnostics
 // ------------------------------------------
 void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
-				   const Vector<MultiFab>& p_in,
-				   const Vector<MultiFab>& u_in,
+                                   const Vector<MultiFab>& p_in,
+                                   const Vector<MultiFab>& u_in,
                                    const Vector<MultiFab>& w0_in,
                                    const int deltat, const int nfiles) {
     // timer for profiling
@@ -58,7 +58,7 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
     baroclinity[0].define(ba, dm, 1, 0);
     baroclinity[0].setVal(0.);
     MakeBaroclinity(rho_in, p_in, baroclinity, {domain});
-    
+
     // time-averaged circulation need multiple files
     if (deltat > 0 && nfiles > 0) {
         amrex::PlotFileData pltfile(iFile);
@@ -131,7 +131,8 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
 
             // MakeMeridionalCirculation
             Vector<MultiFab> meridion_vel_new(1);
-            MakeMeridionalCirculation(u_new, w0_new, meridion_vel_new, {domain});
+            MakeMeridionalCirculation(u_new, w0_new, meridion_vel_new,
+                                      {domain});
 
             // vel = vel + dt/2 * (vel_old + vel_new)
             Real dt = t_new - t_old;
@@ -176,7 +177,7 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
     varnames[0] = "vel_radial";
     varnames[1] = "vel_theta";
     varnames[2] = "baroclinity";
-    
+
     // multifab to hold plotfile data
     Vector<MultiFab> plot_mf(1);
     plot_mf[0].define(ba, dm, nPlot, 0);
@@ -184,12 +185,12 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
     MultiFab::Copy(plot_mf[0], meridion_vel[0], 0, dest_comp, 2, 0);
     dest_comp += 2;
     MultiFab::Copy(plot_mf[0], baroclinity[0], 0, dest_comp, 1, 0);
-    
+
     // write to disk
     std::string slicefilename = "slice_" + iFile;
 
-    WriteSingleLevelPlotfile(slicefilename, plot_mf[0],
-                             varnames, geomFine, 0, 0);
+    WriteSingleLevelPlotfile(slicefilename, plot_mf[0], varnames, geomFine, 0,
+                             0);
 }
 
 // get plotfile name
@@ -274,22 +275,22 @@ void Postprocess::MakeMeridionalCirculation(const Vector<MultiFab>& vel,
 }
 
 void Postprocess::MakeBaroclinity(const Vector<MultiFab>& rho_in,
-				  const Vector<MultiFab>& p_in,
-				  Vector<MultiFab>& baroclinity,
-				  const Vector<Box>& domFine) {
+                                  const Vector<MultiFab>& p_in,
+                                  Vector<MultiFab>& baroclinity,
+                                  const Vector<Box>& domFine) {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeBaroclinity()", MakeBaroclinity);
 
     Real gamma = GetGamma(iFile);
 
     // compute entropy and log(p)
-    Vector<MultiFab> entropy(finest_level+1);
-    Vector<MultiFab> logp(finest_level+1);
+    Vector<MultiFab> entropy(finest_level + 1);
+    Vector<MultiFab> logp(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        entropy[lev].define(rho_in[lev].boxArray(), rho_in[lev].DistributionMap(), 1,
-                            0);
+        entropy[lev].define(rho_in[lev].boxArray(),
+                            rho_in[lev].DistributionMap(), 1, 0);
         logp[lev].define(p_in[lev].boxArray(), p_in[lev].DistributionMap(), 1,
-                            0);
+                         0);
     }
 
     for (int lev = finest_level; lev <= finest_level; ++lev) {
@@ -306,53 +307,56 @@ void Postprocess::MakeBaroclinity(const Vector<MultiFab>& rho_in,
             const Array4<Real> logp_arr = logp[lev].array(mfi);
 
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-		logp_arr(i, j, k) = log(p_arr(i, j, k));
-		    
-		// dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
-		entropy_arr(i, j, k) =
-		    1.0 / (gamma - 1.0) * (logp_arr(i, j, k) - gamma * log(rho_arr(i, j, k)));
+                logp_arr(i, j, k) = log(p_arr(i, j, k));
+
+                // dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
+                entropy_arr(i, j, k) =
+                    1.0 / (gamma - 1.0) *
+                    (logp_arr(i, j, k) - gamma * log(rho_arr(i, j, k)));
             });
         }
     }
-    
+
     // want gradients of entropy and log(p)
     // so we need to compute entropy and pressure on cell faces
     Vector<std::array<MultiFab, AMREX_SPACEDIM> > face_s(finest_level + 1);
     Vector<std::array<MultiFab, AMREX_SPACEDIM> > face_p(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-	AMREX_D_TERM(
-		     face_s[lev][0].define(convert(rho_in[lev].boxArray(), nodal_flag_x),
-					   rho_in[lev].DistributionMap(), 1, 0);
-		     , face_s[lev][1].define(convert(rho_in[lev].boxArray(), nodal_flag_y),
-					     rho_in[lev].DistributionMap(), 1, 0);
-		     , face_s[lev][2].define(convert(rho_in[lev].boxArray(), nodal_flag_z),
-					     rho_in[lev].DistributionMap(), 1, 0););
-	AMREX_D_TERM(
-		     face_p[lev][0].define(convert(p_in[lev].boxArray(), nodal_flag_x),
-					   p_in[lev].DistributionMap(), 1, 0);
-		     , face_p[lev][1].define(convert(p_in[lev].boxArray(), nodal_flag_y),
-					     p_in[lev].DistributionMap(), 1, 0);
-		     , face_p[lev][2].define(convert(p_in[lev].boxArray(), nodal_flag_z),
-					     p_in[lev].DistributionMap(), 1, 0););
+        AMREX_D_TERM(
+            face_s[lev][0].define(convert(rho_in[lev].boxArray(), nodal_flag_x),
+                                  rho_in[lev].DistributionMap(), 1, 0);
+            ,
+            face_s[lev][1].define(convert(rho_in[lev].boxArray(), nodal_flag_y),
+                                  rho_in[lev].DistributionMap(), 1, 0);
+            ,
+            face_s[lev][2].define(convert(rho_in[lev].boxArray(), nodal_flag_z),
+                                  rho_in[lev].DistributionMap(), 1, 0););
+        AMREX_D_TERM(
+            face_p[lev][0].define(convert(p_in[lev].boxArray(), nodal_flag_x),
+                                  p_in[lev].DistributionMap(), 1, 0);
+            , face_p[lev][1].define(convert(p_in[lev].boxArray(), nodal_flag_y),
+                                    p_in[lev].DistributionMap(), 1, 0);
+            , face_p[lev][2].define(convert(p_in[lev].boxArray(), nodal_flag_z),
+                                    p_in[lev].DistributionMap(), 1, 0););
     }
-    
+
     // average face-centered entropy and pressure
     PutDataOnFaces(entropy, face_s, true);
     PutDataOnFaces(logp, face_p, true);
 
     // create multi-level multifab for baroclinity
-    Vector<MultiFab> baro_mf(finest_level+1);
+    Vector<MultiFab> baro_mf(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        baro_mf[lev].define(rho_in[lev].boxArray(), rho_in[lev].DistributionMap(), 1,
-                            0);
+        baro_mf[lev].define(rho_in[lev].boxArray(),
+                            rho_in[lev].DistributionMap(), 1, 0);
     }
 
     const auto& center_p = center;
-    
+
     for (int lev = finest_level; lev <= finest_level; ++lev) {
         const auto dx = pgeom[lev].CellSizeArray();
         const auto prob_lo = pgeom[lev].ProbLoArray();
-    
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -377,31 +381,38 @@ void Postprocess::MakeBaroclinity(const Vector<MultiFab>& rho_in,
                 Real inv_xy = 1.0 / sqrt(x * x + y * y);
 
                 Vector<Real> gradlogp(3);
-                gradlogp[0] = (logpx_arr(i+1, j, k) - logpx_arr(i, j, k)) / dx[0];
-                gradlogp[1] = (logpy_arr(i, j+1, k) - logpy_arr(i, j, k)) / dx[1];
-                gradlogp[2] = (logpz_arr(i, j, k+1) - logpz_arr(i, j, k)) / dx[2];
+                gradlogp[0] =
+                    (logpx_arr(i + 1, j, k) - logpx_arr(i, j, k)) / dx[0];
+                gradlogp[1] =
+                    (logpy_arr(i, j + 1, k) - logpy_arr(i, j, k)) / dx[1];
+                gradlogp[2] =
+                    (logpz_arr(i, j, k + 1) - logpz_arr(i, j, k)) / dx[2];
 
                 Vector<Real> grads(3);
-                grads[0] = (sx_arr(i+1, j, k) - sx_arr(i, j, k)) / dx[0];
-                grads[1] = (sy_arr(i, j+1, k) - sy_arr(i, j, k)) / dx[1];
-                grads[2] = (sz_arr(i, j, k+1) - sz_arr(i, j, k)) / dx[2];
-		
-		Real normgp = 0.0;
-		Real normgs = 0.0;
-		for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-		    normgp += gradlogp[n]*gradlogp[n];
-		    normgs += grads[n]*grads[n];
-		}
-		normgp = std::sqrt(normgp);
-		normgs = std::sqrt(normgs);
+                grads[0] = (sx_arr(i + 1, j, k) - sx_arr(i, j, k)) / dx[0];
+                grads[1] = (sy_arr(i, j + 1, k) - sy_arr(i, j, k)) / dx[1];
+                grads[2] = (sz_arr(i, j, k + 1) - sz_arr(i, j, k)) / dx[2];
+
+                Real normgp = 0.0;
+                Real normgs = 0.0;
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    normgp += gradlogp[n] * gradlogp[n];
+                    normgs += grads[n] * grads[n];
+                }
+                normgp = std::sqrt(normgp);
+                normgs = std::sqrt(normgs);
 
                 // compute baroclinity
-		if (normgp > 0.0 && normgs > 0.0 &&
-		    rho_arr(i, j, k) > base_cutoff_density) {
-		    baro_arr(i, j, k) = -(y*inv_xy*(gradlogp[1]*grads[2] - gradlogp[2]*grads[1])
-					 + x*inv_xy*(gradlogp[0]*grads[2] - gradlogp[2]*grads[0]))
-			/ (normgp * normgs);
-		} 
+                if (normgp > 0.0 && normgs > 0.0 &&
+                    rho_arr(i, j, k) > base_cutoff_density) {
+                    baro_arr(i, j, k) = -(y * inv_xy *
+                                              (gradlogp[1] * grads[2] -
+                                               gradlogp[2] * grads[1]) +
+                                          x * inv_xy *
+                                              (gradlogp[0] * grads[2] -
+                                               gradlogp[2] * grads[0])) /
+                                        (normgp * normgs);
+                }
             });
         }
     }
