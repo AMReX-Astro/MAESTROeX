@@ -5,7 +5,7 @@ including:
 
 - **Convection speed**: The root-mean-squared radial velocity
 
-<img src="https://render.githubusercontent.com/render/math?math=\large v_c(r) = \sqrt{\int_{0}^{2\pi}d\phi \int_0^{\pi}d\theta \sin\theta v_r^2}">
+<img src="https://render.githubusercontent.com/render/math?math=\large v_c(r) = \sqrt{\frac{1}{4\pi}\int_{0}^{2\pi}d\phi \int_0^{\pi}d\theta \sin\theta v_r^2}">
 
 - **Ratio of mean rotation rates to surface rotation**: 
 
@@ -21,6 +21,11 @@ Note that the denominator is currently set at the surface, but it does not stric
 
 where <img src="https://render.githubusercontent.com/render/math?math=v_r"> and <img src="https://render.githubusercontent.com/render/math?math=v_{\theta}"> are the radial and polar velocities.
 The instantaneous circulation components are computed by neglecting the time-averaging terms.
+
+- **Baroclinity**: Averaged over the azimuthal angle
+
+<img src="https://render.githubusercontent.com/render/math?math=\large \xi(r,\theta) = \frac{1}{2\pi} \int_0^{2\pi}d\phi\:\: \dfrac{\hat{\phi}\cdot (\nabla\ln P \times \nabla s)}{|\nabla \ln P|\: |\nabla s|}">.
+
 
 - **Latitudinal shear**: Expressed as the projection of the rotation profile onto the (*l=2*,*m=0*) spherical harmonic, averaged over the surface. This can be computed in Cartesian coordinates
 

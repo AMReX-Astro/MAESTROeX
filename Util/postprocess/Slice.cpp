@@ -7,19 +7,58 @@ using namespace amrex;
 // ------------------------------------------
 // Write 2D r-theta slice diagnostics
 // ------------------------------------------
-void Postprocess::Write2dSliceFile(const Vector<MultiFab>& u_in,
+void Postprocess::Write2dSliceFile(const Vector<MultiFab>& rho_in,
+				   const Vector<MultiFab>& p_in,
+				   const Vector<MultiFab>& u_in,
                                    const Vector<MultiFab>& w0_in,
                                    const int deltat, const int nfiles) {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::Write2dSliceFile()", Write2dSliceFile);
 
-    // MakeMeridionalCirculation
-    int max_grid_size = GetMaxGridSize(iFile);
-    Geometry geomFine;
-    Vector<MultiFab> meridion_vel(1);
-    MakeMeridionalCirculation(u_in, w0_in, meridion_vel, max_grid_size,
-                              geomFine);
+    // need single-level finest grid for whole domain
+    //  TODO: domain size should be larger than simply half x-z slice
+    //        since its diagonal plane has the largest area
+    const Box& domain0 = pgeom[0].Domain();
+    auto dom0_lo = domain0.loVect();
+    auto dom0_hi = domain0.hiVect();
+    IntVect ncell(0, 1, 0);
+    ncell[0] = (dom0_hi[0] + 1) * (finest_level + 1) / 2 - 1;
+    ncell[2] = (dom0_hi[2] + 1) * (finest_level + 1) - 1;
 
+    IntVect domLo(AMREX_D_DECL(dom0_lo[0], dom0_lo[1], dom0_lo[2]));
+    IntVect domHi(AMREX_D_DECL(ncell[0], ncell[1], ncell[2]));
+    Box domain(domLo, domHi);
+
+    // we only need half x-z plane because theta is between (0,pi)
+    auto prob_lo = pgeom[0].ProbLo();
+    auto prob_hi = pgeom[0].ProbHi();
+    const auto dx = pgeom[finest_level].CellSizeArray();
+
+    Real probLo[] = {prob_lo[0] + (prob_hi[0] - prob_lo[0]) / 2.0, prob_lo[1],
+                     prob_lo[2]};
+    Real probHi[] = {prob_hi[0], prob_lo[1] + 2.0 * dx[1], prob_hi[2]};
+    RealBox real_box(probLo, probHi);
+
+    // make BoxArray and Geometry
+    int max_grid_size = GetMaxGridSize(iFile);
+    BoxArray ba(domain);
+    ba.maxSize(max_grid_size);
+    DistributionMapping dm(ba);
+    Geometry geomFine(domain, &real_box);
+
+    // MakeMeridionalCirculation
+    // define velocities on new single-level grid
+    Vector<MultiFab> meridion_vel(1);
+    meridion_vel[0].define(ba, dm, 2, 0);
+    meridion_vel[0].setVal(0.);
+    MakeMeridionalCirculation(u_in, w0_in, meridion_vel, {domain});
+
+    // MakeBaroclinity
+    Vector<MultiFab> baroclinity(1);
+    baroclinity[0].define(ba, dm, 1, 0);
+    baroclinity[0].setVal(0.);
+    MakeBaroclinity(rho_in, p_in, baroclinity, {domain});
+    
     // time-averaged circulation need multiple files
     if (deltat > 0 && nfiles > 0) {
         amrex::PlotFileData pltfile(iFile);
@@ -92,8 +131,7 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& u_in,
 
             // MakeMeridionalCirculation
             Vector<MultiFab> meridion_vel_new(1);
-            MakeMeridionalCirculation(u_new, w0_new, meridion_vel_new,
-                                      max_grid_size, geomFine);
+            MakeMeridionalCirculation(u_new, w0_new, meridion_vel_new, {domain});
 
             // vel = vel + dt/2 * (vel_old + vel_new)
             Real dt = t_new - t_old;
@@ -132,11 +170,26 @@ void Postprocess::Write2dSliceFile(const Vector<MultiFab>& u_in,
         }
     }
 
+    // headers for plotfile data
+    int nPlot = 3;
+    Vector<std::string> varnames(nPlot);
+    varnames[0] = "vel_radial";
+    varnames[1] = "vel_theta";
+    varnames[2] = "baroclinity";
+    
+    // multifab to hold plotfile data
+    Vector<MultiFab> plot_mf(1);
+    plot_mf[0].define(ba, dm, nPlot, 0);
+    int dest_comp = 0;
+    MultiFab::Copy(plot_mf[0], meridion_vel[0], 0, dest_comp, 2, 0);
+    dest_comp += 2;
+    MultiFab::Copy(plot_mf[0], baroclinity[0], 0, dest_comp, 1, 0);
+    
     // write to disk
     std::string slicefilename = "slice_" + iFile;
 
-    WriteSingleLevelPlotfile(slicefilename, meridion_vel[0],
-                             {"vel_radial", "vel_theta"}, geomFine, 0, 0);
+    WriteSingleLevelPlotfile(slicefilename, plot_mf[0],
+                             varnames, geomFine, 0, 0);
 }
 
 // get plotfile name
@@ -148,8 +201,7 @@ void Postprocess::PlotFileName(const int timestep, std::string* basefilename,
 void Postprocess::MakeMeridionalCirculation(const Vector<MultiFab>& vel,
                                             const Vector<MultiFab>& w0rcart,
                                             Vector<MultiFab>& circ_vel,
-                                            const int max_grid_size,
-                                            Geometry& geomFine) {
+                                            const Vector<Box>& domFine) {
     // timer for profiling
     BL_PROFILE_VAR("Postprocess::MakeMeridionalCirculation()",
                    MakeMeridionalCirculation);
@@ -216,42 +268,146 @@ void Postprocess::MakeMeridionalCirculation(const Vector<MultiFab>& vel,
         }
     }
 
-    // need single-level finest grid for whole domain
-    //  TODO: domain size should be larger than simply half x-z slice
-    //        since its diagonal plane has the largest area
-    const Box& domain0 = pgeom[0].Domain();
-    auto dom0_lo = domain0.loVect();
-    auto dom0_hi = domain0.hiVect();
-    IntVect ncell(0, 1, 0);
-    ncell[0] = (dom0_hi[0] + 1) * (finest_level + 1) / 2 - 1;
-    ncell[2] = (dom0_hi[2] + 1) * (finest_level + 1) - 1;
+    // average to 2D r-theta (x-z) plane
+    Average2d(rad_vel, circ_vel, 0, domFine, 0);
+    Average2d(ang_vel, circ_vel, 1, domFine, 0);
+}
 
-    IntVect domLo(AMREX_D_DECL(dom0_lo[0], dom0_lo[1], dom0_lo[2]));
-    IntVect domHi(AMREX_D_DECL(ncell[0], ncell[1], ncell[2]));
-    Box domain(domLo, domHi);
+void Postprocess::MakeBaroclinity(const Vector<MultiFab>& rho_in,
+				  const Vector<MultiFab>& p_in,
+				  Vector<MultiFab>& baroclinity,
+				  const Vector<Box>& domFine) {
+    // timer for profiling
+    BL_PROFILE_VAR("Postprocess::MakeBaroclinity()", MakeBaroclinity);
 
-    // we only need half x-z plane because theta is between (0,pi)
-    auto prob_lo = pgeom[0].ProbLo();
-    auto prob_hi = pgeom[0].ProbHi();
-    const auto dx = pgeom[finest_level].CellSizeArray();
+    Real gamma = GetGamma(iFile);
 
-    Real probLo[] = {prob_lo[0] + (prob_hi[0] - prob_lo[0]) / 2.0, prob_lo[1],
-                     prob_lo[2]};
-    Real probHi[] = {prob_hi[0], prob_lo[1] + 2.0 * dx[1], prob_hi[2]};
-    RealBox real_box(probLo, probHi);
+    // compute entropy and log(p)
+    Vector<MultiFab> entropy(finest_level+1);
+    Vector<MultiFab> logp(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        entropy[lev].define(rho_in[lev].boxArray(), rho_in[lev].DistributionMap(), 1,
+                            0);
+        logp[lev].define(p_in[lev].boxArray(), p_in[lev].DistributionMap(), 1,
+                            0);
+    }
 
-    // make BoxArray and Geometry
-    BoxArray ba(domain);
-    ba.maxSize(max_grid_size);
-    DistributionMapping dm(ba);
+    for (int lev = finest_level; lev <= finest_level; ++lev) {
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(rho_in[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
 
-    geomFine.define(domain, &real_box);
+            const Array4<const Real> rho_arr = rho_in[lev].array(mfi);
+            const Array4<const Real> p_arr = p_in[lev].array(mfi);
+            const Array4<Real> entropy_arr = entropy[lev].array(mfi);
+            const Array4<Real> logp_arr = logp[lev].array(mfi);
 
-    // define velocities on new single-level grid
-    int numcomp = 2;
-    circ_vel[0].define(ba, dm, numcomp, 0);
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+		logp_arr(i, j, k) = log(p_arr(i, j, k));
+		    
+		// dimensionless entropy = 1/(gam - 1)*( log(p) - gamma*log(rho) )
+		entropy_arr(i, j, k) =
+		    1.0 / (gamma - 1.0) * (logp_arr(i, j, k) - gamma * log(rho_arr(i, j, k)));
+            });
+        }
+    }
+    
+    // want gradients of entropy and log(p)
+    // so we need to compute entropy and pressure on cell faces
+    Vector<std::array<MultiFab, AMREX_SPACEDIM> > face_s(finest_level + 1);
+    Vector<std::array<MultiFab, AMREX_SPACEDIM> > face_p(finest_level + 1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	AMREX_D_TERM(
+		     face_s[lev][0].define(convert(rho_in[lev].boxArray(), nodal_flag_x),
+					   rho_in[lev].DistributionMap(), 1, 0);
+		     , face_s[lev][1].define(convert(rho_in[lev].boxArray(), nodal_flag_y),
+					     rho_in[lev].DistributionMap(), 1, 0);
+		     , face_s[lev][2].define(convert(rho_in[lev].boxArray(), nodal_flag_z),
+					     rho_in[lev].DistributionMap(), 1, 0););
+	AMREX_D_TERM(
+		     face_p[lev][0].define(convert(p_in[lev].boxArray(), nodal_flag_x),
+					   p_in[lev].DistributionMap(), 1, 0);
+		     , face_p[lev][1].define(convert(p_in[lev].boxArray(), nodal_flag_y),
+					     p_in[lev].DistributionMap(), 1, 0);
+		     , face_p[lev][2].define(convert(p_in[lev].boxArray(), nodal_flag_z),
+					     p_in[lev].DistributionMap(), 1, 0););
+    }
+    
+    // average face-centered entropy and pressure
+    PutDataOnFaces(entropy, face_s, true);
+    PutDataOnFaces(logp, face_p, true);
+
+    // create multi-level multifab for baroclinity
+    Vector<MultiFab> baro_mf(finest_level+1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        baro_mf[lev].define(rho_in[lev].boxArray(), rho_in[lev].DistributionMap(), 1,
+                            0);
+    }
+
+    const auto& center_p = center;
+    
+    for (int lev = finest_level; lev <= finest_level; ++lev) {
+        const auto dx = pgeom[lev].CellSizeArray();
+        const auto prob_lo = pgeom[lev].ProbLoArray();
+    
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(baro_mf[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
+            // Get the index space of the valid region
+            const Box& tileBox = mfi.tilebox();
+
+            const Array4<const Real> logpx_arr = face_p[lev][0].array(mfi);
+            const Array4<const Real> logpy_arr = face_p[lev][1].array(mfi);
+            const Array4<const Real> logpz_arr = face_p[lev][2].array(mfi);
+            const Array4<const Real> sx_arr = face_s[lev][0].array(mfi);
+            const Array4<const Real> sy_arr = face_s[lev][1].array(mfi);
+            const Array4<const Real> sz_arr = face_s[lev][2].array(mfi);
+            const Array4<const Real> rho_arr = rho_in[lev].array(mfi);
+            const Array4<Real> baro_arr = baro_mf[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                baro_arr(i, j, k) = 0.0;
+
+                Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
+                Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
+                Real inv_xy = 1.0 / sqrt(x * x + y * y);
+
+                Vector<Real> gradlogp(3);
+                gradlogp[0] = (logpx_arr(i+1, j, k) - logpx_arr(i, j, k)) / dx[0];
+                gradlogp[1] = (logpy_arr(i, j+1, k) - logpy_arr(i, j, k)) / dx[1];
+                gradlogp[2] = (logpz_arr(i, j, k+1) - logpz_arr(i, j, k)) / dx[2];
+
+                Vector<Real> grads(3);
+                grads[0] = (sx_arr(i+1, j, k) - sx_arr(i, j, k)) / dx[0];
+                grads[1] = (sy_arr(i, j+1, k) - sy_arr(i, j, k)) / dx[1];
+                grads[2] = (sz_arr(i, j, k+1) - sz_arr(i, j, k)) / dx[2];
+		
+		Real normgp = 0.0;
+		Real normgs = 0.0;
+		for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+		    normgp += gradlogp[n]*gradlogp[n];
+		    normgs += grads[n]*grads[n];
+		}
+		normgp = std::sqrt(normgp);
+		normgs = std::sqrt(normgs);
+
+                // compute baroclinity
+		if (normgp > 0.0 && normgs > 0.0 &&
+		    rho_arr(i, j, k) > base_cutoff_density) {
+		    baro_arr(i, j, k) = -(y*inv_xy*(gradlogp[1]*grads[2] - gradlogp[2]*grads[1])
+					 + x*inv_xy*(gradlogp[0]*grads[2] - gradlogp[2]*grads[0]))
+			/ (normgp * normgs);
+		} 
+            });
+        }
+    }
+    // debug
+    // VisMF::Write(baro_mf[0],"a_baro");
 
     // average to 2D r-theta (x-z) plane
-    Average2d(rad_vel, circ_vel, 0, {domain}, 0);
-    Average2d(ang_vel, circ_vel, 1, {domain}, 0);
+    Average2d(baro_mf, baroclinity, 0, domFine, 0);
 }

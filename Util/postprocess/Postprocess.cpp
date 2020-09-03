@@ -4,6 +4,18 @@
 
 using namespace amrex;
 
+// helper IntVects used to define face/nodal MultiFabs
+#if (AMREX_SPACEDIM == 2)
+IntVect Postprocess::nodal_flag(1, 1);
+IntVect Postprocess::nodal_flag_x(1, 0);
+IntVect Postprocess::nodal_flag_y(0, 1);
+#elif (AMREX_SPACEDIM == 3)
+IntVect Postprocess::nodal_flag(1, 1, 1);
+IntVect Postprocess::nodal_flag_x(1, 0, 0);
+IntVect Postprocess::nodal_flag_y(0, 1, 0);
+IntVect Postprocess::nodal_flag_z(0, 0, 1);
+#endif
+
 // constructor
 Postprocess::Postprocess() = default;
 // destructor
@@ -131,11 +143,11 @@ void Postprocess::diag() {
     // Write 2D slice output file
     if (deltat.empty() || numfiles.empty()) {
         Print() << "Writing 2D slice file for single plot file" << std::endl;
-        Write2dSliceFile(u_mf, w0_mf);
+        Write2dSliceFile(rho_mf, p0_mf, u_mf, w0_mf);
     } else {
         Print() << "Writing 2D slice file for " << stoi(numfiles) + 1
                 << " plot files" << std::endl;
-        Write2dSliceFile(u_mf, w0_mf, stoi(deltat), stoi(numfiles));
+        Write2dSliceFile(rho_mf, p0_mf, u_mf, w0_mf, stoi(deltat), stoi(numfiles));
     }
 
     // Write diag file for initial model if specified
