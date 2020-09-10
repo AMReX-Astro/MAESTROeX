@@ -1,0 +1,120 @@
+
+# INITIAL MODEL
+maestro.model_file = "convective_M_0.30.hse.1024"
+maestro.perturb_model = true
+
+maestro.drdxfac = 5
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.e0  0.e0  0.e0
+geometry.prob_hi     =  7.e10 7.e10 7.e10
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 2 2 2
+maestro.hi_bc = 2 2 2
+geometry.is_periodic =  0 0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+#maestro.mg_verbose = 2
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# GRIDDING AND REFINEMENT
+amr.n_cell = 384 384 384
+amr.max_grid_size      = 64
+amr.max_level          = 0       # maximum level number allowed
+maestro.regrid_int     = 2      # how often to regrid
+amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
+amr.blocking_factor    = 16       # block factor in grid generation
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+maestro.octant = false
+
+# TIME STEPPING
+maestro.max_step  = 200000
+maestro.stop_time = 3000000.
+maestro.cfl       = 0.7    # cfl number for hyperbolic system
+                           # In this test problem, the velocity is
+		           # time-dependent.  We could use 0.9 in
+		           # the 3D test, but need to use 0.7 in 2D
+		           # to satisfy CFL condition.
+
+# ALGORITHMIC OPTIONS
+maestro.spherical = 1
+maestro.evolve_base_state = false
+maestro.fix_base_state = false
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 3
+maestro.init_iter             = 1
+
+maestro.anelastic_cutoff_density = 0.1
+maestro.base_cutoff_density = 0.05
+
+maestro.do_sponge = 1
+maestro.sponge_center_density = 0.3
+maestro.sponge_start_factor = 33.33e0
+maestro.sponge_kappa = 10.e0
+
+maestro.init_shrink = 0.001
+maestro.use_soundspeed_firstdt = true
+maestro.use_divu_firstdt = true
+
+maestro.use_tfromp = true
+maestro.use_exact_base_state = false
+
+maestro.do_heating = true
+
+# PLOTFILES
+maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_int   = 100      # number of timesteps between plot files
+maestro.plot_deltat = -1.
+amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
+maestro.plot_Hext = true
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = 100
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-12
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 5.e-10
+maestro.eps_hg_max         = 1.e-9
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+# BURNING 
+maestro.do_burning = false
+maestro.small_dens = 1.e-5
+maestro.small_temp = 1.e2
+
+#SDC 
+maestro.sdc_couple_velocity = false
+
+# ROTATION
+maestro.rotational_frequency = 4.e-5
+maestro.rotation_radius = 0.0
+
+&probin
+
+
+  velpert_radius = 3.e9
+  velpert_amplitude = 1.e4
+  eos_assume_neutral = .false.
+
+/
