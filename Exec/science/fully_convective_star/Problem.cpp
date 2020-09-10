@@ -235,7 +235,7 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
         totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
 
         // root-mean-squared radial velocity
-        vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r) / t_interval);
+        vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r, comp) / t_interval);
     }
 }
 
