@@ -220,10 +220,6 @@ void Maestro::Init() {
                                gamma1bar_old, uold, sold, S_cc_old);
         }
 
-#ifdef DO_PROBLEM_POST_INIT
-        ProblemPostInit();
-#endif
-
         if (chk_int > 0 || chk_deltat > 0) {
             Print() << "\nWriting checkpoint 0 after all initialization"
                     << std::endl;
@@ -237,6 +233,11 @@ void Maestro::Init() {
             DiagFile(0, t_old, rho0_old, p0_old, uold, sold, index_dummy);
         }
     }
+    
+#ifdef DO_PROBLEM_POST_INIT
+    ProblemPostInit();
+#endif
+
 }
 
 // fill in multifab and base state data

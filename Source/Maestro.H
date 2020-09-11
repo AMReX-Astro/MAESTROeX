@@ -2056,6 +2056,7 @@ class Maestro : public amrex::AmrCore {
 
     // post problem file array
 #ifdef DO_PROBLEM_POST_INIT
+    const int NumPost = 2;
     BaseState<amrex::Real> postfile_data;
     amrex::Vector<amrex::MultiFab> postfile_mf;
 

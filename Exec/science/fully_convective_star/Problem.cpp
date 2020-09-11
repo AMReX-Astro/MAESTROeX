@@ -10,7 +10,7 @@ void Maestro::ProblemPostInit() {
     // initialize radial diagnostic
     // 0: convective velocity
     // 1: meridional circulation (radial)
-    postfile_data.resize(base_geom.max_radial_level + 1, base_geom.nr_fine, 2);
+    postfile_data.resize(base_geom.max_radial_level + 1, base_geom.nr_fine, NumPost);
     postfile_data.setVal(0.);
 
     // initialize multifab diagnostics
@@ -54,63 +54,150 @@ void Maestro::ProblemPostInit() {
     postfile_mf[0].define(baFine, dmFine, 2, 0);
     postfile_mf[0].setVal(0.);
 
-    // compute diagnostics for initial state
-    // make radial and theta-component velocity
     Vector<MultiFab> rad_vel(finest_level + 1);
     Vector<MultiFab> ang_vel(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
-        rad_vel[lev].define(grids[lev], dmap[lev], 1, 0);
-        ang_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	rad_vel[lev].define(grids[lev], dmap[lev], 1, 0);
+	ang_vel[lev].define(grids[lev], dmap[lev], 1, 0);
     }
-    MakeVelrth(uold, w0_cart, rad_vel, ang_vel);
-
-    // make convection velocity
     BaseState<Real> convect_vel(base_geom.max_radial_level + 1,
-                                base_geom.nr_fine);
-    MakeConvectionVel(rad_vel, convect_vel, postfile_data, 0, t_new);
-
-    // make meridional circulation
+				base_geom.nr_fine);
     Vector<MultiFab> circ_vel(1);
     circ_vel[0].define(baFine, dmFine, 2, 0);
-    MakeMeridionalCirculation(rad_vel, ang_vel, circ_vel, postfile_mf, t_new);
+	
+    // initialize diagnostics
+    if (restart_file.empty()) {
+	// compute diagnostics for initial state
+	// make radial and theta-component velocity	
+	MakeVelrth(uold, w0_cart, rad_vel, ang_vel);
 
-    // wrote a plotfile
-    if (plot_int > 0 || plot_deltat > 0) {
-        std::string plotfilename = plot_base_name + "0000000";
+	// make convection velocity
+	MakeConvectionVel(rad_vel, convect_vel, postfile_data, 0, t_new);
+	
+	// make meridional circulation
+	MakeMeridionalCirculation(rad_vel, ang_vel, circ_vel, postfile_mf, t_new);
 
-        VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+    } else {
+	// if restarting from checkpoint
+	Print() << "Initializing postprocessing diagnostics from checkpoint "
+		<< restart_file << std::endl;
 
-        // write out the cell-centered diagnostics
-        if (ParallelDescriptor::IOProcessor()) {
-            for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
-                std::ofstream PostFile;
-                PostFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(),
-                                            io_buffer.size());
-                std::string PostFileName(plotfilename + "/PostTimestep_");
-                std::string levStr = std::to_string(lev);
-                PostFileName.append(levStr);
-                PostFile.open(PostFileName.c_str(), std::ofstream::out |
+	std::string line, word;
+	
+	// read in cell-centered basestate
+	std::string File(restart_file + "/PostCC");
+	Vector<char> fileCharPtr;
+	ParallelDescriptor::ReadAndBcastFile(File, fileCharPtr);
+	std::string fileCharPtrString(fileCharPtr.dataPtr());
+	std::istringstream is(fileCharPtrString, std::istringstream::in);
+
+	for (int i = 0;
+	     i < (base_geom.max_radial_level + 1) * base_geom.nr_fine; ++i) {
+	    std::getline(is, line);
+	    std::istringstream lis(line);
+	    
+	    // NumPost components in postfile_data
+	    for (int ncomp = 0; ncomp < NumPost; ++ncomp) {
+		lis >> word;
+		postfile_data.array()(ncomp+2*i) = std::stod(word);
+	    }
+	}
+	
+	// read in the multifab data
+	VisMF::Read(postfile_mf[0], amrex::MultiFabFileFullPrefix(0, restart_file,
+								  "PostTimestep_", "diag"));
+
+	// compute diagnostics output
+	// set updated values to zero to get old values at t_old
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    rad_vel[lev].setVal(0.);
+	    ang_vel[lev].setVal(0.);
+	}
+	
+	// make convection velocity
+	MakeConvectionVel(rad_vel, convect_vel, postfile_data, 0, t_old);
+	
+	// make meridional circulation
+	MakeMeridionalCirculation(rad_vel, ang_vel, circ_vel, postfile_mf, t_old);
+    }
+
+    if (restart_file.empty()) {
+	// wrote a plotfile
+	if (plot_int > 0 || plot_deltat > 0) {
+	    std::string plotfilename = plot_base_name + "0000000";
+
+	    VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+
+	    // write out the cell-centered diagnostics
+	    if (ParallelDescriptor::IOProcessor()) {
+		for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+		    std::ofstream PostFile;
+		    PostFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(),
+						io_buffer.size());
+		    std::string PostFileName(plotfilename + "/PostTimestep_");
+		    std::string levStr = std::to_string(lev);
+		    PostFileName.append(levStr);
+		    PostFile.open(PostFileName.c_str(), std::ofstream::out |
                                                         std::ofstream::trunc |
                                                         std::ofstream::binary);
-                if (!PostFile.good()) {
-                    amrex::FileOpenFailed(PostFileName);
-                }
+		    if (!PostFile.good()) {
+			amrex::FileOpenFailed(PostFileName);
+		    }
 
-                PostFile.precision(17);
+		    PostFile.precision(17);
+		    
+		    PostFile << "r_cc  convection_vel   \n";
+		    
+		    for (int i = 0; i < base_geom.nr(lev); ++i) {
+			PostFile << base_geom.r_cc_loc(lev, i) << " "
+				 << convect_vel.array()(lev, i) << "\n";
+		    }
+		}
+	    }
 
-                PostFile << "r_cc  convection_vel   \n";
+	    // write out the planar-averaged diagnostics
+	    std::string PostFileName(plotfilename + "/PostTimestep");
+	    WriteSingleLevelPlotfile(PostFileName, circ_vel[0],
+				     {"vel_radial", "vel_theta"}, geomFine, 0, 0);
+	}
 
-                for (int i = 0; i < base_geom.nr(lev); ++i) {
-                    PostFile << base_geom.r_cc_loc(lev, i) << " "
-                             << convect_vel.array()(lev, i) << "\n";
-                }
-            }
-        }
-
-        // write out the planar-averaged diagnostics
-        std::string PostFileName(plotfilename + "/PostTimestep");
-        WriteSingleLevelPlotfile(PostFileName, circ_vel[0],
-                                 {"vel_radial", "vel_theta"}, geomFine, 0, 0);
+	// wrote a checkpoint file
+	if (chk_int > 0 || chk_deltat > 0) {
+	    // checkpoint file name, e.g., chk00010
+	    const std::string& checkpointname =
+		amrex::Concatenate(check_base_name, 0, 7);
+	    
+	    VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+	    
+	    // write out the cell-centered base state
+	    if (ParallelDescriptor::IOProcessor()) {
+		std::ofstream PostCCFile;
+		PostCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+		std::string PostCCFileName(checkpointname + "/PostCC");
+		PostCCFile.open(PostCCFileName.c_str(), std::ofstream::out |
+				std::ofstream::trunc |
+				std::ofstream::binary);
+		if (!PostCCFile.good()) {
+		    amrex::FileOpenFailed(PostCCFileName);
+		}
+		
+		PostCCFile.precision(17);
+		
+		for (int i = 0;
+		     i < (base_geom.max_radial_level + 1) * base_geom.nr_fine; ++i) {
+		    // NumPost components in postfile_data
+		    for (int ncomp = 0; ncomp < NumPost; ++ncomp) {
+			PostCCFile << postfile_data.array()(ncomp + 2*i) << " ";
+		    }
+		    PostCCFile << "\n";
+		}
+	    }
+	    
+	    // write the MultiFab data
+	    amrex::UtilCreateCleanDirectory(checkpointname+"/PostTimestep_0", true);
+	    VisMF::Write(postfile_mf[0], amrex::MultiFabFileFullPrefix(
+			  		     0, checkpointname, "PostTimestep_", "diag"));
+	}
     }
 }
 
@@ -121,7 +208,7 @@ void Maestro::ProblemPostInit() {
 void Maestro::ProblemPostTimestep() {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ProblemPostInit()", ProblemPostInit);
-
+    
     // compute diagnostics after every time step
     // make radial and theta-component velocity
     Vector<MultiFab> rad_vel(finest_level + 1);
@@ -183,6 +270,47 @@ void Maestro::ProblemPostTimestep() {
         std::string PostFileName(plotfilename + "/PostTimestep");
         WriteSingleLevelPlotfile(PostFileName, circ_vel[0],
                                  {"vel_radial", "vel_theta"}, geomFine, 0, 0);
+    }
+    
+    // wrote a checkpoint file
+    if ((chk_int > 0 && istep % chk_int == 0) ||
+	(chk_deltat > 0 && std::fmod(t_new, chk_deltat) < dt) ||
+	((chk_int > 0 || chk_deltat > 0) &&
+	 (istep == max_step || t_old >= stop_time))) {
+	// checkpoint file name, e.g., chk00010
+	const std::string& checkpointname =
+	    amrex::Concatenate(check_base_name, istep, 7);
+
+        VisMF::IO_Buffer io_buffer(VisMF::IO_Buffer_Size);
+
+	// write out the cell-centered base state
+	if (ParallelDescriptor::IOProcessor()) {
+	    std::ofstream PostCCFile;
+	    PostCCFile.rdbuf()->pubsetbuf(io_buffer.dataPtr(), io_buffer.size());
+	    std::string PostCCFileName(checkpointname + "/PostCC");
+	    PostCCFile.open(PostCCFileName.c_str(), std::ofstream::out |
+			    std::ofstream::trunc |
+			    std::ofstream::binary);
+	    if (!PostCCFile.good()) {
+		amrex::FileOpenFailed(PostCCFileName);
+	    }
+
+	    PostCCFile.precision(17);
+
+	    for (int i = 0;
+		 i < (base_geom.max_radial_level + 1) * base_geom.nr_fine; ++i) {
+		// NumPost components in postfile_data
+		for (int ncomp = 0; ncomp < NumPost; ++ncomp) {
+		    PostCCFile << postfile_data.array()(ncomp + 2*i);
+		}
+		PostCCFile << "\n";
+	    }
+	}
+	
+	// write the MultiFab data
+	amrex::UtilCreateCleanDirectory(checkpointname+"/PostTimestep_0", true);
+	VisMF::Write(postfile_mf[0], amrex::MultiFabFileFullPrefix(
+					 0, checkpointname, "PostTimestep_", "diag"));
     }
 }
 
