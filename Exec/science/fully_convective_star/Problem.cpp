@@ -234,11 +234,13 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
         // Zero the velocity if it is a negative value.
         // Note that the Average() subroutine can cause some interpolation
-	// values near the center of star to be negative.
+        // values near the center of star to be negative.
         // This should not affect values located further from the center.
-        if (vel_conv_arr(0, r) < 0)  { vel_conv_arr(0, r) = 0.0; }
-	
-	totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
+        if (vel_conv_arr(0, r) < 0) {
+            vel_conv_arr(0, r) = 0.0;
+        }
+
+        totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
 
         // root-mean-squared radial velocity
         vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r, comp) / t_interval);
