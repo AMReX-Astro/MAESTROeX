@@ -232,7 +232,14 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
     auto totsum_arr = totsum.array();
 
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
-        totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
+        // DEBUG
+        // if (vel_conv_arr(0, r) < 0)
+	//     Print() << "HACK: " << r << ", " << vel_conv_arr(0, r) << std::endl;
+
+	// Note that the abs value is used here because the Average() subroutine
+	// causes some interpolation values near center of star to be negative.
+        // This should not affect values located further from the center.
+        totsum_arr(0, r, comp) += dt * amrex::Math::abs(vel_conv_arr(0, r));
 
         // root-mean-squared radial velocity
         vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r, comp) / t_interval);
