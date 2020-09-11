@@ -233,11 +233,10 @@ void Maestro::Init() {
             DiagFile(0, t_old, rho0_old, p0_old, uold, sold, index_dummy);
         }
     }
-    
+
 #ifdef DO_PROBLEM_POST_INIT
     ProblemPostInit();
 #endif
-
 }
 
 // fill in multifab and base state data
