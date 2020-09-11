@@ -234,10 +234,10 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
     for (auto r = 0; r < base_geom.nr_fine; ++r) {
         // DEBUG
         // if (vel_conv_arr(0, r) < 0)
-	//     Print() << "HACK: " << r << ", " << vel_conv_arr(0, r) << std::endl;
+        //     Print() << "HACK: " << r << ", " << vel_conv_arr(0, r) << std::endl;
 
-	// Note that the abs value is used here because the Average() subroutine
-	// causes some interpolation values near center of star to be negative.
+        // Note that the abs value is used here because the Average() subroutine
+        // causes some interpolation values near center of star to be negative.
         // This should not affect values located further from the center.
         totsum_arr(0, r, comp) += dt * amrex::Math::abs(vel_conv_arr(0, r));
 
