@@ -313,8 +313,7 @@ void Maestro::ProblemPostTimestep() {
                  ++i) {
                 // NumPost components in postfile_data
                 for (int ncomp = 0; ncomp < NumPost; ++ncomp) {
-                    PostCCFile << postfile_data.array()(ncomp + 2 * i)
-                               << " ";
+                    PostCCFile << postfile_data.array()(ncomp + 2 * i) << " ";
                 }
                 PostCCFile << "\n";
             }
