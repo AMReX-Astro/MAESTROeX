@@ -382,10 +382,16 @@ void Maestro::MakeConvectionVel(const Vector<MultiFab>& velr,
             vel_conv_arr(0, r) = 0.0;
         }
 
-        totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
+        if (t_new - dt >= diag_skip_time) {
+            totsum_arr(0, r, comp) += dt * vel_conv_arr(0, r);
+        } else if (t_new >= diag_skip_time) {
+            totsum_arr(0, r, comp) += (t_new-diag_skip_time) * vel_conv_arr(0, r);
+        } else {
+            // do nothing
+        }
 
         // root-mean-squared radial velocity
-        vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r, comp) / t_interval);
+        vel_conv_arr(0, r) = std::sqrt(totsum_arr(0, r, comp) / (t_interval-diag_skip_time) );
     }
 }
 
@@ -416,8 +422,16 @@ void Maestro::MakeMeridionalCirculation(const Vector<MultiFab>& velr,
 
         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
             for (int n = 0; n < 2; ++n) {
-                circsum_arr(i, j, k, n) += dt * circvel_arr(i, j, k, n);
-                circvel_arr(i, j, k, n) = circsum_arr(i, j, k, n) / t_interval;
+
+                if (t_new - dt >= diag_skip_time) {
+                    circsum_arr(i, j, k, n) += dt * circvel_arr(i, j, k, n);
+                } else if (t_new >= diag_skip_time) {
+                    circsum_arr(i, j, k, n) += (t_new-diag_skip_time) * circvel_arr(i, j, k, n);
+                } else {
+                    // do nothing
+                }
+
+                circvel_arr(i, j, k, n) = circsum_arr(i, j, k, n) / (t_interval-diag_skip_time);
             }
         });
     }
