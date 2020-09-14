@@ -168,9 +168,15 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     }
 
     LPInfo info;
-    info.setAgglomeration(true);
-    info.setConsolidation(true);
     info.setMetricTerm(false);
+    
+    if (hg_bottom_solver == 4) {
+        info.setAgglomeration(true);
+        info.setConsolidation(true);
+    } else {
+        info.setAgglomeration(false);
+        info.setConsolidation(false);
+    }
 
     // Only pass up to defined level to prevent looping over undefined grids.
     MLNodeLaplacian mlndlap(Geom(0, finest_level), grids, dmap, info);
