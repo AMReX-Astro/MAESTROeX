@@ -169,7 +169,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 
     LPInfo info;
     info.setMetricTerm(false);
-    
+
     if (hg_bottom_solver == 4) {
         info.setAgglomeration(true);
         info.setConsolidation(true);
