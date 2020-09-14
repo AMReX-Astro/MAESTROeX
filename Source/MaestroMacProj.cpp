@@ -136,7 +136,7 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     //
     LPInfo info;
     info.setMetricTerm(false);
-    
+
     if (mg_bottom_solver == 4) {
         info.setAgglomeration(true);
         info.setConsolidation(true);
