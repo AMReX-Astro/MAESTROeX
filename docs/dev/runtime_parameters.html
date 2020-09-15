@@ -633,12 +633,14 @@ F-cycle, 2 = W-cycle, 3 = V-cycle</p></td>
 <td><p>3</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hg_bottom_solver</span></code></p></td>
-<td><p>valid values are $ge$ 0</p></td>
-<td><p>-1</p></td>
+<td><p>4 is the fancy agglomerating bottom solver otherwise it
+uses the default MLMG non-agglomerating</p></td>
+<td><p>4</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mg_bottom_solver</span></code></p></td>
-<td><p>valid values are $ge$ 0</p></td>
-<td><p>-1</p></td>
+<td><p>4 is the fancy agglomerating bottom solver otherwise it
+uses the default MLMG non-agglomerating</p></td>
+<td><p>4</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_mg_bottom_nlevels</span></code></p></td>
 <td><p>if mg_bottom_solver == 4, then how many mg levels can
