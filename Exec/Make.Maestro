@@ -89,6 +89,10 @@ ifeq ($(USE_ROTATION), TRUE)
   DEFINES += -DROTATION
 endif
 
+ifeq ($(USE_CENTRIFUGAL), TRUE)
+  DEFINES += -DCENTRIFUGAL
+endif
+
 #------------------------------------------------------------------------------
 # AMReX
 #------------------------------------------------------------------------------
