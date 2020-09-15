@@ -165,8 +165,13 @@ void Maestro::MakeVelForce(
                     const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
 
                     Real centrifugal_term[3];
+#ifdef CENTRIFUGAL
                     centrifugal_term[0] = -omega * omega * x;
                     centrifugal_term[1] = -omega * omega * y;
+#else
+		    centrifugal_term[0] = 0.0;
+		    centrifugal_term[1] = 0.0;
+#endif
                     centrifugal_term[2] = 0.0;
                     Real coriolis_term[3];
 
