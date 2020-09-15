@@ -169,8 +169,8 @@ void Maestro::MakeVelForce(
                     centrifugal_term[0] = -omega * omega * x;
                     centrifugal_term[1] = -omega * omega * y;
 #else
-		    centrifugal_term[0] = 0.0;
-		    centrifugal_term[1] = 0.0;
+                    centrifugal_term[0] = 0.0;
+                    centrifugal_term[1] = 0.0;
 #endif
                     centrifugal_term[2] = 0.0;
                     Real coriolis_term[3];
