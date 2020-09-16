@@ -417,6 +417,9 @@ co_latitude                         Real               0.0      y
 # radius used for computing centrifugal term in rotation problems
 rotation_radius                     Real               1.0e6
 
+# include (true) or exclude (false) centrifugal term
+use_centrifugal                bool               true 
+
 # maximum mach number before the code aborts
 mach_max_abort                      Real               -1.0
 
