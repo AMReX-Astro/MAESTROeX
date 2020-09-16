@@ -135,6 +135,15 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
+    info.setMetricTerm(false);
+
+    if (mg_bottom_solver == 4) {
+        info.setAgglomeration(true);
+        info.setConsolidation(true);
+    } else {
+        info.setAgglomeration(false);
+        info.setConsolidation(false);
+    }
 
     // Only pass up to defined level to prevent looping over undefined grids.
     MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);

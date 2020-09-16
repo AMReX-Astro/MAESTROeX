@@ -248,11 +248,13 @@ mg_cycle_type                       int            3
 # Type of cycle used in the nodal multigrid -- 1 = F-cycle, 2 = W-cycle, 3 = V-cycle
 hg_cycle_type                       int            3
 
-# valid values are $\ge$ 0
-hg_bottom_solver                    int            -1
+# 4 is the fancy agglomerating bottom solver
+# otherwise it uses the default MLMG non-agglomerating
+hg_bottom_solver                    int            4
 
-# valid values are $\ge$ 0
-mg_bottom_solver                    int            -1
+# 4 is the fancy agglomerating bottom solver
+# otherwise it uses the default MLMG non-agglomerating
+mg_bottom_solver                    int            4
 
 # if mg\_bottom\_solver == 4, then how many mg levels can the bottom solver mgt object have
 max_mg_bottom_nlevels               int            1000
@@ -414,6 +416,9 @@ co_latitude                         Real               0.0      y
 
 # radius used for computing centrifugal term in rotation problems
 rotation_radius                     Real               1.0e6
+
+# include (true) or exclude (false) centrifugal term
+use_centrifugal                bool               true 
 
 # maximum mach number before the code aborts
 mach_max_abort                      Real               -1.0

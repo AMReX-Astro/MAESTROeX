@@ -1,6 +1,16 @@
+# 20.09
+
+  * Bug fix for SDC multilevel problems
+
+  * Fixed non-deterministic issue with GPU runs
+
+  * Parameters header files are now created at build time
+
+  * Updated Urca test problem
+
 # 20.08
 
-  * Bug fix: taggin issues are resolved when finest_level < max_radial_level
+  * Bug fix: tagging issues are resolved when finest_level < max_radial_level
 
   * Fixed dpdt implementation and SDC algorithm for thermal diffusion
 
