@@ -370,6 +370,8 @@ namespace: ``maestro``
 | ``rotation_radius``                    | radius used for computing centrifugal term in rotation  | 1.0e6         |
 |                                        | problems                                                |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_centrifugal``                    | include (true) or exclude (false) centrifugal term      | true          |
++----------------------------------------+---------------------------------------------------------+---------------+
 | ``mach_max_abort``                     | maximum mach number before the code aborts              | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``drive_initial_convection``           | freeze the temperature used in the reaction network to  | false         |
