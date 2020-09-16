@@ -421,8 +421,8 @@ void Maestro::MakeMeridionalCirculation(const Vector<MultiFab>& velr,
 
         const Array4<Real> circvel_arr = vel_circ[0].array(mfi);
         const Array4<Real> circsum_arr = sum_circ[0].array(mfi);
-	const auto dt_loc = dt;
-	const auto tnew_loc = t_new;
+        const auto dt_loc = dt;
+        const auto tnew_loc = t_new;
 
         AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
             for (int n = 0; n < 2; ++n) {
