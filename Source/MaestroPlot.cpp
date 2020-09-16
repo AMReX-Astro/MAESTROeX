@@ -1568,7 +1568,7 @@ void Maestro::MakeVelrth(const Vector<MultiFab>& vel,
                 Real inv_radius = 1.0 / sqrt(x * x + y * y + z * z);
                 Real inv_xy = 1.0 / sqrt(x * x + y * y);
 
-                GpuArray<Real, 3> theta_dir;
+		Real theta_dir[3];
                 theta_dir[0] = x * inv_radius * z * inv_xy;
                 theta_dir[1] = y * inv_radius * z * inv_xy;
                 theta_dir[2] = -inv_radius / inv_xy;
