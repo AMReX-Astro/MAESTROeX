@@ -110,6 +110,7 @@ maestro.sdc_couple_velocity = false
 # ROTATION
 maestro.rotational_frequency = 0.0 #4.e-6
 maestro.rotation_radius = 0.0
+maestro.use_centrifugal = true
 
 &probin
 
