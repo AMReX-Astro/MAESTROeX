@@ -173,7 +173,7 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
 
     // set solver parameters
     mac_mlmg.setVerbose(mg_verbose);
-    mac_mlmg.setCGVerbose(cg_verbose);
+    mac_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     const Real mac_tol_abs = -1.e0;

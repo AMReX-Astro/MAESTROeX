@@ -240,7 +240,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 
     MLMG mlmg(mlndlap);
     mlmg.setVerbose(mg_verbose);
-    mlmg.setCGVerbose(cg_verbose);
+    mlmg.setBottomVerbose(cg_verbose);
 
     Real abs_tol = -1.;  // disable absolute tolerance
     Real rel_tol = 1.e-3;
