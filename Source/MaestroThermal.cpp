@@ -496,7 +496,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
 
     // set solver parameters
     thermal_mlmg.setVerbose(mg_verbose);
-    thermal_mlmg.setCGVerbose(cg_verbose);
+    thermal_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
@@ -695,7 +695,7 @@ void Maestro::ThermalConductSDC(
 
     // set solver parameters
     thermal_mlmg.setVerbose(mg_verbose);
-    thermal_mlmg.setCGVerbose(cg_verbose);
+    thermal_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
