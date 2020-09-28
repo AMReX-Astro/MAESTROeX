@@ -156,9 +156,12 @@ void Maestro::MakeVelForce(
                 const Array4<const Real> w0macx_arr = w0mac[lev][0].array(mfi);
                 const Array4<const Real> w0macy_arr = w0mac[lev][1].array(mfi);
                 const Array4<const Real> uold_arr = uold[lev].array(mfi);
+		const auto omega_loc = omega;
 #endif
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+	        amrex::ParallelFor(
+                tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
 #ifdef ROTATION
                     const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
                     const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
@@ -166,8 +169,8 @@ void Maestro::MakeVelForce(
 
                     Real centrifugal_term[3];
                     if (use_centrifugal) {
-                        centrifugal_term[0] = -omega * omega * x;
-                        centrifugal_term[1] = -omega * omega * y;
+                        centrifugal_term[0] = -omega_loc * omega_loc * x;
+                        centrifugal_term[1] = -omega_loc * omega_loc * y;
                     } else {
                         centrifugal_term[0] = 0.0;
                         centrifugal_term[1] = 0.0;
@@ -184,20 +187,20 @@ void Maestro::MakeVelForce(
 
                     if (is_final_update) {
                         coriolis_term[0] =
-                            -2.0 * omega * 0.5 *
+                            -2.0 * omega_loc * 0.5 *
                             (vedge(i, j, k) + w0macy_arr(i, j, k) +
                              vedge(i, j + 1, k) + w0macy_arr(i, j + 1, k));
                         coriolis_term[1] =
-                            2.0 * omega * 0.5 *
+                            2.0 * omega_loc * 0.5 *
                             (uedge(i, j, k) + w0macx_arr(i, j, k) +
                              uedge(i + 1, j, k) + w0macx_arr(i + 1, j, k));
                         coriolis_term[2] = 0.0;
                     } else {
                         coriolis_term[0] =
-                            -2.0 * omega *
+                            -2.0 * omega_loc *
                             (uold_arr(i, j, k, 1) + w0_arr(i, j, k, 1));
                         coriolis_term[1] =
-                            2.0 * omega *
+                            2.0 * omega_loc *
                             (uold_arr(i, j, k, 0) + w0_arr(i, j, k, 0));
                         coriolis_term[2] = 0.0;
                     }
