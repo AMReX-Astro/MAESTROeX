@@ -3,7 +3,7 @@
 maestro.model_file = "initial_models/15m_aprox19.6400"
 maestro.perturb_model = false
 
-maestro.drdxfac = 5
+maestro.drdxfac = 2
 #maestro.ppm_type = 1
 
 # PROBLEM SIZE
@@ -28,6 +28,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 #amr.n_cell             = 160 160 160
 #amr.n_cell             = 64 64 64
 amr.n_cell = 128 128 128
+#amr.n_cell = 384 384 384
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 10      # how often to regrid
@@ -37,7 +38,7 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 maestro.octant = true
 
 # TIME STEPPING
-maestro.max_step  = 200
+maestro.max_step  = 200000
 maestro.stop_time = 300000.
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
@@ -48,7 +49,7 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 1
 maestro.evolve_base_state = false
-maestro.fix_base_state = false
+maestro.fix_base_state = true
 maestro.do_initial_projection = true
 maestro.init_divu_iter        = 3
 maestro.init_iter             = 1
@@ -56,7 +57,7 @@ maestro.init_iter             = 1
 maestro.anelastic_cutoff_density = 1.e3
 maestro.base_cutoff_density = 1.e1
 
-maestro.do_sponge = 0
+maestro.do_sponge = 1
 maestro.sponge_center_density = 3.e6
 maestro.sponge_start_factor = 3.333e0
 maestro.sponge_kappa = 10.e0
@@ -69,14 +70,14 @@ maestro.use_tfromp = true
 maestro.use_exact_base_state = false
 
 # PLOTFILES
-maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_base_name  = plt_    # root name of plot file
 maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = 10
+maestro.chk_int         = 1000
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12
@@ -101,11 +102,7 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.do_burning = true
 maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
-maestro.burning_cutoff_density_lo = 5.e5
 maestro.burning_cutoff_density_hi = 5.e6
-maestro.do_heating = true
-maestro.plot_Hext = true
-maestro.heating_cutoff_density_lo = 5.e6
 
 #SDC 
 maestro.sdc_couple_velocity = true
@@ -118,12 +115,12 @@ maestro.rotation_radius = 2.e8
 &probin
 
   ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e7
+  velpert_amplitude = 1.e6
   velpert_radius = 2.e7
   velpert_scale = 1.e7
   velpert_steep = 1.e5
   tag_density_1 = 1.e7
-  use_analytic_heating = T
+  use_analytic_heating = F
 
   !extern
 
@@ -153,6 +150,4 @@ maestro.rotation_radius = 2.e8
 
   renormalize_abundances = T
 
-  rho_nse = 3.e8
-  T_nse = 3.e9
 /

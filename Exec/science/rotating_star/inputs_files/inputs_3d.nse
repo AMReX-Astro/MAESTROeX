@@ -136,8 +136,7 @@ maestro.rotation_radius = 2.e8
 
   use_eos_coulomb = T
 
-  retry_burn = F
-  abort_on_failure = F
+  retry_burn = T
 
   call_eos_in_rhs = T
   jacobian = 1
