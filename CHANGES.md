@@ -1,3 +1,11 @@
+# 20.10
+
+  * Added input parameter to toggle centrifugal force
+
+  * Enabled control for toggling AMReX fancy bottom solver
+
+  * Updated test problem: fully convective star
+
 # 20.09
 
   * Bug fix for SDC multilevel problems
