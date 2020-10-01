@@ -633,12 +633,14 @@ F-cycle, 2 = W-cycle, 3 = V-cycle</p></td>
 <td><p>3</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">hg_bottom_solver</span></code></p></td>
-<td><p>valid values are $ge$ 0</p></td>
-<td><p>-1</p></td>
+<td><p>4 is the fancy agglomerating bottom solver otherwise it
+uses the default MLMG non-agglomerating</p></td>
+<td><p>4</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mg_bottom_solver</span></code></p></td>
-<td><p>valid values are $ge$ 0</p></td>
-<td><p>-1</p></td>
+<td><p>4 is the fancy agglomerating bottom solver otherwise it
+uses the default MLMG non-agglomerating</p></td>
+<td><p>4</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_mg_bottom_nlevels</span></code></p></td>
 <td><p>if mg_bottom_solver == 4, then how many mg levels can
@@ -865,23 +867,27 @@ the domain is only a subset of a full star.</p></td>
 problems</p></td>
 <td><p>1.0e6</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_centrifugal</span></code></p></td>
+<td><p>include (true) or exclude (false) centrifugal term</p></td>
+<td><p>true</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
 <td><p>maximum mach number before the code aborts</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
 <td><p>freeze the temperature used in the reaction network to
 the initial value.  This is useful for developing an
 initial convective field to carry away the energy,
 while preventing the reactions from going nonlinear.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
 <td><p>timestep beyond which we set {tt
 drive_initial_convection} = F</p></td>
 <td><p>-1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
 <td><p>restart the simulation using a result from a {tt
 drive_initial_convection} = T run note that this uses
 the restart variable to specify which file to restart
@@ -890,13 +896,13 @@ the restart file, the time and timestep number are
 zeroed.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
 <td><p>modify the momentum equation to have $(beta_0/rho)
 nabla (pi/beta_0)$ instead of just $(1/rho) nabla
 (pi)$</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
 <td><p>do we include the explicit omegadot terms in the
 constraint RHS source S?</p></td>
 <td><p>true</p></td>

@@ -227,9 +227,11 @@ namespace: ``maestro``
 | ``hg_cycle_type``                      | Type of cycle used in the nodal multigrid -- 1 =        | 3             |
 |                                        | F-cycle, 2 = W-cycle, 3 = V-cycle                       |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``hg_bottom_solver``                   | valid values are $\ge$ 0                                | -1            |
+| ``hg_bottom_solver``                   | 4 is the fancy agglomerating bottom solver otherwise it | 4             |
+|                                        | uses the default MLMG non-agglomerating                 |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``mg_bottom_solver``                   | valid values are $\ge$ 0                                | -1            |
+| ``mg_bottom_solver``                   | 4 is the fancy agglomerating bottom solver otherwise it | 4             |
+|                                        | uses the default MLMG non-agglomerating                 |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``max_mg_bottom_nlevels``              | if mg\_bottom\_solver == 4, then how many mg levels can | 1000          |
 |                                        | the bottom solver mgt object have                       |               |
@@ -367,6 +369,8 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``rotation_radius``                    | radius used for computing centrifugal term in rotation  | 1.0e6         |
 |                                        | problems                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``use_centrifugal``                    | include (true) or exclude (false) centrifugal term      | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``mach_max_abort``                     | maximum mach number before the code aborts              | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
