@@ -78,7 +78,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         MultiFab::Copy(scal, temp_mf, 0, FirstAux + comp, 1, 0);
     }
 #endif
-    
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -106,7 +106,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                     scal_arr(i, j, k, FirstSpec + comp) / eos_state.rho;
             }
 #if NAUX_NET > 0
-	    for (auto comp = 0; comp < NumAux; ++comp) {
+            for (auto comp = 0; comp < NumAux; ++comp) {
                 eos_state.aux[comp] =
                     scal_arr(i, j, k, FirstAux + comp) / eos_state.rho;
             }
