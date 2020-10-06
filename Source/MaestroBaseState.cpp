@@ -162,7 +162,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                 }
             }
 #if NAUX_NET > 0
-            RealVector aux_ambient(NumAux);
+            RealVector aux_ambient(NumAux, 0.0);
 #endif
 
             // initialize the aux variables
