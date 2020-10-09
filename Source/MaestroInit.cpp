@@ -492,7 +492,7 @@ void Maestro::DivuIter(int istep_divu_iter) {
     Vector<MultiFab> rho_omegadot(finest_level + 1);
     Vector<MultiFab> rho_Hnuc(finest_level + 1);
 #if NAUX_NET > 0
-    Vector<MultiFab> rho_auxdot(finest_level + 1); 
+    Vector<MultiFab> rho_auxdot(finest_level + 1);
 #endif
     Vector<MultiFab> thermal(finest_level + 1);
     Vector<MultiFab> rhohalf(finest_level + 1);
@@ -524,7 +524,7 @@ void Maestro::DivuIter(int istep_divu_iter) {
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
 #if NAUX_NET > 0
-        rho_auxdot[lev].define(grids[lev], dmap[lev], NumAux, 0); 
+        rho_auxdot[lev].define(grids[lev], dmap[lev], NumAux, 0);
 #endif
         thermal[lev].define(grids[lev], dmap[lev], 1, 0);
         rhohalf[lev].define(grids[lev], dmap[lev], 1, 1);
@@ -539,11 +539,11 @@ void Maestro::DivuIter(int istep_divu_iter) {
         rhohalf[lev].setVal(1.);
     }
 
-    React(sold, stemp, rho_Hext, rho_omegadot, rho_Hnuc, 
+    React(sold, stemp, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-          rho_auxdot,  
+          rho_auxdot,
 #endif
-	  p0_old, 0.5 * dt, t_old);
+          p0_old, 0.5 * dt, t_old);
 
     // WriteMF(sold,"a_sold_2levs");
     // Abort();

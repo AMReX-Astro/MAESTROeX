@@ -10,10 +10,10 @@ void Maestro::React(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     Vector<MultiFab>& rho_Hext, Vector<MultiFab>& rho_omegadot,
                     Vector<MultiFab>& rho_Hnuc,
 #if NAUX_NET > 0
-		    Vector<MultiFab>& rho_auxdot,
+                    Vector<MultiFab>& rho_auxdot,
 #endif
-		    const BaseState<Real>& p0,
-                    const Real dt_in, const Real time_in) {
+                    const BaseState<Real>& p0, const Real dt_in,
+                    const Real time_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()", React);
 
@@ -48,9 +48,9 @@ void Maestro::React(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         // we pass in rho_Hext so that we can add it to rhoh in case we applied heating
         Burner(s_in, s_out, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-	       rho_auxdot,
+               rho_auxdot,
 #endif
-	       p0, dt_in, time_in);
+               p0, dt_in, time_in);
 #endif
         // pass temperature through for seeding the temperature update eos call
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -166,7 +166,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot, Vector<MultiFab>& rho_Hnuc,
 #if NAUX_NET > 0
-		     Vector<MultiFab>& rho_auxdot,
+                     Vector<MultiFab>& rho_auxdot,
 #endif
                      const BaseState<Real>& p0, const Real dt_in,
                      const Real time_in) {
@@ -202,7 +202,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         MultiFab& rho_omegadot_mf = rho_omegadot[lev];
         MultiFab& rho_Hnuc_mf = rho_Hnuc[lev];
 #if NAUX_NET > 0
-	MultiFab& rho_auxdot_mf = rho_auxdot[lev];
+        MultiFab& rho_auxdot_mf = rho_auxdot[lev];
 #endif
         const MultiFab& tempbar_cart_mf = tempbar_init_cart[lev];
 
@@ -239,7 +239,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                                  BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                                  BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
 #if NAUX_NET > 0
-				 BL_TO_FORTRAN_ANYD(rho_auxdot_mf[mfi]),
+                                 BL_TO_FORTRAN_ANYD(rho_auxdot_mf[mfi]),
 #endif
                                  BL_TO_FORTRAN_ANYD(tempbar_cart_mf[mfi]),
                                  dt_in, time_in, BL_TO_FORTRAN_ANYD(mask[mfi]),
@@ -254,7 +254,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                             BL_TO_FORTRAN_ANYD(rho_omegadot_mf[mfi]),
                             BL_TO_FORTRAN_ANYD(rho_Hnuc_mf[mfi]),
 #if NAUX_NET > 0
-			    BL_TO_FORTRAN_ANYD(rho_auxdot_mf[mfi]),
+                            BL_TO_FORTRAN_ANYD(rho_auxdot_mf[mfi]),
 #endif
                             tempbar_init_vec.dataPtr(), dt_in, time_in,
                             BL_TO_FORTRAN_ANYD(mask[mfi]), (int)use_mask);

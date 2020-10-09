@@ -95,7 +95,7 @@ void burner_loop(const int* lo, const int* hi, const int lev,
                  amrex::Real* rho_odot, const int* r_lo, const int* r_hi,
                  amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
 #if NAUX_NET > 0
-		 amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
+                 amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
 #endif
                  const amrex::Real* tempbar_init_in, const amrex::Real dt_in,
                  const amrex::Real time_in, const int* mask, const int* m_lo,
@@ -107,12 +107,12 @@ void burner_loop_sphr(const int* lo, const int* hi, const amrex::Real* s_in,
                       const amrex::Real* rho_Hext, const int* e_lo,
                       const int* e_hi, amrex::Real* rho_odot, const int* r_lo,
                       const int* r_hi, amrex::Real* rho_Hnuc, const int* n_lo,
-                      const int* n_hi, 
+                      const int* n_hi,
 #if NAUX_NET > 0
-		      amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
+                      amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
 #endif
-		      const amrex::Real* tempbar_init_cart,
-                      const int* t_lo, const int* t_hi, const amrex::Real dt_in,
+                      const amrex::Real* tempbar_init_cart, const int* t_lo,
+                      const int* t_hi, const amrex::Real dt_in,
                       const amrex::Real time_in, const int* mask,
                       const int* m_lo, const int* m_hi, const int use_mask);
 

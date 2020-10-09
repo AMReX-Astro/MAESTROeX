@@ -1395,7 +1395,7 @@ class Maestro : public amrex::AmrCore {
                amrex::Vector<amrex::MultiFab>& rho_omegadot,
                amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 #if NAUX_NET > 0
-	       amrex::Vector<amrex::MultiFab>& rho_auxdot,
+               amrex::Vector<amrex::MultiFab>& rho_auxdot,
 #endif
                const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
                const amrex::Real time_in);
@@ -1414,7 +1414,7 @@ class Maestro : public amrex::AmrCore {
                 amrex::Vector<amrex::MultiFab>& rho_omegadot,
                 amrex::Vector<amrex::MultiFab>& rho_Hnuc,
 #if NAUX_NET > 0
- 	        amrex::Vector<amrex::MultiFab>& rho_auxdot,
+                amrex::Vector<amrex::MultiFab>& rho_auxdot,
 #endif
                 const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
                 const amrex::Real time_in);

@@ -16,7 +16,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     Vector<MultiFab> S_cc_nph(finest_level + 1);
     Vector<MultiFab> rho_omegadot(finest_level + 1);
 #if NAUX_NET > 0
-    Vector<MultiFab> rho_auxdot(finest_level + 1); 
+    Vector<MultiFab> rho_auxdot(finest_level + 1);
 #endif
     Vector<MultiFab> thermal1(finest_level + 1);
     Vector<MultiFab> thermal2(finest_level + 1);
@@ -109,7 +109,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         S_cc_nph[lev].define(grids[lev], dmap[lev], 1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
 #if NAUX_NET > 0
-        rho_auxdot[lev].define(grids[lev], dmap[lev], NumAux, 0); 
+        rho_auxdot[lev].define(grids[lev], dmap[lev], NumAux, 0);
 #endif
         thermal1[lev].define(grids[lev], dmap[lev], 1, 0);
         thermal2[lev].define(grids[lev], dmap[lev], 1, 0);
@@ -235,11 +235,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     // wallclock time
     Real start_total_react = ParallelDescriptor::second();
 
-    React(sold, s1, rho_Hext, rho_omegadot, rho_Hnuc, 
+    React(sold, s1, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-          rho_auxdot, 
+          rho_auxdot,
 #endif
-	  p0_old, 0.5 * dt, t_old);
+          p0_old, 0.5 * dt, t_old);
 
     // wallclock time
     Real end_total_react = ParallelDescriptor::second() - start_total_react;
@@ -512,11 +512,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2, snew, rho_Hext, rho_omegadot, rho_Hnuc, 
+    React(s2, snew, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-          rho_auxdot, 
+          rho_auxdot,
 #endif
-	  p0_new, 0.5 * dt, t_old + 0.5 * dt);
+          p0_new, 0.5 * dt, t_old + 0.5 * dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;
@@ -782,12 +782,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     // wallclock time
     start_total_react = ParallelDescriptor::second();
 
-    React(s2, snew, rho_Hext, rho_omegadot, rho_Hnuc, 
+    React(s2, snew, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
           rho_auxdot,
 #endif
-	  p0_new, 0.5 * dt,
-          t_old + 0.5 * dt);
+          p0_new, 0.5 * dt, t_old + 0.5 * dt);
 
     // wallclock time
     end_total_react += ParallelDescriptor::second() - start_total_react;

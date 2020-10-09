@@ -84,17 +84,17 @@ void Maestro::DiagFile(const int step, const Real t_in,
 
 #ifndef SDC
     if (dt < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, 
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-	      rho_auxdot, 
+              rho_auxdot,
 #endif
-	      p0_in, small_dt, t_in);
+              p0_in, small_dt, t_in);
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc,  
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc,
 #if NAUX_NET > 0
-	      rho_auxdot, 
+              rho_auxdot,
 #endif
-	      p0_in, dt * 0.5, t_in);
+              p0_in, dt * 0.5, t_in);
     }
 #else
     if (dt < small_dt) {
