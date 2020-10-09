@@ -291,6 +291,13 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     }
     dest_comp += NumSpec;
 
+#if NAUX_NET > 0
+    for (int i = 0; i <= finest_level; ++i) {
+	plot_mf_data[i]->copy(s_in[i], FirstAux, dest_comp, NumAux);
+    }
+    dest_comp += NumAux;
+#endif
+
     if (plot_spec) {
         // X
         for (int i = 0; i <= finest_level; ++i) {
@@ -310,10 +317,27 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         ++dest_comp;
     }
 
+#if NAUX_NET > 0
+    if (plot_aux) {
+        // X
+        for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy(s_in[i], FirstAux, dest_comp, NumAux);
+            for (int comp = 0; comp < NumAux; ++comp) {
+                MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho,
+                                 dest_comp + comp, 1, 0);
+            }
+        }
+        dest_comp += NumAux;
+    }
+#endif
+
     Vector<MultiFab> stemp(finest_level + 1);
     Vector<MultiFab> rho_Hext(finest_level + 1);
     Vector<MultiFab> rho_omegadot(finest_level + 1);
     Vector<MultiFab> rho_Hnuc(finest_level + 1);
+#if NAUX_NET > 0
+    Vector<MultiFab> rho_auxdot(finest_level + 1); 
+#endif
     Vector<MultiFab> sdc_source(finest_level + 1);
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -321,6 +345,9 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         rho_Hext[lev].define(grids[lev], dmap[lev], 1, 0);
         rho_omegadot[lev].define(grids[lev], dmap[lev], NumSpec, 0);
         rho_Hnuc[lev].define(grids[lev], dmap[lev], 1, 0);
+#if NAUX_NET > 0
+        rho_auxdot[lev].define(grids[lev], dmap[lev], NumAux, 0); 
+#endif
         sdc_source[lev].define(grids[lev], dmap[lev], Nscal, 0);
 
         sdc_source[lev].setVal(0.);
@@ -328,11 +355,17 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
 
 #ifndef SDC
     if (dt_in < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, 
+#if NAUX_NET > 0
+              rho_auxdot,
+#endif
+	      p0_in, small_dt, t_in);
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in * 0.5,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, 
+#if NAUX_NET > 0
+              rho_auxdot,
+#endif
+	      p0_in, dt_in * 0.5, t_in);
     }
 #else
     if (dt_in < small_dt) {
@@ -357,6 +390,20 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
             dest_comp += NumSpec;
         }
     }
+
+#if NAUX_NET > 0
+    // auxdot
+    if (plot_auxdot) {
+	for (int i = 0; i <= finest_level; ++i) {
+	    plot_mf_data[i]->copy(rho_auxdot[i], 0, dest_comp, NumAux);
+	    for (int comp = 0; comp < NumAux; ++comp) {
+		MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho,
+				 dest_comp + comp, 1, 0);
+	    }
+	}
+	dest_comp += NumAux;
+    }
+#endif
 
     if (plot_Hext) {
         // Hext
@@ -795,8 +842,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         (*nPlot) += NumSpec;
     }  // omegadot
     // auxiliary variables
-    if (!plot_aux) {
-        (*nPlot) -= NumAux;
+    if (plot_aux) {
+        (*nPlot) += NumAux;
+    }
+    if (plot_auxdot) {
+	(*nPlot) += NumAux;
     }
     if (plot_Hext) {
         (*nPlot)++;
@@ -877,6 +927,28 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         delete[] spec_name;
     }
 
+#if NAUX_NET > 0
+    for (int i = 0; i < NumAux; i++) {
+	int len = 20;
+	Vector<int> int_aux_names(len);
+	//
+	// This call return the actual length of each string in "len"
+	//
+	get_aux_names(int_aux_names.dataPtr(), &i, &len);
+	auto* aux_name = new char[len + 1];
+	for (int j = 0; j < len; j++) {
+	    aux_name[j] = int_aux_names[j];
+	}
+	aux_name[len] = '\0';
+	std::string aux_string = "rhoX(";
+	aux_string += aux_name;
+	aux_string += ')';
+	
+	names[cnt++] = aux_string;
+	delete[] aux_name;
+    }
+#endif
+
     if (plot_spec) {
         for (int i = 0; i < NumSpec; i++) {
             int len = 20;
@@ -902,6 +974,30 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         names[cnt++] = "abar";
     }
 
+#if NAUX_NET > 0
+    if (plot_aux) {
+        for (int i = 0; i < NumAux; i++) {
+            int len = 20;
+            Vector<int> int_aux_names(len);
+            //
+            // This call return the actual length of each string in "len"
+            //
+            get_aux_names(int_aux_names.dataPtr(), &i, &len);
+            auto* aux_name = new char[len + 1];
+            for (int j = 0; j < len; j++) {
+                aux_name[j] = int_aux_names[j];
+            }
+            aux_name[len] = '\0';
+            std::string aux_string = "X(";
+            aux_string += aux_name;
+            aux_string += ')';
+
+            names[cnt++] = aux_string;
+            delete[] aux_name;
+        }
+    }
+#endif
+
     if (plot_spec || plot_omegadot) {
         for (int i = 0; i < NumSpec; i++) {
             int len = 20;
@@ -925,6 +1021,31 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         }
     }
 
+#if NAUX_NET > 0
+    if (plot_auxdot) {
+        for (int i = 0; i < NumAux; i++) {
+            int len = 20;
+            Vector<int> int_aux_names(len);
+            //
+            // This call return the actual length of each string in "len"
+            //
+            get_aux_names(int_aux_names.dataPtr(), &i, &len);
+            auto* aux_name = new char[len + 1];
+            for (int j = 0; j < len; j++) {
+                aux_name[j] = int_aux_names[j];
+            }
+            aux_name[len] = '\0';
+            std::string aux_string = "auxdot(";
+            aux_string += aux_name;
+            aux_string += ')';
+
+            names[cnt++] = aux_string;
+
+            delete[] aux_name;
+        }
+    }
+#endif
+    
     if (plot_Hext) {
         names[cnt++] = "Hext";
     }

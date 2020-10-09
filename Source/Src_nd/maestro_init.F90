@@ -1,7 +1,7 @@
 module maestro_init_module
 
   use amrex_error_module
-  use network, only: network_init, nspec, short_spec_names
+  use network, only: network_init, nspec, short_spec_names, short_aux_names
   use amrex_paralleldescriptor_module, only: parallel_IOProcessor => amrex_pd_ioprocessor
   use amrex_fort_module, only: amrex_spacedim
   use model_parser_module
@@ -153,6 +153,28 @@ contains
     Z = zion(ispec+1)
 
   end subroutine get_spec_az
+
+  ! :::
+  ! ::: ----------------------------------------------------------------
+  ! :::
+
+  subroutine get_aux_names(aux_names,iaux,len) bind(C, name="get_aux_names")
+    ! Binds to C function ``get_aux_names``
+
+    integer, intent(in   ) :: iaux
+    integer, intent(inout) :: len
+    integer, intent(inout) :: aux_names(len)
+
+    ! Local variables
+    integer   :: i
+
+    len = len_trim(short_aux_names(iaux+1))
+
+    do i = 1,len
+       aux_names(i) = ichar(short_aux_names(iaux+1)(i:i))
+    end do
+
+  end subroutine get_aux_names
 
   ! :::
   ! ::: ----------------------------------------------------------------

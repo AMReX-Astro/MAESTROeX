@@ -94,6 +94,9 @@ void burner_loop(const int* lo, const int* hi, const int lev,
                  const amrex::Real* rho_Hext, const int* e_lo, const int* e_hi,
                  amrex::Real* rho_odot, const int* r_lo, const int* r_hi,
                  amrex::Real* rho_Hnuc, const int* n_lo, const int* n_hi,
+#if NAUX_NET > 0
+		 amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
+#endif
                  const amrex::Real* tempbar_init_in, const amrex::Real dt_in,
                  const amrex::Real time_in, const int* mask, const int* m_lo,
                  const int* m_hi, const int use_mask);
@@ -104,7 +107,11 @@ void burner_loop_sphr(const int* lo, const int* hi, const amrex::Real* s_in,
                       const amrex::Real* rho_Hext, const int* e_lo,
                       const int* e_hi, amrex::Real* rho_odot, const int* r_lo,
                       const int* r_hi, amrex::Real* rho_Hnuc, const int* n_lo,
-                      const int* n_hi, const amrex::Real* tempbar_init_cart,
+                      const int* n_hi, 
+#if NAUX_NET > 0
+		      amrex::Real* rho_adot, const int* a_lo, const int* a_hi,
+#endif
+		      const amrex::Real* tempbar_init_cart,
                       const int* t_lo, const int* t_hi, const amrex::Real dt_in,
                       const amrex::Real time_in, const int* mask,
                       const int* m_lo, const int* m_hi, const int use_mask);
@@ -284,6 +291,7 @@ void maestro_conductivity_init();
 void get_num_spec(int* nspec);
 void get_spec_names(int* spec_names, int* ispec, int* len);
 void get_spec_az(const int* ispec, amrex::Real* A, amrex::Real* Z);
+void get_aux_names(int* aux_names, int* iaux, int* len);
 
 // set fortran-specific parameters in meth_params.F90
 void set_method_params(const amrex::Real* prob_lo_in,

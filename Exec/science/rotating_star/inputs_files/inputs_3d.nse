@@ -75,6 +75,9 @@ maestro.plot_int   = 10      # number of timesteps between plot files
 maestro.plot_deltat = -1.
 amr.small_plot_vars = rho Pi p0 tpert circ_velocity radial_velocity
 
+maestro.plot_aux = true
+maestro.plot_auxdot = true
+
 # CHECKPOINT
 maestro.check_base_name = chk
 maestro.chk_int         = 1000
