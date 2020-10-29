@@ -85,7 +85,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                                          base_geom.nr_fine + 1);
 
     bool is_predictor;
-    bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl
@@ -298,11 +297,15 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             // save old-time value
             w0_old.copy(w0);
 
-            // compute w0, w0_force
-            is_predictor = true;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
+            // compute w0, w0_force (for planar, do this later)
+            if (spherical) {
+                is_predictor = true;
+                Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
+                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
+                       dtold, is_predictor);
+            } else {
+                w0.setVal(0.0);
+            }
 
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 #if (AMREX_SPACEDIM == 3)
@@ -311,6 +314,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                 MakeW0mac(w0mac);
             }
 #endif
+        } else {
+            w0.setVal(0.0);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -332,8 +338,18 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         delta_gamma1_term[lev].setVal(0.);
     }
 
-    if (evolve_base_state && !split_projection) {
-        Sbar.copy(1.0 / (gamma1bar_old * p0_old) * (p0_old - p0_nm1) / dtold);
+    // For the planar case, calculate w0 or replace Sbar
+    if (evolve_base_state && !spherical) {
+        if (split_projection) {
+            is_predictor = true;
+            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
+                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
+                   dtold, is_predictor);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        } else {
+            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            ReplaceSbar(Sbar, gamma1bar_old, p0_old, p0_old, p0_nm1, dtold);
+        }
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -341,7 +357,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                        delta_gamma1_term, gamma1bar_old, p0_old, delta_p_term,
                        delta_chi, is_predictor);
 
-    if (spherical && evolve_base_state && split_projection) {
+    if (evolve_base_state && split_projection) {
         // subtract w0mac from umac
         Addw0(umac, w0mac, -1.);
     }
@@ -358,9 +374,12 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_macproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical && evolve_base_state && split_projection) {
+    if (evolve_base_state && split_projection) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
+        // reset w0
+        w0.setVal(0.0);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -457,7 +476,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
         if (!spherical) {
-            MakeEtarho(etarhoflux_dummy);
+            if (split_projection) {
+                MakeEtarhoPlanar(s1, s2, umac);
+            }
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
         }
@@ -603,20 +624,28 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                 Sbar += delta_gamma1_termbar;
             }
 
-            // compute w0, w0_force
-            is_predictor = false;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
-
+            // compute w0, w0_force (planar case later)
+            if (spherical) {
+                is_predictor = false;
+                Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
+                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
+                       dtold, is_predictor);
+            } else {
+                w0.setVal(0.0);
+            }
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+
 #if (AMREX_SPACEDIM == 3)
             if (spherical) {
                 // put w0 on Cartesian edges
                 MakeW0mac(w0mac);
             }
 #endif
+        } else {
+            w0.setVal(0.0);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
+
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -631,8 +660,18 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     is_predictor = false;
     AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
-    if (evolve_base_state && !split_projection) {
-        Sbar.copy(1.0 / (gamma1bar_nph * p0_nph) * (p0_new - p0_old) / dt);
+    // For the planar case, calculate w0 or replace Sbar
+    if (evolve_base_state && !spherical) {
+        if (split_projection) {
+            is_predictor = true;
+            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
+                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
+                   dtold, is_predictor);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        } else {
+            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            ReplaceSbar(Sbar, gamma1bar_nph, p0_nph, p0_new, p0_old, dt);
+        }
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -640,7 +679,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                        delta_gamma1_term, gamma1bar_new, p0_new, delta_p_term,
                        delta_chi, is_predictor);
 
-    if (spherical && evolve_base_state && split_projection) {
+    if (evolve_base_state && split_projection) {
         // subtract w0mac from umac
         Addw0(umac, w0mac, -1.);
     }
@@ -657,9 +696,12 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_macproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical && evolve_base_state && split_projection) {
+    if (evolve_base_state && split_projection) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
+        // reset w0
+        w0.setVal(0.0);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -734,7 +776,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
         if (!spherical) {
-            MakeEtarho(etarhoflux_dummy);
+            if (split_projection) {
+                MakeEtarhoPlanar(s1, s2, umac);
+            }
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
         }
@@ -830,15 +874,20 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             if (use_delta_gamma1_term) {
                 Sbar += delta_gamma1_termbar;
             }
-
-            // compute w0, w0_force
-            is_predictor = false;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
-                   p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
-
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+            if (spherical) {
+                // compute w0, w0_force
+                is_predictor = false;
+                Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
+                       p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
+                       dtold, is_predictor);
+            } else {
+                w0.setVal(0.0);
+            }
+        } else {
+            w0.setVal(0.0);
         }
+
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -862,7 +911,21 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         w0.copy(w0_old);
     }
 
-    if (spherical && evolve_base_state && split_projection) {
+    // For the planar case, calculate w0 or replace Sbar
+    if (evolve_base_state && !spherical) {
+        if (split_projection) {
+            is_predictor = true;
+            Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
+                   p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
+                   dtold, is_predictor);
+            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        } else {
+            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            ReplaceSbar(Sbar, gamma1bar_new, p0_new, p0_new, p0_old, dt);
+        }
+    }
+
+    if (evolve_base_state && split_projection) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
@@ -870,9 +933,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             MultiFab::Subtract(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
                                0);
         }
-    }
-    if (evolve_base_state && !split_projection) {
-        Sbar.copy((p0_new - p0_old) / (dt * gamma1bar_new * p0_new));
     }
 
     int proj_type;
@@ -935,13 +995,17 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (spherical && evolve_base_state && split_projection) {
+    if (evolve_base_state && split_projection) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Add(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
         }
         AverageDown(unew, 0, AMREX_SPACEDIM);
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+
+        // reset w0
+        w0.setVal(0.0);
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     beta0_nm1.copy(0.5 * (beta0_old + beta0_new));

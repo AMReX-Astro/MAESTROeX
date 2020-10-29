@@ -344,6 +344,10 @@ fix_base_state                      bool            false
 # of cell-centered data instead of advecting
 average_base_state                  bool            false       y
 
+# turn on (true) or off (false) split projection when using
+# average_base_state (or others)
+split_projection                    bool            true        y
+
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
 do_smallscale                       bool            false       y
