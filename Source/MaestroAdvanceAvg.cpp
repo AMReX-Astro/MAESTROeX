@@ -347,7 +347,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                    dtold, is_predictor);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         } else {
-            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            // Also update etarho when using the density constraint
+            // MakeEtarhoPlanar(s1, s2, umac, 0.0);
             ReplaceSbar(Sbar, gamma1bar_old, p0_old, p0_old, p0_nm1, dtold);
         }
     }
@@ -669,7 +670,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                    dtold, is_predictor);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         } else {
-            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            // Also update etarho when using the density constraint
+            // MakeEtarhoPlanar(s1, s2, umac, 0.0);
             ReplaceSbar(Sbar, gamma1bar_nph, p0_nph, p0_new, p0_old, dt);
         }
     }
@@ -920,7 +922,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                    dtold, is_predictor);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         } else {
-            MakeEtarhoPlanar(s1, s2, umac, 0.0);
+            // Also update etarho when using the density constraint
+            // MakeEtarhoPlanar(s1, s2, umac, 0.0);
             ReplaceSbar(Sbar, gamma1bar_new, p0_new, p0_new, p0_old, dt);
         }
     }

@@ -63,8 +63,7 @@ void Maestro::ReplaceSbar(BaseState<Real>& Sbar,
                     const BaseState<Real>& p0_in,
                     const BaseState<Real>& p0_new_in,
                     const BaseState<Real>& p0_old_in,
-                    const Real dtold_in)
-{
+                    const Real dtold_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReplaceSbar()", ReplaceSbar);
 
@@ -90,13 +89,14 @@ void Maestro::ReplaceSbar(BaseState<Real>& Sbar,
         for (auto j = 1; j <= base_geom.numdisjointchunks(n); ++j) {
 
             for (auto r = base_geom.r_start_coord(n,j);
-                r <= base_geom.r_end_coord(n,j); ++r) {
+                r <= base_geom.r_end_coord(n, j); ++r) {
 
-                Real gamma1bar_p0 = gamma1bar_arr(n,r) * p0_arr(n,r);
-                Sbar_arr(n,r) = - etarho_cc_arr(n, r) * grav_const_loc / gamma1bar_p0;
-                //Sbar_arr(n,r) = (p0_new_arr(n,r) - p0_old_arr(n,r)) / (gamma1bar_p0 * dt_loc);
+                Real gamma1bar_p0 = gamma1bar_arr(n, r) * p0_arr(n, r);
+                // Using the density constraint may be a better option:
+                // Sbar_arr(n,r) = - etarho_cc_arr(n, r) * grav_const_loc / gamma1bar_p0;
+                Sbar_arr(n, r) = (p0_new_arr(n, r) - p0_old_arr(n, r)) / (gamma1bar_p0 * dt_loc);
                 if (r > base_cutoff_density_coord) {
-                    Sbar_arr(n,r) = 0.0;
+                    Sbar_arr(n, r) = 0.0;
                 }
             }
         }
