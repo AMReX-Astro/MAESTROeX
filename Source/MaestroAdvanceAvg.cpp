@@ -339,7 +339,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         delta_gamma1_term[lev].setVal(0.);
     }
 
-    // For the planar case, calculate w0 or replace Sbar
+    // For the planar case, calculate w0 just before the projection
     if (evolve_base_state && !spherical) {
         if (split_projection) {
             is_predictor = true;
@@ -658,7 +658,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     is_predictor = false;
     AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
-    // For the planar case, calculate w0 or replace Sbar
+    // For the planar case, calculate w0 just before the projection
     if (evolve_base_state && !spherical) {
         if (split_projection) {
             is_predictor = true;
@@ -906,7 +906,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         w0.copy(w0_old);
     }
 
-    // For the planar case, calculate w0 or replace Sbar
+    // For the planar case, calculate w0 just before the projection
     if (evolve_base_state && !spherical) {
         if (split_projection) {
             is_predictor = true;
