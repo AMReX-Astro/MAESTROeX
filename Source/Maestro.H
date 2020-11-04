@@ -1066,8 +1066,7 @@ class Maestro : public amrex::AmrCore {
     void MakeEtarhoPlanar(
         const amrex::Vector<amrex::MultiFab>& scal_old,
         const amrex::Vector<amrex::MultiFab>& scal_new,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
-        const amrex::Real fac=1.0);
+        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac);
 
     // end MaestroMakeEta.cpp functions
     ////////////
@@ -1178,13 +1177,6 @@ class Maestro : public amrex::AmrCore {
                 const BaseState<amrex::Real>& p0_minus_peosbar,
                 const amrex::Real dt_in, const amrex::Real dtold_in,
                 const bool is_predictor);
-
-    void ReplaceSbar(BaseState<Real>& Sbar,
-               const BaseState<Real>& gamma1bar_in,
-               const BaseState<Real>& p0_in,
-               const BaseState<Real>& p0_new_in,
-               const BaseState<Real>& p0_old_in,
-               const Real dtold_in);
 
     void Makew0PlanarVarg(const BaseState<amrex::Real>& w0_old,
                           BaseState<amrex::Real>& w0_force,

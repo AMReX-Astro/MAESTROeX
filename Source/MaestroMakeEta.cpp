@@ -284,7 +284,7 @@ void Maestro::MakeEtarhoSphr(
 
 void Maestro::MakeEtarhoPlanar(
     const Vector<MultiFab>& scal_old, const Vector<MultiFab>& scal_new,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac, const Real fac) {
+    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarhoPlanar()", MakeEtarhoPlanar);
 
@@ -299,7 +299,7 @@ void Maestro::MakeEtarhoPlanar(
     }
 
     BaseState<Real> rho0_nph(max_lev, base_geom.nr_fine);
-    rho0_nph.copy(0.5 * fac * (rho0_old + rho0_new));
+    rho0_nph.copy(0.5 * (rho0_old + rho0_new));
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, false, false, bcs_f, 0);
 
