@@ -85,6 +85,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                                          base_geom.nr_fine + 1);
 
     bool is_predictor;
+    bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl
