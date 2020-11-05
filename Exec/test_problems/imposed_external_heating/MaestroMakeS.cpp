@@ -167,7 +167,7 @@ void Maestro::Make_S_cc(
                     }
 
                     S_cc_arr(i, j, k) =
-                        (1e-13 / eos_state.rho) *
+                        (sigma / eos_state.rho) *
                             (rho_Hext_arr(i, j, k) + rho_Hnuc_arr(i, j, k) +
                              thermal_arr(i, j, k)) +
                         sigma * xi_term +
@@ -240,7 +240,8 @@ void Maestro::Make_S_cc(
                     }
 
                     S_cc_arr(i, j, k) =
-                        (1e-13 / eos_state.rho) *
+                        //(sigma / eos_state.rho) *
+                        (1.0 / eos_state.rho) *
                             (rho_Hext_arr(i, j, k) + rho_Hnuc_arr(i, j, k) +
                              thermal_arr(i, j, k)) +
                         sigma * xi_term +

@@ -4,7 +4,7 @@ using namespace amrex;
 
 // initializes data on a specific level
 void
-Maestro::InitLevelData(const int lev, const Real time, 
+Maestro::InitLevelData(const int lev, const Real time,
                        const MFIter& mfi, const Array4<Real> scal, const Array4<Real> vel)
 {
     // timer for profiling
@@ -16,9 +16,22 @@ Maestro::InitLevelData(const int lev, const Real time,
         Abort("Error: InitLevelData only implemented for 2d.");
     }
 
-    // set velocity to zero 
+    // set velocity the correct value c sin(y/c)/(cos(y/c)+b)
+    const Real H=10.0;
+    const Real pi_=3.141592653589793238462643383279;
+    const Real c=H/pi_;
+    const Real a=2;
+    const Real b=2;
+    const auto prob_lo = geom[lev].ProbLoArray();
+    const auto prob_hi = geom[lev].ProbHiArray();
+    const auto dx = geom[lev].CellSizeArray();
+
     AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n, {
+        const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
         vel(i,j,k,n) = 0.0;
+        if (n == 2) {
+            vel(i,j,k,n) = c * sin(y/c)/(cos(y/c)+b);
+        }
     });
 
     const auto s0_arr = s0_init.const_array();
@@ -36,19 +49,7 @@ Maestro::InitLevelData(const int lev, const Real time,
         }
         // initialize pi to zero for now
         scal(i,j,k,Pi) = 0.0;
-    });    
-
-    // introduce density fluctuations 
-    const auto prob_lo = geom[lev].ProbLoArray();
-    const auto prob_hi = geom[lev].ProbHiArray();
-    const auto dx = geom[lev].CellSizeArray();
-
-    const auto pert_amp_loc = pert_amp;
-    const auto scale_height_loc = scale_height;
-    const auto pres_base_loc = pres_base;
-    const auto k_hoz_loc = k_hoz;
-    const auto k_vert_loc = k_vert;
-    const auto grav_const_loc = fabs(grav_const);
+    });
 
     AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
         const auto r = j;
@@ -83,7 +84,7 @@ Maestro::InitLevelData(const int lev, const Real time,
 }
 
 void
-Maestro::InitLevelDataSphr(const int lev, const Real time, 
+Maestro::InitLevelDataSphr(const int lev, const Real time,
 			   MultiFab& scal, MultiFab& vel)
 {
     Abort("InitLevelDataSphr is not implemented.");
