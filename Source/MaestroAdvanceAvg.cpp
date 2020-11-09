@@ -661,7 +661,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     // For the planar case, calculate w0 just before the projection
     if (evolve_base_state && !spherical) {
         if (split_projection) {
-            is_predictor = true;
+            is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
