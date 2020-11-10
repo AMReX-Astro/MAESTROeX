@@ -281,3 +281,67 @@ void Maestro::MakeEtarhoSphr(
     });
     Gpu::synchronize();
 }
+
+void Maestro::MakeEtarhoPlanar(
+    const Vector<MultiFab>& scal_old, const Vector<MultiFab>& scal_new,
+    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEtarhoPlanar()", MakeEtarhoPlanar);
+
+    const int max_lev = base_geom.max_radial_level + 1;
+    const int nrf = base_geom.nr_fine + 1;
+
+    Vector<MultiFab> eta_cart(finest_level + 1);
+    Vector<MultiFab> rho0_nph_cart(finest_level + 1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        eta_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_nph_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+
+    BaseState<Real> rho0_nph(max_lev, base_geom.nr_fine);
+    rho0_nph.copy(0.5 * (rho0_old + rho0_new));
+
+    Put1dArrayOnCart(rho0_nph, rho0_nph_cart, false, false, bcs_f, 0);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(scal_old[lev], TilingIfNotGPU()); mfi.isValid();
+             ++mfi) {
+            // Get the index space of the valid region
+            const Box& tilebox = mfi.tilebox();
+
+            const Array4<const Real> rho_old = scal_old[lev].array(mfi);
+            const Array4<const Real> rho_new = scal_new[lev].array(mfi);
+            const Array4<const Real> rho0_nph_cart_arr =
+                rho0_nph_cart[lev].array(mfi);
+#if (AMREX_SPACEDIM == 2)
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+#else
+            const Array4<const Real> vmac = umac[lev][2].array(mfi);
+#endif
+            const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+
+#if (AMREX_SPACEDIM == 2)
+                Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j + 1, k));
+#else
+                Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j, k + 1));
+#endif
+                // construct time-centered [ rho' (U dot e_r) ]
+                eta_cart_arr(i, j, k) =
+                    (0.5 * (rho_old(i, j, k) + rho_new(i, j, k))- rho0_nph_cart_arr(i,j,k) ) * U_dot_er;
+            });
+        }  // end MFIter loop
+    }      // end loop over levels
+
+    // average fine data onto coarser cells & fill ghost cells
+    AverageDown(eta_cart, 0, 1);
+    FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
+
+    // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
+    Average(eta_cart, etarho_cc, 0);
+}
