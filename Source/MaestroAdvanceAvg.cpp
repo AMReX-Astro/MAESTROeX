@@ -302,8 +302,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             if (spherical) {
                 is_predictor = true;
                 Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
+                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar,
+                       dt, dtold, is_predictor);
             } else {
                 w0.setVal(0.0);
             }
@@ -626,8 +626,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             if (spherical) {
                 is_predictor = false;
                 Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
+                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar,
+                       dt, dtold, is_predictor);
             } else {
                 w0.setVal(0.0);
             }
@@ -643,7 +643,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             w0.setVal(0.0);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -873,8 +872,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                 // compute w0, w0_force
                 is_predictor = false;
                 Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
-                       p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
+                       p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar,
+                       dt, dtold, is_predictor);
             } else {
                 w0.setVal(0.0);
             }
