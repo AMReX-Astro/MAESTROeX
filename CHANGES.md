@@ -1,3 +1,37 @@
+# 20.11
+
+  * Update cpp linter action
+
+# 20.10
+
+  * Added input parameter to toggle centrifugal force
+
+  * Enabled control for toggling AMReX fancy bottom solver
+
+  * Updated test problem: fully convective star
+
+# 20.09
+
+  * Bug fix for SDC multilevel problems
+
+  * Fixed non-deterministic issue with GPU runs
+
+  * Parameters header files are now created at build time
+
+  * Updated Urca test problem
+
+# 20.08
+
+  * Bug fix: tagging issues are resolved when finest_level < max_radial_level
+
+  * Fixed dpdt implementation and SDC algorithm for thermal diffusion
+
+  * Various bug fixes
+  
+  * Implemented clang-format
+
+  * Added Github actions: version release, checkout submodule development branches
+
 # 20.07
 
   * The master branch has been renamed the main branch. If you have an

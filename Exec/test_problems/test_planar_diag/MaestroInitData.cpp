@@ -47,7 +47,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto pres_base_loc = pres_base;
     const auto k_hoz_loc = k_hoz;
     const auto k_vert_loc = k_vert;
-    const auto grav_const_loc = fabs(grav_const);
+    const auto grav_const_loc = amrex::Math::abs(grav_const);
 
     ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         const auto r = j;

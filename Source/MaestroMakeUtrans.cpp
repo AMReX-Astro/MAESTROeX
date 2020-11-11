@@ -152,7 +152,7 @@ void Maestro::MakeUtrans(
 
                 // solve Riemann problem using full velocity
                 bool test = (ulx <= 0.0 && urx >= 0.0) ||
-                            (fabs(ulx + urx) < rel_eps_local);
+                            (amrex::Math::abs(ulx + urx) < rel_eps_local);
                 utrans_arr(i, j, k) = 0.5 * (ulx + urx) > 0.0 ? ulx : urx;
                 utrans_arr(i, j, k) = test ? 0.0 : utrans_arr(i, j, k);
             });
@@ -255,8 +255,9 @@ void Maestro::MakeUtrans(
                 bool test =
                     (vly + w0_arr(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                      vry + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-                    (fabs(vly + vry +
-                          2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
+                    (amrex::Math::abs(vly + vry +
+                                      2.0 *
+                                          w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
                      rel_eps_local);
                 vtrans_arr(i, j, k) =
                     0.5 * (vly + vry) + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >
@@ -367,10 +368,11 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (ulx + w0macx(i, j, k) <= 0.0 &&
-                                 urx + w0macx(i, j, k) >= 0.0) ||
-                                (fabs(ulx + urx + 2.0 * w0macx(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (ulx + w0macx(i, j, k) <= 0.0 &&
+                         urx + w0macx(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(ulx + urx + 2.0 * w0macx(i, j, k)) <
+                         rel_eps_local);
                     utrans_arr(i, j, k) =
                         0.5 * (ulx + urx) + w0macx(i, j, k) > 0.0 ? ulx : urx;
                     utrans_arr(i, j, k) = test ? 0.0 : utrans_arr(i, j, k);
@@ -378,7 +380,7 @@ void Maestro::MakeUtrans(
                 } else {
                     // solve Riemann problem using full velocity
                     bool test = (ulx <= 0.0 && urx >= 0.0) ||
-                                (fabs(ulx + urx) < rel_eps_local);
+                                (amrex::Math::abs(ulx + urx) < rel_eps_local);
                     utrans_arr(i, j, k) = 0.5 * (ulx + urx) > 0.0 ? ulx : urx;
                     utrans_arr(i, j, k) = test ? 0.0 : utrans_arr(i, j, k);
                 }
@@ -482,17 +484,18 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (vly + w0macy(i, j, k) <= 0.0 &&
-                                 vry + w0macy(i, j, k) >= 0.0) ||
-                                (fabs(vly + vry + 2.0 * w0macy(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (vly + w0macy(i, j, k) <= 0.0 &&
+                         vry + w0macy(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(vly + vry + 2.0 * w0macy(i, j, k)) <
+                         rel_eps_local);
                     vtrans_arr(i, j, k) =
                         0.5 * (vly + vry) + w0macy(i, j, k) > 0.0 ? vly : vry;
                     vtrans_arr(i, j, k) = test ? 0.0 : vtrans_arr(i, j, k);
                 } else {
                     // solve Riemann problem using full velocity
                     bool test = (vly <= 0.0 && vry >= 0.0) ||
-                                (fabs(vly + vry) < rel_eps_local);
+                                (amrex::Math::abs(vly + vry) < rel_eps_local);
                     vtrans_arr(i, j, k) = 0.5 * (vly + vry) > 0.0 ? vly : vry;
                     vtrans_arr(i, j, k) = test ? 0.0 : vtrans_arr(i, j, k);
                 }
@@ -596,10 +599,11 @@ void Maestro::MakeUtrans(
 
                 if (spherical) {
                     // solve Riemann problem using full velocity
-                    bool test = (wlz + w0macz(i, j, k) <= 0.0 &&
-                                 wrz + w0macz(i, j, k) >= 0.0) ||
-                                (fabs(wlz + wrz + 2.0 * w0macz(i, j, k)) <
-                                 rel_eps_local);
+                    bool test =
+                        (wlz + w0macz(i, j, k) <= 0.0 &&
+                         wrz + w0macz(i, j, k) >= 0.0) ||
+                        (amrex::Math::abs(wlz + wrz + 2.0 * w0macz(i, j, k)) <
+                         rel_eps_local);
                     wtrans_arr(i, j, k) =
                         0.5 * (wlz + wrz) + w0macz(i, j, k) > 0.0 ? wlz : wrz;
                     wtrans_arr(i, j, k) = test ? 0.0 : wtrans_arr(i, j, k);
@@ -608,8 +612,9 @@ void Maestro::MakeUtrans(
                     bool test =
                         (wlz + w0_arr(i, j, k, AMREX_SPACEDIM - 1) <= 0.0 &&
                          wrz + w0_arr(i, j, k, AMREX_SPACEDIM - 1) >= 0.0) ||
-                        (fabs(wlz + wrz +
-                              2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
+                        (amrex::Math::abs(
+                             wlz + wrz +
+                             2.0 * w0_arr(i, j, k, AMREX_SPACEDIM - 1)) <
                          rel_eps_local);
                     wtrans_arr(i, j, k) =
                         0.5 * (wlz + wrz) +

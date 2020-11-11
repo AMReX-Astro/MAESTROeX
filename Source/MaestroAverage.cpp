@@ -55,14 +55,29 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                 const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
 
+#ifdef AMREX_USE_CUDA
+                // Atomic::Add is non-deterministic on the GPU. If this flag is true,
+                // run on the CPU instead
+                bool launched;
+                if (deterministic_nodal_solve) {
+                    launched = !Gpu::notInLaunchRegion();
+                    // turn off GPU
+                    if (launched) Gpu::setLaunchRegion(false);
+                }
+#endif
+
                 ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     int r = AMREX_SPACEDIM == 2 ? j : k;
-#if (AMREX_SPACEDIM == 2)
-                    if (k == 0)
-#endif
-                        amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, r)),
-                                                       phi_arr(i, j, k));
+                    amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, r)),
+                                                   phi_arr(i, j, k));
                 });
+
+#ifdef AMREX_USE_CUDA
+                if (deterministic_nodal_solve) {
+                    // turn GPU back on
+                    if (launched) Gpu::setLaunchRegion(true);
+                }
+#endif
             }
         }
 
@@ -218,6 +233,17 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                 bool use_mask = !(lev == fine_lev - 1);
 
+#ifdef AMREX_USE_CUDA
+                // Atomic::Add is non-deterministic on the GPU. If this flag is true,
+                // run on the CPU instead
+                bool launched;
+                if (deterministic_nodal_solve) {
+                    launched = !Gpu::notInLaunchRegion();
+                    // turn off GPU
+                    if (launched) Gpu::setLaunchRegion(false);
+                }
+#endif
+
                 ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
@@ -234,13 +260,15 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                         Real radius = sqrt(x * x + y * y + z * z);
 
                         // figure out which radii index this point maps into
-                        auto index = (int)round(
+                        auto index = (int)amrex::Math::round(
                             ((radius / dx[0]) * (radius / dx[0]) - 0.75) / 2.0);
 
                         // due to roundoff error, need to ensure that we are in the proper radial bin
                         if (index < nr_irreg) {
-                            if (fabs(radius - radii(lev, index + 1)) >
-                                fabs(radius - radii(lev, index + 2))) {
+                            if (amrex::Math::abs(radius -
+                                                 radii(lev, index + 1)) >
+                                amrex::Math::abs(radius -
+                                                 radii(lev, index + 2))) {
                                 index++;
                             }
                         }
@@ -251,6 +279,13 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                                                        1);
                     }
                 });
+
+#ifdef AMREX_USE_CUDA
+                if (deterministic_nodal_solve) {
+                    // turn GPU back on
+                    if (launched) Gpu::setLaunchRegion(true);
+                }
+#endif
             }
         }
 
@@ -296,8 +331,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // for each level, find the closest coordinate
             for (auto n = 0; n < fine_lev; ++n) {
                 for (auto j = rcoord_p[n]; j <= nr_irreg; ++j) {
-                    if (fabs(radius - radii(n, j + 1)) <
-                        fabs(radius - radii(n, j + 2))) {
+                    if (amrex::Math::abs(radius - radii(n, j + 1)) <
+                        amrex::Math::abs(radius - radii(n, j + 2))) {
                         rcoord_p[n] = j;
                         break;
                     }
@@ -315,14 +350,14 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // choose the level with the largest min over the ncell interpolation points
             which_lev(r) = 0;
 
-            int min_all =
-                amrex::min(ncell(0, rcoord_p[0]), ncell(0, rcoord_p[0] + 1),
-                           ncell(0, rcoord_p[0] + 2));
+            int min_all = amrex::min(ncell(0, rcoord_p[0]),
+                                     amrex::min(ncell(0, rcoord_p[0] + 1),
+                                                ncell(0, rcoord_p[0] + 2)));
 
             for (auto n = 1; n < fine_lev; ++n) {
-                int min_lev =
-                    amrex::min(ncell(n, rcoord_p[n]), ncell(n, rcoord_p[n] + 1),
-                               ncell(n, rcoord_p[n] + 2));
+                int min_lev = amrex::min(ncell(n, rcoord_p[n]),
+                                         amrex::min(ncell(n, rcoord_p[n] + 1),
+                                                    ncell(n, rcoord_p[n] + 2)));
 
                 if (min_lev > min_all) {
                     min_all = min_lev;
@@ -391,8 +426,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
             // find the closest coordinate
             for (auto j = stencil_coord; j <= max_rcoord(which_lev(r)); ++j) {
-                if (fabs(radius - radii(which_lev(r), j + 1)) <
-                    fabs(radius - radii(which_lev(r), j + 2))) {
+                if (amrex::Math::abs(radius - radii(which_lev(r), j + 1)) <
+                    amrex::Math::abs(radius - radii(which_lev(r), j + 2))) {
                     stencil_coord = j;
                     break;
                 }

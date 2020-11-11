@@ -7,13 +7,14 @@
 
 ![MAESTROeX](https://github.com/AMReX-Astro/MAESTROeX/blob/development/Util/logo/maestroex_200px.png)
 
-*a C++/F90 low Mach number stellar hydrodynamics code*
+*a C++ low Mach number stellar hydrodynamics code*
 
 MAESTROeX solves the equations of low Mach number hydrodynamics for
 stratified atmospheres/full spherical stars with a general equation of state,
 and nuclear reaction networks in an adaptive-grid finite-volume framework. It
 includes reactions and thermal diffusion and can be used on anything
-from a single core to 100,000s of processor cores with MPI + OpenMP.
+from a single core to 100,000s of processor cores with MPI + OpenMP or 1,000s
+of GPUs.
 
 A description of the algorithm and links to the algorithm papers can be found here:
 
@@ -22,51 +23,76 @@ http://amrex-astro.github.io/MAESTROeX/
 
 ## Getting started
 
-- MAESTROeX requires a C++ compiler that supports the C++11 standard, a Fortran compiler that supports the Fortran 2003 standard, and a C compiler that supports the C99 standard. Several compiler suites are supported, including GNU, Intel, PGI and Cray. GNU Make is also required, as is Python (>= 2.7, including 3) and standard tools available in any Unix-like environments (e.g., Perl and `sed`).
+- MAESTROeX requires a C++ compiler that supports the C++11 standard,
+  a Fortran compiler that supports the Fortran 2003 standard, and a C
+  compiler that supports the C99 standard. Several compiler suites are
+  supported, including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also
+  required, as is Python (>= 3.6) and standard tools available in any
+  Unix-like environments (e.g., Perl and `sed`).
 
-- To stay up-to-date with MAESTROeX, you will want to periodically pull changes
-from the repository by typing `git pull`.
+  For GPU computing, CUDA 10 or later is requred.
 
-- To get things running, you will need to get a copy of Microphysics and AMReX.
-Both are available on github and can be obtained via:
+- To stay up-to-date with MAESTROeX, you will want to periodically
+  pull changes from the repository by typing `git pull`.
 
-```
-git clone https://github.com/starkiller-astro/Microphysics.git
-git clone https://github.com/AMReX-Codes/amrex.git
-```
+- To get things running, you will need to get a copy of Microphysics
+  and AMReX.  Both are available on github separately or as submodules.
 
-- You will then need to setup your shell environment to tell MAESTROeX where to
-find AMReX and Microphysics. Define the `AMREX_HOME` environment variable to point
-to the `amrex/` directory, and `MICROPHYSICS_HOME` environment variable to point
-to the `Microphysics/` directory. For example, if your shell is Bash:
+  To clone MAESTROeX with the submodules, do:
 
-```
-export AMREX_HOME="/path/to/amrex/"
-export MICROPHYSICS_HOME='/path/to/Microphysics" 
-```
+  ```
+  git clone --recursive https://github.com/AMReX-Astro/MAESTROeX.git
+  ```
 
-Note: you must specify the full path to the directories. 
-Do not use `∼` to refer to your home directory; the scripts used by 
-the build system will not be able to process this.
+  To add the submodules to an exisiting clone, from the top-level
+  MAESTROeX directory, do:
 
-- Change directory to correspond to the problem that you want to run. Each problem lives under 
-one of three sub-directories of `MAESTROeX/Exec/`: `SCIENCE/`, `TEST_PROBLEMS/`, or `UNIT_TESTS/`.
-Then build the executable and run it by specifying an input file. 
+  ```
+  git submodule update --init --recursive
+  ```
+
+  If you want to get the AMReX and Microphysics separately, they can
+  be directly cloned as:
+
+  ```
+  git clone https://github.com/starkiller-astro/Microphysics.git
+  git clone https://github.com/AMReX-Codes/amrex.git
+  ```
+
+- You will then need to setup your shell environment to tell MAESTROeX
+  where to find AMReX and Microphysics. Define the `AMREX_HOME`
+  environment variable to point to the `amrex/` directory, and
+  `MICROPHYSICS_HOME` environment variable to point to the
+  `Microphysics/` directory. For example, if your shell is Bash:
+
+  ```
+  export AMREX_HOME="/path/to/amrex/"
+  export MICROPHYSICS_HOME='/path/to/Microphysics" 
+  ```
+
+  Note: you must specify the full path to the directories.  Do not use
+  `∼` to refer to your home directory; the scripts used by the build
+  system will not be able to process this.
+
+- Change directory to correspond to the problem that you want to
+  run. Each problem lives under one of three sub-directories of
+  `MAESTROeX/Exec/`: `SCIENCE/`, `TEST_PROBLEMS/`, or `UNIT_TESTS/`.
+  Then build the executable and run it by specifying an input file.
 
     * For example, to run the standard reacting_bubble problem in 2-D:
 
-    ```
-    cd MAESTROeX/Exec/TEST_PROBLEMS/reacting_bubble/
-    make DIM=2
-    ./Maestro2d.gnu.ex inputs_2d_C
-    ```
+      ```
+      cd MAESTROeX/Exec/TEST_PROBLEMS/reacting_bubble/
+      make DIM=2
+      ./Maestro2d.gnu.ex inputs_2d_C
+      ```
 
-- The plotfiles (named `pltXXXXXXX`) are in BoxLib/AMReX format and can be visualized 
-using Amrvis, VisIt, and yt.
+- The plotfiles (named `pltXXXXXXX`) are in BoxLib/AMReX format and
+  can be visualized using yt, Amrvis, and VisIt.
 
 
-For more detailed instructions on how to run the code and available test problems, 
-refer to MAESTROeX User's Guide: 
+For more detailed instructions on how to run the code and available
+test problems, refer to MAESTROeX User's Guide:
 
 https://amrex-astro.github.io/MAESTROeX/docs/getting_started.html
 

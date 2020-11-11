@@ -17,7 +17,7 @@ jobs:
           cd ../..
 
       - name: Run cpp linter
-        uses: AMReX-Astro/cpp-linter-action@master
+        uses: AMReX-Astro/cpp-linter-action@main
         with: 
           build_path: 'Exec/science/wdconvect'
           make_options: '-j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3 DEBUG=TRUE'

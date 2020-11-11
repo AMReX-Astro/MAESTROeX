@@ -29,18 +29,15 @@ Compiling
    
 #. *make issues an error like:*
 
-   .. raw:: latex
-
-      \small
-
    ::
 
-              .../BoxLib/Tools/F_mk/GMakeMPI.mak:40: Extraneous text after `else' directive
-              .../BoxLib/Tools/F_mk/GMakeMPI.mak:47: *** only one `else' per conditional.  Stop
+      $ make
+      Loading /home/zingale/development/amrex//Tools/GNUMake/comps/gnu.mak...
+      Loading /home/zingale/development/amrex//Tools/GNUMake/sites/Make.unknown...
+      /home/zingale/development/amrex//Tools/GNUMake/Make.rules:476: tmp_build_dir/d/3d.gnu.MPI.EXE/f90.depends: No such file or directory
+      make: *** No rule to make target `meth_params.F90', needed by `tmp_build_dir/d/3d.gnu.MPI.EXE/f90.depends'.  Stop.
 
-
-   You need to use GNU make version 3.81 or later. Earlier versions do
-   not support an *else-if* clause.
+   You need to use GNU make version 3.82 or later.
 
 Running
 =======

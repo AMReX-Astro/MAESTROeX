@@ -168,9 +168,15 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     }
 
     LPInfo info;
-    info.setAgglomeration(true);
-    info.setConsolidation(true);
     info.setMetricTerm(false);
+
+    if (hg_bottom_solver == 4) {
+        info.setAgglomeration(true);
+        info.setConsolidation(true);
+    } else {
+        info.setAgglomeration(false);
+        info.setConsolidation(false);
+    }
 
     // Only pass up to defined level to prevent looping over undefined grids.
     MLNodeLaplacian mlndlap(Geom(0, finest_level), grids, dmap, info);
@@ -234,7 +240,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 
     MLMG mlmg(mlndlap);
     mlmg.setVerbose(mg_verbose);
-    mlmg.setCGVerbose(cg_verbose);
+    mlmg.setBottomVerbose(cg_verbose);
 
     Real abs_tol = -1.;  // disable absolute tolerance
     Real rel_tol = 1.e-3;
@@ -257,25 +263,25 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
             }
         } else {
             if (istep_divu_iter == init_divu_iter) {
-                rel_tol = std::min(
+                rel_tol = amrex::min(
                     eps_divu_cart * pow(divu_level_factor, finest_level),
                     eps_divu_cart * pow(divu_level_factor, 2));
             } else if (istep_divu_iter == init_divu_iter - 1) {
-                rel_tol = std::min(eps_divu_cart * divu_iter_factor *
-                                       pow(divu_level_factor, finest_level),
-                                   eps_divu_cart * divu_iter_factor *
-                                       pow(divu_level_factor, 2));
+                rel_tol = amrex::min(eps_divu_cart * divu_iter_factor *
+                                         pow(divu_level_factor, finest_level),
+                                     eps_divu_cart * divu_iter_factor *
+                                         pow(divu_level_factor, 2));
             } else if (istep_divu_iter <= init_divu_iter - 2) {
-                rel_tol = std::min(eps_divu_cart * pow(divu_iter_factor, 2) *
-                                       pow(divu_level_factor, finest_level),
-                                   eps_divu_cart * pow(divu_iter_factor, 2) *
-                                       pow(divu_level_factor, 2));
+                rel_tol = amrex::min(eps_divu_cart * pow(divu_iter_factor, 2) *
+                                         pow(divu_level_factor, finest_level),
+                                     eps_divu_cart * pow(divu_iter_factor, 2) *
+                                         pow(divu_level_factor, 2));
             }
         }
     } else if (proj_type == pressure_iters_comp ||
                proj_type == regular_timestep_comp) {
         rel_tol =
-            std::min(eps_hg_max, eps_hg * pow(hg_level_factor, finest_level));
+            amrex::min(eps_hg_max, eps_hg * pow(hg_level_factor, finest_level));
     }
 
     // solve for phi

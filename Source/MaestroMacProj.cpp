@@ -135,6 +135,15 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     // Set up implicit solve using MLABecLaplacian class
     //
     LPInfo info;
+    info.setMetricTerm(false);
+
+    if (mg_bottom_solver == 4) {
+        info.setAgglomeration(true);
+        info.setConsolidation(true);
+    } else {
+        info.setAgglomeration(false);
+        info.setConsolidation(false);
+    }
 
     // Only pass up to defined level to prevent looping over undefined grids.
     MLABecLaplacian mlabec(Geom(0, finest_level), grids, dmap, info);
@@ -164,12 +173,12 @@ void Maestro::MacProj(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
 
     // set solver parameters
     mac_mlmg.setVerbose(mg_verbose);
-    mac_mlmg.setCGVerbose(cg_verbose);
+    mac_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     const Real mac_tol_abs = -1.e0;
     const Real mac_tol_rel =
-        std::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
+        amrex::min(eps_mac * pow(mac_level_factor, finest_level), eps_mac_max);
 
     // solve for phi
     mac_mlmg.solve(GetVecOfPtrs(macphi), GetVecOfConstPtrs(solverrhs),

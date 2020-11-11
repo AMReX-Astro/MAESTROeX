@@ -58,6 +58,7 @@ CEXE_sources += MaestroVelPred.cpp
 ifeq ($(USE_ROTATION), TRUE)
     CEXE_sources += MaestroRotation.cpp
 endif
+CEXE_sources += runparams_defaults.cpp
 
 CEXE_headers += BaseState.H
 CEXE_headers += BaseStateGeometry.H
@@ -67,5 +68,9 @@ CEXE_headers += MaestroInletBCs.H
 CEXE_headers += MaestroPlot.H
 CEXE_headers += MaestroUtil.H
 CEXE_headers += PhysBCFunctMaestro.H
+CEXE_headers += state_indices.H
+
+F90EXE_sources += meth_params.F90
+F90EXE_sources += state_indices_nd.F90
 
 FEXE_headers += Maestro_F.H

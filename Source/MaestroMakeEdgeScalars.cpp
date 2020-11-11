@@ -142,12 +142,16 @@ void Maestro::MakeEdgeScal(Vector<MultiFab>& state,
                     }
                 }
 
+                Gpu::synchronize();
+
                 // Create s_{\i-\half\e_x}^x, etc.
 
                 MakeEdgeScalPredictor(
                     mfi, slx_arr, srx_arr, sly_arr, sry_arr, scal_arr,
                     Ip.array(mfi), Im.array(mfi), umac_arr, vmac_arr, simhx_arr,
                     simhy_arr, domainBox, bcs, dx, scomp, bccomp, is_vel);
+
+                Gpu::synchronize();
 
                 Array4<Real> const sedgex_arr = sedge[lev][0].array(mfi);
                 Array4<Real> const sedgey_arr = sedge[lev][1].array(mfi);
@@ -353,7 +357,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srx(i, j, k) = s(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    srx(i, j, k) = min(srx(i, j, k), 0.0);
+                    srx(i, j, k) = amrex::min(srx(i, j, k), 0.0);
                 }
                 slx(i, j, k) = srx(i, j, k);
             } else if (bclo == REFLECT_EVEN) {
@@ -370,7 +374,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srx(i, j, k) = s(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    slx(i, j, k) = max(slx(i, j, k), 0.0);
+                    slx(i, j, k) = amrex::max(slx(i, j, k), 0.0);
                 }
                 srx(i, j, k) = slx(i, j, k);
             } else if (bchi == REFLECT_EVEN) {
@@ -383,7 +387,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhx by solving Riemann problem
         simhx(i, j, k) = (umac(i, j, k) > 0.0) ? slx(i, j, k) : srx(i, j, k);
-        simhx(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhx(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                              ? simhx(i, j, k)
                              : 0.5 * (slx(i, j, k) + srx(i, j, k));
     });
@@ -412,7 +416,7 @@ void Maestro::MakeEdgeScalPredictor(
                 sry(i, j, k) = s(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sry(i, j, k) = min(sry(i, j, k), 0.0);
+                    sry(i, j, k) = amrex::min(sry(i, j, k), 0.0);
                 }
                 sly(i, j, k) = sry(i, j, k);
             } else if (bclo == REFLECT_EVEN) {
@@ -429,7 +433,7 @@ void Maestro::MakeEdgeScalPredictor(
                 sry(i, j, k) = s(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sly(i, j, k) = max(sly(i, j, k), 0.0);
+                    sly(i, j, k) = amrex::max(sly(i, j, k), 0.0);
                 }
                 sry(i, j, k) = sly(i, j, k);
             } else if (bchi == REFLECT_EVEN) {
@@ -442,7 +446,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhy by solving Riemann problem
         simhy(i, j, k) = (vmac(i, j, k) > 0.0) ? sly(i, j, k) : sry(i, j, k);
-        simhy(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhy(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                              ? simhy(i, j, k)
                              : 0.5 * (sly(i, j, k) + sry(i, j, k));
     });
@@ -520,9 +524,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (fabs(umac(i, j, k)) > rel_eps_local)
-                                    ? sedgex(i, j, k, comp)
-                                    : 0.5 * (sedgelx + sedgerx);
+        sedgex(i, j, k, comp) =
+            (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
+                ? sedgex(i, j, k, comp)
+                : 0.5 * (sedgelx + sedgerx);
 
         // impose lo side bc's
         if (i == domlo[0]) {
@@ -530,7 +535,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgex(i, j, k, comp) = s(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    sedgex(i, j, k, comp) = min(sedgerx, 0.0);
+                    sedgex(i, j, k, comp) = amrex::min(sedgerx, 0.0);
                 } else {
                     sedgex(i, j, k, comp) = sedgerx;
                 }
@@ -546,7 +551,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgex(i, j, k, comp) = s(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    sedgex(i, j, k, comp) = max(sedgelx, 0.0);
+                    sedgex(i, j, k, comp) = amrex::max(sedgelx, 0.0);
                 } else {
                     sedgex(i, j, k, comp) = sedgelx;
                 }
@@ -599,9 +604,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (fabs(vmac(i, j, k)) > rel_eps_local)
-                                    ? sedgey(i, j, k, comp)
-                                    : 0.5 * (sedgely + sedgery);
+        sedgey(i, j, k, comp) =
+            (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
+                ? sedgey(i, j, k, comp)
+                : 0.5 * (sedgely + sedgery);
 
         // impose lo side bc's
         if (j == domlo[1]) {
@@ -609,7 +615,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgey(i, j, k, comp) = s(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sedgey(i, j, k, comp) = min(sedgery, 0.0);
+                    sedgey(i, j, k, comp) = amrex::min(sedgery, 0.0);
                 } else {
                     sedgey(i, j, k, comp) = sedgery;
                 }
@@ -625,7 +631,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgey(i, j, k, comp) = s(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sedgey(i, j, k, comp) = max(sedgely, 0.0);
+                    sedgey(i, j, k, comp) = amrex::max(sedgely, 0.0);
                 } else {
                     sedgey(i, j, k, comp) = sedgely;
                 }
@@ -708,7 +714,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srx(i, j, k) = scal(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    srx(i, j, k) = min(srx(i, j, k), 0.0);
+                    srx(i, j, k) = amrex::min(srx(i, j, k), 0.0);
                 }
                 slx(i, j, k) = srx(i, j, k);
             } else if (bclo == REFLECT_EVEN) {
@@ -725,7 +731,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srx(i, j, k) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    slx(i, j, k) = max(slx(i, j, k), 0.0);
+                    slx(i, j, k) = amrex::max(slx(i, j, k), 0.0);
                 }
                 srx(i, j, k) = slx(i, j, k);
             } else if (bchi == REFLECT_EVEN) {
@@ -738,7 +744,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhx by solving Riemann problem
         simhx(i, j, k) = (umac(i, j, k) > 0.0) ? slx(i, j, k) : srx(i, j, k);
-        simhx(i, j, k) = (fabs(umac(i, j, k)) > 0.0)
+        simhx(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > 0.0)
                              ? simhx(i, j, k)
                              : 0.5 * (slx(i, j, k) + srx(i, j, k));
     });
@@ -766,7 +772,7 @@ void Maestro::MakeEdgeScalPredictor(
                 sry(i, j, k) = scal(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sry(i, j, k) = min(sry(i, j, k), 0.0);
+                    sry(i, j, k) = amrex::min(sry(i, j, k), 0.0);
                 }
                 sly(i, j, k) = sry(i, j, k);
             } else if (bclo == REFLECT_EVEN) {
@@ -782,7 +788,7 @@ void Maestro::MakeEdgeScalPredictor(
                 sry(i, j, k) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sly(i, j, k) = max(sly(i, j, k), 0.0);
+                    sly(i, j, k) = amrex::max(sly(i, j, k), 0.0);
                 }
                 sry(i, j, k) = sly(i, j, k);
             } else if (bchi == REFLECT_EVEN) {
@@ -795,7 +801,7 @@ void Maestro::MakeEdgeScalPredictor(
 
         // make simhy by solving Riemann problem
         simhy(i, j, k) = (vmac(i, j, k) > 0.0) ? sly(i, j, k) : sry(i, j, k);
-        simhy(i, j, k) = (fabs(vmac(i, j, k)) > 0.0)
+        simhy(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > 0.0)
                              ? simhy(i, j, k)
                              : 0.5 * (sly(i, j, k) + sry(i, j, k));
     });
@@ -823,7 +829,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srz(i, j, k) = scal(i, j, k - 1, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    srz(i, j, k) = min(srz(i, j, k), 0.0);
+                    srz(i, j, k) = amrex::min(srz(i, j, k), 0.0);
                 }
                 slz(i, j, k) = srz(i, j, k);
             } else if (bclo == REFLECT_EVEN) {
@@ -839,7 +845,7 @@ void Maestro::MakeEdgeScalPredictor(
                 srz(i, j, k) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    slz(i, j, k) = max(slz(i, j, k), 0.0);
+                    slz(i, j, k) = amrex::max(slz(i, j, k), 0.0);
                 }
                 srz(i, j, k) = slz(i, j, k);
             } else if (bchi == REFLECT_EVEN) {
@@ -851,7 +857,7 @@ void Maestro::MakeEdgeScalPredictor(
         }
 
         simhz(i, j, k) = (wmac(i, j, k) > 0.0) ? slz(i, j, k) : srz(i, j, k);
-        simhz(i, j, k) = (fabs(wmac(i, j, k)) > 0.0)
+        simhz(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > 0.0)
                              ? simhz(i, j, k)
                              : 0.5 * (slz(i, j, k) + srz(i, j, k));
     });
@@ -931,7 +937,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srxy = scal(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    srxy = min(srxy, 0.0);
+                    srxy = amrex::min(srxy, 0.0);
                 }
                 slxy = srxy;
             } else if (bclo == REFLECT_EVEN) {
@@ -948,7 +954,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srxy = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    slxy = max(slxy, 0.0);
+                    slxy = amrex::max(slxy, 0.0);
                 }
                 srxy = slxy;
             } else if (bchi == REFLECT_EVEN) {
@@ -961,7 +967,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhxy(i, j, k) = (umac(i, j, k) > 0.0) ? slxy : srxy;
-        simhxy(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhxy(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                               ? simhxy(i, j, k)
                               : 0.5 * (slxy + srxy);
     });
@@ -1007,7 +1013,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srxz = scal(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    srxz = min(srxz, 0.0);
+                    srxz = amrex::min(srxz, 0.0);
                 }
                 slxz = srxz;
             } else if (bclo == REFLECT_EVEN) {
@@ -1024,7 +1030,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srxz = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    slxz = max(slxz, 0.0);
+                    slxz = amrex::max(slxz, 0.0);
                 }
                 srxz = slxz;
             } else if (bchi == REFLECT_EVEN) {
@@ -1037,7 +1043,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhxz(i, j, k) = (umac(i, j, k) > 0.0) ? slxz : srxz;
-        simhxz(i, j, k) = (fabs(umac(i, j, k)) > rel_eps_local)
+        simhxz(i, j, k) = (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
                               ? simhxz(i, j, k)
                               : 0.5 * (slxz + srxz);
     });
@@ -1086,7 +1092,7 @@ void Maestro::MakeEdgeScalTransverse(
                 sryx = scal(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sryx = min(sryx, 0.0);
+                    sryx = amrex::min(sryx, 0.0);
                 }
                 slyx = sryx;
             } else if (bclo == REFLECT_EVEN) {
@@ -1103,7 +1109,7 @@ void Maestro::MakeEdgeScalTransverse(
                 sryx = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    slyx = max(slyx, 0.0);
+                    slyx = amrex::max(slyx, 0.0);
                 }
                 sryx = slyx;
             } else if (bchi == REFLECT_EVEN) {
@@ -1116,7 +1122,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhxy by solving Riemann problem
         simhyx(i, j, k) = (vmac(i, j, k) > 0.0) ? slyx : sryx;
-        simhyx(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhyx(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                               ? simhyx(i, j, k)
                               : 0.5 * (slyx + sryx);
     });
@@ -1162,7 +1168,7 @@ void Maestro::MakeEdgeScalTransverse(
                 sryz = scal(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sryz = min(sryz, 0.0);
+                    sryz = amrex::min(sryz, 0.0);
                 }
                 slyz = sryz;
             } else if (bclo == REFLECT_EVEN) {
@@ -1179,7 +1185,7 @@ void Maestro::MakeEdgeScalTransverse(
                 sryz = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    slyz = max(slyz, 0.0);
+                    slyz = amrex::max(slyz, 0.0);
                 }
                 sryz = slyz;
             } else if (bchi == REFLECT_EVEN) {
@@ -1192,7 +1198,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhyz by solving Riemann problem
         simhyz(i, j, k) = (vmac(i, j, k) > 0.0) ? slyz : sryz;
-        simhyz(i, j, k) = (fabs(vmac(i, j, k)) > rel_eps_local)
+        simhyz(i, j, k) = (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
                               ? simhyz(i, j, k)
                               : 0.5 * (slyz + sryz);
     });
@@ -1241,7 +1247,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srzx = scal(i, j, k - 1, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    srzx = min(srzx, 0.0);
+                    srzx = amrex::min(srzx, 0.0);
                 }
                 slzx = srzx;
             } else if (bclo == REFLECT_EVEN) {
@@ -1258,7 +1264,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srzx = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    slzx = max(slzx, 0.0);
+                    slzx = amrex::max(slzx, 0.0);
                 }
                 srzx = slzx;
             } else if (bchi == REFLECT_EVEN) {
@@ -1271,7 +1277,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhzx by solving Riemann problem
         simhzx(i, j, k) = (wmac(i, j, k) > 0.0) ? slzx : srzx;
-        simhzx(i, j, k) = (fabs(wmac(i, j, k)) > rel_eps_local)
+        simhzx(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
                               ? simhzx(i, j, k)
                               : 0.5 * (slzx + srzx);
     });
@@ -1317,7 +1323,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srzy = scal(i, j, k - 1, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    srzy = min(srzy, 0.0);
+                    srzy = amrex::min(srzy, 0.0);
                 }
                 slzy = srzy;
             } else if (bclo == REFLECT_EVEN) {
@@ -1334,7 +1340,7 @@ void Maestro::MakeEdgeScalTransverse(
                 srzy = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    slzy = max(slzy, 0.0);
+                    slzy = amrex::max(slzy, 0.0);
                 }
                 srzy = slzy;
             } else if (bchi == REFLECT_EVEN) {
@@ -1347,7 +1353,7 @@ void Maestro::MakeEdgeScalTransverse(
 
         // make simhzy by solving Riemann problem
         simhzy(i, j, k) = (wmac(i, j, k) > 0.0) ? slzy : srzy;
-        simhzy(i, j, k) = (fabs(wmac(i, j, k)) > rel_eps_local)
+        simhzy(i, j, k) = (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
                               ? simhzy(i, j, k)
                               : 0.5 * (slzy + srzy);
     });
@@ -1441,9 +1447,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgex by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgex(i, j, k, comp) = (umac(i, j, k) > 0.0) ? sedgelx : sedgerx;
-        sedgex(i, j, k, comp) = (fabs(umac(i, j, k)) > rel_eps_local)
-                                    ? sedgex(i, j, k, comp)
-                                    : 0.5 * (sedgelx + sedgerx);
+        sedgex(i, j, k, comp) =
+            (amrex::Math::abs(umac(i, j, k)) > rel_eps_local)
+                ? sedgex(i, j, k, comp)
+                : 0.5 * (sedgelx + sedgerx);
 
         // impose lo side bc's
         if (i == domlo[0]) {
@@ -1451,7 +1458,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgex(i, j, k, comp) = scal(i - 1, j, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    sedgex(i, j, k, comp) = min(sedgerx, 0.0);
+                    sedgex(i, j, k, comp) = amrex::min(sedgerx, 0.0);
                 } else {
                     sedgex(i, j, k, comp) = sedgerx;
                 }
@@ -1467,7 +1474,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgex(i, j, k, comp) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 0) {
-                    sedgex(i, j, k, comp) = max(sedgelx, 0.0);
+                    sedgex(i, j, k, comp) = amrex::max(sedgelx, 0.0);
                 } else {
                     sedgex(i, j, k, comp) = sedgelx;
                 }
@@ -1530,9 +1537,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgey by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgey(i, j, k, comp) = (vmac(i, j, k) > 0.0) ? sedgely : sedgery;
-        sedgey(i, j, k, comp) = (fabs(vmac(i, j, k)) > rel_eps_local)
-                                    ? sedgey(i, j, k, comp)
-                                    : 0.5 * (sedgely + sedgery);
+        sedgey(i, j, k, comp) =
+            (amrex::Math::abs(vmac(i, j, k)) > rel_eps_local)
+                ? sedgey(i, j, k, comp)
+                : 0.5 * (sedgely + sedgery);
 
         // impose lo side bc's
         if (j == domlo[1]) {
@@ -1540,7 +1548,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgey(i, j, k, comp) = scal(i, j - 1, k, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sedgey(i, j, k, comp) = min(sedgery, 0.0);
+                    sedgey(i, j, k, comp) = amrex::min(sedgery, 0.0);
                 } else {
                     sedgey(i, j, k, comp) = sedgery;
                 }
@@ -1556,7 +1564,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgey(i, j, k, comp) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 1) {
-                    sedgey(i, j, k, comp) = max(sedgely, 0.0);
+                    sedgey(i, j, k, comp) = amrex::max(sedgely, 0.0);
                 } else {
                     sedgey(i, j, k, comp) = sedgely;
                 }
@@ -1619,9 +1627,10 @@ void Maestro::MakeEdgeScalEdges(
         // make sedgez by solving Riemann problem
         // boundary conditions enforced outside of i,j,k loop
         sedgez(i, j, k, comp) = (wmac(i, j, k) > 0.0) ? sedgelz : sedgerz;
-        sedgez(i, j, k, comp) = (fabs(wmac(i, j, k)) > rel_eps_local)
-                                    ? sedgez(i, j, k, comp)
-                                    : 0.5 * (sedgelz + sedgerz);
+        sedgez(i, j, k, comp) =
+            (amrex::Math::abs(wmac(i, j, k)) > rel_eps_local)
+                ? sedgez(i, j, k, comp)
+                : 0.5 * (sedgelz + sedgerz);
 
         // impose lo side bc's
         if (k == domlo[2]) {
@@ -1629,7 +1638,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgez(i, j, k, comp) = scal(i, j, k - 1, comp);
             } else if (bclo == FOEXTRAP || bclo == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    sedgez(i, j, k, comp) = min(sedgerz, 0.0);
+                    sedgez(i, j, k, comp) = amrex::min(sedgerz, 0.0);
                 } else {
                     sedgez(i, j, k, comp) = sedgerz;
                 }
@@ -1645,7 +1654,7 @@ void Maestro::MakeEdgeScalEdges(
                 sedgez(i, j, k, comp) = scal(i, j, k, comp);
             } else if (bchi == FOEXTRAP || bchi == HOEXTRAP) {
                 if (is_vel && comp == 2) {
-                    sedgez(i, j, k, comp) = max(sedgelz, 0.0);
+                    sedgez(i, j, k, comp) = amrex::max(sedgelz, 0.0);
                 } else {
                     sedgez(i, j, k, comp) = sedgelz;
                 }

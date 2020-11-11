@@ -73,7 +73,6 @@ endif
 
 Bdirs 	:= Source \
            Source/Src_nd \
-           Source/param_includes \
            constants \
            Util/model_parser \
            Util/simple_log \
@@ -98,7 +97,7 @@ endif
 # directories into VPATH_LOCATIONS and INCLUDE_LOCATIONS for us, so we
 # don't need to do it here
 
-Pdirs 	:= Base Boundary AmrCore LinearSolvers/C_CellMG LinearSolvers/MLMG
+Pdirs 	:= Base Boundary AmrCore LinearSolvers/MLMG
 
 Bpack	+= $(foreach dir, $(Pdirs), $(AMREX_HOME)/Src/$(dir)/Make.package)
 
@@ -186,11 +185,9 @@ PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
 
-MANAGED_PROBIN_FLAG :=
 ifdef USE_CUDA
   ifeq ($(USE_CUDA), TRUE)
     USE_GPU_PRAGMA = TRUE
-    MANAGED_PROBIN_FLAG := --managed
     DEFINES += -DCUDA
   endif
 endif
@@ -201,12 +198,41 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	@echo " "
 	@echo "${bold}WRITING extern.F90${normal}"
-	$(AMREX_HOME)/Tools/F_scripts/write_probin.py \
+	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           -t $(PROBIN_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90 -n probin \
-          --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" $(MANAGED_PROBIN_FLAG) \
+          --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
 
+#------------------------------------------------------------------------------
+# MAESTROeX C++ parameters
+#------------------------------------------------------------------------------
+
+CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
+METH_PARAMS_TEMPLATE := $(TOP)/Source/param/meth_params.template
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90: $(CPP_PARAMETERS) $(METH_PARAMS_TEMPLATE)
+	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
+	$(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
+
+# for debugging
+test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
+
+#------------------------------------------------------------------------------
+# state variable info
+#-------------------------------------------------------------------------------
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
+	echo "state_indices.H will be generated at the same time as state_indices_nd.F90"
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90:
+	$(MAESTROEX_HOME)/Source/param/set_variables.py \
+           --defines "$(DEFINES)" \
+           --odir $(MAESTROEX_AUTO_SOURCE_DIR) \
+           $(MAESTROEX_HOME)/Source/param/_variables
+
+# for debugging
+test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
 
 
 #------------------------------------------------------------------------------

@@ -214,9 +214,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                             if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                                 // is it one of the 8 zones surrounding the center?
-                                if (fabs(x - center[0]) < dx[0] &&
-                                    fabs(y - center[1]) < dx[1] &&
-                                    fabs(z - center[2]) < dx[2]) {
+                                if (amrex::Math::abs(x - center[0]) < dx[0] &&
+                                    amrex::Math::abs(y - center[1]) < dx[1] &&
+                                    amrex::Math::abs(z - center[2]) < dx[2]) {
                                     ncenter_level++;
 
                                     T_center_level += scal(i, j, k, Temp);
@@ -533,8 +533,8 @@ void Maestro::DiagFile(const int step, const Real t_in,
             int_ener += int_ener_level;
             nuc_ener += nuc_ener_level;
 
-            U_max = max(U_max, U_max_level);
-            Mach_max = max(Mach_max, Mach_max_level);
+            U_max = amrex::max(U_max, U_max_level);
+            Mach_max = amrex::max(Mach_max, Mach_max_level);
 
             // if T_max_level is the new max, then copy the location as well
             if (T_max_level > T_max) {

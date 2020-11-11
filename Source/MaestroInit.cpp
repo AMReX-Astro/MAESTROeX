@@ -185,7 +185,7 @@ void Maestro::Init() {
         }
 
         if (stop_time >= 0. && t_old + dt > stop_time) {
-            dt = std::min(dt, stop_time - t_old);
+            dt = amrex::min(dt, stop_time - t_old);
             Print() << "Stop time limits dt = " << dt << std::endl;
         }
 
@@ -596,7 +596,7 @@ void Maestro::DivuIter(int istep_divu_iter) {
                        "previous dt = "
                     << dt_hold << std::endl;
         }
-        dt = std::min(dt_hold, dt);
+        dt = amrex::min(dt_hold, dt);
     }
 
     if (fixed_dt != -1.0) {
@@ -730,7 +730,7 @@ void Maestro::DivuIterSDC(int istep_divu_iter) {
                        "previous dt = "
                     << dt_hold << std::endl;
         }
-        dt = std::min(dt_hold, dt);
+        dt = amrex::min(dt_hold, dt);
     }
 
     if (fixed_dt != -1.0) {

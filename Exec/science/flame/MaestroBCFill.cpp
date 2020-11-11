@@ -73,7 +73,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[0] > domhi[0]) {
-        auto imin = domhi[0] + 1;
+        auto imin = domhi[0];
 
         if (bcs.hi(0) == BCType::ext_dir) {
             ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
@@ -158,7 +158,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[1] > domhi[1]) {
-        auto jmin = domhi[1] + 1;
+        auto jmin = domhi[1];
 
         if (bcs.hi(1) == BCType::ext_dir) {
             ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
@@ -244,7 +244,7 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
     }
 
     if (hi[2] > domhi[2]) {
-        auto kmin = domhi[2] + 1;
+        auto kmin = domhi[2];
 
         if (bcs.hi(2) == BCType::ext_dir) {
             ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {

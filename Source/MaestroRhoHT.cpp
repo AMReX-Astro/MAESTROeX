@@ -467,12 +467,12 @@ void Maestro::HfromRhoTedge(
 
                     // get edge-centered temperature
                     if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
-                        eos_state.T =
-                            max(sedgex(i, j, k, Temp) + tempbar_arr(i, j, k),
-                                small_temp_loc);
+                        eos_state.T = amrex::max(
+                            sedgex(i, j, k, Temp) + tempbar_arr(i, j, k),
+                            small_temp_loc);
                     } else {
                         eos_state.T =
-                            max(sedgex(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgex(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
@@ -538,15 +538,15 @@ void Maestro::HfromRhoTedge(
                     // get edge-centered temperature
                     if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
 #if (AMREX_SPACEDIM == 2)
-                        eos_state.T = max(
+                        eos_state.T = amrex::max(
                             sedgey(i, j, k, Temp) + tempbar_edge_arr(i, j, k),
                             small_temp_loc);
 #else
-                        eos_state.T = max(sedgey(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp_loc);
+                        eos_state.T = amrex::max(sedgey(i,j,k,Temp) + tempbar_arr(i,j,k), small_temp_loc);
 #endif
                     } else {
                         eos_state.T =
-                            max(sedgey(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgey(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
@@ -619,12 +619,12 @@ void Maestro::HfromRhoTedge(
 
                     // get edge-centered temperature
                     if (enthalpy_pred_type_loc == predict_Tprime_then_h_loc) {
-                        eos_state.T = max(
+                        eos_state.T = amrex::max(
                             sedgez(i, j, k, Temp) + tempbar_edge_arr(i, j, k),
                             small_temp_loc);
                     } else {
                         eos_state.T =
-                            max(sedgez(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgez(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
@@ -694,11 +694,11 @@ void Maestro::HfromRhoTedge(
                         Real tempbar_edge_l = 0.5 * (tempbar_arr(i - 1, j, k) +
                                                      tempbar_arr(i, j, k));
                         eos_state.T =
-                            max(sedgex(i, j, k, Temp) + tempbar_edge_l,
-                                small_temp_loc);
+                            amrex::max(sedgex(i, j, k, Temp) + tempbar_edge_l,
+                                       small_temp_loc);
                     } else {
                         eos_state.T =
-                            max(sedgex(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgex(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
@@ -767,11 +767,11 @@ void Maestro::HfromRhoTedge(
                         Real tempbar_edge_l = 0.5 * (tempbar_arr(i, j - 1, k) +
                                                      tempbar_arr(i, j, k));
                         eos_state.T =
-                            max(sedgey(i, j, k, Temp) + tempbar_edge_l,
-                                small_temp_loc);
+                            amrex::max(sedgey(i, j, k, Temp) + tempbar_edge_l,
+                                       small_temp_loc);
                     } else {
                         eos_state.T =
-                            max(sedgey(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgey(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species
@@ -840,11 +840,11 @@ void Maestro::HfromRhoTedge(
                         Real tempbar_edge_l = 0.5 * (tempbar_arr(i, j, k - 1) +
                                                      tempbar_arr(i, j, k));
                         eos_state.T =
-                            max(sedgez(i, j, k, Temp) + tempbar_edge_l,
-                                small_temp_loc);
+                            amrex::max(sedgez(i, j, k, Temp) + tempbar_edge_l,
+                                       small_temp_loc);
                     } else {
                         eos_state.T =
-                            max(sedgez(i, j, k, Temp), small_temp_loc);
+                            amrex::max(sedgez(i, j, k, Temp), small_temp_loc);
                     }
 
                     // get edge-centered density and species

@@ -13,6 +13,11 @@ jobs:
       with:
         ref: refs/heads/${{ github.head_ref }}
 
+    - name: Run tab exterminator script
+      run: |
+        cd Util/scripts
+        ./tab_exterminator.sh
+
     - name: Run clang-format
       run: |
         find . -regex '.*\.\(cpp\|h\|H\)' | xargs clang-format -i -style=file
@@ -26,6 +31,7 @@ jobs:
 
     - name: Push changes
       uses: ad-m/github-push-action@master
+      if: github.repository_owner == 'AMReX-Astro' 
       with:
         branch: ${{ github.head_ref }}
         github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -1246,7 +1246,8 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << " Inputs File Parameters\n";
         jobInfoFile << PrettyLine;
 
-        ParmParse::dumpTable(jobInfoFile, true);
+        // ParmParse::dumpTable(jobInfoFile, true);
+#include "maestro_job_info_tests.H"
 
         jobInfoFile.close();
 

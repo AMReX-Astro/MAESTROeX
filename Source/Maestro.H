@@ -1065,6 +1065,11 @@ class Maestro : public amrex::AmrCore {
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             w0mac);
 
+    void MakeEtarhoPlanar(
+        const amrex::Vector<amrex::MultiFab>& scal_old,
+        const amrex::Vector<amrex::MultiFab>& scal_new,
+        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac);
+
     // end MaestroMakeEta.cpp functions
     ////////////
 

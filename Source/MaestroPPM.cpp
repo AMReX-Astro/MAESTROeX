@@ -44,24 +44,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i - 1, j, k, n) - s(i - 2, j, k, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i + 1, j, k, n) - s(i - 1, j, k, n));
             dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to x-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i - 1, j, k, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm, min(s(i, j, k, n), s(i - 1, j, k, n)));
-            sm = min(sm, max(s(i, j, k, n), s(i - 1, j, k, n)));
+            sm = amrex::max(sm, amrex::min(s(i, j, k, n), s(i - 1, j, k, n)));
+            sm = amrex::min(sm, amrex::max(s(i, j, k, n), s(i - 1, j, k, n)));
 
             // sp
             dsvl_l = 0.0;
@@ -72,24 +76,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i - 1, j, k, n));
             dsr = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i + 2, j, k, n) - s(i, j, k, n));
             dsl = 2.0 * (s(i + 1, j, k, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i + 2, j, k, n) - s(i + 1, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to x-edges.
             Real sp = 0.5 * (s(i + 1, j, k, n) + s(i, j, k, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
-            sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
+            sp = amrex::max(sp, amrex::min(s(i + 1, j, k, n), s(i, j, k, n)));
+            sp = amrex::min(sp, amrex::max(s(i + 1, j, k, n), s(i, j, k, n)));
 
             // save for later
             Real sedgel = sp;
@@ -99,11 +107,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                 sp = s(i, j, k, n);
                 sm = s(i, j, k, n);
-            } else if (fabs(sp - s(i, j, k, n)) >=
-                       2.0 * fabs(sm - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                 sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-            } else if (fabs(sm - s(i, j, k, n)) >=
-                       2.0 * fabs(sp - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                 sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
 
@@ -118,8 +126,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i + 1, j, k, n) - 0.05 * s(i + 2, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i + 1, j, k, n), s(i, j, k, n)));
                 }
 
             } else if (i == domlo[0] + 1) {
@@ -129,8 +139,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i + 1, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j, k, n), s(i - 1, j, k, n)));
-                    sm = min(sm, max(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j, k, n), s(i - 1, j, k, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
@@ -139,11 +151,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -158,8 +170,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i - 1, j, k, n) - 0.05 * s(i - 2, j, k, n);
 
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i - 1, j, k, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i - 1, j, k, n), s(i, j, k, n)));
                 }
 
             } else if (i == domhi[0] - 1) {
@@ -169,8 +183,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i - 1, j, k, n);
 
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j, k, n), s(i + 1, j, k, n)));
-                    sp = min(sp, max(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j, k, n), s(i + 1, j, k, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
@@ -179,11 +195,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -196,7 +212,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i + 1, j, k)) * dt_local / dx[0];
+                Real sigma =
+                    amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
                 if (u(i + 1, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
                         sp - 0.5 * sigma *
@@ -205,7 +222,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
                 if (u(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 0) =
                         sm + 0.5 * sigma *
@@ -215,7 +232,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 }
 
             } else {
-                Real sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                Real sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
                 if (u(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
                         sp - 0.5 * sigma *
@@ -224,7 +241,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
                 if (u(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 0) =
                         sm + 0.5 * sigma *
@@ -252,10 +269,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i - 1, j, k, n);
                 Real D2R =
                     s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgel =
                     0.5 * (s(i - 2, j, k, n) + s(i - 1, j, k, n)) - D2LIM / 6.0;
             }
@@ -273,10 +292,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i - 2, j, k, n) - 2.0 * s(i - 1, j, k, n) + s(i, j, k, n);
                 Real D2R =
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedge = 0.5 * (s(i - 1, j, k, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
@@ -294,10 +315,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedger =
                     0.5 * (s(i, j, k, n) + s(i + 1, j, k, n)) - D2LIM / 6.0;
             }
@@ -317,10 +340,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
                 Real D2R = s(i + 1, j, k, n) - 2.0 * s(i + 2, j, k, n) +
                            s(i + 3, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgerr =
                     0.5 * (s(i + 1, j, k, n) + s(i + 2, j, k, n)) - D2LIM / 6.0;
             }
@@ -331,8 +356,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -346,8 +373,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                 Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                            amrex::Math::abs(dafacep));
+                Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                           amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
 
@@ -369,17 +398,18 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i + 1, j, k, n) + s(i + 2, j, k, n);
                 Real D2C =
                     s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) + s(i + 1, j, k, n);
-                Real sgn = copysign(1.0, D2);
-                Real D2LIM = max(
-                    min(sgn * D2,
-                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                Real sgn = amrex::Math::copysign(1.0, D2);
+                Real D2LIM = amrex::max(
+                    amrex::min(sgn * D2, amrex::min(C * sgn * D2L,
+                                                    amrex::min(C * sgn * D2R,
+                                                               C * sgn * D2C))),
                     0.0);
-                Real D2ABS = max(fabs(D2), 1.e-10);
+                Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                 alpham = alpham * D2LIM / D2ABS;
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -393,7 +423,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -422,8 +452,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i + 1, j, k, n) - 0.05 * s(i + 2, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sp = max(sp, min(s(i + 1, j, k, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i + 1, j, k, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i + 1, j, k, n), s(i, j, k, n)));
 
                 } else if (i == domlo[0] + 1) {
                     sedgel = s(i - 2, j, k, n);
@@ -434,8 +466,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             0.05 * s(i + 1, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sedge = max(sedge, min(s(i, j, k, n), s(i - 1, j, k, n)));
-                    sedge = min(sedge, max(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sedge = amrex::max(
+                        sedge, amrex::min(s(i, j, k, n), s(i - 1, j, k, n)));
+                    sedge = amrex::min(
+                        sedge, amrex::max(s(i, j, k, n), s(i - 1, j, k, n)));
 
                 } else if (i == domlo[0] + 2) {
                     // use a modified stencil to get sedge on the first interior edge
@@ -444,10 +478,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.5 * s(i - 1, j, k, n) - 0.05 * s(i, j, k, n);
 
                     // make sure sedge lies in between adjacent cell-centered values
-                    sedgel =
-                        max(sedgel, min(s(i - 1, j, k, n), s(i - 2, j, k, n)));
-                    sedgel =
-                        min(sedgel, max(s(i - 1, j, k, n), s(i - 2, j, k, n)));
+                    sedgel = amrex::max(sedgel, amrex::min(s(i - 1, j, k, n),
+                                                           s(i - 2, j, k, n)));
+                    sedgel = amrex::min(sedgel, amrex::max(s(i - 1, j, k, n),
+                                                           s(i - 2, j, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -455,8 +489,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (i == domlo[0] + 1 || i == domlo[0] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -470,8 +506,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                         Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
 
@@ -493,18 +531,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i + 2, j, k, n);
                         Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i + 1, j, k, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
@@ -520,7 +559,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
@@ -552,8 +591,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i - 1, j, k, n) - 0.05 * s(i - 2, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i - 1, j, k, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i - 1, j, k, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i - 1, j, k, n), s(i, j, k, n)));
 
                 } else if (i == domhi[0] - 1) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -562,8 +603,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.05 * s(i - 1, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger, min(s(i, j, k, n), s(i + 1, j, k, n)));
-                    sedger = min(sedger, max(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sedger = amrex::max(
+                        sedger, amrex::min(s(i, j, k, n), s(i + 1, j, k, n)));
+                    sedger = amrex::min(
+                        sedger, amrex::max(s(i, j, k, n), s(i + 1, j, k, n)));
 
                 } else if (i == domhi[0] - 2) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -572,10 +615,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                               0.5 * s(i + 1, j, k, n) - 0.05 * s(i, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr =
-                        max(sedgerr, min(s(i + 1, j, k, n), s(i + 2, j, k, n)));
-                    sedgerr =
-                        min(sedgerr, max(s(i + 1, j, k, n), s(i + 2, j, k, n)));
+                    sedgerr = amrex::max(
+                        sedgerr,
+                        amrex::min(s(i + 1, j, k, n), s(i + 2, j, k, n)));
+                    sedgerr = amrex::min(
+                        sedgerr,
+                        amrex::max(s(i + 1, j, k, n), s(i + 2, j, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -583,8 +628,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (i == domhi[0] - 1 || i == domhi[0] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -598,8 +645,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i - 1, j, k, n);
                         Real dabarp = s(i + 1, j, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -620,18 +669,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i + 2, j, k, n);
                         Real D2C = s(i - 1, j, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i + 1, j, k, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i - 1, j, k, n) - s(i, j, k, n);
@@ -647,7 +697,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i + 1, j, k, n) - s(i, j, k, n);
@@ -677,7 +727,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // u is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(u(i + 1, j, k)) * dt_local / dx[0];
+                Real sigma =
+                    amrex::Math::abs(u(i + 1, j, k)) * dt_local / dx[0];
 
                 if (u(i + 1, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
@@ -687,7 +738,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
 
                 if (u(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 0) =
@@ -697,7 +748,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Im(i, j, k, 0) = s(i, j, k, n);
                 }
             } else {
-                Real sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                Real sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
 
                 if (u(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 0) =
@@ -707,7 +758,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 0) = s(i, j, k, n);
                 }
 
-                sigma = fabs(u(i, j, k)) * dt_local / dx[0];
+                sigma = amrex::Math::abs(u(i, j, k)) * dt_local / dx[0];
 
                 if (u(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 0) =
@@ -739,24 +790,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i, j - 1, k, n) - s(i, j - 2, k, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j + 1, k, n) - s(i, j - 1, k, n));
             dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to y-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i, j - 1, k, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm, min(s(i, j, k, n), s(i, j - 1, k, n)));
-            sm = min(sm, max(s(i, j, k, n), s(i, j - 1, k, n)));
+            sm = amrex::max(sm, amrex::min(s(i, j, k, n), s(i, j - 1, k, n)));
+            sm = amrex::min(sm, amrex::max(s(i, j, k, n), s(i, j - 1, k, n)));
 
             // sp
             dsvl_l = 0.0;
@@ -767,24 +822,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j - 1, k, n));
             dsr = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j + 2, k, n) - s(i, j, k, n));
             dsl = 2.0 * (s(i, j + 1, k, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i, j + 2, k, n) - s(i, j + 1, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to y-edges.
             Real sp = 0.5 * (s(i, j + 1, k, n) + s(i, j, k, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
-            sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
+            sp = amrex::max(sp, amrex::min(s(i, j + 1, k, n), s(i, j, k, n)));
+            sp = amrex::min(sp, amrex::max(s(i, j + 1, k, n), s(i, j, k, n)));
 
             // save for later
             Real sedgel = sp;
@@ -794,11 +853,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                 sp = s(i, j, k, n);
                 sm = s(i, j, k, n);
-            } else if (fabs(sp - s(i, j, k, n)) >=
-                       2.0 * fabs(sm - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                 sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-            } else if (fabs(sm - s(i, j, k, n)) >=
-                       2.0 * fabs(sp - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                 sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
 
@@ -813,8 +872,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j + 2, k, n);
 
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j + 1, k, n), s(i, j, k, n)));
                 }
 
             } else if (j == domlo[1] + 1) {
@@ -824,8 +885,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i, j + 1, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j, k, n), s(i, j - 1, k, n)));
-                    sm = min(sm, max(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j, k, n), s(i, j - 1, k, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
@@ -834,11 +897,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -853,8 +916,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j - 2, k, n);
 
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j - 1, k, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j - 1, k, n), s(i, j, k, n)));
                 }
 
             } else if (j == domhi[1] - 1) {
@@ -864,8 +929,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i, j - 1, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j, k, n), s(i, j + 1, k, n)));
-                    sp = min(sp, max(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j, k, n), s(i, j + 1, k, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
@@ -874,11 +941,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -891,7 +958,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i, j + 1, k)) * dt_local / dx[1];
+                Real sigma =
+                    amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
                 if (v(i, j + 1, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -900,7 +968,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 1) =
                         sm + 0.5 * sigma *
@@ -910,7 +978,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 }
 
             } else {
-                Real sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                Real sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -919,7 +987,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 1) =
                         sm + 0.5 * sigma *
@@ -947,10 +1015,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i, j - 1, k, n);
                 Real D2R =
                     s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgel =
                     0.5 * (s(i, j - 2, k, n) + s(i, j - 1, k, n)) - D2LIM / 6.0;
             }
@@ -968,10 +1038,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j - 2, k, n) - 2.0 * s(i, j - 1, k, n) + s(i, j, k, n);
                 Real D2R =
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedge = 0.5 * (s(i, j - 1, k, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
@@ -989,10 +1061,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedger =
                     0.5 * (s(i, j, k, n) + s(i, j + 1, k, n)) - D2LIM / 6.0;
             }
@@ -1012,10 +1086,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
                 Real D2R = s(i, j + 1, k, n) - 2.0 * s(i, j + 2, k, n) +
                            s(i, j + 3, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgerr =
                     0.5 * (s(i, j + 1, k, n) + s(i, j + 2, k, n)) - D2LIM / 6.0;
             }
@@ -1025,8 +1101,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             // to eliminate sensitivity to roundoff.
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -1040,8 +1118,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                 Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                            amrex::Math::abs(dafacep));
+                Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                           amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -1062,17 +1142,18 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j + 1, k, n) + s(i, j + 2, k, n);
                 Real D2C =
                     s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) + s(i, j + 1, k, n);
-                Real sgn = copysign(1.0, D2);
-                Real D2LIM = max(
-                    min(sgn * D2,
-                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                Real sgn = amrex::Math::copysign(1.0, D2);
+                Real D2LIM = amrex::max(
+                    amrex::min(sgn * D2, amrex::min(C * sgn * D2L,
+                                                    amrex::min(C * sgn * D2R,
+                                                               C * sgn * D2C))),
                     0.0);
-                Real D2ABS = max(fabs(D2), 1.e-10);
+                Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                 alpham = alpham * D2LIM / D2ABS;
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -1086,7 +1167,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -1116,8 +1197,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j + 2, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j + 1, k, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j + 1, k, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j + 1, k, n), s(i, j, k, n)));
 
                 } else if (j == domlo[1] + 1) {
                     sedgel = s(i, j - 2, k, n);
@@ -1128,8 +1211,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             0.05 * s(i, j + 1, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedge = max(sedge, min(s(i, j, k, n), s(i, j - 1, k, n)));
-                    sedge = min(sedge, max(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sedge = amrex::max(
+                        sedge, amrex::min(s(i, j, k, n), s(i, j - 1, k, n)));
+                    sedge = amrex::min(
+                        sedge, amrex::max(s(i, j, k, n), s(i, j - 1, k, n)));
 
                 } else if (j == domlo[1] + 2) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -1138,10 +1223,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgel =
-                        max(sedgel, min(s(i, j - 1, k, n), s(i, j - 2, k, n)));
-                    sedgel =
-                        min(sedgel, max(s(i, j - 1, k, n), s(i, j - 2, k, n)));
+                    sedgel = amrex::max(sedgel, amrex::min(s(i, j - 1, k, n),
+                                                           s(i, j - 2, k, n)));
+                    sedgel = amrex::min(sedgel, amrex::max(s(i, j - 1, k, n),
+                                                           s(i, j - 2, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -1149,8 +1234,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (j == domlo[1] + 1 || j == domlo[1] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1164,8 +1251,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                         Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1186,18 +1275,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j + 2, k, n);
                         Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j + 1, k, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
@@ -1213,7 +1303,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
@@ -1245,8 +1335,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j - 1, k, n) - 0.05 * s(i, j - 2, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j - 1, k, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j - 1, k, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j - 1, k, n), s(i, j, k, n)));
 
                 } else if (j == domhi[1] - 1) {
                     sedgerr = s(i, j + 2, k, n);
@@ -1257,8 +1349,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.05 * s(i, j - 1, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger, min(s(i, j, k, n), s(i, j + 1, k, n)));
-                    sedger = min(sedger, max(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sedger = amrex::max(
+                        sedger, amrex::min(s(i, j, k, n), s(i, j + 1, k, n)));
+                    sedger = amrex::min(
+                        sedger, amrex::max(s(i, j, k, n), s(i, j + 1, k, n)));
 
                 } else if (j == domhi[1] - 2) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -1267,10 +1361,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                               0.5 * s(i, j + 1, k, n) - 0.05 * s(i, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr =
-                        max(sedgerr, min(s(i, j + 1, k, n), s(i, j + 2, k, n)));
-                    sedgerr =
-                        min(sedgerr, max(s(i, j + 1, k, n), s(i, j + 2, k, n)));
+                    sedgerr = amrex::max(
+                        sedgerr,
+                        amrex::min(s(i, j + 1, k, n), s(i, j + 2, k, n)));
+                    sedgerr = amrex::min(
+                        sedgerr,
+                        amrex::max(s(i, j + 1, k, n), s(i, j + 2, k, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -1278,8 +1374,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (j == domhi[1] - 1 || j == domhi[1] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1293,8 +1391,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j - 1, k, n);
                         Real dabarp = s(i, j + 1, k, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1315,18 +1415,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j + 2, k, n);
                         Real D2C = s(i, j - 1, k, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j + 1, k, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j - 1, k, n) - s(i, j, k, n);
@@ -1342,7 +1443,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j + 1, k, n) - s(i, j, k, n);
@@ -1371,7 +1472,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // v is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(v(i, j + 1, k)) * dt_local / dx[1];
+                Real sigma =
+                    amrex::Math::abs(v(i, j + 1, k)) * dt_local / dx[1];
                 if (v(i, j + 1, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -1380,7 +1482,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 1) =
                         sm + 0.5 * sigma *
@@ -1390,7 +1492,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 }
 
             } else {
-                Real sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                Real sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 1) =
                         sp - 0.5 * sigma *
@@ -1399,7 +1501,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 1) = s(i, j, k, n);
                 }
 
-                sigma = fabs(v(i, j, k)) * dt_local / dx[1];
+                sigma = amrex::Math::abs(v(i, j, k)) * dt_local / dx[1];
                 if (v(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 1) =
                         sm + 0.5 * sigma *
@@ -1431,24 +1533,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             Real dsl = 2.0 * (s(i, j, k - 1, n) - s(i, j, k - 2, n));
             Real dsr = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j, k + 1, n) - s(i, j, k - 1, n));
             dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to z-edges.
             Real sm = 0.5 * (s(i, j, k, n) + s(i, j, k - 1, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sm = max(sm, min(s(i, j, k, n), s(i, j, k - 1, n)));
-            sm = min(sm, max(s(i, j, k, n), s(i, j, k - 1, n)));
+            sm = amrex::max(sm, amrex::min(s(i, j, k, n), s(i, j, k - 1, n)));
+            sm = amrex::min(sm, amrex::max(s(i, j, k, n), s(i, j, k - 1, n)));
 
             // sp
             dsvl_l = 0.0;
@@ -1459,24 +1565,28 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             dsl = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
             dsr = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             if (dsl * dsr > 0.0)
-                dsvl_l = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_l = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // right side
             dsc = 0.5 * (s(i, j, k + 2, n) - s(i, j, k, n));
             dsl = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
             dsr = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
             if (dsl * dsr > 0.0)
-                dsvl_r = copysign(1.0, dsc) *
-                         min(fabs(dsc), min(fabs(dsl), fabs(dsr)));
+                dsvl_r = amrex::Math::copysign(1.0, dsc) *
+                         amrex::min(amrex::Math::abs(dsc),
+                                    amrex::min(amrex::Math::abs(dsl),
+                                               amrex::Math::abs(dsr)));
 
             // Interpolate s to z-edges.
             Real sp = 0.5 * (s(i, j, k + 1, n) + s(i, j, k, n)) -
                       (dsvl_r - dsvl_l) / 6.0;
 
             // Make sure sedge lies in between adjacent cell-centered values.
-            sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
-            sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+            sp = amrex::max(sp, amrex::min(s(i, j, k + 1, n), s(i, j, k, n)));
+            sp = amrex::min(sp, amrex::max(s(i, j, k + 1, n), s(i, j, k, n)));
 
             // save for later
             Real sedgel = sp;
@@ -1486,11 +1596,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
             if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                 sp = s(i, j, k, n);
                 sm = s(i, j, k, n);
-            } else if (fabs(sp - s(i, j, k, n)) >=
-                       2.0 * fabs(sm - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                 sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-            } else if (fabs(sm - s(i, j, k, n)) >=
-                       2.0 * fabs(sp - s(i, j, k, n))) {
+            } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                       2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                 sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
             }
 
@@ -1505,8 +1615,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k + 2, n);
 
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j, k + 1, n), s(i, j, k, n)));
                 }
 
             } else if (k == domlo[2] + 1) {
@@ -1516,8 +1628,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i, j, k + 1, n);
 
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j, k, n), s(i, j, k - 1, n)));
-                    sm = min(sm, max(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j, k, n), s(i, j, k - 1, n)));
 
                     // reset sp on second interior edge
                     sp = sedgel;
@@ -1526,11 +1640,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -1545,8 +1659,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k - 2, n);
 
                     // Make sure sm lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j, k - 1, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j, k - 1, n), s(i, j, k, n)));
                 }
 
             } else if (k == domhi[2] - 1) {
@@ -1556,8 +1672,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k, n) - 0.05 * s(i, j, k - 1, n);
 
                     // Make sure sp lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j, k, n), s(i, j, k + 1, n)));
-                    sp = min(sp, max(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j, k, n), s(i, j, k + 1, n)));
 
                     // reset sm on second interior edge
                     sm = sedger;
@@ -1566,11 +1684,11 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     if ((sp - s(i, j, k, n)) * (s(i, j, k, n) - sm) <= 0.0) {
                         sp = s(i, j, k, n);
                         sm = s(i, j, k, n);
-                    } else if (fabs(sp - s(i, j, k, n)) >=
-                               2.0 * fabs(sm - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sp - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sm - s(i, j, k, n))) {
                         sp = 3.0 * s(i, j, k, n) - 2.0 * sm;
-                    } else if (fabs(sm - s(i, j, k, n)) >=
-                               2.0 * fabs(sp - s(i, j, k, n))) {
+                    } else if (amrex::Math::abs(sm - s(i, j, k, n)) >=
+                               2.0 * amrex::Math::abs(sp - s(i, j, k, n))) {
                         sm = 3.0 * s(i, j, k, n) - 2.0 * sp;
                     }
                 }
@@ -1583,7 +1701,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i, j, k + 1)) * dt_local / dx[2];
+                Real sigma =
+                    amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
 
                 if (w(i, j, k + 1) > rel_eps_local) {
                     Ip(i, j, k, 2) =
@@ -1593,7 +1712,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 2) =
@@ -1603,7 +1722,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Im(i, j, k, 2) = s(i, j, k, n);
                 }
             } else {
-                Real sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                Real sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 2) =
@@ -1613,7 +1732,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 2) =
@@ -1642,10 +1761,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                            s(i, j, k - 1, n);
                 Real D2R =
                     s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgel =
                     0.5 * (s(i, j, k - 2, n) + s(i, j, k - 1, n)) - D2LIM / 6.0;
             }
@@ -1663,10 +1784,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k - 2, n) - 2.0 * s(i, j, k - 1, n) + s(i, j, k, n);
                 Real D2R =
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedge = 0.5 * (s(i, j, k - 1, n) + s(i, j, k, n)) - D2LIM / 6.0;
             }
 
@@ -1684,10 +1807,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
                 Real D2R =
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedger =
                     0.5 * (s(i, j, k, n) + s(i, j, k + 1, n)) - D2LIM / 6.0;
             }
@@ -1707,18 +1832,22 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
                 Real D2R = s(i, j, k + 1, n) - 2.0 * s(i, j, k + 2, n) +
                            s(i, j, k + 3, n);
-                Real sgn = copysign(1.0, D2);
+                Real sgn = amrex::Math::copysign(1.0, D2);
                 Real D2LIM =
                     sgn *
-                    max(min(C * sgn * D2L, min(C * sgn * D2R, sgn * D2)), 0.0);
+                    amrex::max(amrex::min(C * sgn * D2L,
+                                          amrex::min(C * sgn * D2R, sgn * D2)),
+                               0.0);
                 sedgerr =
                     0.5 * (s(i, j, k + 1, n) + s(i, j, k + 2, n)) - D2LIM / 6.0;
             }
 
             Real alphap = sedger - s(i, j, k, n);
             Real alpham = sedge - s(i, j, k, n);
-            bool bigp = fabs(alphap) > 2.0 * fabs(alpham);
-            bool bigm = fabs(alpham) > 2.0 * fabs(alphap);
+            bool bigp =
+                amrex::Math::abs(alphap) > 2.0 * amrex::Math::abs(alpham);
+            bool bigm =
+                amrex::Math::abs(alpham) > 2.0 * amrex::Math::abs(alphap);
             bool extremum = false;
 
             if (alpham * alphap >= 0.0) {
@@ -1734,8 +1863,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 Real dafacep = sedgerr - sedger;
                 Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                 Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                            amrex::Math::abs(dafacep));
+                Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                           amrex::Math::abs(dabarp));
                 Real dachkm = 0.0;
                 Real dachkp = 0.0;
                 if (dafacemin >= dabarmin) {
@@ -1756,17 +1887,18 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     s(i, j, k, n) - 2.0 * s(i, j, k + 1, n) + s(i, j, k + 2, n);
                 Real D2C =
                     s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) + s(i, j, k + 1, n);
-                Real sgn = copysign(1.0, D2);
-                Real D2LIM = max(
-                    min(sgn * D2,
-                        min(C * sgn * D2L, min(C * sgn * D2R, C * sgn * D2C))),
+                Real sgn = amrex::Math::copysign(1.0, D2);
+                Real D2LIM = amrex::max(
+                    amrex::min(sgn * D2, amrex::min(C * sgn * D2L,
+                                                    amrex::min(C * sgn * D2R,
+                                                               C * sgn * D2C))),
                     0.0);
-                Real D2ABS = max(fabs(D2), 1.e-10);
+                Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                 alpham = alpham * D2LIM / D2ABS;
                 alphap = alphap * D2LIM / D2ABS;
             } else {
                 if (bigp) {
-                    Real sgn = copysign(1.0, alpham);
+                    Real sgn = amrex::Math::copysign(1.0, alpham);
                     Real amax = -alphap * alphap / (4.0 * (alpham + alphap));
                     Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delam) {
@@ -1780,7 +1912,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     }
                 }
                 if (bigm) {
-                    Real sgn = copysign(1.0, alphap);
+                    Real sgn = amrex::Math::copysign(1.0, alphap);
                     Real amax = -alpham * alpham / (4.0 * (alpham + alphap));
                     Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
                     if (sgn * amax >= sgn * delap) {
@@ -1809,8 +1941,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k + 2, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sp = max(sp, min(s(i, j, k + 1, n), s(i, j, k, n)));
-                    sp = min(sp, max(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = amrex::max(
+                        sp, amrex::min(s(i, j, k + 1, n), s(i, j, k, n)));
+                    sp = amrex::min(
+                        sp, amrex::max(s(i, j, k + 1, n), s(i, j, k, n)));
 
                 } else if (k == domlo[2] + 1) {
                     sedgel = s(i, j, k - 2, n);
@@ -1821,8 +1955,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             0.05 * s(i, j, k + 1, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedge = max(sedge, min(s(i, j, k, n), s(i, j, k - 1, n)));
-                    sedge = min(sedge, max(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sedge = amrex::max(
+                        sedge, amrex::min(s(i, j, k, n), s(i, j, k - 1, n)));
+                    sedge = amrex::min(
+                        sedge, amrex::max(s(i, j, k, n), s(i, j, k - 1, n)));
 
                 } else if (k == domlo[2] + 2) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -1831,10 +1967,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgel =
-                        max(sedgel, min(s(i, j, k - 1, n), s(i, j, k - 2, n)));
-                    sedgel =
-                        min(sedgel, max(s(i, j, k - 1, n), s(i, j, k - 2, n)));
+                    sedgel = amrex::max(sedgel, amrex::min(s(i, j, k - 1, n),
+                                                           s(i, j, k - 2, n)));
+                    sedgel = amrex::min(sedgel, amrex::max(s(i, j, k - 1, n),
+                                                           s(i, j, k - 2, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -1842,8 +1978,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (k == domlo[2] + 1 || k == domlo[2] + 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1857,8 +1995,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                         Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -1879,18 +2019,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j, k + 2, n);
                         Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j, k + 1, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
@@ -1906,7 +2047,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
@@ -1938,8 +2079,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                          0.5 * s(i, j, k - 1, n) - 0.05 * s(i, j, k - 2, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sm = max(sm, min(s(i, j, k - 1, n), s(i, j, k, n)));
-                    sm = min(sm, max(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = amrex::max(
+                        sm, amrex::min(s(i, j, k - 1, n), s(i, j, k, n)));
+                    sm = amrex::min(
+                        sm, amrex::max(s(i, j, k - 1, n), s(i, j, k, n)));
 
                 } else if (k == domhi[2] - 1) {
                     sedgerr = s(i, j, k + 2, n);
@@ -1950,8 +2093,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                              0.05 * s(i, j, k - 1, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedger = max(sedger, min(s(i, j, k, n), s(i, j, k + 1, n)));
-                    sedger = min(sedger, max(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sedger = amrex::max(
+                        sedger, amrex::min(s(i, j, k, n), s(i, j, k + 1, n)));
+                    sedger = amrex::min(
+                        sedger, amrex::max(s(i, j, k, n), s(i, j, k + 1, n)));
 
                 } else if (k == domhi[2] - 2) {
                     // Use a modified stencil to get sedge on the first interior edge.
@@ -1960,10 +2105,12 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                               0.5 * s(i, j, k + 1, n) - 0.05 * s(i, j, k, n);
 
                     // Make sure sedge lies in between adjacent cell-centered values.
-                    sedgerr =
-                        max(sedgerr, min(s(i, j, k + 1, n), s(i, j, k + 2, n)));
-                    sedgerr =
-                        min(sedgerr, max(s(i, j, k + 1, n), s(i, j, k + 2, n)));
+                    sedgerr = amrex::max(
+                        sedgerr,
+                        amrex::min(s(i, j, k + 1, n), s(i, j, k + 2, n)));
+                    sedgerr = amrex::min(
+                        sedgerr,
+                        amrex::max(s(i, j, k + 1, n), s(i, j, k + 2, n)));
                 }
 
                 // Apply Colella 2008 limiters to compute sm and sp in the second
@@ -1971,8 +2118,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                 if (k == domhi[2] - 1 || k == domhi[2] - 2) {
                     alphap = sedger - s(i, j, k, n);
                     alpham = sedge - s(i, j, k, n);
-                    bigp = fabs(alphap) > 2.0 * fabs(alpham);
-                    bigm = fabs(alpham) > 2.0 * fabs(alphap);
+                    bigp = amrex::Math::abs(alphap) >
+                           2.0 * amrex::Math::abs(alpham);
+                    bigm = amrex::Math::abs(alpham) >
+                           2.0 * amrex::Math::abs(alphap);
                     extremum = false;
 
                     if (alpham * alphap >= 0.0) {
@@ -1986,8 +2135,10 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                         Real dafacep = sedgerr - sedger;
                         Real dabarm = s(i, j, k, n) - s(i, j, k - 1, n);
                         Real dabarp = s(i, j, k + 1, n) - s(i, j, k, n);
-                        Real dafacemin = min(fabs(dafacem), fabs(dafacep));
-                        Real dabarmin = min(fabs(dabarm), fabs(dabarp));
+                        Real dafacemin = amrex::min(amrex::Math::abs(dafacem),
+                                                    amrex::Math::abs(dafacep));
+                        Real dabarmin = amrex::min(amrex::Math::abs(dabarm),
+                                                   amrex::Math::abs(dabarp));
                         Real dachkm = 0.0;
                         Real dachkp = 0.0;
                         if (dafacemin >= dabarmin) {
@@ -2008,18 +2159,19 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                                    s(i, j, k + 2, n);
                         Real D2C = s(i, j, k - 1, n) - 2.0 * s(i, j, k, n) +
                                    s(i, j, k + 1, n);
-                        Real sgn = copysign(1.0, D2);
-                        Real D2LIM =
-                            max(min(sgn * D2,
-                                    min(C * sgn * D2L,
-                                        min(C * sgn * D2R, C * sgn * D2C))),
-                                0.0);
-                        Real D2ABS = max(fabs(D2), 1.e-10);
+                        Real sgn = amrex::Math::copysign(1.0, D2);
+                        Real D2LIM = amrex::max(
+                            amrex::min(sgn * D2,
+                                       amrex::min(C * sgn * D2L,
+                                                  amrex::min(C * sgn * D2R,
+                                                             C * sgn * D2C))),
+                            0.0);
+                        Real D2ABS = amrex::max(amrex::Math::abs(D2), 1.e-10);
                         alpham = alpham * D2LIM / D2ABS;
                         alphap = alphap * D2LIM / D2ABS;
                     } else {
                         if (bigp) {
-                            Real sgn = copysign(1.0, alpham);
+                            Real sgn = amrex::Math::copysign(1.0, alpham);
                             Real amax =
                                 -alphap * alphap / (4.0 * (alpham + alphap));
                             Real delam = s(i, j, k - 1, n) - s(i, j, k, n);
@@ -2035,7 +2187,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                             }
                         }
                         if (bigm) {
-                            Real sgn = copysign(1.0, alphap);
+                            Real sgn = amrex::Math::copysign(1.0, alphap);
                             Real amax =
                                 -alpham * alpham / (4.0 * (alpham + alphap));
                             Real delap = s(i, j, k + 1, n) - s(i, j, k, n);
@@ -2065,7 +2217,8 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
 
             if (is_umac) {
                 // w is MAC velocity -- use edge-based indexing
-                Real sigma = fabs(w(i, j, k + 1)) * dt_local / dx[2];
+                Real sigma =
+                    amrex::Math::abs(w(i, j, k + 1)) * dt_local / dx[2];
 
                 if (w(i, j, k + 1) > rel_eps_local) {
                     Ip(i, j, k, 2) =
@@ -2075,7 +2228,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 2) =
@@ -2085,7 +2238,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Im(i, j, k, 2) = s(i, j, k, n);
                 }
             } else {
-                Real sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                Real sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) > rel_eps_local) {
                     Ip(i, j, k, 2) =
@@ -2095,7 +2248,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                     Ip(i, j, k, 2) = s(i, j, k, n);
                 }
 
-                sigma = fabs(w(i, j, k)) * dt_local / dx[2];
+                sigma = amrex::Math::abs(w(i, j, k)) * dt_local / dx[2];
 
                 if (w(i, j, k) < -rel_eps_local) {
                     Im(i, j, k, 2) =

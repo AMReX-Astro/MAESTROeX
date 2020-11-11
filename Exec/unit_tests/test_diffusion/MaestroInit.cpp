@@ -26,7 +26,7 @@ void Maestro::Init() {
     FirstDt();
 
     if (stop_time >= 0. && t_old + dt > stop_time) {
-        dt = std::min(dt, stop_time - t_old);
+        dt = amrex::min(dt, stop_time - t_old);
         Print() << "Stop time limits dt = " << dt << std::endl;
     }
 
@@ -159,7 +159,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
 
                 temp_zone += del_temp;
 
-                if (fabs(del_temp) < tol * temp_zone) {
+                if (amrex::Math::abs(del_temp) < tol * temp_zone) {
                     converged = true;
                     break;
                 }

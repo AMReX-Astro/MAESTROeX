@@ -345,7 +345,7 @@ void BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
                     chunk_start = false;
                 }
             }
-            maxchunks = max(nchunks, maxchunks);
+            maxchunks = amrex::max(nchunks, maxchunks);
         }
     }
 
@@ -380,7 +380,7 @@ void BaseStateGeometry::InitMultiLevel(const int finest_radial_level_in,
                     chunk_start = false;
                 } else if (r == nr(n - 1) - 1 && chunk_start) {
                     // if last chunk is at the end of array
-                    r_end_coord(n, numdisjointchunks(n)) = 2 * r - 1;
+                    r_end_coord(n, numdisjointchunks(n)) = 2 * r + 1;
                 }
             }
         }

@@ -496,12 +496,12 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
 
     // set solver parameters
     thermal_mlmg.setVerbose(mg_verbose);
-    thermal_mlmg.setCGVerbose(cg_verbose);
+    thermal_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
     for (int lev = 0; lev <= finest_level; ++lev) {
-        thermal_tol_abs = std::max(thermal_tol_abs, phi[lev].norm0());
+        thermal_tol_abs = amrex::max(thermal_tol_abs, phi[lev].norm0());
     }
     const Real solver_tol_abs = eps_mac * thermal_tol_abs;
     const Real solver_tol_rel = eps_mac;
@@ -695,12 +695,12 @@ void Maestro::ThermalConductSDC(
 
     // set solver parameters
     thermal_mlmg.setVerbose(mg_verbose);
-    thermal_mlmg.setCGVerbose(cg_verbose);
+    thermal_mlmg.setBottomVerbose(cg_verbose);
 
     // tolerance parameters taken from original MAESTRO fortran code
     Real thermal_tol_abs = -1.e0;
     for (int lev = 0; lev <= finest_level; ++lev) {
-        thermal_tol_abs = std::max(thermal_tol_abs, phi[lev].norm0());
+        thermal_tol_abs = amrex::max(thermal_tol_abs, phi[lev].norm0());
     }
     const Real solver_tol_abs = eps_mac * thermal_tol_abs;
     const Real solver_tol_rel = eps_mac;
