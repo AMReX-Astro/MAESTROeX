@@ -421,7 +421,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(1, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac,
-                   w0mac, rho0_pred_edge_dummy);
+                   w0mac_dummy, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -465,7 +465,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
+    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy, thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -711,7 +711,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(2, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac,
-                   w0mac, rho0_pred_edge_dummy);
+                   w0mac_dummy, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -754,7 +754,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
+    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy, thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
