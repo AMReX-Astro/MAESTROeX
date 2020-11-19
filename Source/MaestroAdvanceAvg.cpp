@@ -298,26 +298,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             // save old-time value
             w0_old.copy(w0);
 
-            // compute w0, w0_force (for planar, do this later)
-            if (spherical) {
-                is_predictor = true;
-                Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
-            } else {
-                w0.setVal(0.0);
-            }
-
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-#if (AMREX_SPACEDIM == 3)
-            if (spherical) {
-                // put w0 on Cartesian edges
-                MakeW0mac(w0mac);
-            }
-#endif
-        } else {
+            // reset w0
             w0.setVal(0.0);
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
     }
 
@@ -339,14 +321,26 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         delta_gamma1_term[lev].setVal(0.);
     }
 
-    // For the planar case, calculate w0 just before the projection
-    if (evolve_base_state && !spherical) {
+    // compute w0 just before the projection
+    if (evolve_base_state) {
         if (split_projection) {
             is_predictor = true;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+
+#if (AMREX_SPACEDIM == 3)
+            if (spherical) {
+                // put w0 on Cartesian edges
+                MakeW0mac(w0mac);
+            }
+#endif
+        } else {
+            w0.setVal(0.0);
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                w0_cart[lev].setVal(0.);
+            }
         }
     }
 
@@ -377,7 +371,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Addw0(umac, w0mac, 1.);
         // reset w0
         w0.setVal(0.0);
-        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -425,7 +421,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(1, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac,
-                   w0mac, rho0_pred_edge_dummy);
+                   w0mac_dummy, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -469,7 +465,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
+    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
+                    thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -621,29 +618,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             if (use_delta_gamma1_term) {
                 Sbar += delta_gamma1_termbar;
             }
-
-            // compute w0, w0_force (planar case later)
-            if (spherical) {
-                is_predictor = false;
-                Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                       p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
-            } else {
-                w0.setVal(0.0);
-            }
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-
-#if (AMREX_SPACEDIM == 3)
-            if (spherical) {
-                // put w0 on Cartesian edges
-                MakeW0mac(w0mac);
-            }
-#endif
-        } else {
-            w0.setVal(0.0);
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -658,14 +633,26 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     is_predictor = false;
     AdvancePremac(umac, w0mac_dummy, w0_force_cart_dummy);
 
-    // For the planar case, calculate w0 just before the projection
-    if (evolve_base_state && !spherical) {
+    // compute w0 just before the projection
+    if (evolve_base_state) {
         if (split_projection) {
             is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
                    p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
                    dtold, is_predictor);
             Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+
+#if (AMREX_SPACEDIM == 3)
+            if (spherical) {
+                // put w0 on Cartesian edges
+                MakeW0mac(w0mac);
+            }
+#endif
+        } else {
+            w0.setVal(0.0);
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                w0_cart[lev].setVal(0.);
+            }
         }
     }
 
@@ -696,7 +683,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Addw0(umac, w0mac, 1.);
         // reset w0
         w0.setVal(0.0);
-        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -723,7 +712,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // advect rhoX, rho, and tracers
     DensityAdvance(2, s1, s2, sedge, sflux, scal_force, etarhoflux_dummy, umac,
-                   w0mac, rho0_pred_edge_dummy);
+                   w0mac_dummy, rho0_pred_edge_dummy);
 
     // correct the base state density by "averaging"
     if (evolve_base_state) {
@@ -766,7 +755,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac, thermal1);
+    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
+                    thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -869,20 +859,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
             if (use_delta_gamma1_term) {
                 Sbar += delta_gamma1_termbar;
             }
-            if (spherical) {
-                // compute w0, w0_force
-                is_predictor = false;
-                Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
-                       p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
-                       dtold, is_predictor);
-            } else {
-                w0.setVal(0.0);
-            }
-        } else {
-            w0.setVal(0.0);
         }
-
-        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -906,15 +883,18 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         w0.copy(w0_old);
     }
 
-    // For the planar case, calculate w0 just before the projection
-    if (evolve_base_state && !spherical) {
+    // compute w0 just before the projection
+    if (evolve_base_state) {
         if (split_projection) {
             is_predictor = false;
             Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
                    p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
                    dtold, is_predictor);
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        } else {
+            w0.setVal(0.0);
         }
+
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
     if (evolve_base_state && split_projection) {
@@ -997,7 +977,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
         // reset w0
         w0.setVal(0.0);
-        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.);
+        }
     }
 
     beta0_nm1.copy(0.5 * (beta0_old + beta0_new));

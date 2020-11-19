@@ -327,13 +327,15 @@ void Maestro::MakeEtarhoPlanar(
             AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
 
 #if (AMREX_SPACEDIM == 2)
-                Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j + 1, k));
+                Real U_dot_er = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
 #else
                 Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j, k + 1));
 #endif
                 // construct time-centered [ rho' (U dot e_r) ]
                 eta_cart_arr(i, j, k) =
-                    (0.5 * (rho_old(i, j, k) + rho_new(i, j, k))- rho0_nph_cart_arr(i,j,k) ) * U_dot_er;
+                    (0.5 * (rho_old(i, j, k) + rho_new(i, j, k)) -
+                     rho0_nph_cart_arr(i, j, k)) *
+                    U_dot_er;
             });
         }  // end MFIter loop
     }      // end loop over levels

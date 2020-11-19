@@ -417,8 +417,9 @@ class Maestro : public amrex::AmrCore {
 
     /// Print out the contents of the base state
     void PrintBase(const RealVector& base, const bool is_cell_centered = true);
-    
-    void PrintBase(const BaseState<amrex::Real>& base, const bool is_cell_centered = true);
+
+    void PrintBase(const BaseState<amrex::Real>& base,
+                   const bool is_cell_centered = true);
 
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF(const amrex::Vector<amrex::MultiFab>& MF);
