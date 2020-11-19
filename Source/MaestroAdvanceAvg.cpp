@@ -465,7 +465,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy, thermal1);
+    EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
+                    thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
@@ -754,7 +755,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         Print() << "            : enthalpy_advance >>>" << std::endl;
     }
 
-    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy, thermal1);
+    EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
+                    thermal1);
 
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
