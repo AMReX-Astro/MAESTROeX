@@ -23,7 +23,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         }
 
         if (drive_initial_convection) {
-            Put1dArrayOnCart(tempbar_init, tempbar_init_cart, 0, 0, bcs_f, 0);
+            Put1dArrayOnCart(tempbar_init, tempbar_init_cart, false, false,
+                             bcs_f, 0);
         }
     }
 
@@ -45,7 +46,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            bool use_mask = (lev != finest_level);
+            const bool use_mask = (lev != finest_level);
 
             const Array4<const Real> s_in_arr = s_in[lev].array(mfi);
             const Array4<Real> s_out_arr = s_out[lev].array(mfi);
@@ -66,10 +67,15 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 auto rho = s_in_arr(i, j, k, Rho);
                 Real x_in[NumSpec];
-                for (auto n = 0; n < NumSpec; ++n) {
-                    x_in[n] = s_in_arr(i, j, k, FirstSpec + n) /
-                              s_in_arr(i, j, k, Rho);
+                for (int n = 0; n < NumSpec; ++n) {
+                    x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
                 }
+#if NAUX_NET > 0
+                Real aux_in[NumAux];
+                for (int n = 0; n < NumAux; ++n) {
+                    aux_in[n] = s_in_arr(i, j, k, FirstAux + n) / rho;
+                }
+#endif
 
                 Real T_in = 0.0;
                 if (drive_initial_convection) {
@@ -90,6 +96,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 burn_t state_out;
 
                 Real x_out[NumSpec];
+#if NAUX_NET > 0
+                Real aux_out[NumAux];
+#endif
                 Real rhowdot[NumSpec];
                 Real rhoH = 0.0;
 
@@ -105,36 +114,56 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     state_in.e = 0.0;
                     state_in.rho = rho;
                     state_in.T = T_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_in.xn[n] = x_in[n];
                     }
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        state_in.aux[n] = aux_in[n];
+                    }
+#endif
 
                     // initialize state_out the same as state_in
                     state_out.e = 0.0;
                     state_out.rho = rho;
                     state_out.T = T_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_out.xn[n] = x_in[n];
                     }
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        state_out.aux[n] = aux_in[n];
+                    }
+#endif
 
                     burner(state_out, dt_in);
 
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] = state_out.xn[n];
                         rhowdot[n] = state_out.rho *
                                      (state_out.xn[n] - state_in.xn[n]) / dt_in;
                     }
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        aux_out[n] = state_out.aux[n];
+                    }
+#endif
                     rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
                 } else {
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] = x_in[n];
                         rhowdot[n] = 0.0;
                     }
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        aux_out[n] = aux_in[n];
+                    }
+#endif
                 }
 
                 // check if sum{X_k} = 1
                 Real sumX = 0.0;
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     sumX += x_out[n];
                 }
 
@@ -142,7 +171,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #ifndef AMREX_USE_GPU
                     Abort("ERROR: abundances do not sum to 1");
 #endif
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_out.xn[n] /= sumX;
                     }
                 }
@@ -152,12 +181,19 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 s_out_arr(i, j, k, Pi) = s_in_arr(i, j, k, Pi);
 
                 // update the species
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     s_out_arr(i, j, k, FirstSpec + n) = x_out[n] * rho;
                 }
 
+                // update the auxiliary variables
+#if NAUX_NET > 0
+                for (int n = 0; n < NumAux; ++n) {
+                    s_out_arr(i, j, k, FirstAux + n) = aux_out[n] * rho;
+                }
+#endif
+
                 // store the energy generation and species create quantities
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     rho_omegadot_arr(i, j, k, n) = rhowdot[n];
                 }
                 rho_Hnuc_arr(i, j, k) = rhoH;
@@ -183,15 +219,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     Vector<MultiFab> p0_cart(finest_level + 1);
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
-    if (spherical == 1) {
+    if (spherical) {
         for (int lev = 0; lev <= finest_level; ++lev) {
             p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
             p0_cart[lev].setVal(0.);
         }
-
-        if (drive_initial_convection) {
-            Put1dArrayOnCart(p0, p0_cart, 0, 0, bcs_f, 0);
-        }
+        Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
     }
 
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -210,7 +243,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
 
-            int use_mask = !(lev == finest_level);
+            const bool use_mask = !(lev == finest_level);
 
             const Array4<const Real> s_in_arr = s_in[lev].array(mfi);
             const Array4<Real> s_out_arr = s_out[lev].array(mfi);
@@ -227,7 +260,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 auto r = (AMREX_SPACEDIM == 2) ? j : k;
 
                 Real sdc_rhoX[NumSpec];
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     sdc_rhoX[n] = source_arr(i, j, k, FirstSpec + n);
                 }
                 auto sdc_rhoh = source_arr(i, j, k, RhoH);
@@ -235,9 +268,15 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 auto rho_in = s_in_arr(i, j, k, Rho);
                 Real rhoX_in[NumSpec];
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     rhoX_in[n] = s_in_arr(i, j, k, FirstSpec + n);
                 }
+#if NAUX_NET > 0
+                Real aux_in[NumAux];
+                for (int n = 0; n < NumAux; ++n) {
+                    aux_in[n] = s_in_arr(i, j, k, FirstAux + n);
+                }
+#endif
                 auto rhoh_in = s_in_arr(i, j, k, RhoH);
 
                 Real x_test = (ispec_threshold > 0)
@@ -248,65 +287,93 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 sdc_t state_out;
 
                 Real rhoX_out[NumSpec];
+#if NAUX_NET > 0
+                Real aux_out[NumAux];
+#endif
                 Real rho_out = 0.0;
                 Real rhoh_out = 0.0;
 
                 // if the threshold species is not in the network, then we burn
                 // normally.  if it is in the network, make sure the mass
                 // fraction is above the cutoff.
-                if ((rho > burning_cutoff_density_lo &&
-                     rho < burning_cutoff_density_hi) &&
+                if ((rho_in > burning_cutoff_density_lo &&
+                     rho_in < burning_cutoff_density_hi) &&
                     (ispec_threshold < 0 ||
                      (ispec_threshold > 0 &&
                       x_test > burner_threshold_cutoff))) {
                     state_in.p0 = sdc_p0;
                     state_in.rho = rho_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_in.y[n] = rhoX_in[n];
                     }
                     state_in.y[NumSpec] = rhoh_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_in.ydot_a[n] = sdc_rhoX[n];
                     }
                     state_in.ydot_a[NumSpec] = sdc_rhoh;
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        state_in.aux[n] = rhoaux_in[n] / rho_in;
+                    }
+#endif
                     state_in.success = true;
 
                     // initialize state_out the same
                     state_out.p0 = sdc_p0;
                     state_out.rho = rho_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_out.y[n] = rhoX_in[n];
                     }
                     state_out.y[NumSpec] = rhoh_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         state_out.ydot_a[n] = sdc_rhoX[n];
                     }
                     state_out.ydot_a[NumSpec] = sdc_rhoh;
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        state_out.aux[n] = rhoaux_in[n] / rho_in;
+                    }
+#endif
                     state_out.success = true;
 
                     integrator(state_out, dt_in);
 
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         rho_out += state_out.y[n];
                         rhoX_out[n] = state_out.y[n];
                     }
                     rhoh_out = state_out.y[NumSpec];
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        rhoaux_out[n] = rho_out * state_out.aux[n];
+                    }
+#endif
                 } else {
                     rho_out = rho_in;
-                    for (auto n = 0; n < NumSpec; ++n) {
+                    for (int n = 0; n < NumSpec; ++n) {
                         rho_out += sdc_rhoX[n] * dt_in;
                         rhoX_out[n] = rhoX_in[n] + sdc_rhoX[n] * dt_in;
                     }
                     rhoh_out = rhoh_in + sdc_rhoh * dt_in;
+#if NAUX_NET > 0
+                    for (int n = 0; n < NumAux; ++n) {
+                        rhoaux_out[n] = rho_out / rho_in * rhoaux_in[n];
+                    }
+#endif
                 }
 
                 // update the density
                 s_out_arr(i, j, k, Rho) = rho_out;
 
                 // update the species
-                for (auto n = 0; n < NumSpec; ++n) {
+                for (int n = 0; n < NumSpec; ++n) {
                     s_out_arr(i, j, k, FirstSpec + n) = rhoX_out[n];
                 }
+#if NAUX_NET > 0
+                for (int n = 0; n < NumAux; ++n) {
+                    s_out_arr(i, j, k, FirstAux + n) = rhoaux_out[n];
+                }
+#endif
 
                 // update the enthalpy -- include the change due to external heating
                 s_out_arr(i, j, k, RhoH) = rhoh_out;
