@@ -23,7 +23,8 @@ void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) {
     }
 }
 
-void Maestro::PrintBase(const BaseState<Real>& base_s, const bool is_cell_centered) {
+void Maestro::PrintBase(const BaseState<Real>& base_s,
+                        const bool is_cell_centered) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
 
@@ -35,8 +36,8 @@ void Maestro::PrintBase(const BaseState<Real>& base_s, const bool is_cell_center
             auto hi = is_cell_centered ? base_geom.r_end_coord(lev, i)
                                        : base_geom.r_end_coord(lev, i) + 1;
             for (auto r = lo; r <= hi; ++r) {
-		std::cout << std::setprecision(16) << "base lev, r " << lev << ", " << r << ", "
-                        << base(lev, r) << std::endl;
+                std::cout << std::setprecision(16) << "base lev, r " << lev
+                          << ", " << r << ", " << base(lev, r) << std::endl;
             }
         }
     }
