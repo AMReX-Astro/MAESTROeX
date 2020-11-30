@@ -859,7 +859,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 
     for (int i = 0; i < NumSpec; i++) {
         std::string spec_string = "rhoX(";
-        spec_string += spec_names_cxx[i];
+        spec_string += short_spec_names_cxx[i];
         spec_string += ')';
 
         names[cnt++] = spec_string;
@@ -868,7 +868,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_spec) {
         for (int i = 0; i < NumSpec; i++) {
             std::string spec_string = "X(";
-            spec_string += spec_names_cxx[i];
+            spec_string += short_spec_names_cxx[i];
             spec_string += ')';
 
             names[cnt++] = spec_string;
@@ -880,7 +880,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_spec || plot_omegadot) {
         for (int i = 0; i < NumSpec; i++) {
             std::string spec_string = "omegadot(";
-            spec_string += spec_names_cxx[i];
+            spec_string += short_spec_names_cxx[i];
             spec_string += ')';
 
             names[cnt++] = spec_string;
@@ -1234,7 +1234,7 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << OtherLine;
 
         for (int i = 0; i < NumSpec; i++) {
-            auto spec_name = spec_names_cxx[i];
+            auto spec_name = short_spec_names_cxx[i];
             jobInfoFile << std::setw(6) << i << SkipSpace << std::setw(mlen + 1)
                         << std::setfill(' ') << spec_name << SkipSpace
                         << std::setw(7) << aion[i] << SkipSpace << std::setw(7)
