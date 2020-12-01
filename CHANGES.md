@@ -1,3 +1,13 @@
+# 20.12
+
+  * Set default in SDC algorithm to use split projection for both planar and spherical problems 
+
+  * Bug fix: spherical SDC with split projection
+
+  * Added test problem: imposed_external_heating
+
+  * Fixed create_release action and release action python script
+
 # 20.11
 
   * Update cpp linter action
