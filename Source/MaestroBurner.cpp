@@ -283,8 +283,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                                   ? rhoX_in[ispec_threshold] / rho_in
                                   : 0.0;
 
-                sdc_t state_in;
-                sdc_t state_out;
+                burn_t state_in;
+                burn_t state_out;
 
                 Real rhoX_out[NumSpec];
 #if NAUX_NET > 0
@@ -306,11 +306,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     for (int n = 0; n < NumSpec; ++n) {
                         state_in.y[n] = rhoX_in[n];
                     }
-                    state_in.y[NumSpec] = rhoh_in;
+                    state_in.y[SENTH] = rhoh_in;
                     for (int n = 0; n < NumSpec; ++n) {
                         state_in.ydot_a[n] = sdc_rhoX[n];
                     }
-                    state_in.ydot_a[NumSpec] = sdc_rhoh;
+                    state_in.ydot_a[SENTH] = sdc_rhoh;
 #if NAUX_NET > 0
                     for (int n = 0; n < NumAux; ++n) {
                         state_in.aux[n] = rhoaux_in[n] / rho_in;
