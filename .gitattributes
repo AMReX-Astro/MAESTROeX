@@ -1,0 +1,5 @@
+*.ipynb linguist-vendored
+*.[23]levels linguist-vendored
+*.tex linguist-documentation
+
+*.H linguist-language=C++
