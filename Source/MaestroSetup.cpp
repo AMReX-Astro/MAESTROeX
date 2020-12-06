@@ -41,7 +41,7 @@ void Maestro::Setup() {
     maestro_network_init();
 
     maestro_eos_init();
-    eos_init();
+    eos_init(maestro::small_temp, maestro::small_dens);
 
     burner_init();
 
