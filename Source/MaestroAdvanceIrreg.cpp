@@ -853,11 +853,6 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     VelocityAdvance(rhohalf, umac, w0mac_dummy, w0_force_cart_dummy, rho0_nph,
                     grav_cell_nph, sponge);
 
-    if (evolve_base_state && is_initIter) {
-        // throw away w0 by setting w0 = w0_old
-        w0.copy(w0_old);
-    }
-
     // compute w0 just before the projection
     if (evolve_base_state) {
         // compute w0, w0_force
@@ -867,6 +862,12 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
                is_predictor);
 
         // put w0 on Cartesian cell-centers
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+    }
+
+    if (evolve_base_state && is_initIter) {
+        // throw away w0 by setting w0 = w0_old
+        w0.copy(w0_old);
         Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
     

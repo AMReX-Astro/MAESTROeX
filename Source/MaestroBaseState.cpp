@@ -112,7 +112,8 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     Real p_above_cutoff = p0_init_arr(n, 0);
 
     for (auto r = 0; r < base_geom.nr(n); ++r) {
-        Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
+        Real rloc = use_exact_base_state ? base_geom.r_cc_loc(n, r)
+	                                 : starting_rad + (Real(r) + 0.5) * dr(n);
 
         // here we account for r > rmax of the model.hse array, assuming
         // that the state stays constant beyond rmax
@@ -267,7 +268,8 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     Real max_hse_error = -1.e30;
 
     for (auto r = 1; r < base_geom.nr(n); ++r) {
-        Real rloc = starting_rad + (Real(r) + 0.5) * dr(n);
+        Real rloc = use_exact_base_state ? base_geom.r_cc_loc(n, r)
+	                                 : starting_rad + (Real(r) + 0.5) * dr(n);
         rloc = amrex::min(rloc, rmax);
 
         if (rloc < base_cutoff_density_loc) {
@@ -278,11 +280,13 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             r_l += use_exact_base_state ? base_geom.r_edge_loc(n, r)
                                         : Real(r) * dr(n);
 
+	    Real dr_local = r_r - r_l; 
+
             Real g = 0.0;
 
             if (spherical || do_2d_planar_octant) {
                 g = -Gconst * mencl / (r_l * r_l);
-                mencl += 4.0 / 3.0 * M_PI * dr(n) *
+                mencl += 4.0 / 3.0 * M_PI * dr_local *
                          (r_l * r_l + r_l * r_r + r_r * r_r) *
                          s0_init_arr(n, r, Rho);
             } else {
