@@ -296,8 +296,8 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         // save old-time value
         w0_old.copy(w0);
 
-	// reset w0
-	w0.setVal(0.0);
+        // reset w0
+        w0.setVal(0.0);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -335,8 +335,8 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
             MakeW0mac(w0mac);
         }
 #endif
-    } 
-    
+    }
+
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_old, S_cc_nph, Sbar, beta0_old,
                        delta_gamma1_term, gamma1bar_old, p0_old, delta_p_term,
@@ -362,11 +362,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     if (evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
-	// reset w0
-	w0.setVal(0.0);
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    w0_cart[lev].setVal(0.0);
-	}
+        // reset w0
+        w0.setVal(0.0);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.0);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -459,7 +459,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     }
 
     EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
-		    thermal1);
+                    thermal1);
 
     // compute the new etarho
     if (evolve_base_state && use_etarho) {
@@ -637,7 +637,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         }
 #endif
     }
-    
+
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
     MakeRHCCforMacProj(macrhs, rho0_new, S_cc_nph, Sbar, beta0_nph,
                        delta_gamma1_term, gamma1bar_new, p0_new, delta_p_term,
@@ -663,11 +663,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     if (evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
-	// reset w0
-	w0.setVal(0.0);
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    w0_cart[lev].setVal(0.0);
-	}
+        // reset w0
+        w0.setVal(0.0);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.0);
+        }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -870,7 +870,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         w0.copy(w0_old);
         Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
-    
+
     if (spherical && evolve_base_state) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -949,11 +949,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         AverageDown(unew, 0, AMREX_SPACEDIM);
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
-	// reset w0
-	w0.setVal(0.0);
-	for (int lev = 0; lev <= finest_level; ++lev) {
-	    w0_cart[lev].setVal(0.0);
-	}
+        // reset w0
+        w0.setVal(0.0);
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            w0_cart[lev].setVal(0.0);
+        }
     }
 
     beta0_nm1.copy(0.5 * (beta0_old + beta0_new));
