@@ -206,12 +206,13 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     }
 #endif
 
+    // initialize to zero
     Sbar.setVal(0.);
+    w0.setVal(0.);
 
     // set dummy variables to zero
     w0_force_dummy.setVal(0.);
-    rho0_pred_edge_dummy.setVal(0.0);
-    w0.setVal(0.0);
+    rho0_pred_edge_dummy.setVal(0.);
 
     // make the sponge for all levels
     if (do_sponge) {
@@ -264,7 +265,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
 
     // compute p0_minus_peosbar = p0_old - peosbar_old (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
-    if (dpdt_factor > 0.0) {
+    if (dpdt_factor > 0.) {
         // peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
         PfromRhoH(sold, sold, delta_p_term);
 
@@ -283,7 +284,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         }
     } else {
         // these should have no effect if dpdt_factor <= 0
-        p0_minus_peosbar.setVal(0.0);
+        p0_minus_peosbar.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
@@ -297,7 +298,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         w0_old.copy(w0);
 
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -363,9 +364,9 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
-            w0_cart[lev].setVal(0.0);
+            w0_cart[lev].setVal(0.);
         }
     }
 
@@ -461,8 +462,8 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     EnthalpyAdvance(1, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
                     thermal1);
 
-    // compute the new etarho
     if (evolve_base_state && use_etarho) {
+        // compute the new etarho
         MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
     }
 
@@ -664,9 +665,9 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
-            w0_cart[lev].setVal(0.0);
+            w0_cart[lev].setVal(0.);
         }
     }
 
@@ -728,7 +729,6 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     }
 
     // base state enthalpy averaging
-    // add new dp/dt term to rhoh0_new
     if (evolve_base_state) {
         Average(s2, rhoh0_new, RhoH);
     }
@@ -741,8 +741,8 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     EnthalpyAdvance(2, s1, s2, sedge, sflux, scal_force, umac, w0mac_dummy,
                     thermal1);
 
-    // compute the new etarho
     if (evolve_base_state && use_etarho) {
+        // compute the new etarho
         MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
     }
 
@@ -829,6 +829,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     }
 
     if (evolve_base_state) {
+        // compute Sbar = average(S_cc_new)
         Average(S_cc_new, Sbar, 0);
 
         // compute Sbar = Sbar + delta_gamma1_termbar
@@ -853,6 +854,11 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
     VelocityAdvance(rhohalf, umac, w0mac_dummy, w0_force_cart_dummy, rho0_nph,
                     grav_cell_nph, sponge);
 
+    if (evolve_base_state && is_initIter) {
+        // throw away w0 by setting w0 = w0_old
+        w0.copy(w0_old);
+    }
+
     // compute w0 just before the projection
     if (evolve_base_state) {
         // compute w0, w0_force
@@ -865,13 +871,7 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
-    if (evolve_base_state && is_initIter) {
-        // throw away w0 by setting w0 = w0_old
-        w0.copy(w0_old);
-        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
-    }
-
-    if (spherical && evolve_base_state) {
+    if (evolve_base_state) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
@@ -950,9 +950,9 @@ void Maestro::AdvanceTimeStepIrreg(bool is_initIter) {
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
-            w0_cart[lev].setVal(0.0);
+            w0_cart[lev].setVal(0.);
         }
     }
 

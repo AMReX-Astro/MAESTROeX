@@ -5,6 +5,7 @@
 using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
+// assume split_projection is true
 void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvanceTimeStepAverage()", AdvanceTimeStepAverage);
@@ -85,7 +86,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                                          base_geom.nr_fine + 1);
 
     bool is_predictor;
-    bool split_projection = true;
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl
@@ -208,11 +208,11 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // initialize to zero
     Sbar.setVal(0.);
-    w0.setVal(0.0);
+    w0.setVal(0.);
 
     // set dummy variables to zero
     w0_force_dummy.setVal(0.);
-    rho0_pred_edge_dummy.setVal(0.0);
+    rho0_pred_edge_dummy.setVal(0.);
 
     // make the sponge for all levels
     if (do_sponge) {
@@ -265,7 +265,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // compute p0_minus_peosbar = p0_old - peosbar_old (for making w0) and
     // compute delta_p_term = peos_old - p0_old (for RHS of projections)
-    if (dpdt_factor > 0.0) {
+    if (dpdt_factor > 0.) {
         // peos_old (delta_p_term) now holds the thermodynamic p computed from sold(rho,h,X)
         PfromRhoH(sold, sold, delta_p_term);
 
@@ -284,23 +284,21 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         }
     } else {
         // these should have no effect if dpdt_factor <= 0
-        p0_minus_peosbar.setVal(0.0);
+        p0_minus_peosbar.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
             delta_p_term[lev].setVal(0.);
         }
     }
 
     if (evolve_base_state) {
-        if (split_projection) {
-            // compute Sbar = average(S_cc_nph)
-            Average(S_cc_nph, Sbar, 0);
+        // compute Sbar = average(S_cc_nph)
+        Average(S_cc_nph, Sbar, 0);
 
-            // save old-time value
-            w0_old.copy(w0);
+        // save old-time value
+        w0_old.copy(w0);
 
-            // reset w0
-            w0.setVal(0.0);
-        }
+        // reset w0
+        w0.setVal(0.);
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -323,25 +321,21 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // compute w0 just before the projection
     if (evolve_base_state) {
-        if (split_projection) {
-            is_predictor = true;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        // compute w0, w0_force
+        is_predictor = true;
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old, p0_old,
+               gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dtold,
+               is_predictor);
+
+        // put w0 on Cartesian cell-centers
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
 #if (AMREX_SPACEDIM == 3)
-            if (spherical) {
-                // put w0 on Cartesian edges
-                MakeW0mac(w0mac);
-            }
-#endif
-        } else {
-            w0.setVal(0.0);
-            for (int lev = 0; lev <= finest_level; ++lev) {
-                w0_cart[lev].setVal(0.);
-            }
+        if (spherical) {
+            // put w0 on Cartesian edges
+            MakeW0mac(w0mac);
         }
+#endif
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -349,7 +343,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                        delta_gamma1_term, gamma1bar_old, p0_old, delta_p_term,
                        delta_chi, is_predictor);
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // subtract w0mac from umac
         Addw0(umac, w0mac, -1.);
     }
@@ -366,11 +360,11 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_macproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
             w0_cart[lev].setVal(0.);
         }
@@ -471,9 +465,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
         if (!spherical) {
-            if (split_projection) {
-                MakeEtarhoPlanar(s1, s2, umac);
-            }
+            MakeEtarhoPlanar(s1, s2, umac);
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
         }
@@ -610,14 +602,12 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     }
 
     if (evolve_base_state) {
-        if (split_projection) {
-            // compute Sbar = average(S_cc_nph)
-            Average(S_cc_nph, Sbar, 0);
+        // compute Sbar = average(S_cc_nph)
+        Average(S_cc_nph, Sbar, 0);
 
-            // compute Sbar = Sbar + delta_gamma1_termbar
-            if (use_delta_gamma1_term) {
-                Sbar += delta_gamma1_termbar;
-            }
+        // compute Sbar = Sbar + delta_gamma1_termbar
+        if (use_delta_gamma1_term) {
+            Sbar += delta_gamma1_termbar;
         }
     }
 
@@ -635,25 +625,21 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // compute w0 just before the projection
     if (evolve_base_state) {
-        if (split_projection) {
-            is_predictor = false;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old,
-                   p0_old, gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
-            Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
+        // compute w0, w0_force
+        is_predictor = false;
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old, p0_old,
+               gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dtold,
+               is_predictor);
+
+        // put w0 on Cartesian cell-centers
+        Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
 
 #if (AMREX_SPACEDIM == 3)
-            if (spherical) {
-                // put w0 on Cartesian edges
-                MakeW0mac(w0mac);
-            }
-#endif
-        } else {
-            w0.setVal(0.0);
-            for (int lev = 0; lev <= finest_level; ++lev) {
-                w0_cart[lev].setVal(0.);
-            }
+        if (spherical) {
+            // put w0 on Cartesian edges
+            MakeW0mac(w0mac);
         }
+#endif
     }
 
     // compute RHS for MAC projection, beta0*(S_cc-Sbar) + beta0*delta_chi
@@ -661,7 +647,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
                        delta_gamma1_term, gamma1bar_new, p0_new, delta_p_term,
                        delta_chi, is_predictor);
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // subtract w0mac from umac
         Addw0(umac, w0mac, -1.);
     }
@@ -678,11 +664,11 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_macproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // add w0mac back to umac
         Addw0(umac, w0mac, 1.);
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
             w0_cart[lev].setVal(0.);
         }
@@ -761,9 +747,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     if (evolve_base_state && use_etarho) {
         // compute the new etarho
         if (!spherical) {
-            if (split_projection) {
-                MakeEtarhoPlanar(s1, s2, umac);
-            }
+            MakeEtarhoPlanar(s1, s2, umac);
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
         }
@@ -851,14 +835,12 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     }
 
     if (evolve_base_state) {
-        if (split_projection) {
-            // compute Sbar = average(S_cc_new)
-            Average(S_cc_new, Sbar, 0);
+        // compute Sbar = average(S_cc_new)
+        Average(S_cc_new, Sbar, 0);
 
-            // compute Sbar = Sbar + delta_gamma1_termbar
-            if (use_delta_gamma1_term) {
-                Sbar += delta_gamma1_termbar;
-            }
+        // compute Sbar = Sbar + delta_gamma1_termbar
+        if (use_delta_gamma1_term) {
+            Sbar += delta_gamma1_termbar;
         }
     }
 
@@ -885,19 +867,17 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
 
     // compute w0 just before the projection
     if (evolve_base_state) {
-        if (split_projection) {
-            is_predictor = false;
-            Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new,
-                   p0_new, gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt,
-                   dtold, is_predictor);
-        } else {
-            w0.setVal(0.0);
-        }
+        // compute w0, w0_force
+        is_predictor = false;
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_new, rho0_new, p0_new, p0_new,
+               gamma1bar_new, gamma1bar_new, p0_minus_peosbar, dt, dtold,
+               is_predictor);
 
+        // put w0 on Cartesian cell-centers
         Put1dArrayOnCart(w0, w0_cart, true, true, bcs_u, 0, 1);
     }
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // subtract w0 from uold and unew for nodal projection
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Subtract(uold[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM,
@@ -967,7 +947,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     ParallelDescriptor::ReduceRealMax(end_total_nodalproj,
                                       ParallelDescriptor::IOProcessorNumber());
 
-    if (evolve_base_state && split_projection) {
+    if (evolve_base_state) {
         // add w0 back to unew
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Add(unew[lev], w0_cart[lev], 0, 0, AMREX_SPACEDIM, 0);
@@ -976,7 +956,7 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
 
         // reset w0
-        w0.setVal(0.0);
+        w0.setVal(0.);
         for (int lev = 0; lev <= finest_level; ++lev) {
             w0_cart[lev].setVal(0.);
         }
