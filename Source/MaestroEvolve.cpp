@@ -81,11 +81,11 @@ void Maestro::Evolve() {
 #ifdef SDC
         AdvanceTimeStepSDC(false);
 #else
-        if (use_exact_base_state) {
-            AdvanceTimeStepIrreg(false);
-        } else if (average_base_state) {
+        if (use_exact_base_state || average_base_state) {
+            // new temporal algorithm
             AdvanceTimeStepAverage(false);
         } else {
+            // original temporal algorithm
             AdvanceTimeStep(false);
         }
 #endif

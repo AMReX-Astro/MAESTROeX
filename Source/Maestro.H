@@ -868,8 +868,7 @@ class Maestro : public amrex::AmrCore {
                    const BaseState<amrex::Real>& rho0_s,
                    const BaseState<amrex::Real>& p0_s,
                    const BaseState<amrex::Real>& gamma1bar_s,
-                   const BaseState<amrex::Real>& grav_cell_s,
-                   const bool is_irreg = false);
+                   const BaseState<amrex::Real>& grav_cell_s);
 
     // end MaestroMakeBeta0.cpp functions
     ////////////

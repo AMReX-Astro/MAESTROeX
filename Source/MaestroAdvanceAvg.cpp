@@ -627,8 +627,8 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     if (evolve_base_state) {
         // compute w0, w0_force
         is_predictor = false;
-        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_old, p0_old, p0_old,
-               gamma1bar_old, gamma1bar_old, p0_minus_peosbar, dt, dtold,
+        Makew0(w0_old, w0_force_dummy, Sbar, rho0_old, rho0_new, p0_old, p0_new,
+               gamma1bar_old, gamma1bar_new, p0_minus_peosbar, dt, dtold,
                is_predictor);
 
         // put w0 on Cartesian cell-centers
