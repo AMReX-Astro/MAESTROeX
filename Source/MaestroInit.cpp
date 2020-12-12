@@ -760,9 +760,7 @@ void Maestro::InitIter() {
 
     // advance the solution by dt
 #ifndef SDC
-    if (use_exact_base_state) {
-        AdvanceTimeStepIrreg(true);
-    } else if (average_base_state) {
+    if (use_exact_base_state || average_base_state) {
         AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);
