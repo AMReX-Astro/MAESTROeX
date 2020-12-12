@@ -119,8 +119,7 @@ void Maestro::Regrid() {
     MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
     // beta0_old needs to be recomputed
-    MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old,
-              use_exact_base_state);
+    MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old);
 
     // wallclock time
     Real end_total = ParallelDescriptor::second() - strt_total;

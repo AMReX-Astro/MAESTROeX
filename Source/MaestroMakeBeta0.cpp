@@ -6,8 +6,7 @@ using namespace amrex;
 void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                         const BaseState<Real>& p0_s,
                         const BaseState<Real>& gamma1bar_s,
-                        const BaseState<Real>& grav_cell_s,
-                        const bool is_irreg) {
+                        const BaseState<Real>& grav_cell_s) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeBeta0()", MakeBeta0);
 
@@ -66,11 +65,12 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                     Real nu = 0.0;
 
                     if (r < base_geom.anelastic_cutoff_density_coord(n)) {
-                        Real drp = is_irreg ? base_geom.r_edge_loc(n, r + 1) -
-                                                  base_geom.r_edge_loc(n, r)
-                                            : dr(n);
+                        Real drp = use_exact_base_state
+                                       ? base_geom.r_edge_loc(n, r + 1) -
+                                             base_geom.r_edge_loc(n, r)
+                                       : dr(n);
                         Real drm = dr(n);
-                        if (is_irreg) {
+                        if (use_exact_base_state) {
                             drm = r > 0 ? base_geom.r_edge_loc(n, r) -
                                               base_geom.r_edge_loc(n, r - 1)
                                         : drp;
@@ -81,7 +81,7 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                             // mu = 0.0;
                             // nu = 0.0;
                         } else {
-                            Real drc = is_irreg
+                            Real drc = use_exact_base_state
                                            ? base_geom.r_cc_loc(n, r + 1) -
                                                  base_geom.r_cc_loc(n, r - 1)
                                            : dr(n);
@@ -129,7 +129,7 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                 sflag * amrex::min(slim, amrex::Math::abs(del));
                         }
 
-                        if (is_irreg) {
+                        if (use_exact_base_state) {
                             // edge-to-cell-center spacings
                             drp = 2.0 * (base_geom.r_edge_loc(n, r + 1) -
                                          base_geom.r_cc_loc(n, r));
@@ -151,7 +151,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                        (p0(n, r) * gamma1bar(n, r));
 
                         } else {
-                            if (use_linear_grav_in_beta0 && !is_irreg) {
+                            if (use_linear_grav_in_beta0 &&
+                                !use_exact_base_state) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
                                 Real del = 0.5 *

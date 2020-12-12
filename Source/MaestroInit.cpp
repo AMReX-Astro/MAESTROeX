@@ -135,8 +135,7 @@ void Maestro::Init() {
         MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
         // compute beta0
-        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old,
-                  use_exact_base_state);
+        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old);
 
         // set beta0^{-1} = beta0_old
         beta0_nm1.copy(beta0_old);
@@ -761,9 +760,7 @@ void Maestro::InitIter() {
 
     // advance the solution by dt
 #ifndef SDC
-    if (use_exact_base_state) {
-        AdvanceTimeStepIrreg(true);
-    } else if (average_base_state) {
+    if (use_exact_base_state || average_base_state) {
         AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);
