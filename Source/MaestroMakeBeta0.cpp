@@ -65,9 +65,10 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                     Real nu = 0.0;
 
                     if (r < base_geom.anelastic_cutoff_density_coord(n)) {
-                        Real drp = use_exact_base_state ? base_geom.r_edge_loc(n, r + 1) -
-                                                  base_geom.r_edge_loc(n, r)
-                                            : dr(n);
+                        Real drp = use_exact_base_state
+                                       ? base_geom.r_edge_loc(n, r + 1) -
+                                             base_geom.r_edge_loc(n, r)
+                                       : dr(n);
                         Real drm = dr(n);
                         if (use_exact_base_state) {
                             drm = r > 0 ? base_geom.r_edge_loc(n, r) -
@@ -150,7 +151,8 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                        (p0(n, r) * gamma1bar(n, r));
 
                         } else {
-                            if (use_linear_grav_in_beta0 && !use_exact_base_state) {
+                            if (use_linear_grav_in_beta0 &&
+                                !use_exact_base_state) {
                                 // also do piecewise linear reconstruction of
                                 // gravity -- not documented in publication yet.
                                 Real del = 0.5 *
