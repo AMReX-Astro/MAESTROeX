@@ -461,7 +461,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
     }
 
     EnthalpyAdvanceSDC(1, sold, shat, sedge, sflux, scal_force, umac, w0mac,
-                       p0_nph, diff_old);
+                       diff_old);
 
     // base state enthalpy update
     if (evolve_base_state) {
@@ -566,9 +566,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         MakeGravCell(grav_cell_new, rho0_new);
 
         EnforceHSE(rho0_new, p0_new, grav_cell_new);
-
-        // compute p0_nph
-        // p0_nph.copy(0.5 * (p0_old + p0_new));
 
         // hold dp0/dt in psi for Make_S_cc
         psi.copy((p0_new - p0_old) / dt);
@@ -836,7 +833,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
 
             p0_nph.copy(0.5 * (p0_old + p0_new));
-            // p0_nph.copy(p0_new);
 
             // hold dp0/dt in psi for enthalpy advance
             psi.copy((p0_new - p0_old) / dt);
@@ -848,7 +844,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         }
 
         EnthalpyAdvanceSDC(2, sold, shat, sedge, sflux, scal_force, umac, w0mac,
-                           p0_nph, diff_old);
+                           diff_old);
 
         // base state enthalpy update
         if (evolve_base_state) {
@@ -968,9 +964,6 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             MakeGravCell(grav_cell_new, rho0_new);
 
             EnforceHSE(rho0_new, p0_new, grav_cell_new);
-
-            // compute p0_nph
-            // p0_nph.copy(0.5 * (p0_old + p0_new));
 
             // hold dp0/dt in psi for Make_S_cc
             psi.copy((p0_new - p0_old) / dt);

@@ -8,7 +8,7 @@ using namespace amrex;
 // advance a single level for a single time step, updates flux registers
 void Maestro::AdvanceTimeStep(bool is_initIter) {
     // // timer for profiling
-    // BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
+    BL_PROFILE_VAR("Maestro::AdvanceTimeStep()", AdvanceTimeStep);
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl

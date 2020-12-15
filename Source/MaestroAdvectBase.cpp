@@ -42,7 +42,7 @@ void Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state) {
             int lo = base_geom.r_start_coord(n, i);
             int hi = base_geom.r_end_coord(n, i);
 
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
 
                 force_arr(n, r) = -rho0_old_arr(n, r) *
@@ -61,7 +61,7 @@ void Maestro::AdvectBaseDensPlanar(BaseState<Real>& rho0_predicted_edge_state) {
             int lo = base_geom.r_start_coord(n, i);
             int hi = base_geom.r_end_coord(n, i);
 
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
 
                 rho0_new_arr(n, r) =
@@ -91,7 +91,7 @@ void Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge_state) {
     const auto r_edge_loc = base_geom.r_edge_loc;
     auto force_arr = force.array();
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         force_arr(0, r) =
             -rho0_old_arr(0, r) * (w0_arr(0, r + 1) - w0_arr(0, r)) / dr0 -
             rho0_old_arr(0, r) * (w0_arr(0, r) + w0_arr(0, r + 1)) /
@@ -101,7 +101,7 @@ void Maestro::AdvectBaseDensSphr(BaseState<Real>& rho0_predicted_edge_state) {
 
     MakeEdgeState1d(rho0_old, rho0_predicted_edge_state, force);
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         rho0_new_arr(0, r) =
             rho0_old_arr(0, r) -
             dtdr / (r_cc_loc(0, r) * r_cc_loc(0, r)) *
@@ -157,7 +157,7 @@ void Maestro::AdvectBaseEnthalpyPlanar(
             int hi = base_geom.r_end_coord(n, i);
 
             // here we predict (rho h)_0 on the edges
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
                 force_arr(n, r) = -rhoh0_old_arr(n, r) *
                                       (w0_arr(n, r + 1) - w0_arr(n, r)) / dr +
@@ -178,7 +178,7 @@ void Maestro::AdvectBaseEnthalpyPlanar(
             int hi = base_geom.r_end_coord(n, i);
 
             // update (rho h)_0
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
                 rhoh0_new_arr(n, r) =
                     rhoh0_old_arr(n, r) -
@@ -213,7 +213,7 @@ void Maestro::AdvectBaseEnthalpySphr(
     const auto psi_arr = psi.const_array();
     auto force_arr = force.array();
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         force_arr(0, r) =
             -rhoh0_old_arr(0, r) * (w0_arr(0, r + 1) - w0_arr(0, r)) / dr0 -
             rhoh0_old_arr(0, r) * (w0_arr(0, r) + w0_arr(0, r + 1)) /
@@ -224,7 +224,7 @@ void Maestro::AdvectBaseEnthalpySphr(
 
     MakeEdgeState1d(rhoh0_old, rhoh0_predicted_edge_state, force);
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         rhoh0_new_arr(0, r) =
             rhoh0_old_arr(0, r) -
             dtdr / (r_cc_loc(0, r) * r_cc_loc(0, r)) *

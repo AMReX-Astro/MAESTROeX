@@ -11,12 +11,14 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     const auto s0_arr = s0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
@@ -46,11 +48,15 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         const Array4<Real> scal_arr = scal.array(mfi);
 
         // set velocity to zero
-        AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                              { vel_arr(i, j, k, n) = 0.0; });
+        ParallelFor(tileBox, AMREX_SPACEDIM,
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                        vel_arr(i, j, k, n) = 0.0;
+                    });
 
-        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n,
-                              { scal_arr(i, j, k, n) = 0.0; });
+        ParallelFor(tileBox, Nscal,
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                        scal_arr(i, j, k, n) = 0.0;
+                    });
     }
 
     const auto ihe4 = network_spec_index("helium-4");
@@ -124,7 +130,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         const Array4<const Real> p0_arr = p0_cart.array(mfi);
 
         // initialize rho as sum of partial densities rho*X_i
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 scal_arr(i, j, k, Rho) += scal_arr(i, j, k, FirstSpec + comp);
             }
@@ -200,7 +206,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             const auto velpert_steep_loc = velpert_steep;
 
             // now do the big loop over all the points in the domain
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 const Real x =
                     prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                 const Real y =

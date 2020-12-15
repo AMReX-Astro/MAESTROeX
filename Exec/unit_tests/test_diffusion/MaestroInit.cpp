@@ -116,10 +116,12 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
         const Array4<Real> scal = sold[lev].array(mfi);
 
         // set scalars to zero
-        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n,
-                              { scal(i, j, k, n) = 0.0; });
+        ParallelFor(tileBox, Nscal,
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                        scal(i, j, k, n) = 0.0;
+                    });
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             const auto r = j;
 
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];

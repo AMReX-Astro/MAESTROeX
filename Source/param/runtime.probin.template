@@ -50,7 +50,7 @@ module runtime_init_module
 
 contains
 
-subroutine runtime_init()
+subroutine runtime_init() bind(C, name="runtime_init")
 
 
 

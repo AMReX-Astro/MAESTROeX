@@ -58,11 +58,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(0) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (i < imax) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[0,0] - must supply Dirichlet boundary "
@@ -76,11 +77,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.hi(0) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (i > imin) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[0,1] - must supply Dirichlet boundary "
@@ -94,11 +96,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(1) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (j < jmax) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[1,0] - must supply Dirichlet boundary "
@@ -112,11 +115,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.hi(1) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (j > jmin) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[1,1] - must supply Dirichlet boundary "
@@ -132,11 +136,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.lo(2) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (k < kmax) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[2,0] - must supply Dirichlet boundary "
@@ -150,11 +155,12 @@ void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
 
         if (bcs.hi(2) == BCType::ext_dir) {
             if (comp == Pi || is_vel) {
-                AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+                ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (k > kmin) {
                         q(i, j, k) = 0.0;
                     }
                 });
+                Gpu::synchronize();
             } else {
                 Abort(
                     "MaestroBCFill bc[2,1] - must supply Dirichlet boundary "

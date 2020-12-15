@@ -19,13 +19,15 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     const auto s0_arr = s0_init.const_array();
     const auto p0_arr = p0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
@@ -50,7 +52,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto prob_lo = geom[lev].ProbLoArray();
         const auto dx = geom[lev].CellSizeArray();
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 
             Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
@@ -98,11 +100,15 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         const Array4<Real> scal_arr = scal.array(mfi);
 
         // set velocity to zero
-        AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                              { vel_arr(i, j, k, n) = 0.0; });
+        ParallelFor(tileBox, AMREX_SPACEDIM,
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                        vel_arr(i, j, k, n) = 0.0;
+                    });
 
-        AMREX_PARALLEL_FOR_4D(tileBox, Nscal, i, j, k, n,
-                              { scal_arr(i, j, k, n) = 0.0; });
+        ParallelFor(tileBox, Nscal,
+                    [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                        scal_arr(i, j, k, n) = 0.0;
+                    });
     }
 
     // if we are spherical, we want to make sure that p0 is good, since that is
@@ -158,7 +164,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
         // initialize rho as sum of partial densities rho*X_i
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 scal_arr(i, j, k, Rho) += scal_arr(i, j, k, FirstSpec + comp);
             }
@@ -216,7 +222,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             const auto dx = geom[lev].CellSizeArray();
 
             // add an optional perturbation
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
                 Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
                 Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];

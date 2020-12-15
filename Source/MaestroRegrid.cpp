@@ -66,8 +66,6 @@ void Maestro::Regrid() {
     if (!spherical) {
         TagArray();
     }
-    init_multilevel(tag_array.dataPtr(), &finest_level);
-    // InitMultilevel(finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
@@ -375,14 +373,15 @@ void Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge) {
 
     // copy the coarsest level of the real arrays into the
     // temp arrays
-    AMREX_PARALLEL_FOR_1D(nrf, r, { state_temp(0, r) = base(0, r); });
+    ParallelFor(nrf,
+                [=] AMREX_GPU_DEVICE(int r) { state_temp(0, r) = base(0, r); });
     Gpu::synchronize();
 
     // piecewise linear interpolation to fill the cc temp arrays
     for (auto n = 1; n < max_lev; ++n) {
         if (is_edge) {
             const auto nrn = base_geom.nr(n) + 1;
-            AMREX_PARALLEL_FOR_1D(nrn, r, {
+            ParallelFor(nrn, [=] AMREX_GPU_DEVICE(int r) {
                 if (r % 2 == 0) {
                     state_temp(n, r) = state_temp(n - 1, r / 2);
                 } else {
@@ -393,7 +392,7 @@ void Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge) {
             });
         } else {
             const auto nrn = base_geom.nr(n);
-            AMREX_PARALLEL_FOR_1D(nrn, r, {
+            ParallelFor(nrn, [=] AMREX_GPU_DEVICE(int r) {
                 if (r == 0 || r == nrn - 1) {
                     state_temp(n, r) = state_temp(n - 1, r / 2);
                 } else {
@@ -416,7 +415,7 @@ void Maestro::RegridBaseState(BaseState<Real>& base_s, const bool is_edge) {
             const auto lo = base_geom.r_start_coord(n, i);
             const auto hi = is_edge ? base_geom.r_end_coord(n, i) + 1
                                     : base_geom.r_end_coord(n, i);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                 int r = k + lo;
                 state_temp(n, r) = base(n, r);
             });
