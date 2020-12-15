@@ -61,6 +61,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinxfortran.fortran_autodoc',
               'sphinx.ext.intersphinx']
 
+# bibtex
+bibtex_bibfiles = ["maestro_doc.bib"]
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
