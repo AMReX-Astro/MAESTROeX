@@ -27,8 +27,10 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     }
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     if (apply_vel_field) {
         const auto velpert_height = velpert_height_loc;
@@ -38,7 +40,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
         const Real* vortices_xloc_p = vortices_xloc.dataPtr();
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
             const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
             const Real ydist = y - velpert_height;
@@ -75,7 +77,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
     const auto s0_arr = s0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0

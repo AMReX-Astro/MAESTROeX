@@ -32,7 +32,7 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
 
             if (use_eos_e_instead_of_h_loc) {
                 // (rho, (h->e)) --> T, p
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.rho = state(i, j, k, Rho);
@@ -58,7 +58,7 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
                 });
             } else {
                 // (rho, h) --> T, p
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.rho = state(i, j, k, Rho);
@@ -116,7 +116,7 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
             // (rho, p) --> T
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state(i, j, k, Rho);
@@ -179,7 +179,7 @@ void Maestro::PfromRhoH(const Vector<MultiFab>& state,
             const Array4<Real> peos_arr = peos[lev].array(mfi);
 
             // (rho, H) --> T, p
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
@@ -243,7 +243,7 @@ void Maestro::MachfromRhoH(const Vector<MultiFab>& scal,
             const Array4<const Real> w0_arr = w0cart[lev].array(mfi);
             const Array4<Real> mach_arr = mach[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 
             // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
@@ -314,7 +314,7 @@ void Maestro::CsfromRhoH(const Vector<MultiFab>& scal,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
             const Array4<Real> cs_arr = cs[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state(i, j, k, Rho);
@@ -462,7 +462,7 @@ void Maestro::HfromRhoTedge(
                 const Array4<const Real> tempbar_edge_arr =
                     tempbar_edge_cart[lev].array(mfi);
                 // x-edge
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature
@@ -532,7 +532,7 @@ void Maestro::HfromRhoTedge(
                 });
 
                 // y-edge
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature
@@ -614,7 +614,7 @@ void Maestro::HfromRhoTedge(
 
 #if (AMREX_SPACEDIM == 3)
                 // z-edge
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature
@@ -686,7 +686,7 @@ void Maestro::HfromRhoTedge(
             } else {
 #if (AMREX_SPACEDIM == 3)
                 // x-edge
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature
@@ -759,7 +759,7 @@ void Maestro::HfromRhoTedge(
                 });
 
                 // y-edge
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature
@@ -832,7 +832,7 @@ void Maestro::HfromRhoTedge(
                 });
 
                 // z-edge
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     // get edge-centered temperature

@@ -120,7 +120,7 @@ void Maestro::UpdateScal(
                 // Enthalpy update
                 const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real divterm =
                         ((sfluxx(i + 1, j, k, RhoH) - sfluxx(i, j, k, RhoH)) /
                              dx[0] +
@@ -164,26 +164,28 @@ void Maestro::UpdateScal(
             } else if (start_comp == FirstSpec) {
                 // RhoX update
 
-                AMREX_PARALLEL_FOR_4D(tileBox, NumSpec, i, j, k, n, {
-                    int comp = FirstSpec + n;
+                ParallelFor(tileBox, NumSpec,
+                            [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                                int comp = FirstSpec + n;
 
-                    Real divterm =
-                        (sfluxx(i + 1, j, k, comp) - sfluxx(i, j, k, comp)) /
-                        dx[0];
-                    divterm +=
-                        (sfluxy(i, j + 1, k, comp) - sfluxy(i, j, k, comp)) /
-                        dx[1];
+                                Real divterm = (sfluxx(i + 1, j, k, comp) -
+                                                sfluxx(i, j, k, comp)) /
+                                               dx[0];
+                                divterm += (sfluxy(i, j + 1, k, comp) -
+                                            sfluxy(i, j, k, comp)) /
+                                           dx[1];
 #if (AMREX_SPACEDIM == 3)
-                    divterm +=
-                        (sfluxz(i, j, k + 1, comp) - sfluxz(i, j, k, comp)) /
-                        dx[2];
+                                divterm += (sfluxz(i, j, k + 1, comp) -
+                                            sfluxz(i, j, k, comp)) /
+                                           dx[2];
 #endif
-                    snew_arr(i, j, k, comp) =
-                        sold_arr(i, j, k, comp) +
-                        dt_loc * (-divterm + force_arr(i, j, k, comp));
-                });
+                                snew_arr(i, j, k, comp) =
+                                    sold_arr(i, j, k, comp) +
+                                    dt_loc *
+                                        (-divterm + force_arr(i, j, k, comp));
+                            });
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // update density
                     snew_arr(i, j, k, Rho) = sold_arr(i, j, k, Rho);
 
@@ -334,7 +336,7 @@ void Maestro::UpdateVel(
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // create cell-centered Utilde
                     Real ubar = 0.5 * (umacx(i, j, k) + umacx(i + 1, j, k));
                     Real vbar = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
@@ -419,7 +421,7 @@ void Maestro::UpdateVel(
                 const Array4<const Real> w0macy = w0mac[lev][1].array(mfi);
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // create cell-centered Utilde
                     Real ubar = 0.5 * (umacx(i, j, k) + umacx(i + 1, j, k));
                     Real vbar = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));

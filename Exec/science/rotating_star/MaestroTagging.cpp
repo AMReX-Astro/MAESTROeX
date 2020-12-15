@@ -31,7 +31,7 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     const Box& tilebox = mfi.tilebox();
 
     // Tag on regions of high density
-    AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (state(i, j, k, Rho) >= tag_density_3) {
             tag(i, j, k) = TagBox::SET;
         }

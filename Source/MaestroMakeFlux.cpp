@@ -101,7 +101,7 @@ void Maestro::MakeRhoXFlux(
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
-            amrex::ParallelFor(
+            ParallelFor(
                 xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
                     // loop over components cannot be part of the ParallelFor
                     // due to race condition on sflux for the Rho component
@@ -136,8 +136,8 @@ void Maestro::MakeRhoXFlux(
                 });
 
             // y-direction
-            amrex::ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j,
-                                                         int k) noexcept {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j,
+                                                  int k) noexcept {
                 for (int comp = start_comp; comp < num_comp + start_comp;
                      ++comp) {
                     Real rho0_edge =
@@ -183,7 +183,7 @@ void Maestro::MakeRhoXFlux(
 
             if (!spherical) {
                 // x-direction
-                amrex::ParallelFor(
+                ParallelFor(
                     xbx, ybx, zbx,
                     [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         // loop over components cannot be part of the ParallelFor
@@ -582,7 +582,7 @@ void Maestro::MakeRhoHFlux(
             const auto rhoh0_edge_new_arr = rhoh0_edge_new.const_array();
 
 #if (AMREX_SPACEDIM == 2)
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // create x-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
@@ -618,7 +618,7 @@ void Maestro::MakeRhoHFlux(
                 }
             });
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // create y-fluxes
                 if (have_h) {
                     // enthalpy edge state is h
@@ -656,7 +656,7 @@ void Maestro::MakeRhoHFlux(
 #elif (AMREX_SPACEDIM == 3)
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // create x-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -694,7 +694,7 @@ void Maestro::MakeRhoHFlux(
                     }
                 });
 
-                AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // create y-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -732,7 +732,7 @@ void Maestro::MakeRhoHFlux(
                     }
                 });
 
-                AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // create z-fluxes
                     if (have_h) {
                         // enthalpy edge state is h
@@ -778,7 +778,7 @@ void Maestro::MakeRhoHFlux(
                     const Array4<const Real> rhoh0_edgez =
                         rhoh0mac_edgez.array(mfi);
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -801,7 +801,7 @@ void Maestro::MakeRhoHFlux(
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -823,7 +823,7 @@ void Maestro::MakeRhoHFlux(
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             // this is not supported on irregular-spaced base state
@@ -856,7 +856,7 @@ void Maestro::MakeRhoHFlux(
                     const Array4<const Real> h0_edgey = h0mac_edgey.array(mfi);
                     const Array4<const Real> h0_edgez = h0mac_edgez.array(mfi);
 
-                    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+                    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
@@ -908,7 +908,7 @@ void Maestro::MakeRhoHFlux(
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+                    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
@@ -958,7 +958,7 @@ void Maestro::MakeRhoHFlux(
                         }
                     });
 
-                    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+                    ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                         if (have_h) {
                             // enthalpy edge state is h
                             if (species_pred_type_loc == pred_rhoprime_and_X) {
