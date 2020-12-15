@@ -248,7 +248,7 @@
 C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
 at C-F interfaces to ensure the correct solution to the Poisson equation
 across these interfaces. There is no correction step needed in this
-case (this differs from <a class="bibtex reference internal" href="zreferences.html#ricker-2008" id="id1">[Ricker08]</a>).</p>
+case (this differs from <span class="bibtex" id="id1">[ricker:2008]</span>).</p>
 <p>The MG solver always works with jumps of <span class="math notranslate nohighlight">\(2\times\)</span> between levels. In
 some codes (but not MAESTROeX) we can have jumps of <span class="math notranslate nohighlight">\(4\times\)</span> between
 levels. AMReX uses a mini_cycle in these cases, effectively
@@ -379,7 +379,7 @@ in 2-d and 27-point stencil in 3-d.</p></li>
 all the points in <span class="math notranslate nohighlight">\((i\pm1,j\pm1)\)</span>. The
 derivation of this stencil is based on finite-element ideas, defining
 basis functions on the nodes. This is developed in 2-d in
-<a class="bibtex reference internal" href="zreferences.html#almgrenbellszymczak-1996" id="id2">[ABS96]</a>.</p></li>
+<span class="bibtex" id="id2">[almgrenBellSzymczak:1996]</span>.</p></li>
 <li><p>ND_VATER_STENCIL: this is an alternate dense stencil derived
 using a similar finite-element idea as above, but a different control
 volume.</p></li>
