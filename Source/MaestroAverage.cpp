@@ -155,9 +155,6 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
                 if (ncell(lev, r) > 0) {
                     phisum_arr(lev, r) /= ncell(lev, r);
-                } else {
-                    // keep value constant if it is outside the cutoff coords
-                    phisum_arr(lev, r) = phisum_arr(lev, r - 1);
                 }
             });
             Gpu::synchronize();
