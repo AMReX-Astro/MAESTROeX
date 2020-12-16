@@ -37,11 +37,10 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
 
 		    Real x = (Real(i) + 0.5) * dx[0] + prob_lo[0];
 		    Real y = (Real(j) + 0.5) * dx[1] + prob_lo[1];
-		    Real r = y;
-#if (AMREX_SPACEDIM == 3)
 		    Real z = (Real(k) + 0.5) * dx[2] + prob_lo[2];
-		    r = z;
-#endif
+
+		    Real r = (AMREX_SPACEDIM == 2) ? y : z;
+		    
 		    Real er = std::exp(-(r - r_layer)*(r - r_layer) / 1.e14);
 
 		    rho_Hext_arr(i, j, k) = er * (1.0 + 
