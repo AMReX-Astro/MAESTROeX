@@ -11,17 +11,11 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeHeating()", MakeHeating);
 
-    static bool model_init = true;
-    if (model_init) {
-        const int model_file_length = model_file.length();
-        Vector<int> model_file_name(model_file_length);
-        for (int i = 0; i < model_file_length; i++)
-            model_file_name[i] = model_file[i];
-        ca_read_model_file(model_file_name.dataPtr(), &model_file_length);
-
-	model_init = false;
+    if (!input_model.model_initialized) {
+	// read model file
+	input_model.ReadFile(model_file);
     }
-
+    
     const auto& center_p = center;
     
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -54,10 +48,14 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
 						    xloc[1]*xloc[1] + xloc[2]*xloc[2])
 		                        : xloc[AMREX_SPACEDIM-1];
 		
-                Real T9 = scal_arr(i,j,k,Temp)/1.e9;
                 Real rho = scal_arr(i,j,k,Rho);
-                rho_Hext_arr(i,j,k) = rho * 2.4e4 * rho / pow(T9, 2.0/3.0) *
-		    std::exp(-3.38 / pow(T9, 1.0/3.0));
+
+		if (rho > heating_cutoff_density_lo && rho < heating_cutoff_density_hi) {
+		    rho_Hext_arr(i,j,k) = rho *
+			input_model.Interpolate(rloc, ModelParser::ienuc_model);
+		} else {
+		    rho_Hext_arr(i,j,k) = 0.0;
+		}
             });
 
         }
