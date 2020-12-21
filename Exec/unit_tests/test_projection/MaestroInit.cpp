@@ -28,10 +28,6 @@ void Maestro::InitData() {
 
     Print() << "Calling InitData()" << std::endl;
 
-    // init_base_state(s0_init.dataPtr(),p0_init.dataPtr(),rho0_old.dataPtr(),
-    //                 rhoh0_old.dataPtr(),p0_old.dataPtr(),tempbar.dataPtr(),
-    //                 tempbar_init.dataPtr());
-
     // calls AmrCore::InitFromScratch(), which calls a MakeNewGrids() function
     // that repeatedly calls Maestro::MakeNewLevelFromScratch() to build and initialize
     InitFromScratch(t_old);
@@ -39,9 +35,7 @@ void Maestro::InitData() {
     // reset tagging array to include buffer zones
     TagArray();
 
-    // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
