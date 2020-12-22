@@ -15,7 +15,7 @@ Real grav_zone(Real y) {
         fg = 1.0;
     }
 
-    Real g = fg * g0 / pow((y / 4.e8), 1.25);
+    Real g = fg * g0 / std::pow((y / 4.e8), 1.25);
 
     return g;
 }
