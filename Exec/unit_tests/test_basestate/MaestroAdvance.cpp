@@ -129,7 +129,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
         for (int n = 0; n <= max_radial_level; ++n) {
             for (int r = 0; r < base_geom.nr(n); ++r) {
                 Real rho = rho0_old_arr(n, r);
-                Real T_6_third = pow((tempbar_arr(n, r) / 1.0e6), 1.0 / 3.0);
+                Real T_6_third = std::pow((tempbar_arr(n, r) / 1.0e6), 1.0 / 3.0);
                 Real tmp1 = rhoX0_old_arr(n, r, c12_comp);
                 Real tmp2 = rhoX0_old_arr(n, r, n14_comp);
                 Real tmp3 = rhoX0_old_arr(n, r, o16_comp);

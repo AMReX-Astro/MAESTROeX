@@ -58,8 +58,8 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
 
                 Real T9 = scal_arr(i, j, k, Temp) / 1.e9;
                 Real rho = scal_arr(i, j, k, Rho);
-                rho_Hext_arr(i, j, k) = rho * 2.4e4 * rho / pow(T9, 2.0 / 3.0) *
-                                        std::exp(-3.38 / pow(T9, 1.0 / 3.0));
+                rho_Hext_arr(i, j, k) = rho * 2.4e4 * rho / std::pow(T9, 2.0 / 3.0) *
+                                        std::exp(-3.38 / std::pow(T9, 1.0 / 3.0));
             });
         }
     }
