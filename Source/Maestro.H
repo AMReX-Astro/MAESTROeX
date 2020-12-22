@@ -133,9 +133,9 @@ class Maestro : public amrex::AmrCore {
         BaseState<amrex::Real>& rhoh0_predicted_edge_state);
     // only need to advect species for test_basetest problem
     void UpdateSpecies(const BaseState<Real>& rho0,
-		       const BaseState<Real>& rho0_predicted_edge,
-		       const BaseState<Real>& rhoX0_old,
-		       BaseState<Real>& rhoX0_new);
+                       const BaseState<Real>& rho0_predicted_edge,
+                       const BaseState<Real>& rhoX0_old,
+                       BaseState<Real>& rhoX0_new);
     // end MaestroAdvectBase.cpp functions
     ////////////
 

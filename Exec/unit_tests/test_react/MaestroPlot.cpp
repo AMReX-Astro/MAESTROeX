@@ -384,7 +384,7 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << OtherLine;
 
         for (int i = 0; i < NumSpec; i++) {
-	    auto spec_name = short_spec_names_cxx[i];
+            auto spec_name = short_spec_names_cxx[i];
             jobInfoFile << std::setw(6) << i << SkipSpace << std::setw(mlen + 1)
                         << std::setfill(' ') << spec_name << SkipSpace
                         << std::setw(7) << aion[i] << SkipSpace << std::setw(7)

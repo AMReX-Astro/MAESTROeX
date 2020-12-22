@@ -63,12 +63,12 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
         bool found_dens = false;
         bool found_temp = false;
         bool found_pres = false;
-	bool found_enuc = false;
+        bool found_enuc = false;
         std::vector<bool> found_spec(NumSpec);
-	std::vector<bool> found_omegadot(NumSpec);
+        std::vector<bool> found_omegadot(NumSpec);
         for (auto comp = 0; comp < NumSpec; ++comp) {
             found_spec[comp] = false;
-	    found_omegadot[comp] = false;
+            found_omegadot[comp] = false;
         }
 
         for (auto j = 0; j < nvars_model_file; ++j) {
@@ -89,19 +89,21 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
                 model_state[i][ipres_model] = vars_stored[j];
                 found_model = true;
                 found_pres = true;
-	    } else if (varnames_stored[j] == "enuc") {
+            } else if (varnames_stored[j] == "enuc") {
                 model_state[i][ienuc_model] = vars_stored[j];
                 found_model = true;
                 found_enuc = true;
             } else {
                 for (auto comp = 0; comp < NumSpec; ++comp) {
-		    std::string omegadot_name = "omegadot_" + spec_names_cxx[comp];
+                    std::string omegadot_name =
+                        "omegadot_" + spec_names_cxx[comp];
                     if (varnames_stored[j] == spec_names_cxx[comp]) {
                         model_state[i][ispec_model + comp] = vars_stored[j];
                         found_model = true;
                         found_spec[comp] = true;
                     } else if (varnames_stored[j] == omegadot_name) {
-                        model_state[i][ispec_model + NumSpec + comp] = vars_stored[j];
+                        model_state[i][ispec_model + NumSpec + comp] =
+                            vars_stored[j];
                         found_model = true;
                         found_omegadot[comp] = true;
                     }
@@ -130,7 +132,7 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
                 Print() << "WARNING: pressure not provided in inputs file"
                         << std::endl;
             }
-	    if (!found_enuc) {
+            if (!found_enuc) {
                 Print() << "WARNING: enuc not provided in inputs file"
                         << std::endl;
             }
@@ -140,10 +142,10 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
                         << "WARNING: " << maestro::trim(spec_names_cxx[comp])
                         << " not provided in inputs file" << std::endl;
                 }
-		if (!found_omegadot[comp]) {
-                    Print()
-                        << "WARNING: omegadot_" << maestro::trim(spec_names_cxx[comp])
-                        << " not provided in inputs file" << std::endl;
+                if (!found_omegadot[comp]) {
+                    Print() << "WARNING: omegadot_"
+                            << maestro::trim(spec_names_cxx[comp])
+                            << " not provided in inputs file" << std::endl;
                 }
             }
         }

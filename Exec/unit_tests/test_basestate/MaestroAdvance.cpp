@@ -82,151 +82,168 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // ! compute the heating term and Sbar
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    auto Hext_bar_arr = Hext_bar.array();    
+    auto Hext_bar_arr = Hext_bar.array();
 
     Hext_bar.setVal(0.0);
 
     if (prob_type == 1) {
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
 
-	if (t_old <= heating_time) {
-	    Real fac;
-	    if ( (t_old+dt) > heating_time ) {
-		fac = (heating_time - t_old) / dt;
-	    } else {
-		fac = 1.0;
-	    }
-
-	    for (int n = 0; n <= max_radial_level; ++n) {
-	        for (int r = 0; r < base_geom.nr(n); ++r) {
-		    if (!spherical) {
-			// plane-parallel -- do the heating term in paper II (section 4)
-			Hext_bar_arr(n,r) = fac * heating_peak * 
-			    std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-				       (base_geom.r_cc_loc(n,r) - heating_rad))
-				     / heating_sigma);
-		    } else {
-			// spherical -- lower amplitude heating term
-			Hext_bar_arr(n,r) = fac * heating_peak * 
-			    std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-				       (base_geom.r_cc_loc(n,r) - heating_rad))
-				     / heating_sigma);
-		    }
-		}
-	    }
-	}
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // plane-parallel -- do the heating term in paper II (section 4)
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    } else {
+                        // spherical -- lower amplitude heating term
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    }
+                }
+            }
+        }
 
     } else if (prob_type == 2) {
+        // analytic heating modeling CNO cycle
 
-	// analytic heating modeling CNO cycle
-
-	const auto h1_comp = network_spec_index("hydrogen-1");
-	const auto c12_comp = network_spec_index("carbon-12");
-	const auto n14_comp = network_spec_index("nitrogen-14");
-	const auto o16_comp = network_spec_index("oxygen-16");
+        const auto h1_comp = network_spec_index("hydrogen-1");
+        const auto c12_comp = network_spec_index("carbon-12");
+        const auto n14_comp = network_spec_index("nitrogen-14");
+        const auto o16_comp = network_spec_index("oxygen-16");
 
         for (int n = 0; n <= max_radial_level; ++n) {
-	    for (int r = 0; r < base_geom.nr(n); ++r) {
-		Real rho = rho0_old_arr(n,r);
-		Real T_6_third = pow((tempbar_arr(n,r) / 1.0e6), 1.0/3.0);
-		Real tmp1 = rhoX0_old_arr(n,r,c12_comp);
-		Real tmp2 = rhoX0_old_arr(n,r,n14_comp);
-		Real tmp3 = rhoX0_old_arr(n,r,o16_comp);
-		Real X_CNO = (tmp1 + tmp2 + tmp3) / rho;
-		Real X_1 = rhoX0_old_arr(n,r,h1_comp) / rho;
-		
-		tmp1 =   2.7e-3 * T_6_third;
-		tmp2 = -7.78e-3 * T_6_third*T_6_third;
-		tmp3 = -1.49e-4 * T_6_third*T_6_third*T_6_third;
-		Real g14 = 1.0 + tmp1 + tmp2 + tmp3;
+            for (int r = 0; r < base_geom.nr(n); ++r) {
+                Real rho = rho0_old_arr(n, r);
+                Real T_6_third = pow((tempbar_arr(n, r) / 1.0e6), 1.0 / 3.0);
+                Real tmp1 = rhoX0_old_arr(n, r, c12_comp);
+                Real tmp2 = rhoX0_old_arr(n, r, n14_comp);
+                Real tmp3 = rhoX0_old_arr(n, r, o16_comp);
+                Real X_CNO = (tmp1 + tmp2 + tmp3) / rho;
+                Real X_1 = rhoX0_old_arr(n, r, h1_comp) / rho;
 
-		tmp1 = 8.67e27 * g14 * X_CNO * X_1 * rho / (T_6_third*T_6_third);
-		tmp2 = std::exp(-1.5228e2 / T_6_third);
-		Hext_bar_arr(n,r) = tmp1 * tmp2;
-	    }
-	}
+                tmp1 = 2.7e-3 * T_6_third;
+                tmp2 = -7.78e-3 * T_6_third * T_6_third;
+                tmp3 = -1.49e-4 * T_6_third * T_6_third * T_6_third;
+                Real g14 = 1.0 + tmp1 + tmp2 + tmp3;
+
+                tmp1 =
+                    8.67e27 * g14 * X_CNO * X_1 * rho / (T_6_third * T_6_third);
+                tmp2 = std::exp(-1.5228e2 / T_6_third);
+                Hext_bar_arr(n, r) = tmp1 * tmp2;
+            }
+        }
 
     } else if (prob_type == 3) {
+        const auto he4_comp = network_spec_index("helium-4");
 
-	const auto he4_comp = network_spec_index("helium-4");
+        // off-center heating for sub_chandra
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
 
-	// off-center heating for sub_chandra
-	if (t_old <= heating_time) {
-	    Real fac;
-	    if ( (t_old+dt) > heating_time ) {
-		fac = (heating_time - t_old) / dt;
-	    } else {
-		fac = 1.0;
-	    }
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // Abort("ERROR: heating not supported")
 
-	    for (int n = 0; n <= max_radial_level; ++n) {
-		for (int r = 0; r < base_geom.nr(n); ++r) {
-		    if (!spherical) {
-			// Abort("ERROR: heating not supported")
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    } else {
+                        // spherical -- lower amplitude heating term
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                (heating_sigma * heating_sigma));
 
-			Hext_bar_arr(n,r) = fac * heating_peak * 
-			    std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-				       (base_geom.r_cc_loc(n,r) - heating_rad))
-				     / heating_sigma);
-		    } else {
-			// spherical -- lower amplitude heating term
-			Hext_bar_arr(n,r) = fac * heating_peak * 
-			    std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-				       (base_geom.r_cc_loc(n,r) - heating_rad))
-				     / (heating_sigma*heating_sigma));
-
-			// only heat if there is He-4
-			Hext_bar_arr(n,r) *= rhoX0_old_arr(n,r,he4_comp)/rho0_old_arr(n,r);
-		    }
-		}
-	    }
-	}
+                        // only heat if there is He-4
+                        Hext_bar_arr(n, r) *=
+                            rhoX0_old_arr(n, r, he4_comp) / rho0_old_arr(n, r);
+                    }
+                }
+            }
+        }
 
     } else if (prob_type == 4) {
-	// Apply both heating and cooling for an Urca process
+        // Apply both heating and cooling for an Urca process
 
-	if (t_old <= heating_time) {
-	    Real fac;
-	    if ( (t_old+dt) > heating_time ) {
-		fac = (heating_time - t_old) / dt;
-	    } else {
-		fac = 1.0;
-	    }
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
 
-	    for (int n = 0; n <= max_radial_level; ++n) {
-		for (int r = 0; r < base_geom.nr(n); ++r) {
-		    if (!spherical) {
-			// plane-parallel -- do the heating term in paper II (section 4)
-			// plus a similar cooling term for Urca
-			Hext_bar_arr(n,r) = fac * (heating_peak *
-					       std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-							  (base_geom.r_cc_loc(n,r) - heating_rad))
-							/ heating_sigma) + cooling_peak *
-					       std::exp(-((base_geom.r_cc_loc(n,r) - cooling_rad) *
-							  (base_geom.r_cc_loc(n,r) - cooling_rad))
-							/ cooling_sigma));
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // plane-parallel -- do the heating term in paper II (section 4)
+                        // plus a similar cooling term for Urca
+                        Hext_bar_arr(n, r) =
+                            fac * (heating_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   heating_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   heating_rad)) /
+                                                heating_sigma) +
+                                   cooling_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad)) /
+                                                cooling_sigma));
 
-		    } else {
-			// spherical -- lower amplitude heating/cooling term
-			Hext_bar_arr(n,r) = fac * (heating_peak *
-					       std::exp(-((base_geom.r_cc_loc(n,r) - heating_rad) *
-							  (base_geom.r_cc_loc(n,r) - heating_rad))
-							/ heating_sigma) + cooling_peak *
-					       std::exp(-((base_geom.r_cc_loc(n,r) - cooling_rad) *
-							  (base_geom.r_cc_loc(n,r) - cooling_rad))
-							/ cooling_sigma));
-		    }
-		}
-	    }
-	}
+                    } else {
+                        // spherical -- lower amplitude heating/cooling term
+                        Hext_bar_arr(n, r) =
+                            fac * (heating_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   heating_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   heating_rad)) /
+                                                heating_sigma) +
+                                   cooling_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad)) /
+                                                cooling_sigma));
+                    }
+                }
+            }
+        }
 
     } else {
-
-	Print() << "ERROR: " << prob_type << " prob_type not yet supported." << std::endl;
-	Abort();
-
+        Print() << "ERROR: " << prob_type << " prob_type not yet supported."
+                << std::endl;
+        Abort();
     }
 
-    
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! make Sbar
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

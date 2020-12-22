@@ -105,12 +105,12 @@ void Maestro::Evolve() {
 
             // first compute cutoff coordinates using initial density profile
             ComputeCutoffCoords(rho0_old);
-	    base_geom.ComputeCutoffCoords(rho0_old.array());
+            base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
             ComputeCutoffCoords(rho0_old);
-	    base_geom.ComputeCutoffCoords(rho0_old.array());
+            base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // call eos with r,p as input to recompute T,h
             TfromRhoP(sold, p0_old, 1);

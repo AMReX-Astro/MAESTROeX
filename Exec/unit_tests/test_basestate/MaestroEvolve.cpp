@@ -18,7 +18,7 @@ void Maestro::Evolve() {
         // if this is the first time step we already have a dt from either FirstDt()
         // or EstDt called during the divu_iters
         if (istep > 1) {
-	    EstDt();
+            EstDt();
 
             if (verbose > 0) {
                 Print() << "Call to estdt at beginning of step " << istep
@@ -76,83 +76,81 @@ void Maestro::Evolve() {
 
     const auto rho0_old_arr = rho0_old.const_array();
     const auto p0_old_arr = p0_old.const_array();
-    
+
     const auto& dr = base_geom.dr;
     const Real starting_rad = (spherical) ? 0.0 : geom[0].ProbLo(0);
-    
-    for (int n = 0; n <= base_geom.max_radial_level; ++n) {
 
-	Real mencl = 0.0;
-    		
-	if (use_exact_base_state) {
-	    Real dr_irreg = base_geom.r_edge_loc(n, 1) -
+    for (int n = 0; n <= base_geom.max_radial_level; ++n) {
+        Real mencl = 0.0;
+
+        if (use_exact_base_state) {
+            Real dr_irreg = base_geom.r_edge_loc(n, 1) -
                             base_geom.r_edge_loc(n, 0);  // edge-to-edge
 
-	    if (spherical || do_2d_planar_octant) {
-		mencl = 4.0 / 3.0 * M_PI * dr_irreg * dr_irreg * dr_irreg *
+            if (spherical || do_2d_planar_octant) {
+                mencl = 4.0 / 3.0 * M_PI * dr_irreg * dr_irreg * dr_irreg *
                         rho0_old_arr(n, 0);
-	    }
-	} else {
-	    if (spherical || do_2d_planar_octant) {
-		mencl = 4.0 / 3.0 * M_PI * dr(n) * dr(n) * dr(n) *
+            }
+        } else {
+            if (spherical || do_2d_planar_octant) {
+                mencl = 4.0 / 3.0 * M_PI * dr(n) * dr(n) * dr(n) *
                         rho0_old_arr(n, 0);
-	    }
-	}
-	
-	for (auto r = 1; r < base_geom.nr(n); ++r) {
-	    Real rloc = use_exact_base_state
-                        ? base_geom.r_cc_loc(n, r)
-                        : starting_rad + (Real(r) + 0.5) * dr(n);
-	    
-	    if (rloc < base_geom.base_cutoff_density_coord(n)) {
-		Real r_r = starting_rad;
-		r_r += use_exact_base_state ? base_geom.r_edge_loc(n, r + 1)
+            }
+        }
+
+        for (auto r = 1; r < base_geom.nr(n); ++r) {
+            Real rloc = use_exact_base_state
+                            ? base_geom.r_cc_loc(n, r)
+                            : starting_rad + (Real(r) + 0.5) * dr(n);
+
+            if (rloc < base_geom.base_cutoff_density_coord(n)) {
+                Real r_r = starting_rad;
+                r_r += use_exact_base_state ? base_geom.r_edge_loc(n, r + 1)
                                             : Real(r + 1) * dr(n);
-		Real r_l = starting_rad;
-		r_l += use_exact_base_state ? base_geom.r_edge_loc(n, r)
+                Real r_l = starting_rad;
+                r_l += use_exact_base_state ? base_geom.r_edge_loc(n, r)
                                             : Real(r) * dr(n);
 
-		Real dr_local = r_r - r_l;
-	    
-		Real g = 0.0;
+                Real dr_local = r_r - r_l;
 
-		if (spherical || do_2d_planar_octant) {
-		    g = -Gconst * mencl / (r_l * r_l);
-		    mencl += 4.0 / 3.0 * M_PI * dr_local *
-			(r_l * r_l + r_l * r_r + r_r * r_r) *
-			rho0_old_arr(n, r);
-		} else {
-		    if (!do_planar_invsq_grav) {
-			g = grav_const;
-		    } else {
-			g = -Gconst * planar_invsq_mass / (r_l * r_l);
-		    }
-		}
+                Real g = 0.0;
 
-		Real dpdr = 0.0;
-		Real rhog = 0.0;
-		if (use_exact_base_state) {
-		    Real dr_irreg =
-			base_geom.r_cc_loc(n, r) - base_geom.r_cc_loc(n, r - 1);
-		    dpdr = (p0_old_arr(n, r) - p0_old_arr(n, r - 1)) / dr_irreg;
+                if (spherical || do_2d_planar_octant) {
+                    g = -Gconst * mencl / (r_l * r_l);
+                    mencl += 4.0 / 3.0 * M_PI * dr_local *
+                             (r_l * r_l + r_l * r_r + r_r * r_r) *
+                             rho0_old_arr(n, r);
+                } else {
+                    if (!do_planar_invsq_grav) {
+                        g = grav_const;
+                    } else {
+                        g = -Gconst * planar_invsq_mass / (r_l * r_l);
+                    }
+                }
 
-		    Real rfrac = (base_geom.r_edge_loc(n, r) -
-				  base_geom.r_cc_loc(n, r - 1)) /
-			dr_irreg;
-		    rhog = ((1.0 - rfrac) * rho0_old_arr(n, r) +
-			    rfrac * rho0_old_arr(n, r - 1)) *
-			g;
-		} else {
-		    dpdr = (p0_old_arr(n, r) - p0_old_arr(n, r - 1)) / dr(n);
-		    rhog = 0.5 *
-			(rho0_old_arr(n, r) + rho0_old_arr(n, r - 1)) *
-			g;
-		}
+                Real dpdr = 0.0;
+                Real rhog = 0.0;
+                if (use_exact_base_state) {
+                    Real dr_irreg =
+                        base_geom.r_cc_loc(n, r) - base_geom.r_cc_loc(n, r - 1);
+                    dpdr = (p0_old_arr(n, r) - p0_old_arr(n, r - 1)) / dr_irreg;
 
-		max_hse_error =
-                amrex::max(max_hse_error, amrex::Math::abs(dpdr - rhog) /
-                                              amrex::Math::abs(dpdr));
-	    }
+                    Real rfrac = (base_geom.r_edge_loc(n, r) -
+                                  base_geom.r_cc_loc(n, r - 1)) /
+                                 dr_irreg;
+                    rhog = ((1.0 - rfrac) * rho0_old_arr(n, r) +
+                            rfrac * rho0_old_arr(n, r - 1)) *
+                           g;
+                } else {
+                    dpdr = (p0_old_arr(n, r) - p0_old_arr(n, r - 1)) / dr(n);
+                    rhog =
+                        0.5 * (rho0_old_arr(n, r) + rho0_old_arr(n, r - 1)) * g;
+                }
+
+                max_hse_error =
+                    amrex::max(max_hse_error, amrex::Math::abs(dpdr - rhog) /
+                                                  amrex::Math::abs(dpdr));
+            }
         }
     }
 
