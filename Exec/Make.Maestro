@@ -18,6 +18,9 @@ MICROPHYSICS_HOME ?= $(TOP)/external/Microphysics
 
 AMREX_HOME ?= $(TOP)/external/amrex
 
+# Require C++17
+CXXSTD := c++17
+
 # Check to make sure that Microphysics actually exists,
 # using an arbitrary file that must exist to check.
 # Throw an error if we don't have Microphysics.
