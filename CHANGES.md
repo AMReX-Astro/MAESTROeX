@@ -1,3 +1,7 @@
+# 21.01
+
+  * C++17 is now the minimum supported C++ standard.
+
 # 20.12
 
   * Set default in SDC algorithm to use split projection for both planar and spherical problems 
