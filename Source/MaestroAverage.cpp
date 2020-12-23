@@ -151,13 +151,13 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
         // divide phisum by ncell so it stores "phibar"
         for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
-	    for (int r = 0; r < base_geom.nr_fine; ++r) {
+            for (int r = 0; r < base_geom.nr_fine; ++r) {
                 if (ncell(lev, r) > 0) {
                     phisum_arr(lev, r) /= Real(ncell(lev, r));
                 } else {
-		    // keep value constant if it is outside the cutoff coords
-		    phisum_arr(lev, r) = phisum_arr(lev, r-1);
-		}
+                    // keep value constant if it is outside the cutoff coords
+                    phisum_arr(lev, r) = phisum_arr(lev, r - 1);
+                }
             }
         }
 
@@ -299,9 +299,9 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 if (ncell(n, r + 1) > 0) {
                     phisum(n, r + 1) /= Real(ncell(n, r + 1));
                 } else {
-		    // keep value constant if it is outside the cutoff coords
-		    phisum(n, r + 1) = phisum(n, r);
-		}
+                    // keep value constant if it is outside the cutoff coords
+                    phisum(n, r + 1) = phisum(n, r);
+                }
             }
         }
 
