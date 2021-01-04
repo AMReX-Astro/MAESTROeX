@@ -40,7 +40,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="burner_loop.F90" href="burner_loop_f.html" />
-    <link rel="prev" title="average.F90" href="average_f.html" /> 
+    <link rel="prev" title="Src_nd" href="../Src_nd_files.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -149,17 +149,12 @@
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../Src_nd_files.html">Src_nd</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="average_f.html">average.F90</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">base_state_geometry.F90</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#f/base_state_geometry_module">base_state_geometry_module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="burner_loop_f.html">burner_loop.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fill_3d_data_f.html">fill_3d_data.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="inlet_bc_f.html">inlet_bc.F90</a></li>
 <li class="toctree-l3"><a class="reference internal" href="maestro_init_f.html">maestro_init.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_grav_f.html">make_grav.F90</a></li>
-<li class="toctree-l3"><a class="reference internal" href="make_heating_f.html">make_heating.F90</a></li>
 </ul>
 </li>
 </ul>
@@ -436,9 +431,6 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
 <li><p><strong>is_cell_centered</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
 </dd>
-<dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
-</dd>
 </dl>
 </dd></dl>
 
@@ -451,9 +443,6 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
 <li><p><strong>s0</strong> (<a class="reference internal" href="#f/base_state_geometry_module/max_radial_level" title="f/base_state_geometry_module/max_radial_level">max_radial_level</a>)+1,<a class="reference internal" href="#f/base_state_geometry_module/nr_fine" title="f/base_state_geometry_module/nr_fine">nr_fine</a>-1+1)<em> [</em><em>double precision</em><em>,</em><em>inout</em><em>]</em></p></li>
 <li><p><strong>is_cell_centered</strong><em> [</em><em>integer</em><em>,</em><em>in,value</em><em>]</em></p></li>
 </ul>
-</dd>
-<dt class="field-even">Called from</dt>
-<dd class="field-even"><p><a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell" title="f/average_module/divide_phisum_by_ncell"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell()</span></code></a>, <a class="reference internal" href="average_f.html#f/average_module/divide_phisum_by_ncell_irreg" title="f/average_module/divide_phisum_by_ncell_irreg"><code class="xref f f-func docutils literal notranslate"><span class="pre">divide_phisum_by_ncell_irreg()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_cell" title="f/make_grav_module/make_grav_cell"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_cell()</span></code></a>, <a class="reference internal" href="make_grav_f.html#f/make_grav_module/make_grav_edge" title="f/make_grav_module/make_grav_edge"><code class="xref f f-func docutils literal notranslate"><span class="pre">make_grav_edge()</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -554,7 +543,7 @@ Binds to C function <code class="docutils literal notranslate"><span class="pre"
         <a href="burner_loop_f.html" class="btn btn-neutral float-right" title="burner_loop.F90" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="average_f.html" class="btn btn-neutral float-left" title="average.F90" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../Src_nd_files.html" class="btn btn-neutral float-left" title="Src_nd" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
