@@ -13,7 +13,6 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()", Average);
 
-    const int max_lev = base_geom.max_radial_level + 1;
     const auto nr_irreg = base_geom.nr_irreg;
 
     phibar.setVal(0.0);
@@ -151,16 +150,15 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             (base_geom.max_radial_level + 1) * base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        for (int lev = 0; lev < max_lev; ++lev) {
-            ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
+        for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+            for (int r = 0; r < base_geom.nr_fine; ++r) {
                 if (ncell(lev, r) > 0) {
-                    phisum_arr(lev, r) /= ncell(lev, r);
+                    phisum_arr(lev, r) /= Real(ncell(lev, r));
                 } else {
                     // keep value constant if it is outside the cutoff coords
                     phisum_arr(lev, r) = phisum_arr(lev, r - 1);
                 }
-            });
-            Gpu::synchronize();
+            }
         }
 
         RestrictBase(phisum, true);
@@ -298,8 +296,11 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
         // normalize phisum so it actually stores the average at a radius
         for (auto n = 0; n <= finest_level; ++n) {
             for (auto r = 0; r <= nr_irreg; ++r) {
-                if (ncell(n, r + 1) != 0) {
+                if (ncell(n, r + 1) > 0) {
                     phisum(n, r + 1) /= Real(ncell(n, r + 1));
+                } else {
+                    // keep value constant if it is outside the cutoff coords
+                    phisum(n, r + 1) = phisum(n, r);
                 }
             }
         }

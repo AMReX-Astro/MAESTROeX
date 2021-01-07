@@ -2,7 +2,7 @@
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
 #include <MaestroPlot.H>
-#include <Maestro_F.H>
+#include <unistd.h>  // getcwd
 
 using namespace amrex;
 
@@ -168,21 +168,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     names[cnt++] = "h";
 
     for (int i = 0; i < NumSpec; i++) {
-        int len = 20;
-        Vector<int> int_spec_names(len);
-        //
-        // This call return the actual length of each string in "len"
-        //
-        get_spec_names(int_spec_names.dataPtr(), &i, &len);
-        char* spec_name = new char[len + 1];
-        for (int j = 0; j < len; j++) spec_name[j] = int_spec_names[j];
-        spec_name[len] = '\0';
         std::string spec_string = "rhoX(";
-        spec_string += spec_name;
+        spec_string += short_spec_names_cxx[i];
         spec_string += ')';
 
         names[cnt++] = spec_string;
-        delete[] spec_name;
     }
 
     names[cnt++] = "tfromp";
@@ -365,24 +355,11 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << OtherLine;
 
         for (int i = 0; i < NumSpec; i++) {
-            int len = mlen;
-            Vector<int> int_spec_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_spec_names(int_spec_names.dataPtr(), &i, &len);
-            char* spec_name = new char[len + 1];
-            for (int j = 0; j < len; j++) spec_name[j] = int_spec_names[j];
-            spec_name[len] = '\0';
-
-            // get A and Z
-            get_spec_az(&i, &Aion, &Zion);
-
+            auto spec_name = short_spec_names_cxx[i];
             jobInfoFile << std::setw(6) << i << SkipSpace << std::setw(mlen + 1)
                         << std::setfill(' ') << spec_name << SkipSpace
-                        << std::setw(7) << Aion << SkipSpace << std::setw(7)
-                        << Zion << "\n";
-            delete[] spec_name;
+                        << std::setw(7) << aion[i] << SkipSpace << std::setw(7)
+                        << zion[i] << "\n";
         }
         jobInfoFile << "\n\n";
 
