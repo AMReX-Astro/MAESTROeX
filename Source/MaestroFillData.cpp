@@ -218,7 +218,7 @@ void Maestro::FillUmacGhost(
             const Array4<Real> wmac = umac_in[lev][2].array(mfi);
 #endif
 
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // lo x-faces
                 if (i == domlo[0] - 1) {
                     switch (physbc_p[0]) {
@@ -298,7 +298,7 @@ void Maestro::FillUmacGhost(
 
             Gpu::synchronize();
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // lo y-faces
                 if (j == domlo[1] - 1) {
                     switch (physbc_p[1]) {
@@ -380,7 +380,7 @@ void Maestro::FillUmacGhost(
 
             Gpu::synchronize();
 
-            AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+            ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // lo z-faces
                 if (k == domlo[2] - 1) {
                     switch (physbc_p[2]) {

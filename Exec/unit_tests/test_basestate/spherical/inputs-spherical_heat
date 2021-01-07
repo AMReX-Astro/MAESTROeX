@@ -5,14 +5,14 @@ maestro.max_step = 1000000
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
-amr.n_cell             = 640
+amr.n_cell             = 640 64 64
 amr.max_grid_size      = 64
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 maestro.spherical = 1
 
 # PROBLEM SIZE
-geometry.prob_lo     =  0.e8
-geometry.prob_hi     =  5.e8
+geometry.prob_lo     =  0.e8 0.e8 0.e8
+geometry.prob_hi     =  5.e8 .5e8 .5e8
 maestro.evolve_base_state = false
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
@@ -23,9 +23,9 @@ maestro.cfl = 0.7e0
 # 0 = Interior   3 = Symmetry
 # 1 = Inflow     4 = Slipwall
 # 2 = Outflow    5 = NoSlipWall
-maestro.lo_bc = 2 2
-maestro.hi_bc = 2 2
-geometry.is_periodic =  0 0
+maestro.lo_bc = 2 2 2
+maestro.hi_bc = 2 2 2
+geometry.is_periodic =  0 0 0
 
 # VERBOSITY
 maestro.v              = 1       # verbosity

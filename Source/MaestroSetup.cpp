@@ -39,13 +39,11 @@ void Maestro::Setup() {
     VariableSetup();
 
     maestro_network_init();
+    network_init();
 
     maestro_eos_init();
-    eos_init();
+    eos_init(maestro::small_temp, maestro::small_dens);
 
-    burner_init();
-
-    // maestro_conductivity_init();
     conductivity_init();
 
 #ifdef ROTATION
@@ -59,10 +57,6 @@ void Maestro::Setup() {
 
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
-
-    // define additional module variables in meth_params.F90 that are defined
-    // at the top of meth_params.template
-    set_method_params(ZFILL(probLo), ZFILL(probHi));
 
     // set up BCRec definitions for BC types
     BCSetup();
@@ -82,10 +76,10 @@ void Maestro::Setup() {
         const Real domhi = domainBoxFine.bigEnd(0) + 1;
         if (!octant) {
             base_geom.nr_irreg =
-                int((3 * (domhi / 2 - 0.5) * (domhi / 2 - 0.5) - 0.75) / 2.0);
+                int((3.0 * (domhi / 2 - 0.5) * (domhi / 2 - 0.5) - 0.75) / 2.0);
         } else {
             base_geom.nr_irreg =
-                int((3 * (domhi - 0.5) * (domhi - 0.5) - 0.75) / 2.0);
+                int((3.0 * (domhi - 0.5) * (domhi - 0.5) - 0.75) / 2.0);
         }
 
         // compute base_geom.nr_fine
@@ -165,26 +159,6 @@ void Maestro::Setup() {
     base_geom.Init(base_geom.max_radial_level, base_geom.nr_fine,
                    base_geom.dr_fine, base_geom.nr_irreg, geom, max_level,
                    center);
-
-    RealVector r_cc_loc_vec((base_geom.max_radial_level + 1) *
-                            base_geom.nr_fine);
-    RealVector r_edge_loc_vec((base_geom.max_radial_level + 1) *
-                              (base_geom.nr_fine + 1));
-    for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-        for (auto r = 0; r < base_geom.nr_fine; ++r) {
-            r_cc_loc_vec[l + (base_geom.max_radial_level + 1) * r] =
-                base_geom.r_cc_loc(l, r);
-            r_edge_loc_vec[l + (base_geom.max_radial_level + 1) * r] =
-                base_geom.r_edge_loc(l, r);
-        }
-        r_edge_loc_vec[l +
-                       (base_geom.max_radial_level + 1) * (base_geom.nr_fine)] =
-            base_geom.r_edge_loc(l, base_geom.nr_fine);
-    }
-    init_base_state_geometry(&base_geom.max_radial_level, &base_geom.nr_fine,
-                             &base_geom.dr_fine, r_cc_loc_vec.dataPtr(),
-                             r_edge_loc_vec.dataPtr(),
-                             geom[max_level].CellSize(), &base_geom.nr_irreg);
 
     if (use_exact_base_state) {
         average_base_state = true;
@@ -301,7 +275,7 @@ void Maestro::ExternInit() {
         std::cout << "reading extern runtime parameters ..." << std::endl;
     }
 
-    maestro_extern_init();
+    runtime_init();
 
     // grab them from Fortran to C++
     init_extern_parameters();

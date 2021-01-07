@@ -20,7 +20,7 @@ void Maestro::CelltoEdge(const BaseState<Real>& s0_cell_s,
             Real nr_lev = base_geom.nr(n);
             const int lo = base_geom.r_start_coord(n, i);
             const int hi = base_geom.r_end_coord(n, i) + 1;
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
 
                 if (r == 0) {

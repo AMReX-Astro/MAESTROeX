@@ -22,7 +22,7 @@ void Maestro::InitBaseStateMapSphr(
         const auto probLo = geom[0].ProbLoArray();
         const auto center_p = center;
 
-        AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+        ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             Real x = probLo[0] + (static_cast<Real>(i) + 0.5) * dx_lev[0] -
                      center_p[0];
             Real y = probLo[1] + (static_cast<Real>(j) + 0.5) * dx_lev[1] -
@@ -34,7 +34,7 @@ void Maestro::InitBaseStateMapSphr(
                 (x * x + y * y + z * z) / (2.0 * dx_fine[0] * dx_fine[0]) -
                 0.375;
             cc_to_r(i, j, k) = (int)amrex::Math::round(index);
-        })
+        });
     }
 }
 #endif

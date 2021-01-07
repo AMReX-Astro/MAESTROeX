@@ -128,7 +128,7 @@ void Maestro::Makew0Planar(
             // compute psi for level n
             int lo = base_geom.r_start_coord(n, j);
             int hi = base_geom.r_end_coord(n, j);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                 int r = k + lo;
                 if (r < base_cutoff_density_coord) {
                     psi_planar(r) =
@@ -186,7 +186,7 @@ void Maestro::Makew0Planar(
                     // Offset the w0 on level i above the top of level n
                     lo = (base_geom.r_end_coord(n, j) + 1) / refrat + 1;
                     hi = base_geom.nr(i);
-                    AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+                    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                         int r = k + lo;
                         w0_arr(i, r) += offset;
                     });
@@ -202,14 +202,14 @@ void Maestro::Makew0Planar(
             if (j == base_geom.numdisjointchunks(n)) {
                 const int lo = base_geom.r_end_coord(n, j) + 2;
                 const int hi = base_geom.nr(n);
-                AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                     int r = k + lo;
                     w0_arr(n, r) = 0.0;
                 });
             } else {
                 const int lo = base_geom.r_end_coord(n, j) + 2;
                 const int hi = base_geom.r_start_coord(n, j + 1) - 1;
-                AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                     int r = k + lo;
                     w0_arr(n, r) = 0.0;
                 });
@@ -230,7 +230,7 @@ void Maestro::Makew0Planar(
 
             const int lo = base_geom.r_start_coord(n, j);
             const int hi = base_geom.r_end_coord(n, j);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                 int r = k + lo;
 
                 Real w0_old_cen =
@@ -335,7 +335,7 @@ void Maestro::Makew0PlanarVarg(
 
     int lo = 1;
     int hi = nr_finest;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         Real gamma1bar_p0_avg =
             gamma1bar_nph_fine_arr(r - 1) * p0_nph_fine_arr(r - 1);
@@ -384,7 +384,7 @@ void Maestro::Makew0PlanarVarg(
 
     lo = 1;
     hi = fine_base_density_cutoff_coord;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         A(r) = gamma1bar_nph_fine_arr(r - 1) * p0_nph_fine_arr(r - 1);
         A(r) /= dr_finest * dr_finest;
@@ -427,7 +427,7 @@ void Maestro::Makew0PlanarVarg(
 
     lo = 1;
     hi = fine_base_density_cutoff_coord + 1;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         deltaw0_fine_arr(r) = u(r);
     });
@@ -435,7 +435,7 @@ void Maestro::Makew0PlanarVarg(
 
     lo = fine_base_density_cutoff_coord + 2;
     hi = nr_finest;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         deltaw0_fine_arr(r) =
             deltaw0_fine_arr(fine_base_density_cutoff_coord + 1);
@@ -443,7 +443,7 @@ void Maestro::Makew0PlanarVarg(
     Gpu::synchronize();
 
     // 6) compute w0 = w0bar + deltaw0
-    AMREX_PARALLEL_FOR_1D(nr_finest + 1, r, {
+    ParallelFor(nr_finest + 1, [=] AMREX_GPU_DEVICE(int r) {
         w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
         w0_arr(base_geom.finest_radial_level, r) = w0_fine_arr(r);
     });
@@ -464,14 +464,14 @@ void Maestro::Makew0PlanarVarg(
             if (j == base_geom.numdisjointchunks(n)) {
                 lo = base_geom.r_end_coord(n, j) + 2;
                 hi = base_geom.nr(n);
-                AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                     int r = k + lo;
                     w0_arr(n, r) = 0.0;
                 });
             } else {
                 lo = base_geom.r_end_coord(n, j) + 2;
                 hi = base_geom.r_start_coord(n, j + 1);
-                AMREX_PARALLEL_FOR_1D(hi - lo, k, {
+                ParallelFor(hi - lo, [=] AMREX_GPU_DEVICE(int k) {
                     int r = k + lo;
                     w0_arr(n, r) = 0.0;
                 });
@@ -493,7 +493,7 @@ void Maestro::Makew0PlanarVarg(
 
             lo = base_geom.r_start_coord(n, j);
             hi = base_geom.r_end_coord(n, j);
-            AMREX_PARALLEL_FOR_1D(hi - lo + 1, k, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int k) {
                 int r = k + lo;
                 Real w0_old_cen =
                     0.5 * (w0_old_arr(n, r) + w0_old_arr(n, r + 1));
@@ -567,8 +567,6 @@ void Maestro::Makew0Sphr(
     const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
 
-    Real base_cutoff_dens = 0.0;
-    get_base_cutoff_density(&base_cutoff_dens);
     const auto base_cutoff_density_coord =
         base_geom.base_cutoff_density_coord(0);
 
@@ -576,8 +574,7 @@ void Maestro::Makew0Sphr(
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
-    // for (auto r = 0; r < nr_fine; ++r) {
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         p0_nph(r) = 0.5 * (p0_old_arr(0, r) + p0_new_arr(0, r));
         rho0_nph(0, r) = 0.5 * (rho0_old_arr(0, r) + rho0_new_arr(0, r));
         gamma1bar_nph(r) =
@@ -592,7 +589,7 @@ void Maestro::Makew0Sphr(
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
         Real volume_discrepancy =
-            rho0_old_arr(0, r - 1) > base_cutoff_dens
+            rho0_old_arr(0, r - 1) > base_cutoff_density
                 ? dpdt_factor_loc * p0_minus_peosbar_arr(0, r - 1) / dt_in
                 : 0.0;
 
@@ -608,7 +605,7 @@ void Maestro::Makew0Sphr(
 
     int lo = 1;
     int hi = base_geom.nr_fine;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         w0_from_Sbar(r) /= (r_edge_loc(0, r) * r_edge_loc(0, r));
     });
@@ -635,7 +632,6 @@ void Maestro::Makew0Sphr(
 
     lo = 1;
     hi = max_cutoff;
-    //AMREX_PARALLEL_FOR_1D(hi-lo+1, j, {
     amrex::ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) noexcept {
         int r = j + lo;
         A(r) = gamma1bar_nph(r - 1) * p0_nph(r - 1) /
@@ -689,7 +685,7 @@ void Maestro::Makew0Sphr(
 
     lo = 1;
     hi = max_cutoff + 1;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         w0_arr(0, r) =
             u(r) / (r_edge_loc(0, r) * r_edge_loc(0, r)) + w0_from_Sbar(r);
@@ -698,7 +694,7 @@ void Maestro::Makew0Sphr(
 
     lo = max_cutoff + 2;
     hi = base_geom.nr_fine;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         w0_arr(0, r) = w0_arr(0, max_cutoff + 1) *
                        r_edge_loc(0, max_cutoff + 1) *
@@ -710,7 +706,7 @@ void Maestro::Makew0Sphr(
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     const Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         Real w0_old_cen = 0.5 * (w0_old_arr(0, r) + w0_old_arr(0, r + 1));
         Real w0_new_cen = 0.5 * (w0_arr(0, r) + w0_arr(0, r + 1));
         Real w0_avg =
@@ -776,14 +772,12 @@ void Maestro::Makew0SphrIrreg(
     const auto w0_old_arr = w0_old.const_array();
     auto w0_force_arr = w0_force.array();
 
-    Real base_cutoff_dens = 0.0;
-    get_base_cutoff_density(&base_cutoff_dens);
     const auto base_cutoff_density_coord =
         base_geom.base_cutoff_density_coord(0);
     const Real dpdt_factor_loc = dpdt_factor;
 
     // create time-centered base-state quantities
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         p0_nph(r) = 0.5 * (p0_old_arr(0, r) + p0_new_arr(0, r));
         rho0_nph(r) = 0.5 * (rho0_old_arr(0, r) + rho0_new_arr(0, r));
         gamma1bar_nph(r) =
@@ -798,7 +792,7 @@ void Maestro::Makew0SphrIrreg(
 
     for (auto r = 1; r <= base_geom.nr_fine; ++r) {
         Real volume_discrepancy =
-            rho0_old_arr(0, r - 1) > base_cutoff_dens
+            rho0_old_arr(0, r - 1) > base_cutoff_density
                 ? dpdt_factor_loc * p0_minus_peosbar_arr(0, r - 1) / dt_in
                 : 0.0;
 
@@ -833,7 +827,7 @@ void Maestro::Makew0SphrIrreg(
 
     int lo = 1;
     int hi = max_cutoff;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         Real dr1 = r_edge_loc(0, r) - r_edge_loc(0, r - 1);
         Real dr2 = r_edge_loc(0, r + 1) - r_edge_loc(0, r);
@@ -890,7 +884,7 @@ void Maestro::Makew0SphrIrreg(
 
     lo = 1;
     hi = max_cutoff + 1;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         w0_arr(0, r) =
             u(r) / (r_edge_loc(0, r) * r_edge_loc(0, r)) + w0_from_Sbar(r);
@@ -899,7 +893,7 @@ void Maestro::Makew0SphrIrreg(
 
     lo = max_cutoff + 2;
     hi = base_geom.nr_fine;
-    AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+    ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
         int r = j + lo;
         w0_arr(0, r) = w0_arr(0, max_cutoff + 1) *
                        r_edge_loc(0, max_cutoff + 1) *
@@ -911,7 +905,7 @@ void Maestro::Makew0SphrIrreg(
     // Compute the forcing term in the base state velocity equation, - 1/rho0 grad pi0
     const Real dt_avg = 0.5 * (dt_in + dtold_in);
 
-    AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+    ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
         Real dr1 = r_edge_loc(0, r) - r_edge_loc(0, r - 1);
         Real w0_old_cen = 0.5 * (w0_old_arr(0, r) + w0_old_arr(0, r + 1));
         Real w0_new_cen = 0.5 * (w0_arr(0, r) + w0_arr(0, r + 1));

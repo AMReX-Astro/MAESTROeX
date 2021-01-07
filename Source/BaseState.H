@@ -181,15 +181,19 @@ class BaseState {
     void setVal(const int comp, const T& val);
 
     /// number of levels in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nLevels() const {
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nLevels() const noexcept {
         return nlev;
     };
 
     /// number of cells in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int length() const { return len; };
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int length() const noexcept {
+        return len;
+    };
 
     /// number of components
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nComp() const { return nvar; };
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nComp() const noexcept {
+        return nvar;
+    };
 
     /// deep copy
     void copy(const BaseState<T>& src);

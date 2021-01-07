@@ -32,7 +32,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
     int bchi = bcs[bccomp].hi()[0];
 
     if (ppm_type == 1) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // Compute van Leer slopes in x-direction
 
             // sm
@@ -253,7 +253,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
         });
 
     } else if (ppm_type == 2) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // -1
             // Interpolate s to x-edges.
             Real sedgel =
@@ -778,7 +778,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
     bchi = bcs[bccomp].hi()[1];
 
     if (ppm_type == 1) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // Compute van Leer slopes in y-direction.
 
             // sm
@@ -999,7 +999,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
         });
 
     } else if (ppm_type == 2) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // -1
             // Interpolate s to y-edges.
             Real sedgel =
@@ -1521,7 +1521,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
     bchi = bcs[bccomp].hi()[2];
 
     if (ppm_type == 1) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // Compute van Leer slopes in z-direction.
 
             // sm
@@ -1745,7 +1745,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
         });
 
     } else if (ppm_type == 2) {
-        AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+        ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             // -1
             // Interpolate s to z-edges.
             Real sedgel =

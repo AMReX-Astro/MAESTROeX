@@ -20,8 +20,6 @@ void Maestro::MakeVelForce(
     Vector<MultiFab> gradw0_cart(finest_level + 1);
     Vector<MultiFab> grav_cart(finest_level + 1);
     Vector<MultiFab> rho0_cart(finest_level + 1);
-
-    // constants in Fortran
     for (int lev = 0; lev <= finest_level; ++lev) {
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         gradw0_cart[lev].setVal(0.);
@@ -42,7 +40,7 @@ void Maestro::MakeVelForce(
         auto gradw0_arr = gradw0.array();
 
         for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
-            AMREX_PARALLEL_FOR_1D(base_geom.nr_fine, r, {
+            ParallelFor(base_geom.nr_fine, [=] AMREX_GPU_DEVICE(int r) {
                 gradw0_arr(l, r) = (w0_arr(l, r + 1) - w0_arr(l, r)) / dr0;
             });
             Gpu::synchronize();
@@ -99,10 +97,11 @@ void Maestro::MakeVelForce(
 
             // offload to GPU
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
 #ifdef ROTATION
-                    Abort("MakeVelForce: rotation not implemented for planar");
+                Abort("MakeVelForce: rotation not implemented for planar");
 #endif
+
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real rhopert = rho_arr(i, j, k) - rho0_arr(i, j, k);
 
                     // cutoff the buoyancy term if we are outside of the star
@@ -159,9 +158,8 @@ void Maestro::MakeVelForce(
                 const auto omega_loc = omega;
 #endif
 
-                // AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
-                amrex::ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(
-                                                int i, int j, int k) noexcept {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j,
+                                                          int k) noexcept {
 #ifdef ROTATION
                     const Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
                     const Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
@@ -341,7 +339,7 @@ void Maestro::ModifyScalForce(
                 const auto domhi = domainBox.hiVect3d();
                 const Array4<const Real> divu_arr = divu_cart[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     // umac does not contain w0
                     Real divumac = (umac(i + 1, j, k) - umac(i, j, k)) / dx[0] +
                                    (vmac(i, j + 1, k) - vmac(i, j, k)) / dx[1] +
@@ -415,7 +413,7 @@ void Maestro::ModifyScalForce(
                 Abort("ModifyScalForce: Spherical is not valid for DIM < 3");
 #endif
             } else {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // umac does not contain w0
 #if (AMREX_SPACEDIM == 2)
                     Real divu = (umac(i + 1, j, k) - umac(i, j, k)) / dx[0] +
@@ -584,7 +582,7 @@ void Maestro::MakeRhoHForce(
             // For non-spherical, add wtilde d(p0)/dr
             // For spherical, we make u grad p = div (u p) - p div (u)
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real gradp0 = 0.0;
 
 #if (AMREX_SPACEDIM == 2)
@@ -635,7 +633,7 @@ void Maestro::MakeRhoHForce(
                 });
             } else {
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real divup = (umac(i + 1, j, k) * p0macx(i + 1, j, k) -
                                   umac(i, j, k) * p0macx(i, j, k)) /
                                      dx[0] +
@@ -732,7 +730,7 @@ void Maestro::MakeTempForce(
             const Array4<const Real> psi_arr = psi_cart[lev].array(mfi);
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real gradp0 = 0.0;
 #if (AMREX_SPACEDIM == 2)
                     if (j == 0) {
@@ -795,7 +793,7 @@ void Maestro::MakeTempForce(
                 });
             } else {
 #if (AMREX_SPACEDIM == 3)
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 
                     eos_state.T = scal_arr(i, j, k, Temp);

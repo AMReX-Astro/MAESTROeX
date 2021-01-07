@@ -1,3 +1,13 @@
+# 21.01
+
+  * Converted all remaining routines to C++
+
+  * Fixed exact base state algorithm and combined MaestroAdvanceIrreg with MaestroAdvanceAvg subroutine
+
+  * Converted all kernel launches to use amrex::ParallelFor for easier debugging
+
+  * C++17 is now the minimum supported C++ standard.
+
 # 20.12
 
   * Set default in SDC algorithm to use split projection for both planar and spherical problems 

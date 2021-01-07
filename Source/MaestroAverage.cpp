@@ -13,7 +13,6 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Average()", Average);
 
-    const int max_lev = base_geom.max_radial_level + 1;
     const auto nr_irreg = base_geom.nr_irreg;
 
     phibar.setVal(0.0);
@@ -66,7 +65,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 }
 #endif
 
-                AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     int r = AMREX_SPACEDIM == 2 ? j : k;
                     amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, r)),
                                                    phi_arr(i, j, k));
@@ -91,7 +90,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             for (auto i = 1; i <= base_geom.numdisjointchunks(lev); ++i) {
                 const int lo = base_geom.r_start_coord(lev, i);
                 const int hi = base_geom.r_end_coord(lev, i);
-                AMREX_PARALLEL_FOR_1D(hi - lo + 1, j, {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                     int r = j + lo;
                     phisum_arr(lev, r) /= ncell(lev);
                 });
@@ -110,33 +109,35 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
         // phibar is dimensioned to "max_radial_level" so we must mimic that for phisum
         // so we can simply swap this result with phibar
-        RealVector phisum((base_geom.max_radial_level + 1) * base_geom.nr_fine,
-                          0.0);
+        BaseState<Real> phisum(base_geom.max_radial_level + 1,
+                               base_geom.nr_fine);
+        phisum.setVal(0.0);
+        auto phisum_arr = phisum.array();
 
         // this stores how many cells there are at each level
-        Vector<int> ncell((base_geom.max_radial_level + 1) * base_geom.nr_fine,
-                          0);
+        BaseState<int> ncell_s(base_geom.max_radial_level + 1);
+        auto ncell = ncell_s.array();
 
         // loop is over the existing levels (up to finest_level)
         for (int lev = 0; lev <= finest_level; ++lev) {
-            // get references to the MultiFabs at level lev
-            const MultiFab& phi_mf = phi[lev];
-            const iMultiFab& cc_to_r = cell_cc_to_r[lev];
-
-            // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
-            for (MFIter mfi(phi_mf); mfi.isValid(); ++mfi) {
+// Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel if (!system::regtest_reduction)
+#endif
+            for (MFIter mfi(phi[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
                 // Get the index space of the valid region
-                const Box& validBox = mfi.validbox();
+                const Box& tilebox = mfi.tilebox();
 
-                // call fortran subroutine
-                // use macros in AMReX_ArrayLim.H to pass in each FAB's data,
-                // lo/hi coordinates (including ghost cells), and/or the # of components
-                // We will also pass "validBox", which specifies the "valid" region.
-                average_sphr_irreg(&lev, ARLIM_3D(validBox.loVect()),
-                                   ARLIM_3D(validBox.hiVect()),
-                                   BL_TO_FORTRAN_N_3D(phi_mf[mfi], comp),
-                                   phisum.dataPtr(), ncell.dataPtr(),
-                                   BL_TO_FORTRAN_3D(cc_to_r[mfi]));
+                const Array4<const int> cc_to_r = cell_cc_to_r[lev].array(mfi);
+                const Array4<const Real> phi_arr = phi[lev].array(mfi, comp);
+
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+                    auto index = cc_to_r(i, j, k);
+
+                    amrex::HostDevice::Atomic::Add(&(phisum_arr(lev, index)),
+                                                   phi_arr(i, j, k));
+                    amrex::HostDevice::Atomic::Add(&(ncell(lev, index)), 1);
+                });
             }
         }
 
@@ -149,24 +150,22 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             (base_geom.max_radial_level + 1) * base_geom.nr_fine);
 
         // divide phisum by ncell so it stores "phibar"
-        for (int lev = 0; lev < max_lev; ++lev) {
-            for (auto r = 0; r < base_geom.nr_fine; ++r) {
-                if (ncell[lev + max_lev * r] > 0) {
-                    phisum[lev + max_lev * r] /= ncell[lev + max_lev * r];
+        for (int lev = 0; lev <= base_geom.max_radial_level; ++lev) {
+            for (int r = 0; r < base_geom.nr_fine; ++r) {
+                if (ncell(lev, r) > 0) {
+                    phisum_arr(lev, r) /= Real(ncell(lev, r));
                 } else {
                     // keep value constant if it is outside the cutoff coords
-                    phisum[lev + max_lev * r] = phisum[lev + max_lev * (r - 1)];
+                    phisum_arr(lev, r) = phisum_arr(lev, r - 1);
                 }
             }
         }
 
-        BaseState<Real> phisum_b(phisum, base_geom.max_radial_level + 1,
-                                 base_geom.nr_fine);
-        RestrictBase(phisum_b, true);
-        FillGhostBase(phisum_b, true);
+        RestrictBase(phisum, true);
+        FillGhostBase(phisum, true);
 
         // swap pointers so phibar contains the computed average
-        phisum_b.swap(phibar);
+        phisum.swap(phibar);
     } else {
         // spherical case with even base state spacing
 
@@ -192,7 +191,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // Get the index space of the domain
             const auto dx = geom[lev].CellSizeArray();
 
-            AMREX_PARALLEL_FOR_1D(nr_irreg + 1, r, {
+            ParallelFor(nr_irreg + 1, [=] AMREX_GPU_DEVICE(int r) {
                 radii(lev, r + 1) = std::sqrt(0.75 + 2.0 * Real(r)) * dx[0];
             });
             Gpu::synchronize();
@@ -243,7 +242,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 }
 #endif
 
-                AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
+                ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
                     Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
@@ -297,8 +296,11 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
         // normalize phisum so it actually stores the average at a radius
         for (auto n = 0; n <= finest_level; ++n) {
             for (auto r = 0; r <= nr_irreg; ++r) {
-                if (ncell(n, r + 1) != 0) {
+                if (ncell(n, r + 1) > 0) {
                     phisum(n, r + 1) /= Real(ncell(n, r + 1));
+                } else {
+                    // keep value constant if it is outside the cutoff coords
+                    phisum(n, r + 1) = phisum(n, r);
                 }
             }
         }
@@ -317,7 +319,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
         const auto dr0 = base_geom.dr(0);
         const auto nrf = base_geom.nr_fine;
 
-        AMREX_PARALLEL_FOR_1D(nrf, r, {
+        ParallelFor(nrf, [=] AMREX_GPU_DEVICE(int r) {
             Real radius = (Real(r) + 0.5) * dr0;
             // Vector<int> rcoord_p(fine_lev, 0);
             int rcoord_p[MAESTRO_MAX_LEVELS];
@@ -419,7 +421,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
         const Real drdxfac_loc = drdxfac;
         auto phibar_arr = phibar.array();
 
-        AMREX_PARALLEL_FOR_1D(nrf, r, {
+        ParallelFor(nrf, [=] AMREX_GPU_DEVICE(int r) {
             Real radius = (Real(r) + 0.5) * dr0;
             int stencil_coord = 0;
 

@@ -575,7 +575,6 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
                             v_fab.setVal<RunOn::Device>(0.0, ovlp, idir, 1);
                         }
                     }
-
                 }  // end loop over grids
             }      // end if/else logic for inflow
         }          // end loop over direction
@@ -603,7 +602,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi, Vector<MultiFab>& gphi) {
             const Array4<Real> gphi_arr = gphi[lev].array(mfi);
 
 #if (AMREX_SPACEDIM == 2)
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 gphi_arr(i, j, k, 0) =
                     0.5 *
                     (phi_arr(i + 1, j, k) + phi_arr(i + 1, j + 1, k) -
@@ -616,7 +615,7 @@ void Maestro::ComputeGradPhi(Vector<MultiFab>& phi, Vector<MultiFab>& gphi) {
                     dx[1];
             });
 #else
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 gphi_arr(i, j, k, 0) =
                     0.25 *
                     (phi_arr(i + 1, j, k) + phi_arr(i + 1, j + 1, k) +
@@ -659,14 +658,14 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart) {
 #endif
         for (MFIter mfi(snew_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the tile's valid region
-            const Box& tileBox = mfi.tilebox();
+            const Box& tilebox = mfi.tilebox();
 
             const Array4<const Real> pi_arr = pi[lev].array(mfi);
             const Array4<Real> pi_cc = snew[lev].array(mfi, Pi);
             const Array4<const Real> beta0_cart_arr =
                 beta0_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                 pi_cc(i, j, k) =
                     0.25 * (pi_arr(i, j, k) + pi_arr(i + 1, j, k) +
