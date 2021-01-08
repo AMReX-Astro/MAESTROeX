@@ -122,7 +122,7 @@ def write_meth_module(plist, meth_template, out_directory):
 
                 mo.write("\n")
 
-                mo.write('    call amrex_parmparse_build(pp, "{}")\n'.format(nm))
+                mo.write(f'    call amrex_parmparse_build(pp, "{nm}")\n')
 
                 for p in params_nm:
                     mo.write(p.get_query_string("F90"))
@@ -136,8 +136,8 @@ def write_meth_module(plist, meth_template, out_directory):
             params_free = [q for q in params if q.in_fortran == 1]
 
             for p in params_free:
-                mo.write("    if (allocated({})) then\n".format(p.name))
-                mo.write("        deallocate({})\n".format(p.name))
+                mo.write(f"    if (allocated({p.name})) then\n")
+                mo.write(f"        deallocate({p.name})\n")
                 mo.write("    end if\n")
 
             mo.write("\n\n")
@@ -249,7 +249,7 @@ def parse_params(infile, meth_template, out_directory):
                 for p in [q for q in params_nm if q.ifdef is None]:
                     cd.write(p.get_declare_string())
             else:
-                cd.write("#ifdef {}\n".format(ifdef))
+                cd.write(f"#ifdef {ifdef}\n")
                 for p in [q for q in params_nm if q.ifdef == ifdef]:
                     cd.write(p.get_declare_string())
                 cd.write("#endif\n")
@@ -268,7 +268,7 @@ def parse_params(infile, meth_template, out_directory):
         cp.write(f"#define _{nm.upper()}_PARAMS_H_\n")
 
         cp.write("\n")
-        cp.write("namespace {} {{\n".format(nm))
+        cp.write(f"namespace {nm} {{\n")
 
         for p in params_nm:
             cp.write(p.get_decl_string())
