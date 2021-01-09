@@ -36,6 +36,8 @@ module meth_params_module
 
   ! End the declarations of the ParmParse parameters
 
+  character (len=:), allocatable :: dummy_string_param
+
 contains
 
   subroutine read_method_params() bind(C, name="read_method_params")
