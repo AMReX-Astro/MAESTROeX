@@ -336,9 +336,9 @@ void Maestro::Put1dArrayOnCart(const int lev, const BaseState<Real>& s0,
 }
 
 AMREX_GPU_DEVICE
-Real Maestro::QuadInterp(const Real x, const Real x0, const Real x1,
-                         const Real x2, const Real y0, const Real y1,
-                         const Real y2, bool limit) {
+Real QuadInterp(const Real x, const Real x0, const Real x1,
+		const Real x2, const Real y0, const Real y1,
+		const Real y2, bool limit) {
     Real y = y0 + (y1 - y0) / (x1 - x0) * (x - x0) +
              ((y2 - y1) / (x2 - x1) - (y1 - y0) / (x1 - x0)) / (x2 - x0) *
                  (x - x0) * (x - x1);
