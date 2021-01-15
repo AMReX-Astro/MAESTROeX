@@ -40,11 +40,10 @@ using IntVector = amrex::Vector<int>;
 
 // function called on GPU only
 AMREX_GPU_DEVICE
-amrex::Real QuadInterp(
-        const amrex::Real x, const amrex::Real x0, const amrex::Real x1,
-        const amrex::Real x2, const amrex::Real y0, const amrex::Real y1,
-        const amrex::Real y2, const bool limit = true);
-
+amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
+                       const amrex::Real x1, const amrex::Real x2,
+                       const amrex::Real y0, const amrex::Real y1,
+                       const amrex::Real y2, const bool limit = true);
 
 /// hard code a maximum level limit
 #define MAESTRO_MAX_LEVELS 15
