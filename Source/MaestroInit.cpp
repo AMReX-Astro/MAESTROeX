@@ -78,10 +78,6 @@ void Maestro::Init() {
             }
             pi[lev].define(convert(grids[lev], nodal_flag), dmap[lev], 1,
                            0);  // nodal
-#ifdef SDC
-            intra[lev].define(grids[lev], dmap[lev], Nscal, 0);  // for sdc
-            intra[lev].setVal(0.);
-#endif
         }
 
         for (int lev = 0; lev <= finest_level; ++lev) {
@@ -201,6 +197,21 @@ void Maestro::Init() {
             Print() << "Doing initial pressure iteration #" << i << std::endl;
             InitIter();
         }
+	
+	// Throw away new states by setting them to their old states
+	for (int lev = 0; lev <= finest_level; ++lev) {
+	    MultiFab::Copy(snew[lev], sold[lev], 0, 0, Nscal, ng_s);
+	    MultiFab::Copy(unew[lev], uold[lev], 0, 0, AMREX_SPACEDIM, ng_s);
+	    MultiFab::Copy(S_cc_new[lev], S_cc_old[lev], 0, 0, 1, 0);
+	}
+
+	rho0_new.copy(rho0_old);
+	rhoh0_new.copy(rhoh0_old);
+	p0_new.copy(p0_old);
+
+	beta0_new.copy(beta0_old);
+	gamma1bar_new.copy(gamma1bar_old);
+	grav_cell_new.copy(grav_cell_old);
 
         if (plot_int > 0 || plot_deltat > 0) {
             Print() << "\nWriting plotfile 0 after all initialization"

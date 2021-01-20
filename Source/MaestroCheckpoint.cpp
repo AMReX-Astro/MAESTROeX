@@ -230,6 +230,9 @@ int Maestro::ReadCheckPoint() {
             S_cc_old[lev].define(ba, dm, 1, 0);
             gpi[lev].define(ba, dm, AMREX_SPACEDIM, 0);
             dSdt[lev].define(ba, dm, 1, 0);
+#ifdef SDC
+            intra[lev].define(ba, dm, Nscal, 0);  // for sdc
+#endif
 
             // build FluxRegister data
             if (lev > 0 && reflux_type == 2) {
