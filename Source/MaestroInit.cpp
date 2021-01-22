@@ -84,9 +84,11 @@ void Maestro::Init() {
             w0_cart[lev].setVal(0.);
             rhcc_for_nodalproj[lev].setVal(0.);
             pi[lev].setVal(0.);
-            S_cc_new[lev].setVal(0.);
             unew[lev].setVal(0.);
             snew[lev].setVal(0.);
+	    // needed for t=0 case: S_cc_new = S_cc_old + dt*dSdt
+	    MultiFab::LinComb(S_cc_new[lev], 1.0, S_cc_old[lev], 0, dt,
+			      dSdt[lev], 0, 0, 1, 0);
         }
 
         // put w0 on Cartesian cell-centers

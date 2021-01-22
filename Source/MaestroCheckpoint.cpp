@@ -135,7 +135,7 @@ void Maestro::WriteCheckPoint(int step) {
                        << " " << psi.array()(i) << " " << tempbar.array()(i)
                        << " " << etarho_cc.array()(i) << " "
                        << tempbar_init.array()(i) << " " << p0_old.array()(i)
-                       << " " << beta0_nm1.array()(i) << "\n";
+                       << " " << beta0_old.array()(i) << "\n";
         }
     }
 
