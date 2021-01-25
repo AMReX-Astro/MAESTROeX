@@ -23,6 +23,26 @@ void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) {
     }
 }
 
+void Maestro::PrintBase(const BaseState<Real>& base_s,
+                        const bool is_cell_centered) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
+
+    const auto base = base_s.const_array();
+
+    for (auto lev = 0; lev <= base_geom.finest_radial_level; ++lev) {
+        for (auto i = 0; i <= base_geom.numdisjointchunks(lev, 0); ++i) {
+            auto lo = base_geom.r_start_coord(lev, i);
+            auto hi = is_cell_centered ? base_geom.r_end_coord(lev, i)
+                                       : base_geom.r_end_coord(lev, i) + 1;
+            for (auto r = lo; r <= hi; ++r) {
+                std::cout << std::setprecision(16) << "base lev, r " << lev
+                          << ", " << r << ", " << base(lev, r) << std::endl;
+            }
+        }
+    }
+}
+
 // print out the contents of a Vector of MultiFabs
 void Maestro::PrintMF(const Vector<MultiFab>& MF) {
     // timer for profiling

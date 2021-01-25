@@ -1,3 +1,35 @@
+# 21.01
+
+  * Converted all remaining routines to C++
+
+  * Fixed exact base state algorithm and combined MaestroAdvanceIrreg with MaestroAdvanceAvg subroutine
+
+  * Converted all kernel launches to use amrex::ParallelFor for easier debugging
+
+  * C++17 is now the minimum supported C++ standard.
+
+# 20.12
+
+  * Set default in SDC algorithm to use split projection for both planar and spherical problems 
+
+  * Bug fix: spherical SDC with split projection
+
+  * Added test problem: imposed_external_heating
+
+  * Fixed create_release action and release action python script
+
+# 20.11
+
+  * Update cpp linter action
+
+# 20.10
+
+  * Added input parameter to toggle centrifugal force
+
+  * Enabled control for toggling AMReX fancy bottom solver
+
+  * Updated test problem: fully convective star
+
 # 20.09
 
   * Bug fix for SDC multilevel problems

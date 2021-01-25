@@ -336,7 +336,7 @@ void Maestro::MakeEdgeScalPredictor(
     const auto domhi = domainBox.hiVect3d();
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
-    AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
+    ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type_local == 0) {
             // make slx, srx with 1D extrapolation
             slx(i, j, k) =
@@ -395,7 +395,7 @@ void Maestro::MakeEdgeScalPredictor(
     // loop over appropriate y-faces
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
-    AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
+    ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type_local == 0) {
             // make sly, sry with 1D extrapolation
             sly(i, j, k) =
@@ -487,7 +487,7 @@ void Maestro::MakeEdgeScalEdges(
     // x-direction
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
-    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real sedgelx = 0.0;
         Real sedgerx = 0.0;
 
@@ -566,7 +566,7 @@ void Maestro::MakeEdgeScalEdges(
     // y-direction
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
-    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real sedgely = 0.0;
         Real sedgery = 0.0;
 
@@ -653,7 +653,7 @@ void Maestro::MakeDivU(const Box& bx, Array4<Real> const divu,
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDivU()", MakeDivU);
 
-    AMREX_PARALLEL_FOR_3D(bx, i, j, k, {
+    ParallelFor(bx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         divu(i, j, k) = umac(i + 1, j, k) - umac(i, j, k) + vmac(i, j + 1, k) -
                         vmac(i, j, k) + wmac(i, j, k + 1) - wmac(i, j, k);
         divu(i, j, k) /= dx[0];
@@ -694,7 +694,7 @@ void Maestro::MakeEdgeScalPredictor(
     const auto domhi = domainBox.hiVect3d();
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
-    AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
+    ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type_local == 0) {
             slx(i, j, k) =
                 scal(i - 1, j, k, comp) +
@@ -752,7 +752,7 @@ void Maestro::MakeEdgeScalPredictor(
     // loop over appropriate y-faces
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
-    AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
+    ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type_local == 0) {
             sly(i, j, k) =
                 scal(i, j - 1, k, comp) +
@@ -809,7 +809,7 @@ void Maestro::MakeEdgeScalPredictor(
     // loop over appropriate z-faces
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
-    AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, {
+    ParallelFor(mzbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type_local == 0) {
             slz(i, j, k) =
                 scal(i, j, k - 1, comp) +
@@ -900,7 +900,7 @@ void Maestro::MakeEdgeScalTransverse(
     // Box imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,0,1));
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slxy = 0.0;
         Real srxy = 0.0;
 
@@ -977,7 +977,7 @@ void Maestro::MakeEdgeScalTransverse(
     imhbox = amrex::growHi(imhbox, 0, 1);
     // imhbox = mfi.grownnodaltilebox(0, amrex::IntVect(0,1,0));
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slxz = 0.0;
         Real srxz = 0.0;
         // loop over appropriate xz faces
@@ -1056,7 +1056,7 @@ void Maestro::MakeEdgeScalTransverse(
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slyx = 0.0;
         Real sryx = 0.0;
         // loop over appropriate yx faces
@@ -1132,7 +1132,7 @@ void Maestro::MakeEdgeScalTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 0, 1);
     imhbox = amrex::growHi(imhbox, 1, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slyz = 0.0;
         Real sryz = 0.0;
         // loop over appropriate yz faces
@@ -1211,7 +1211,7 @@ void Maestro::MakeEdgeScalTransverse(
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slzx = 0.0;
         Real srzx = 0.0;
         // loop over appropriate zx faces
@@ -1287,7 +1287,7 @@ void Maestro::MakeEdgeScalTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 0, 1);
     imhbox = amrex::growHi(imhbox, 2, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real slzy = 0.0;
         Real srzy = 0.0;
         // loop over appropriate zy faces
@@ -1399,7 +1399,7 @@ void Maestro::MakeEdgeScalEdges(
     // x-direction
     int bclo = bcs[bccomp].lo()[0];
     int bchi = bcs[bccomp].hi()[0];
-    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real sedgelx = 0.0;
         Real sedgerx = 0.0;
 
@@ -1489,7 +1489,7 @@ void Maestro::MakeEdgeScalEdges(
     // y-direction
     bclo = bcs[bccomp].lo()[1];
     bchi = bcs[bccomp].hi()[1];
-    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real sedgely = 0.0;
         Real sedgery = 0.0;
 
@@ -1579,7 +1579,7 @@ void Maestro::MakeEdgeScalEdges(
     // z-direction
     bclo = bcs[bccomp].lo()[2];
     bchi = bcs[bccomp].hi()[2];
-    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+    ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         Real sedgelz = 0.0;
         Real sedgerz = 0.0;
 

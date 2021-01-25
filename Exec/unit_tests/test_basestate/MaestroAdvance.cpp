@@ -8,7 +8,7 @@ using namespace amrex;
 // advance a single level for a single time step, updates flux registers
 void Maestro::AdvanceTimeStep(bool is_initIter) {
     // // timer for profiling
-    // BL_PROFILE_VAR("Maestro::AdvanceTimeStep()",AdvanceTimeStep);
+    BL_PROFILE_VAR("Maestro::AdvanceTimeStep()", AdvanceTimeStep);
 
     Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
             << " DT = " << dt << std::endl
@@ -39,12 +39,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     p0_minus_peosbar.setVal(0.);
     delta_chi_w0.setVal(0.);
-
-    // make Fortran-friendly RealVectors
-    RealVector p0_old_vec((max_radial_level + 1) * nr_fine);
-    RealVector gamma1bar_old_vec((max_radial_level + 1) * nr_fine);
-    p0_old.toVector(p0_old_vec);
-    gamma1bar_old.toVector(gamma1bar_old_vec);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! compute initial gamma1bar_old
@@ -88,14 +82,173 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // ! compute the heating term and Sbar
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    get_heating(Hext_bar.dataPtr(), rho0_old.dataPtr(), tempbar.dataPtr(),
-                rhoX0_old.dataPtr(), t_old, dt, base_geom.r_cc_loc.dataPtr());
+    auto Hext_bar_arr = Hext_bar.array();
+
+    Hext_bar.setVal(0.0);
+
+    if (prob_type == 1) {
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
+
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // plane-parallel -- do the heating term in paper II (section 4)
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    } else {
+                        // spherical -- lower amplitude heating term
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    }
+                }
+            }
+        }
+
+    } else if (prob_type == 2) {
+        // analytic heating modeling CNO cycle
+
+        const auto h1_comp = network_spec_index("hydrogen-1");
+        const auto c12_comp = network_spec_index("carbon-12");
+        const auto n14_comp = network_spec_index("nitrogen-14");
+        const auto o16_comp = network_spec_index("oxygen-16");
+
+        for (int n = 0; n <= max_radial_level; ++n) {
+            for (int r = 0; r < base_geom.nr(n); ++r) {
+                Real rho = rho0_old_arr(n, r);
+                Real T_6_third =
+                    std::pow((tempbar_arr(n, r) / 1.0e6), 1.0 / 3.0);
+                Real tmp1 = rhoX0_old_arr(n, r, c12_comp);
+                Real tmp2 = rhoX0_old_arr(n, r, n14_comp);
+                Real tmp3 = rhoX0_old_arr(n, r, o16_comp);
+                Real X_CNO = (tmp1 + tmp2 + tmp3) / rho;
+                Real X_1 = rhoX0_old_arr(n, r, h1_comp) / rho;
+
+                tmp1 = 2.7e-3 * T_6_third;
+                tmp2 = -7.78e-3 * T_6_third * T_6_third;
+                tmp3 = -1.49e-4 * T_6_third * T_6_third * T_6_third;
+                Real g14 = 1.0 + tmp1 + tmp2 + tmp3;
+
+                tmp1 =
+                    8.67e27 * g14 * X_CNO * X_1 * rho / (T_6_third * T_6_third);
+                tmp2 = std::exp(-1.5228e2 / T_6_third);
+                Hext_bar_arr(n, r) = tmp1 * tmp2;
+            }
+        }
+
+    } else if (prob_type == 3) {
+        const auto he4_comp = network_spec_index("helium-4");
+
+        // off-center heating for sub_chandra
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
+
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // Abort("ERROR: heating not supported")
+
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                heating_sigma);
+                    } else {
+                        // spherical -- lower amplitude heating term
+                        Hext_bar_arr(n, r) =
+                            fac * heating_peak *
+                            std::exp(
+                                -((base_geom.r_cc_loc(n, r) - heating_rad) *
+                                  (base_geom.r_cc_loc(n, r) - heating_rad)) /
+                                (heating_sigma * heating_sigma));
+
+                        // only heat if there is He-4
+                        Hext_bar_arr(n, r) *=
+                            rhoX0_old_arr(n, r, he4_comp) / rho0_old_arr(n, r);
+                    }
+                }
+            }
+        }
+
+    } else if (prob_type == 4) {
+        // Apply both heating and cooling for an Urca process
+
+        if (t_old <= heating_time) {
+            Real fac;
+            if ((t_old + dt) > heating_time) {
+                fac = (heating_time - t_old) / dt;
+            } else {
+                fac = 1.0;
+            }
+
+            for (int n = 0; n <= max_radial_level; ++n) {
+                for (int r = 0; r < base_geom.nr(n); ++r) {
+                    if (!spherical) {
+                        // plane-parallel -- do the heating term in paper II (section 4)
+                        // plus a similar cooling term for Urca
+                        Hext_bar_arr(n, r) =
+                            fac * (heating_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   heating_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   heating_rad)) /
+                                                heating_sigma) +
+                                   cooling_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad)) /
+                                                cooling_sigma));
+
+                    } else {
+                        // spherical -- lower amplitude heating/cooling term
+                        Hext_bar_arr(n, r) =
+                            fac * (heating_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   heating_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   heating_rad)) /
+                                                heating_sigma) +
+                                   cooling_peak *
+                                       std::exp(-((base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad) *
+                                                  (base_geom.r_cc_loc(n, r) -
+                                                   cooling_rad)) /
+                                                cooling_sigma));
+                    }
+                }
+            }
+        }
+
+    } else {
+        Print() << "ERROR: " << prob_type << " prob_type not yet supported."
+                << std::endl;
+        Abort();
+    }
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! make Sbar
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    auto Hext_bar_arr = Hext_bar.array();
     auto Sbar_old_arr = Sbar_old.array();
 
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
@@ -144,7 +297,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     auto gamma1bar_new_arr = gamma1bar_new.array();
     auto tempbar_new_arr = tempbar_new.array();
 
-    compute_cutoff_coords(rho0_new.dataPtr());
     ComputeCutoffCoords(rho0_new);
     base_geom.ComputeCutoffCoords(rho0_new.array());
 
@@ -158,14 +310,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // ! update species
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    // make a Fortran-friendly RealVector of rho0_predicted_edge
-    RealVector rho0_predicted_edge_vec((max_radial_level + 1) * (nr_fine + 1));
-    rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
-
-    update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
-                   rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-                   base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(),
-                   dt);
+    UpdateSpecies(rho0_old, rho0_predicted_edge, rhoX0_old, rhoX0_new);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! update pressure
@@ -175,12 +320,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     p0_new.copy(p0_old);
 
     EnforceHSE(rho0_new, p0_new, grav_cell_new);
-
-    // make Fortran-friendly RealVectors
-    RealVector p0_new_vec((max_radial_level + 1) * nr_fine);
-    RealVector gamma1bar_new_vec((max_radial_level + 1) * nr_fine);
-    p0_new.toVector(p0_new_vec);
-    gamma1bar_new.toVector(gamma1bar_new_vec);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! compute gamma1bar_new
@@ -228,7 +367,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // ! reset cutoff coordinates
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
     base_geom.ComputeCutoffCoords(rho0_old.array());
 
@@ -275,13 +413,11 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     AdvectBaseDens(rho0_predicted_edge);
-    rho0_predicted_edge.toVector(rho0_predicted_edge_vec);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! recompute cutoff coordinates now that rho0 has changed
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    compute_cutoff_coords(rho0_new.dataPtr());
     ComputeCutoffCoords(rho0_new);
     base_geom.ComputeCutoffCoords(rho0_new.array());
 
@@ -295,10 +431,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // ! update species
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    update_species(rho0_old.dataPtr(), rho0_predicted_edge_vec.dataPtr(),
-                   rhoX0_old.dataPtr(), rhoX0_new.dataPtr(), w0.dataPtr(),
-                   base_geom.r_edge_loc.dataPtr(), base_geom.r_cc_loc.dataPtr(),
-                   dt);
+    UpdateSpecies(rho0_old, rho0_predicted_edge, rhoX0_old, rhoX0_new);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! update pressure
@@ -306,7 +439,6 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     p0_new.copy(p0_old);
 
     EnforceHSE(rho0_new, p0_new, grav_cell_new);
-    p0_new.toVector(p0_new_vec);
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // ! compute gamma1bar_new

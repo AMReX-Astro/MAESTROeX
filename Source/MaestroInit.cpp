@@ -103,16 +103,11 @@ void Maestro::Init() {
             TagArray();
         }
 
-        // set finest_radial_level in fortran
+        // set finest_radial_level
         // compute numdisjointchunks, r_start_coord, r_end_coord
-        init_multilevel(tag_array.dataPtr(), &finest_level);
-        // InitMultilevel(finest_level);
         BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                    base_geom.nr_fine);
         base_geom.InitMultiLevel(finest_level, tag_array_b.array());
-
-        compute_cutoff_coords(rho0_old.dataPtr());
-        ComputeCutoffCoords(rho0_old);
         base_geom.ComputeCutoffCoords(rho0_old.array());
     }
 
@@ -135,8 +130,7 @@ void Maestro::Init() {
         MakeGamma1bar(sold, gamma1bar_old, p0_old);
 
         // compute beta0
-        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old,
-                  use_exact_base_state);
+        MakeBeta0(beta0_old, rho0_old, p0_old, gamma1bar_old, grav_cell_old);
 
         // set beta0^{-1} = beta0_old
         beta0_nm1.copy(beta0_old);
@@ -271,8 +265,6 @@ void Maestro::InitData() {
 
     // set finest_radial_level
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
-    // InitMultilevel(finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
@@ -285,12 +277,10 @@ void Maestro::InitData() {
 
     if (fix_base_state) {
         // compute cutoff coordinates
-        ComputeCutoffCoords(rho0_old);
         base_geom.ComputeCutoffCoords(rho0_old.array());
         MakeGravCell(grav_cell_old, rho0_old);
     } else {
         // first compute cutoff coordinates using initial density profile
-        ComputeCutoffCoords(rho0_old);
         base_geom.ComputeCutoffCoords(rho0_old.array());
 
         if (do_smallscale) {
@@ -300,7 +290,6 @@ void Maestro::InitData() {
         } else {
             // set rho0 to be the average
             Average(sold, rho0_old, Rho);
-            ComputeCutoffCoords(rho0_old);
             base_geom.ComputeCutoffCoords(rho0_old.array());
 
             // compute gravity
@@ -765,9 +754,7 @@ void Maestro::InitIter() {
 
     // advance the solution by dt
 #ifndef SDC
-    if (use_exact_base_state) {
-        AdvanceTimeStepIrreg(true);
-    } else if (average_base_state) {
+    if (use_exact_base_state || average_base_state) {
         AdvanceTimeStepAverage(true);
     } else {
         AdvanceTimeStep(true);

@@ -858,45 +858,20 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     names[cnt++] = "h";
 
     for (int i = 0; i < NumSpec; i++) {
-        int len = 20;
-        Vector<int> int_spec_names(len);
-        //
-        // This call return the actual length of each string in "len"
-        //
-        get_spec_names(int_spec_names.dataPtr(), &i, &len);
-        auto* spec_name = new char[len + 1];
-        for (int j = 0; j < len; j++) {
-            spec_name[j] = int_spec_names[j];
-        }
-        spec_name[len] = '\0';
         std::string spec_string = "rhoX(";
-        spec_string += spec_name;
+        spec_string += short_spec_names_cxx[i];
         spec_string += ')';
 
         names[cnt++] = spec_string;
-        delete[] spec_name;
     }
 
     if (plot_spec) {
         for (int i = 0; i < NumSpec; i++) {
-            int len = 20;
-            Vector<int> int_spec_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_spec_names(int_spec_names.dataPtr(), &i, &len);
-            auto* spec_name = new char[len + 1];
-            for (int j = 0; j < len; j++) {
-                spec_name[j] = int_spec_names[j];
-            }
-            spec_name[len] = '\0';
             std::string spec_string = "X(";
-            spec_string += spec_name;
+            spec_string += short_spec_names_cxx[i];
             spec_string += ')';
 
             names[cnt++] = spec_string;
-
-            delete[] spec_name;
         }
 
         names[cnt++] = "abar";
@@ -904,24 +879,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 
     if (plot_spec || plot_omegadot) {
         for (int i = 0; i < NumSpec; i++) {
-            int len = 20;
-            Vector<int> int_spec_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_spec_names(int_spec_names.dataPtr(), &i, &len);
-            auto* spec_name = new char[len + 1];
-            for (int j = 0; j < len; j++) {
-                spec_name[j] = int_spec_names[j];
-            }
-            spec_name[len] = '\0';
             std::string spec_string = "omegadot(";
-            spec_string += spec_name;
+            spec_string += short_spec_names_cxx[i];
             spec_string += ')';
 
             names[cnt++] = spec_string;
-
-            delete[] spec_name;
         }
     }
 
@@ -931,12 +893,8 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_Hnuc) {
         names[cnt++] = "Hnuc";
     }
-    if (plot_eta) {
-        names[cnt++] = "eta_rho";
-    }
-
-    names[cnt++] = "tfromp";
     names[cnt++] = "tfromh";
+    names[cnt++] = "tfromp";
     names[cnt++] = "deltap";
     names[cnt++] = "deltaT";
     names[cnt++] = "Pi";
@@ -1276,26 +1234,11 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << OtherLine;
 
         for (int i = 0; i < NumSpec; i++) {
-            int len = mlen;
-            Vector<int> int_spec_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_spec_names(int_spec_names.dataPtr(), &i, &len);
-            auto* spec_name = new char[len + 1];
-            for (int j = 0; j < len; j++) {
-                spec_name[j] = int_spec_names[j];
-            }
-            spec_name[len] = '\0';
-
-            // get A and Z
-            get_spec_az(&i, &Aion, &Zion);
-
+            auto spec_name = short_spec_names_cxx[i];
             jobInfoFile << std::setw(6) << i << SkipSpace << std::setw(mlen + 1)
                         << std::setfill(' ') << spec_name << SkipSpace
-                        << std::setw(7) << Aion << SkipSpace << std::setw(7)
-                        << Zion << "\n";
-            delete[] spec_name;
+                        << std::setw(7) << aion[i] << SkipSpace << std::setw(7)
+                        << zion[i] << "\n";
         }
         jobInfoFile << "\n\n";
 
@@ -1421,7 +1364,7 @@ void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
                 const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     Real v_total =
                         vel_arr(i, j, k, 1) +
@@ -1452,7 +1395,7 @@ void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
                 const Array4<Real> magvel_arr = magvel[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real u_total =
                         vel_arr(i, j, k, 0) +
                         0.5 * (w0macx(i, j, k) + w0macx(i + 1, j, k));
@@ -1496,7 +1439,7 @@ void Maestro::MakeVelrc(const Vector<MultiFab>& vel,
             const Array4<const Real> w0rcart_arr = w0rcart[lev].array(mfi);
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 circvel_arr(i, j, k) = 0.0;
                 radvel_arr(i, j, k) = 0.0;
 
@@ -1618,7 +1561,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
 #endif
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
@@ -1649,7 +1592,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
             const auto hi = tileBox.hiVect3d();
 
             if (!spherical) {
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real nabla = 0.0;
 
                     if (state_arr(i, j, k, Rho) > base_cutoff_density_loc) {
@@ -1706,7 +1649,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
                 Real* AMREX_RESTRICT dtemp = dtemp_vec.dataPtr();
                 Real* AMREX_RESTRICT dp = dp_vec.dataPtr();
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real nabla = 0.0;
 
                     if (state_arr(i, j, k, Rho) > base_cutoff_density_loc) {
@@ -1847,7 +1790,7 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
 
 #if (AMREX_SPACEDIM == 2)
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
                 Real uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
 
@@ -1889,7 +1832,7 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
             });
 
 #else
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
                 Real uz = 0.5 * (u(i, j, k + 1, 0) - u(i, j, k - 1, 0)) / hz;
                 Real vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
@@ -2345,7 +2288,7 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
                 gamma1bar_cart[lev].array(mfi);
             const Array4<Real> deltagamma_arr = deltagamma[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
@@ -2397,7 +2340,7 @@ void Maestro::MakeEntropy(const Vector<MultiFab>& state,
             const Array4<const Real> state_arr = state[lev].array(mfi);
             const Array4<Real> entropy_arr = entropy[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 eos_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
@@ -2446,7 +2389,7 @@ void Maestro::MakeDivw0(
                 const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
                 const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     divw0_arr(i, j, k) =
                         (w0_arr(i, j + 1, k, 1) - w0_arr(i, j, k, 1)) / dx[1];
@@ -2472,7 +2415,7 @@ void Maestro::MakeDivw0(
                 const Array4<const Real> w0macz = w0mac[lev][2].array(mfi);
                 const Array4<Real> divw0_arr = divw0[lev].array(mfi);
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     divw0_arr(i, j, k) =
                         (w0macx(i + 1, j, k) - w0macx(i, j, k)) / dx[0] +
                         (w0macy(i, j + 1, k) - w0macy(i, j, k)) / dx[1] +
@@ -2507,7 +2450,7 @@ void Maestro::MakePiDivu(const Vector<MultiFab>& vel,
             const Array4<const Real> pi_cc = state[lev].array(mfi, Pi);
             const Array4<Real> pidivu_arr = pidivu[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 pidivu_arr(i, j, k) =
                     pi_cc(i, j, k) * 0.5 *
                     ((vel_arr(i + 1, j, k, 0) - vel_arr(i - 1, j, k, 0)) /
@@ -2543,7 +2486,7 @@ void Maestro::MakeAbar(const Vector<MultiFab>& state, Vector<MultiFab>& abar) {
             const Array4<const Real> state_arr = state[lev].array(mfi);
             const Array4<Real> abar_arr = abar[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real denominator = 0.0;
 
                 for (auto comp = 0; comp < NumSpec; ++comp) {

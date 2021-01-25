@@ -18,6 +18,9 @@ MICROPHYSICS_HOME ?= $(TOP)/external/Microphysics
 
 AMREX_HOME ?= $(TOP)/external/amrex
 
+# Require C++17
+CXXSTD := c++17
+
 # Check to make sure that Microphysics actually exists,
 # using an arbitrary file that must exist to check.
 # Throw an error if we don't have Microphysics.
@@ -117,6 +120,8 @@ USE_CONDUCTIVITY := TRUE
 
 USE_CXX_EOS := TRUE
 
+USE_CXX_REACTIONS := TRUE
+
 ifeq ($(USE_REACT), TRUE)
   DEFINES += -DREACTIONS
   ifeq ($(USE_SDC), TRUE)
@@ -128,7 +133,7 @@ endif
 # Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
 ifeq ($(USE_SDC), TRUE)
   USE_SIMPLIFIED_SDC = TRUE
-  DEFINES += -DSDC -DSIMPLIFIED_SDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
+  DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
 endif
       
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
@@ -177,11 +182,11 @@ EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
    EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
 endif
-EXTERN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(EXTERN_SEARCH))
+EXTERN_PARAMETERS := $(foreach dir, $(EXTERN_SEARCH),$(realpath $(wildcard $(dir)/_parameters)))
 
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
-PROBIN_PARAMETERS := $(shell $(AMREX_HOME)/Tools/F_scripts/findparams.py $(PROBIN_PARAMETER_DIRS))
+PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
 
 ifdef USE_CUDA
   ifeq ($(USE_CUDA), TRUE)
@@ -211,7 +216,7 @@ METH_PARAMS_TEMPLATE := $(TOP)/Source/param/meth_params.template
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90: $(CPP_PARAMETERS) $(METH_PARAMS_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
-	$(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
+	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
 
 # for debugging
 test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90

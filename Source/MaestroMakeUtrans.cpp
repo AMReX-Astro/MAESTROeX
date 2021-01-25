@@ -86,7 +86,7 @@ void Maestro::MakeUtrans(
             int bclo = phys_bc[0];
             int bchi = phys_bc[AMREX_SPACEDIM];
 
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real ulx = 0.0;
                 Real urx = 0.0;
 
@@ -186,7 +186,7 @@ void Maestro::MakeUtrans(
             int bclo = phys_bc[1];
             int bchi = phys_bc[AMREX_SPACEDIM + 1];
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vly = 0.0;
                 Real vry = 0.0;
 
@@ -302,7 +302,7 @@ void Maestro::MakeUtrans(
             int bclo = phys_bc[0];
             int bchi = phys_bc[AMREX_SPACEDIM];
 
-            AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+            ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real ulx = 0.0;
                 Real urx = 0.0;
 
@@ -417,7 +417,7 @@ void Maestro::MakeUtrans(
             int bclo = phys_bc[1];
             int bchi = phys_bc[AMREX_SPACEDIM + 1];
 
-            AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+            ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vly = 0.0;
                 Real vry = 0.0;
 
@@ -533,7 +533,7 @@ void Maestro::MakeUtrans(
             int bclo = phys_bc[2];
             int bchi = phys_bc[AMREX_SPACEDIM + 2];
 
-            AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+            ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real wlz = 0.0;
                 Real wrz = 0.0;
 

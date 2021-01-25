@@ -11,8 +11,10 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto prob_hi = geom[lev].ProbHiArray();
@@ -28,7 +30,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
     const auto s0_arr = s0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
         Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
         Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];

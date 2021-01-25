@@ -327,7 +327,7 @@ void Maestro::VelPredInterface(
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
 
-    AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
+    ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
             Real maxu = amrex::max(0.0, ufull(i - 1, j, k, 0));
             Real minu = amrex::min(0.0, ufull(i, j, k, 0));
@@ -427,7 +427,7 @@ void Maestro::VelPredInterface(
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM + 1];
 
-    AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
+    ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
             Real maxu = amrex::max(0.0, ufull(i, j - 1, k, 1));
             Real minu = amrex::min(0.0, ufull(i, j, k, 1));
@@ -559,7 +559,7 @@ void Maestro::VelPredVelocities(
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
 
-    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
                                         : Ipfx(i - 1, j, k, 0);
@@ -626,7 +626,7 @@ void Maestro::VelPredVelocities(
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM + 1];
 
-    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
                                         : Ipfy(i, j - 1, k, 1);
@@ -742,7 +742,7 @@ void Maestro::VelPredInterface(
     int bclo = phys_bc[0];
     int bchi = phys_bc[AMREX_SPACEDIM];
 
-    AMREX_PARALLEL_FOR_3D(mxbx, i, j, k, {
+    ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
             Real maxu = 0.5 - dt2 * amrex::max(0.0, ufull(i - 1, j, k, 0)) / hx;
             Real minu = 0.5 + dt2 * amrex::min(0.0, ufull(i, j, k, 0)) / hx;
@@ -851,7 +851,7 @@ void Maestro::VelPredInterface(
     bclo = phys_bc[1];
     bchi = phys_bc[AMREX_SPACEDIM + 1];
 
-    AMREX_PARALLEL_FOR_3D(mybx, i, j, k, {
+    ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
             Real maxu =
                 (0.5 - dt2 * amrex::max(0.0, ufull(i, j - 1, k, 1)) / hy);
@@ -962,7 +962,7 @@ void Maestro::VelPredInterface(
     bclo = phys_bc[2];
     bchi = phys_bc[AMREX_SPACEDIM + 2];
 
-    AMREX_PARALLEL_FOR_3D(mzbx, i, j, k, {
+    ParallelFor(mzbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
             Real maxu = 0.5 - dt2 * amrex::max(0.0, ufull(i, j, k - 1, 2)) / hz;
             Real minu = 0.5 + dt2 * amrex::min(0.0, ufull(i, j, k, 2)) / hz;
@@ -1106,7 +1106,7 @@ void Maestro::VelPredTransverse(
     Box imhbox = amrex::grow(mfi.tilebox(), 0, 1);
     imhbox = amrex::growHi(imhbox, 1, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real ulyz = uly(i, j, k, 0) -
                     (dt6 / hz) *
@@ -1168,7 +1168,7 @@ void Maestro::VelPredTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 0, 1);
     imhbox = amrex::growHi(imhbox, 2, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real ulzy = ulz(i, j, k, 0) -
                     (dt6 / hy) *
@@ -1230,7 +1230,7 @@ void Maestro::VelPredTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 1, 1);
     imhbox = amrex::growHi(imhbox, 0, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real vlxz = ulx(i, j, k, 1) -
                     (dt6 / hz) *
@@ -1292,7 +1292,7 @@ void Maestro::VelPredTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 1, 1);
     imhbox = amrex::growHi(imhbox, 2, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real vlzx = ulz(i, j, k, 1) -
                     (dt6 / hx) *
@@ -1354,7 +1354,7 @@ void Maestro::VelPredTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 2, 1);
     imhbox = amrex::growHi(imhbox, 0, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real wlxy = ulx(i, j, k, 2) -
                     (dt6 / hy) *
@@ -1416,7 +1416,7 @@ void Maestro::VelPredTransverse(
     imhbox = amrex::grow(mfi.tilebox(), 2, 1);
     imhbox = amrex::growHi(imhbox, 1, 1);
 
-    AMREX_PARALLEL_FOR_3D(imhbox, i, j, k, {
+    ParallelFor(imhbox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // extrapolate to faces
         Real wlyx = uly(i, j, k, 2) -
                     (dt6 / hx) *
@@ -1522,7 +1522,7 @@ void Maestro::VelPredVelocities(
     }
 
     // x-direction
-    AMREX_PARALLEL_FOR_3D(xbx, i, j, k, {
+    ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i - 1, j, k, 0)
                                         : Ipfx(i - 1, j, k, 0);
@@ -1600,7 +1600,7 @@ void Maestro::VelPredVelocities(
     });
 
     // y-direction
-    AMREX_PARALLEL_FOR_3D(ybx, i, j, k, {
+    ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j - 1, k, 1)
                                         : Ipfy(i, j - 1, k, 1);
@@ -1678,7 +1678,7 @@ void Maestro::VelPredVelocities(
     });
 
     // z-direction
-    AMREX_PARALLEL_FOR_3D(zbx, i, j, k, {
+    ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
         Real fl = ppm_trace_forces == 0 ? force(i, j, k - 1, 2)
                                         : Ipfz(i, j, k - 1, 2);

@@ -1,4 +1,1 @@
-F90EXE_sources += test_basestate.F90
-F90EXE_sources += make_edge_state.F90
-
-FEXE_headers += Problem_F.H
+CEXE_sources += MaestroAdvectBase2.cpp
