@@ -1,0 +1,11 @@
+For reference, the following conversion chart shows which initial model to use when exact_base_state = T.
+
+grid size     # of pts in model file
+64	      1488
+128   	      6048
+192   	      13680
+256   	      24384
+384   	      55008
+512	      97920
+768   	      220608
+1024  	      392448
