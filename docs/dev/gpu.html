@@ -354,7 +354,7 @@ function call contains <code class="docutils literal notranslate"><span class="p
 import within the function/subroutine, and put <code class="docutils literal notranslate"><span class="pre">!</span> <span class="pre">function</span></code> at the
 end of the line, e.g.</p></li>
 </ul>
-<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">use </span><span class="n">my_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">my_func</span> <span class="c">! function</span>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">use </span><span class="n">my_module</span><span class="p">,</span> <span class="k">only</span><span class="p">:</span> <span class="n">my_func</span> <span class="c">! function</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -385,9 +385,9 @@ subroutine <code class="docutils literal notranslate"><span class="pre">estdt</s
                  <span class="n">p0_cart</span><span class="p">,</span> <span class="n">p_lo</span><span class="p">,</span> <span class="n">p_hi</span><span class="p">,</span> <span class="p">&amp;</span>
                  <span class="n">gamma1bar_cart</span><span class="p">,</span> <span class="n">g_lo</span><span class="p">,</span> <span class="n">g_hi</span><span class="p">)</span> <span class="k">bind</span> <span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;estdt&quot;</span><span class="p">)</span>
 
-   <span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">HALF</span>
-   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">amrex_min</span> <span class="c">! function</span>
-   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="n">only</span><span class="p">:</span> <span class="n">amrex_max</span> <span class="c">! function</span>
+   <span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span> <span class="k">only</span><span class="p">:</span> <span class="n">HALF</span>
+   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="k">only</span><span class="p">:</span> <span class="n">amrex_min</span> <span class="c">! function</span>
+   <span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span> <span class="k">only</span><span class="p">:</span> <span class="n">amrex_max</span> <span class="c">! function</span>
 
    <span class="c">! input parameters</span>
    <span class="kt">integer</span>  <span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span>   <span class="p">)</span> <span class="kd">::</span> <span class="n">lev</span>
