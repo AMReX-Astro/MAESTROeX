@@ -115,7 +115,8 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
         auto phisum_arr = phisum.array();
 
         // this stores how many cells there are at each level
-        BaseState<int> ncell_s(base_geom.max_radial_level + 1);
+        BaseState<int> ncell_s(base_geom.max_radial_level + 1,
+                               base_geom.nr_fine);
         auto ncell = ncell_s.array();
 
         // loop is over the existing levels (up to finest_level)
