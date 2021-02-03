@@ -219,11 +219,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     Vector<MultiFab> p0_cart(finest_level + 1);
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
-    if (spherical) {
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            p0_cart[lev].setVal(0.);
-        }
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	p0_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+	p0_cart[lev].setVal(0.);
+    }
+    if (spherical) {	
         Put1dArrayOnCart(p0, p0_cart, false, false, bcs_f, 0);
     }
 
