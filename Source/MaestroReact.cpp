@@ -390,10 +390,11 @@ void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
 
                         Array1D<Real, 1, neqs> ydot;
                         actual_rhs(state, ydot);
-
+			// Note ydot is 1-based
+			
                         for (auto n = 0; n < NumSpec; ++n) {
                             rho_omegadot_arr(i, j, k, n) =
-                                state.rho * aion[n] * ydot(n);
+                                state.rho * aion[n] * ydot(1+n);
                         }
 			// only necessary if nspec_evolve < nspec
                         // rho_omegadot_arr(i, j, k, NumSpec) = 0.0;
