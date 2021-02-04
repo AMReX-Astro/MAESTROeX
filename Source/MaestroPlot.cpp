@@ -341,7 +341,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         ReactSDC(s_in, stemp, rho_Hext, p0_in, dt_in * 0.5, t_in, sdc_source);
     }
 
-    MakeReactionRates(rho_omegadot, rho_Hnuc, stemp);
+    MakeReactionRates(rho_omegadot, rho_Hnuc, s_in);
 #endif
 
     if (plot_spec || plot_omegadot) {
