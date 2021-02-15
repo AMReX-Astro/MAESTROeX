@@ -917,23 +917,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 
 #if NAUX_NET > 0
     for (int i = 0; i < NumAux; i++) {
-        int len = 20;
-        Vector<int> int_aux_names(len);
-        //
-        // This call return the actual length of each string in "len"
-        //
-        get_aux_names(int_aux_names.dataPtr(), &i, &len);
-        auto* aux_name = new char[len + 1];
-        for (int j = 0; j < len; j++) {
-            aux_name[j] = int_aux_names[j];
-        }
-        aux_name[len] = '\0';
         std::string aux_string = "rhoX(";
-        aux_string += aux_name;
+        aux_string += short_aux_names_cxx[i];
         aux_string += ')';
 
         names[cnt++] = aux_string;
-        delete[] aux_name;
     }
 #endif
 
@@ -952,23 +940,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 #if NAUX_NET > 0
     if (plot_aux) {
         for (int i = 0; i < NumAux; i++) {
-            int len = 20;
-            Vector<int> int_aux_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_aux_names(int_aux_names.dataPtr(), &i, &len);
-            auto* aux_name = new char[len + 1];
-            for (int j = 0; j < len; j++) {
-                aux_name[j] = int_aux_names[j];
-            }
-            aux_name[len] = '\0';
             std::string aux_string = "X(";
-            aux_string += aux_name;
+            aux_string += short_aux_names_cxx[i];
             aux_string += ')';
 
             names[cnt++] = aux_string;
-            delete[] aux_name;
         }
     }
 #endif
@@ -986,24 +962,11 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 #if NAUX_NET > 0
     if (plot_auxdot) {
         for (int i = 0; i < NumAux; i++) {
-            int len = 20;
-            Vector<int> int_aux_names(len);
-            //
-            // This call return the actual length of each string in "len"
-            //
-            get_aux_names(int_aux_names.dataPtr(), &i, &len);
-            auto* aux_name = new char[len + 1];
-            for (int j = 0; j < len; j++) {
-                aux_name[j] = int_aux_names[j];
-            }
-            aux_name[len] = '\0';
             std::string aux_string = "auxdot(";
-            aux_string += aux_name;
+            aux_string += short_aux_names_cxx[i];
             aux_string += ')';
 
             names[cnt++] = aux_string;
-
-            delete[] aux_name;
         }
     }
 #endif
