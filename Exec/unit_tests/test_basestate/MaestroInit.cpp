@@ -32,10 +32,7 @@ void Maestro::Init() {
                       gamma1bar_old, uold, sold, S_cc_old);
     }
 
-    // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
-    // InitMultilevel(finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
@@ -51,7 +48,8 @@ void Maestro::Init() {
     MakeGravCell(grav_cell_old, rho0_old);
 
     // compute initial time step
-    FirstDt();
+    // FirstDt();
+    dt = initial_dt;
 
     if (stop_time >= 0. && t_old + dt > stop_time) {
         dt = amrex::min(dt, stop_time - t_old);
@@ -82,16 +80,12 @@ void Maestro::InitData() {
     // reset tagging array to include buffer zones
     TagArray();
 
-    // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
-    // InitMultilevel(finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
     // first compute cutoff coordinates using initial density profile
-    compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
     base_geom.ComputeCutoffCoords(rho0_old.array());
 
@@ -103,22 +97,6 @@ void Maestro::InitData() {
 
     // set p0^{-1} = p0_old
     p0_nm1.copy(p0_old);
-
-    rhoX0_old.resize(base_geom.max_radial_level + 1, base_geom.nr_fine,
-                     NumSpec);
-    rhoX0_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine,
-                     NumSpec);
-
-    auto rhoX0_old_arr = rhoX0_old.array();
-    const auto s0_init_arr = s0_init.const_array();
-
-    for (auto n = 0; n < base_geom.max_radial_level; ++n) {
-        for (auto r = 0; r < base_geom.nr(n); ++r) {
-            for (auto comp = 0; comp < NumSpec; ++comp) {
-                rhoX0_old_arr(n, r, comp) = s0_init_arr(n, r, FirstSpec + comp);
-            }
-        }
-    }
 
     // set some stuff to zero
     etarho_ec.setVal(0.0);
@@ -193,10 +171,6 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
 #if (AMREX_SPACEDIM == 3)
             const auto dx_fine_vec = geom[max_level].CellSizeArray();
             const auto dx_lev = geom[lev].CellSizeArray();
-
-            init_base_state_map_sphr(ARLIM_3D(lo), ARLIM_3D(hi),
-                                     BL_TO_FORTRAN_3D(cc_to_r[mfi]),
-                                     ZFILL(dx_fine), ZFILL(dx));
 
             InitBaseStateMapSphr(lev, mfi, dx_fine_vec, dx_lev);
 #endif

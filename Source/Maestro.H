@@ -13,8 +13,10 @@
 #include <AMReX_MultiFabUtil.H>
 #include <AMReX_ParmParse.H>
 #include <AMReX_PlotFileUtil.H>
+
 #include <BaseState.H>
 #include <BaseStateGeometry.H>
+#include <burner.H>
 #include <conductivity.H>
 #include <eos.H>
 #include <network.H>
@@ -129,6 +131,11 @@ class Maestro : public amrex::AmrCore {
         BaseState<amrex::Real>& rhoh0_predicted_edge_state);
     void AdvectBaseEnthalpySphr(
         BaseState<amrex::Real>& rhoh0_predicted_edge_state);
+    // only need to advect species for test_basetest problem
+    void UpdateSpecies(const BaseState<Real>& rho0,
+                       const BaseState<Real>& rho0_predicted_edge,
+                       const BaseState<Real>& rhoX0_old,
+                       BaseState<Real>& rhoX0_new);
     // end MaestroAdvectBase.cpp functions
     ////////////
 
@@ -189,15 +196,15 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        const BaseState<amrex::Real>& r0_old,
-        const BaseState<amrex::Real>& rho0_edge_old,
+        const BaseState<amrex::Real>& rho0_old_in,
+        const BaseState<amrex::Real>& rho0_edge_old_state,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             r0mac_old,
-        const BaseState<amrex::Real>& r0_new,
-        const BaseState<amrex::Real>& rho0_edge_new,
+        const BaseState<amrex::Real>& rho0_new_in,
+        const BaseState<amrex::Real>& rho0_edge_new_state,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             r0mac_new,
-        const BaseState<amrex::Real>& rho0_predicted_edge, int start_comp,
+        const BaseState<amrex::Real>& rho0_predicted_edge_state, int start_comp,
         int num_comp);
 
     /// Calculate `rhoh` flux
@@ -229,20 +236,20 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        const BaseState<amrex::Real>& r0_old,
-        const BaseState<amrex::Real>& r0_edge_old,
+        const BaseState<amrex::Real>& rho0_old_in,
+        const BaseState<amrex::Real>& rho0_edge_old,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             r0mac_old,
-        const BaseState<amrex::Real>& r0_new,
-        const BaseState<amrex::Real>& r0_edge_new,
+        const BaseState<amrex::Real>& rho0_new_in,
+        const BaseState<amrex::Real>& rho0_edge_new,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             r0mac_new,
-        const BaseState<amrex::Real>& rh0_old,
-        const BaseState<amrex::Real>& rh0_edge_old,
+        const BaseState<amrex::Real>& rhoh0_old_in,
+        const BaseState<amrex::Real>& rhoh0_edge_old,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             rh0mac_old,
-        const BaseState<amrex::Real>& rh0_new,
-        const BaseState<amrex::Real>& rh0_edge_new,
+        const BaseState<amrex::Real>& rhoh0_new_in,
+        const BaseState<amrex::Real>& rhoh0_edge_new,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             rh0mac_new,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
@@ -263,7 +270,7 @@ class Maestro : public amrex::AmrCore {
         const amrex::Vector<amrex::MultiFab>& stateold,
         amrex::Vector<amrex::MultiFab>& statenew,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sflux,
-        const amrex::Vector<amrex::MultiFab>& force, int start_scomp,
+        const amrex::Vector<amrex::MultiFab>& force, int start_comp,
         int num_comp, const amrex::Vector<amrex::MultiFab>& p0_cart);
 
     /// Update velocity
@@ -319,12 +326,12 @@ class Maestro : public amrex::AmrCore {
 #endif
     void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0_state);
 
-    void RestrictBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
-    void RestrictBase(const BaseStateArray<Real>& s0_vec,
+    void RestrictBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void RestrictBase(const BaseStateArray<Real>& s0,
                       const bool is_cell_centered);
 
-    void FillGhostBase(BaseState<Real>& s0_vec, const bool is_cell_centered);
-    void FillGhostBase(const BaseStateArray<Real>& s0_vec,
+    void FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void FillGhostBase(const BaseStateArray<Real>& s0,
                        const bool is_cell_centered);
 
     // end MaestroBaseStateGeometry.cpp functions
@@ -386,7 +393,7 @@ class Maestro : public amrex::AmrCore {
     /// @param flag     determines whether base state is subtracted (true) or added (false)
     void PutInPertForm(amrex::Vector<amrex::MultiFab>& scal,
                        const BaseState<Real>& s0, int comp, int bccomp,
-                       const amrex::Vector<amrex::BCRec>& bcs_in, bool flag);
+                       const amrex::Vector<amrex::BCRec>& bcs, bool flag);
 
     /// If `flag`, subtract the base state, returning the perturbed quantity.
     /// Otherwise, add the base state, returning the full quantity.
@@ -401,7 +408,7 @@ class Maestro : public amrex::AmrCore {
     /// @param flag     determines whether base state is subtracted (true) or added (false)
     void PutInPertForm(int level, amrex::Vector<amrex::MultiFab>& scal,
                        const BaseState<Real>& s0, int comp, int bccomp,
-                       const amrex::Vector<amrex::BCRec>& bcs_in, bool flag);
+                       const amrex::Vector<amrex::BCRec>& bcs, bool flag);
 
     /// If `flag`, returns species mass fraction `X` given the conserved variable `rhoX`.
     /// Otherwise, performs inverse operation
@@ -417,6 +424,9 @@ class Maestro : public amrex::AmrCore {
 
     /// Print out the contents of the base state
     void PrintBase(const RealVector& base, const bool is_cell_centered = true);
+
+    void PrintBase(const BaseState<amrex::Real>& base,
+                   const bool is_cell_centered = true);
 
     /// Print out the contents of a Vector of MultiFabs
     void PrintMF(const amrex::Vector<amrex::MultiFab>& MF);
@@ -480,7 +490,7 @@ class Maestro : public amrex::AmrCore {
     void WriteDiagFile(int& index);
 
     /// Write plotfile to disk
-    void DiagFile(const int step, const amrex::Real dt_in,
+    void DiagFile(const int step, const amrex::Real t_in,
                   const BaseState<amrex::Real>& rho0_in,
                   const BaseState<amrex::Real>& p0_in,
                   const amrex::Vector<amrex::MultiFab>& u_in,
@@ -548,8 +558,7 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& scal_force,
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        const BaseState<amrex::Real>& p0,
-        const amrex::Vector<amrex::MultiFab>& diff);
+        const amrex::Vector<amrex::MultiFab>& thermal);
     ////////////////////////
 
     ////////////////////////
@@ -638,7 +647,7 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& s0_cart,
         const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-        int sbccomp = 0, int variable_type = 0);
+        const int sbccomp = 0, const int variable_type = 0);
 
     /// Maps 1d arrays onto multi-D cartesian MultiFabs
     ///
@@ -654,14 +663,14 @@ class Maestro : public amrex::AmrCore {
         amrex::MultiFab& s0_cart, const bool is_input_edge_centered,
         const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-        int sbccomp = 0);
+        const int sbccomp = 0);
 
     void Put1dArrayOnCart(
-        int level, const BaseState<amrex::Real>& s0,
+        const int level, const BaseState<amrex::Real>& s0,
         amrex::Vector<amrex::MultiFab>& s0_cart,
         const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
-        int sbccomp = 0);
+        const int sbccomp = 0);
 
     AMREX_GPU_DEVICE amrex::Real QuadInterp(
         const amrex::Real x, const amrex::Real x0, const amrex::Real x1,
@@ -711,7 +720,8 @@ class Maestro : public amrex::AmrCore {
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             uedge_in,
         const amrex::Vector<amrex::MultiFab>& rho,
-        const BaseState<amrex::Real>& rho0, const BaseState<amrex::Real>& grav,
+        const BaseState<amrex::Real>& rho0,
+        const BaseState<amrex::Real>& grav_cell,
         const amrex::Vector<amrex::MultiFab>& w0_force_cart,
 #ifdef ROTATION
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
@@ -865,8 +875,7 @@ class Maestro : public amrex::AmrCore {
                    const BaseState<amrex::Real>& rho0_s,
                    const BaseState<amrex::Real>& p0_s,
                    const BaseState<amrex::Real>& gamma1bar_s,
-                   const BaseState<amrex::Real>& grav_cell_s,
-                   const bool is_irreg = false);
+                   const BaseState<amrex::Real>& grav_cell_s);
 
     // end MaestroMakeBeta0.cpp functions
     ////////////
@@ -1062,6 +1071,11 @@ class Maestro : public amrex::AmrCore {
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             w0mac);
+
+    void MakeEtarhoPlanar(
+        const amrex::Vector<amrex::MultiFab>& scal_old,
+        const amrex::Vector<amrex::MultiFab>& scal_new,
+        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac);
 
     // end MaestroMakeEta.cpp functions
     ////////////

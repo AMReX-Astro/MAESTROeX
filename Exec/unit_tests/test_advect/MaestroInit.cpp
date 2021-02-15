@@ -16,9 +16,7 @@ void Maestro::Init() {
     // fill in multifab and base state data
     InitData();
 
-    // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
@@ -55,9 +53,7 @@ void Maestro::InitData() {
     // reset tagging array to include buffer zones
     TagArray();
 
-    // set finest_radial_level in fortran
     // compute numdisjointchunks, r_start_coord, r_end_coord
-    init_multilevel(tag_array.dataPtr(), &finest_level);
     BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                base_geom.nr_fine);
     base_geom.InitMultiLevel(finest_level, tag_array_b.array());
@@ -67,13 +63,11 @@ void Maestro::InitData() {
     FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
 
     // first compute cutoff coordinates using initial density profile
-    compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
     base_geom.ComputeCutoffCoords(rho0_old.array());
 
     // set rho0 to be the average
     Average(sold, rho0_old, Rho);
-    compute_cutoff_coords(rho0_old.dataPtr());
     ComputeCutoffCoords(rho0_old);
     base_geom.ComputeCutoffCoords(rho0_old.array());
 

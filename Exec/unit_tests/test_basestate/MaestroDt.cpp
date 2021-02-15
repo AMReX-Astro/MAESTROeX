@@ -182,7 +182,7 @@ void Maestro::EstDt() {
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    set_rel_eps(&umax);
+    rel_eps = umax;
 }
 
 void Maestro::FirstDt() {
@@ -334,5 +334,5 @@ void Maestro::FirstDt() {
 
     // set rel_eps in fortran module
     umax *= 1.e-8;
-    set_rel_eps(&umax);
+    rel_eps = umax;
 }

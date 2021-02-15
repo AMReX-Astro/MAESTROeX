@@ -52,7 +52,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
 
 #if (AMREX_SPACEDIM == 2)
             int zlo = tilebox.loVect3d()[2];
-            AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 if (k == zlo) {
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev, j)),
                                                    etarhoflux_arr(i, j, k));
@@ -75,7 +75,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
                 const int lo = ybx.loVect3d()[0];
                 const int hi = ybx.hiVect3d()[0];
 
-                AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, n, {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int n) {
                     int i = n + lo;
                     amrex::HostDevice::Atomic::Add(&(etarhosum(lev, j)),
                                                    etarhoflux_arr(i, j, k));
@@ -83,7 +83,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
                 Gpu::synchronize();
             }
 #else
-            AMREX_HOST_DEVICE_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 amrex::HostDevice::Atomic::Add(&(etarhosum(lev, k)),
                                                etarhoflux_arr(i, j, k));
             });
@@ -101,7 +101,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
             if (top_edge) {
                 const auto zbx = mfi.nodaltilebox(2);
                 int zhi = zbx.hiVect3d()[2];
-                AMREX_HOST_DEVICE_FOR_3D(zbx, i, j, k, {
+                ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     if (k == zhi) {
                         amrex::HostDevice::Atomic::Add(&(etarhosum(lev, k)),
                                                        etarhoflux_arr(i, j, k));
@@ -128,7 +128,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
             const int lo = base_geom.r_start_coord(n, i);
             const int hi = base_geom.r_end_coord(n, i) + 1;
             const auto ncell_lev = ncell(n);
-            AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
                 etarho_ec_arr(n, r) = etarhosum_arr(n, r) / Real(ncell_lev);
             });
@@ -147,7 +147,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
         for (auto i = 1; i <= base_geom.numdisjointchunks(n); ++i) {
             const int lo = base_geom.r_start_coord(n, i);
             const int hi = base_geom.r_end_coord(n, i);
-            AMREX_HOST_DEVICE_FOR_1D(hi - lo + 1, j, {
+            ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
                 etarho_cc_arr(n, r) =
                     0.5 * (etarho_ec_arr(n, r) + etarho_ec_arr(n, r + 1));
@@ -216,7 +216,7 @@ void Maestro::MakeEtarhoSphr(
             const Array4<const Real> normal_arr = normal[lev].array(mfi);
             const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real U_dot_er = 0.5 *
                                     (umac_arr(i, j, k) + umac_arr(i + 1, j, k) +
                                      w0macx(i, j, k) + w0macx(i + 1, j, k)) *
@@ -259,15 +259,14 @@ void Maestro::MakeEtarhoSphr(
     // note that in spherical the base state has no refinement
     // the 0th value of etarho = 0, since U dot . e_r must be
     // zero at the center (since e_r is not defined there)
-    const bool sph_loc = spherical;
-    AMREX_PARALLEL_FOR_1D(nrf, r, {
+    ParallelFor(nrf, [=] AMREX_GPU_DEVICE(int r) {
         if (r == 0) {
             etarho_ec_arr(0, r) = 0.0;
         } else if (r == nrf - 1) {
             // probably should do some better extrapolation here eventually
             etarho_ec_arr(0, r) = etarho_cc_arr(0, r - 1);
         } else {
-            if (sph_loc) {
+            if (spherical) {
                 Real dr1 = r_cc_loc(0, r) - r_edge_loc(0, r);
                 Real dr2 = r_edge_loc(0, r) - r_cc_loc(0, r - 1);
                 etarho_ec_arr(0, r) = (dr2 * etarho_cc_arr(0, r) +
@@ -280,4 +279,70 @@ void Maestro::MakeEtarhoSphr(
         }
     });
     Gpu::synchronize();
+}
+
+void Maestro::MakeEtarhoPlanar(
+    const Vector<MultiFab>& scal_old, const Vector<MultiFab>& scal_new,
+    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac) {
+    // timer for profiling
+    BL_PROFILE_VAR("Maestro::MakeEtarhoPlanar()", MakeEtarhoPlanar);
+
+    const int max_lev = base_geom.max_radial_level + 1;
+    const int nrf = base_geom.nr_fine + 1;
+
+    Vector<MultiFab> eta_cart(finest_level + 1);
+    Vector<MultiFab> rho0_nph_cart(finest_level + 1);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        eta_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        rho0_nph_cart[lev].define(grids[lev], dmap[lev], 1, 0);
+    }
+
+    BaseState<Real> rho0_nph(max_lev, base_geom.nr_fine);
+    rho0_nph.copy(0.5 * (rho0_old + rho0_new));
+
+    Put1dArrayOnCart(rho0_nph, rho0_nph_cart, false, false, bcs_f, 0);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
+#ifdef _OPENMP
+#pragma omp parallel
+#endif
+        for (MFIter mfi(scal_old[lev], TilingIfNotGPU()); mfi.isValid();
+             ++mfi) {
+            // Get the index space of the valid region
+            const Box& tilebox = mfi.tilebox();
+
+            const Array4<const Real> rho_old = scal_old[lev].array(mfi);
+            const Array4<const Real> rho_new = scal_new[lev].array(mfi);
+            const Array4<const Real> rho0_nph_cart_arr =
+                rho0_nph_cart[lev].array(mfi);
+#if (AMREX_SPACEDIM == 2)
+            const Array4<const Real> vmac = umac[lev][1].array(mfi);
+#else
+            const Array4<const Real> vmac = umac[lev][2].array(mfi);
+#endif
+            const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
+
+            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+
+#if (AMREX_SPACEDIM == 2)
+                Real U_dot_er = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
+#else
+                Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j, k + 1));
+#endif
+                // construct time-centered [ rho' (U dot e_r) ]
+                eta_cart_arr(i, j, k) =
+                    (0.5 * (rho_old(i, j, k) + rho_new(i, j, k)) -
+                     rho0_nph_cart_arr(i, j, k)) *
+                    U_dot_er;
+            });
+        }  // end MFIter loop
+    }      // end loop over levels
+
+    // average fine data onto coarser cells & fill ghost cells
+    AverageDown(eta_cart, 0, 1);
+    FillPatch(t_old, eta_cart, eta_cart, eta_cart, 0, 0, 1, 0, bcs_f);
+
+    // compute etarho_cc as the average of eta_cart = [ rho' (U dot e_r) ]
+    Average(eta_cart, etarho_cc, 0);
 }

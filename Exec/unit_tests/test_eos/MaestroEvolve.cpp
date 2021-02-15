@@ -47,7 +47,7 @@ void Maestro::Evolve() {
             const Array4<Real> scal = sold[lev].array(mfi);
             const Array4<Real> error_arr = error[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 // set the composition -- approximately solar
                 const auto metalicity = Real(k) * dmetal;
 

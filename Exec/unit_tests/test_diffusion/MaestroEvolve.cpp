@@ -67,7 +67,7 @@ void Maestro::Evolve() {
             const auto t0_loc = t0;
             const auto diff_coeff = diffusion_coefficient;
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 const auto x =
                     prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                 const auto y =
@@ -143,7 +143,7 @@ void Maestro::Evolve() {
                 const auto t0_loc = t0;
                 const auto diff_coeff = diffusion_coefficient;
 
-                AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+                ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     const auto x =
                         prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
                     const auto y =

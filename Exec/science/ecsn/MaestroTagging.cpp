@@ -32,7 +32,7 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
     const Box& tilebox = mfi.tilebox();
 
     // Tag on regions of high temperature
-    AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+    ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (state(i, j, k, Temp) >= 7.e8 || (i == 0 && j == 0 && k == 0)) {
             tag(i, j, k) = TagBox::SET;
         }
