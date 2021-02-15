@@ -161,7 +161,6 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     }
 }
 
-
 // compute heating terms, rho_omegadot and rho_Hnuc
 void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
                                 Vector<MultiFab>& rho_Hnuc,
