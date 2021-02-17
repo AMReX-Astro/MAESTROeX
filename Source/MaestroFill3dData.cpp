@@ -336,9 +336,8 @@ void Maestro::Put1dArrayOnCart(const int lev, const BaseState<Real>& s0,
 }
 
 AMREX_GPU_DEVICE
-Real Maestro::QuadInterp(const Real x, const Real x0, const Real x1,
-                         const Real x2, const Real y0, const Real y1,
-                         const Real y2, bool limit) {
+Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
+                const Real y0, const Real y1, const Real y2, bool limit) {
     Real y = y0 + (y1 - y0) / (x1 - x0) * (x - x0) +
              ((y2 - y1) / (x2 - x1) - (y1 - y0) / (x1 - x0)) / (x2 - x0) *
                  (x - x0) * (x - x1);
@@ -799,8 +798,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             Real dri =
                                 r_cc_loc(0, index + 1) - r_cc_loc(0, index);
                             if (index >= nr_fine - 1) {
-                                s0macx(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macx(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macx(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -814,8 +812,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macx(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macx(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macx(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macx(i, j, k) =
                                     s0_arr(0, index) *
@@ -843,8 +840,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             Real dri =
                                 r_cc_loc(0, index + 1) - r_cc_loc(0, index);
                             if (index >= nr_fine - 1) {
-                                s0macy(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macy(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macy(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -858,8 +854,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macy(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macy(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macy(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macy(i, j, k) =
                                     s0_arr(0, index) *
@@ -887,8 +882,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             Real dri =
                                 r_cc_loc(0, index + 1) - r_cc_loc(0, index);
                             if (index >= nr_fine - 1) {
-                                s0macz(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macz(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macz(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -902,8 +896,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macz(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macz(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macz(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macz(i, j, k) =
                                     s0_arr(0, index) *
@@ -1026,8 +1019,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
 
                         if (radius >= r_cc_loc(0, index)) {
                             if (index >= nr_fine - 1) {
-                                s0macx(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macx(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macx(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -1039,8 +1031,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macx(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macx(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macx(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macx(i, j, k) =
                                     s0_arr(0, index) *
@@ -1064,8 +1055,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
 
                         if (radius >= r_cc_loc(0, index)) {
                             if (index >= nr_fine - 1) {
-                                s0macy(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macy(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macy(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -1077,8 +1067,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macy(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macy(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macy(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macy(i, j, k) =
                                     s0_arr(0, index) *
@@ -1102,8 +1091,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
 
                         if (radius >= r_cc_loc(0, index)) {
                             if (index >= nr_fine - 1) {
-                                s0macz(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macz(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macz(i, j, k) =
                                     s0_arr(0, index + 1) *
@@ -1115,8 +1103,7 @@ void Maestro::MakeS0mac(const BaseState<Real>& s0,
                             if (index == 0) {
                                 s0macz(i, j, k) = s0_arr(0, index);
                             } else if (index > nr_fine - 1) {
-                                s0macz(i, j, k) =
-                                    s0_arr(0, base_geom.nr_fine - 1);
+                                s0macz(i, j, k) = s0_arr(0, nr_fine - 1);
                             } else {
                                 s0macz(i, j, k) =
                                     s0_arr(0, index) *

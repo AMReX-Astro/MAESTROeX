@@ -38,6 +38,13 @@ using RealVector = amrex::Vector<amrex::Real>;
 using IntVector = amrex::Vector<int>;
 #endif
 
+// function called on GPU only
+AMREX_GPU_DEVICE
+amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
+                       const amrex::Real x1, const amrex::Real x2,
+                       const amrex::Real y0, const amrex::Real y1,
+                       const amrex::Real y2, const bool limit = true);
+
 /// hard code a maximum level limit
 #define MAESTRO_MAX_LEVELS 15
 
@@ -671,11 +678,6 @@ class Maestro : public amrex::AmrCore {
         const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         const int sbccomp = 0);
-
-    AMREX_GPU_DEVICE amrex::Real QuadInterp(
-        const amrex::Real x, const amrex::Real x0, const amrex::Real x1,
-        const amrex::Real x2, const amrex::Real y0, const amrex::Real y1,
-        const amrex::Real y2, const bool limit = true);
 
     /// Add (`mult` times) the MAC-projected base state velocity to the edge-based
     /// velocity `uedge`
