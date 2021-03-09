@@ -107,6 +107,10 @@ void Maestro::Makew0Planar(
     const Real grav_const_loc = grav_const;
     const Real dpdt_factor_loc = dpdt_factor;
 
+    // pressure correction variables
+    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine);
+    auto int1_over_gamma1bar_p0_planar = int1_over_gamma1bar_p0.array();
+
     // Compute w0 on edges at level n
     for (auto n = 0; n <= base_geom.max_radial_level; ++n) {
         psi_planar_state.setVal(0.0);
@@ -119,6 +123,7 @@ void Maestro::Makew0Planar(
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
                 w0_arr(0, 0) = 0.0;
+                int1_over_gamma1bar_p0_planar(0) = 0.0;
             } else {
                 // Obtain the starting value of w0 from the coarser grid
                 w0_arr(n, base_geom.r_start_coord(n, j)) =
@@ -159,12 +164,26 @@ void Maestro::Makew0Planar(
                                          p0_new_arr(n, r - 1) * dt_loc);
                     }
                 }
-
+                if (n == 0) {
+                    int1_over_gamma1bar_p0_planar(r) =
+                        int1_over_gamma1bar_p0_planar(r - 1) +
+                        (1.0 / gamma1bar_p0_avg) * dr_lev;
+                }
                 w0_arr(n, r) = w0_arr(n, r - 1) + Sbar_arr(n, r - 1) * dr_lev -
                                psi_planar[r - 1] / gamma1bar_p0_avg * dr_lev -
                                delta_chi_w0 * dr_lev;
             }
-
+            // add the pressure correction for a closed box for n == 0
+            if (n == 0  && add_pb) {
+                const int k = base_geom.r_end_coord(n, j) + 1;
+                p0bdot = w0_arr(n, k) / int1_over_gamma1bar_p0_planar(k);
+                // set p0b for use in EnforceHSE
+                p0b    = p0bdot * dt;
+                for (auto r = base_geom.r_start_coord(n, j) + 1;
+                     r <= base_geom.r_end_coord(n, j) + 1; ++r) {
+                    w0_arr(n, r) -= p0bdot * int1_over_gamma1bar_p0_planar(r);
+                }
+            }
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
                 // the corresponding point on level n-1

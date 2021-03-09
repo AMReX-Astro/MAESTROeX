@@ -194,10 +194,17 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
         }      // end loop over levels
     }          // spherical
 
-    // now compare pressure in the last cell and offset to make sure we
-    // are integrating "from the top"
+    // if the top is closed in planar geometry, offset the pressure to
+    // make it consistent with that boundary condition
+    //
+    // otherwise, now compare pressure in the last cell and offset to
+    // make sure we are integrating "from the top"
     // we use the coarsest level as the reference point
-    offset = p0(0, base_geom.nr(0) - 1) - p0old(0, base_geom.nr(0) - 1);
+    if (add_pb && !spherical) {
+        offset =  - 1.0 * p0b;
+    } else {
+        offset =  p0(0, base_geom.nr(0) - 1) - p0old(0, base_geom.nr(0) - 1);
+    }
 
     // offset level 0
     for (auto r = 0; r < base_geom.nr_fine; ++r) {

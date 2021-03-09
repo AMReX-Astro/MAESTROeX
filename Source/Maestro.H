@@ -2064,6 +2064,11 @@ class Maestro : public amrex::AmrCore {
     /// used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister>> flux_reg_s;
 
+    /// Rate of change of pressure at the lower boundary. Used to modify w0
+    /// and p0 in the case of a closed upper boundary (planar).
+    Real p0bdot;
+    Real p0b;
+
     /// flag for writing plotfiles
     enum plotfile_flag {
         plotInitData = -9999999,
