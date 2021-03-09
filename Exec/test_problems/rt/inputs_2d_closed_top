@@ -1,4 +1,5 @@
-
+## This input makes the top boundary impenetrable by adding a correction
+## to the pressure. It works well with average_base_state = true.
 # INITIAL MODEL
 maestro.perturb_model = true
 
