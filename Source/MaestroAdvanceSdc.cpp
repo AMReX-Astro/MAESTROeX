@@ -252,6 +252,9 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         Print() << "<<< STEP 1 : Compute advection velocities >>>" << std::endl;
     }
 
+    // walltime
+    Real start_total_advect = ParallelDescriptor::second();
+    
     if (t_old == 0.) {
         // this is either a pressure iteration or the first time step
         // set S_cc_nph = (1/2) (S_cc_old + S_cc_new)
@@ -344,6 +347,11 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
         // subtract w0mac from umac
         Addw0(umac, w0mac, -1.);
     }
+
+    // wallclock time
+    Real end_total_advect = ParallelDescriptor::second() - start_total_advect;
+    ParallelDescriptor::ReduceRealMax(end_total_advect,
+                                      ParallelDescriptor::IOProcessorNumber());
 
     // wallclock time
     Real start_total_macproj = ParallelDescriptor::second();
@@ -679,6 +687,9 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
             MakeReactionRates(rho_omegadot, rho_Hnuc, snew);
 
+	    // wallclock time
+            Real start_total_advect_corrector = ParallelDescriptor::second();
+
             // compute S at cell-centers
             Make_S_cc(S_cc_new, delta_gamma1_term, delta_gamma1, snew, uold,
                       rho_omegadot, rho_Hnuc, rho_Hext, diff_new, p0_new,
@@ -765,6 +776,14 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                 Addw0(umac, w0mac, -1.);
             }
 
+	    // wallclock time
+            Real end_total_advect_corrector =
+                ParallelDescriptor::second() - start_total_advect_corrector;
+            ParallelDescriptor::ReduceRealMax(
+                end_total_advect_corrector,
+                ParallelDescriptor::IOProcessorNumber());
+	    end_total_advect += end_total_advect_corrector;
+	    
             // wallclock time
             Real start_total_macproj_corrector = ParallelDescriptor::second();
 
@@ -778,7 +797,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             ParallelDescriptor::ReduceRealMax(
                 end_total_macproj_corrector,
                 ParallelDescriptor::IOProcessorNumber());
-
+	    end_total_macproj += end_total_macproj_corrector;
+	    
             if (spherical && evolve_base_state && split_projection) {
                 // add w0mac back to umac
                 Addw0(umac, w0mac, 1.);
@@ -922,7 +942,8 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             ParallelDescriptor::second() - start_total_react_corrector;
         ParallelDescriptor::ReduceRealMax(
             end_total_react_corrector, ParallelDescriptor::IOProcessorNumber());
-
+	end_total_react += end_total_react_corrector;
+	
         // extract IR =  [ (snew - sold)/dt - sdc_source ]
         for (int lev = 0; lev <= finest_level; ++lev) {
             intra[lev].setVal(0.);
@@ -1222,6 +1243,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
     // print wallclock time
     if (maestro_verbose > 0) {
+        Print() << "Time to solve advection  : " << end_total_advect << '\n';
         Print() << "Time to solve mac proj   : " << end_total_macproj << '\n';
         Print() << "Time to solve nodal proj : " << end_total_nodalproj << '\n';
         Print() << "Time to solve reactions  : " << end_total_react << '\n';
