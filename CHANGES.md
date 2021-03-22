@@ -1,3 +1,9 @@
+# 21.03
+
+  * Bug fixes for simplified SDC algorithm
+
+  * GPU bug fixes
+
 # 21.02
 
   * Bug fix for exact base state algorithm 

@@ -401,6 +401,7 @@ void Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
     const Real dt_loc = dt;
     const Real dpdt_factor_loc = dpdt_factor;
     const Real base_cutoff_density_loc = base_cutoff_density;
+    auto base_cutoff_density_coord_loc = base_geom.base_cutoff_density_coord;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -436,7 +437,7 @@ void Maestro::CorrectRHCCforNodalProj(Vector<MultiFab>& rhcc,
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     int r = (AMREX_SPACEDIM == 2) ? j : k;
                     Real correction_factor =
-                        (r < base_geom.base_cutoff_density_coord(lev))
+                        (r < base_cutoff_density_coord_loc(lev))
                             ? beta0_arr(i, j, k) * dpdt_factor_loc /
                                   (gamma1bar_arr(i, j, k) * p0_arr(i, j, k)) /
                                   dt_loc
@@ -504,6 +505,7 @@ void Maestro::MakeRHCCforMacProj(
     const Real base_cutoff_density_loc = base_cutoff_density;
     const Real dt_loc = dt;
     const Real dpdt_factor_loc = dpdt_factor;
+    auto base_cutoff_density_coord_loc = base_geom.base_cutoff_density_coord;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         // fill rhcc
@@ -559,7 +561,7 @@ void Maestro::MakeRHCCforMacProj(
                     ParallelFor(
                         tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                             int r = (AMREX_SPACEDIM == 2) ? j : k;
-                            if (r < base_geom.base_cutoff_density_coord(lev)) {
+                            if (r < base_cutoff_density_coord_loc(lev)) {
                                 delta_chi_arr(i, j, k) +=
                                     dpdt_factor_loc * delta_p_arr(i, j, k) /
                                     (dt_loc * gamma1bar_arr(i, j, k) *
