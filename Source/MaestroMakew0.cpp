@@ -321,6 +321,7 @@ void Maestro::Makew0PlanarVarg(
     auto etarho_cc_fine_arr = etarho_cc_fine.array();
     auto Sbar_in_fine_arr = Sbar_in_fine.array();
     auto grav_edge_fine_arr = grav_edge_fine.array();
+    auto finest_radial_level = base_geom.finest_radial_level;
 
     // create time-centered base-state quantities
     p0_nph_fine.copy(0.5 * (p0_old_fine + p0_new_fine));
@@ -394,13 +395,13 @@ void Maestro::Makew0PlanarVarg(
         B(r) = -(gamma1bar_nph_fine_arr(r - 1) * p0_nph_fine_arr(r - 1) +
                  gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r)) /
                (dr_finest * dr_finest);
-        B(r) -= 2.0 * dpdr / (r_edge_loc(base_geom.finest_radial_level, r));
+        B(r) -= 2.0 * dpdr / (r_edge_loc(finest_radial_level, r));
 
         C(r) = gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r);
         C(r) /= dr_finest * dr_finest;
 
         F(r) = 2.0 * dpdr * w0bar_fine_arr(r) /
-                   r_edge_loc(base_geom.finest_radial_level, r) -
+                   r_edge_loc(finest_radial_level, r) -
                grav_edge_fine_arr(r) *
                    (etarho_cc_fine_arr(r) - etarho_cc_fine_arr(r - 1)) /
                    dr_finest;
@@ -445,7 +446,7 @@ void Maestro::Makew0PlanarVarg(
     // 6) compute w0 = w0bar + deltaw0
     ParallelFor(nr_finest + 1, [=] AMREX_GPU_DEVICE(int r) {
         w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
-        w0_arr(base_geom.finest_radial_level, r) = w0_fine_arr(r);
+        w0_arr(finest_radial_level, r) = w0_fine_arr(r);
     });
     Gpu::synchronize();
 
