@@ -893,8 +893,8 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_Hnuc) {
         names[cnt++] = "Hnuc";
     }
-    names[cnt++] = "tfromh";
     names[cnt++] = "tfromp";
+    names[cnt++] = "tfromh";
     names[cnt++] = "deltap";
     names[cnt++] = "deltaT";
     names[cnt++] = "Pi";
