@@ -15,7 +15,7 @@ MAESTROEX_HOME  := ../../..
 # We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := gamma_law_general
-CONDUCTIVITY_DIR := stellar
+CONDUCTIVITY_DIR := constant
 NETWORK_DIR      := general_null
 NETWORK_INPUTS := simple.net
 INTEGRATOR_DIR   := VODE

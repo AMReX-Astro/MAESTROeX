@@ -61,7 +61,7 @@ maestro.species_pred_type = 3
 #maestro.enthalpy_pred_type = 3
 
 maestro.do_burning = false
-maestro.do_heating = false
+maestro.do_heating = true
 
 maestro.anelastic_cutoff_density = 50.e-8
 maestro.base_cutoff_density = 25.e-8
@@ -74,7 +74,7 @@ maestro.sponge_kappa = 1000.e0
 
 # PLOTFILES
 maestro.plot_base_name  = plt_    # root name of plot file
-maestro.plot_int   = 10      # number of timesteps between plot files
+maestro.plot_int   = 100      # number of timesteps between plot files
 maestro.plot_deltat = 100.e0
 maestro.small_plot_base_name = smallplt_
 maestro.small_plot_int = -1
@@ -117,6 +117,8 @@ maestro.eps_hg_bottom      = 1.e-4
   ! Fortran does not like seeing unknown variables
   ! in the namelist.
 
-  !eos_gamma = 1.25d0
+  eos_gamma = 4.0d0/3.0d0
+  eos_assume_neutral = .true.
+  const_conductivity = 1.0d-3
 
 /

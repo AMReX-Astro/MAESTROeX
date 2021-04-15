@@ -1,4 +1,4 @@
-constant_heat_flux       real  0.0e0
+constant_heat_flux       real  1.0e6
 g0                       real  -2479.0
 rho_t                    real  16.e-5
 T_0                      real  165.0
