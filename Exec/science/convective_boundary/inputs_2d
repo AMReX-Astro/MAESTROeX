@@ -62,6 +62,7 @@ maestro.species_pred_type = 3
 
 maestro.do_burning = false
 maestro.do_heating = true
+maestro.use_thermal_diffusion = true
 
 maestro.anelastic_cutoff_density = 50.e-8
 maestro.base_cutoff_density = 25.e-8
