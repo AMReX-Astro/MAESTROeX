@@ -30,7 +30,26 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
+    Vector<MultiFab> react_in(finest_level+1), react_out(finest_level+1);
+    Vector<std::string> react_in_varnames, react_out_varnames;
+    for (int i = 0; i < NumSpec; ++i) {
+        std::string spec_string = "X(";
+        spec_string += short_spec_names_cxx[i];
+        spec_string += ')';
+        react_in_varnames.push_back(spec_string);
+        react_out_varnames.push_back(spec_string);
+    }
+    react_in_varnames.push_back("rho");
+    react_in_varnames.push_back("temp");
+    react_out_varnames.push_back("enuc");
+    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
+
     for (int lev = 0; lev <= finest_level; ++lev) {
+        if (save_react_data) {
+            react_in[lev].define(grids[lev], dmap[lev], NumSpec+2, 0);  // X, rho, T -> burn
+            react_out[lev].define(grids[lev], dmap[lev], NumSpec+1, 0); // burn -> X, Hnuc
+        }
+
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
         if (lev == finest_level) finelev = finest_level;
@@ -54,6 +73,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             const Array4<Real> rho_omegadot_arr = rho_omegadot[lev].array(mfi);
             const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
             const auto tempbar_init_arr = tempbar_init.const_array();
+
+            Array4<Real> react_in_arr, react_out_arr;
+
+            if (save_react_data) {
+                react_in_arr = react_in[lev].array(mfi);
+                react_out_arr = react_out[lev].array(mfi);
+            }
 
             // use a dummy value for non-spherical as tempbar_init_cart is not defined
             const Array4<const Real> tempbar_cart_arr =
@@ -91,6 +117,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 Real x_test =
                     (ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
+
+                if (save_react_data) {
+                    for (int n = 0; n < NumSpec; ++n) {
+                        react_in_arr(i, j, k, n) = x_in[n];
+                        react_out_arr(i, j, k, n) = react_in_arr(i, j, k, n);
+                    }
+                    react_in_arr(i, j, k, NumSpec) = rho;    // input density
+                    react_in_arr(i, j, k, NumSpec+1) = T_in; // input temperature
+                    react_out_arr(i, j, k, NumSpec) = 0.0;   // output generated energy
+                }
 
                 burn_t state_in;
                 burn_t state_out;
@@ -137,6 +173,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #endif
 
                     burner(state_out, dt_in);
+
+                    if (save_react_data) {
+                        for (int n = 0; n < NumSpec; ++n) {
+                            react_out_arr(i, j, k, n) = state_out.xn[n];
+                        }
+                        react_out_arr(i, j, k, NumSpec) = state_out.e - state_in.e;
+                    }
 
                     for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] = state_out.xn[n];
@@ -204,6 +247,20 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                                            dt_in * rho_Hext_arr(i, j, k);
             });
         }
+    }
+
+    if (save_react_data) {
+        std::string react_in_name = "react_inputs_";
+        std::string react_out_name = "react_outputs_";
+        PlotFileName(istep, &react_in_name);
+        PlotFileName(istep, &react_out_name);
+        react_in_name = react_in_name + "_" + algo_step;
+        react_out_name = react_out_name + "_" + algo_step;
+        Vector<int> step_array(finest_level+1, istep);
+        WriteMultiLevelPlotfile(react_in_name, finest_level + 1, GetVecOfConstPtrs(react_in), react_in_varnames,
+                                Geom(), time_in, step_array, refRatio());
+        WriteMultiLevelPlotfile(react_out_name, finest_level + 1, GetVecOfConstPtrs(react_out), react_out_varnames,
+                                Geom(), time_in, step_array, refRatio());
     }
 }
 
