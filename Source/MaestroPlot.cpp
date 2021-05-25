@@ -143,14 +143,15 @@ void Maestro::WritePlotFile(
 
             BaseCCFile.precision(17);
 
-            BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar \n";
+            BaseCCFile << "r_cc  rho0  rhoh0  p0  gamma1bar tempbar\n";
 
             for (int i = 0; i < base_geom.nr(lev); ++i) {
                 BaseCCFile << base_geom.r_cc_loc(lev, i) << " "
                            << rho0_in.array()(lev, i) << " "
                            << rhoh0_in.array()(lev, i) << " "
                            << p0_in.array()(lev, i) << " "
-                           << gamma1bar_in.array()(lev, i) << "\n";
+                           << gamma1bar_in.array()(lev, i) << " "
+                           << tempbar.array()(lev, i) << "\n";
             }
         }
     }
@@ -893,8 +894,8 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     if (plot_Hnuc) {
         names[cnt++] = "Hnuc";
     }
-    names[cnt++] = "tfromh";
     names[cnt++] = "tfromp";
+    names[cnt++] = "tfromh";
     names[cnt++] = "deltap";
     names[cnt++] = "deltaT";
     names[cnt++] = "Pi";

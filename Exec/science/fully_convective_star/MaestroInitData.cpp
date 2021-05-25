@@ -123,27 +123,27 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                     for (auto i = 1; i <= 3; ++i) {
                         const int n = i - 1 + 3 * (j - 1 + 3 * (k - 1));
 
-                        // alpha[n] = std::pow(0.5, i) * std::pow(0.7, j) * std::pow(0.3, k) * std::pow(-1.0, i);
-                        // beta[n] = std::pow(0.5, i) * std::pow(0.3, j) * std::pow(0.7, k) * std::pow(-1.0, j);
-                        // gamma[n] = std::pow(0.3, i) * std::pow(0.5, j) * std::pow(0.7, k) * std::pow(-1.0, k);
+                        alpha[n] = std::pow(0.5, i) * std::pow(0.7, j) * std::pow(0.3, k) * std::pow(-1.0, i);
+                        beta[n] = std::pow(0.5, i) * std::pow(0.3, j) * std::pow(0.7, k) * std::pow(-1.0, j);
+                        gamma[n] = std::pow(0.3, i) * std::pow(0.5, j) * std::pow(0.7, k) * std::pow(-1.0, k);
 
-                        // phix[n] = std::pow(0.3, i) * std::pow(0.7, j) * std::pow(0.5, k);
-                        // phix[n] *= 2.0 * M_PI;
-                        // phiy[n] = std::pow(0.7, i) * std::pow(0.3, j) * std::pow(0.5, k);
-                        // phiy[n] *= 2.0 * M_PI;
-                        // phiz[n] = std::pow(0.7, i) * std::pow(0.5, j) * std::pow(0.3, k);
-                        // phiz[n] *= 2.0 * M_PI;
+                        phix[n] = std::pow(0.3, i) * std::pow(0.7, j) * std::pow(0.5, k);
+                        phix[n] *= 2.0 * M_PI;
+                        phiy[n] = std::pow(0.7, i) * std::pow(0.3, j) * std::pow(0.5, k);
+                        phiy[n] *= 2.0 * M_PI;
+                        phiz[n] = std::pow(0.7, i) * std::pow(0.5, j) * std::pow(0.3, k);
+                        phiz[n] *= 2.0 * M_PI;
 
                         normk[n] =
                             std::sqrt(Real(i * i) + Real(j * j) + Real(k * k));
 
-                        alpha[n] = 2.0 * amrex::Random() - 1.0;
-                        beta[n] = 2.0 * amrex::Random() - 1.0;
-                        gamma[n] = 2.0 * amrex::Random() - 1.0;
+                        // alpha[n] = 2.0 * amrex::Random() - 1.0;
+                        // beta[n] = 2.0 * amrex::Random() - 1.0;
+                        // gamma[n] = 2.0 * amrex::Random() - 1.0;
 
-                        phix[n] = 2.0 * M_PI * amrex::Random();
-                        phiy[n] = 2.0 * M_PI * amrex::Random();
-                        phiz[n] = 2.0 * M_PI * amrex::Random();
+                        // phix[n] = 2.0 * M_PI * amrex::Random();
+                        // phiy[n] = 2.0 * M_PI * amrex::Random();
+                        // phiz[n] = 2.0 * M_PI * amrex::Random();
                     }
                 }
             }
