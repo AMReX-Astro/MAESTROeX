@@ -1,3 +1,7 @@
+# 21.06
+
+  * Change blocking factor to 8
+
 # 21.05
 
   * Fix labels for tfromp and tfromh in output files
