@@ -30,10 +30,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -260,8 +261,8 @@
 <p>The equation set and solution procedure used by MAESTROeX has changed
 and improved over time.  In this chapter, we outline the model
 equations and algorithmic options in the code.  The latest published
-references for MAESTROeX are the multilevel paper <span id="id1">[<a class="reference internal" href="zreferences.html#id7">NonakaAlmgrenBell+10</a>]</span>
-and the more recent <span id="id2">[<a class="reference internal" href="zreferences.html#id41">FanNonakaAlmgren+19</a>]</span>.  These two papers use the same
+references for MAESTROeX are the multilevel paper <span id="id1">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>
+and the more recent <span id="id2">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span>.  These two papers use the same
 model equations, however the more recent paper, in addition to
 retaining the original algorithmic capability of the previous code,
 includes an option to use a new, simplified temporal integration
@@ -310,7 +311,7 @@ a trivial average of all the values at a given height.
 For spherical problems there is a
 novel interpolation routine we use to average 3D data representing
 a full spherical star into a 1D array representing the average.
-Details can be found in <span id="id3">[<a class="reference internal" href="zreferences.html#id7">NonakaAlmgrenBell+10</a>]</span> and <span id="id4">[<a class="reference internal" href="zreferences.html#id41">FanNonakaAlmgren+19</a>]</span>.</p>
+Details can be found in <span id="id3">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span> and <span id="id4">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span>.</p>
 <p>For the velocity field, we can decompose the full velocity
 field into a base state velocity and a local velocity,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-5">
@@ -461,7 +462,7 @@ and perturbational density as <span class="math notranslate nohighlight">\(\rho'
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <p>This is the form of the momentum equation that we solved in papers
 I–IV and in the multilevel paper.</p>
-<p>Several authors <span id="id5">[<a class="reference internal" href="zreferences.html#id32">KP12</a>, <a class="reference internal" href="zreferences.html#id33">VLB+13</a>]</span> explored the idea of energy
+<p>Several authors <span id="id5">[<a class="reference internal" href="zreferences.html#id32" title="Rupert Klein and Olivier Pauluis. Thermodynamic consistency of a pseudoincompressible approximation  for general equations of state. JAS, March 2012.">KP12</a>, <a class="reference internal" href="zreferences.html#id33" title="Geoffrey M. Vasil, Daniel Lecoanet, Benjamin P. Brown, Toby S. Wood, and Ellen G. Zweibel. Energy conservation and gravity waves in sound-proof treatments of stellar interiors. ii. lagrangian constrained analysis. Astrophysical Journal, 773:169-, 2013.">VLB+13</a>]</span> explored the idea of energy
 conservation in a low Mach number system and found that an additional
 term (which can look like a buoyancy) is needed in the low Mach number
 formulation, yielding:</p>
@@ -528,7 +529,7 @@ term is only present if we are using thermal diffusion (<code class="docutils li
 <p>In this constraint, <span class="math notranslate nohighlight">\(\gammabar\)</span> is the lateral average of
 <span class="math notranslate nohighlight">\(\Gamma_1 \equiv d\log p / d\log \rho |_s\)</span>. Using the lateral average
 here makes it possible to cast the constraint as a
-divergence. <span id="id6">[<a class="reference internal" href="zreferences.html#id32">KP12</a>]</span> discuss the general case where we want to
+divergence. <span id="id6">[<a class="reference internal" href="zreferences.html#id32" title="Rupert Klein and Olivier Pauluis. Thermodynamic consistency of a pseudoincompressible approximation  for general equations of state. JAS, March 2012.">KP12</a>]</span> discuss the general case where we want to
 keep the local variations of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> (and we explored this in paper
 III). We also look at this in § <a class="reference internal" href="#sec-flow-gamma1vary"><span class="std std-ref">\Gamma_1 Variation Changes</span></a></p>
 </div>
@@ -734,8 +735,8 @@ incompressible / low speed papers, <span class="math notranslate nohighlight">\(
 </div>
 <div class="section" id="time-advancement-algorithm-ingredients">
 <span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Permalink to this headline">¶</a></h2>
-<p>The full time advancement algorithm is detailed in <span id="id8">[<a class="reference internal" href="zreferences.html#id7">NonakaAlmgrenBell+10</a>]</span> for the original
-algorithm and <span id="id9">[<a class="reference internal" href="zreferences.html#id41">FanNonakaAlmgren+19</a>]</span> for the new, simplified algorithm.  We do not repeat
+<p>The full time advancement algorithm is detailed in <span id="id8">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span> for the original
+algorithm and <span id="id9">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span> for the new, simplified algorithm.  We do not repeat
 that here.</p>
 <p>The overall flow of the algorithm is depicted in the following flowcharts:</p>
 <div class="figure align-center" id="id15">
@@ -1063,7 +1064,7 @@ First we construct:</p>
 </div>
 <div class="section" id="thermal-diffusion-changes">
 <span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this headline">¶</a></h3>
-<p>Thermal diffusion was introduced in the XRB <span id="id10">[<a class="reference internal" href="zreferences.html#id8">MaloneNonakaAlmgren+11</a>]</span>. This
+<p>Thermal diffusion was introduced in the XRB <span id="id10">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
 that process here.</p>
@@ -1205,7 +1206,7 @@ we define <span class="math notranslate nohighlight">\({\bf V} = (\Ubt^{1,\star}
 <div class="math notranslate nohighlight" id="equation-flowchart-61">
 <span class="eqno">(93)<a class="headerlink" href="#equation-flowchart-61" title="Permalink to this equation">¶</a></span>\[L_\beta^\rho \phi = D \left ( \beta_0^{\myhalf} {\bf V} \right) - \beta_0^{\myhalf} \left[ \left(S^{1}-\overline{S^{1}}\right) - \left(S^{0}-\overline{S^{0}}\right) \right]  .\]</div>
 <p>(The motivation for this form of the projection in the initial pressure iterations
-is discussed in <span id="id11">[<a class="reference internal" href="zreferences.html#id19">ABC00</a>]</span>.)
+is discussed in <span id="id11">[<a class="reference internal" href="zreferences.html#id19" title="A. S. Almgren, J. B. Bell, and W. Y. Crutchfield. Approximate projection methods: part I. Inviscid analysis. SIAM J. Sci. Comput., 22(4):1139–59, 2000.">ABC00</a>]</span>.)
 We discard the new velocity resulting from this, but keep the new
 value for <span class="math notranslate nohighlight">\(\pi^{\myhalf} = \pi^{-\myhalf} + (1 / \dt) \; \phi.\)</span>
 These steps also yield new scalar data at time <span class="math notranslate nohighlight">\(\dt,\)</span> which
@@ -1294,9 +1295,9 @@ been successful.</p></li>
 </div>
 <div class="section" id="numerical-methodology">
 <span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Permalink to this headline">¶</a></h1>
-<p>We give an overview of the original MAESTRO algorithm <span id="id12">[<a class="reference internal" href="zreferences.html#id7">NonakaAlmgrenBell+10</a>]</span>,
+<p>We give an overview of the original MAESTRO algorithm <span id="id12">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>,
 as well as the recently introduced new temporal integration
-scheme <span id="id13">[<a class="reference internal" href="zreferences.html#id41">FanNonakaAlmgren+19</a>]</span>.  These schemes share many of the same algorithmic
+scheme <span id="id13">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span>.  These schemes share many of the same algorithmic
 modules, however the new scheme is significantly simpler.</p>
 <p>To summarize, in the original scheme we integrated the base state evolution
 over the time step, which requires splitting the velocity equation into

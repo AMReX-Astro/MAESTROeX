@@ -30,10 +30,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
@@ -241,15 +242,15 @@ only to MAESTROeX, although many of the ideas originated in
 MAESTRO before the change to MAESTROeX.</p>
 <p>The idea for MAESTROeX grew out of our success in applying low Mach
 number combustion methods developed for terrestrial flames
-<span id="id1">[<a class="reference internal" href="zreferences.html#id21">DB00</a>]</span> to small-scale (non-stratified) astrophysical
-flames such as the Landau-Darrieus instability <span id="id2">[<a class="reference internal" href="zreferences.html#id24">BDR+04</a>]</span>,
-Rayleigh-Taylor unstable flames <span id="id3">[<a class="reference internal" href="zreferences.html#id26">ZingaleWoosleyRendleman+05</a>]</span>, and flame-turbulence
-interactions <span id="id4">[<a class="reference internal" href="zreferences.html#id27">AspdenBellDay+08</a>]</span>. Our original small-scale astrophysical
+<span id="id1">[<a class="reference internal" href="zreferences.html#id21" title="M. S. Day and J. B. Bell. Numerical simulation of laminar reacting flows with complex chemistry. Combust. Theory Modelling, 4(4):535-556, 2000.">DB00</a>]</span> to small-scale (non-stratified) astrophysical
+flames such as the Landau-Darrieus instability <span id="id2">[<a class="reference internal" href="zreferences.html#id24" title="J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, and M. Zingale. Direct numerical simulations of Type Ia supernovae flames I: the Landau-Darrieus instability. \apj , 606:1029, 2004.">BDR+04</a>]</span>,
+Rayleigh-Taylor unstable flames <span id="id3">[<a class="reference internal" href="zreferences.html#id26" title="M Zingale, S. E. Woosley, C. A. Rendleman, M. S. Day, and J. B. Bell. Three-dimensional Numerical Simulations of Rayleigh-Taylor Unstable Flames in Type Ia Supernovae. \apj , 632:1021, 2005.">ZingaleWoosleyRendleman+05</a>]</span>, and flame-turbulence
+interactions <span id="id4">[<a class="reference internal" href="zreferences.html#id27" title="A. J. Aspden, J. B. Bell, M. S. Day, S. E. Woosley, and M. Zingale. Turbulence-Flame Interactions in Type Ia Supernovae. ApJ, 689:1173-1185, December 2008. arXiv:0811.2816, doi:10.1086/592726.">AspdenBellDay+08</a>]</span>. Our original small-scale astrophysical
 combustion algorithm is detailed in</p>
 <ul class="simple">
 <li><p><em>Adaptive Low Mach Number Simulations of Nuclear Flames,</em>
 J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, &amp; M. Zingale
-2004, JCP, 195, 2, 677 (henceforth BDRWZ) <span id="id5">[<a class="reference internal" href="zreferences.html#id3">BellDayRendleman+04</a>]</span></p></li>
+2004, JCP, 195, 2, 677 (henceforth BDRWZ) <span id="id5">[<a class="reference internal" href="zreferences.html#id3" title="J. B. Bell, M. S. Day, C. A. Rendleman, S. E. Woosley, and M. A. Zingale. Adaptive low Mach number simulations of nuclear flame microphysics. Journal of Computational Physics, 195:677-694, April 2004. doi:10.1016/j.jcp.2003.10.035.">BellDayRendleman+04</a>]</span></p></li>
 </ul>
 <p>MAESTROeX was developed initially for modeling the convective phase in
 a Chandrasekhar mass white dwarf preceding the ignition of a
@@ -257,41 +258,41 @@ Type Ia supernovae.  As
 such, we needed to incorporate the compressibility effects due to
 large-scale stratification in the star. The method closest in spirit
 to MAESTROeX is the pseudo-incompressible method of Durran
-<span id="id6">[<a class="reference internal" href="zreferences.html#id15">Dur89</a>]</span>, developed for terrestrial atmospheric flows (assuming
+<span id="id6">[<a class="reference internal" href="zreferences.html#id15" title="D. R. Durran. Improving the anelastic approximation. Journal of Atmospheric Science, 46(11):1453-1461, 1989.">Dur89</a>]</span>, developed for terrestrial atmospheric flows (assuming
 an ideal gas). Part of the complexity of the equations in MAESTROeX
 stems from the need to descibe a general equation of state.
 Additionally, since reactions can significantly alter the hydrostatic
 structure of a star, we incorporated extensions that capture the
-expansion of the background state <span id="id7">[<a class="reference internal" href="zreferences.html#id14">Alm00</a>]</span>. The low Mach
+expansion of the background state <span id="id7">[<a class="reference internal" href="zreferences.html#id14" title="A. Almgren. A new look at the pseudo-incompressible solution to Lamb's problem of hydrostatic adjustment. Journal of Atmospheric Science, 57:995–998, April 2000.">Alm00</a>]</span>. The low Mach
 number equations for stellar flows were developed in a series of
 papers leading up to the first application to this problem:</p>
 <ul class="simple">
 <li><p><em>Low Mach Number Modeling of Type Ia
 Supernovae. I. Hydrodynamics,</em> A. S. Almgren, J. B. Bell,
 C. A. Rendleman, &amp; M. Zingale 2006, ApJ, 637, 922 (henceforth
-paper I) <span id="id8">[<a class="reference internal" href="zreferences.html#id2">AlmgrenBellRendlemanZingale06a</a>]</span></p></li>
+paper I) <span id="id8">[<a class="reference internal" href="zreferences.html#id2" title="A. S. Almgren, J. B. Bell, C. A. Rendleman, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. I. Hydrodynamics. \apj , 637:922-936, February 2006. arXiv:arXiv:astro-ph/0509892, doi:10.1086/498426.">AlmgrenBellRendlemanZingale06a</a>]</span></p></li>
 <li><p><em>Low Mach Number Modeling of Type Ia Supernovae. II. Energy
 Evolution,</em> A. S. Almgren, J. B. Bell, C. A. Rendleman, &amp; M. Zingale
-2006, ApJ, 649, 927 (henceforth paper II) <span id="id9">[<a class="reference internal" href="zreferences.html#id5">AlmgrenBellRendlemanZingale06b</a>]</span></p></li>
+2006, ApJ, 649, 927 (henceforth paper II) <span id="id9">[<a class="reference internal" href="zreferences.html#id5" title="A. S. Almgren, J. B. Bell, C. A. Rendleman, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. II. Energy Evolution. \apj , 649:927-938, October 2006. arXiv:arXiv:astro-ph/0606496, doi:10.1086/507089.">AlmgrenBellRendlemanZingale06b</a>]</span></p></li>
 <li><p><em>Low Mach Number Modeling of Type Ia Supernovae. III. Reactions,</em>
 A. S. Almgren, J. B. Bell, A. Nonaka, &amp; M. Zingale
-2008, ApJ, 684, 449 (henceforth paper III) <span id="id10">[<a class="reference internal" href="zreferences.html#id6">AlmgrenBellNonakaZingale08</a>]</span></p></li>
+2008, ApJ, 684, 449 (henceforth paper III) <span id="id10">[<a class="reference internal" href="zreferences.html#id6" title="A. S. Almgren, J. B. Bell, A. Nonaka, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. III. Reactions. \apj , 684:449-470, September 2008. doi:10.1086/590321.">AlmgrenBellNonakaZingale08</a>]</span></p></li>
 <li><p><em>Low Mach Number Modeling of Type Ia Supernovae. IV. White Dwarf Convection,</em>
 M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, &amp; S. E. Woosley
-2009, ApJ, 704, 196 (henceforth paper IV) <span id="id11">[<a class="reference internal" href="zreferences.html#id10">ZingaleAlmgrenBell+09</a>]</span></p></li>
+2009, ApJ, 704, 196 (henceforth paper IV) <span id="id11">[<a class="reference internal" href="zreferences.html#id10" title="M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, and S. E. Woosley. Low Mach Number Modeling of Type IA Supernovae. IV. White Dwarf Convection. \apj , 704:196-210, October 2009. arXiv:0908.2668, doi:10.1088/0004-637X/704/1/196.">ZingaleAlmgrenBell+09</a>]</span></p></li>
 </ul>
 <p>The adaptive mesh refinement version of the algorithm was presented in the
 next papers in the series:</p>
 <ul class="simple">
 <li><p><em>MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar
 Flows,</em> A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone,
-&amp; M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”) <span id="id12">[<a class="reference internal" href="zreferences.html#id7">NonakaAlmgrenBell+10</a>]</span></p></li>
+&amp; M. Zingale 2010, ApJS, 188, 358 (henceforth “the multilevel paper”) <span id="id12">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span></p></li>
 </ul>
 <p>The most recent developments for MAESTROeX are described in:</p>
 <ul class="simple">
 <li><p><em>MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver,</em> D. Fan,
 A. Nonaka, A. S. Almgren, A. Harpole, &amp; M. Zingale, 2019, submitted to ApJ
-<span id="id13">[<a class="reference internal" href="zreferences.html#id41">FanNonakaAlmgren+19</a>]</span></p></li>
+<span id="id13">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span></p></li>
 </ul>
 <p>We have many papers that describe applications of the method to Type
 Ia supernovae, X-ray bursts, and stellar evolution. These are listed
@@ -301,19 +302,19 @@ that describe enhancements to the code—these are noted below.</p>
 <li><p><em>Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional
 Convection Prior to the Outburst of a Pure 4He Accretor,</em>
 C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, &amp; M. Zingale 2011,
-ApJ, 728, 118 (henceforth “the XRB paper”) <span id="id14">[<a class="reference internal" href="zreferences.html#id8">MaloneNonakaAlmgren+11</a>]</span></p>
+ApJ, 728, 118 (henceforth “the XRB paper”) <span id="id14">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span></p>
 <p>This introduces the thermal diffusion portion of the MAESTROeX algorithm.</p>
 </li>
 <li><p><em>Comparisons of Two- and Three-Dimensional Convection in
 Type I X-ray Bursts</em> M. Zingale, C. M. Malone, A. Nonaka,
-A. S. Almgren, &amp; J. B. Bell 2015, ApJ, 807, 60. <span id="id15">[<a class="reference internal" href="zreferences.html#id42">ZingaleMaloneNonaka+15</a>]</span></p>
+A. S. Almgren, &amp; J. B. Bell 2015, ApJ, 807, 60. <span id="id15">[<a class="reference internal" href="zreferences.html#id42" title="M. Zingale, C. M. Malone, A. Nonaka, A. S. Almgren, and J. B. Bell. Comparisons of Two- and Three-Dimensional Convection in Type I X-Ray Bursts. \apj , 807(1):60, Jul 2015. arXiv:1410.5796, doi:10.1088/0004-637X/807/1/60.">ZingaleMaloneNonaka+15</a>]</span></p>
 <p>This has an appendix that describes the Godunov state construction in more
 detail than previous papers.</p>
 </li>
 <li><p><em>Low Mach Number Modeling of Convection in Helium Shells on
 Sub-Chandrasekhar White Dwarfs II: Bulk Properties of Simple Models,</em>
 A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, &amp; J. B. Bell
-2016, ApJ, 827, 84. <span id="id16">[<a class="reference internal" href="zreferences.html#id43">JacobsZingaleNonaka+16</a>]</span></p>
+2016, ApJ, 827, 84. <span id="id16">[<a class="reference internal" href="zreferences.html#id43" title="A. M. Jacobs, M. Zingale, A. Nonaka, A. S. Almgren, and J. B. Bell. Low Mach Number Modeling of Convection in Helium Shells on Sub-Chandrasekhar White Dwarfs. II. Bulk Properties of Simple Models. \apj , 827(1):84, Aug 2016. arXiv:1507.06696, doi:10.3847/0004-637X/827/1/84.">JacobsZingaleNonaka+16</a>]</span></p>
 <p>This has an appendix that shows some test problems for the alternate energy
 formulation in MAESTROeX.</p>
 </li>
@@ -397,13 +398,13 @@ base state.</p>
 </div>
 <div class="section" id="alternate-energy-formulation">
 <h3>Alternate Energy Formulation<a class="headerlink" href="#alternate-energy-formulation" title="Permalink to this headline">¶</a></h3>
-<p>Several authors <span id="id17">[<a class="reference internal" href="zreferences.html#id32">KP12</a>, <a class="reference internal" href="zreferences.html#id33">VLB+13</a>]</span> showed that with a slightly
+<p>Several authors <span id="id17">[<a class="reference internal" href="zreferences.html#id32" title="Rupert Klein and Olivier Pauluis. Thermodynamic consistency of a pseudoincompressible approximation  for general equations of state. JAS, March 2012.">KP12</a>, <a class="reference internal" href="zreferences.html#id33" title="Geoffrey M. Vasil, Daniel Lecoanet, Benjamin P. Brown, Toby S. Wood, and Ellen G. Zweibel. Energy conservation and gravity waves in sound-proof treatments of stellar interiors. ii. lagrangian constrained analysis. Astrophysical Journal, 773:169-, 2013.">VLB+13</a>]</span> showed that with a slightly
 different momentum equation, the low Mach number system can conserve
 an energy (that is, a quantity that looks like the compressible
 energy, but formed using the low Mach number quantities). This change
 manifests itself as either a change to the buoyancy term or by
 changing <span class="math notranslate nohighlight">\(\nabla \pi\)</span> to <span class="math notranslate nohighlight">\(\beta_0 \nabla (\pi/\beta_0)\)</span>. Furthermore,
-<span id="id18">[<a class="reference internal" href="zreferences.html#id33">VLB+13</a>]</span> showed that the new formulation better captures the
+<span id="id18">[<a class="reference internal" href="zreferences.html#id33" title="Geoffrey M. Vasil, Daniel Lecoanet, Benjamin P. Brown, Toby S. Wood, and Ellen G. Zweibel. Energy conservation and gravity waves in sound-proof treatments of stellar interiors. ii. lagrangian constrained analysis. Astrophysical Journal, 773:169-, 2013.">VLB+13</a>]</span> showed that the new formulation better captures the
 vertical propagation of gravity waves. As of
 Dec. 2013, this new formulation is the default in MAESTROeX.</p>
 </div>
@@ -411,7 +412,7 @@ Dec. 2013, this new formulation is the default in MAESTROeX.</p>
 <div class="section" id="projection-methods-101">
 <h2>Projection Methods 101<a class="headerlink" href="#projection-methods-101" title="Permalink to this headline">¶</a></h2>
 <p>Most astrophysical hydrodynamics codes
-(e.g. CASTRO <span id="id19">[<a class="reference internal" href="zreferences.html#id11">AlmgrenBecknerBell+10</a>]</span> or FLASH <span id="id20">[<a class="reference internal" href="zreferences.html#id12">FryxellOlsonRicker+00</a>]</span>) solve the
+(e.g. CASTRO <span id="id19">[<a class="reference internal" href="zreferences.html#id11" title="A. S. Almgren, V. E. Beckner, J. B. Bell, M. S. Day, L. H. Howell, C. C. Joggerst, M. J. Lijewski, A. Nonaka, M. Singer, and M. Zingale. CASTRO: A New Compressible Astrophysical Solver. I. Hydrodynamics and Self-gravity. \apj , 715:1221-1238, June 2010. arXiv:1005.0114, doi:10.1088/0004-637X/715/2/1221.">AlmgrenBecknerBell+10</a>]</span> or FLASH <span id="id20">[<a class="reference internal" href="zreferences.html#id12" title="B. Fryxell, K. Olson, P. Ricker, F. X. Timmes, M. Zingale, D. Q. Lamb, P. MacNeice, R. Rosner, J. W. Truran, and H. Tufo. FLASH: An Adaptive Mesh Hydrodynamics Code for Modeling Astrophysical Thermonuclear Flashes. \apjs , 131:273-334, November 2000. doi:10.1086/317361.">FryxellOlsonRicker+00</a>]</span>) solve the
 compressible Euler equations, which can be written in the form:</p>
 <div class="math notranslate nohighlight" id="equation-introduction-6">
 <span class="eqno">(7)<a class="headerlink" href="#equation-introduction-6" title="Permalink to this equation">¶</a></span>\[\Ub_t + \nabla \cdot F(\Ub) = 0\]</div>
@@ -429,7 +430,7 @@ information propagates. For the Euler equations, these are <span class="math not
 compressible equations make use of this wave-nature to compute fluxes
 at the interfaces of grid cells to update the state in time. An
 excellent introduction to these methods is provided by LeVeque’s book
-<span id="id21">[<a class="reference internal" href="zreferences.html#id13">LeVeque02</a>]</span>. The timestep for these methods is limited by the time
+<span id="id21">[<a class="reference internal" href="zreferences.html#id13" title="R. J. LeVeque. Finite Volume Methods for Hyperbolic Problems. Cambridge Texts in Applied Mathematics. Cambridge University Press, 2002.">LeVeque02</a>]</span>. The timestep for these methods is limited by the time
 it takes for the maximum characteristic speed to traverse one grid cell.
 For very subsonic flows, this means that the timestep is dominated by
 the propagation of soundwaves, which may not be important to the
@@ -472,16 +473,16 @@ be computed as</p>
 <p>Because soundwaves are filtered, the timestep constraint now depends only
 on <span class="math notranslate nohighlight">\(|\Ub|\)</span>.</p>
 <p>Extensions to variable-density incompressible
-flows <span id="id23">[<a class="reference internal" href="zreferences.html#id18">BM92</a>]</span> involve a slightly different
+flows <span id="id23">[<a class="reference internal" href="zreferences.html#id18" title="J. B. Bell and D. L. Marcus. A second-order projection method for variable-density flows. Journal of Computational Physics, 101(2):334–348, August 1992.">BM92</a>]</span> involve a slightly different
 decomposition of the velocity field and, as a result, a slightly
 different Poisson equation. There is also a variety of different ways
-to express what is being projected <span id="id24">[<a class="reference internal" href="zreferences.html#id19">ABC00</a>]</span>,
+to express what is being projected <span id="id24">[<a class="reference internal" href="zreferences.html#id19" title="A. S. Almgren, J. B. Bell, and W. Y. Crutchfield. Approximate projection methods: part I. Inviscid analysis. SIAM J. Sci. Comput., 22(4):1139–59, 2000.">ABC00</a>]</span>,
 and different discretizations of the divergence and gradient operators
 lead to slightly different mathematical properties of the methods
 (leading to “approximate
-projections” <span id="id25">[<a class="reference internal" href="zreferences.html#id16">ABS96</a>]</span>). Finally, for
+projections” <span id="id25">[<a class="reference internal" href="zreferences.html#id16" title="A. S. Almgren, J. B. Bell, and W. G. Szymczak. A numerical method for the incompressible Navier-Stokes equations based on an approximate projection. SIAM J. Sci. Comput., 17(2):358–369, March 1996.">ABS96</a>]</span>). Finally, for
 second-order methods, two projections are typically done per timestep.
-The first (the ‘MAC’ projection <span id="id26">[<a class="reference internal" href="zreferences.html#id17">BCH91</a>]</span>)
+The first (the ‘MAC’ projection <span id="id26">[<a class="reference internal" href="zreferences.html#id17" title="J. B. Bell, P. Colella, and L. H. Howell. An efficient second-order projection method for viscous incompressible flow. In Proceedings of the Tenth AIAA Computational Fluid Dynamics Conference, 360–367. AIAA, June 1991.">BCH91</a>]</span>)
 operates on the half-time, edge-centered advective velocities, making
 sure that they satisfy the divergence constraint. These advective
 velocities are used to construct the fluxes through the interfaces to
