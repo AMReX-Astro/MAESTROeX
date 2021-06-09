@@ -20,6 +20,8 @@ void Maestro::MakeVelForce(
     Vector<MultiFab> gradw0_cart(finest_level + 1);
     Vector<MultiFab> grav_cart(finest_level + 1);
     Vector<MultiFab> rho0_cart(finest_level + 1);
+    Vector<MultiFab> lambdabar_cart(finest_level + 1);
+
     for (int lev = 0; lev <= finest_level; ++lev) {
         gradw0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         gradw0_cart[lev].setVal(0.);
@@ -29,6 +31,9 @@ void Maestro::MakeVelForce(
 
         rho0_cart[lev].define(grids[lev], dmap[lev], 1, 1);
         rho0_cart[lev].setVal(0.);
+
+        lambdabar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        lambdabar_cart[lev].setVal(0.);
     }
 
     BaseState<Real> gradw0(base_geom.max_radial_level + 1, base_geom.nr_fine);
@@ -50,6 +55,7 @@ void Maestro::MakeVelForce(
     Put1dArrayOnCart(gradw0, gradw0_cart, false, false, bcs_u, 0, 1);
     Put1dArrayOnCart(rho0, rho0_cart, false, false, bcs_s, Rho);
     Put1dArrayOnCart(grav_cell, grav_cart, false, true, bcs_f, 0);
+    Put1dArrayOnCart(lambdabar, lambdabar_cart, false, false, bcs_f, 0);
 
 #ifdef ROTATION
     Put1dArrayOnCart(w0, w0_cart, 1, 1, bcs_f, 0);
@@ -84,6 +90,7 @@ void Maestro::MakeVelForce(
             const Array4<const Real> w0_force = w0_force_cart[lev].array(mfi);
             const Array4<const Real> grav = grav_cart[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
+            const Array4<const Real> lambdabar_arr = lambdabar_cart[lev].array(mfi);
 
             // output
             const Array4<Real> vel_force = vel_force_cart[lev].array(mfi);
@@ -102,7 +109,13 @@ void Maestro::MakeVelForce(
 #endif
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
+
                     Real rhopert = rho_arr(i, j, k) - rho0_arr(i, j, k);
+
+                    // add hybrid lambdabar correction via rhopert
+                    if (use_lambdabar_term) {
+                        rhopert -= rho_arr(i, j, k) * lambdabar_arr(i, j, k);
+                    }
 
                     // cutoff the buoyancy term if we are outside of the star
                     if (rho_arr(i, j, k) <

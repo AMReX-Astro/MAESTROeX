@@ -159,7 +159,7 @@ plot_spec                           bool            true
 # plot omegadot in plotfile
 plot_omegadot                       bool            true
 
-# plot auxiliary variables in plotfile 
+# plot auxiliary variables in plotfile
 plot_aux                            bool            false
 
 # plot external heating (Hext) in plotfile
@@ -418,7 +418,7 @@ co_latitude                         Real               0.0      y
 rotation_radius                     Real               1.0e6
 
 # include (true) or exclude (false) centrifugal term
-use_centrifugal                bool               true 
+use_centrifugal                bool               true
 
 # maximum mach number before the code aborts
 mach_max_abort                      Real               -1.0
@@ -445,6 +445,19 @@ use_alt_energy_fix                  bool            true        y
 
 # do we include the explicit omegadot terms in the constraint RHS source S?
 use_omegadot_terms_in_S             bool            true        y
+
+# include hybrid \lambdabar term in the momentum equation
+use_lambdabar_term                  bool            false       y
+
+# method to update lambda for hybrid equations;
+# 0 = standard nodal projection,
+# 1 = as 0, but add/subtract lambdabar term in a similar fashion to the gpi term
+# N (>=2) = iterative, updating the lambdabar term in unew N-1 times
+lambda_update_method                int             0           y
+
+# Enforce zero average of the lambdabar term in the nodal projection
+# (required for a closed box with the current nodal projection).
+zero_average_lambda                 bool            false       y
 
 #-----------------------------------------------------------------------------
 # category: thermal diffusion
