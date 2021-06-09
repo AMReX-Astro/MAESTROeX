@@ -53,6 +53,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             const Array4<const Real> rho_Hext_arr = rho_Hext[lev].array(mfi);
             const Array4<Real> rho_omegadot_arr = rho_omegadot[lev].array(mfi);
             const Array4<Real> rho_Hnuc_arr = rho_Hnuc[lev].array(mfi);
+            const Array4<const Real> TempC_arr = TempC[lev].array(mfi);
             const auto tempbar_init_arr = tempbar_init.const_array();
 
             // use a dummy value for non-spherical as tempbar_init_cart is not defined
@@ -198,10 +199,15 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
                 rho_Hnuc_arr(i, j, k) = rhoH;
 
+                // temperature correction factor T_eos / T
+                // (not implemented in reactions)
+                Real Tfac = 1.0;
+                if (use_correct_temp) Tfac = T_in / TempC_arr(i, j, k);
+
                 // update the enthalpy -- include the change due to external heating
                 s_out_arr(i, j, k, RhoH) = s_in_arr(i, j, k, RhoH) +
-                                           dt_in * rho_Hnuc_arr(i, j, k) +
-                                           dt_in * rho_Hext_arr(i, j, k);
+                                           Tfac * dt_in * rho_Hnuc_arr(i, j, k) +
+                                           Tfac * dt_in * rho_Hext_arr(i, j, k);
             });
         }
     }

@@ -1946,6 +1946,10 @@ class Maestro : public amrex::AmrCore {
     /// during a regular time step we overwrite this
     amrex::Vector<amrex::MultiFab> rhcc_for_nodalproj;
 
+    // this stores the thermodynamically consistent temperature
+    // that is updated together with the EOS temperature
+    amrex::Vector<amrex::MultiFab> TempC;
+
     /// spherical only -
     /// we make this persistent in that we only have to rebuild and
     /// fill this after regridding

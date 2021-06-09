@@ -78,10 +78,12 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     sold[lev].define(ba, dm, Nscal, ng_s);
     snew[lev].define(ba, dm, Nscal, ng_s);
     S_cc_old[lev].define(ba, dm, 1, 0);
+    TempC[lev].define(ba, dm, 1, 1);
 
     sold[lev].setVal(0.);
     snew[lev].setVal(0.);
     S_cc_old[lev].setVal(0.);
+    TempC[lev].setVal(0.);
 
     const auto prob_lo = geom[lev].ProbLoArray();
     const auto dx = geom[lev].CellSizeArray();
@@ -110,6 +112,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
         const Box& tileBox = mfi.tilebox();
 
         const Array4<Real> scal = sold[lev].array(mfi);
+        const Array4<Real> TempC_arr = TempC[lev].array(mfi);
 
         // set scalars to zero
         ParallelFor(tileBox, Nscal,
@@ -173,6 +176,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
             scal(i, j, k, Rho) = eos_state.rho;
             scal(i, j, k, RhoH) = eos_state.rho * eos_state.h;
             scal(i, j, k, Temp) = eos_state.T;
+            TempC_arr(i, j, k) = eos_state.T;
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 scal(i, j, k, FirstSpec + comp) =
                     eos_state.xn[comp] * eos_state.rho;

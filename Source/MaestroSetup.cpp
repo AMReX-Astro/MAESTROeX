@@ -187,6 +187,7 @@ void Maestro::Setup() {
     pi.resize(max_level + 1);
     intra.resize(max_level + 1);
     w0_cart.resize(max_level + 1);
+    TempC.resize(max_level + 1);
     rhcc_for_nodalproj.resize(max_level + 1);
     normal.resize(max_level + 1);
     cell_cc_to_r.resize(max_level + 1);
