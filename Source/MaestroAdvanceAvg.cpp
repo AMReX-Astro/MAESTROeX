@@ -808,7 +808,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     }
 
     beta0_nph.copy(0.5 * (beta0_old + beta0_new));
-    gamma1bar_nph.copy(0.5 * (gamma1bar_old + gamma1bar_new));
 
     //////////////////////////////////////////////////////////////////////////////
     // STEP 10 -- compute S^{n+1} for the final projection
