@@ -436,7 +436,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         // only update the dt*grav*lambdabar term in unew when performing an
         // interative update
         if (is_predictor && use_lambdabar_term && !spherical &&
-            lambdabar_update_method >= 2) {
+            lambda_update_method >= 2) {
             Vector<MultiFab> grav_cart(finest_level + 1);
             Vector<MultiFab> lambdabar_cart(finest_level + 1);
             for (int lev = 0; lev <= finest_level; ++lev) {
