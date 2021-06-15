@@ -393,6 +393,13 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
     }
     ++dest_comp;
+    if (plot_tfrompC) {
+        // tfromp correction
+        for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy(TempC[i], 0, dest_comp, 1);
+        }
+        ++dest_comp;
+    }
 
     // compute tfromh
     TfromRhoH(s_in, p0_in);
@@ -401,6 +408,13 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
     }
     ++dest_comp;
+    if (plot_tfromhC) {
+        // tfromh correction
+        for (int i = 0; i <= finest_level; ++i) {
+            plot_mf_data[i]->copy(TempC[i], 0, dest_comp, 1);
+        }
+        ++dest_comp;
+    }
 
     // deltap
     // compute & copy tfromp
@@ -782,12 +796,13 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     // velocities (AMREX_SPACEDIM)
     // magvel, momentum
     // rho, rhoh, h, rhoX, tfromp, tfromh, deltap, deltaT Pi (Nscal+4 -- the extra 4 are h, tfromh, deltap and deltaT)
+    // corrected tfromp, tfromh (2)
     // rho' and rhoh' and t' (3)
     // pioverp0, p0pluspi (2)
     // MachNumber, deltagamma, entropy, entropypert, S
     // thermal, conductivity
 
-    (*nPlot) = AMREX_SPACEDIM + Nscal + 19;
+    (*nPlot) = AMREX_SPACEDIM + Nscal + 21;
 
     if (plot_spec) {
         (*nPlot) += NumSpec + 1;
@@ -895,7 +910,13 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         names[cnt++] = "Hnuc";
     }
     names[cnt++] = "tfromp";
+    if (plot_tfrompC) {
+        names[cnt++] = "tfrompC";
+    }
     names[cnt++] = "tfromh";
+    if (plot_tfromhC) {
+        names[cnt++] = "tfromhC";
+    }
     names[cnt++] = "deltap";
     names[cnt++] = "deltaT";
     names[cnt++] = "Pi";

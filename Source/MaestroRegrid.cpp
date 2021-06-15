@@ -224,6 +224,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     const int ng_w = w0_cart[lev].nGrow();
     const int ng_r = rhcc_for_nodalproj[lev].nGrow();
     const int ng_p = pi[lev].nGrow();
+    const int ng_T = TempC[lev].nGrow();
 #ifdef SDC
     const int ng_i = intra[lev].nGrow();
 #endif
@@ -239,6 +240,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     MultiFab w0_cart_state(ba, dm, AMREX_SPACEDIM, ng_w);
     MultiFab rhcc_for_nodalproj_state(ba, dm, 1, ng_r);
     MultiFab pi_state(convert(ba, nodal_flag), dm, 1, ng_p);
+    MultiFab TempC_state(ba, dm, 1, ng_T);
 #ifdef SDC
     MultiFab intra_state(ba, dm, Nscal, ng_i);
 #endif
@@ -265,6 +267,7 @@ void Maestro::RemakeLevel(int lev, Real time, const BoxArray& ba,
     std::swap(w0_cart_state, w0_cart[lev]);
     std::swap(rhcc_for_nodalproj_state, rhcc_for_nodalproj[lev]);
     std::swap(pi_state, pi[lev]);
+    std::swap(TempC_state, TempC[lev]);
 #ifdef SDC
     FillPatch(lev, time, intra_state, intra, intra, 0, 0, Nscal, 0, bcs_f);
     std::swap(intra_state, intra[lev]);
@@ -305,6 +308,7 @@ void Maestro::MakeNewLevelFromCoarse(int lev, Real time, const BoxArray& ba,
     rhcc_for_nodalproj[lev].define(ba, dm, 1, 1);
 
     pi[lev].define(convert(ba, nodal_flag), dm, 1, 0);  // nodal
+    TempC[lev].define(ba, dm, 1, 1);
 #ifdef SDC
     intra[lev].define(ba, dm, Nscal, 0);
 #endif
@@ -326,6 +330,7 @@ void Maestro::MakeNewLevelFromCoarse(int lev, Real time, const BoxArray& ba,
                     bcs_f);
     FillCoarsePatch(lev, time, gpi[lev], gpi, gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time, dSdt[lev], dSdt, dSdt, 0, 0, 1, bcs_f);
+    FillCoarsePatch(lev, time, TempC[lev], TempC, TempC, 0, 0, 1, bcs_s);
 #ifdef SDC
     FillCoarsePatch(lev, time, intra[lev], intra, intra, 0, 0, Nscal, bcs_f);
 #endif
@@ -349,6 +354,7 @@ void Maestro::ClearLevel(int lev) {
     w0_cart[lev].clear();
     rhcc_for_nodalproj[lev].clear();
     pi[lev].clear();
+    TempC[lev].clear();
 #ifdef SDC
     intra[lev].clear();
 #endif

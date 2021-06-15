@@ -153,6 +153,14 @@ chk_deltat                          Real           -1.0
 # NOT IMPLEMENTED YET
 plot_h_with_use_tfromp              bool            true
 
+# plot thermodynamically consistent temperature based on
+# tfromp
+plot_tfrompC                        bool            false
+
+# plot thermodynamically consistent temperature based on
+# tfromh
+plot_tfromhC                        bool            false
+
 # plot species and omegadot in plotfile
 plot_spec                           bool            true
 
@@ -445,6 +453,10 @@ use_alt_energy_fix                  bool            true        y
 
 # do we include the explicit omegadot terms in the constraint RHS source S?
 use_omegadot_terms_in_S             bool            true        y
+
+# Use the thermodynamically consistent temperature in "externally facing"
+# quantities, e.g. thermal diffusion and external heating.
+use_correct_temp                    bool            false       y
 
 #-----------------------------------------------------------------------------
 # category: thermal diffusion

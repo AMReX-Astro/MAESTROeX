@@ -28,6 +28,7 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
             const Box& tileBox = mfi.tilebox();
 
             const Array4<Real> state = scal[lev].array(mfi);
+            const Array4<Real> TempC_arr = TempC[lev].array(mfi);
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
             if (use_eos_e_instead_of_h_loc) {
@@ -55,6 +56,15 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
                     eos(eos_input_re, eos_state);
 
                     state(i, j, k, Temp) = eos_state.T;
+
+                    // update the thermodynamically consistent temperature
+                    if (use_correct_temp) {
+                        Real pref = eos_state.dpdT /
+                                    (eos_state.dsdT * eos_state.p *
+                                     eos_state.rho * eos_state.gam1);
+                        TempC_arr(i, j, k) = state(i, j, k, Temp)
+                                       + pref * state(i, j, k, Pi);
+                    }
                 });
             } else {
                 // (rho, h) --> T, p
@@ -79,6 +89,15 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
                     eos(eos_input_rh, eos_state);
 
                     state(i, j, k, Temp) = eos_state.T;
+
+                    // update the thermodynamically consistent temperature
+                    if (use_correct_temp) {
+                        Real pref = eos_state.dpdT /
+                                    (eos_state.dsdT * eos_state.p *
+                                     eos_state.rho * eos_state.gam1);
+                        TempC_arr(i, j, k) = state(i, j, k, Temp)
+                                       + pref * state(i, j, k, Pi);
+                    }
                 });
             }
         }
@@ -87,6 +106,12 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
     // average down and fill ghost cells
     AverageDown(scal, Temp, 1);
     FillPatch(t_old, scal, scal, scal, Temp, Temp, 1, Temp, bcs_s);
+
+    if (use_correct_temp) {
+        AverageDown(TempC, 0, 1);
+        FillPatch(t_old, TempC, TempC, TempC, 0, 0, 1, 0, bcs_s);
+    }
+
 }
 
 void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
@@ -113,6 +138,7 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
             // Get the index space of the valid region
             const Box& tileBox = mfi.tilebox();
             const Array4<Real> state = scal[lev].array(mfi);
+            const Array4<Real> TempC_arr = TempC[lev].array(mfi);
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
             // (rho, p) --> T
@@ -143,6 +169,15 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
 
                 state(i, j, k, Temp) = eos_state.T;
 
+                // update the thermodynamically consistent temperature
+                if (use_correct_temp) {
+                    Real pref = eos_state.dpdT /
+                                (eos_state.dsdT * eos_state.p *
+                                 eos_state.rho * eos_state.gam1);
+                    TempC_arr(i, j, k) = state(i, j, k, Temp)
+                                   + pref * state(i, j, k, Pi);
+                }
+
                 if (updateRhoH) {
                     state(i, j, k, RhoH) = eos_state.rho * eos_state.h;
                 }
@@ -153,6 +188,11 @@ void Maestro::TfromRhoP(Vector<MultiFab>& scal, const BaseState<Real>& p0,
     // average down and fill ghost cells (Temperature)
     AverageDown(scal, Temp, 1);
     FillPatch(t_old, scal, scal, scal, Temp, Temp, 1, Temp, bcs_s);
+
+    if (use_correct_temp) {
+        AverageDown(TempC, 0, 1);
+        FillPatch(t_old, TempC, TempC, TempC, 0, 0, 1, 0, bcs_s);
+    }
 
     // average down and fill ghost cells (Enthalpy)
     if (updateRhoH) {

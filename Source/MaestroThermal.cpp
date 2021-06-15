@@ -59,10 +59,17 @@ void Maestro::MakeExplicitThermal(
         mlabec.setScalars(0.0, 1.0);
 
         // set value of phi
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Copy(phi[lev], scal[lev], Temp, 0, 1, 1);
+        // When using the corrected temperature, it is assumed to be consistent
+        // with that stored in scal.
+        if (use_correct_temp) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab::Copy(phi[lev], TempC[lev], 0, 0, 1, 1);
+            }
+        } else {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab::Copy(phi[lev], scal[lev], Temp, 0, 1, 1);
+            }
         }
-
         ApplyThermal(mlabec, resid, Tcoeff, phi, bcs_s, RhoH);
 
         for (int lev = 0; lev <= finest_level; ++lev) {

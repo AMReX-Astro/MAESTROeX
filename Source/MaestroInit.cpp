@@ -60,7 +60,7 @@ void Maestro::Init() {
         ReadCheckPoint();
 
         // build (define) the following MultiFabs (that weren't read in from checkpoint):
-        // snew, unew, S_cc_new, w0_cart, rhcc_for_nodalproj, normal, pi
+        // snew, unew, S_cc_new, w0_cart, rhcc_for_nodalproj, normal, pi, TempC
         for (int lev = 0; lev <= finest_level; ++lev) {
             snew[lev].define(grids[lev], dmap[lev], Nscal, ng_s);
             unew[lev].define(grids[lev], dmap[lev], AMREX_SPACEDIM, ng_s);
@@ -73,6 +73,7 @@ void Maestro::Init() {
             }
             pi[lev].define(convert(grids[lev], nodal_flag), dmap[lev], 1,
                            0);  // nodal
+            TempC[lev].define(grids[lev], dmap[lev], 1, 1);
 #ifdef SDC
             intra[lev].define(grids[lev], dmap[lev], Nscal, 0);  // for sdc
             intra[lev].setVal(0.);
@@ -86,6 +87,7 @@ void Maestro::Init() {
             S_cc_new[lev].setVal(0.);
             unew[lev].setVal(0.);
             snew[lev].setVal(0.);
+            TempC[lev].setVal(0.);
         }
 
         // put w0 on Cartesian cell-centers
@@ -333,6 +335,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     rhcc_for_nodalproj[lev].define(ba, dm, 1, 1);
 
     pi[lev].define(convert(ba, nodal_flag), dm, 1, 0);  // nodal
+    TempC[lev].define(ba, dm, 1, 1);
     intra[lev].define(ba, dm, Nscal, 0);                // for sdc
 
     sold[lev].setVal(0.);
@@ -346,6 +349,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     w0_cart[lev].setVal(0.);
     rhcc_for_nodalproj[lev].setVal(0.);
     pi[lev].setVal(0.);
+    TempC[lev].setVal(0.);
     intra[lev].setVal(0.);
 
     if (spherical) {
