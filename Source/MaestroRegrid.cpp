@@ -51,6 +51,11 @@ void Maestro::Regrid() {
         // created, we need to initialize tempbar_init there, in
         // case drive_initial_convection = T
         RegridBaseState(tempbar_init);
+
+        // regrid lambabar term (it is not reconstructed later)
+        if (use_lambdabar_term) {
+            RegridBaseState(lambdabar);
+        }
     } else {
         // Here we want to fill in the rho0 array so there is
         // valid data in any new grid locations that are created

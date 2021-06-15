@@ -18,7 +18,7 @@ using namespace amrex;
 // rhcc should enter as beta0*(S-Sbar) so we need to multiply by -1 in this routine
 // the projection (done below)
 void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
-                        int istep_divu_iter, bool sdc_off) {
+                        int istep_divu_iter, bool sdc_off, bool is_predictor) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::NodalProj()", NodalProj);
 
@@ -330,6 +330,57 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         mlndlap.setSigma(ilev, sig[ilev]);
     }
 
+    // When using the lambdabar term with a closed box we require the average of
+    // lambda to be zero to remove the degeneracy in phi. Rescale phi here in
+    // order to satisfy that constraint. The steps are as follows:
+    // (1) Construct beta0 / (gamma1bar * p0) and take its radial sum, Bsum
+    // (2) Construct the horizontal average of phi * beta0 / (gamma1bar * p0),
+    //     then take its radial sum, Bphisum
+    // (3) Add C = - Bphisum / Bsum onto phi
+    // N.B. Pi and lambda are not updated in this step
+    if ((proj_type == regular_timestep_comp || proj_type == pressure_iters_comp ) &&
+        use_lambdabar_term && zero_average_lambda) {
+
+        // set lambdabar = 1 / (gamma1bar p0)
+        const auto pg = 0.25 * (p0_new + p0_old) * (gamma1bar_new + gamma1bar_old) ;
+        lambdabar.setVal(1.0);
+        lambdabar /= pg;
+
+        // set time-centered beta0_nph_int = beta0 / (gamma1bar p0)
+        // then construct the radial sum, Bsum
+        auto beta0_nph_int = 0.5 * (beta0_old + beta0_new);
+        beta0_nph_int *= lambdabar;
+        Real Bsum = 0.;
+        auto Bgp = beta0_nph_int.array();
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
+            Bsum += Bgp(0, r);
+        }
+
+        // copy phi to pi
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            MultiFab::Copy(pi[lev], phi[lev], 0, 0, 1, 0);
+        }
+        // snew(Pi) = beta0 * phi
+        MakePiCC(beta0_cart);
+        // beta0_nph_int = Average(beta0 * phi)
+        Average(snew, beta0_nph_int, Pi);
+        // beta0_nph_int = phi * beta0 / (gamma1bar * p0)
+        beta0_nph_int *= lambdabar;
+
+        // sum of beta0 phibar / (gamma1bar * p0)
+        Real Bphisum = 0.;
+        //auto Bphi = beta0_nph.array();
+        for (auto r = 0; r < base_geom.nr_fine; ++r) {
+            Bphisum += Bgp(0, r);
+        }
+
+        // correct phi
+        Real C = - Bphisum / Bsum;
+        for (int lev = 0; lev <= finest_level; ++lev) {
+            phi[lev].plus(C,0);
+        }
+    }
+
     // compute a cell-centered grad(phi) from nodal phi
     Vector<MultiFab> gphi(finest_level + 1);
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -351,24 +402,103 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     // divu_iters_comp:         pi = 0         grad(pi) = 0
     // pressure_iters_comp:     pi = pi + phi  grad(pi) = grad(pi) + grad(phi)
     // regular_timestep_comp:   pi = phi/dt    grad(pi) = grad(phi)/dt
-    if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            pi[lev].setVal(0.);
-            gpi[lev].setVal(0.);
-        }
-    } else if (proj_type == pressure_iters_comp) {
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            MultiFab::Add(pi[lev], phi[lev], 0, 0, 1, 0);
-            MultiFab::Add(gpi[lev], gphi[lev], 0, 0, AMREX_SPACEDIM, 0);
-        }
-    } else if (proj_type == regular_timestep_comp) {
+    if (is_predictor && proj_type == regular_timestep_comp) {
+        // just update Pi
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Copy(pi[lev], phi[lev], 0, 0, 1, 0);
-            MultiFab::Copy(gpi[lev], gphi[lev], 0, 0, AMREX_SPACEDIM, 0);
             pi[lev].mult(1. / dt);
-            gpi[lev].mult(1. / dt);
+        }
+    } else {
+        if (proj_type == initial_projection_comp || proj_type == divu_iters_comp) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                pi[lev].setVal(0.);
+                gpi[lev].setVal(0.);
+            }
+        } else if (proj_type == pressure_iters_comp) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab::Add(pi[lev], phi[lev], 0, 0, 1, 0);
+                MultiFab::Add(gpi[lev], gphi[lev], 0, 0, AMREX_SPACEDIM, 0);
+            }
+        } else if (proj_type == regular_timestep_comp) {
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                MultiFab::Copy(pi[lev], phi[lev], 0, 0, 1, 0);
+                MultiFab::Copy(gpi[lev], gphi[lev], 0, 0, AMREX_SPACEDIM, 0);
+                pi[lev].mult(1. / dt);
+                gpi[lev].mult(1. / dt);
+            }
         }
     }
+
+    // update pi, lambdabar
+    if (proj_type == pressure_iters_comp ||
+        proj_type == regular_timestep_comp) {
+
+        // only update the dt*grav*lambdabar term in unew when performing an
+        // interative update
+        if (is_predictor && use_lambdabar_term && !spherical &&
+            lambda_update_method >= 2) {
+            Vector<MultiFab> grav_cart(finest_level + 1);
+            Vector<MultiFab> lambdabar_cart(finest_level + 1);
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                grav_cart[lev].define(grids[lev], dmap[lev],
+                                      AMREX_SPACEDIM, 1);
+                grav_cart[lev].setVal(0.);
+
+                lambdabar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+                lambdabar_cart[lev].setVal(0.);
+            }
+            // use the time-centered grav
+            auto grav_cell_nph = 0.5 * dt * (grav_cell_old + grav_cell_new);
+            Put1dArrayOnCart(grav_cell_nph, grav_cart, false, true, bcs_f, 0);
+            Put1dArrayOnCart(lambdabar, lambdabar_cart, false, false, bcs_f, 0);
+
+            // multiply grav by lambdabar, and add the result to unew
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+                    MultiFab::Multiply(grav_cart[lev], lambdabar_cart[lev], 0,
+                                       dir, 1, 0);
+                }
+                MultiFab::Subtract(unew[lev], grav_cart[lev], 0, 0,
+                              AMREX_SPACEDIM, 0);
+                for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+                    MultiFab::Divide(grav_cart[lev], lambdabar_cart[lev], 0,
+                                       dir, 1, 0);
+                }
+            }
+
+            // average pi from nodes to cell-centers and store in the Pi component of snew
+            MakePiCC(beta0_cart);
+
+            // update lambdabar
+            auto pg = 0.25 * (p0_new + p0_old) * (gamma1bar_new + gamma1bar_old);
+            Average(snew, lambdabar, Pi);
+            lambdabar /= pg;
+
+            // multiply grav by lambdabar, and subtract the result from unew
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+                    MultiFab::Multiply(grav_cart[lev], lambdabar_cart[lev], 0,
+                                       dir, 1, 0);
+                }
+                MultiFab::Add(unew[lev], grav_cart[lev], 0, 0,
+                              AMREX_SPACEDIM, 0);
+            }
+        } else {
+
+            // average pi from nodes to cell-centers and store in the Pi component of snew
+            MakePiCC(beta0_cart);
+
+            // update lambdabar
+            if (use_lambdabar_term) {
+                auto pg = 0.25 * (p0_new + p0_old) * (gamma1bar_new + gamma1bar_old);
+                Average(snew, lambdabar, Pi);
+                lambdabar /= pg;
+            }
+        }
+    }
+
+    // quit now if iterating
+    if (is_predictor) return;
 
     // update velocity
     // initial_projection_comp: Utilde^0   = Vproj - sig*grad(phi)
@@ -409,6 +539,34 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
             }
             MultiFab::Subtract(Vproj[lev], gphi[lev], 0, 0, AMREX_SPACEDIM, 0);
         }
+        // subtract dt*grav*lambdabar term in the one-step update
+        if (use_lambdabar_term && !spherical && lambda_update_method == 1) {
+            Vector<MultiFab> grav_cart(finest_level + 1);
+            Vector<MultiFab> lambdabar_cart(finest_level + 1);
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                grav_cart[lev].define(grids[lev], dmap[lev],
+                                      AMREX_SPACEDIM, 1);
+                grav_cart[lev].setVal(0.);
+
+                lambdabar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+                lambdabar_cart[lev].setVal(0.);
+            }
+            // use the time-centered grav
+            auto grav_cell_nph = 0.5 * dt * (grav_cell_old + grav_cell_new);
+            Put1dArrayOnCart(grav_cell_nph, grav_cart, false, true, bcs_f, 0);
+            Put1dArrayOnCart(lambdabar, lambdabar_cart, false, false, bcs_f, 0);
+
+            // multiply last grav component by dt*lambdabar, and add the result
+            // to Vproj
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+                    MultiFab::Multiply(grav_cart[lev], lambdabar_cart[lev], 0,
+                                       dir, 1, 0);
+                }
+                MultiFab::Subtract(Vproj[lev], grav_cart[lev], 0, 0,
+                                   AMREX_SPACEDIM, 0);
+            }
+        }
         // Utilde^n+1 = Vproj - sig*grad(phi)
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab::Copy(unew[lev], Vproj[lev], 0, 0, AMREX_SPACEDIM, 0);
@@ -423,12 +581,6 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     // fill ghost cells
     FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
     FillPatch(t_new, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-
-    if (proj_type == pressure_iters_comp ||
-        proj_type == regular_timestep_comp) {
-        // average pi from nodes to cell-centers and store in the Pi component of snew
-        MakePiCC(beta0_cart);
-    }
 }
 
 // fill in Vproj
@@ -470,6 +622,34 @@ void Maestro::CreateUvecForProj(int proj_type, Vector<MultiFab>& Vproj,
             // revert gpi/rhohalf back to gpi
             for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
                 MultiFab::Multiply(gpi[lev], sig[lev], 0, dir, 1, 0);
+            }
+        }
+
+        // subtract out dt*grav*lambdabar term in the one-step update
+        if (use_lambdabar_term && !spherical && lambda_update_method == 1) {
+            Vector<MultiFab> grav_cart(finest_level + 1);
+            Vector<MultiFab> lambdabar_cart(finest_level + 1);
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                grav_cart[lev].define(grids[lev], dmap[lev],
+                                      AMREX_SPACEDIM, 1);
+                grav_cart[lev].setVal(0.);
+
+                lambdabar_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+                lambdabar_cart[lev].setVal(0.);
+            }
+            // use the time-centered grav
+            auto grav_cell_nph = 0.5 * dt * (grav_cell_old + grav_cell_new);
+            Put1dArrayOnCart(grav_cell_nph, grav_cart, false, true, bcs_f, 0);
+            Put1dArrayOnCart(lambdabar, lambdabar_cart, false, false, bcs_f, 0);
+
+            // multiply grav by lambdabar, and add the result to Vproj
+            for (int lev = 0; lev <= finest_level; ++lev) {
+                for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
+                    MultiFab::Multiply(grav_cart[lev], lambdabar_cart[lev], 0,
+                                       dir, 1, 0);
+                }
+                MultiFab::Add(Vproj[lev], grav_cart[lev], 0, 0,
+                              AMREX_SPACEDIM, 0);
             }
         }
     } else {
@@ -671,9 +851,9 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart) {
                     0.25 * (pi_arr(i, j, k) + pi_arr(i + 1, j, k) +
                             pi_arr(i, j + 1, k) + pi_arr(i + 1, j + 1, k));
 #else
-                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
-                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1) 
-                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1) 
+                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k)
+                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1)
+                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1)
                     + pi_arr(i,j+1,k+1) + pi_arr(i+1,j+1,k+1));
 #endif
                 if (use_alt_energy_fix_loc) {

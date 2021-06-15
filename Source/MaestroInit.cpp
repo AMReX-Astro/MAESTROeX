@@ -120,6 +120,8 @@ void Maestro::Init() {
     // make gravity
     MakeGravCell(grav_cell_old, rho0_old);
 
+    if (use_lambdabar_term) lambdabar.setVal(0.);
+
     if (restart_file.empty()) {
         // compute gamma1bar
         MakeGamma1bar(sold, gamma1bar_old, p0_old);

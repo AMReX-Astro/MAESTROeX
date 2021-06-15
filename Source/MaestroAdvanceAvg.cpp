@@ -939,6 +939,14 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     const Real start_total_nodalproj = ParallelDescriptor::second();
 
     // call nodal projection
+    // if updating the lambdabar term iteratively, call the nodal projection
+    // to update only that term in unew, before making a final update
+    if (use_lambdabar_term && lambda_update_method >= 2) {
+        for (int iter = 1; iter < lambda_update_method; ++iter) {
+        // extra interations of the lambdabar term
+            NodalProj(proj_type, rhcc_for_nodalproj, is_predictor = true);
+        }
+    }
     NodalProj(proj_type, rhcc_for_nodalproj);
 
     // wallclock time
@@ -954,12 +962,6 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         }
         AverageDown(unew, 0, AMREX_SPACEDIM);
         FillPatch(t_new, unew, unew, unew, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-
-        // reset w0
-        w0.setVal(0.);
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            w0_cart[lev].setVal(0.);
-        }
     }
 
     beta0_nm1.copy(0.5 * (beta0_old + beta0_new));

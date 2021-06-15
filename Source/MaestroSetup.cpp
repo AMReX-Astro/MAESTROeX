@@ -134,6 +134,7 @@ void Maestro::Setup() {
     grav_cell_new.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
     etarho_cc.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
     psi.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
+    lambdabar.resize(base_geom.max_radial_level + 1, base_geom.nr_fine);
 
     // vectors store the multilevel 1D states as one very long array
     // these are edge-centered

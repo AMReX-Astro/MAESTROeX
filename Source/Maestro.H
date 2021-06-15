@@ -1253,7 +1253,8 @@ class Maestro : public amrex::AmrCore {
 
     /// Perform a nodal projection
     void NodalProj(int proj_type, amrex::Vector<amrex::MultiFab>& rhcc,
-                   int istep_divu_iter = 0, bool sdc_off = true);
+                   int istep_divu_iter = 0, bool sdc_off = true,
+                   bool is_predictor = false);
 
     /// Fill in `Vproj`
     ///
@@ -1983,6 +1984,7 @@ class Maestro : public amrex::AmrCore {
     BaseState<amrex::Real> gamma1bar_new;
     BaseState<amrex::Real> etarho_cc;
     BaseState<amrex::Real> psi;
+    BaseState<amrex::Real> lambdabar;
     BaseState<amrex::Real> grav_cell_old;
     BaseState<amrex::Real> grav_cell_new;
     /// `p0^{n-1}` needed to compute `d(p0)/dt` for nonuniform grid spacing
