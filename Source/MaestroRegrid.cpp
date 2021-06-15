@@ -330,9 +330,9 @@ void Maestro::MakeNewLevelFromCoarse(int lev, Real time, const BoxArray& ba,
                     bcs_f);
     FillCoarsePatch(lev, time, gpi[lev], gpi, gpi, 0, 0, AMREX_SPACEDIM, bcs_f);
     FillCoarsePatch(lev, time, dSdt[lev], dSdt, dSdt, 0, 0, 1, bcs_f);
-    FillCoarsePatch(lev, time, TempC[lev], TempC, TempC, 0, 0, 1, bcs_f);
+    FillCoarsePatch(lev, time, TempC[lev], TempC, TempC, 0, 0, 1, bcs_s);
 #ifdef SDC
-    FillCoarsePatch(lev, time, intra[lev], intra, intra, 0, 0, Nscal, bcs_s);
+    FillCoarsePatch(lev, time, intra[lev], intra, intra, 0, 0, Nscal, bcs_f);
 #endif
 }
 
