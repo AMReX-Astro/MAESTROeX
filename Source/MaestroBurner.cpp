@@ -202,7 +202,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 // temperature correction factor T_eos / T
                 // (not implemented in reactions)
                 Real Tfac = 1.0;
-                if (use_correct_temp) Tfac = T_in / TempC_arr(i, j, k);
+                if (use_correct_temp) {
+                    Tfac = s_in_arr(i, j, k, Temp) / TempC_arr(i, j, k);
+                }
 
                 // update the enthalpy -- include the change due to external heating
                 s_out_arr(i, j, k, RhoH) = s_in_arr(i, j, k, RhoH) +
