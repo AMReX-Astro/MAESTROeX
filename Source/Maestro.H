@@ -2070,6 +2070,8 @@ class Maestro : public amrex::AmrCore {
         plotInitProj = -9999998,
         plotDivuIter = -9999997
     };
+
+    std::string algo_step;
 };
 
 #endif
