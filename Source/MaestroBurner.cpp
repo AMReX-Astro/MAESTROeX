@@ -42,7 +42,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     react_in_varnames.push_back("rho");
     react_in_varnames.push_back("temp");
     react_out_varnames.push_back("enuc");
-    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
+    const bool save_react_data = istep > 2 && save_react_int > 0 && istep % save_react_int == 0;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
@@ -257,10 +257,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         react_in_name = react_in_name + "_" + algo_step;
         react_out_name = react_out_name + "_" + algo_step;
         Vector<int> step_array(finest_level+1, istep);
-        WriteMultiLevelPlotfile(react_in_name, finest_level + 1, GetVecOfConstPtrs(react_in), react_in_varnames,
-                                Geom(), time_in, step_array, refRatio());
+	WriteMultiLevelPlotfile(react_in_name, finest_level + 1, GetVecOfConstPtrs(react_in), react_in_varnames,
+                                Geom(), dt_in, step_array, refRatio());
         WriteMultiLevelPlotfile(react_out_name, finest_level + 1, GetVecOfConstPtrs(react_out), react_out_varnames,
-                                Geom(), time_in, step_array, refRatio());
+                                Geom(), dt_in, step_array, refRatio());
     }
 }
 
