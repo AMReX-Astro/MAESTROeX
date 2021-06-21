@@ -42,7 +42,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     react_in_varnames.push_back("rho");
     react_in_varnames.push_back("temp");
     react_out_varnames.push_back("enuc");
-    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
+    const bool save_react_data = istep > 2 && save_react_int > 0 && istep % save_react_int == 0;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
