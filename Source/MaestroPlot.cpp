@@ -240,6 +240,41 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         tempmf_scalar2[i].define(grids[i], dmap[i], 1, 0);
     }
 
+    Vector<std::array<MultiFab, AMREX_SPACEDIM> > w0mac(finest_level + 1);
+    Vector<MultiFab> w0r_cart(finest_level + 1);
+
+    for (int lev = 0; lev <= finest_level; ++lev) {
+        if (spherical) {
+            // w0mac will contain an edge-centered w0 on a Cartesian grid,
+            // for use in computing divergences.
+            AMREX_D_TERM(
+                w0mac[lev][0].define(convert(grids[lev], nodal_flag_x),
+                                     dmap[lev], 1, 1);
+                , w0mac[lev][1].define(convert(grids[lev], nodal_flag_y),
+                                       dmap[lev], 1, 1);
+                , w0mac[lev][2].define(convert(grids[lev], nodal_flag_z),
+                                       dmap[lev], 1, 1););
+            for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
+                w0mac[lev][idim].setVal(0.);
+            }
+        }
+
+        // w0r_cart is w0 but onto a Cartesian grid in cell-centered as
+        // a scalar.  Since w0 is the radial expansion velocity, w0r_cart
+        // is the radial w0 in a zone
+        w0r_cart[lev].define(grids[lev], dmap[lev], 1, 1);
+        w0r_cart[lev].setVal(0.);
+    }
+
+    if (evolve_base_state && !average_base_state) {
+#if (AMREX_SPACEDIM == 3)
+        if (spherical) {
+            MakeW0mac(w0mac);
+        }
+#endif
+        Put1dArrayOnCart(w0, w0r_cart, true, false, bcs_u, 0);
+    }
+
     // velocity
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(u_in[i], 0, dest_comp, AMREX_SPACEDIM);
@@ -247,7 +282,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     dest_comp += AMREX_SPACEDIM;
 
     // magvel
-    MakeMagvel(u_in, tempmf);
+    MakeMagvel(u_in, w0mac, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
         plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
     }
@@ -504,41 +539,6 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
             plot_mf_data[i]->copy(p0_cart[i], 0, dest_comp + 3, 1);
         }
         dest_comp += 4;
-    }
-
-    Vector<std::array<MultiFab, AMREX_SPACEDIM> > w0mac(finest_level + 1);
-    Vector<MultiFab> w0r_cart(finest_level + 1);
-
-    for (int lev = 0; lev <= finest_level; ++lev) {
-        if (spherical) {
-            // w0mac will contain an edge-centered w0 on a Cartesian grid,
-            // for use in computing divergences.
-            AMREX_D_TERM(
-                w0mac[lev][0].define(convert(grids[lev], nodal_flag_x),
-                                     dmap[lev], 1, 1);
-                , w0mac[lev][1].define(convert(grids[lev], nodal_flag_y),
-                                       dmap[lev], 1, 1);
-                , w0mac[lev][2].define(convert(grids[lev], nodal_flag_z),
-                                       dmap[lev], 1, 1););
-            for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
-                w0mac[lev][idim].setVal(0.);
-            }
-        }
-
-        // w0r_cart is w0 but onto a Cartesian grid in cell-centered as
-        // a scalar.  Since w0 is the radial expansion velocity, w0r_cart
-        // is the radial w0 in a zone
-        w0r_cart[lev].define(grids[lev], dmap[lev], 1, 1);
-        w0r_cart[lev].setVal(0.);
-    }
-
-    if (evolve_base_state) {
-#if (AMREX_SPACEDIM == 3)
-        if (spherical) {
-            MakeW0mac(w0mac);
-        }
-#endif
-        Put1dArrayOnCart(w0, w0r_cart, true, false, bcs_u, 0);
     }
 
     // Mach number
@@ -1330,26 +1330,10 @@ void Maestro::WriteBuildInfo() {
 }
 
 void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
-                         Vector<MultiFab>& magvel) {
+                         const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
+			 Vector<MultiFab>& magvel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()", MakeMagvel);
-
-#if (AMREX_SPACEDIM == 3)
-
-    Vector<std::array<MultiFab, AMREX_SPACEDIM> > w0mac(finest_level + 1);
-
-    if (spherical) {
-        for (int lev = 0; lev <= finest_level; ++lev) {
-            w0mac[lev][0].define(convert(grids[lev], nodal_flag_x), dmap[lev],
-                                 1, 1);
-            w0mac[lev][1].define(convert(grids[lev], nodal_flag_y), dmap[lev],
-                                 1, 1);
-            w0mac[lev][2].define(convert(grids[lev], nodal_flag_z), dmap[lev],
-                                 1, 1);
-        }
-        MakeW0mac(w0mac);
-    }
-#endif
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
@@ -1367,14 +1351,18 @@ void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
-                    Real v_total =
-                        vel_arr(i, j, k, 1) +
-                        0.5 * (w0_arr(i, j, k, 1) + w0_arr(i, j + 1, k, 1));
-                    magvel_arr(i, j, k) =
+		    Real v_total = vel_arr(i, j, k, 1);
+		    if (!average_base_state) {
+			v_total += 0.5 * (w0_arr(i, j, k, 1) + w0_arr(i, j + 1, k, 1));
+		    }
+		    magvel_arr(i, j, k) =
                         sqrt(vel_arr(i, j, k, 0) * vel_arr(i, j, k, 0) +
                              v_total * v_total);
 #else
-                    Real w_total = vel_arr(i,j,k,2) + 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
+                    Real w_total = vel_arr(i,j,k,2);
+		    if (!average_base_state) {
+			w_total += 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
+		    }
                     magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
                         vel_arr(i,j,k,1)*vel_arr(i,j,k,1) + 
                         w_total*w_total);
