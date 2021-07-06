@@ -209,6 +209,9 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
     // initialize to zero
     Sbar.setVal(0.);
     w0.setVal(0.);
+    for (int lev = 0; lev <= finest_level; ++lev) {
+	w0_cart[lev].setVal(0.);
+    }
 
     // set dummy variables to zero
     w0_force_dummy.setVal(0.);
