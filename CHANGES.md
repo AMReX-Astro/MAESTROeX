@@ -1,3 +1,11 @@
+# 21.07
+
+  * Fix sphinx4 latex macro rendering 
+
+# 21.06
+
+  * Change blocking factor to 8
+
 # 21.05
 
   * Fix labels for tfromp and tfromh in output files
