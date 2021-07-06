@@ -814,35 +814,40 @@ $X$ separately.</p></td>
 <td><p>turn on the etarho term as described in flow chart</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">slope_order</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">add_pb</span></code></p></td>
+<td><p>turns on pressure correction to make the top an
+impenetrable boundary</p></td>
+<td><p>false</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">slope_order</span></code></p></td>
 <td><p>order of slopes in piecewise linear Godunov algorithm.
 Options are 0, 2, or 4.</p></td>
 <td><p>4</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></p></td>
 <td><p>the gravitational acceleration (cm~s$^{-2}$) for plane-
 parallel geometry</p></td>
 <td><p>-1.5e10</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></p></td>
 <td><p>0 = no ppm (piecewise linear slopes instead) newline 1
 = 1984 ppm newline 2 = Hybrid Sekora/Colella and
 McCorquodale/Colella 2009/2010 ppm</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></p></td>
 <td><p>0 = use ppm instead for multi-d integrator newline 1 =
 bilinear</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></p></td>
 <td><p>if 1, then perform parabolic reconstruction on the
 forces used in the prediction and trace under the
 parabola to the interfaces the amount that can reach
 the interface over dt</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
 <td><p>what type of coefficient to use inside the velocity
 divergence constraint. newline {tt beta0_type} = 1
 uses $beta_0$; newline {tt beta0_type} = 2 uses
@@ -850,47 +855,47 @@ $rho_0$ (anelastic); newline {tt beta0_type} = 3
 uses 1 (small-scale combustion).</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
 <td><p>how to represent gravity in the $beta_0$ integration:
 true = piecewise linear false = piecewise constant</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rotational_frequency</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rotational_frequency</span></code></p></td>
 <td><p>rotational frequency used for computing centrifugal
 term in rotation problems.</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">co_latitude</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">co_latitude</span></code></p></td>
 <td><p>latitude, in radians, for problems with rotation where
 the domain is only a subset of a full star.</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rotation_radius</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rotation_radius</span></code></p></td>
 <td><p>radius used for computing centrifugal term in rotation
 problems</p></td>
 <td><p>1.0e6</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_centrifugal</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_centrifugal</span></code></p></td>
 <td><p>include (true) or exclude (false) centrifugal term</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
 <td><p>maximum mach number before the code aborts</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
 <td><p>freeze the temperature used in the reaction network to
 the initial value.  This is useful for developing an
 initial convective field to carry away the energy,
 while preventing the reactions from going nonlinear.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
 <td><p>timestep beyond which we set {tt
 drive_initial_convection} = F</p></td>
 <td><p>-1</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
 <td><p>restart the simulation using a result from a {tt
 drive_initial_convection} = T run note that this uses
 the restart variable to specify which file to restart
@@ -899,13 +904,13 @@ the restart file, the time and timestep number are
 zeroed.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
 <td><p>modify the momentum equation to have $(beta_0/rho)
 nabla (pi/beta_0)$ instead of just $(1/rho) nabla
 (pi)$</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
 <td><p>do we include the explicit omegadot terms in the
 constraint RHS source S?</p></td>
 <td><p>true</p></td>
