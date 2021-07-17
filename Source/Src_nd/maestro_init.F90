@@ -15,13 +15,14 @@ module maestro_init_module
 contains
 
   subroutine maestro_network_init() bind(C, name="maestro_network_init")
+#ifndef CXX_REACTIONS
     ! Binds to C function ``maestro_network_init``
 
-!    use actual_rhs_module, only: actual_rhs_init
+    use actual_rhs_module, only: actual_rhs_init
 
     call network_init()
-!    call actual_rhs_init()
-
+    call actual_rhs_init()
+#endif
   end subroutine maestro_network_init
 
   ! :::
@@ -29,6 +30,7 @@ contains
   ! :::
 
   subroutine maestro_eos_init() bind(C, name="maestro_eos_init")
+#ifndef CXX_EOS
     ! Binds to C function ``maestro_eos_init``
     
     use eos_module, only: eos_init
@@ -66,7 +68,7 @@ contains
      ! may be modified coming back out of this routine.
  
      call eos_init(small_dens=small_dens, small_temp=small_temp)
-
+#endif
   end subroutine maestro_eos_init
 
 end module maestro_init_module

@@ -1,5 +1,6 @@
 module burner_loop_module
 
+#ifndef CXX_REACTIONS
   use amrex_error_module
   use burner_module
   use burn_type_module, only: burn_t
@@ -9,6 +10,7 @@ module burner_loop_module
        burning_cutoff_density_lo, burning_cutoff_density_hi, reaction_sum_tol, &
        drive_initial_convection
   use base_state_geometry_module, only: max_radial_level, nr_fine
+#endif
 
   implicit none
 
@@ -25,11 +27,11 @@ module burner_loop_module
 contains
 
   subroutine burner_loop_init()
-
+#ifndef CXX_REACTIONS
       allocate(ispec_threshold)
 
       ispec_threshold = network_species_index(burner_threshold_species)
-
+#endif
   end subroutine burner_loop_init
 
 #ifndef SDC
@@ -43,7 +45,7 @@ contains
        tempbar_init_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
-
+#ifndef CXX_REACTIONS
     use burn_type_module, only : copy_burn_t
 
     implicit none
@@ -218,7 +220,7 @@ contains
           enddo
        enddo
     enddo
-
+#endif
   end subroutine burner_loop
 
   subroutine burner_loop_sphr(lo, hi, &
@@ -230,7 +232,7 @@ contains
        tempbar_init_cart, t_lo, t_hi, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
-
+#ifndef CXX_REACTIONS
     use burn_type_module, only : copy_burn_t
 
     implicit none
@@ -400,7 +402,7 @@ contains
           enddo
        enddo
     enddo
-
+#endif
   end subroutine burner_loop_sphr
 
 #else
@@ -412,7 +414,7 @@ contains
        p0_in, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop")
-
+#ifndef CXX_REACTIONS
     use sdc_type_module, only: sdc_t
     use integrator_module, only: integrator
     
@@ -546,7 +548,7 @@ contains
           enddo
        enddo
     enddo
-
+#endif
   end subroutine burner_loop
 
   subroutine burner_loop_sphr(lo, hi, &
@@ -556,7 +558,7 @@ contains
        p0_cart, t_lo, t_hi, dt_in, time_in, &
        mask,     m_lo, m_hi, use_mask) &
        bind (C,name="burner_loop_sphr")
-
+#ifndef CXX_REACTIONS
     use sdc_type_module, only: sdc_t
     use integrator_module, only: integrator
 
@@ -686,13 +688,13 @@ contains
           enddo
        enddo
     enddo
-    
+#endif
   end subroutine burner_loop_sphr
 #endif
 
   subroutine instantaneous_reaction_rates(lo,hi, rho_omegadot,o_lo,o_hi, &
        rho_Hnuc,h_lo,h_hi, scal,s_lo,s_hi) bind(C,name="instantaneous_reaction_rates")
-
+#ifndef CXX_REACTIONS
     use network, only: aion, nspec_evolve
     use actual_rhs_module, only: actual_rhs
     use amrex_constants_module   , only: ZERO
@@ -778,6 +780,6 @@ contains
           end do
        end do
     end do
-
+#endif
   end subroutine instantaneous_reaction_rates
 end module burner_loop_module
