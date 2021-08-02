@@ -1,3 +1,7 @@
+# 21.08
+
+  * Pressure correction for impenetrable top boundary for planar problems
+
 # 21.07
 
   * Fix sphinx4 latex macro rendering 
