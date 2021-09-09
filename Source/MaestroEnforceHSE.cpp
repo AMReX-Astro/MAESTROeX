@@ -201,9 +201,9 @@ void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
     // make sure we are integrating "from the top"
     // we use the coarsest level as the reference point
     if (add_pb && !spherical) {
-        offset =  - 1.0 * p0b;
+        offset = -1.0 * p0b;
     } else {
-        offset =  p0(0, base_geom.nr(0) - 1) - p0old(0, base_geom.nr(0) - 1);
+        offset = p0(0, base_geom.nr(0) - 1) - p0old(0, base_geom.nr(0) - 1);
     }
 
     // offset level 0
