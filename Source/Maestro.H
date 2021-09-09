@@ -1335,10 +1335,9 @@ class Maestro : public amrex::AmrCore {
     void WriteJobInfo(const std::string& dir) const;
 
     /// Calculate the magnitude of the velocity
-    void MakeMagvel(
-        const amrex::Vector<amrex::MultiFab>& vel,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        amrex::Vector<amrex::MultiFab>& magvel);
+    void MakeMagvel(const amrex::Vector<amrex::MultiFab>& vel,
+                    const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
+                    amrex::Vector<amrex::MultiFab>& magvel);
 
     /// Calculate the radial and circular components of the velocity
     void MakeVelrc(const amrex::Vector<amrex::MultiFab>& vel,

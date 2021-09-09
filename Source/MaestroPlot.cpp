@@ -1329,10 +1329,9 @@ void Maestro::WriteBuildInfo() {
     std::cout << "\n\n";
 }
 
-void Maestro::MakeMagvel(
-    const Vector<MultiFab>& vel,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
-    Vector<MultiFab>& magvel) {
+void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
+                         const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
+                         Vector<MultiFab>& magvel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()", MakeMagvel);
 
