@@ -1329,9 +1329,10 @@ void Maestro::WriteBuildInfo() {
     std::cout << "\n\n";
 }
 
-void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
-                         const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
-			 Vector<MultiFab>& magvel) {
+void Maestro::MakeMagvel(
+    const Vector<MultiFab>& vel,
+    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
+    Vector<MultiFab>& magvel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()", MakeMagvel);
 
@@ -1351,18 +1352,19 @@ void Maestro::MakeMagvel(const Vector<MultiFab>& vel,
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
-		    Real v_total = vel_arr(i, j, k, 1);
-		    if (!average_base_state) {
-			v_total += 0.5 * (w0_arr(i, j, k, 1) + w0_arr(i, j + 1, k, 1));
-		    }
-		    magvel_arr(i, j, k) =
+                    Real v_total = vel_arr(i, j, k, 1);
+                    if (!average_base_state) {
+                        v_total +=
+                            0.5 * (w0_arr(i, j, k, 1) + w0_arr(i, j + 1, k, 1));
+                    }
+                    magvel_arr(i, j, k) =
                         sqrt(vel_arr(i, j, k, 0) * vel_arr(i, j, k, 0) +
                              v_total * v_total);
 #else
                     Real w_total = vel_arr(i,j,k,2);
-		    if (!average_base_state) {
-			w_total += 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
-		    }
+                    if (!average_base_state) {
+                        w_total += 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
+                    }
                     magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
                         vel_arr(i,j,k,1)*vel_arr(i,j,k,1) + 
                         w_total*w_total);

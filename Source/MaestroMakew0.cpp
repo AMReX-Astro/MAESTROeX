@@ -174,11 +174,11 @@ void Maestro::Makew0Planar(
                                delta_chi_w0 * dr_lev;
             }
             // add the pressure correction for a closed box for n == 0
-            if (n == 0  && add_pb) {
+            if (n == 0 && add_pb) {
                 const int k = base_geom.r_end_coord(n, j) + 1;
                 p0bdot = w0_arr(n, k) / int1_over_gamma1bar_p0_planar(k);
                 // set p0b for use in EnforceHSE
-                p0b    = p0bdot * dt;
+                p0b = p0bdot * dt;
                 for (auto r = base_geom.r_start_coord(n, j) + 1;
                      r <= base_geom.r_end_coord(n, j) + 1; ++r) {
                     w0_arr(n, r) -= p0bdot * int1_over_gamma1bar_p0_planar(r);
