@@ -159,7 +159,7 @@ plot_spec                           bool            true
 # plot omegadot in plotfile
 plot_omegadot                       bool            true
 
-# plot auxiliary variables in plotfile 
+# plot auxiliary variables in plotfile
 plot_aux                            bool            false
 
 # plot external heating (Hext) in plotfile
@@ -374,6 +374,9 @@ use_delta_gamma1_term               bool            true        y
 
 # turn on the etarho term as described in flow chart
 use_etarho                          bool            true
+
+# turns on pressure correction to make the top an impenetrable boundary
+add_pb                              bool            false
 
 # order of slopes in piecewise linear Godunov algorithm.  Options are 0, 2, or 4.
 slope_order                         int            4              y
