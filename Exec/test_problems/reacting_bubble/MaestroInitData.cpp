@@ -183,7 +183,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 scal_arr(i, j, k, FirstAux + iabar) +=
                     scal_arr(i, j, k, FirstSpec + comp) * aion_inv[comp];
                 scal_arr(i, j, k, FirstAux + ibea) +=
-                    scal_arr(i, j, k, FirstSpec + comp) * aprox19::bion(comp) *
+                    scal_arr(i, j, k, FirstSpec + comp) * aprox19::bion(comp+1) *
                     aion_inv[comp];
             }
 
@@ -258,7 +258,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                         scal_arr(i, j, k, FirstSpec + comp) * aion_inv[comp];
                     scal_arr(i, j, k, FirstAux + ibea) +=
                         scal_arr(i, j, k, FirstSpec + comp) *
-                        aprox19::bion(comp) * aion_inv[comp];
+                        aprox19::bion(comp+1) * aion_inv[comp];
                 }
 
                 scal_arr(i, j, k, FirstAux + iabar) =
