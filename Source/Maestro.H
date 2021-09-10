@@ -28,6 +28,11 @@ using namespace maestro;
 #include <PhysBCFunctMaestro.H>
 #include <SimpleLog.H>
 
+/// Include pytorch library if using ML model
+#ifdef ML
+#include <torch/script.h> 
+#endif
+
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
 /// this will be stored in CUDA managed memory.
 #ifdef AMREX_USE_CUDA
@@ -2071,6 +2076,12 @@ class Maestro : public amrex::AmrCore {
     Real p0bdot;
     Real p0b;
 
+    /// ML model
+#ifdef ML
+    bool use_ml;
+    torch::jit::script::Module module;
+#endif
+    
     /// flag for writing plotfiles
     enum plotfile_flag {
         plotInitData = -9999999,
