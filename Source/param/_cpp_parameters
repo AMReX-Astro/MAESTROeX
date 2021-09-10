@@ -212,6 +212,7 @@ plot_pidivu                         bool            false
 # small plot file variables
 small_plot_vars                     string          "rho p0 magvel"
 
+
 #-----------------------------------------------------------------------------
 # category: algorithm initialization
 #-----------------------------------------------------------------------------
@@ -293,7 +294,6 @@ sponge_start_factor                 Real               3.333e0          y
 # plot fdamp rather than sponge
 # assumes sponge has the form 1/(1+dt*{\tt sponge\_kappa}*fdamp)
 plot_sponge_fdamp                   bool            false
-
 
 # The density below which we modify the constraint to look like
 # the anelastic constraint, instead of the low Mach constraint.  This
@@ -398,7 +398,6 @@ bds_type                            int            0
 # amount that can reach the interface over dt
 ppm_trace_forces                    int            0           y
 
-
 # what type of coefficient to use inside the velocity divergence constraint. @@
 # {\tt beta0\_type} = 1 uses $\beta_0$; @@
 # {\tt beta0\_type} = 2 uses $\rho_0$ (anelastic); @@
@@ -441,13 +440,13 @@ stop_initial_convection            int              -1
 # time and timestep number are zeroed.
 restart_with_vel_field              bool            false
 
-
 # modify the momentum equation to have $(\beta_0/\rho) \nabla (\pi/\beta_0)$
 # instead of just $(1/\rho) \nabla (\pi)$
 use_alt_energy_fix                  bool            true        y
 
 # do we include the explicit omegadot terms in the constraint RHS source S?
 use_omegadot_terms_in_S             bool            true        y
+
 
 #-----------------------------------------------------------------------------
 # category: thermal diffusion
@@ -467,7 +466,6 @@ thermal_diffusion_type              int            1        y
 # apply the conductivity limiting---if T, then we set the thermal coefficients
 # all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}
 limit_conductivity                  bool            false      y
-
 
 
 #-----------------------------------------------------------------------------
@@ -490,6 +488,7 @@ do_subgrid_burning                  bool            false
 # mass fraction sum tolerance (if they don't sum to 1 within this tolerance,
 # we abort)
 reaction_sum_tol                    Real               1.e-10   y
+
 
 #-----------------------------------------------------------------------------
 # category: EOS
@@ -538,6 +537,7 @@ s0mac_interp_type                   int            1        y
 # 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
 # 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
 w0mac_interp_type                   int            1          y
+
 
 #-----------------------------------------------------------------------------
 # category: diagnostics, I/O
@@ -621,7 +621,15 @@ sdc_couple_mac_velocity             bool            false
 
 # The nodal solve is non-deterministic on the GPU. Should it instead be run 
 # on the CPU to give a deterministic solution?
-deterministic_nodal_solve           bool false
+deterministic_nodal_solve           bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: machine learned model
+#-----------------------------------------------------------------------------
+
+# Where the ml model is located.  Empty string means do not use model.
+ml_model_file                       string          "" 
 
 
 #-----------------------------------------------------------------------------
