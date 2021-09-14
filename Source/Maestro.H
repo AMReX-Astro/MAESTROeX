@@ -30,7 +30,7 @@ using namespace maestro;
 
 /// Include pytorch library if using ML model
 #ifdef ML
-#include <torch/script.h> 
+#include <TorchLib.H> 
 #endif
 
 /// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then

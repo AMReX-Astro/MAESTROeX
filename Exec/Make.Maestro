@@ -56,7 +56,7 @@ endif
 ifdef USE_CUDA
   ifeq ($(USE_CUDA),TRUE)
     USE_GPU_PRAGMA = TRUE
-    DEFINES += -DCUDA
+    DEFINES += -DUSE_CUDA
   endif
 endif
 
