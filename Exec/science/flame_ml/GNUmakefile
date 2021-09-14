@@ -4,6 +4,7 @@ COMP	   = gnu
 USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
+USE_ML     = FALSE
 
 TINY_PROFILE = FALSE
 PROFILE      = FALSE # TRUE overrides TINY_PROFILE
@@ -18,7 +19,7 @@ MAESTROEX_HOME  := ../../..
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ignition_simple
+NETWORK_DIR      := aprox13
 INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package

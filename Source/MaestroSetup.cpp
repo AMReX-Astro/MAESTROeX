@@ -226,7 +226,7 @@ void Maestro::Setup() {
     // if model file is provided, load model
     if (ml_model_file.empty()) {
 	use_ml = false;
-	Print() << "Warning: No ML model file provided! Will not use ML.";
+	Print() << "Warning: No ML model file provided! Will not use ML." << std::endl;
     } else {
 	use_ml = true;
 
