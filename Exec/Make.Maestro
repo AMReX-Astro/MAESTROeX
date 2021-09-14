@@ -48,13 +48,16 @@ EXTERN_CORE ?=
 ifeq ($(USE_SDC), TRUE)
   USERSuffix = .SDC
 endif
+
 ifeq ($(USE_ML), TRUE)
   USERSuffix = .ML
 endif
 
-ifeq ($(USE_CUDA),TRUE)
-  USE_GPU_PRAGMA = TRUE
-  DEFINES += -DCUDA
+ifdef USE_CUDA
+  ifeq ($(USE_CUDA),TRUE)
+    USE_GPU_PRAGMA = TRUE
+    DEFINES += -DCUDA
+  endif
 endif
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
@@ -165,7 +168,7 @@ ifeq ($(USE_ML), TRUE)
   TORCH_LIBPATH = $(PYTORCH_ROOT)/lib
 
   ifeq ($(USE_CUDA),TRUE)
-    TORCH_LIBS = -ltorch -lc10 -lc10_cuda -lcuda  # -lcaffe2 -lcaffe2_gpu -lnvrtc -lnvToolsExt -lnccl -lmkldnn -lmkl_rt
+    TORCH_LIBS = -ltorch -ltorch_cpu -lc10 -lc10_cuda -lcuda  # -lcaffe2 -lcaffe2_gpu
   else
     TORCH_LIBS = -ltorch -ltorch_cpu -lc10  # -lcaffe2
   endif
@@ -176,8 +179,8 @@ ifeq ($(USE_ML), TRUE)
 
   DEFINES += -DML -D_GLIBCXX_USE_CXX11_ABI=1
 
-  ifeq ($(USE_CUDA),TRUE)
-    LDFLAGS += -Xlinker "--no-as-needed,-rpath $(TORCH_LIBPATH) $(TORCH_LIBS)"
+  ifeq ($(USE_CUDA), TRUE)
+    LDFLAGS += -Xlinker '--no-as-needed,-rpath $(TORCH_LIBPATH) $(TORCH_LIBS)'
   else
     LDFLAGS += -Wl,--no-as-needed,-rpath=$(TORCH_LIBPATH) $(TORCH_LIBS)
   endif
@@ -225,13 +228,6 @@ EXTERN_PARAMETERS := $(foreach dir, $(EXTERN_SEARCH),$(realpath $(wildcard $(dir
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
-
-ifdef USE_CUDA
-  ifeq ($(USE_CUDA), TRUE)
-    USE_GPU_PRAGMA = TRUE
-    DEFINES += -DCUDA
-  endif
-endif
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90
 

@@ -115,32 +115,40 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		temp_ptr[index*NumInput + NumSpec + 2] = T_in;
 	    });
 
-	    // create torch tensor from array
-#ifndef AMREX_USE_CUDA
-	    at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
-						       torch::TensorOptions().dtype(dtype0));
-#else
-	    at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
-						       torch::TensorOptions().dtype(dtype0).device(torch::kCUDA));
+	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec+1}, torch::TensorOptions().dtype(dtype0));
+#ifdef AMREX_USE_CUDA
+	    outputs_torch.to(torch::kCUDA);
 #endif
 
-	    // evaluate torch model
-	    at::Tensor outputs_torch = module.forward({inputs_torch}).toTensor();
-	    outputs_torch = outputs_torch.to(dtype0);
+	    if (use_ml) {
+		// create torch tensor from array
+#ifndef AMREX_USE_CUDA
+		at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
+							   torch::TensorOptions().dtype(dtype0));
+#else
+		at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
+							   torch::TensorOptions().dtype(dtype0).device(torch::kCUDA));
+#endif
 
+		// evaluate torch model
+		outputs_torch = module.forward({inputs_torch}).toTensor();
+		outputs_torch = outputs_torch.to(dtype0);
+	    }
+	    
 	    // get accessor to tensor (read-only)
 #ifndef AMREX_USE_CUDA
 	    auto outputs_torch_acc = outputs_torch.accessor<Real,2>();
 #else
 	    auto outputs_torch_acc = outputs_torch.packed_accessor64<Real,2>();
 #endif
-
-	    // copy output tensor to multifabs
-	    // index ordering: (species, enuc)
+	    
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
                 if (use_mask && mask_arr(i, j, k))
                     return;  // cell is covered by finer cells
 
+		auto rho = s_in_arr(i, j, k, Rho);
+		Real x_in[NumSpec];
+		
 		int ii = i - bx_lo[0];
 		int jj = j - bx_lo[1];
 		int index = jj*nbox[0] + ii;
@@ -149,12 +157,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		index += kk*nbox[0]*nbox[1];
 #endif
 
-		auto rho = temp_ptr[index*NumInput + NumSpec + 1];
-		Real x_in[NumSpec];
 		for (int n = 0; n < NumSpec; ++n) {
 		    x_in[n] = temp_ptr[index*NumInput + 1 + n];
 		}
-		
+
                 Real x_test =
                     (ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
 
@@ -171,14 +177,61 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      (ispec_threshold > 0 &&
                       x_test > burner_threshold_cutoff))) {
 
-                    for (int n = 0; n < NumSpec; ++n) {
-                        x_out[n] = outputs_torch_acc[index][n];
-                        rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
-                    }
+		    if (use_ml) {
+			// copy output tensor to multifabs
+			// index ordering: (species, enuc)
+			for (int n = 0; n < NumSpec; ++n) {
+			    x_out[n] = outputs_torch_acc[index][n];
+			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
+			}
 
-		    // note enuc in output tensor is the same as (state_out.e - state_in.e)
-                    rhoH = rho * outputs_torch_acc[index][NumSpec] / dt_in;
-                } else {
+			// note enuc in output tensor is the same as (state_out.e - state_in.e)
+			rhoH = rho * outputs_torch_acc[index][NumSpec] / dt_in;
+		    } else {
+			// need to use burner if no ML model was given
+			burn_t state_in;
+			burn_t state_out;
+		
+			Real T_in = 0.0;
+			if (drive_initial_convection) {
+			    if (!spherical) {
+				auto r = (AMREX_SPACEDIM == 2) ? j : k;
+				T_in = tempbar_init_arr(lev, r);
+			    } else {
+				T_in = tempbar_cart_arr(i, j, k);
+			    }
+			} else {
+			    T_in = s_in_arr(i, j, k, Temp);
+			}
+
+			// initialize burn state_in and state_out
+			state_in.e = 0.0;
+			state_in.rho = rho;
+			state_in.T = T_in;
+			for (int n = 0; n < NumSpec; ++n) {
+			    state_in.xn[n] = x_in[n];
+			}
+
+			// initialize state_out the same as state_in
+			state_out.e = 0.0;
+			state_out.rho = rho;
+			state_out.T = T_in;
+			for (int n = 0; n < NumSpec; ++n) {
+			    state_out.xn[n] = x_in[n];
+			}
+
+			burner(state_out, dt_in);
+
+			for (int n = 0; n < NumSpec; ++n) {
+			    x_out[n] = state_out.xn[n];
+			    rhowdot[n] = state_out.rho *
+                                         (state_out.xn[n] - state_in.xn[n]) / dt_in;
+			}
+			
+			rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
+		    }
+                }
+		else {
                     for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] = x_in[n];
                         rhowdot[n] = 0.0;
