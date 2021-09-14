@@ -245,7 +245,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
 
                 if (fabs(sumX - 1.0) > reaction_sum_tol) {
-#ifndef AMREX_USE_GPU
+#ifndef AMREX_USE_CUDA
                     Print() << "WARNING: abundances do not sum to 1" << std::endl;
 #endif
                     for (int n = 0; n < NumSpec; ++n) {
@@ -442,7 +442,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
 
                 if (fabs(sumX - 1.0) > reaction_sum_tol) {
-#ifndef AMREX_USE_GPU
+#ifndef AMREX_USE_CUDA
                     Abort("ERROR: abundances do not sum to 1");
 #endif
                     for (int n = 0; n < NumSpec; ++n) {

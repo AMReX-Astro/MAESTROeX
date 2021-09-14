@@ -180,7 +180,7 @@ contains
                    sumX = sumX + x_out(n)
                 enddo
                 if (abs(sumX - 1.d0) > reaction_sum_tol) then
-#ifndef AMREX_USE_GPU
+#ifndef AMREX_USE_CUDA
                    call amrex_error("ERROR: abundances do not sum to 1", abs(sumX-1.d0))
 #endif
                    do n = 1, nspec

@@ -1103,7 +1103,7 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
 
         jobInfoFile << "\n\n";
 
-#ifdef AMREX_USE_GPU
+#ifdef AMREX_USE_CUDA
         // This output assumes for simplicity that every rank uses the
         // same type of GPU.
 
