@@ -34,6 +34,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
+    const bool use_ml_const = use_ml;
+
     // data type of pytorch tensor
     auto dtype0 = torch::kFloat64;
     
@@ -177,7 +179,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      (ispec_threshold > 0 &&
                       x_test > burner_threshold_cutoff))) {
 
-		    if (use_ml) {
+		    if (use_ml_const) {
 			// copy output tensor to multifabs
 			// index ordering: (species, enuc)
 			for (int n = 0; n < NumSpec; ++n) {
