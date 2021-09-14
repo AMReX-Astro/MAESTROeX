@@ -24,12 +24,8 @@ if __name__ == "__main__":
                     txt = txt[m.end():m.end()+m_next.start()].rstrip()
                 else:
                     txt = txt[m.end():].rstrip()
-
-                txt = f'# {sys.argv[1]}' + txt
             else:
                 txt = ""
-
-            print(txt)
 
             # we now need to substitute characters in the string so that
             # the action can deal with line breaks
