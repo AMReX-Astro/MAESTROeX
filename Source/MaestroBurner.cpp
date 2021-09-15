@@ -113,8 +113,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		for (int n = 0; n < NumSpec; ++n) {
 		    temp_ptr[index*NumInput + 1 + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		}
-		temp_ptr[index*NumInput + NumSpec + 1] = rho;
-		temp_ptr[index*NumInput + NumSpec + 2] = T_in;
+		temp_ptr[index*NumInput + NumSpec + 1] = rho / dens_fac;
+		temp_ptr[index*NumInput + NumSpec + 2] = T_in / temp_fac;
 	    });
 
 	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec+1}, torch::TensorOptions().dtype(dtype0));
@@ -133,6 +133,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #endif
 
 		// evaluate torch model
+		inputs_torch = inputs_torch.to(torch::kFloat32);
 		outputs_torch = module.forward({inputs_torch}).toTensor();
 		outputs_torch = outputs_torch.to(dtype0);
 	    }
@@ -187,8 +188,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 			}
 
-			// note enuc in output tensor is the same as (state_out.e - state_in.e)
-			rhoH = rho * outputs_torch_acc[index][NumSpec] / dt_in;
+			// note enuc in output tensor is the normalized value
+			// of (state_out.e - state_in.e)
+			rhoH = rho * (outputs_torch_acc[index][NumSpec] * enuc_fac) / dt_in;
 		    } else {
 			// need to use burner if no ML model was given
 			burn_t state_in;

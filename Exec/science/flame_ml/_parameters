@@ -28,3 +28,9 @@ do_average_burn         logical              .false.
 # at that vertical coord if do_average_burn = T (should be smaller
 # than the EOS tolerance).
 transverse_tol          real                 1.d-7
+
+
+# ML normalization constants
+dens_fac                real         4.914646941093778610d7
+temp_fac                real         2.994452890577044010d9
+enuc_fac                real         1.334678186688000000d12
