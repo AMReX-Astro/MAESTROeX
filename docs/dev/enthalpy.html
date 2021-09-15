@@ -1,78 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Notes on Enthalpy &mdash; MAESTROeX  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Regression Testing and Continuous Integration" href="regtest.html" />
     <link rel="prev" title="Notes on \(\beta_0\)" href="beta0.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
-
-          
             <a href="index.html" class="icon icon-home"> MAESTROeX
-          
-
-          
-            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,30 +41,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
     <div class="branch">
         Branch: <a href="../enthalpy.html">main</a> | <a href="./enthalpy.html">development</a>
     </div>
 
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
@@ -119,7 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<p class="caption" role="heading"><span class="caption-text">MAESTROeX technical details</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
@@ -155,84 +105,43 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References</span></p>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Notes on Enthalpy</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/enthalpy.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="notes-on-enthalpy">
+             
+  <section id="notes-on-enthalpy">
 <h1>Notes on Enthalpy<a class="headerlink" href="#notes-on-enthalpy" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="evolution-equations">
+<section id="evolution-equations">
 <h2>Evolution Equations<a class="headerlink" href="#evolution-equations" title="Permalink to this headline">¶</a></h2>
 <p>The compressible and low Mach number formulations of the governing
 equations both share the unapproximated continuity and momentum equations
@@ -263,8 +172,8 @@ these two equations are analytically equivalent.</p>
 <p>In low Mach number combustion, <span class="math notranslate nohighlight">\(Dp/Dt = 0,\)</span> which makes the enthalpy
 equation preferable to the internal energy equation because we don’t
 need to evaluate <span class="math notranslate nohighlight">\(p \nabla \cdot \Ub.\)</span></p>
-</div>
-<div class="section" id="derivation-of-velocity-constraint">
+</section>
+<section id="derivation-of-velocity-constraint">
 <h2>Derivation of Velocity Constraint<a class="headerlink" href="#derivation-of-velocity-constraint" title="Permalink to this headline">¶</a></h2>
 <p>Differentiating the equation of state, written in the form, <span class="math notranslate nohighlight">\(p =
 p(\rho,T,X_k),\)</span> along particle paths, we can write</p>
@@ -279,7 +188,7 @@ p(\rho,T,X_k),\)</span> along particle paths, we can write</p>
 <p>with <span class="math notranslate nohighlight">\(p_\rho = \left.\partial p/\partial \rho\right|_{X_k,T}\)</span>,
 <span class="math notranslate nohighlight">\(p_{X_k} = \left.\partial p/\partial X_k \right|_{T,\rho,(X_j,j\ne k)}\)</span>,
 and <span class="math notranslate nohighlight">\(p_T = \left.\partial p/\partial T\right|_{\rho,X_k}\)</span>.</p>
-<div class="section" id="using-the-enthalpy-equation">
+<section id="using-the-enthalpy-equation">
 <h3>Using the Enthalpy Equation<a class="headerlink" href="#using-the-enthalpy-equation" title="Permalink to this headline">¶</a></h3>
 <p>Now writing <span class="math notranslate nohighlight">\(h = h(p,T,X_k)\)</span> and expanding <span class="math notranslate nohighlight">\(Dh/Dt\)</span> and using the
 enthalpy evolution equation:</p>
@@ -320,8 +229,8 @@ of <span class="math notranslate nohighlight">\(h\)</span> on <span class="math 
 <div class="math notranslate nohighlight" id="equation-enthalpy-8">
 <span class="eqno">(400)<a class="headerlink" href="#equation-enthalpy-8" title="Permalink to this equation">¶</a></span>\[\alpha(\rho,T) \equiv - \left( \frac{(1 - \rho h_p )p_T - \rho c_p}{\rho^2
   c_p p_\rho} \right)  . \label{eq:alphadef}\]</div>
-</div>
-<div class="section" id="using-the-energy-equation">
+</section>
+<section id="using-the-energy-equation">
 <h3>Using the Energy Equation<a class="headerlink" href="#using-the-energy-equation" title="Permalink to this headline">¶</a></h3>
 <p>Now writing <span class="math notranslate nohighlight">\(e = e(p,T,X_k)\)</span> and expanding <span class="math notranslate nohighlight">\(De/Dt\)</span> and using the
 energy evolution equation:</p>
@@ -356,9 +265,9 @@ Then</p>
     - \sum_k p_{X_k} {\omegadot}_k \right)  ,\]</div>
 <p>Note that we can replace <span class="math notranslate nohighlight">\(p\)</span> by <span class="math notranslate nohighlight">\(p_0\)</span> in the coefficient on the
 l.h.s. as well as on the r.h.s.</p>
-</div>
-</div>
-<div class="section" id="comparison-of-constraints">
+</section>
+</section>
+<section id="comparison-of-constraints">
 <h2>Comparison of Constraints<a class="headerlink" href="#comparison-of-constraints" title="Permalink to this headline">¶</a></h2>
 <p>If we set <span class="math notranslate nohighlight">\(\omegadot_k = \Hnuc = 0\)</span> for simplicity, then the
 constraint as derived using <span class="math notranslate nohighlight">\(h\)</span> can be written</p>
@@ -375,8 +284,8 @@ constraint as derived using <span class="math notranslate nohighlight">\(h\)</sp
 then both constraints reduce to</p>
 <div class="math notranslate nohighlight" id="equation-enthalpy-15">
 <span class="eqno">(407)<a class="headerlink" href="#equation-enthalpy-15" title="Permalink to this equation">¶</a></span>\[\nabla \cdot \Ub + \frac{1}{\gamma p} \frac{D p_0}{D t} = 0\]</div>
-</div>
-<div class="section" id="enthalpy-vs-energy-equation">
+</section>
+<section id="enthalpy-vs-energy-equation">
 <h2>Enthalpy vs Energy Equation<a class="headerlink" href="#enthalpy-vs-energy-equation" title="Permalink to this headline">¶</a></h2>
 <p>The full enthalpy equation, with no approximations, appears as:</p>
 <div class="math notranslate nohighlight" id="equation-enthalpy-16">
@@ -438,7 +347,7 @@ instead of <span class="math notranslate nohighlight">\(h\)</span>. This is equi
 <p>which is identical to solving the energy equation with <span class="math notranslate nohighlight">\(p\to p_0\)</span>.
 This option is enabled in MAESTROeX via
 use_eos_e_instead_of_h = T.</p>
-<div class="section" id="constant-gamma-gas">
+<section id="constant-gamma-gas">
 <h3>Constant <span class="math notranslate nohighlight">\(\gamma\)</span> Gas<a class="headerlink" href="#constant-gamma-gas" title="Permalink to this headline">¶</a></h3>
 <p>Going back to the constant <span class="math notranslate nohighlight">\(\gamma\)</span>, ideal gas EOS, we can rewrite the
 enthalpy equation as a pressure evolution equation</p>
@@ -468,9 +377,9 @@ rewritten as</p>
 <span class="eqno">(418)<a class="headerlink" href="#equation-enthalpy-21" title="Permalink to this equation">¶</a></span>\[-\frac{Dp}{Dt} - \frac{\gamma}{\gamma-1}\left(1-\frac{p}{p_0}\right)\rho H = 0,\]</div>
 <p>where the equality holds from <a class="reference internal" href="#equation-eq-pressure-evolution-constant-gamma">Eq.417</a>. In other words, for the constant <span class="math notranslate nohighlight">\(\gamma\)</span> gas we have
 <span class="math notranslate nohighlight">\(p=p_0\)</span> as expected.</p>
-</div>
-</div>
-<div class="section" id="outstanding-questions">
+</section>
+</section>
+<section id="outstanding-questions">
 <h2>Outstanding Questions<a class="headerlink" href="#outstanding-questions" title="Permalink to this headline">¶</a></h2>
 <ol class="arabic">
 <li><p>Why do we want to start with enthalpy instead of internal energy?</p>
@@ -507,55 +416,38 @@ earlier in the timestep).</p></li>
 projection, don’t we need these to be in terms of <span class="math notranslate nohighlight">\(p_0\)</span> instead of
 <span class="math notranslate nohighlight">\(p(h,\rho)\)</span>?</p></li>
 </ol>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="regtest.html" class="btn btn-neutral float-right" title="Regression Testing and Continuous Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="beta0.html" class="btn btn-neutral float-left" title="Notes on \(\beta_0\)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="regtest.html" class="btn btn-neutral float-right" title="Regression Testing and Continuous Integration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2018-2020, MAESTROeX development tem.
-
-    </p>
+    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-    
+  </script>  
 
 
 </body>

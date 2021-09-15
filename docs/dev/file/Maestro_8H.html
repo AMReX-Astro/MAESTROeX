@@ -1,78 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>File Maestro.H &mdash; MAESTROeX  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="File MaestroBCThreads.H" href="MaestroBCThreads_8H.html" />
     <link rel="prev" title="File BaseStateGeometry.H" href="BaseStateGeometry_8H.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
-
-          
             <a href="../index.html" class="icon icon-home"> MAESTROeX
-          
-
-          
-            
             <img src="../_static/maestroex_logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,30 +41,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
     <div class="branch">
         Branch: <a href="../../file/Maestro_8H.html">main</a> | <a href="../file/Maestro_8H.html">development</a>
     </div>
 
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../flowchart.html">Governing Equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../addproblem.html">Adding A New Problem</a></li>
@@ -119,7 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../managingjobs.html">Managing Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<p class="caption" role="heading"><span class="caption-text">MAESTROeX technical details</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../volume_discrepancy.html">Volume Discrepancy Factor</a></li>
@@ -141,7 +91,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../enthalpy.html">Notes on Enthalpy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../regtest.html">Regression Testing and Continuous Integration</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
@@ -156,79 +106,37 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../classlist.html">Class list</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References</span></p>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../zreferences.html">References</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">MAESTROeX</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../filelist.html">File list</a> &raquo;</li>
-        
       <li>File Maestro.H</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/file/Maestro_8H.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="file-maestro-h">
+             
+  <section id="file-maestro-h">
 <h1>File Maestro.H<a class="headerlink" href="#file-maestro-h" title="Permalink to this headline">¶</a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
@@ -1343,7 +1251,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE">
-<span id="_CPPv3N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeMagvel__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1aea2710dbc4b9cae69224fde215afb7c3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeMagvel</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">AMREX_SPACEDIM</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w0mac</span></span>, <span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">magvel</span></span><span class="sig-paren">)</span><br /></dt>
+<span id="_CPPv3N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="_CPPv2N7Maestro10MakeMagvelERKN5amrex6VectorIN5amrex8MultiFabEEERKN5amrex6VectorINSt5arrayIN5amrex8MultiFabE14AMREX_SPACEDIMEEEERN5amrex6VectorIN5amrex8MultiFabEEE"></span><span id="Maestro::MakeMagvel__Vector:MultiFab:CR.Vector:array:MultiFab.AMREX_SPACEDIM::CR.Vector:MultiFab:R"></span><span class="target" id="classMaestro_1af686e78f439a83de842b222a98c1d93c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MakeMagvel</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">vel</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">AMREX_SPACEDIM</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">w0mac</span></span>, <span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">amrex</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MultiFab</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">magvel</span></span><span class="sig-paren">)</span><br /></dt>
 <dd><p>Calculate the magnitude of the velocity. </p>
 </dd></dl>
 
@@ -2259,54 +2167,37 @@
 <span id="_CPPv37maestro"></span><span id="_CPPv27maestro"></span><span id="maestro"></span><span class="target" id="namespacemaestro"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maestro</span></span></span><a class="headerlink" href="#_CPPv47maestro" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="MaestroBCThreads_8H.html" class="btn btn-neutral float-right" title="File MaestroBCThreads.H" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="BaseStateGeometry_8H.html" class="btn btn-neutral float-left" title="File BaseStateGeometry.H" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="MaestroBCThreads_8H.html" class="btn btn-neutral float-right" title="File MaestroBCThreads.H" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2018-2020, MAESTROeX development tem.
-
-    </p>
+    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-    
+  </script>  
 
 
 </body>

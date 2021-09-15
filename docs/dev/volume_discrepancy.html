@@ -1,78 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Volume Discrepancy Factor &mdash; MAESTROeX  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Equation of State Notes" href="eos_notes.html" />
     <link rel="prev" title="Low Density Cutoffs" href="lo_density.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
-
-          
             <a href="index.html" class="icon icon-home"> MAESTROeX
-          
-
-          
-            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,30 +41,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
     <div class="branch">
         Branch: <a href="../volume_discrepancy.html">main</a> | <a href="./volume_discrepancy.html">development</a>
     </div>
 
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
@@ -119,7 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<p class="caption" role="heading"><span class="caption-text">MAESTROeX technical details</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Volume Discrepancy Factor</a></li>
@@ -141,82 +91,41 @@
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References</span></p>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Volume Discrepancy Factor</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/volume_discrepancy.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="volume-discrepancy-factor">
+             
+  <section id="volume-discrepancy-factor">
 <h1>Volume Discrepancy Factor<a class="headerlink" href="#volume-discrepancy-factor" title="Permalink to this headline">¶</a></h1>
 <p>The volume discrepancy term is used in the constraint equation to
 force the system back to the equation of state. We write our velocity
@@ -259,54 +168,37 @@ w_0 \partial p_0 / \partial r\)</span>, we have</p>
 <span class="eqno">(115)<a class="headerlink" href="#equation-volume-discrepancy-3" title="Permalink to this equation">¶</a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -
  \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .\]</div>
 <p>This is the form that is solved in <code class="docutils literal notranslate"><span class="pre">make_w0</span></code>.</p>
-</div>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="eos_notes.html" class="btn btn-neutral float-right" title="Equation of State Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="lo_density.html" class="btn btn-neutral float-left" title="Low Density Cutoffs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eos_notes.html" class="btn btn-neutral float-right" title="Equation of State Notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2018-2020, MAESTROeX development tem.
-
-    </p>
+    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-    
+  </script>  
 
 
 </body>
