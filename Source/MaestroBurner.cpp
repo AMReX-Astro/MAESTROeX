@@ -184,7 +184,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			// copy output tensor to multifabs
 			// index ordering: (species, enuc)
 			for (int n = 0; n < NumSpec; ++n) {
-			    x_out[n] = outputs_torch_acc[index][n];
+			    // check if X_k >= 0
+			    x_out[n] = (outputs_torch_acc[index][n] >= 0.0) ?
+				outputs_torch_acc[index][n] : 0.0;
 			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 			}
 
@@ -245,13 +247,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 // check if sum{X_k} = 1
                 Real sumX = 0.0;
                 for (int n = 0; n < NumSpec; ++n) {
-                    sumX += x_out[n];
+		    sumX += x_out[n];
                 }
 
                 if (fabs(sumX - 1.0) > reaction_sum_tol) {
-#ifndef AMREX_USE_CUDA
-                    Print() << "WARNING: abundances do not sum to 1" << std::endl;
-#endif
                     for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] /= sumX;
                     }
