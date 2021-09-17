@@ -517,9 +517,22 @@ void Maestro::DivuIter(int istep_divu_iter) {
         rhohalf[lev].setVal(1.);
     }
 
+#ifdef ML
+    // save current state of use_ml
+    const auto use_ml_temp = use_ml;
+
+    // do not use ML model for divu steps
+    use_ml = false;
+#endif
+    
     React(sold, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_old, 0.5 * dt,
           t_old);
 
+#ifdef ML
+    // reset use_ml to previous state
+    use_ml = use_ml_temp;
+#endif
+    
     // WriteMF(sold,"a_sold_2levs");
     // Abort();
 
