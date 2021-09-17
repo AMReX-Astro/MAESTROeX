@@ -36,7 +36,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     const bool use_ml_const = use_ml;
 
-    // data type of pytorch tensor
+    // match data type of pytorch tensor to multifab data
     auto dtype0 = torch::kFloat64;
     
     for (int lev = 0; lev <= finest_level; ++lev) {
@@ -136,6 +136,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		inputs_torch = inputs_torch.to(torch::kFloat32);
 		outputs_torch = module.forward({inputs_torch}).toTensor();
 		outputs_torch = outputs_torch.to(dtype0);
+
+		if (/*DEBUG=*/1) {
+		    Print() << "example input: \n"
+			    << inputs_torch.slice(/*dim=*/0, /*start=*/0, /*end=*/5) << '\n';
+		    Print() << "example output: \n"
+			    << outputs_torch.slice(/*dim=*/0, /*start=*/0, /*end=*/5) << '\n';
+		}
 	    }
 	    
 	    // get accessor to tensor (read-only)
