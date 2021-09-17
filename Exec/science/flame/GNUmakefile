@@ -18,7 +18,7 @@ MAESTROEX_HOME  := ../../..
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ignition_simple
+NETWORK_DIR      := aprox13
 INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package
