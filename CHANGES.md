@@ -1,3 +1,15 @@
+# 21.09
+
+  * No changes since last release
+
+# 21.08
+
+  * Pressure correction for impenetrable top boundary for planar problems
+
+# 21.07
+
+  * Fix sphinx4 latex macro rendering 
+
 # 21.06
 
   * Change blocking factor to 8

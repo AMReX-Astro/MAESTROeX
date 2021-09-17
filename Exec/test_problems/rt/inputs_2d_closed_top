@@ -1,0 +1,131 @@
+## This input makes the top boundary impenetrable by adding a correction
+## to the pressure. It works well with average_base_state = true.
+# INITIAL MODEL
+maestro.perturb_model = true
+
+maestro.ppm_type = 0
+
+maestro.max_step  = 100000
+maestro.stop_time = 1.5
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0  0.0  0.0
+geometry.prob_hi     =  0.5  1.0  1.0
+
+# PROBLEM SIZE & GEOMETRY
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 4 2
+maestro.hi_bc = 0 4 2
+geometry.is_periodic =  1 0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# REFINEMENT
+amr.n_cell           =  256   512   64
+amr.max_level       = 0       # maximum level number allowed
+amr.ref_ratio       = 2 2 2 2 # refinement ratio
+amr.blocking_factor = 8       # block factor in grid generation
+amr.max_grid_size   = 128
+maestro.regrid_int     = 2       # how often to regrid
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+maestro.regrid_int      = 2       # how often to regrid
+
+# TIME STEP CONTROL
+maestro.cfl         = 0.9    # cfl number for hyperbolic system
+                             # In this test problem, the velocity is
+			     # time-dependent.  We could use 0.9 in
+			     # the 3D test, but need to use 0.7 in 2D
+			     # to satisfy CFL condition.
+maestro.init_shrink = 0.1e0
+
+# PLOTFILES
+maestro.plot_base_name  = plt    # root name of plot file
+maestro.plot_int   = 100     # number of timesteps between plot files
+maestro.plot_deltat = 1e0
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = -1
+
+# ALGORITHMIC OPTIONS
+maestro.evolve_base_state     = true
+maestro.average_base_state    = true
+maestro.do_initial_projection = true
+maestro.add_pb                = true # pressure correction for closed top
+maestro.init_divu_iter        = 1
+maestro.init_iter             = 1
+
+maestro.do_sponge = 0
+maestro.sponge_center_density = 3.e6
+maestro.sponge_start_factor = 10.e0
+maestro.sponge_kappa = 10.e0
+
+maestro.use_thermal_diffusion = false
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-8
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+#maestro.eps_mac            = 1.e-10
+#maestro.eps_mac_max        = 1.e-8
+#maestro.mac_level_factor   = 10.
+#maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-12
+maestro.eps_hg_max         = 1.e-10
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+# HYDRODYNAMICS options
+maestro.anelastic_cutoff_density = 1.e-10
+maestro.base_cutoff_density = 1.e-10
+maestro.grav_const = -1.0
+
+# EOS parameters
+maestro.small_temp = 1.e-10
+maestro.small_dens = 1.e-10
+
+# BURNING parameters
+maestro.do_burning = false
+
+# OMP settings
+amrex.regtest_reduction = 1
+
+&probin
+
+  ! override the default values of the probin namelist values here
+  rho_1 = 1.d0
+  rho_2 = 2.d0
+  vel_amplitude  = 0.25d0
+  vel_width = 0.025d0
+  nmodes  = 1
+  p0_base = 5.0d0
+
+  !extern
+
+  ! Note that some of the parameters in this
+  ! namelist are specific to the default EOS,
+  ! network, and/or integrator used in the
+  ! makefile. If you try a different set of
+  ! microphysics routines be sure to check that
+  ! the parameters in here are consistent, as
+  ! Fortran does not like seeing unknown variables
+  ! in the namelist.
+
+  eos_gamma = 1.666666667d0
+  eos_assume_neutral = T
+  const_conductivity = 1.0d0
+
+/
