@@ -65,8 +65,8 @@ struct BaseStateArray {
     }
 
     /// if access using only one index, then this ignores the underlying data structure. Useful for e.g. applying the same operation to all data.
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE T& operator()(const int i) const
-        noexcept {
+    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE T& operator()(
+        const int i) const noexcept {
         return dptr[i];
     }
 
@@ -611,9 +611,10 @@ BaseState<T>& BaseState<T>::operator/=(const T val) {
 template <class T>
 BaseState<T> BaseState<T>::operator/(const T val) const noexcept {
     BaseState<T> s(nlev, len, nvar);
-    BaseStateArray<T> base_arr = s.array();
+    BaseStateArray<T> s_arr = s.array();
+    BaseStateArray<T> base_arr = this->array();
     AMREX_PARALLEL_FOR_1D(nvar * len * nlev, i,
-                          { base_arr(i) = base_data[i] / val; });
+                          { s_arr(i) = base_arr(i) / val; });
     amrex::Gpu::synchronize();
     return s;
 }

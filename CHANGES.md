@@ -1,3 +1,35 @@
+# 21.09
+
+  * No changes since last release
+
+# 21.08
+
+  * Pressure correction for impenetrable top boundary for planar problems
+
+# 21.07
+
+  * Fix sphinx4 latex macro rendering 
+
+# 21.06
+
+  * Change blocking factor to 8
+
+# 21.05
+
+  * Fix labels for tfromp and tfromh in output files
+
+  * Remove reference to rtol_temp and atol_temp to sync with Microphysics
+
+# 21.04
+
+  * Add a yt VR of ECSN radial velocity
+
+# 21.03
+
+  * Bug fixes for simplified SDC algorithm
+
+  * GPU bug fixes
+
 # 21.02
 
   * Bug fix for exact base state algorithm 

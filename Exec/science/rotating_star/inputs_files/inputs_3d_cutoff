@@ -141,11 +141,9 @@ maestro.rotation_radius = 2.e8
   jacobian = 1
   
   atol_spec = 1.e-6
-  atol_temp = 1.e-6
   atol_enuc = 1.e-6
 
   rtol_spec = 1.e-6
-  rtol_temp = 1.e-6
   rtol_enuc = 1.e-6
 
   renormalize_abundances = T

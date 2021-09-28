@@ -107,6 +107,10 @@ void Maestro::Makew0Planar(
     const Real grav_const_loc = grav_const;
     const Real dpdt_factor_loc = dpdt_factor;
 
+    // pressure correction variables
+    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine);
+    auto int1_over_gamma1bar_p0_planar = int1_over_gamma1bar_p0.array();
+
     // Compute w0 on edges at level n
     for (auto n = 0; n <= base_geom.max_radial_level; ++n) {
         psi_planar_state.setVal(0.0);
@@ -119,6 +123,7 @@ void Maestro::Makew0Planar(
             if (n == 0) {
                 // Initialize new w0 at bottom of coarse base array to 0.0.
                 w0_arr(0, 0) = 0.0;
+                int1_over_gamma1bar_p0_planar(0) = 0.0;
             } else {
                 // Obtain the starting value of w0 from the coarser grid
                 w0_arr(n, base_geom.r_start_coord(n, j)) =
@@ -159,12 +164,26 @@ void Maestro::Makew0Planar(
                                          p0_new_arr(n, r - 1) * dt_loc);
                     }
                 }
-
+                if (n == 0) {
+                    int1_over_gamma1bar_p0_planar(r) =
+                        int1_over_gamma1bar_p0_planar(r - 1) +
+                        (1.0 / gamma1bar_p0_avg) * dr_lev;
+                }
                 w0_arr(n, r) = w0_arr(n, r - 1) + Sbar_arr(n, r - 1) * dr_lev -
                                psi_planar[r - 1] / gamma1bar_p0_avg * dr_lev -
                                delta_chi_w0 * dr_lev;
             }
-
+            // add the pressure correction for a closed box for n == 0
+            if (n == 0 && add_pb) {
+                const int k = base_geom.r_end_coord(n, j) + 1;
+                p0bdot = w0_arr(n, k) / int1_over_gamma1bar_p0_planar(k);
+                // set p0b for use in EnforceHSE
+                p0b = p0bdot * dt;
+                for (auto r = base_geom.r_start_coord(n, j) + 1;
+                     r <= base_geom.r_end_coord(n, j) + 1; ++r) {
+                    w0_arr(n, r) -= p0bdot * int1_over_gamma1bar_p0_planar(r);
+                }
+            }
             if (n > 0) {
                 // Compare the difference between w0 at top of level n to
                 // the corresponding point on level n-1
@@ -321,6 +340,7 @@ void Maestro::Makew0PlanarVarg(
     auto etarho_cc_fine_arr = etarho_cc_fine.array();
     auto Sbar_in_fine_arr = Sbar_in_fine.array();
     auto grav_edge_fine_arr = grav_edge_fine.array();
+    auto finest_radial_level = base_geom.finest_radial_level;
 
     // create time-centered base-state quantities
     p0_nph_fine.copy(0.5 * (p0_old_fine + p0_new_fine));
@@ -394,13 +414,13 @@ void Maestro::Makew0PlanarVarg(
         B(r) = -(gamma1bar_nph_fine_arr(r - 1) * p0_nph_fine_arr(r - 1) +
                  gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r)) /
                (dr_finest * dr_finest);
-        B(r) -= 2.0 * dpdr / (r_edge_loc(base_geom.finest_radial_level, r));
+        B(r) -= 2.0 * dpdr / (r_edge_loc(finest_radial_level, r));
 
         C(r) = gamma1bar_nph_fine_arr(r) * p0_nph_fine_arr(r);
         C(r) /= dr_finest * dr_finest;
 
         F(r) = 2.0 * dpdr * w0bar_fine_arr(r) /
-                   r_edge_loc(base_geom.finest_radial_level, r) -
+                   r_edge_loc(finest_radial_level, r) -
                grav_edge_fine_arr(r) *
                    (etarho_cc_fine_arr(r) - etarho_cc_fine_arr(r - 1)) /
                    dr_finest;
@@ -445,7 +465,7 @@ void Maestro::Makew0PlanarVarg(
     // 6) compute w0 = w0bar + deltaw0
     ParallelFor(nr_finest + 1, [=] AMREX_GPU_DEVICE(int r) {
         w0_fine_arr(r) = w0bar_fine_arr(r) + deltaw0_fine_arr(r);
-        w0_arr(base_geom.finest_radial_level, r) = w0_fine_arr(r);
+        w0_arr(finest_radial_level, r) = w0_fine_arr(r);
     });
     Gpu::synchronize();
 

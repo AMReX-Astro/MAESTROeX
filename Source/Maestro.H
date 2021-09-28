@@ -39,6 +39,13 @@ using RealVector = amrex::Vector<amrex::Real>;
 using IntVector = amrex::Vector<int>;
 #endif
 
+// function called on GPU only
+AMREX_GPU_DEVICE
+amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
+                       const amrex::Real x1, const amrex::Real x2,
+                       const amrex::Real y0, const amrex::Real y1,
+                       const amrex::Real y2, const bool limit = true);
+
 /// hard code a maximum level limit
 #define MAESTRO_MAX_LEVELS 15
 
@@ -675,11 +682,6 @@ class Maestro : public amrex::AmrCore {
         const bool is_input_edge_centered, const bool is_output_a_vector,
         const amrex::Vector<amrex::BCRec>& bcs = amrex::Vector<amrex::BCRec>(),
         const int sbccomp = 0);
-
-    AMREX_GPU_DEVICE amrex::Real QuadInterp(
-        const amrex::Real x, const amrex::Real x0, const amrex::Real x1,
-        const amrex::Real x2, const amrex::Real y0, const amrex::Real y1,
-        const amrex::Real y2, const bool limit = true);
 
     /// Add (`mult` times) the MAC-projected base state velocity to the edge-based
     /// velocity `uedge`
@@ -1337,8 +1339,10 @@ class Maestro : public amrex::AmrCore {
     void WriteJobInfo(const std::string& dir) const;
 
     /// Calculate the magnitude of the velocity
-    void MakeMagvel(const amrex::Vector<amrex::MultiFab>& vel,
-                    amrex::Vector<amrex::MultiFab>& magvel);
+    void MakeMagvel(
+        const amrex::Vector<amrex::MultiFab>& vel,
+        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
+        amrex::Vector<amrex::MultiFab>& magvel);
 
     /// Calculate the radial and circular components of the velocity
     void MakeVelrc(const amrex::Vector<amrex::MultiFab>& vel,
@@ -2112,6 +2116,11 @@ class Maestro : public amrex::AmrCore {
     /// therefore `flux_reg[0]` and `flux_reg[max_level]` are never actually
     /// used in the reflux operation
     amrex::Vector<std::unique_ptr<amrex::FluxRegister>> flux_reg_s;
+
+    /// Rate of change of pressure at the lower boundary. Used to modify w0
+    /// and p0 in the case of a closed upper boundary (planar).
+    Real p0bdot;
+    Real p0b;
 
     /// flag for writing plotfiles
     enum plotfile_flag {
