@@ -1,78 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>The Mixing Term, \(\etarho\) &mdash; MAESTROeX  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Interface State Details" href="pert.html" />
     <link rel="prev" title="Reaction Networks" href="networks.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
-
-          
             <a href="index.html" class="icon icon-home"> MAESTROeX
-          
-
-          
-            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -80,30 +41,19 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
     <div class="branch">
         Branch: <a href="./eta.html">main</a> | <a href="./dev/eta.html">development</a>
     </div>
 
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Using MAESTROeX</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="addproblem.html">Adding A New Problem</a></li>
@@ -119,7 +69,7 @@
 <li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<p class="caption" role="heading"><span class="caption-text">MAESTROeX technical details</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
@@ -153,86 +103,45 @@
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References</span></p>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span></li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/eta.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <p>We carry around three different 1D radial quantities: <span class="math notranslate nohighlight">\(\etarhoec\)</span>
 (edge-centered), <span class="math notranslate nohighlight">\(\etarhocc\)</span> (cell-centered), and <span class="math notranslate nohighlight">\(\divetarho\)</span>
 (cell-centered). These notes discuss when each of these is used, and
 how they are computed, in both plane-parallel and spherical.</p>
-<div class="section" id="the-mixing-term-etarho">
+<section id="the-mixing-term-etarho">
 <h1>The Mixing Term, <span class="math notranslate nohighlight">\(\etarho\)</span><a class="headerlink" href="#the-mixing-term-etarho" title="Permalink to this headline">¶</a></h1>
 <p>The base state evolves in response to heating and mixing in the star.
 The density evolution is governed by</p>
@@ -326,8 +235,8 @@ divergence, we instead use <a class="reference internal" href="#equation-eq-rhop
 = - \frac{\overline{\rhop^{n+1}} - \overline{\rhop^n}}{\Delta t}
 = - \frac{\overline{\rhop^{n+1}}}{\Delta t}  ,\]</div>
 <p>where we have made use of the fact that <span class="math notranslate nohighlight">\(\overline{\rhop^n} = 0\)</span> by construction.</p>
-</div>
-<div class="section" id="eta-flow-chart">
+</section>
+<section id="eta-flow-chart">
 <h1><span class="math notranslate nohighlight">\(\eta\)</span> Flow Chart<a class="headerlink" href="#eta-flow-chart" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic simple">
 <li><p>Enter <code class="docutils literal notranslate"><span class="pre">advance_timestep</span></code> with <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n-\myhalf}\)</span>.</p></li>
@@ -340,11 +249,11 @@ divergence, we instead use <a class="reference internal" href="#equation-eq-rhop
 <li><p>Call <code class="docutils literal notranslate"><span class="pre">make_etarho</span></code> to compute <span class="math notranslate nohighlight">\([\etarhoec, \etarhocc]^{n+\myhalf}\)</span>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm flux},n+\myhalf}\)</span>.</p></li>
 <li><p>Call <code class="docutils literal notranslate"><span class="pre">make_psi</span></code>. The plane-parallel version uses <span class="math notranslate nohighlight">\(\etarho^{{\rm cc},n+\myhalf}\)</span>.</p></li>
 </ol>
-</div>
-<div class="section" id="computing-etarhoec-and-etarhocc">
+</section>
+<section id="computing-etarhoec-and-etarhocc">
 <h1>Computing <span class="math notranslate nohighlight">\(\etarhoec\)</span> and <span class="math notranslate nohighlight">\(\etarhocc\)</span><a class="headerlink" href="#computing-etarhoec-and-etarhocc" title="Permalink to this headline">¶</a></h1>
 <p>This is done in <code class="docutils literal notranslate"><span class="pre">make_eta.f90</span></code>.</p>
-<div class="section" id="plane-parallel">
+<section id="plane-parallel">
 <h2>Plane-Parallel<a class="headerlink" href="#plane-parallel" title="Permalink to this headline">¶</a></h2>
 <p>We first compute a radial edge-centered multifab, <span class="math notranslate nohighlight">\(\etarho^{\rm flux}\)</span>, using</p>
 <div class="math notranslate nohighlight" id="equation-eta-7">
@@ -355,8 +264,8 @@ divergence, we instead use <a class="reference internal" href="#equation-eq-rhop
 <p><span class="math notranslate nohighlight">\(\etarhocc\)</span> is a cell-centered average of <span class="math notranslate nohighlight">\(\etarhoec\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-eta-9">
 <span class="eqno">(129)<a class="headerlink" href="#equation-eta-9" title="Permalink to this equation">¶</a></span>\[\eta_{\rho,r}^{\rm cc} = \frac{\eta_{\rho,r+\myhalf}^{\rm ec} + \eta_{\rho,r-\myhalf}^{\rm ec}}{2}.\]</div>
-</div>
-<div class="section" id="spherical">
+</section>
+<section id="spherical">
 <span id="sec-eta-spherical"></span><h2>Spherical<a class="headerlink" href="#spherical" title="Permalink to this headline">¶</a></h2>
 <p>First, construct <span class="math notranslate nohighlight">\(\eta_{\rho}^{\rm cart} =
 [\rho'(\Ubt\cdot\eb_r)]^{n+\myhalf}\)</span> using:</p>
@@ -373,79 +282,62 @@ divergence, we instead use <a class="reference internal" href="#equation-eq-rhop
 <span class="eqno">(133)<a class="headerlink" href="#equation-eta-13" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
 \eta_{\rho,-\myhalf}^{\rm ec} &amp;=&amp; 0, \\
 \eta_{\rho,{\rm nr}-\myhalf}^{\rm ec} &amp;=&amp; \eta_{\rho,{\rm nr}-1}^{\rm cc}.\end{aligned}\end{split}\]</div>
-</div>
-</div>
-<div class="section" id="using-etarhoec">
+</section>
+</section>
+<section id="using-etarhoec">
 <h1>Using <span class="math notranslate nohighlight">\(\etarhoec\)</span><a class="headerlink" href="#using-etarhoec" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="plane-parallel-1">
+<section id="plane-parallel-1">
 <span id="id1"></span><h2>Plane-Parallel<a class="headerlink" href="#plane-parallel-1" title="Permalink to this headline">¶</a></h2>
 <p>NOT USED.</p>
-</div>
-<div class="section" id="id2">
+</section>
+<section id="id2">
 <h2>Spherical<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p>In <code class="docutils literal notranslate"><span class="pre">make_w0</span></code>, <span class="math notranslate nohighlight">\(\etarhoec\)</span> is used in the construction of the RHS
 for the <span class="math notranslate nohighlight">\(\delta w_0\)</span> equation.</p>
-</div>
-</div>
-<div class="section" id="using-etarhocc">
+</section>
+</section>
+<section id="using-etarhocc">
 <h1>Using <span class="math notranslate nohighlight">\(\etarhocc\)</span><a class="headerlink" href="#using-etarhocc" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="plane-parallel-2">
+<section id="plane-parallel-2">
 <span id="id3"></span><h2>Plane-Parallel<a class="headerlink" href="#plane-parallel-2" title="Permalink to this headline">¶</a></h2>
 <p>In <code class="docutils literal notranslate"><span class="pre">make_psi</span></code>, <span class="math notranslate nohighlight">\(\psi = \etarhocc g\)</span>.</p>
-</div>
-<div class="section" id="spherical-1">
+</section>
+<section id="spherical-1">
 <span id="id4"></span><h2>Spherical<a class="headerlink" href="#spherical-1" title="Permalink to this headline">¶</a></h2>
 <p>In <code class="docutils literal notranslate"><span class="pre">make_w0</span></code>, <span class="math notranslate nohighlight">\(\etarhocc\)</span> is used in the construction of the RHS
 for the <span class="math notranslate nohighlight">\(\delta w_0\)</span> equation.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="pert.html" class="btn btn-neutral float-right" title="Interface State Details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="networks.html" class="btn btn-neutral float-left" title="Reaction Networks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="pert.html" class="btn btn-neutral float-right" title="Interface State Details" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2018-2020, MAESTROeX development tem.
-
-    </p>
+    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-    
+  </script>  
 
 
 </body>
