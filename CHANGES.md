@@ -1,3 +1,7 @@
+# 21.10
+
+  * Bug fix for NSE problems
+
 # 21.09
 
   * No changes since last release
