@@ -109,26 +109,6 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		    }
 
-		    // Only perturb a portion of the data
-		    if (i > 16) {
-			// Pick a random species from 7 to 12 (these are species whose peaks are lower than 10^-5)
-			int spec_cutoff = 7;
-			int spec_rand = spec_cutoff + (int)(amrex::Random(engine) * (NumSpec - spec_cutoff));
-			if (spec_rand >= NumSpec) spec_rand = NumSpec-1;
-
-			// Set a random perturbation based on log(X_k)
-			Real X_log = log(x_in[spec_rand]);
-			// Random number generated between [-X_log/15, X_log/15]
-			Real rand = -X_log/15.0 + amrex::Random(engine) * 2*X_log/15.0;
-			Real perturb = exp(X_log + rand) - x_in[spec_rand];
-			x_in[spec_rand] += perturb;
-
-			// Pick a random species from 0 to 6 to subtract perturbation
-			// since sum(X_k) = 1 must be satisfied
-			int spec_rand2 = (int)(amrex::Random(engine) * spec_cutoff);
-			x_in[spec_rand2] -= perturb;
-		    }
-
 #if NAUX_NET > 0
 		    Real aux_in[NumAux];
 		    for (int n = 0; n < NumAux; ++n) {
@@ -150,6 +130,33 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
 		    Real x_test =
 			(ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
+
+		    // Only perturb a portion of the data
+		    if (i > 16) {
+			// Pick a random species from 7 to 12 (these are species whose peaks are lower than 10^-5)
+			int spec_cutoff = 7;
+			int spec_rand = spec_cutoff + (int)(amrex::Random(engine) * (NumSpec - spec_cutoff));
+			if (spec_rand >= NumSpec) spec_rand = NumSpec-1;
+
+			// Set a random perturbation based on log(X_k)
+			Real X_log = log(x_in[spec_rand]);
+			// Random number generated between [-X_log/15, X_log/15]
+			Real rand = (amrex::Random(engine) - 0.5) * 2*X_log/15.0;
+			Real perturb = exp(X_log + rand) - x_in[spec_rand];
+			x_in[spec_rand] += perturb;
+
+			// Pick a random species from 0 to 6 to subtract perturbation
+			// since sum(X_k) = 1 must be satisfied
+			int spec_rand2 = (int)(amrex::Random(engine) * spec_cutoff);
+			x_in[spec_rand2] -= perturb;
+
+			// Perturb density and temperature by small relative values
+			// since they do not change much
+			Real perturb_rel = (amrex::Random(engine) - 0.5) * 2.e-4;
+			rho *= (1.0 + perturb_rel);
+			perturb_rel = (amrex::Random(engine) - 0.5) * 6.e-4;
+			T_in *= (1.0 + perturb_rel);
+		    }
 
 		    for (int n = 0; n < NumSpec; ++n) {
                         react_in_arr(i, j, k, n) = x_in[n];
