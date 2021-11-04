@@ -49,7 +49,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
         react_out_varnames.push_back(spec_string);
     }
     react_out_varnames.push_back("enucdot");
-    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
+    const bool save_react_data = istep > 1 && save_react_int > 0 && istep % save_react_int == 0;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
