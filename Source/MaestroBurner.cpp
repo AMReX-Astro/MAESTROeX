@@ -131,25 +131,31 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		    Real x_test =
 			(ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
 
-		    // Only perturb a portion of the data
-		    if (i > 16) {
-			// Pick a random species from 7 to 12 (these are species whose peaks are lower than 10^-5)
-			int spec_cutoff = 7;
-			int spec_rand = spec_cutoff + (int)(amrex::Random(engine) * (NumSpec - spec_cutoff));
-			if (spec_rand >= NumSpec) spec_rand = NumSpec-1;
+		    // Perturb 75 percent of the data
+		    if (amrex::Random(engine) < 0.75) {
+			// Three main species are C12(1), O16(2), Mg24(4)
+			// Loop over rest of the species
+			for (int n = 0; n < NumSpec; ++n) {
+			    // Do not perturb the main species
+			    if (n != 1 && n != 2 && n !=4) {
+				// Set a random perturbation based on log(X_k)
+				Real X_log = log(x_in[n]);
+				// We only want to perturb mass fractions below 10^-4
+				// Note ln(10^-4) = -9.2
+				if (X_log <= -10.0) {
+				    // Random number generated between [-X_log/15, X_log/15]
+				    Real rand = (amrex::Random(engine) - 0.5) * 2*X_log/15.0;
+				    Real perturb = exp(X_log + rand) - x_in[n];
+				    x_in[n] += perturb;
 
-			// Set a random perturbation based on log(X_k)
-			Real X_log = log(x_in[spec_rand]);
-			// Random number generated between [-X_log/15, X_log/15]
-			Real rand = (amrex::Random(engine) - 0.5) * 2*X_log/15.0;
-			Real perturb = exp(X_log + rand) - x_in[spec_rand];
-			x_in[spec_rand] += perturb;
-
-			// Pick a random species from 0 to 6 to subtract perturbation
-			// since sum(X_k) = 1 must be satisfied
-			int spec_rand2 = (int)(amrex::Random(engine) * spec_cutoff);
-			x_in[spec_rand2] -= perturb;
-
+				    // Pick the larger mass fraction of C12 and Mg24
+				    // and subtract perturb since sum(X_k) = 1 
+				    int spec_rand = (x_in[1] > x_in[4]) ? 1 : 4;
+				    x_in[spec_rand] -= perturb;
+				}
+			    }
+			}
+			
 			// Perturb density and temperature by small relative values
 			// since they do not change much
 			Real perturb_rel = (amrex::Random(engine) - 0.5) * 2.e-4;
