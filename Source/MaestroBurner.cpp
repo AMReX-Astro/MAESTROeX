@@ -94,26 +94,26 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                           : rho_Hext[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
 
-	    // If save_react_data, we add perturbations to the mass fractions to
-	    // get more varied data for training ML model
-	    if (save_react_data) {
-		ParallelForRNG(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k,
-							     amrex::RandomEngine const& engine) noexcept
-		{
+            // If save_react_data, we add perturbations to the mass fractions to
+            // get more varied data for training ML model
+            if (save_react_data) {
+                ParallelForRNG(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k,
+                                                             amrex::RandomEngine const& engine) noexcept
+                {
                     if (use_mask && mask_arr(i, j, k))
-			return;  // cell is covered by finer cells
+                        return;  // cell is covered by finer cells
 
-		    auto rho = s_in_arr(i, j, k, Rho);
-		    Real x_in[NumSpec];
-		    for (int n = 0; n < NumSpec; ++n) {
-			x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
-		    }
+                    auto rho = s_in_arr(i, j, k, Rho);
+                    Real x_in[NumSpec];
+                    for (int n = 0; n < NumSpec; ++n) {
+                        x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
+                    }
 
 #if NAUX_NET > 0
-		    Real aux_in[NumAux];
-		    for (int n = 0; n < NumAux; ++n) {
-			aux_in[n] = s_in_arr(i, j, k, FirstAux + n) / rho;
-		    }
+                    Real aux_in[NumAux];
+                    for (int n = 0; n < NumAux; ++n) {
+                        aux_in[n] = s_in_arr(i, j, k, FirstAux + n) / rho;
+                    }
 #endif
 
 		    Real T_in = 0.0;
@@ -177,63 +177,63 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     }
 
 
-		    burn_t state_in;
-		    burn_t state_out;
+                    burn_t state_in;
+                    burn_t state_out;
 
-		    Real x_out[NumSpec];
+                    Real x_out[NumSpec];
 #if NAUX_NET > 0
-		    Real aux_out[NumAux];
+                    Real aux_out[NumAux];
 #endif
-		    Real rhowdot[NumSpec];
-		    Real rhoH = 0.0;
+                    Real rhowdot[NumSpec];
+                    Real rhoH = 0.0;
 
-		    // if the threshold species is not in the network, then we burn
-		    // normally.  if it is in the network, make sure the mass
-		    // fraction is above the cutoff.
-		    if ((rho > burning_cutoff_density_lo &&
-			 rho < burning_cutoff_density_hi) &&
-			(ispec_threshold < 0 ||
-			 (ispec_threshold > 0 &&
-			  x_test > burner_threshold_cutoff))) {
-			// Initialize burn state_in and state_out
-			state_in.e = 0.0;
-			state_in.rho = rho;
-			state_in.T = T_in;
-			for (int n = 0; n < NumSpec; ++n) {
-			    state_in.xn[n] = x_in[n];
-			}
+                    // if the threshold species is not in the network, then we burn
+                    // normally.  if it is in the network, make sure the mass
+                    // fraction is above the cutoff.
+                    if ((rho > burning_cutoff_density_lo &&
+                         rho < burning_cutoff_density_hi) &&
+                        (ispec_threshold < 0 ||
+                         (ispec_threshold > 0 &&
+                          x_test > burner_threshold_cutoff))) {
+                        // Initialize burn state_in and state_out
+                        state_in.e = 0.0;
+                        state_in.rho = rho;
+                        state_in.T = T_in;
+                        for (int n = 0; n < NumSpec; ++n) {
+                            state_in.xn[n] = x_in[n];
+                        }
 #if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    state_in.aux[n] = aux_in[n];
-			}
-#endif
-
-			// initialize state_out the same as state_in
-			state_out.e = 0.0;
-			state_out.rho = rho;
-			state_out.T = T_in;
-			for (int n = 0; n < NumSpec; ++n) {
-			    state_out.xn[n] = x_in[n];
-			}
-#if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    state_out.aux[n] = aux_in[n];
-			}
+                        for (int n = 0; n < NumAux; ++n) {
+                            state_in.aux[n] = aux_in[n];
+                        }
 #endif
 
-			burner(state_out, dt_in);
-
-			for (int n = 0; n < NumSpec; ++n) {
-			    x_out[n] = state_out.xn[n];
-			    rhowdot[n] = state_out.rho *
-                                         (state_out.xn[n] - state_in.xn[n]) / dt_in;
-			}
+                        // initialize state_out the same as state_in
+                        state_out.e = 0.0;
+                        state_out.rho = rho;
+                        state_out.T = T_in;
+                        for (int n = 0; n < NumSpec; ++n) {
+                            state_out.xn[n] = x_in[n];
+                        }
 #if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    aux_out[n] = state_out.aux[n];
-			}
+                        for (int n = 0; n < NumAux; ++n) {
+                            state_out.aux[n] = aux_in[n];
+                        }
 #endif
-			rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
+
+                        burner(state_out, dt_in);
+
+                        for (int n = 0; n < NumSpec; ++n) {
+                            x_out[n] = state_out.xn[n];
+                            rhowdot[n] = state_out.rho *
+                                (state_out.xn[n] - state_in.xn[n]) / dt_in;
+                        }
+#if NAUX_NET > 0
+                        for (int n = 0; n < NumAux; ++n) {
+                            aux_out[n] = state_out.aux[n];
+                        }
+#endif
+                        rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
 
                         // use state_in and state_out to set the reaction outputs and RHS
                         // because the EOS calls require the actual internal energy e,
@@ -249,14 +249,14 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                         Array1D<Real, 1, neqs> ydot; // this will hold the RHS
                         actual_rhs(state_out, ydot); // evaluate the RHS to get dYdt
                         for (int n = 1; n <= NumSpec; ++n) {
-                           react_out_arr(i, j, k, NumSpec+n) = ydot(n) * aion[n-1]; // save dXdt
+                            react_out_arr(i, j, k, NumSpec+n) = ydot(n) * aion[n-1]; // save dXdt
                         }
-                        react_out_arr(i, j, k, 2*NumSpec+1) = ydot(net_ienuc); // save enucdot                    
-		    }
-		});
-	    }
+                        react_out_arr(i, j, k, 2*NumSpec+1) = ydot(net_ienuc); // save enucdot
+                    }
+                });
+            }
 
-	    // solve original input states
+            // solve original input states
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 if (use_mask && mask_arr(i, j, k))
                     return;  // cell is covered by finer cells
