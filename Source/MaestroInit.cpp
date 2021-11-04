@@ -15,6 +15,12 @@ void Maestro::Init() {
 
     Print() << "Calling Init()" << std::endl;
 
+    // initializes the seed for C++ random number calls
+    auto seed = 142;
+    InitRandom(seed + ParallelDescriptor::MyProc(),
+	       ParallelDescriptor::NProcs(),
+	       seed + ParallelDescriptor::MyProc());
+
     if (restart_file.empty()) {
         start_step = 1;
 
