@@ -139,13 +139,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			    // Do not perturb the main species
 			    if (n != 1 && n != 2 && n !=4) {
 				// Set a random perturbation based on log(X_k)
-				Real X_log = log(x_in[n]);
+				Real X_log = std::log10(x_in[n]);
 				// We only want to perturb mass fractions below 10^-4
-				// Note ln(10^-4) = -9.2
-				if (X_log <= -10.0) {
+				if (X_log <= -4.0) {
 				    // Random number generated between [-X_log/15, X_log/15]
 				    Real rand = (amrex::Random(engine) - 0.5) * 2*X_log/15.0;
-				    Real perturb = exp(X_log + rand) - x_in[n];
+				    Real perturb = pow(10.0, X_log + rand) - x_in[n];
 				    x_in[n] += perturb;
 
 				    // Pick the larger mass fraction of C12 and Mg24
