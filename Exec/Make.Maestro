@@ -75,7 +75,6 @@ endif
 #------------------------------------------------------------------------------
 
 Bdirs 	:= Source \
-           Source/Src_nd \
            constants \
            Util/model_parser \
            Util/simple_log \
