@@ -1,5 +1,6 @@
 CEXE_sources += ModelParser.cpp
 CEXE_headers += ModelParser.H
-
-F90EXE_sources += model_parser.F90
-FEXE_headers += model_parser_F.H
+ifeq ($(USE_FORT_MICROPHYSICS), TRUE)
+  F90EXE_sources += model_parser.F90
+  FEXE_headers += model_parser_F.H
+endif

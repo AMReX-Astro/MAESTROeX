@@ -225,11 +225,20 @@ test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
 # state variable info
 #-------------------------------------------------------------------------------
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
-	echo "state_indices.H will be generated at the same time as state_indices_nd.F90"
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
+	echo "state_indices_nd.F90 will be generated at the same time as state_indices.H"
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90:
-	$(MAESTROEX_HOME)/Source/param/set_variables.py \
+ifeq ($(USE_FORT_MICROPHYSICS), TRUE)
+  state_fort_opts = --with_fortran
+else
+  state_fort_opts =
+endif
+
+# for dependency resolution
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H:
+	$(MAESTROEX_HOME)/Source/param/set_variables.py $(state_fort_opts) \
            --defines "$(DEFINES)" \
            --odir $(MAESTROEX_AUTO_SOURCE_DIR) \
            $(MAESTROEX_HOME)/Source/param/_variables
