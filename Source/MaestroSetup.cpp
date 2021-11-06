@@ -2,6 +2,10 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
+#if !defined(NETWORK_HAS_CXX_IMPLEMENTATION)
+#include <microphysics_F.H>
+#endif
+
 using namespace amrex;
 
 // read in C++/F90 parameters
@@ -45,6 +49,10 @@ void Maestro::Setup() {
     eos_init(maestro::small_temp, maestro::small_dens);
 
     conductivity_init();
+
+#ifdef MICROPHYSICS_FORT
+    microphysics_initialize(maestro::small_temp, maestro::small_dens);
+#endif
 
 #ifdef ROTATION
     RotationInit();
