@@ -2,7 +2,7 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
-#if !defined(NETWORK_HAS_CXX_IMPLEMENTATION)
+#ifdef MICROPHYSICS_FORT
 #include <microphysics_F.H>
 #endif
 
@@ -42,10 +42,8 @@ void Maestro::Setup() {
     // calls network_init
     VariableSetup();
 
-    maestro_network_init();
     network_init();
 
-    maestro_eos_init();
     eos_init(maestro::small_temp, maestro::small_dens);
 
     conductivity_init();
