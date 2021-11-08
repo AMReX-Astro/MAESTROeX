@@ -70,6 +70,7 @@ CEXE_headers += PhysBCFunctMaestro.H
 CEXE_headers += state_indices.H
 
 F90EXE_sources += meth_params.F90
-F90EXE_sources += state_indices_nd.F90
-
+ifeq ($(USE_FORT_MICROPHYSICS), TRUE)
+    F90EXE_sources += state_indices_nd.F90
+endif
 FEXE_headers += Maestro_F.H

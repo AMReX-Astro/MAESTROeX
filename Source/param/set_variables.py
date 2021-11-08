@@ -145,7 +145,7 @@ class Counter:
             self.cxx_name, self.get_cxx_value(offset=self.cxx_starting_val))
 
 
-def doit(variables_file, odir, defines):
+def doit(variables_file, odir, defines, do_fortran):
 
     # read the file and create a list of indices
     indices = []
@@ -245,25 +245,26 @@ def doit(variables_file, odir, defines):
     # all these routines will live in a single file
 
     # first the Fortran
-    with open(os.path.join(odir, "state_indices_nd.F90"), "w") as f:
+    if do_fortran:
+        with open(os.path.join(odir, "state_indices_nd.F90"), "w") as f:
 
-        # first write out the counter sizes
-        f.write("module state_indices_module\n")
-        f.write("   use network, only : nspec, naux\n")
-        f.write("   implicit none\n\n")
-        # f.write(f"   integer, parameter :: nscal = {nadv}\n")
-        for ac in all_counters:
-            f.write(f"   {ac.get_f90_set_string()}\n")
+            # first write out the counter sizes
+            f.write("module state_indices_module\n")
+            f.write("   use network, only : nspec, naux\n")
+            f.write("   implicit none\n\n")
+            # f.write(f"   integer, parameter :: nscal = {nadv}\n")
+            for ac in all_counters:
+                f.write(f"   {ac.get_f90_set_string()}\n")
 
-        # we only loop over the default sets for setting indices, not the
-        # "adds to", so we don't set the same index twice
-        for s in unique_sets:
-            set_indices = [q for q in indices if q.iset == s]
-            f.write(f"\n   ! {s}\n")
-            for i in set_indices:
-                f.write(i.get_f90_set_string(set_default=0))
+            # we only loop over the default sets for setting indices, not the
+            # "adds to", so we don't set the same index twice
+            for s in unique_sets:
+                set_indices = [q for q in indices if q.iset == s]
+                f.write(f"\n   ! {s}\n")
+                for i in set_indices:
+                    f.write(i.get_f90_set_string(set_default=0))
 
-        f.write("\nend module state_indices_module\n")
+            f.write("\nend module state_indices_module\n")
 
     # now the C++
     with open(os.path.join(odir, "state_indices.H"), "w") as f:
@@ -304,6 +305,9 @@ def main():
                         help="preprocessor defines to interpret")
     parser.add_argument("variables_file", type=str, nargs=1,
                         help="input variable definition file")
+    parser.add_argument("--with_fortran", action="store_true",
+                        help="do we build the Fortran module?")
+
     args = parser.parse_args()
 
     if args.odir != "" and not os.path.isdir(args.odir):
@@ -314,7 +318,7 @@ def main():
             # to create the directory by another make target
             pass
 
-    doit(args.variables_file[0], args.odir, args.defines)
+    doit(args.variables_file[0], args.odir, args.defines, args.with_fortran)
 
 
 if __name__ == "__main__":
