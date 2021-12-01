@@ -1,3 +1,9 @@
+# 21.12
+
+  * Remove Fortran files that are no longer used
+
+  * Remove Make.cuda_rules
+
 # 21.11
 
   * No changes since last release
