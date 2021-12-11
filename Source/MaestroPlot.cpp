@@ -1249,11 +1249,10 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << PrettyLine;
 
         // ParmParse::dumpTable(jobInfoFile, true);
-#include "maestro_job_info_tests.H"
 #include "extern_job_info_tests.H"
+#include "maestro_job_info_tests.H"
 
         jobInfoFile.close();
-
     }
 }
 
