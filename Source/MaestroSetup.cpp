@@ -281,7 +281,9 @@ void Maestro::ExternInit() {
         std::cout << "reading extern runtime parameters ..." << std::endl;
     }
 
+#ifdef MICROPHYSICS_FORT
     runtime_init();
+#endif
 
     // grab them from Fortran to C++
     init_extern_parameters();

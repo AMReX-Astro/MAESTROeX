@@ -1250,18 +1250,10 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
 
         // ParmParse::dumpTable(jobInfoFile, true);
 #include "maestro_job_info_tests.H"
+#include "extern_job_info_tests.H"
 
         jobInfoFile.close();
 
-        // now the external parameters
-        const int jobinfo_file_length = FullPathJobInfoFile.length();
-        Vector<int> jobinfo_file_name(jobinfo_file_length);
-
-        for (int i = 0; i < jobinfo_file_length; i++) {
-            jobinfo_file_name[i] = FullPathJobInfoFile[i];
-        }
-
-        runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
     }
 }
 
