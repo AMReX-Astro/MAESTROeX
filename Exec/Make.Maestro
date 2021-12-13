@@ -75,7 +75,6 @@ endif
 #------------------------------------------------------------------------------
 
 Bdirs 	:= Source \
-           constants \
            Util/model_parser \
            Util/simple_log \
            Util/utils
@@ -177,7 +176,7 @@ FEXE_headers += extern_parameters_F.H
 CEXE_headers += extern_parameters.H
 
 # these are for finding runtime parameters
-EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
+EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
    EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
 endif
