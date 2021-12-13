@@ -155,7 +155,7 @@ in the problem’s ``GNUmakefile``.
 
    -  ``helmholtz``
 
-   -  ``gamma_law_general``
+   -  ``gamma_law``
 
    -  ``multigamma``
 
