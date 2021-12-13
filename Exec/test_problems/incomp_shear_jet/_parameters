@@ -1,3 +1,5 @@
+@namespace: problem
+
 yt        real  0.0333333333333d0
 delx      real  0.05d0
 rho_base  real  1.0d0
