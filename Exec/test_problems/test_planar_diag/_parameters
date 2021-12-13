@@ -1,3 +1,5 @@
+@namespace: problem
+
 pres_base       real      1d13
 dens_base       real      1d0
 scale_height    real      1d9
