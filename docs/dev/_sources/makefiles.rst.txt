@@ -195,8 +195,6 @@ Core MAESTROeX modules
 Several modules are included in all MAESTROeX builds by default.
 In addition to the AMReX sources, we also include 
 
--  ``MAESTROeX/constants``
-
 -  ``MAESTROeX/Source``
 
 -  ``Util/model_parser``
