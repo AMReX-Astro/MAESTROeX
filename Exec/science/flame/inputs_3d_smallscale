@@ -109,4 +109,4 @@ problem.temp_ash = 3.e9
 problem.interface_pos_frac = 0.125e0
 problem.smooth_len_frac = 0.025e0
 
-eos.use_eos_coulomb = T
+eos.use_eos_coulomb = 1
