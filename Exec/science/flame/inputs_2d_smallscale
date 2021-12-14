@@ -1,7 +1,6 @@
 
 # INITIAL MODEL
 maestro.model_file = "model_files/kepler_new_6.25e8.hybrid.hse.320"
-maestro.probin_file = "probin"
 maestro.perturb_model = false
 maestro.drdxfac = 5
 
@@ -95,30 +94,15 @@ maestro.eps_hg_bottom      = 1.e-4
 
 maestro.do_burning = true
 
-&probin
+# override the default values of the probin namelist values here
 
-  ! override the default values of the probin namelist values here
-  dens_fuel = 5.e7
-  temp_fuel = 1.e8
-  xc12_fuel = 0.5e0
-  vel_fuel = 1.e5
-  temp_ash = 3.e9
-  interface_pos_frac = 0.125e0
-  smooth_len_frac = 0.025e0
+problem.dens_fuel = 5.e7
+problem.temp_fuel = 1.e8
+problem.xc12_fuel = 0.5e0
+problem.vel_fuel = 1.e5
+problem.temp_ash = 3.e9
+problem.interface_pos_frac = 0.125e0
+problem.smooth_len_frac = 0.025e0
 
-  !extern
+eos.use_eos_coulomb = T
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  use_eos_coulomb = T
-
-  !eos_gamma = 1.6666666e0
-
-/

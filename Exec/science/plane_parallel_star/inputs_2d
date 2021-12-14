@@ -103,39 +103,26 @@ maestro.burning_invert_cutoff_density = true
 
 maestro.grav_const = -3.2e-1
 
-&probin
+# override the default values of the probin namelist values here
 
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e5
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 1.e7
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  tag_density_3 = 1.e9
+problem.velpert_amplitude = 1.e5
+problem.velpert_radius = 2.e7
+problem.velpert_scale = 1.e7
+problem.velpert_steep = 1.e5
+problem.tag_density_1 = 1.e7
+problem.tag_density_2 = 1.e8
+problem.tag_density_3 = 1.e9
 
-  !extern
+eos.use_eos_coulomb = 1
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
+integrator.rtol_spec = 1.e-6
+integrator.rtol_enuc = 1.e-5
 
-  use_eos_coulomb = T
+integrator.retry_burn = 1
 
-  rtol_spec = 1.e-6
-  rtol_enuc = 1.e-5
+# Inputs for generating a Nonaka Plot (TM) at specific zone (i,j,k)
 
-  retry_burn = T
+integrator.nonaka_i = 15
+integrator.nonaka_j = 45
+integrator.nonaka_k = 0
 
-  ! Inputs for generating a Nonaka Plot (TM) at specific zone (i,j,k)
-  nonaka_i = 15
-  nonaka_j = 45
-  nonaka_k = 0
-  
-/
