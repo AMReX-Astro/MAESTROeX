@@ -127,13 +127,16 @@ ifeq ($(USE_REACT), TRUE)
     DEFINES += -DEXTRA_THERMO
    endif
 endif
-      
+
 # Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
 ifeq ($(USE_SDC), TRUE)
   USE_SIMPLIFIED_SDC = TRUE
   DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
 endif
-      
+
+
+USE_FORT_MICROPHYSICS := FALSE
+
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
@@ -223,26 +226,17 @@ test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
 # state variable info
 #-------------------------------------------------------------------------------
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
-	echo "state_indices_nd.F90 will be generated at the same time as state_indices.H"
-
-ifeq ($(USE_FORT_MICROPHYSICS), TRUE)
-  state_fort_opts = --with_fortran
-else
-  state_fort_opts =
-endif
-
 # for dependency resolution
 AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H:
-	$(MAESTROEX_HOME)/Source/param/set_variables.py $(state_fort_opts) \
+	$(MAESTROEX_HOME)/Source/param/set_variables.py \
            --defines "$(DEFINES)" \
            --odir $(MAESTROEX_AUTO_SOURCE_DIR) \
            $(MAESTROEX_HOME)/Source/param/_variables
 
 # for debugging
-test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
+test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
 
 #------------------------------------------------------------------------------
