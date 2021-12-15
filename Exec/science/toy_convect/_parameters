@@ -1,3 +1,5 @@
+@namespace: problem
+
 # Velocity field initialization
 apply_vel_field                     logical            .false.
 

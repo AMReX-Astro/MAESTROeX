@@ -1,3 +1,5 @@
+@namespace: problem
+
 apply_vel_field     logical   .true.
 velpert_scale       real      5.d6
 velpert_amplitude   real      1.d5

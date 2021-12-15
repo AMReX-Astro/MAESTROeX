@@ -75,7 +75,6 @@ endif
 #------------------------------------------------------------------------------
 
 Bdirs 	:= Source \
-           constants \
            Util/model_parser \
            Util/simple_log \
            Util/utils
@@ -136,7 +135,7 @@ ifeq ($(USE_SDC), TRUE)
 endif
 
 
-USE_FORT_MICROPHYSICS := FALSE
+USE_FORT_MICROPHYSICS ?= FALSE
 
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
@@ -182,7 +181,7 @@ CEXE_headers += extern_parameters.H
 AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
 # these are for finding runtime parameters
-EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
+EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
    EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
 endif
@@ -228,9 +227,6 @@ test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
 # state variable info
 #-------------------------------------------------------------------------------
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
-	echo "state_indices_nd.F90 will be generated at the same time as state_indices.H"
-
 # for dependency resolution
 AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
@@ -241,7 +237,7 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H:
            $(MAESTROEX_HOME)/Source/param/_variables
 
 # for debugging
-test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
+test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
 
 #------------------------------------------------------------------------------

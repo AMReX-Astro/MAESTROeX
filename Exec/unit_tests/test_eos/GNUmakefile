@@ -10,7 +10,7 @@ MAESTROEX_HOME  := ../../..
 
 
 # define the physics packages to build this problem
-# EOS_DIR := gamma_law_general
+# EOS_DIR := gamma_law
 EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := stellar
 NETWORK_DIR := general_null

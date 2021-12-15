@@ -1,3 +1,5 @@
+@namespace: problem
+
 velpert_amplitude         real 1.e5
 velpert_amplitude         real 1.e6
 velpert_radius            real 2.e7

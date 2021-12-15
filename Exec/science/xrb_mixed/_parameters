@@ -1,3 +1,4 @@
+@namespace: problem
 
 # Magnitude of the perturbation.
 xrb_pert_factor                     real               1.d-2               
