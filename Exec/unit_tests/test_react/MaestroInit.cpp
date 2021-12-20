@@ -1,8 +1,8 @@
 
 #include <AMReX_VisMF.H>
 #include <Maestro.H>
-#include <Maestro_F.H>
-#include <Problem_F.H>
+#include <extern_parameters.H>
+
 using namespace amrex;
 
 void Maestro::Init() {
@@ -23,7 +23,7 @@ void Maestro::Init() {
 
     // compute initial time step
     // FirstDt();
-    get_min_timestep(&dt);
+    dt = min_time_step;
 
     if (stop_time >= 0. && t_old + dt > stop_time) {
         dt = amrex::min(dt, stop_time - t_old);
