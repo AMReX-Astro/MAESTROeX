@@ -2,9 +2,8 @@
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
 #include <MaestroPlot.H>
-#include <Maestro_F.H>
-#include <Problem_F.H>
 #include <unistd.h>  // getcwd
+#include <extern_parameters.H>
 
 using namespace amrex;
 
@@ -25,10 +24,6 @@ void Maestro::WritePlotFile(const int step, const Real t_in, const Real dt_in,
     std::string plotfilename;
 
     // get the run prefix
-    const int max_len = 100;
-    char run_prefix_arr[max_len];
-    get_run_prefix(run_prefix_arr, max_len);
-    std::string run_prefix(run_prefix_arr);
 
     if (step == -1) {
         plotfilename = run_prefix + "model1";
