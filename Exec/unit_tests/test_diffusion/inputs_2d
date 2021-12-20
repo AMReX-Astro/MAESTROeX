@@ -63,22 +63,19 @@ maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 
-&probin
- const_conductivity = 1.d7
+conductivity.const_conductivity = 1.d7
 
- dt_mult_factor = 1.0d0
+problem.dt_mult_factor = 1.0e0
 
- outputfile = "norms.out"
+problem.outputfile = "norms.out"
 
- t0 = 1.0d-1
+problem.t0 = 1.0e-1
 
- peak_h = 1.0d1
- ambient_h = 1.0d0
+problem.peak_h = 1.0e1
+problem.ambient_h = 1.0e0
 
- ambient_dens = 1.0d0
+problem.ambient_dens = 1.0e0
 
- ambient_he4 = 0.5d0
- ambient_c12 = 0.25d0
- ambient_fe56 = 0.25d0
-
-/
+problem.ambient_he4 = 0.5e0
+problem.ambient_c12 = 0.25e0
+problem.ambient_fe56 = 0.25e0
