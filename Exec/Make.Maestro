@@ -173,10 +173,12 @@ INCLUDE_LOCATIONS += $(MAESTROEX_AUTO_SOURCE_DIR)
 #------------------------------------------------------------------------------
 
 # runtime parameter support for extern/ routines
-F90EXE_sources += extern.F90
 CEXE_sources += extern_parameters.cpp
 FEXE_headers += extern_parameters_F.H
 CEXE_headers += extern_parameters.H
+
+# for dependency resolution
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
 # these are for finding runtime parameters
 EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/Util/model_parser
@@ -196,14 +198,13 @@ ifdef USE_CUDA
   endif
 endif
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	@echo " "
-	@echo "${bold}WRITING extern.F90${normal}"
-	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py --with_fortran \
-          -t $(PROBIN_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90 -n probin \
+	@echo "${bold}WRITING extern_parameters.cpp${normal}"
+	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
