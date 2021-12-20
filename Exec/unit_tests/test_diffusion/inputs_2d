@@ -63,7 +63,7 @@ maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 
-conductivity.const_conductivity = 1.d7
+conductivity.const_conductivity = 1.e7
 
 problem.dt_mult_factor = 1.0e0
 
