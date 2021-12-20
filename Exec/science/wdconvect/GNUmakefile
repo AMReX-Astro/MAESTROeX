@@ -15,10 +15,9 @@ MAESTROEX_HOME  := ../../..
 # We first check if these exist in $(MAESTROEX_HOME)/Microphysics/(EOS/conductivity/networks)
 # If not we use the version in $(MICROPHYSICS_HOME)/Microphysics/(EOS/conductivity/networks)
 
-USE_FORT_MICROPHYSICS := TRUE
 EOS_DIR          := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR      := ignition_chamulak
+NETWORK_DIR      := ignition_simple
 INTEGRATOR_DIR   := VODE
 
 Bpack   := ./Make.package
