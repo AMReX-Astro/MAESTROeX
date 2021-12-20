@@ -2,8 +2,8 @@
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
 #include <MaestroPlot.H>
-#include <unistd.h>  // getcwd
 #include <extern_parameters.H>
+#include <unistd.h>  // getcwd
 
 using namespace amrex;
 
