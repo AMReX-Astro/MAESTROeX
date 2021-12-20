@@ -2,4 +2,4 @@
 
 advect_test_tol             real              1.d-14
 do_bds                      logical           .false.
-dir                         integer           1
+idir                        integer           1
