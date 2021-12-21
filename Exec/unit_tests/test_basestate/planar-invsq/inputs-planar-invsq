@@ -41,12 +41,10 @@ maestro.planar_invsq_mass = 2.38e33
 # EOS
 maestro.small_temp = 1.e6
 
-&probin
- heating_peak  = 1.e14
- heating_time  = 75.e0
- heating_rad   = 4.1e8
- heating_sigma = 4.e14
+problem.heating_peak  = 1.e14
+problem.heating_time  = 75.e0
+problem.heating_rad   = 4.1e8
+problem.heating_sigma = 4.e14
 
- use_eos_coulomb = T
+eos.use_eos_coulomb = 1
 
-/

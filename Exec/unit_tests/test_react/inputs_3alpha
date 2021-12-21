@@ -55,17 +55,13 @@ maestro.small_dt = 1.e-10
 maestro.base_cutoff_density = 1.e-5
 maestro.anelastic_cutoff_density = 1.e-5
 
-&probin
-  dens_min   = 1.d4
-  dens_max   = 1.d7
-  temp_min   = 5.d7
-  temp_max   = 5.d8
+problem.dens_min   = 1.e4
+problem.dens_max   = 1.e7
+problem.temp_min   = 5.e7
+problem.temp_max   = 5.e8
 
-  min_time_step = 1.0d-10
-  react_its = 7
+problem.min_time_step = 1.0e-10
+problem.react_its = 7
 
-  xin_file   = "xin.3alpha_plus_o"
-  run_prefix = "react_3alpha_"
-
-
-/
+problem.xin_file   = "xin.3alpha_plus_o"
+problem.run_prefix = "react_3alpha_"
