@@ -117,7 +117,7 @@ problem.single = 0
 # Fortran does not like seeing unknown variables
 # in the namelist.
 
-eos.const_conductivity = 1.0e0
+conductivity.const_conductivity = 1.0e0
 eos.species_a_name = "A"
 eos.species_a_gamma = 1.666e0
 

@@ -94,11 +94,11 @@ maestro.small_temp = 1.e-5
 maestro.do_burning = false
 
 # override the default values of the probin namelist values here
-dens_base = 1.65e-3
+problem.dens_base = 1.65e-3
 problem.pert_factor = 8.1e-3
-dens_base = 1.65e-3
+problem.dens_base = 1.65e-3
 problem.pres_base = 1.65e6
-dens_base = 1.65e-3
+problem.dens_base = 1.65e-3
 problem.dens_base = 1.65e-3
 problem.y_pert_center = 0.7e0
 problem.pert_width = 0.025e0
@@ -114,12 +114,12 @@ problem.single = 0
 # Fortran does not like seeing unknown variables
 # in the namelist.
 
-eos.const_conductivity = 1.0d0
+conductivity.const_conductivity = 1.0e0
 eos.species_a_name = "A"
-eos.species_a_gamma = 1.666d0
+eos.species_a_gamma = 1.666e0
 
 eos.species_b_name = "B"
-eos.species_b_gamma = 1.4d0
+eos.species_b_gamma = 1.4e0
 
 eos.species_c_name = "C"
-eos.species_c_gamma = 1.666d0
+eos.species_c_gamma = 1.666e0
