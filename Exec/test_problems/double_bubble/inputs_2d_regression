@@ -99,36 +99,31 @@ amrex.regtest_reduction = 1
 # GPU parameters 
 maestro.deterministic_nodal_solve = true
 
-&probin
+# override the default values of the probin namelist values here
+problem.pert_factor = 8.1e-3
+problem.pres_base = 1.65e6
+problem.dens_base = 1.65e-3
+problem.y_pert_center = 0.7e0
+problem.pert_width = 0.025e0
+problem.do_isentropic = 1
+problem.single = 0
 
-  ! override the default values of the probin namelist values here
-  pert_factor = 8.1e-3
-  pres_base = 1.65d6
-  dens_base = 1.65d-3
-  y_pert_center = 0.7d0
-  pert_width = 0.025d0
-  do_isentropic = T
-  single = F
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent, as
+# Fortran does not like seeing unknown variables
+# in the namelist.
 
-  !extern
+eos.const_conductivity = 1.0e0
+eos.species_a_name = "A"
+eos.species_a_gamma = 1.666e0
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
+eos.species_b_name = "B"
+eos.species_b_gamma = 1.4e0
 
-  const_conductivity = 1.0d0
-  species_a_name = "A"
-  species_a_gamma = 1.666d0
+eos.species_c_name = "C"
+eos.species_c_gamma = 1.666e0
 
-  species_b_name = "B"
-  species_b_gamma = 1.4d0
-
-  species_c_name = "C"
-  species_c_gamma = 1.666d0
-
-/
