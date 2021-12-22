@@ -1,6 +1,6 @@
 
 #include <Maestro.H>
-#include <Problem_F.H>
+#include <extern_parameters.H>
 
 using namespace amrex;
 
@@ -87,6 +87,7 @@ void Maestro::Evolve() {
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab& vel = uold[lev];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -137,6 +138,7 @@ void Maestro::Evolve() {
             MultiFab& vmac_mf = umac_old[lev][1];
             MultiFab& wmac_mf = umac_old[lev][2];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -176,7 +178,7 @@ void Maestro::Evolve() {
                     Real y = static_cast<Real>(j) * dx[1] + prob_lo[1];
                     Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
 
-#if (AMREX_SPACEDIM==2)
+#if AMREX_SPACEDIM == 2
                     vmac_arr(i,j,k) = std::pow(std::sin(M_PI*y), 2) * std::sin(2.0_rt*M_PI*x);
 #else
 
@@ -186,7 +188,7 @@ void Maestro::Evolve() {
 #endif
                 });
 
-#if (AMREX_SPACEDIM==3)
+#if AMREX_SPACEDIM == 3
                 // z-velocity  (x and y are centers, z are edges)
 
                 amrex::ParallelFor(mfi.nodaltilebox(2),
@@ -202,6 +204,8 @@ void Maestro::Evolve() {
                         4.0_rt * M_PI * std::cos(4.0_rt*M_PI*y) * std::sin(2.0_rt*M_PI*z);
 
                 });
+#endif
+
             }
         }
 
@@ -291,6 +295,7 @@ void Maestro::Evolve() {
             MultiFab& gphi_mf = gphi[lev];
             MultiFab& umid_mf = umid[lev];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -333,10 +338,10 @@ void Maestro::Evolve() {
                         gphi_arr(i,j,k,2) = 160.0_rt * z * (1.0_rt - z);
 #endif
 
-                        umid_arr(i,j,k,0) += gphi(i,j,k,0);
-                        umid_arr(i,j,k,1) += gphi(i,j,k,1);
+                        umid_arr(i,j,k,0) += gphi_arr(i,j,k,0);
+                        umid_arr(i,j,k,1) += gphi_arr(i,j,k,1);
 #if AMREX_SPACEDIM == 3
-                        umid_arr(i,j,k,2) += gphi(i,j,k,2);
+                        umid_arr(i,j,k,2) += gphi_arr(i,j,k,2);
 #endif
 
                         });
@@ -361,7 +366,7 @@ void Maestro::Evolve() {
 
                     // now we can explicitly difference phi
 
-                    amrex::ParallelFor(gtilebox,
+                    amrex::ParallelFor(gbox,
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
@@ -397,10 +402,10 @@ void Maestro::Evolve() {
                         gphi_arr(i,j,k,2) = (phi_arr(i,j,k+1) - phi_arr(i,j,k-1)) / (2.0_rt * dx[2]);
 #endif
 
-                        umid_arr(i,j,k,0) += gphi(i,j,k,0);
-                        umid_arr(i,j,k,1) += gphi(i,j,k,1);
+                        umid_arr(i,j,k,0) += gphi_arr(i,j,k,0);
+                        umid_arr(i,j,k,1) += gphi_arr(i,j,k,1);
 #if (AMREX_SPACEDIM==3)
-                        umid_arr(i,j,k,2) += gphi(i,j,k,2);
+                        umid_arr(i,j,k,2) += gphi_arr(i,j,k,2);
 #endif
 
                     });
@@ -443,6 +448,8 @@ void Maestro::Evolve() {
             MultiFab& wmac_mid_mf = umac_mid[lev][2];
 #endif
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
@@ -450,6 +457,7 @@ void Maestro::Evolve() {
 
             for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
+                const Box& gbox = amrex::grow(tilebox, 1);
 
                 if (   phys_bc[0] == SlipWall
                     && phys_bc[1] == SlipWall
@@ -552,7 +560,7 @@ void Maestro::Evolve() {
 
                     // now we can explicitly difference phi
 
-                    amrex::ParallelFor(gtilebox,
+                    amrex::ParallelFor(gbox,
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
@@ -568,6 +576,12 @@ void Maestro::Evolve() {
 #endif
 
                     });
+
+                    // lo and hi for the valid box for imposing BCs
+
+                    const Box& tilebox = mfi.tilebox();
+                    const int* lo = tilebox.loVect();
+                    const int* hi = tilebox.hiVect();
 
                     // x-velocity  (x are edges, y and z are centers)
 
