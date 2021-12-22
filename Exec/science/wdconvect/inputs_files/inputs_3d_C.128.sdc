@@ -124,5 +124,5 @@ problem.particle_tpert_threshold = 2.e7
 # microphysics routines be sure to check that
 # the parameters in here are consistent.
 
-eos.use_eos_coulomb = true
+eos.use_eos_coulomb = 1
 eos.jacobian = 2

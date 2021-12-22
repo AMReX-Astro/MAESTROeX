@@ -111,4 +111,4 @@ problem.velpert_steep = 1.e0
 # microphysics routines be sure to check that
 # the parameters in here are consistent.
 
-eos.use_eos_coulomb = false
+eos.use_eos_coulomb = 0

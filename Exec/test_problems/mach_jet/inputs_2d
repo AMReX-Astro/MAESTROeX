@@ -111,5 +111,5 @@ problem.do_isentropic = false
 # the parameters in here are consistent.
 
 eos.eos_gamma = 1.666666666666666e0
-#eos.eos_assume_neutral = true
-#conductivity.const_conductivity = true
+#eos.eos_assume_neutral = 1
+#conductivity.const_conductivity = 1.0e0

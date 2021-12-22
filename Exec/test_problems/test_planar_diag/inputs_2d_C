@@ -122,5 +122,5 @@ problem.use_p_h_g = true
 # the parameters in here are consistent.
 
 eos.eos_gamma = 1.6666666666666667e0
-eos.eos_assume_neutral = true
+eos.eos_assume_neutral = 1
 conductivity.const_conductivity = 0.0e0

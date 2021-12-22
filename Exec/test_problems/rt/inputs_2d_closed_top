@@ -119,5 +119,5 @@ problem.p0_base = 5.0e0
 # the parameters in here are consistent.
 
 eos.eos_gamma = 1.666666667e0
-eos.eos_assume_neutral = true
+eos.eos_assume_neutral = 1
 conductivity.const_conductivity = 1.0e0
