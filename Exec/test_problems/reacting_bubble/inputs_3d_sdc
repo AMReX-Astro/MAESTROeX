@@ -98,26 +98,17 @@ amrex.regtest_reduction = 1
 # GPU parameters
 maestro.deterministic_nodal_solve = true
 
-&probin
+# override the default values of the probin namelist values here
+problem.pert_temp_factor = 1.e0
+problem.pert_rad_factor = 1.e0
+problem.do_small_domain = false
 
-  ! override the default values of the probin namelist values here
-  pert_temp_factor = 1.d0
-  pert_rad_factor = 1.d0
-  do_small_domain = F
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  use_eos_coulomb = T
-  jacobian = 2
-  
-/
-
+eos.use_eos_coulomb = true
+eos.jacobian = 2
