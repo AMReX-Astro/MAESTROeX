@@ -107,35 +107,27 @@ maestro.mg_bottom_solver = 4
 maestro.hg_bottom_solver = 4
 maestro.max_mg_bottom_nlevels = 4
 
-&probin
+# override the default values of the probin namelist values here
+# temperature perturbation
+problem.xrb_pert_size = 50
+problem.xrb_pert_factor = 1.0e-5
+problem.xrb_pert_type = 1
+problem.xrb_pert_height = 5760.e0
 
-  ! override the default values of the probin namelist values here
-  ! temperature perturbation
-   xrb_pert_size = 50
-   xrb_pert_factor = 1.0d-5
-   xrb_pert_type = 1
-   xrb_pert_height = 5760.d0
+# velocity perturbation
+problem.apply_vel_field = true
+problem.velpert_scale = 1.0e2
+problem.velpert_amplitude = 1.0e5
+problem.velpert_height_loc = 5750.0
+problem.velpert_steep = 12.0e0
+problem.num_vortices = 8
 
-   ! velocity perturbation
-   apply_vel_field    = T
-   velpert_scale      = 1.0d2
-   velpert_amplitude  = 1.0d5
-   velpert_height_loc = 5750.0
-   velpert_steep      = 12.0d0
-   num_vortices = 8
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  !eos_gamma = 1.6666666d0
-  use_eos_coulomb = T
-
-/
+#eos.eos_gamma = 1.6666666e0
+eos.use_eos_coulomb = 1
