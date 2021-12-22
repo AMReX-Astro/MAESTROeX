@@ -96,10 +96,7 @@ maestro.do_burning = false
 # override the default values of the probin namelist values here
 problem.dens_base = 1.65e-3
 problem.pert_factor = 8.1e-3
-problem.dens_base = 1.65e-3
 problem.pres_base = 1.65e6
-problem.dens_base = 1.65e-3
-problem.dens_base = 1.65e-3
 problem.y_pert_center = 0.7e0
 problem.pert_width = 0.025e0
 problem.do_isentropic = 1
