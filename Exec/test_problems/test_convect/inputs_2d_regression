@@ -84,26 +84,18 @@ amrex.regtest_reduction = 1
 # GPU parameters 
 maestro.deterministic_nodal_solve = true
 
-&probin
+# override the default values of the probin namelist values here
+problem.apply_vel_field = true
+problem.velpert_scale = 5.e6
+problem.velpert_amplitude = 1.e5
+problem.velpert_height_loc = 1.2e8
+problem.num_vortices = 2
 
-  ! override the default values of the probin namelist values here
-  apply_vel_field = T
-  velpert_scale = 5.d6
-  velpert_amplitude = 1.d5
-  velpert_height_loc = 1.2e8
-  num_vortices = 2
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  use_eos_coulomb = F
-
-/
+eos.use_eos_coulomb = false
