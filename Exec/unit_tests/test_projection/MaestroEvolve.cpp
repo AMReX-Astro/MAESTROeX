@@ -246,18 +246,26 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+                auto wmac_arr = wmac_mf.array(mfi);
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                });
             }
         }
+
         // write umac_old
         WritePlotFile(0, t_new, dt, dummy, dummy, dummy, dummy, utemp, uold,
                       uold);
@@ -492,16 +500,24 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+                auto wmac_arr = wmac_mf.array(mfi);
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                });
+
             }
         }
 
@@ -520,16 +536,23 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+                auto wmac_arr = wmac_mf.array(mfi);
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                });
             }
         }
 
@@ -667,16 +690,24 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+                auto wmac_arr = wmac_mf.array(mfi);
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                });
+
             }
         }
 

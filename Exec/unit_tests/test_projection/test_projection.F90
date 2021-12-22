@@ -304,47 +304,4 @@ contains
 
         end subroutine add_grad_scalar_mac
 
-        !===========================================================================
-        subroutine convert_MAC_to_cc(lo, hi, &
-             umac, m_lo, m_hi, &
-             vmac, v_lo, v_hi, &
-#if (AMREX_SPACEDIM==3)
-             wmac, w_lo, w_hi, &
-#endif
-             u, u_lo, u_hi) bind(C, name="convert_MAC_to_cc")
-
-          ! convert a MAC velocity field to a cell-centered one -- no ghost
-          ! cell filling is done here.
-
-          integer, intent(in) :: lo(3), hi(3)
-          integer, intent(in) :: m_lo(3), m_hi(3)
-          integer, intent(in) :: v_lo(3), v_hi(3)
-#if (AMREX_SPACEDIM==3)
-          integer, intent(in) :: w_lo(3), w_hi(3)
-#endif
-          integer, intent(in) :: u_lo(3), u_hi(3)
-          double precision, intent(in) :: umac(m_lo(1):m_hi(1),m_lo(2):m_hi(2),m_lo(3):m_hi(3))
-          double precision, intent(in) :: vmac(v_lo(1):v_hi(1),v_lo(2):v_hi(2),v_lo(3):v_hi(3))
-#if (AMREX_SPACEDIM==3)
-          double precision, intent(in) :: wmac(w_lo(1):w_hi(1),w_lo(2):w_hi(2),w_lo(3):w_hi(3))
-#endif
-          double precision, intent(inout) :: u(u_lo(1):u_hi(1),u_lo(2):u_hi(2),u_lo(3):u_hi(3),3)
-
-          integer :: i, j, k
-
-          do k = lo(3), hi(3)
-             do j = lo(2), hi(2)
-                do i = lo(1), hi(1)
-
-                   u(i,j,k,1) = HALF*(umac(i,j,k) + umac(i+1,j,k))
-                   u(i,j,k,2) = HALF*(vmac(i,j,k) + vmac(i,j+1,k))
-#if (AMREX_SPACEDIM==3)
-                   u(i,j,k,3) = HALF*(wmac(i,j,k) + wmac(i,j,k+1))
-#endif
-
-                enddo
-             enddo
-          enddo
-
-        end subroutine convert_MAC_to_cc
 
