@@ -103,33 +103,24 @@ maestro.do_burning = false
 # OMP settings
 amrex.regtest_reduction = 1
 
+# override the default values of the probin namelist values here
+problem.pres_base = 1e13
+problem.scale_height = 1e9
+problem.pert_amp = 0.00e0
+problem.k_hoz = 4.0e0
+problem.k_vert = 2.0e0
+problem.do_uniform = false
+problem.do_isentropic = false
+problem.use_p_dens_g = false
+problem.use_p_h_g = true
 
-&probin
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  ! override the default values of the probin namelist values here
-  pres_base = 1d13
-  scale_height = 1d9
-  pert_amp = 0.00d0
-  k_hoz = 4.0d0
-  k_vert = 2.0d0
-  do_uniform = .false.
-  do_isentropic = .false.
-  use_p_dens_g = .false.
-  use_p_h_g = .true.
-
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  eos_gamma = 1.6666666666666667d0
-  eos_assume_neutral = T
-  const_conductivity = 0.0d0
-
-/
+eos.eos_gamma = 1.6666666666666667e0
+eos.eos_assume_neutral = true
+conductivity.const_conductivity = false
