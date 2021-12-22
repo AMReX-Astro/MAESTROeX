@@ -115,4 +115,4 @@ problem.p_base = 1.0e0
 # microphysics routines be sure to check that
 # the parameters in here are consistent.
 
-#conductivity.const_conductivity = true
+#conductivity.const_conductivity = 1.0e0

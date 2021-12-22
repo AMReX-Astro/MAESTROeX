@@ -123,4 +123,4 @@ problem.use_p_h_g = true
 
 eos.eos_gamma = 1.6666666666666667e0
 eos.eos_assume_neutral = true
-conductivity.const_conductivity = false
+conductivity.const_conductivity = 0.0e0
