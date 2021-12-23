@@ -109,10 +109,10 @@ problem.scale_height = 1e9
 problem.pert_amp = 0.00e0
 problem.k_hoz = 4.0e0
 problem.k_vert = 2.0e0
-problem.do_uniform = false
-problem.do_isentropic = false
-problem.use_p_dens_g = false
-problem.use_p_h_g = true
+problem.do_uniform = 0
+problem.do_isentropic = 0
+problem.use_p_dens_g = 0
+problem.use_p_h_g = 1
 
 # Note that some of the parameters in this
 # namelist are specific to the default EOS,

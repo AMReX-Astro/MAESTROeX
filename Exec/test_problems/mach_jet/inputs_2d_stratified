@@ -100,7 +100,7 @@ maestro.do_burning = false
 amrex.regtest_reduction = 1
 
 # override the default values of the probin namelist values here
-problem.do_stratified = true
+problem.do_stratified = 1
 
 # Note that some of the parameters in this
 # namelist are specific to the default EOS,

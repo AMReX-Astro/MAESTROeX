@@ -100,8 +100,8 @@ amrex.regtest_reduction = 1
 
 # override the default values of the probin namelist values here
 problem.inlet_mach = 1.e-1
-problem.do_stratified = false
-problem.do_isentropic = false
+problem.do_stratified = 0
+problem.do_isentropic = 0
 
 # Note that some of the parameters in this
 # namelist are specific to the default EOS,

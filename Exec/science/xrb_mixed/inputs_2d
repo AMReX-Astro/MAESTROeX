@@ -115,7 +115,7 @@ problem.xrb_pert_type = 1
 problem.xrb_pert_height = 5760.e0
 
 # velocity perturbation
-problem.apply_vel_field = true
+problem.apply_vel_field = 1
 problem.velpert_scale = 1.0e2
 problem.velpert_amplitude = 1.0e5
 problem.velpert_height_loc = 5750.0

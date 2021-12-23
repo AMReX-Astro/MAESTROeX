@@ -85,7 +85,7 @@ amrex.regtest_reduction = 1
 maestro.deterministic_nodal_solve = true
 
 # override the default values of the probin namelist values here
-problem.apply_vel_field = true
+problem.apply_vel_field = 1
 problem.velpert_scale = 5.e6
 problem.velpert_amplitude = 1.e5
 problem.velpert_height_loc = 1.2e8
