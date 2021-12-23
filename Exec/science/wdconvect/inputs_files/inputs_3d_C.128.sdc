@@ -125,4 +125,4 @@ problem.particle_tpert_threshold = 2.e7
 # the parameters in here are consistent.
 
 eos.use_eos_coulomb = 1
-eos.jacobian = 2
+integrator.jacobian = 2
