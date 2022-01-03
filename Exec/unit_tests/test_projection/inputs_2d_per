@@ -46,8 +46,5 @@ maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
 
-&probin
+problem.run_prefix = "periodic_"
 
- run_prefix = "periodic_"
-
-/

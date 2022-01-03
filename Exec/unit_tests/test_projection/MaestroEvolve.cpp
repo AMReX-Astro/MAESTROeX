@@ -327,7 +327,9 @@ void Maestro::Evolve() {
 
                         Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if AMREX_SPACEDIM == 3
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
 #if AMREX_SPACEDIM == 2
                         gphi_arr(i,j,k,0) = 4.0_rt * x * (1.0_rt - x);
@@ -372,10 +374,12 @@ void Maestro::Evolve() {
 
                         Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if AMREX_SPACEDIM == 3
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
-
+#endif
 
 #if AMREX_SPACEDIM == 2
+                        //std::cout << "here: " << i << " " << j << " " << k << std::endl;
                         phi_arr(i,j,k) = 0.1_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x);
 #else
                         phi_arr(i,j,k) = 5.0_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x) * std::cos(2.0_rt*M_PI*z);
