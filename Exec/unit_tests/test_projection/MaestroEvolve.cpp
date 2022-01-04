@@ -203,7 +203,9 @@ void Maestro::Evolve() {
 
                     Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                     Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                     Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
+#endif
 
                     wmac_arr(i,j,k) =
                         2.0_rt * M_PI * std::cos(2.0_rt*M_PI*x) * std::sin(4.0_rt*M_PI*z) -
@@ -331,7 +333,7 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
 #if AMREX_SPACEDIM == 3
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
@@ -378,7 +380,7 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
 #if AMREX_SPACEDIM == 3
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
@@ -401,10 +403,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
-
+#endif
 
                         gphi_arr(i,j,k,0) = (phi_arr(i+1,j,k) - phi_arr(i-1,j,k)) / (2.0_rt * dx[0]);
                         gphi_arr(i,j,k,1) = (phi_arr(i,j+1,k) - phi_arr(i,j-1,k)) / (2.0_rt * dx[1]);
@@ -494,9 +497,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[2];
+                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
 #if AMREX_SPACEDIM == 2
                         gphix_arr(i,j,k) = 4.0_rt * x * (1.0_rt - x);
@@ -516,9 +521,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = static_cast<Real>(j) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
 #if AMREX_SPACEDIM == 2
                         gphiy_arr(i,j,k) = 4.0_rt * y * (1.0_rt - y);
@@ -540,9 +547,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
+#endif
 
                         gphiz_arr(i,j,k) = 160.0_rt * z * (1.0_rt - z);
                         wmac_arr(i,j,k) += gphiz_arr(i,j,k);
@@ -574,9 +583,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
 
 #if AMREX_SPACEDIM == 2
@@ -602,9 +613,11 @@ void Maestro::Evolve() {
                     [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                     {
 
-                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[2];
+                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                         Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
                         gphix_arr(i,j,k) = (phi_arr(i,j,k) - phi_arr(i-1,j,k)) / dx[0];
                         umac_arr(i,j,k) += gphix_arr(i,j,k);
