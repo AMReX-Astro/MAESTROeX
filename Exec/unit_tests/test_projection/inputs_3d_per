@@ -42,8 +42,4 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
-&probin
-
- run_prefix = "periodic_3d_"
-
-/
+problem.run_prefix = "periodic_3d_"

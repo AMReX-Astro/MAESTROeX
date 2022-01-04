@@ -55,16 +55,13 @@ maestro.small_dt = 1.e-10
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
-&probin
+problem.dens_min   = 1.e8
+problem.dens_max   = 2.e9
+problem.temp_min   = 5.e7
+problem.temp_max   = 7.e8
 
-  dens_min   = 1.d8
-  dens_max   = 2.d9
-  temp_min   = 5.d7
-  temp_max   = 7.d8
+problem.min_time_step = 1.0e-5
+problem.react_its = 7
 
-  min_time_step = 1.0d-5
-  react_its = 7
-
-  xin_file   = "xin.ignition"
-  run_prefix = "react_ignition_"
-/
+problem.xin_file   = "xin.ignition"
+problem.run_prefix = "react_ignition_"

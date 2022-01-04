@@ -47,4 +47,3 @@ maestro.base_cutoff_density = 3.e6
 
 
 problem.run_prefix = "periodic_"
-

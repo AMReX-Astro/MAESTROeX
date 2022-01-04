@@ -113,21 +113,13 @@ system.regtest_reduction = 1
 #
 maestro.do_heating = true
 
-&probin
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  eos_gamma = 1.6666666666666667d0
-  eos_assume_neutral = T
-  const_conductivity = 0.0d0
-
-/
+eos.eos_gamma = 1.6666666666666667e0
+eos.eos_assume_neutral = 1
+conductivity.const_conductivity = 0.0e0

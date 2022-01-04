@@ -2,9 +2,6 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
-#ifdef MICROPHYSICS_FORT
-#include <microphysics_F.H>
-#endif
 
 using namespace amrex;
 
@@ -47,10 +44,6 @@ void Maestro::Setup() {
     eos_init(maestro::small_temp, maestro::small_dens);
 
     conductivity_init();
-
-#ifdef MICROPHYSICS_FORT
-    microphysics_initialize(maestro::small_temp, maestro::small_dens);
-#endif
 
 #ifdef ROTATION
     RotationInit();
@@ -281,11 +274,7 @@ void Maestro::ExternInit() {
         std::cout << "reading extern runtime parameters ..." << std::endl;
     }
 
-#ifdef MICROPHYSICS_FORT
-    runtime_init();
-#endif
-
-    // grab them from Fortran to C++
+    // get the Microphysics runtime parameters
     init_extern_parameters();
 }
 
