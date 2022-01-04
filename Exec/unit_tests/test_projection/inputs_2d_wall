@@ -14,6 +14,8 @@ maestro.lo_bc = 4 4
 maestro.hi_bc = 4 4
 geometry.is_periodic =  0 0
 
+maestro.max_step = 1
+
 # PLOTFILES
 maestro.plot_base_name  = nodal_wall    # root name of plot file
 
