@@ -194,7 +194,7 @@ void Maestro::Evolve() {
 #endif
                 });
 
-#if AMREX_SPACEDIM == 3
+#if (AMREX_SPACEDIM == 3)
                 // z-velocity  (x and y are centers, z are edges)
 
                 amrex::ParallelFor(mfi.nodaltilebox(2),
