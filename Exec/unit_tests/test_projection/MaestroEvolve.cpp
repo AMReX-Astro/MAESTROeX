@@ -176,15 +176,17 @@ void Maestro::Evolve() {
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                 {
 
-                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                     Real y = static_cast<Real>(j) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
                     Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
 
 #if AMREX_SPACEDIM == 2
                     vmac_arr(i,j,k) = std::pow(std::sin(M_PI*y), 2) * std::sin(2.0_rt*M_PI*x);
 #else
 
-                    vmac(i,j,k) =
+                    vmac_arr(i,j,k) =
                         2.0_rt * M_PI * std::sin(4.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*z) -
                         4.0_rt * M_PI * std::cos(4.0_rt*M_PI*x) * std::sin(2.0_rt*M_PI*y);
 #endif
@@ -197,7 +199,7 @@ void Maestro::Evolve() {
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
                 {
 
-                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[2];
+                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                     Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
                     Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
 
