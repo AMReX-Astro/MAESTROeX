@@ -231,6 +231,13 @@ int Maestro::ReadCheckPoint() {
             gpi[lev].define(ba, dm, AMREX_SPACEDIM, 0);
             dSdt[lev].define(ba, dm, 1, 0);
 
+	    // initialize data to zero
+	    sold[lev].setVal(0.);
+	    uold[lev].setVal(0.);
+	    S_cc_old[lev].setVal(0.);
+	    gpi[lev].setVal(0.);
+	    dSdt[lev].setVal(0.);
+	
             // build FluxRegister data
             if (lev > 0 && reflux_type == 2) {
                 flux_reg_s[lev] = std::make_unique<FluxRegister>(
@@ -253,17 +260,9 @@ int Maestro::ReadCheckPoint() {
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_",
                                                   "S_cc_new"));
 
-	sold[lev].setVal(0.);
-	uold[lev].setVal(0.);
-	gpi[lev].setVal(0.);
-	dSdt[lev].setVal(0.);
-	S_cc_old[lev].setVal(0.);
-	
 #ifdef SDC
         VisMF::Read(intra[lev], amrex::MultiFabFileFullPrefix(
                                     lev, restart_file, "Level_", "intra"));
-
-	intra[lev].setVal(0.);
 #endif
     }
 
