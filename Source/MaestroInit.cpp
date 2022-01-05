@@ -57,6 +57,9 @@ void Maestro::Init() {
         // rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
         ReadCheckPoint();
 
+        // initialize any inlet BC parameters
+        SetInletBCs();
+
         // build (define) the following MultiFabs (that weren't read in from checkpoint):
         // snew, unew, S_cc_new, w0_cart, rhcc_for_nodalproj, normal, pi
         for (int lev = 0; lev <= finest_level; ++lev) {
