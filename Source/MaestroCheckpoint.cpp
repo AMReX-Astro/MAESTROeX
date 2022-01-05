@@ -252,9 +252,18 @@ int Maestro::ReadCheckPoint() {
         VisMF::Read(S_cc_old[lev],
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_",
                                                   "S_cc_new"));
+
+	sold[lev].setVal(0.);
+	uold[lev].setVal(0.);
+	gpi[lev].setVal(0.);
+	dSdt[lev].setVal(0.);
+	S_cc_old[lev].setVal(0.);
+	
 #ifdef SDC
         VisMF::Read(intra[lev], amrex::MultiFabFileFullPrefix(
                                     lev, restart_file, "Level_", "intra"));
+
+	intra[lev].setVal(0.);
 #endif
     }
 
@@ -309,12 +318,6 @@ int Maestro::ReadCheckPoint() {
             lis >> word;
             beta0_nm1.array()(i) = std::stod(word);
         }
-    }
-
-    if (do_smallscale) {
-        Average(sold, rho0_old, Rho);
-        ComputeCutoffCoords(rho0_old);
-        rho0_old.setVal(0.);
     }
 
     // BaseFC
