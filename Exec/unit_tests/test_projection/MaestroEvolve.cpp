@@ -149,7 +149,9 @@ void Maestro::Evolve() {
 
                 Array4<Real> const umac_arr = umac_mf.array(mfi);
                 Array4<Real> const vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
                 Array4<Real> const wmac_arr = wmac_mf.array(mfi);
+#endif
 
                 // x-velocity  (x are edges, y and z are centers)
 
@@ -203,9 +205,7 @@ void Maestro::Evolve() {
 
                     Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                     Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
-#if (AMREX_SPACEDIM==3)
                     Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
-#endif
 
                     wmac_arr(i,j,k) =
                         2.0_rt * M_PI * std::cos(2.0_rt*M_PI*x) * std::sin(4.0_rt*M_PI*z) -
@@ -262,7 +262,9 @@ void Maestro::Evolve() {
                 auto utemp_arr = utemp_mf.array(mfi);
                 auto umac_arr = umac_mf.array(mfi);
                 auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
                 auto wmac_arr = wmac_mf.array(mfi);
+#endif
 
                 amrex::ParallelFor(tilebox,
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
@@ -549,9 +551,7 @@ void Maestro::Evolve() {
 
                         Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
                         Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
-#if (AMREX_SPACEDIM==3)
                         Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
-#endif
 
                         gphiz_arr(i,j,k) = 160.0_rt * z * (1.0_rt - z);
                         wmac_arr(i,j,k) += gphiz_arr(i,j,k);
@@ -721,7 +721,9 @@ void Maestro::Evolve() {
                 auto utemp_arr = utemp_mf.array(mfi);
                 auto umac_arr = umac_mf.array(mfi);
                 auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
                 auto wmac_arr = wmac_mf.array(mfi);
+#endif
 
                 amrex::ParallelFor(tilebox,
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
@@ -757,7 +759,9 @@ void Maestro::Evolve() {
                 auto utemp_arr = utemp_mf.array(mfi);
                 auto umac_arr = umac_mf.array(mfi);
                 auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
                 auto wmac_arr = wmac_mf.array(mfi);
+#endif
 
                 amrex::ParallelFor(tilebox,
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
@@ -911,7 +915,9 @@ void Maestro::Evolve() {
                 auto utemp_arr = utemp_mf.array(mfi);
                 auto umac_arr = umac_mf.array(mfi);
                 auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
                 auto wmac_arr = wmac_mf.array(mfi);
+#endif
 
                 amrex::ParallelFor(tilebox,
                 [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
