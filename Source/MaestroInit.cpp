@@ -105,19 +105,19 @@ void Maestro::Init() {
                                    base_geom.nr_fine);
         base_geom.InitMultiLevel(finest_level, tag_array_b.array());
 
-	// average down data and fill ghost cells
-	AverageDown(sold, 0, Nscal);
-	FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
-	AverageDown(uold, 0, AMREX_SPACEDIM);
-	FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
-	
-	if (do_smallscale) {
-	    Average(sold, rho0_old, Rho);
-	    base_geom.ComputeCutoffCoords(rho0_old.array());
-	    rho0_old.setVal(0.);
-	} else {
-	    base_geom.ComputeCutoffCoords(rho0_old.array());
-	}
+        // average down data and fill ghost cells
+        AverageDown(sold, 0, Nscal);
+        FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
+        AverageDown(uold, 0, AMREX_SPACEDIM);
+        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+
+        if (do_smallscale) {
+            Average(sold, rho0_old, Rho);
+            base_geom.ComputeCutoffCoords(rho0_old.array());
+            rho0_old.setVal(0.);
+        } else {
+            base_geom.ComputeCutoffCoords(rho0_old.array());
+        }
     }
 
 #if (AMREX_SPACEDIM == 3)
