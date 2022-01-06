@@ -1,6 +1,5 @@
 
 # INITIAL MODEL
-maestro.model_file = "model_files/kepler_new_6.25e8.hybrid.hse.320"
 maestro.probin_file = "probin"
 maestro.perturb_model = false
 maestro.drdxfac = 5

@@ -2,7 +2,6 @@
 #include <Maestro.H>
 #include <Maestro_F.H>
 
-
 using namespace amrex;
 
 // read in C++/F90 parameters
