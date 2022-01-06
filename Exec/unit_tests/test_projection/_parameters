@@ -1,3 +1,5 @@
+@namespace: problem
+
 run_prefix   character   ""
 
 # project_type == 1 is hgproject, project_type == 2 is macproject

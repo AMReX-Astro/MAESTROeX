@@ -1,3 +1,23 @@
+# 22.01
+
+  * Remove all Fortran Microphysics
+
+  * Remove old Fortran constants module, sponge, inlet BC, extern parameter support, and files that are no longer used
+  
+  * Add problem namespace to the problem runtime parameters
+
+  * Convert embedded probins to C++ inputs for all problems
+
+  * Change networks for test problems: xrb_mixed (xrb_simple -> rprox), wdconvect (ignition_chamulak -> ignition_simple)
+
+  * Remove Travis references (Travis is no longer used)
+
+# 21.12
+
+  * Remove Fortran files that are no longer used
+
+  * Remove Make.cuda_rules
+
 # 21.11
 
   * No changes since last release

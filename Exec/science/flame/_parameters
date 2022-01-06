@@ -1,3 +1,5 @@
+@namespace: problem
+
 # For a simple laminar flame setup we define the fuel and ash state.  The
 # fuel parameters will be used to define the inflow boundary condition.
 # the fuel and ash will be in pressure equilibrium, so the ash density

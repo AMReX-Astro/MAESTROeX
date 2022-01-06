@@ -113,40 +113,24 @@ maestro.sdc_couple_velocity = true
 maestro.rotational_frequency = 1.e-3
 maestro.rotation_radius = 2.e8
 
-&probin
+# override the default values of the probin namelist values here
+problem.velpert_amplitude = 1.e6
+problem.velpert_radius = 2.e7
+problem.velpert_scale = 1.e7
+problem.velpert_steep = 1.e5
+problem.tag_density_1 = 1.e7
+problem.use_analytic_heating = 0
 
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e6
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 1.e7
-  use_analytic_heating = F
+eos.use_eos_coulomb = 1
 
-  !extern
+integrator.retry_burn = 1
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
+integrator.jacobian = 1
 
-  use_eos_coulomb = T
+integrator.atol_spec = 1.e-6
+integrator.atol_enuc = 1.e-6
 
-  retry_burn = T
+integrator.rtol_spec = 1.e-6
+integrator.rtol_enuc = 1.e-6
 
-  call_eos_in_rhs = T
-  jacobian = 1
-  
-  atol_spec = 1.e-6
-  atol_enuc = 1.e-6
-
-  rtol_spec = 1.e-6
-  rtol_enuc = 1.e-6
-
-  renormalize_abundances = T
-
-/
+integrator.renormalize_abundances = 1

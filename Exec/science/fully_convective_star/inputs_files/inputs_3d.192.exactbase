@@ -111,11 +111,7 @@ maestro.sdc_couple_velocity = false
 maestro.rotational_frequency = 0.0 #4.e-6
 maestro.rotation_radius = 0.0
 
-&probin
+problem.velpert_radius = 3.e9
+problem.velpert_amplitude = 1.e4
 
-
-  velpert_radius = 3.e9
-  velpert_amplitude = 1.e4
-  eos_assume_neutral = .false.
-
-/
+eos.eos_assume_neutral = 0

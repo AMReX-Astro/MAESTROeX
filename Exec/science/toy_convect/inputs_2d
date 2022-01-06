@@ -102,26 +102,11 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-&probin
+# override the default values of the probin namelist values here
 
-  ! override the default values of the probin namelist values here
-  apply_vel_field = T
-  velpert_height_loc = 3.95d8
-  velpert_scale = 1.d6
-  velpert_amplitude = 1.d3
-  num_vortices = 6
+problem.apply_vel_field = 1
+problem.velpert_height_loc = 3.95e8
+problem.velpert_scale = 1.e6
+problem.velpert_amplitude = 1.e3
+problem.num_vortices = 6
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  !eos_gamma = 1.6666666d0
-
-/
