@@ -168,7 +168,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #endif
 
 		for (int n = 0; n < NumSpec; ++n) {
-		    x_in[n] = temp_ptr[index*NumInput + 1 + n];
+		    x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		}
 
                 Real x_test =
@@ -199,7 +199,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
 			// note enuc in output tensor is the normalized value
 			// of (state_out.e - state_in.e)
-			rhoH = rho * exp(-2.0/outputs_torch_acc[index][NumSpec]) * enuc_fac) / dt_in;
+			rhoH = rho * (exp(-2.0/outputs_torch_acc[index][NumSpec]) * enuc_fac) / dt_in;
 		    } else {
 			// need to use burner if no ML model was given
 			burn_t state_in;
