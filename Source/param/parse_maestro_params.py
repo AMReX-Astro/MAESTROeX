@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 
-"""
-This script parses the list of C++ runtime parameters and writes the
-necessary header files and Fortran routines to make them available
-in Maestro's C++ routines and (optionally) the Fortran routines
-through meth_params_module.
+"""This script parses the list of C++ runtime parameters and writes
+the necessary header files to make them available in Maestro's C++
+routines and (optionally)
 
 parameters have the format:
 
@@ -54,12 +52,6 @@ For a namespace, name, we write out:
     this tests the current value against the default and outputs
     into a file
 
-we write out a single copy of:
-
-  -- meth_params.F90
-     does the parmparse query to override the default in Fortran,
-     and sets a number of other parameters specific to the F90 routinse
-
 """
 
 import argparse
@@ -79,76 +71,6 @@ CWARNING = """
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh\n
 """
-
-def write_meth_module(plist, meth_template, out_directory):
-    """this writes the meth_params_module, starting with the meth_template
-       and inserting the runtime parameter declaration in the correct
-       place
-    """
-
-    try:
-        mt = open(meth_template, "r")
-    except IOError:
-        sys.exit("invalid template file")
-
-    try:
-        mo = open(f"{out_directory}/meth_params.F90", "w")
-    except IOError:
-        sys.exit("unable to open meth_params.F90 for writing")
-
-    mo.write(FWARNING)
-
-    param_decls = [p.get_f90_decl_string() for p in plist if p.in_fortran == 1]
-    params = [p for p in plist if p.in_fortran == 1]
-
-    decls = ""
-
-    for p in param_decls:
-        decls += f"  {p}"
-
-    for line in mt:
-        if line.find("@@f90_declarations@@") > 0:
-            mo.write(decls)
-
-        elif line.find("@@set_maestro_params@@") >= 0:
-
-            namespaces = {q.namespace for q in params}
-            print("namespaces: ", namespaces)
-            for nm in namespaces:
-                params_nm = [q for q in params if q.namespace == nm]
-
-                for p in params_nm:
-                    mo.write(p.get_f90_default_string())
-
-                mo.write("\n")
-
-                mo.write(f'    call amrex_parmparse_build(pp, "{nm}")\n')
-
-                for p in params_nm:
-                    mo.write(p.get_query_string("F90"))
-
-                mo.write('    call amrex_parmparse_destroy(pp)\n')
-
-                mo.write("\n\n")
-
-        elif line.find("@@free_maestro_params@@") >= 0:
-
-            params_free = [q for q in params if q.in_fortran == 1]
-
-            for p in params_free:
-                if p.dtype != "string":
-                    mo.write(f"    if (allocated({p.name})) then\n")
-                    mo.write(f"        deallocate({p.name})\n")
-                    mo.write("    end if\n")
-
-            mo.write("\n\n")
-
-        else:
-            mo.write(line)
-
-    mo.close()
-    mt.close()
-
 
 def parse_params(infile, meth_template, out_directory):
 
@@ -221,7 +143,6 @@ def parse_params(infile, meth_template, out_directory):
                                cpp_var_name=cpp_var_name,
                                namespace=namespace,
                                debug_default=debug_default,
-                               in_fortran=in_fortran,
                                ifdef=ifdef))
 
     # output
@@ -309,9 +230,6 @@ def parse_params(infile, meth_template, out_directory):
                 jo.write("#endif\n")
 
         jo.close()
-
-    # write the Fortran module
-    write_meth_module(params, meth_template, out_directory)
 
 
 def main():
