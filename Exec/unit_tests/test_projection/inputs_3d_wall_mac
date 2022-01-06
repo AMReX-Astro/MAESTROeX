@@ -42,10 +42,6 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.anelastic_cutoff_density = 3.e6
 maestro.base_cutoff_density = 3.e6
 
-&probin
+problem.run_prefix = "mac_wall_3d_"
 
- run_prefix = "mac_wall_3d_"
-
- project_type = 2
-
-/
+problem.project_type = 2

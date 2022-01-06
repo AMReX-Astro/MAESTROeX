@@ -26,10 +26,6 @@ void Maestro::Setup() {
     // read in C++ parameters in maestro_queries.H using ParmParse pp("maestro");
     ReadParameters();
 
-    // read in F90 parameters in meth_params.F90 that are defined
-    // in _cpp_parameters
-    read_method_params();
-
     // Initialize the runtime parameters for any of the external microphysics
     // (in extern.f90)
     ExternInit();
@@ -38,10 +34,8 @@ void Maestro::Setup() {
     // calls network_init
     VariableSetup();
 
-    maestro_network_init();
     network_init();
 
-    maestro_eos_init();
     eos_init(maestro::small_temp, maestro::small_dens);
 
     conductivity_init();
@@ -301,9 +295,7 @@ void Maestro::ExternInit() {
         std::cout << "reading extern runtime parameters ..." << std::endl;
     }
 
-    runtime_init();
-
-    // grab them from Fortran to C++
+    // get the Microphysics runtime parameters
     init_extern_parameters();
 }
 

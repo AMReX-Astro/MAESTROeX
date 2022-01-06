@@ -1,3 +1,5 @@
+@namespace: problem
+
 heating_time          real           0.5d0
 heating_rad           real           0.d0
 heating_peak          real           1.d16

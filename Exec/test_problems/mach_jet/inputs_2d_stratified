@@ -99,24 +99,16 @@ maestro.do_burning = false
 # OMP settings
 amrex.regtest_reduction = 1
 
-&probin
+# override the default values of the probin namelist values here
+problem.do_stratified = 1
 
-  ! override the default values of the probin namelist values here
-  do_stratified = T
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  eos_gamma = 1.666666666666666d0
-  !eos_assume_neutral = T
-  !const_conductivity = 1.0d0
-
-/
+eos.eos_gamma = 1.666666666666666e0
+#eos.eos_assume_neutral = 1
+#conductivity.const_conductivity = 1.0e0

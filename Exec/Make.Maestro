@@ -84,8 +84,6 @@ endif
 #------------------------------------------------------------------------------
 
 Bdirs 	:= Source \
-           Source/Src_nd \
-           constants \
            Util/model_parser \
            Util/simple_log \
            Util/utils
@@ -138,13 +136,16 @@ ifeq ($(USE_REACT), TRUE)
     DEFINES += -DEXTRA_THERMO
    endif
 endif
-      
+
 # Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
 ifeq ($(USE_SDC), TRUE)
   USE_SIMPLIFIED_SDC = TRUE
   DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
 endif
-      
+
+
+USE_FORT_MICROPHYSICS ?= FALSE
+
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
@@ -213,13 +214,15 @@ INCLUDE_LOCATIONS += $(MAESTROEX_AUTO_SOURCE_DIR)
 #------------------------------------------------------------------------------
 
 # runtime parameter support for extern/ routines
-F90EXE_sources += extern.F90
 CEXE_sources += extern_parameters.cpp
 FEXE_headers += extern_parameters_F.H
 CEXE_headers += extern_parameters.H
 
+# for dependency resolution
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
+
 # these are for finding runtime parameters
-EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/constants $(TOP)/Util/model_parser
+EXTERN_SEARCH += $(EXTERN_CORE) $(TOP)/Util/model_parser
 ifdef MICROPHYSICS_HOME
    EXTERN_SEARCH += $(MICROPHYSICS_HOME)/networks/
 endif
@@ -229,14 +232,20 @@ PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90
+ifdef USE_CUDA
+  ifeq ($(USE_CUDA), TRUE)
+    USE_GPU_PRAGMA = TRUE
+    DEFINES += -DCUDA
+  endif
+endif
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	@echo " "
-	@echo "${bold}WRITING extern.F90${normal}"
-	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py --with_fortran \
-          -t $(PROBIN_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90 -n probin \
+	@echo "${bold}WRITING extern_parameters.cpp${normal}"
+	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
@@ -245,31 +254,32 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern.F90: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
 # MAESTROeX C++ parameters
 #------------------------------------------------------------------------------
 
-CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
-METH_PARAMS_TEMPLATE := $(TOP)/Source/param/meth_params.template
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90: $(CPP_PARAMETERS) $(METH_PARAMS_TEMPLATE)
+CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H: $(CPP_PARAMETERS)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
-	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
+	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
 
 # for debugging
-test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
+test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
 
 #------------------------------------------------------------------------------
 # state variable info
 #-------------------------------------------------------------------------------
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
-	echo "state_indices.H will be generated at the same time as state_indices_nd.F90"
+# for dependency resolution
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90:
+$(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H:
 	$(MAESTROEX_HOME)/Source/param/set_variables.py \
            --defines "$(DEFINES)" \
            --odir $(MAESTROEX_AUTO_SOURCE_DIR) \
            $(MAESTROEX_HOME)/Source/param/_variables
 
 # for debugging
-test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices_nd.F90
+test_variables: $(MAESTROEX_AUTO_SOURCE_DIR)/state_indices.H
 
 
 #------------------------------------------------------------------------------
@@ -322,8 +332,6 @@ include $(AMREX_HOME)/Tools/GNUMake/Make.rules
 
 ifeq ($(USE_CUDA),TRUE)
 ifeq ($(USE_GPU_PRAGMA), TRUE)
-
-include $(TOP)/Exec/Make.cuda_rules
 
 endif
 endif

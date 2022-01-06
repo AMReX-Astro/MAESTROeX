@@ -1,3 +1,5 @@
+@namespace: problem
+
 # max mach number at inflow
 inlet_mach       real    1.d-1
 do_stratified    logical .false.

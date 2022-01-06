@@ -155,7 +155,7 @@ in the problem’s ``GNUmakefile``.
 
    -  ``helmholtz``
 
-   -  ``gamma_law_general``
+   -  ``gamma_law``
 
    -  ``multigamma``
 
@@ -194,8 +194,6 @@ Core MAESTROeX modules
 
 Several modules are included in all MAESTROeX builds by default.
 In addition to the AMReX sources, we also include 
-
--  ``MAESTROeX/constants``
 
 -  ``MAESTROeX/Source``
 
