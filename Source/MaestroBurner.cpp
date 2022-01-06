@@ -111,7 +111,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		// array order is row-based [index][comp]
 		temp_ptr[index*NumInput] = dt_in;
 		for (int n = 0; n < NumSpec; ++n) {
-		    temp_ptr[index*NumInput + 1 + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
+		    temp_ptr[index*NumInput + 1 + n] = -5.0/log(s_in_arr(i, j, k, FirstSpec + n) / rho);
 		}
 		temp_ptr[index*NumInput + NumSpec + 1] = rho / dens_fac;
 		temp_ptr[index*NumInput + NumSpec + 2] = T_in / temp_fac;
@@ -193,13 +193,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			for (int n = 0; n < NumSpec; ++n) {
 			    // check if X_k >= 0
 			    x_out[n] = (outputs_torch_acc[index][n] >= 0.0) ?
-				outputs_torch_acc[index][n] : 0.0;
+				exp(-5.0/outputs_torch_acc[index][n]) : 0.0;
 			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 			}
 
 			// note enuc in output tensor is the normalized value
 			// of (state_out.e - state_in.e)
-			rhoH = rho * (outputs_torch_acc[index][NumSpec] * enuc_fac) / dt_in;
+			rhoH = rho * exp(-2.0/outputs_torch_acc[index][NumSpec]) * enuc_fac) / dt_in;
 		    } else {
 			// need to use burner if no ML model was given
 			burn_t state_in;
