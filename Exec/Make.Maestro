@@ -213,15 +213,16 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS) $(PROBIN_
 # MAESTROeX C++ parameters
 #------------------------------------------------------------------------------
 
-CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
-METH_PARAMS_TEMPLATE := $(TOP)/Source/param/meth_params.template
+AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90: $(CPP_PARAMETERS) $(METH_PARAMS_TEMPLATE)
+CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
+
+$(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H: $(CPP_PARAMETERS)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
-	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -m $(METH_PARAMS_TEMPLATE) -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
+	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
 
 # for debugging
-test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/meth_params.F90
+test_cxx_params: $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
 
 #------------------------------------------------------------------------------
 # state variable info
