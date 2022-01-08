@@ -232,13 +232,6 @@ PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
 
-ifdef USE_CUDA
-  ifeq ($(USE_CUDA), TRUE)
-    USE_GPU_PRAGMA = TRUE
-    DEFINES += -DCUDA
-  endif
-endif
-
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
