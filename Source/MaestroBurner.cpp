@@ -80,8 +80,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		nbox[0] * nbox[1] : nbox[0] * nbox[1] * nbox[2];
 	    
 	    // copy multifabs to input array
-	    // index ordering: (dt, species, rho, temp)
-	    const int NumInput = NumSpec + 3;
+	    // index ordering: (species, rho, temp)
+	    // assume dt is constant
+	    const int NumInput = NumSpec + 2;
 	    amrex::Gpu::ManagedVector<Real> state_temp(ncell*NumInput);
 	    Real* AMREX_RESTRICT temp_ptr = state_temp.dataPtr();
 
@@ -109,12 +110,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
                 
 		// array order is row-based [index][comp]
-		temp_ptr[index*NumInput] = dt_in;
+		// temp_ptr[index*NumInput] = dt_in;
 		for (int n = 0; n < NumSpec; ++n) {
-		    temp_ptr[index*NumInput + 1 + n] = -5.0/log(s_in_arr(i, j, k, FirstSpec + n) / rho);
+		    temp_ptr[index*NumInput + n] = -5.0/log(s_in_arr(i, j, k, FirstSpec + n) / rho);
 		}
-		temp_ptr[index*NumInput + NumSpec + 1] = rho / dens_fac;
-		temp_ptr[index*NumInput + NumSpec + 2] = T_in / temp_fac;
+		temp_ptr[index*NumInput + NumSpec] = rho / dens_fac;
+		temp_ptr[index*NumInput + NumSpec + 1] = T_in / temp_fac;
 	    });
 
 	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec+1}, torch::TensorOptions().dtype(dtype0));
@@ -199,7 +200,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
 			// note enuc in output tensor is the normalized value
 			// of (state_out.e - state_in.e)
-			rhoH = rho * (exp(-2.0/outputs_torch_acc[index][NumSpec]) * enuc_fac) / dt_in;
+			if (outputs_torch_acc[index][NumSpec] > 0.0) {
+			    rhoH = rho * (exp(-2.0/outputs_torch_acc[index][NumSpec]) * enuc_fac) / dt_in;
+			}
 		    } else {
 			// need to use burner if no ML model was given
 			burn_t state_in;
