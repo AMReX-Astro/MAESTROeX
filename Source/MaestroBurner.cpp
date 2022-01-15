@@ -137,11 +137,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			// Loop over rest of the species
 			for (int n = 0; n < NumSpec; ++n) {
 			    // Do not perturb the main species
-			    if (n != 1 && n != 2 && n !=4) {
+			    if (n != 1 && n != 2 && n != 4) {
 				// Set a random perturbation based on log(X_k)
 				Real X_log = std::log10(x_in[n]);
 				// We only want to perturb mass fractions below 10^-4
-				if (X_log <= -4.0) {
+				// if (X_log <= -4.0) {
 				    // Random number generated between [-X_log/15, X_log/15]
 				    Real rand = (amrex::Random(engine) - 0.5) * 2*X_log/15.0;
 				    Real perturb = pow(10.0, X_log + rand) - x_in[n];
@@ -151,7 +151,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 				    // and subtract perturb since sum(X_k) = 1 
 				    int spec_rand = (x_in[1] > x_in[4]) ? 1 : 4;
 				    x_in[spec_rand] -= perturb;
-				}
+				// }
 			    }
 			}
 			
