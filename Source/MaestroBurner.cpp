@@ -194,7 +194,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			for (int n = 0; n < NumSpec; ++n) {
 			    // check if X_k >= 0
 			    x_out[n] = (outputs_torch_acc[index][n] >= 0.0) ?
-				exp(-5.0/outputs_torch_acc[index][n]) : 0.0;
+				amrex::max(exp(-5.0/outputs_torch_acc[index][n]), 1.0e-30) : 1.0e-30;
 			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 			}
 
