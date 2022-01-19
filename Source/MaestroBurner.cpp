@@ -157,9 +157,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			
 			// Perturb density and temperature by small relative values
 			// since they do not change much
-			Real perturb_rel = (amrex::Random(engine) - 0.5) * 1.e-7;
+			Real perturb_rel = (amrex::Random(engine) - 0.5) * 2.e-4;
 			rho *= (1.0 + perturb_rel);
-			perturb_rel = (amrex::Random(engine) - 0.5) * 1.e-7;
+			perturb_rel = (amrex::Random(engine) - 0.5) * 6.e-4;
 			T_in *= (1.0 + perturb_rel);
 		    }
 
