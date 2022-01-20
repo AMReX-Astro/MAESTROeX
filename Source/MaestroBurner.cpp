@@ -133,11 +133,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
 		    // Perturb 75 percent of the data
 		    if (amrex::Random(engine) < 0.75) {
-			// Three main species are C12(1), O16(2), Mg24(4)
-			// Loop over rest of the species
+			// Loop over the species
 			for (int n = 0; n < NumSpec; ++n) {
+			    // aprox13 network (NumSpec == 13)
+			    // Three main species are C12(1), O16(2), Mg24(4)
 			    // Do not perturb the main species
-			    if (n != 1 && n != 2 && n != 4) {
+			    if (NumSpec == 13 && n != 1 && n != 2 && n != 4) {
 				// Set a random perturbation based on log(X_k)
 				Real X_log = std::log10(x_in[n]);
 				// We only want to perturb mass fractions below 10^-4
@@ -152,6 +153,20 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 				    int spec_rand = (x_in[1] > x_in[4]) ? 1 : 4;
 				    x_in[spec_rand] -= perturb;
 				// }
+			    }
+			    // ignition_simple network (NumSpec == 3)
+			    else if (NumSpec == 3 && n != 1) {
+				int spec_other = (n == 0) ? 2 : 0;
+				// Set a random perturbation within -/+0.5e-2
+				Real perturb = (amrex::Random(engine) - 0.5) * 1.0e-2;
+				// avoid negative mass fractions
+				if (x_in[n] < -perturb || x_in[spec_other] < perturb) {
+				    perturb = 0.0; 
+				}
+				x_in[n] += perturb;
+
+				// Subtract perturb from the other main species
+				x_in[spec_other] -= perturb;
 			    }
 			}
 			
