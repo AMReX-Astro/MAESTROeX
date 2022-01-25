@@ -113,6 +113,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		for (int n = 0; n < NumSpec; ++n) {
 		    temp_ptr[index*NumInput + 1 + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		}
+		// normalize if using iginition_simple network
+		if (NumSpec == 3) {
+		    temp_ptr[index*NumInput + 1] = (temp_ptr[index*NumInput+1] - xc12_min) / (xc12_max - xc12_min);
+		    temp_ptr[index*NumInput + 2] = (temp_ptr[index*NumInput+2] - xo16_min) / (xo16_max - xo16_min);
+		    temp_ptr[index*NumInput + 3] = (temp_ptr[index*NumInput+3] - xmg24_min) / (xmg24_max - xmg24_min);
+		}
 		temp_ptr[index*NumInput + NumSpec + 1] = rho / dens_fac;
 		temp_ptr[index*NumInput + NumSpec + 2] = T_in / temp_fac;
 	    });
@@ -168,7 +174,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #endif
 
 		for (int n = 0; n < NumSpec; ++n) {
-		    x_in[n] = temp_ptr[index*NumInput + 1 + n];
+		    x_in[n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		}
 
                 Real x_test =
@@ -194,6 +200,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			    // check if X_k >= 0
 			    x_out[n] = (outputs_torch_acc[index][n] >= 0.0) ?
 				outputs_torch_acc[index][n] : 0.0;
+			}
+			
+			// re-normalize if using iginition_simple network
+			if (NumSpec == 3) {
+			    x_out[0] = x_out[0] * (xc12_max - xc12_min) + xc12_min;
+			    x_out[1] = x_out[1] * (xo16_max - xo16_min) + xo16_min;
+			    x_out[2] = x_out[2] * (xmg24_max - xmg24_min) + xmg24_min;
+			}
+
+			for (int n = 0; n < NumSpec; ++n) {
 			    rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 			}
 

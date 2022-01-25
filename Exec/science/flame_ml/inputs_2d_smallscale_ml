@@ -110,6 +110,12 @@ problem.smooth_len_frac = 0.025e0
 problem.dens_fac = 5.0e7
 problem.temp_fac = 3.0e9
 problem.enuc_fac = 1.399999954944e13
+problem.xc12_min = 9.999999999999999082e-31
+problem.xc12_max = 4.999999256789985358e-1
+problem.xo16_min = 4.999999998184556649e-1
+problem.xo16_max = 5.000000001980614561e-1
+problem.xmg24_min = 7.432099949865584384e-8
+problem.xmg24_max = 5.000000000000001110e-1
 
 eos.use_eos_coulomb = 1
 

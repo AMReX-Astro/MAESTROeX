@@ -34,3 +34,9 @@ transverse_tol          real                 1.d-7
 dens_fac                real         4.914646941093778610d7
 temp_fac                real         2.994452890577044010d9
 enuc_fac                real         1.334678186688000000d12
+xc12_min 		real 	     9.999999999999999082d-31
+xc12_max 		real 	     4.999999256789985358d-1
+xo16_min 		real 	     4.999999998184556649d-1
+xo16_max 		real 	     5.000000001980614561d-1
+xmg24_min 		real 	     7.432099949865584384d-8
+xmg24_max 		real 	     5.000000000000001110d-1
