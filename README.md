@@ -54,7 +54,7 @@ http://amrex-astro.github.io/MAESTROeX/
   be directly cloned as:
 
   ```
-  git clone https://github.com/starkiller-astro/Microphysics.git
+  git clone https://github.com/AMReX-Astro/Microphysics.git
   git clone https://github.com/AMReX-Codes/amrex.git
   ```
 
