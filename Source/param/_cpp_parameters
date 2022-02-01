@@ -624,7 +624,15 @@ sdc_couple_mac_velocity             bool            false
 
 # The nodal solve is non-deterministic on the GPU. Should it instead be run 
 # on the CPU to give a deterministic solution?
-deterministic_nodal_solve           bool false
+deterministic_nodal_solve           bool            false
+
+
+#-----------------------------------------------------------------------------
+# category: machine learned model
+#-----------------------------------------------------------------------------
+
+# Where the ml model is located.  Empty string means do not use model.
+ml_model_file                       string          ""
 
 
 #-----------------------------------------------------------------------------

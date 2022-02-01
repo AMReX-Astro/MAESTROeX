@@ -21,6 +21,9 @@ AMREX_HOME ?= $(TOP)/external/amrex
 # Require C++17
 CXXSTD := c++17
 
+# default is to not compile with ML (PyTorch)
+USE_ML ?= FALSE
+
 # Check to make sure that Microphysics actually exists,
 # using an arbitrary file that must exist to check.
 # Throw an error if we don't have Microphysics.
@@ -49,6 +52,10 @@ endif
 ifeq ($(USE_CUDA),TRUE)
   USE_GPU_PRAGMA = TRUE
   DEFINES += -DCUDA
+endif
+
+ifeq ($(USE_ML), TRUE)
+  USERSuffix = .ML
 endif
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
@@ -148,6 +155,37 @@ Blocs += $(foreach dir, $(EXTERN_CORE), $(dir))
 #------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
+# PyTorch
+#------------------------------------------------------------------------------
+
+# Torch directories -- note the Make.package for these adds these
+# directories into INCLUDE_LOCATIONS and LIBRARY_LOCATIONS for us,
+# so we don't need to do it here
+ifeq ($(USE_ML), TRUE)
+  PYTORCH_ROOT := $(TOP)/external/libtorch
+
+  TORCH_LIBPATH = $(PYTORCH_ROOT)/lib
+
+  ifeq ($(USE_CUDA),TRUE)
+    TORCH_LIBS = -ltorch -ltorch_cpu -lc10 -lc10_cuda -lcuda  # -lcaffe2 -lcaffe2_gpu
+  else
+    TORCH_LIBS = -ltorch -ltorch_cpu -lc10  # -lcaffe2
+  endif
+
+  INCLUDE_LOCATIONS += $(PYTORCH_ROOT)/include \
+                       $(PYTORCH_ROOT)/include/torch/csrc/api/include
+  LIBRARY_LOCATIONS += $(TORCH_LIBPATH)
+
+  DEFINES += -DML -D_GLIBCXX_USE_CXX11_ABI=1
+
+  ifeq ($(USE_CUDA), TRUE)
+    LDFLAGS += -Xlinker '--no-as-needed,-rpath $(TORCH_LIBPATH) $(TORCH_LIBS)'
+  else
+    LDFLAGS += -Wl,--no-as-needed,-rpath=$(TORCH_LIBPATH) $(TORCH_LIBS)
+  endif
+endif
+
+#------------------------------------------------------------------------------
 # include all of the necessary directories
 #------------------------------------------------------------------------------
 
@@ -190,13 +228,6 @@ EXTERN_PARAMETERS := $(foreach dir, $(EXTERN_SEARCH),$(realpath $(wildcard $(dir
 PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
-
-ifdef USE_CUDA
-  ifeq ($(USE_CUDA), TRUE)
-    USE_GPU_PRAGMA = TRUE
-    DEFINES += -DCUDA
-  endif
-endif
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
