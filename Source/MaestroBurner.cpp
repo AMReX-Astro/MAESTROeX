@@ -146,8 +146,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			    // ignition_simple network (NumSpec == 3)
 			    else if (NumSpec == 3 && n != 1) {
 				int spec_other = (n == 0) ? 2 : 0;
-				// Set a random perturbation within -/+0.5e-2
-				Real perturb = (amrex::Random(engine) - 0.5) * 1.0e-2;
+				Real x_less = (x_in[n] < x_in[spec_other]) ? x_in[n] : x_in[spec_other];
+				// Set a random perturbation within -/+ 10% of smaller mass fraction
+				Real perturb = (amrex::Random(engine) - 0.5) * 0.1 * x_less;
 				// avoid negative mass fractions
 				if (x_in[n] < -perturb || x_in[spec_other] < perturb) {
 				    perturb = 0.0; 
