@@ -508,9 +508,14 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
-            react_in[lev].define(grids[lev], dmap[lev], NumSpec+2, 0);  // X, rho, T -> burn
-            react_out[lev].define(grids[lev], dmap[lev], 2*(NumSpec+1), 0); // burn -> X, Hnuc, dXdt, enucdot
-        }
+	    if (NumSpec == 3) {
+		react_in[lev].define(grids[lev], dmap[lev], NumSpec+1, 0);  // X(C12), X(Mg24), rho, T -> burn
+		react_out[lev].define(grids[lev], dmap[lev], 2*(NumSpec+0), 0); // burn -> X(C12), X(Mg24), Hnuc, dXdt, enucdot
+	    } else {
+		react_in[lev].define(grids[lev], dmap[lev], NumSpec+2, 0);  // X, rho, T -> burn
+		react_out[lev].define(grids[lev], dmap[lev], 2*(NumSpec+1), 0); // burn -> X, Hnuc, dXdt, enucdot
+	    }
+	}
 
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
@@ -559,7 +564,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
             // copy multifabs to input array
             // index ordering: (species, rho, temp)
-            const int NumInput = NumSpec + 2;
+	    int nextra = (NumSpec == 3) ? 1 : 2;
+            const int NumInput = NumSpec + nextra;
             amrex::Gpu::ManagedVector<Real> state_temp(ncell*NumInput);
             Real* AMREX_RESTRICT temp_ptr = state_temp.dataPtr();
 
@@ -587,11 +593,18 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
 
                 // array order is row-based [index][comp]
-                for (int n = 0; n < NumSpec; ++n) {
-                    temp_ptr[index*NumInput + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
-                }
-                temp_ptr[index*NumInput + NumSpec] = rho / dens_fac;
-                temp_ptr[index*NumInput + NumSpec + 1] = T_in / temp_fac;
+		if (NumSpec == 3) {
+		    temp_ptr[index*NumInput] = s_in_arr(i, j, k, FirstSpec) / rho;
+		    temp_ptr[index*NumInput + 1] = s_in_arr(i, j, k, FirstSpec + 2) / rho;
+		    temp_ptr[index*NumInput + 2] = rho / dens_fac;
+		    temp_ptr[index*NumInput + 3] = T_in / temp_fac;
+		} else {
+		    for (int n = 0; n < NumSpec; ++n) {
+			temp_ptr[index*NumInput + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
+		    }
+		    temp_ptr[index*NumInput + NumSpec] = rho / dens_fac;
+		    temp_ptr[index*NumInput + NumSpec + 1] = T_in / temp_fac;
+		}
             });
 
 	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec+1}, torch::TensorOptions().dtype(dtype0));
@@ -676,16 +689,28 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		Real rhoH = 0.0;
 
 		if (save_react_data) {
-		    for (int n = 0; n < NumSpec; ++n) {
-			react_in_arr(i, j, k, n) = x_in[n];
-			react_out_arr(i, j, k, n) = x_in[n];
-		    }
-		    react_in_arr(i, j, k, NumSpec) = rho;    // input density
-		    react_in_arr(i, j, k, NumSpec+1) = T_in; // input temperature
-		    react_out_arr(i, j, k, NumSpec) = 0.0;   // output generated energy
+		    if (NumSpec == 3) {
+			react_in_arr(i, j, k, 0) = x_in[0];
+			react_in_arr(i, j, k, 1) = x_in[2];
+			react_in_arr(i, j, k, 2) = rho;
+			react_in_arr(i, j, k, 3) = T_in;
 
-		    for (int n = NumSpec+1; n < 2*(NumSpec+1); ++n) {
-			react_out_arr(i, j, k, n) = 0.0;
+			react_out_arr(i, j, k, 2) = 0.0; // output generated energy
+			for (int n = NumSpec; n < 2*(NumSpec); ++n) {
+			    react_out_arr(i, j, k, n) = 0.0;
+			}
+		    } else {
+			for (int n = 0; n < NumSpec; ++n) {
+			    react_in_arr(i, j, k, n) = x_in[n];
+			    react_out_arr(i, j, k, n) = x_in[n];
+			}
+			react_in_arr(i, j, k, NumSpec) = rho;    // input density
+			react_in_arr(i, j, k, NumSpec+1) = T_in; // input temperature
+			react_out_arr(i, j, k, NumSpec) = 0.0;   // output generated energy
+			
+			for (int n = NumSpec+1; n < 2*(NumSpec+1); ++n) {
+			    react_out_arr(i, j, k, n) = 0.0;
+			}
 		    }
 		}
 
@@ -708,11 +733,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			x_out[1] = x_in[1];
 			// check if X_k >= 0
 			x_out[2] = (outputs_torch_acc[index][1] >= 0.0) ?
-				    outputs_torch_acc[index][1] : x_in[2];
-			
-                        for (int n = 0; n < NumSpec; ++n) {
-                            rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
-                        }
+				    outputs_torch_acc[index][1] : 0.0;
 
                         // note enuc in output tensor is the normalized value
                         // of (state_out.e - state_in.e)
@@ -781,21 +802,43 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 }
 
                 if (fabs(sumX - 1.0) > reaction_sum_tol) {
-                    for (int n = 0; n < NumSpec; ++n) {
-                        x_out[n] /= sumX;
-                    }
+		    if (NumSpec == 3) {
+			Real sumXmO16 = sumX - x_out[1];
+			x_out[0] *= (1.0 - x_out[1]) / sumXmO16;
+			x_out[2] *= (1.0 - x_out[1]) / sumXmO16;
+		    } else {
+			for (int n = 0; n < NumSpec; ++n) {
+			    x_out[n] /= sumX;
+			}
+		    }
                 }
 
-		if (save_react_data) {
+		if (use_ml_const) {
 		    for (int n = 0; n < NumSpec; ++n) {
-			react_out_arr(i, j, k, n) = x_out[n];
+			rhowdot[n] = rho * (x_out[n] - x_in[n]) / dt_in;
 		    }
-		    react_out_arr(i, j, k, NumSpec) = rhoH * dt_in;
+		}
 
-		    for (int n = 0; n < NumSpec; ++n) {
-			react_out_arr(i, j, k, NumSpec+n) = rhowdot[n]; // save dXdt
+		if (save_react_data) {
+		    if (NumSpec == 3) {
+			react_out_arr(i, j, k, 0) = x_out[0];
+			react_out_arr(i, j, k, 1) = x_out[2];
+			react_out_arr(i, j, k, 2) = rhoH * dt_in;
+			
+			react_out_arr(i, j, k, NumSpec) = rhowdot[0]; // save dXdt
+			react_out_arr(i, j, k, NumSpec+1) = rhowdot[2];
+			react_out_arr(i, j, k, 2*NumSpec-1) = rhoH; // save enucdot
+		    } else {
+			for (int n = 0; n < NumSpec; ++n) {
+			    react_out_arr(i, j, k, n) = x_out[n];
+			}
+			react_out_arr(i, j, k, NumSpec) = rhoH * dt_in;
+
+			for (int n = 0; n < NumSpec; ++n) {
+			    react_out_arr(i, j, k, NumSpec+n) = rhowdot[n]; // save dXdt
+			}
+			react_out_arr(i, j, k, 2*NumSpec+1) = rhoH; // save enucdot
 		    }
-		    react_out_arr(i, j, k, 2*NumSpec+1) = rhoH; // save enucdot
 		}
 		
                 // pass the density and pi through
@@ -834,8 +877,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 	    std::string spec_string = "X(";
 	    spec_string += short_spec_names_cxx[i];
 	    spec_string += ')';
-	    react_in_varnames.push_back(spec_string);
-	    react_out_varnames.push_back(spec_string);
+	    if (NumSpec == 3 && i != 1) {
+		react_in_varnames.push_back(spec_string);
+		react_out_varnames.push_back(spec_string);
+	    }
 	}
 	react_in_varnames.push_back("rho");
 	react_in_varnames.push_back("temp");
@@ -844,7 +889,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 	    std::string spec_string = "Xdot(";
 	    spec_string += short_spec_names_cxx[i];
 	    spec_string += ')';
-	    react_out_varnames.push_back(spec_string);
+	    if (NumSpec == 3 && i != 1) {
+		react_out_varnames.push_back(spec_string);
+	    }
 	}
 	react_out_varnames.push_back("enucdot");
     
