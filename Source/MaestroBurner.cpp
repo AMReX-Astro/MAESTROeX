@@ -737,8 +737,49 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                         // note enuc in output tensor is the normalized value
                         // of (state_out.e - state_in.e)
-                        rhoH = rho * (outputs_torch_acc[index][2] * enuc_fac) / dt_in;
-                    } else {
+                        //rhoH = rho * (outputs_torch_acc[index][2] * enuc_fac) / dt_in;
+
+
+                        // use burner for enuc
+			burn_t state_in;
+			burn_t state_out;
+
+			// Initialize burn state_in and state_out
+			state_in.e = 0.0;
+			state_in.rho = rho;
+			state_in.T = T_in;
+			for (int n = 0; n < NumSpec; ++n) {
+			    state_in.xn[n] = x_in[n];
+			}
+#if NAUX_NET > 0
+			for (int n = 0; n < NumAux; ++n) {
+			    state_in.aux[n] = aux_in[n];
+			}
+#endif
+
+			// initialize state_out the same as state_in
+			state_out.e = 0.0;
+			state_out.rho = rho;
+			state_out.T = T_in;
+			for (int n = 0; n < NumSpec; ++n) {
+			    state_out.xn[n] = x_in[n];
+			}
+#if NAUX_NET > 0
+			for (int n = 0; n < NumAux; ++n) {
+			    state_out.aux[n] = aux_in[n];
+			}
+#endif
+
+			burner(state_out, dt_in);
+
+#if NAUX_NET > 0
+			for (int n = 0; n < NumAux; ++n) {
+			    aux_out[n] = state_out.aux[n];
+			}
+#endif
+			rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
+
+		    } else {
                         // need to use burner if no ML model was given
 			burn_t state_in;
 			burn_t state_out;
