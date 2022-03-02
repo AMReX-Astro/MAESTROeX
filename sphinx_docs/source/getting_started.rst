@@ -74,7 +74,7 @@ paper 3.
    If you choose to use the Microphysics repo directly, it is
    available on github and can be obtained via::
 
-       git clone https://github.com/starkiller-astro/Microphysics.git
+       git clone https://github.com/AMReX-Astro/Microphysics.git
 
    Next you must specify the path to the Microphysics repository as
    a global environment variable on your machine, ``MICROPHYSICS_HOME``

@@ -77,4 +77,4 @@ used. The overall ideas in this network are based on Appendix C of
 :cite:`wallacewoosley:1981`.
 
 .. [1]
-   https://github.com/starkiller-astro/Microphysics
+   https://github.com/AMReX-Astro/Microphysics
