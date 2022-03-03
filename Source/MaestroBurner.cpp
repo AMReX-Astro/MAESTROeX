@@ -33,7 +33,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     const auto ispec_threshold = network_spec_index(burner_threshold_species);
 
     Vector<MultiFab> react_in(finest_level+1), react_out(finest_level+1);
-    const bool save_react_data = istep > 1 && save_react_int > 0 && istep % save_react_int == 0;
+    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
@@ -505,7 +505,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
     Vector<MultiFab> react_in(finest_level+1), react_out(finest_level+1);
 
-    const bool save_react_data = istep > 1 && save_react_int > 0 && istep % save_react_int == 0;
+    const bool save_react_data = istep > 0 && save_react_int > 0 && istep % save_react_int == 0;
 
     for (int lev = 0; lev <= finest_level; ++lev) {
         if (save_react_data) {
@@ -724,7 +724,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      (ispec_threshold > 0 &&
                       x_test > burner_threshold_cutoff))) {
 
-		    if (use_ml_const) {
+		    if (use_ml_const && istep > 0) {
                         // copy output tensor to multifabs
                         // index ordering: (species, enuc)
 			// check if X_k >= 0
@@ -740,7 +740,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                         // of (state_out.e - state_in.e)
                         rhoH = rho * (outputs_torch_acc[index][2] * enuc_fac) / dt_in;
                     } else {
-                        // need to use burner if no ML model was given
+                        // need to use burner if no ML model was given or at step 0
 			burn_t state_in;
 			burn_t state_out;
 
