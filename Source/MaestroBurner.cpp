@@ -121,7 +121,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			(ispec_threshold > 0) ? x_in[ispec_threshold] : 0.0;
 
 		    // Perturb 75 percent of the data
-		    if (amrex::Random(engine) < 0.75) {
+		    Real rand_perc = 0.75;
+		    if (amrex::Random(engine) < rand_perc) {
 			// Loop over the species
 			for (int n = 0; n < NumSpec; ++n) {
 			    // aprox13 network (NumSpec == 13)
