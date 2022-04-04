@@ -2079,7 +2079,9 @@ class Maestro : public amrex::AmrCore {
     /// ML model
 #ifdef ML
     bool use_ml;
+    int n_ml_models = 0;
     torch::jit::script::Module module;
+    torch::jit::script::Module module_enuc;
 #endif
     
     /// flag for writing plotfiles

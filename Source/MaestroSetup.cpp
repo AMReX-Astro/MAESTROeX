@@ -224,15 +224,29 @@ void Maestro::Setup() {
     } else {
         use_ml = true;
 
+	// Check how many model files are given (max 2)
+	Vector<std::string> model_files;
+	std::stringstream ss(ml_model_file);
+	while (ss.good()) {
+	    std::string substr;
+	    getline(ss, substr, ',');
+	    model_files.push_back(substr);
+	    n_ml_models++;
+	}
+
         // Load pytorch module via torch script
         try {
             // Deserialize the ScriptModule from a file using torch::jit::load().
-            module = torch::jit::load(ml_model_file);
+            module = torch::jit::load(model_files[0]);
+
+	    if (n_ml_models > 1) {
+		module_enuc = torch::jit::load(model_files[1]);
+	    }
         }
         catch (const c10::Error& e) {
             Abort("Error loading the ML model\n");
         }
-        Print() << "ML model loaded.\n";
+        Print() << n_ml_models << " ML models loaded.\n";
 
 #ifdef AMREX_USE_CUDA
         module.to(torch::kCUDA);

@@ -607,9 +607,12 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		}
             });
 
-	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec+1}, torch::TensorOptions().dtype(dtype0));
+	    at::Tensor outputs_torch = torch::zeros({ncell, NumSpec}, torch::TensorOptions().dtype(dtype0));
+	    at::Tensor outputs_enuc_torch = torch::zeros({ncell, 1}, torch::TensorOptions().dtype(dtype0));
+
 #ifdef AMREX_USE_CUDA
             outputs_torch.to(torch::kCUDA);
+	    outputs_enuc_torch.to(torch::kCUDA);
 #endif
 
             if (use_ml) {
@@ -633,13 +636,21 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     Print() << "example output: \n"
                             << outputs_torch.slice(/*dim=*/0, /*start=*/0, /*end=*/5) << '\n';
                 }
+
+		// evaluate torch model for enuc (if given)
+		if (n_ml_models > 1) {
+		    outputs_enuc_torch = module_enuc.forward({inputs_torch}).toTensor();
+		    outputs_enuc_torch = outputs_enuc_torch.to(dtype0);
+		}
             }
 
             // get accessor to tensor (read-only)
 #ifndef AMREX_USE_CUDA
             auto outputs_torch_acc = outputs_torch.accessor<Real,2>();
+            auto outputs_enuc_torch_acc = outputs_enuc_torch.accessor<Real,2>();
 #else
             auto outputs_torch_acc = outputs_torch.packed_accessor64<Real,2>();
+            auto outputs_enuc_torch_acc = outputs_enuc_torch.packed_accessor64<Real,2>();
 #endif
 	    
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
@@ -735,50 +746,51 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 			x_out[2] = (outputs_torch_acc[index][1] >= 0.0) ?
 				    outputs_torch_acc[index][1] : 0.0;
 
+			if (n_ml_models > 1) {
                         // note enuc in output tensor is the normalized value
                         // of (state_out.e - state_in.e)
-                        //rhoH = rho * (outputs_torch_acc[index][2] * enuc_fac) / dt_in;
-
-
-                        // use burner for enuc
-			burn_t state_in;
-			burn_t state_out;
-
-			// Initialize burn state_in and state_out
-			state_in.e = 0.0;
-			state_in.rho = rho;
-			state_in.T = T_in;
-			for (int n = 0; n < NumSpec; ++n) {
-			    state_in.xn[n] = x_in[n];
+			    rhoH = rho * (outputs_enuc_torch_acc[index][0] * enuc_fac) / dt_in;
 			}
+			else {
+			    // use burner for enuc
+			    burn_t state_in;
+			    burn_t state_out;
+
+			    // Initialize burn state_in and state_out
+			    state_in.e = 0.0;
+			    state_in.rho = rho;
+			    state_in.T = T_in;
+			    for (int n = 0; n < NumSpec; ++n) {
+				state_in.xn[n] = x_in[n];
+			    }
 #if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    state_in.aux[n] = aux_in[n];
-			}
+			    for (int n = 0; n < NumAux; ++n) {
+				state_in.aux[n] = aux_in[n];
+			    }
 #endif
 
-			// initialize state_out the same as state_in
-			state_out.e = 0.0;
-			state_out.rho = rho;
-			state_out.T = T_in;
-			for (int n = 0; n < NumSpec; ++n) {
-			    state_out.xn[n] = x_in[n];
-			}
+			    // initialize state_out the same as state_in
+			    state_out.e = 0.0;
+			    state_out.rho = rho;
+			    state_out.T = T_in;
+			    for (int n = 0; n < NumSpec; ++n) {
+				state_out.xn[n] = x_in[n];
+			    }
 #if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    state_out.aux[n] = aux_in[n];
-			}
+			    for (int n = 0; n < NumAux; ++n) {
+				state_out.aux[n] = aux_in[n];
+			    }
 #endif
 
-			burner(state_out, dt_in);
+			    burner(state_out, dt_in);
 
 #if NAUX_NET > 0
-			for (int n = 0; n < NumAux; ++n) {
-			    aux_out[n] = state_out.aux[n];
-			}
+			    for (int n = 0; n < NumAux; ++n) {
+				aux_out[n] = state_out.aux[n];
+			    }
 #endif
-			rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
-
+			    rhoH = state_out.rho * (state_out.e - state_in.e) / dt_in;
+			}
 		    } else {
                         // need to use burner if no ML model was given
 			burn_t state_in;
