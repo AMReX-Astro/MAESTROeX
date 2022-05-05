@@ -281,6 +281,7 @@ BaseState<T>::BaseState(const int num_levs, const int length, const int ncomp,
     : nlev(num_levs), len(length), nvar(ncomp) {
     base_data.resize(nlev * len * nvar);
     base_data.shrink_to_fit();
+    amrex::Gpu::streamSynchronize();
     std::fill(base_data.begin(), base_data.end(), val);
 }
 
@@ -295,6 +296,7 @@ BaseState<T>::BaseState(const amrex::Gpu::ManagedVector<T>& src,
     : nlev(num_levs), len(length), nvar(ncomp) {
     base_data.resize(nlev * len * nvar);
     base_data.shrink_to_fit();
+    amrex::Gpu::streamSynchronize();
     // need to switch from Fortran array-ordering to C++ ordering
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
@@ -312,6 +314,7 @@ BaseState<T>::BaseState(const amrex::Vector<T>& src, const int num_levs,
     : nlev(num_levs), len(length), nvar(ncomp) {
     base_data.resize(nlev * len * nvar);
     base_data.shrink_to_fit();
+    amrex::Gpu::streamSynchronize();
     // need to switch from Fortran array-ordering to C++ ordering
     for (auto l = 0; l < nlev; ++l) {
         for (auto r = 0; r < len; ++r) {
@@ -328,6 +331,7 @@ BaseState<T>::BaseState(const BaseState<T>& src)
     : nlev(src.nLevels()), len(src.length()), nvar(src.nComp()) {
     base_data.resize(nlev * len * nvar);
     base_data.shrink_to_fit();
+    amrex::Gpu::streamSynchronize();
     BaseStateArray<T> base_arr = this->array();
     const BaseStateArray<const T> src_arr = src.array();
     for (auto l = 0; l < nlev; ++l) {
@@ -348,6 +352,7 @@ void BaseState<T>::define(const int num_levs, const int length, const int ncomp,
 
     base_data.resize(nlev * length * nvar);
     base_data.shrink_to_fit();
+    amrex::Gpu::streamSynchronize();
     std::fill(base_data.begin(), base_data.end(), val);
 }
 
@@ -356,8 +361,9 @@ void BaseState<T>::resize(const int num_levs, const int length, const int ncomp,
                           const T val) {
     if (base_data.size() > 0) {
         base_data.resize(0);
+	amrex::Gpu::streamSynchronize();
     }
-    this->define(num_levs, length, ncomp);
+    this->define(num_levs, length, ncomp, val);
 }
 
 template <class T>
