@@ -361,7 +361,7 @@ void BaseState<T>::resize(const int num_levs, const int length, const int ncomp,
                           const T val) {
     if (base_data.size() > 0) {
         base_data.resize(0);
-	amrex::Gpu::streamSynchronize();
+        amrex::Gpu::streamSynchronize();
     }
     this->define(num_levs, length, ncomp, val);
 }
