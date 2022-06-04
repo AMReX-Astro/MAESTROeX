@@ -1,3 +1,23 @@
+# 22.06
+
+  * Bug fix for running code on GPUs
+
+  * Fix precision bug for checkpoint files
+
+# 22.05
+
+  * No changes since last release
+
+# 22.03
+
+  * No changes since last release
+
+# 22.02
+
+  * Fix bug in restart functionality for flame problem
+
+  * Sync up with changes to Microphysics
+
 # 22.01
 
   * Remove all Fortran Microphysics
