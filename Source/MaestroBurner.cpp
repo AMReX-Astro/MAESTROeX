@@ -568,6 +568,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             const int NumInput = NumSpec + nextra;
             amrex::Gpu::ManagedVector<Real> state_temp(ncell*NumInput);
             Real* AMREX_RESTRICT temp_ptr = state_temp.dataPtr();
+            amrex::Gpu::ManagedVector<Real> state_temp2(ncell*NumInput);
+            Real* AMREX_RESTRICT temp2_ptr = state_temp2.dataPtr();
 
 	    // copy input multifab to torch tensor
             amrex::ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) noexcept {
@@ -598,12 +600,23 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 		    temp_ptr[index*NumInput + 1] = s_in_arr(i, j, k, FirstSpec + 2) / rho;
 		    temp_ptr[index*NumInput + 2] = rho / dens_fac;
 		    temp_ptr[index*NumInput + 3] = T_in / temp_fac;
+ 
+		    temp2_ptr[index*NumInput] = -0.5/std::log(s_in_arr(i, j, k, FirstSpec) / rho);
+		    temp2_ptr[index*NumInput + 1] = -0.5/std::log(s_in_arr(i, j, k, FirstSpec + 2) / rho);
+		    temp2_ptr[index*NumInput + 2] = rho / dens_fac;
+		    temp2_ptr[index*NumInput + 3] = T_in / temp_fac;
 		} else {
 		    for (int n = 0; n < NumSpec; ++n) {
 			temp_ptr[index*NumInput + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
 		    }
 		    temp_ptr[index*NumInput + NumSpec] = rho / dens_fac;
 		    temp_ptr[index*NumInput + NumSpec + 1] = T_in / temp_fac;
+ 
+		    for (int n = 0; n < NumSpec; ++n) {
+			temp2_ptr[index*NumInput + n] = s_in_arr(i, j, k, FirstSpec + n) / rho;
+		    }
+		    temp2_ptr[index*NumInput + NumSpec] = rho / dens_fac;
+		    temp2_ptr[index*NumInput + NumSpec + 1] = T_in / temp_fac;
 		}
             });
 
@@ -620,9 +633,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #ifndef AMREX_USE_CUDA
                 at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
                                                            torch::TensorOptions().dtype(dtype0));
+                at::Tensor inputs_enuc_torch = torch::from_blob(temp2_ptr, {ncell, NumInput},
+								torch::TensorOptions().dtype(dtype0));
 #else
                 at::Tensor inputs_torch = torch::from_blob(temp_ptr, {ncell, NumInput},
                                                            torch::TensorOptions().dtype(dtype0).device(torch::kCUDA));
+                at::Tensor inputs_enuc_torch = torch::from_blob(temp2_ptr, {ncell, NumInput},
+								torch::TensorOptions().dtype(dtype0).device(torch::kCUDA));
 #endif
 
                 // evaluate torch model
@@ -639,7 +656,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
 		// evaluate torch model for enuc (if given)
 		if (n_ml_models > 1) {
-		    outputs_enuc_torch = module_enuc.forward({inputs_torch}).toTensor();
+		    inputs_enuc_torch = inputs_enuc_torch.to(torch::kFloat32);
+		    outputs_enuc_torch = module_enuc.forward({inputs_enuc_torch}).toTensor();
 		    outputs_enuc_torch = outputs_enuc_torch.to(dtype0);
 		}
             }
