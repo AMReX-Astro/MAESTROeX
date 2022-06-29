@@ -642,6 +642,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #else
             auto outputs_torch_acc = outputs_torch.packed_accessor64<Real,2>();
 #endif
+            auto use_ml_const_istep_gt_0 = use_ml_const && istep > 0; // cannot use use_ml_const and istep directly in CUDA kernel below.
 	    
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 if (use_mask && mask_arr(i, j, k))
@@ -724,7 +725,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      (ispec_threshold > 0 &&
                       x_test > burner_threshold_cutoff))) {
 
-		    if (use_ml_const && istep > 0) {
+		    if (use_ml_const_istep_gt_0) {
                         // copy output tensor to multifabs
                         // index ordering: (species, enuc)
 			// check if X_k >= 0
