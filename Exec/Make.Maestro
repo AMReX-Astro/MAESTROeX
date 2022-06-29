@@ -49,11 +49,6 @@ ifeq ($(USE_SDC), TRUE)
   USERSuffix = .SDC
 endif
 
-ifeq ($(USE_CUDA),TRUE)
-  USE_GPU_PRAGMA = TRUE
-  DEFINES += -DCUDA
-endif
-
 ifeq ($(USE_ML), TRUE)
   USERSuffix = .ML
 endif
