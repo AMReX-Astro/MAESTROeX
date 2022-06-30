@@ -94,6 +94,11 @@ void Maestro::WriteCheckPoint(int step) {
         }
     }
 
+    // In checkpoint files, always write out FABs in NATIVE format
+    FABio::Format thePrevFormat = FArrayBox::getFormat();
+
+    FArrayBox::setFormat(FABio::FAB_NATIVE);
+
     // write the MultiFab data to, e.g., chk00010/Level_0/
     for (int lev = 0; lev <= finest_level; ++lev) {
         VisMF::Write(snew[lev], amrex::MultiFabFileFullPrefix(
@@ -112,6 +117,9 @@ void Maestro::WriteCheckPoint(int step) {
                                      lev, checkpointname, "Level_", "intra"));
 #endif
     }
+
+    // Restore the previous FAB format.
+    FArrayBox::setFormat(thePrevFormat);
 
     // write out the cell-centered base state
     if (ParallelDescriptor::IOProcessor()) {
