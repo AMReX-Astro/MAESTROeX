@@ -1,3 +1,7 @@
+# 22.07
+
+  * No changes since last release
+
 # 22.06
 
   * Bug fix for running code on GPUs
