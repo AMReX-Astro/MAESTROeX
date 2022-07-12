@@ -4,7 +4,7 @@ maestro.perturb_model = false
 maestro.drdxfac = 5
 
 # ML MODEL
-maestro.ml_model_file = ""
+maestro.ml_model_file = "igsimple_2model_vshape.pt"
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0      0.0
@@ -77,7 +77,7 @@ maestro.check_base_name = chk
 maestro.chk_int         = -1
 
 # ML OUTPUT
-maestro.save_react_int = 10
+maestro.save_react_int = -1
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-11
@@ -110,9 +110,9 @@ problem.temp_ash = 3.e9
 problem.interface_pos_frac = 0.125e0
 problem.smooth_len_frac = 0.025e0
 
-problem.dens_fac = 5.000500606732890755e7
-problem.temp_fac = 3.000899961693421364e9
-problem.enuc_fac = 7.033368299136000000e12
+problem.dens_fac = 5.000500799097912759e7
+problem.temp_fac = 3.000899999579401016e9
+problem.enuc_fac = 9.678571912451201562e13
 
 eos.use_eos_coulomb = 1
 
