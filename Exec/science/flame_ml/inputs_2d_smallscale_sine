@@ -8,7 +8,7 @@ maestro.ml_model_file = "igsimple_2model_vshape.pt"
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0      0.0
-geometry.prob_hi     =  0.625e0  5.e0
+geometry.prob_hi     =  1.25e0  5.e0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -25,7 +25,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 128 1024
+amr.n_cell             = 256 1024
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -114,7 +114,7 @@ problem.dens_fac = 5.000500799097912759e7
 problem.temp_fac = 3.000899999579401016e9
 problem.enuc_fac = 9.678571912451201562e13
 
-problem.test_problem = 0
+problem.test_problem = 2
 
 eos.use_eos_coulomb = 1
 
