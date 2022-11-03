@@ -59,7 +59,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
     Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_f, 0);
     MultiFab::Copy(scal, temp_mf, 0, Temp, 1, 0);
     
-    // initialize demsity
+    // initialize density
     for (auto l = 0; l <= base_geom.max_radial_level; ++l) {
         for (auto r = 0; r < base_geom.nr(l); ++r) {
             temp_arr(l, r) = s0_init_arr(l, r, Rho);
