@@ -149,9 +149,6 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
 
         // initialize rho as sum of partial densities rho*X_i
         ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-            //for (auto comp = 0; comp < NumSpec; ++comp) {
-            //    scal_arr(i, j, k, Rho) += scal_arr(i, j, k, FirstSpec + comp);
-            //}
 
             // initialize (rho h) and T using the EOS
             eos_t eos_state;
