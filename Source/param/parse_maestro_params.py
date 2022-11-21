@@ -21,7 +21,7 @@ the first three (name, type, default) are mandatory:
 
 the next are optional:
 
-   need-in-fortran: if "y" then we do a pp.query() in meth_params.F90
+   need-in-fortran: no longer used
 
    ifdef: only define this parameter if the name provided is #ifdef-ed
 
@@ -60,19 +60,14 @@ import sys
 
 import runtime_parameters as rp
 
-FWARNING = """
-! This file is automatically created by parse_maestro_params.py.  To update
-! or add runtime parameters, please edit _cpp_parameters and then run
-! mk_params.sh\n
-"""
-
 CWARNING = """
 // This file is automatically created by parse_maestro_params.py.  To update
 // or add runtime parameters, please edit _cpp_parameters and then run
 // mk_params.sh\n
 """
 
-def parse_params(infile, meth_template, out_directory):
+
+def parse_params(infile, out_directory):
 
     params = []
 
@@ -165,6 +160,9 @@ def parse_params(infile, meth_template, out_directory):
         cd.write(f"#ifndef _{nm.upper()}_DECLARES_H_\n")
         cd.write(f"#define _{nm.upper()}_DECLARES_H_\n")
 
+        cd.write("\n")
+        cd.write(f"namespace {nm} {{\n")
+
         for ifdef in ifdefs:
             if ifdef is None:
                 for p in [q for q in params_nm if q.ifdef is None]:
@@ -174,7 +172,7 @@ def parse_params(infile, meth_template, out_directory):
                 for p in [q for q in params_nm if q.ifdef == ifdef]:
                     cd.write(p.get_declare_string())
                 cd.write("#endif\n")
-
+        cd.write("}\n\n")
         cd.write("#endif\n")
         cd.close()
 
@@ -192,7 +190,7 @@ def parse_params(infile, meth_template, out_directory):
         cp.write(f"namespace {nm} {{\n")
 
         for p in params_nm:
-            cp.write(p.get_decl_string())
+            cp.write(p.get_declare_string(with_extern=True))
 
         cp.write("};\n\n")
         cp.write("#endif\n")
@@ -235,8 +233,6 @@ def parse_params(infile, meth_template, out_directory):
 def main():
     """the main driver"""
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", type=str, default=None,
-                        help="template for the meth_params module")
     parser.add_argument("-o", type=str, default=None,
                         help="output directory for the generated files")
     parser.add_argument("input_file", type=str, nargs=1,
@@ -244,7 +240,7 @@ def main():
 
     args = parser.parse_args()
 
-    parse_params(args.input_file[0], args.m, args.o)
+    parse_params(args.input_file[0], args.o)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 #include <Maestro_F.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 void Maestro::RetagArray(const Box& bx, const int lev) {
     // timer for profiling

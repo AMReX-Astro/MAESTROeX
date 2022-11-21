@@ -1,6 +1,7 @@
 
 #include <Maestro.H>
 using namespace amrex;
+using namespace problem_rp;
 
 // initializes data on a specific level
 void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
