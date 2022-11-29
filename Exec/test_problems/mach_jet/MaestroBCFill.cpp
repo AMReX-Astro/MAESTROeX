@@ -6,6 +6,7 @@
 
 using namespace amrex;
 using namespace InletBCs;
+using namespace problem_rp;
 
 void Maestro::ScalarFill(const Array4<Real>& scal, const Box& bx,
                          const Box& domainBox, const Real* dx, const BCRec bcs,

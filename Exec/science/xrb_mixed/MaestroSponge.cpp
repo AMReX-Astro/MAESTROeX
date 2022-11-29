@@ -78,7 +78,7 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
     const Real botsponge_hi_r = r_tp;
     const Real topsponge_lo_r = r_sp_outer;
     const Real topsponge_hi_r = r_tp_outer;
-    const Real sponge_min_loc = sponge_min;
+    const Real sponge_min_loc = problem_rp::sponge_min;
 
     if (AMREX_SPACEDIM != 2) {
         Abort("ERROR: sponge only supported for 2d in xrb_mixed");
@@ -105,7 +105,7 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
             AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
                                   { sponge_arr(i, j, k) = 1.0; });
 
-            if (xrb_use_bottom_sponge) {
+            if (problem_rp::xrb_use_bottom_sponge) {
                 for (int n = 0; n <= hi - lo; ++n) {
                     int j = lo + n;
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];

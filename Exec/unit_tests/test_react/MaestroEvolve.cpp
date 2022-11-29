@@ -3,6 +3,7 @@
 #include <extern_parameters.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 // advance solution to final time
 void Maestro::Evolve() {

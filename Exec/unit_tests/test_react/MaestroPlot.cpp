@@ -6,6 +6,7 @@
 #include <unistd.h>  // getcwd
 
 using namespace amrex;
+using namespace problem_rp;
 
 // write plotfile to disk
 void Maestro::WritePlotFile(const int step, const Real t_in, const Real dt_in,
