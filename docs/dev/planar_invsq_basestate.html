@@ -1,39 +1,83 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Modifications for a \(1/r^2\) Plane-Parallel Basestate &mdash; MAESTROeX  documentation</title>
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Notes on Thermodynamics" href="thermo_notes.html" />
     <link rel="prev" title="Modifications for a Spherical Self-Gravitating Star" href="spherical_basestate.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
 
+
+          
             <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -41,11 +85,22 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+
+          
     <div class="branch">
         Branch: <a href="../planar_invsq_basestate.html">main</a> | <a href="./planar_invsq_basestate.html">development</a>
     </div>
 
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
@@ -107,42 +162,83 @@
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/planar_invsq_basestate.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="modifications-for-a-1-r-2-plane-parallel-basestate">
-<span id="sec-planarinvsqgravity"></span><h1>Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate<a class="headerlink" href="#modifications-for-a-1-r-2-plane-parallel-basestate" title="Permalink to this headline">¶</a></h1>
+<span id="sec-planarinvsqgravity"></span><h1>Modifications for a <span class="math notranslate nohighlight">\(1/r^2\)</span> Plane-Parallel Basestate<a class="headerlink" href="#modifications-for-a-1-r-2-plane-parallel-basestate" title="Permalink to this heading">¶</a></h1>
 <p>In the plane parallel assumption, we model a layer of thickness
-<span class="math notranslate nohighlight">\(\Delta R\)</span> a distance <span class="math notranslate nohighlight">\(R_\mathrm{base}\)</span> from the center of a star,
-under the assumption the <span class="math notranslate nohighlight">\(\Delta R \ll R_\mathrm{base}\)</span>. In this
+<span class="math notranslate nohighlight">\(\Delta R`\)</span> a distance <span class="math notranslate nohighlight">\(R_\mathrm{base}`\)</span> from the center of a star,
+under the assumption the <span class="math notranslate nohighlight">\(\Delta R \ll R_\mathrm{base}`\)</span>. In this
 assumption, we can neglect the curvature of the atmosphere. Here, we
 extend that basic assumption to allow for the gravitational acceleration
-to still fall off as <span class="math notranslate nohighlight">\(1/r^2\)</span> as we move outward in the envelope. We assume
+to still fall off as <span class="math notranslate nohighlight">\(1/r^2`\)</span> as we move outward in the envelope. We assume
 that the mass of the envelope is insignificant, and that only the mass of
 the underlying star contributes to the gravitational acceleration.</p>
 <section id="constraint-equation">
-<h2>Constraint Equation<a class="headerlink" href="#constraint-equation" title="Permalink to this headline">¶</a></h2>
+<h2>Constraint Equation<a class="headerlink" href="#constraint-equation" title="Permalink to this heading">¶</a></h2>
 <p>We begin with the <span class="math notranslate nohighlight">\(w_0\)</span> constraint equation (derived elsewhere), including the volume-discrepancy term:</p>
 <div class="math notranslate nohighlight" id="equation-planar-invsq-basestate-0">
 <span class="eqno">(303)<a class="headerlink" href="#equation-planar-invsq-basestate-0" title="Permalink to this equation">¶</a></span>\[\nabla \cdot  ({w_0 \er}) = \bar{S} - \frac{1}{\gammabar p_0} \psi - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{{p_0}_\mathrm{EOS}}}{\dt}\]</div>
@@ -204,7 +300,7 @@ So we now have</p>
 = - \frac{2 w_0 \rho_0 g}{r} - g \frac{\partial \etarho}{\partial r}\]</div>
 </section>
 <section id="uniform-dr-discretization">
-<h2>Uniform <span class="math notranslate nohighlight">\(\dr\)</span> Discretization<a class="headerlink" href="#uniform-dr-discretization" title="Permalink to this headline">¶</a></h2>
+<h2>Uniform <span class="math notranslate nohighlight">\(\dr\)</span> Discretization<a class="headerlink" href="#uniform-dr-discretization" title="Permalink to this heading">¶</a></h2>
 <p>Collecting all of the <span class="math notranslate nohighlight">\(\dw\)</span> terms on the left side, our constraint equation
 appears as:</p>
 <div class="math notranslate nohighlight" id="equation-planar-invsq-basestate-13">
@@ -242,7 +338,7 @@ C_j &amp;=&amp; \frac{1}{\dr^2} \left( {\gammabar p_0}\right)_{j}  , \\
 F_j &amp;=&amp;  -\frac{2}{r_{j-\myhalf}} (\rho_0 g)_{j-\half}   (\ow)_{j-\half} - \frac{g_{j-\half}}{\dr} \left[ \left( \etarho \right)_{j} - \left( \etarho \right)_{j-1} \right] \end{aligned}\end{split}\]</div>
 </section>
 <section id="non-uniform-dr-discretization">
-<h2>Non-Uniform <span class="math notranslate nohighlight">\(\dr\)</span> Discretization<a class="headerlink" href="#non-uniform-dr-discretization" title="Permalink to this headline">¶</a></h2>
+<h2>Non-Uniform <span class="math notranslate nohighlight">\(\dr\)</span> Discretization<a class="headerlink" href="#non-uniform-dr-discretization" title="Permalink to this heading">¶</a></h2>
 <p>centering
 ![image](planeinvsqfigpath/grid2){width=”4in”}</p>
 <p>Consider the above non-uniform grid spacing,
@@ -273,7 +369,7 @@ uniform grid case. In detail, it becomes:</p>
 <p>which has terms proportional to <span class="math notranslate nohighlight">\((\dw)_{j-\thalf}\)</span>, <span class="math notranslate nohighlight">\((\dw)_{j-\half}\)</span>, <span class="math notranslate nohighlight">\((\dw)_{j+\half}\)</span>, and <span class="math notranslate nohighlight">\((\dw)_{j+\thalf}\)</span></p>
 </section>
 <section id="boundary-conditions">
-<h2>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this headline">¶</a></h2>
+<h2>Boundary Conditions<a class="headerlink" href="#boundary-conditions" title="Permalink to this heading">¶</a></h2>
 <p>Together with the assumption that the mass of the envelope does not
 contribute to the gravitational acceleration, we assume that as we move
 a fluid element in the atmosphere, it does not drive a velocity at the very
@@ -283,33 +379,50 @@ base of the layer. Therefore, we take <span class="math notranslate nohighlight"
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="spherical_basestate.html" class="btn btn-neutral float-left" title="Modifications for a Spherical Self-Gravitating Star" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="thermo_notes.html" class="btn btn-neutral float-right" title="Notes on Thermodynamics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="spherical_basestate.html" class="btn btn-neutral float-left" title="Modifications for a Spherical Self-Gravitating Star" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
-  </div>
+    <p>
+        &#169; Copyright 2018-2023, MAESTROeX development tem.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
 
 </body>

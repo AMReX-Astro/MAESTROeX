@@ -1,39 +1,83 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Godunov Interface States &mdash; MAESTROeX  documentation</title>
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Multigrid" href="mg.html" />
     <link rel="prev" title="Interface State Details" href="pert.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
 
+
+          
             <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -41,11 +85,22 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+
+          
     <div class="branch">
         Branch: <a href="../Godunov.html">main</a> | <a href="./Godunov.html">development</a>
     </div>
 
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
@@ -143,35 +198,76 @@
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Godunov Interface States</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/Godunov.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="godunov-interface-states">
-<h1>Godunov Interface States<a class="headerlink" href="#godunov-interface-states" title="Permalink to this headline">¶</a></h1>
+<h1>Godunov Interface States<a class="headerlink" href="#godunov-interface-states" title="Permalink to this heading">¶</a></h1>
 <p>These are working notes for the Godunov step in MAESTROeX and VARDEN.</p>
 <section id="maestroex-notation">
-<h2>MAESTROeX Notation<a class="headerlink" href="#maestroex-notation" title="Permalink to this headline">¶</a></h2>
+<h2>MAESTROeX Notation<a class="headerlink" href="#maestroex-notation" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>For 2D, <span class="math notranslate nohighlight">\(\Ub = (u,w)\)</span> and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\wt)\)</span>.
 Note that <span class="math notranslate nohighlight">\(u = \ut\)</span>. We will use the shorthand <span class="math notranslate nohighlight">\(\ib = (x,r)\)</span>.</p></li>
@@ -183,7 +279,7 @@ and <span class="math notranslate nohighlight">\(\Ubt = (\ut,\vt,\wt)\)</span>. 
 <span class="math notranslate nohighlight">\(\ib = (x,y,z)\)</span>.</p></li>
 </ul>
 <section id="computing-ub-from-ubt">
-<h3>Computing <span class="math notranslate nohighlight">\(\Ub\)</span> From <span class="math notranslate nohighlight">\(\Ubt\)</span><a class="headerlink" href="#computing-ub-from-ubt" title="Permalink to this headline">¶</a></h3>
+<h3>Computing <span class="math notranslate nohighlight">\(\Ub\)</span> From <span class="math notranslate nohighlight">\(\Ubt\)</span><a class="headerlink" href="#computing-ub-from-ubt" title="Permalink to this heading">¶</a></h3>
 <p>For plane-parallel problems, in order to compute <span class="math notranslate nohighlight">\(w\)</span> from
 <span class="math notranslate nohighlight">\(\wt\)</span>, we use simple averaging</p>
 <div class="math notranslate nohighlight" id="equation-godunov-0">
@@ -203,7 +299,7 @@ Then we construct <span class="math notranslate nohighlight">\(\Ub\)</span> by u
 velocity directly since only edge-based quantities are involved.</p>
 </section>
 <section id="computing-partial-w-0-partial-r">
-<h3>Computing <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span><a class="headerlink" href="#computing-partial-w-0-partial-r" title="Permalink to this headline">¶</a></h3>
+<h3>Computing <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span><a class="headerlink" href="#computing-partial-w-0-partial-r" title="Permalink to this heading">¶</a></h3>
 <p>For plane-parallel problems, the spatial derivatives of <span class="math notranslate nohighlight">\(w_0\)</span>
 are given by the two-point centered difference:</p>
 <div class="math notranslate nohighlight" id="equation-godunov-4">
@@ -216,7 +312,7 @@ using put_1d_array_on_cart_3d_sphr.</p>
 </section>
 </section>
 <section id="computing-ubt-trans-in-maestroex">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-trans-in-maestroex" title="Permalink to this headline">¶</a></h2>
+<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-trans-in-maestroex" title="Permalink to this heading">¶</a></h2>
 <div class="line-block">
 <div class="line">In advance_premac, we call mkutrans, to compute
 <span class="math notranslate nohighlight">\(\Ubt^{\trans}\)</span>. We will only compute the normal
@@ -243,7 +339,7 @@ We also use characteristic tracing.</p>
 <span class="eqno">(171)<a class="headerlink" href="#equation-godunov-8" title="Permalink to this equation">¶</a></span>\[\ut_{R,\ib-\half\eb_x} = \ut_{\ib}^n + \left[\frac{1}{2} - \frac{\dt}{2h}\min(0,\ut_{\ib}^n)\right]\partial\ut_{\ib}^n\]</div>
 </div></blockquote>
 <section id="d-cartesian-case">
-<h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case" title="Permalink to this headline">¶</a></h3>
+<h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case" title="Permalink to this heading">¶</a></h3>
 <p>We predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a 1D extrapolation:</p>
 <div class="math notranslate nohighlight" id="equation-godunov-9">
 <span class="eqno">(172)<a class="headerlink" href="#equation-godunov-9" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -273,7 +369,7 @@ that we upwind based on the full velocity.</p>
 \end{cases}\end{split}\]</div>
 </section>
 <section id="d-cartesian-case-1">
-<span id="id1"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-1" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-1" title="Permalink to this heading">¶</a></h3>
 <p>We use the exact same procedure in 2D and 3D to compute <span class="math notranslate nohighlight">\(\ut^{\trans}\)</span> and
 <span class="math notranslate nohighlight">\(\wt^{\trans}\)</span>. The procedure for computing <span class="math notranslate nohighlight">\(\vt^{\trans}\)</span> is analogous to
 computing <span class="math notranslate nohighlight">\(\ut^{\trans}\)</span>. We predict <span class="math notranslate nohighlight">\(\vt\)</span> to y-faces using the
@@ -291,7 +387,7 @@ computing <span class="math notranslate nohighlight">\(\ut^{\trans}\)</span>. We
 \end{cases}\end{split}\]</div>
 </section>
 <section id="d-spherical-case">
-<h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case" title="Permalink to this headline">¶</a></h3>
+<h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case" title="Permalink to this heading">¶</a></h3>
 <p>We predict the normal components of velocity to the normal faces
 using a 1D extrapolation. The equations for all three directions
 are identical to those given in the 2D and 3D plane-parallel
@@ -302,7 +398,7 @@ perturbational velocity.</p>
 </section>
 </section>
 <section id="computing-ubt-mac-in-maestroex">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-mac-in-maestroex" title="Permalink to this headline">¶</a></h2>
+<h2>Computing <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span> in MAESTROeX<a class="headerlink" href="#computing-ubt-mac-in-maestroex" title="Permalink to this heading">¶</a></h2>
 <div class="line-block">
 <div class="line">In advance_premac, we call velpred to compute
 <span class="math notranslate nohighlight">\(\Ubt^{\mac,*}\)</span>. We will only compute the normal component of
@@ -321,7 +417,7 @@ and <span class="math notranslate nohighlight">\(\wt_{L/R,\ib-\half\eb_r}\)</spa
 and <span class="math notranslate nohighlight">\(\wt_{\ib-\half\eb_r}^{\trans}\)</span>)</p>
 </div></blockquote>
 <section id="d-cartesian-case-2">
-<span id="id2"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-2" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-2" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to r-faces using a 1D extrapolation.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(\ut\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
@@ -386,7 +482,7 @@ and <span class="math notranslate nohighlight">\(\wt_{\ib-\half\eb_r}^{\trans}\)
 \end{cases}\end{split}\]</div>
 </section>
 <section id="d-cartesian-case-3">
-<span id="id3"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-3" title="Permalink to this headline">¶</a></h3>
+<span id="id3"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-3" title="Permalink to this heading">¶</a></h3>
 <p>This algorithm is more complicated than the 2D case since we include
 the effects of corner coupling.</p>
 <ol class="arabic simple">
@@ -477,7 +573,7 @@ term before solving the Riemann problem:</p>
 </ul>
 </section>
 <section id="d-spherical-case-1">
-<span id="id4"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-1" title="Permalink to this headline">¶</a></h3>
+<span id="id4"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-1" title="Permalink to this heading">¶</a></h3>
 <p>The spherical case is the same as the plane-parallel 3D Cartesian
 case, except the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term enters
 in the full dimensional extrapolation for each direction.
@@ -486,7 +582,7 @@ full velocity.</p>
 </section>
 </section>
 <section id="computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex">
-<span id="scalar-edge-state-prediction-in-maestroex"></span><h2>Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTROeX<a class="headerlink" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex" title="Permalink to this headline">¶</a></h2>
+<span id="scalar-edge-state-prediction-in-maestroex"></span><h2>Computing <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> in MAESTROeX<a class="headerlink" href="#computing-rho-edge-x-k-edge-rho-h-edge-and-ubt-edge-in-maestroex" title="Permalink to this heading">¶</a></h2>
 <p>We call make_edge_scal to compute <span class="math notranslate nohighlight">\(\rho^{'\edge}, X_k^{\edge},
 (\rho h)^{'\edge}\)</span>, and <span class="math notranslate nohighlight">\(\Ubt^{\edge}\)</span> at each edge.
 The procedure is the same for each quantitiy, so we shall simply denote
@@ -509,7 +605,7 @@ of motion are:</p>
 &amp;&amp; \\
 \frac{\partial\Ubt}{\partial t} &amp;=&amp; -\Ub\cdot\nabla\Ubt \underbrace{- \left(\Ubt\cdot\eb_r\right)\frac{\partial w_0}{\partial r}\eb_r \underbrace{- \frac{1}{\rho}\nabla\pi + \frac{1}{\rho_0}\frac{\partial\pi_0}{\partial r}\eb_r - \frac{(\rho-\rho_0)}{\rho}g\eb_r}_{\hbox{terms included in $\fb_{\Ubt}$}}}_{\hbox{forcing terms}}.\end{aligned}\end{split}\]</div>
 <section id="d-cartesian-case-4">
-<span id="id5"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-4" title="Permalink to this headline">¶</a></h3>
+<span id="id5"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-4" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to r-faces using a 1D extrapolation.</p></li>
 <li><p>Predict <span class="math notranslate nohighlight">\(s\)</span> to x-faces using a full-dimensional extrapolation.</p></li>
@@ -629,7 +725,7 @@ u_{R,\ib-\half\eb_r}, &amp; w^{\mac}_{\ib-\half\eb_r} &lt; 0. \\
 </ul>
 </section>
 <section id="d-cartesian-case-5">
-<span id="id6"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-5" title="Permalink to this headline">¶</a></h3>
+<span id="id6"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-5" title="Permalink to this heading">¶</a></h3>
 <p>This algorithm is more complicated than the 2D case since we include
 the effects of corner coupling.</p>
 <ol class="arabic simple">
@@ -737,7 +833,7 @@ s_{R,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 </ul>
 </section>
 <section id="d-spherical-case-2">
-<span id="id7"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-2" title="Permalink to this headline">¶</a></h3>
+<span id="id7"></span><h3>3D Spherical Case<a class="headerlink" href="#d-spherical-case-2" title="Permalink to this heading">¶</a></h3>
 <p>The spherical case is the same as the plane-parallel 3D Cartesian
 case, except the <span class="math notranslate nohighlight">\(\partial w_0/\partial r\)</span> term enters in the full
 dimensional extrapolation for each direction when predicting velocity
@@ -746,9 +842,9 @@ the full velocity.</p>
 </section>
 </section>
 <section id="computing-ub-mac-in-varden">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\mac,*}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-mac-in-varden" title="Permalink to this headline">¶</a></h2>
+<h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\mac,*}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-mac-in-varden" title="Permalink to this heading">¶</a></h2>
 <section id="d-cartesian-case-6">
-<span id="id8"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-6" title="Permalink to this headline">¶</a></h3>
+<span id="id8"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-6" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>We do a 1D Taylor series extrapolation to get both components of velocity at the x-face:</p>
 <div class="math notranslate nohighlight" id="equation-varden-u-l-1d">
@@ -799,7 +895,7 @@ y-faces, <span class="math notranslate nohighlight">\(v^{\mac,*}_{\ib-\half\eb_y
 </ul>
 </section>
 <section id="d-cartesian-case-7">
-<span id="id9"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-7" title="Permalink to this headline">¶</a></h3>
+<span id="id9"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-7" title="Permalink to this heading">¶</a></h3>
 <p>This is more complicated than the 2D case because we include corner
 coupling. We compute <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_x}^{1D},
 \Ub_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(\Ub_{\ib-\half\eb_z}^{1D}\)</span> in
@@ -837,7 +933,7 @@ obtain <span class="math notranslate nohighlight">\(v_{\ib-\half\eb_y}^{\mac,*}\
 </section>
 </section>
 <section id="computing-ub-edge-and-rho-edge-in-varden">
-<h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span> and <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-edge-and-rho-edge-in-varden" title="Permalink to this headline">¶</a></h2>
+<h2>Computing <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span> and <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN<a class="headerlink" href="#computing-ub-edge-and-rho-edge-in-varden" title="Permalink to this heading">¶</a></h2>
 <p>To compute <span class="math notranslate nohighlight">\(\Ub^{\edge}\)</span>, VARDEN uses the exact same algorithm
 as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in MAESTROeX. The algorithm for
 <span class="math notranslate nohighlight">\(\rho^{\edge}\)</span> in VARDEN is slightly different than the
@@ -845,7 +941,7 @@ as the <span class="math notranslate nohighlight">\(s^{\edge}\)</span> case in M
 formulation. Here, <span class="math notranslate nohighlight">\(s\)</span> is used in place of either <span class="math notranslate nohighlight">\(\rho, u, v\)</span>, or
 <span class="math notranslate nohighlight">\(w\)</span> (in 3D).</p>
 <section id="d-cartesian-case-8">
-<span id="id10"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-8" title="Permalink to this headline">¶</a></h3>
+<span id="id10"></span><h3>2D Cartesian Case<a class="headerlink" href="#d-cartesian-case-8" title="Permalink to this heading">¶</a></h3>
 <p>The 1D extrapolation is:</p>
 <div class="math notranslate nohighlight" id="equation-varden-s-l-1d">
 <span class="eqno">(230)<a class="headerlink" href="#equation-varden-s-l-1d" title="Permalink to this equation">¶</a></span>\[s_{L,\ib-\half\eb_x}^{1D} = s_{\ib-\eb_x}^n + \left(\half - \frac{\dt}{2h}u_{\ib-\half\eb_x}^{\mac}\right)\Delta_x s_{\ib-\eb_x}^n,\]</div>
@@ -884,7 +980,7 @@ s_{R,\ib-\half\eb_x}^{\edge}, &amp; u^{\mac}_{\ib-\half\eb_x} &lt; 0.
 <p>We use an analogous procedure to compute <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{\edge}\)</span>.</p>
 </section>
 <section id="d-cartesian-case-9">
-<span id="id11"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-9" title="Permalink to this headline">¶</a></h3>
+<span id="id11"></span><h3>3D Cartesian Case<a class="headerlink" href="#d-cartesian-case-9" title="Permalink to this heading">¶</a></h3>
 <p>This is more complicated than the 2D case because we include corner
 coupling. We first compute <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_x}^{1D}\)</span>,
 <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_y}^{1D}\)</span>, and <span class="math notranslate nohighlight">\(s_{\ib-\half\eb_z}^{1D}\)</span> in an
@@ -940,7 +1036,7 @@ We use an analogous procedure to compute both
 </section>
 </section>
 <section id="estate-fpu-in-godunov-2d-3d-f">
-<h2>ESTATE_FPU in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-fpu-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
+<h2>ESTATE_FPU in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-fpu-in-godunov-2d-3d-f" title="Permalink to this heading">¶</a></h2>
 <ul>
 <li><p>First, the normal predictor.</p>
 <div class="math notranslate nohighlight" id="equation-godunov-70">
@@ -1004,7 +1100,7 @@ s_R^x, &amp; \text{else}. \\
 </ul>
 </section>
 <section id="estate-in-godunov-2d-3d-f">
-<h2>ESTATE in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-in-godunov-2d-3d-f" title="Permalink to this headline">¶</a></h2>
+<h2>ESTATE in GODUNOV_2D/3D.f<a class="headerlink" href="#estate-in-godunov-2d-3d-f" title="Permalink to this heading">¶</a></h2>
 <p>First, the normal predictor.</p>
 <div class="math notranslate nohighlight" id="equation-godunov-75">
 <span class="eqno">(249)<a class="headerlink" href="#equation-godunov-75" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{aligned}
@@ -1035,7 +1131,7 @@ instead of UEDGE. Finally, upwind analogous to <a class="reference internal" hre
 to get <span class="math notranslate nohighlight">\(\text{sedge}_{\ib-\half\eb_x}\)</span>, but use UEDGE instead of UAD.</p>
 </section>
 <section id="piecewise-parabolic-method-ppm">
-<h2>Piecewise Parabolic Method (PPM)<a class="headerlink" href="#piecewise-parabolic-method-ppm" title="Permalink to this headline">¶</a></h2>
+<h2>Piecewise Parabolic Method (PPM)<a class="headerlink" href="#piecewise-parabolic-method-ppm" title="Permalink to this heading">¶</a></h2>
 <p>Consider a scalar, <span class="math notranslate nohighlight">\(s\)</span>, which we wish to predict to
 time-centered edges.  The PPM method is an improvement over the
 piecewise-linear method.  Using our notation, we modify equations
@@ -1104,7 +1200,7 @@ s_{i}, &amp; \text{else}.
 </li>
 </ul>
 <section id="colella-and-woodward-based-approach">
-<span id="sec-colellawoodward"></span><h3>Colella and Woodward Based Approach<a class="headerlink" href="#colella-and-woodward-based-approach" title="Permalink to this headline">¶</a></h3>
+<span id="sec-colellawoodward"></span><h3>Colella and Woodward Based Approach<a class="headerlink" href="#colella-and-woodward-based-approach" title="Permalink to this heading">¶</a></h3>
 <p>Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.
 Use a 4th-order interpolation in space with van Leer limiting to obtain edge values:</p>
 <div class="math notranslate nohighlight" id="equation-eq-cw-edge">
@@ -1148,7 +1244,7 @@ holds, then for that choice of <span class="math notranslate nohighlight">\(\pm 
 <span class="eqno">(268)<a class="headerlink" href="#equation-godunov-92" title="Permalink to this equation">¶</a></span>\[s_{i,\pm} = 3s_i - 2s_{i,\mp}.\]</div>
 </section>
 <section id="colella-and-sekora-based-approach">
-<span id="sec-colellasekora"></span><h3>Colella and Sekora Based Approach<a class="headerlink" href="#colella-and-sekora-based-approach" title="Permalink to this headline">¶</a></h3>
+<span id="sec-colellasekora"></span><h3>Colella and Sekora Based Approach<a class="headerlink" href="#colella-and-sekora-based-approach" title="Permalink to this heading">¶</a></h3>
 <ul>
 <li><p>Spatially interpolate <span class="math notranslate nohighlight">\(s\)</span> to edges.</p>
 <p>Use a 4th-order interpolation in space to obtain edge values:</p>
@@ -1234,33 +1330,50 @@ If <span class="math notranslate nohighlight">\(s\delta s - \alpha_{i,\mp} \ge 1
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="pert.html" class="btn btn-neutral float-left" title="Interface State Details" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="mg.html" class="btn btn-neutral float-right" title="Multigrid" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="pert.html" class="btn btn-neutral float-left" title="Interface State Details" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
-  </div>
+    <p>
+        &#169; Copyright 2018-2023, MAESTROeX development tem.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
 
 </body>
