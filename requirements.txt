@@ -5,4 +5,8 @@ sphinxcontrib_bibtex
 numpydoc
 more_itertools
 numpy
-
+IPython>=3
+nbconvert
+pandoc
+jupyter
+sphinx-prompt
