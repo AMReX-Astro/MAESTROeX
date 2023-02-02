@@ -28,3 +28,12 @@ Science papers that used this setup include:
     https://doi.org/10.1088/0004-637X/728/2/118
 
 
+## initial model
+
+* `inputs_2d.rprox`
+
+  This initial model comes from the original MAESTRO.  It was generated
+  with `initial_models/toy_atm` using the
+  `_params.xrb_mixed.hi_dens.tall.CNO` inputs file.
+
+  This is intended to be used with the rprox network.
