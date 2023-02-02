@@ -130,8 +130,6 @@ ifeq ($(USE_SDC), TRUE)
 endif
 
 
-USE_FORT_MICROPHYSICS ?= FALSE
-
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 
 Bpack += $(foreach dir, $(EXTERN_CORE), $(dir)/Make.package)
