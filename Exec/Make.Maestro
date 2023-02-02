@@ -18,6 +18,9 @@ MICROPHYSICS_HOME ?= $(TOP)/external/Microphysics
 
 AMREX_HOME ?= $(TOP)/external/amrex
 
+# disable AMReX Fortran by default
+BL_NO_FORT ?= TRUE
+
 # Require C++17
 CXXSTD := c++17
 
