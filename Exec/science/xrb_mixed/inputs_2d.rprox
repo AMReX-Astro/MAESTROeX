@@ -1,12 +1,12 @@
 # This is a port of production/new/6cm-1536w/inputs_2d_6.0cm in MAESTRO
 
 # INITIAL MODEL
-maestro.model_file = "xrb_new.hse.dx_6.000cm"
+maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12.000cm.dx_6.000cm.CNO"
 maestro.perturb_model = true
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0       0.0
-geometry.prob_hi     =  2304.0e0  9216.0e0
+geometry.prob_hi     =  2304.0    4608.0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -23,7 +23,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 384 1536
+amr.n_cell             = 384 768
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -112,13 +112,13 @@ maestro.max_mg_bottom_nlevels = 4
 problem.xrb_pert_size = 50
 problem.xrb_pert_factor = 1.0e-5
 problem.xrb_pert_type = 1
-problem.xrb_pert_height = 5760.e0
+problem.xrb_pert_height = 1475.0
 
 # velocity perturbation
 problem.apply_vel_field = 1
 problem.velpert_scale = 1.0e2
 problem.velpert_amplitude = 1.0e5
-problem.velpert_height_loc = 5750.0
+problem.velpert_height_loc = 1460.0
 problem.velpert_steep = 12.0e0
 problem.num_vortices = 8
 
