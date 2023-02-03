@@ -57,8 +57,7 @@ extensions = ['sphinx.ext.autodoc',
               'numpydoc',
               'sphinx.ext.githubpages',
               'breathe',
-              'sphinxfortran.fortran_domain',
-              'sphinxfortran.fortran_autodoc',
+              'IPython.sphinxext.ipython_console_highlighting',
               'sphinx.ext.intersphinx']
 
 # bibtex
@@ -81,7 +80,7 @@ main_doc = 'index'
 
 # General information about the project.
 project = 'MAESTROeX'
-copyright = '2018-2020, MAESTROeX development tem'
+copyright = '2018-2023, MAESTROeX development tem'
 author = 'MAESTROeX development team'
 
 html_logo = "maestroex_logo.png"
@@ -246,12 +245,6 @@ breathe_default_members = ('members', 'undoc-members', 'protected-members',
 breathe_doxygen_config_options = {'EXTRACT_ALL': 'YES',
                                   'SHOW_USED_FILES': 'YES', 'RECURSIVE': 'YES'
                                   }
-
-# -- Options for sphinx-fortran -----------------------------------------
-
-fortran_src = [os.path.abspath('preprocessed_files')]
-
-fortran_ext = ['f90', 'F90']
 
 
 # -- Options for intersphinx --------------------------------------------

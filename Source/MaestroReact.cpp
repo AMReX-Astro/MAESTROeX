@@ -383,11 +383,6 @@ void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
                         eos(eos_input_rh, eos_state);
                         eos_to_burn(eos_state, state);
 
-                        // we don't need the temperature RHS so set self_heat = False
-#ifdef STRANG
-                        state.self_heat = false;
-#endif
-
                         Array1D<Real, 1, neqs> ydot;
                         actual_rhs(state, ydot);
                         // Note ydot is 1-based
