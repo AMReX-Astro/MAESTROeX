@@ -103,12 +103,12 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto num_vortices_loc = num_vortices;
         const auto velpert_height = velpert_height_loc;
 
-        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices + 1);
+        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices);
 
         // vortex x-coords
         RealVector vortices_xloc(num_vortices);
         for (auto i = 0; i < num_vortices; ++i) {
-            vortices_xloc[i] = (Real(i) + 0.5) * offset;
+            vortices_xloc[i] = (static_cast<Real>(i) + 0.5_rt) * offset;
         }
 
         const Real* vortices_xloc_p = vortices_xloc.dataPtr();
@@ -125,24 +125,23 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
             for (auto vortex = 0; vortex < num_vortices_loc; ++vortex) {
                 Real xdist = x - vortices_xloc_p[vortex];
 
-                Real rad = std::sqrt(x * x + y * y);
+                Real rad = std::sqrt(xdist * xdist + ydist * ydist);
 
                 // e.g. Calder et al. ApJSS 143, 201-229 (2002)
                 // we set things up so that every other vortex has the same
                 // orientation
                 upert -=
-                    ydist / velpert_scale_loc * velpert_amplitude_loc *
+                    ydist * velpert_amplitude_loc *
                     std::exp(-rad * rad /
                              (2.0 * velpert_scale_loc * velpert_scale_loc)) *
                     pow(-1.0, vortex + 1);
 
                 vpert +=
-                    xdist / velpert_scale_loc * velpert_amplitude_loc *
+                    xdist * velpert_amplitude_loc *
                     std::exp(-rad * rad /
                              (2.0 * velpert_scale_loc * velpert_scale_loc)) *
                     pow(-1.0, vortex + 1);
             }
-
             vel(i, j, k, 0) += upert;
             vel(i, j, k, 1) += vpert;
         });
