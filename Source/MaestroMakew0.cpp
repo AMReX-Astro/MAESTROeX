@@ -108,7 +108,7 @@ void Maestro::Makew0Planar(
     const Real dpdt_factor_loc = dpdt_factor;
 
     // pressure correction variables
-    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine);
+    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine+1);
     auto int1_over_gamma1bar_p0_planar = int1_over_gamma1bar_p0.array();
 
     // Compute w0 on edges at level n
