@@ -1,37 +1,81 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>GPU &mdash; MAESTROeX  documentation</title>
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
-    <script src="_static/js/theme.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Base State" href="base_state.html" />
     <link rel="prev" title="Initial Models" href="initial_models.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
 
+
+          
             <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -39,11 +83,22 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+
+          
     <div class="branch">
         Branch: <a href="./gpu.html">main</a> | <a href="./dev/gpu.html">development</a>
     </div>
 
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
@@ -110,44 +165,85 @@
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>GPU</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/gpu.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="gpu">
-<span id="sec-gpu"></span><h1>GPU<a class="headerlink" href="#gpu" title="Permalink to this headline">¶</a></h1>
+<span id="sec-gpu"></span><h1>GPU<a class="headerlink" href="#gpu" title="Permalink to this heading">¶</a></h1>
 <p>In this chapter, we will present the GPU support in MAESTROeX,
 including necessary build parameters, how to offload a routine
 to GPU, and some basic profiling and debugging options.
 Note that currently MAESTROeX only supports NVIDIA GPUs.</p>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
 <p>Since MAESTROeX uses primarily CUDA C++ and CUDA Fortran,
 it requires a recent version of CUDA (e.g., &gt;= 9) and the device
 must have compute capability of &gt;= 6.</p>
 </section>
 <section id="building-gpu-support">
-<span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Permalink to this headline">¶</a></h2>
+<span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Permalink to this heading">¶</a></h2>
 <p>To build MAESTROeX with GPU support, add the following argument
 to the GNUmakefile:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_CUDA</span> <span class="o">:=</span> <span class="n">TRUE</span>
@@ -179,7 +275,7 @@ capability 6.x, the flag should be set to:</p>
 </div>
 </section>
 <section id="offloading-a-routine-to-gpu">
-<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Permalink to this headline">¶</a></h2>
+<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Permalink to this heading">¶</a></h2>
 <p>In order to offload a routine to the GPU, we insert a <code class="docutils literal notranslate"><span class="pre">#pragma</span> <span class="pre">gpu</span></code>
 statement on the line before the call. This tells the preprocessor to
 generate a CUDA device version of the function, with all the
@@ -187,7 +283,7 @@ additional CUDA GPU management. In addition to this, there are a few
 other modifications required to ensure the function operates correctly
 on the GPU. We summarize these below.</p>
 <section id="c">
-<h3>C++<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h3>
+<h3>C++<a class="headerlink" href="#c" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Make sure that the box <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> are the first two arguments
 and use <code class="docutils literal notranslate"><span class="pre">AMREX_INT_ANYD</span></code> as the macro wrapping <code class="docutils literal notranslate"><span class="pre">bx.loVect()</span></code> and
@@ -205,31 +301,31 @@ The MultiFab counterparts are on the GPU.</p></li>
 <li><p>Use <code class="docutils literal notranslate"><span class="pre">BL_TO_FORTRAN_ANYD()</span></code> to wrap MultiFab arguments (and in the header file wrap with <code class="docutils literal notranslate"><span class="pre">BL_FORT_FAB_ARG_3D</span></code>)</p></li>
 </ul>
 <p>To illustrate these modifications, consider the function <code class="docutils literal notranslate"><span class="pre">mk_sponge</span></code>. To call the function on the CPU, we would write</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
 
-<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span><span class="w"></span>
-<span class="w">              </span><span class="n">BL_TO_FORTRAN_3D</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span><span class="w"></span>
-<span class="w">              </span><span class="n">ZFILL</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dt</span><span class="p">);</span><span class="w"></span>
-<span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
+<span class="w">              </span><span class="n">BL_TO_FORTRAN_3D</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
+<span class="w">              </span><span class="n">ZFILL</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dt</span><span class="p">);</span>
+<span class="w"> </span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Implementing the changes described above to offload this to GPU, this becomes</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
 
 <span class="cp">#pragma gpu box(tileBox)</span>
-<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span><span class="w"></span>
-<span class="w">              </span><span class="n">BL_TO_FORTRAN_ANYD</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span><span class="w"></span>
-<span class="w">              </span><span class="n">AMREX_REAL_ANYD</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span><span class="w"></span>
-<span class="w"> </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
+<span class="w">              </span><span class="n">BL_TO_FORTRAN_ANYD</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
+<span class="w">              </span><span class="n">AMREX_REAL_ANYD</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span>
+<span class="w"> </span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
 <section id="fortran">
-<h3>Fortran<a class="headerlink" href="#fortran" title="Permalink to this headline">¶</a></h3>
+<h3>Fortran<a class="headerlink" href="#fortran" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>The routine must only operate on a single zone in <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p>
 <ul>
@@ -283,46 +379,46 @@ function if the file has the correct extension.</p></li>
 </ul>
 <p>We can see some of the above modifications by looking at the
 subroutine <code class="docutils literal notranslate"><span class="pre">estdt</span></code> in <code class="docutils literal notranslate"><span class="pre">compute_dt.F90</span></code>:</p>
-<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">estdt</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span><span class="p">,</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="n">dx</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">scal</span><span class="p">,</span><span class="w">  </span><span class="n">s_lo</span><span class="p">,</span><span class="w"> </span><span class="n">s_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_s</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">u</span><span class="p">,</span><span class="w">     </span><span class="n">u_lo</span><span class="p">,</span><span class="w"> </span><span class="n">u_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_u</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">force</span><span class="p">,</span><span class="w"> </span><span class="n">f_lo</span><span class="p">,</span><span class="w"> </span><span class="n">f_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_f</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">divu</span><span class="p">,</span><span class="w">  </span><span class="n">d_lo</span><span class="p">,</span><span class="w"> </span><span class="n">d_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">dSdt</span><span class="p">,</span><span class="w">  </span><span class="n">t_lo</span><span class="p">,</span><span class="w"> </span><span class="n">t_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">w0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">w_lo</span><span class="p">,</span><span class="w"> </span><span class="n">w_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">p0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">p_lo</span><span class="p">,</span><span class="w"> </span><span class="n">p_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span><span class="w"></span>
-<span class="w">                 </span><span class="n">gamma1bar_cart</span><span class="p">,</span><span class="w"> </span><span class="n">g_lo</span><span class="p">,</span><span class="w"> </span><span class="n">g_hi</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="w"> </span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;estdt&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">estdt</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span><span class="p">,</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="n">dx</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">scal</span><span class="p">,</span><span class="w">  </span><span class="n">s_lo</span><span class="p">,</span><span class="w"> </span><span class="n">s_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_s</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">u</span><span class="p">,</span><span class="w">     </span><span class="n">u_lo</span><span class="p">,</span><span class="w"> </span><span class="n">u_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_u</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">force</span><span class="p">,</span><span class="w"> </span><span class="n">f_lo</span><span class="p">,</span><span class="w"> </span><span class="n">f_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_f</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">divu</span><span class="p">,</span><span class="w">  </span><span class="n">d_lo</span><span class="p">,</span><span class="w"> </span><span class="n">d_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">dSdt</span><span class="p">,</span><span class="w">  </span><span class="n">t_lo</span><span class="p">,</span><span class="w"> </span><span class="n">t_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">w0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">w_lo</span><span class="p">,</span><span class="w"> </span><span class="n">w_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">p0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">p_lo</span><span class="p">,</span><span class="w"> </span><span class="n">p_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
+<span class="w">                 </span><span class="n">gamma1bar_cart</span><span class="p">,</span><span class="w"> </span><span class="n">g_lo</span><span class="p">,</span><span class="w"> </span><span class="n">g_hi</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="w"> </span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;estdt&quot;</span><span class="p">)</span>
 
-<span class="w">   </span><span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">HALF</span><span class="w"></span>
+<span class="w">   </span><span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">HALF</span>
 <span class="w">   </span><span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">amrex_min</span><span class="w"> </span><span class="c">! function</span>
 <span class="w">   </span><span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">amrex_max</span><span class="w"> </span><span class="c">! function</span>
 
 <span class="w">   </span><span class="c">! input parameters</span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lev</span><span class="w"></span>
-<span class="w">   </span><span class="kt">double precision</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span><span class="w"></span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">         </span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
-<span class="w">   </span><span class="p">...</span><span class="w"></span>
+<span class="w">   </span><span class="kt">integer</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lev</span>
+<span class="w">   </span><span class="kt">double precision</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span>
+<span class="w">   </span><span class="kt">integer</span><span class="w">         </span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">   </span><span class="p">...</span>
 
 <span class="w">   </span><span class="c">! local variables</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">spdx</span><span class="p">,</span><span class="w"> </span><span class="n">spdy</span><span class="p">,</span><span class="w"> </span><span class="n">spdz</span><span class="p">,</span><span class="w"> </span><span class="n">spdr</span><span class="p">,</span><span class="w"> </span><span class="n">rho_min</span><span class="w"></span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fx</span><span class="p">,</span><span class="w"> </span><span class="n">fy</span><span class="p">,</span><span class="w"> </span><span class="n">fz</span><span class="p">,</span><span class="w"> </span><span class="n">dt_temp</span><span class="w"></span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eps</span><span class="p">,</span><span class="n">denom</span><span class="p">,</span><span class="n">gradp0</span><span class="w"></span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="w"></span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">          </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="w"></span>
+<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">spdx</span><span class="p">,</span><span class="w"> </span><span class="n">spdy</span><span class="p">,</span><span class="w"> </span><span class="n">spdz</span><span class="p">,</span><span class="w"> </span><span class="n">spdr</span><span class="p">,</span><span class="w"> </span><span class="n">rho_min</span>
+<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fx</span><span class="p">,</span><span class="w"> </span><span class="n">fy</span><span class="p">,</span><span class="w"> </span><span class="n">fz</span><span class="p">,</span><span class="w"> </span><span class="n">dt_temp</span>
+<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eps</span><span class="p">,</span><span class="n">denom</span><span class="p">,</span><span class="n">gradp0</span>
+<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span>
+<span class="w">   </span><span class="kt">integer</span><span class="w">          </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span>
 
 <span class="w">   </span><span class="c">!$gpu</span>
 
-<span class="w">   </span><span class="n">rho_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d-20</span><span class="w"></span>
-<span class="w">   </span><span class="p">...</span><span class="w"></span>
+<span class="w">   </span><span class="n">rho_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d-20</span>
+<span class="w">   </span><span class="p">...</span>
 
-<span class="w">   </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
-<span class="w">         </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
-<span class="w">            </span><span class="n">spdx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">spdx</span><span class="w"> </span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span><span class="w"></span>
+<span class="w">   </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">      </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">         </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">            </span><span class="n">spdx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">spdx</span><span class="w"> </span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
 
-<span class="w">   </span><span class="p">...</span><span class="w"></span>
+<span class="w">   </span><span class="p">...</span>
 
-<span class="k">end subroutine </span><span class="n">estdt</span><span class="w"></span>
+<span class="k">end subroutine </span><span class="n">estdt</span>
 </pre></div>
 </div>
 <ul class="simple">
@@ -338,7 +434,7 @@ variables, but before the main body of the function.</p></li>
 </section>
 </section>
 <section id="profiling-with-gpus">
-<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Permalink to this headline">¶</a></h2>
+<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Permalink to this heading">¶</a></h2>
 <p>NVIDIA’s profiler, <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>, is recommended when profiling for GPUs.
 It returns data on how long each kernel launch lasted on the GPU,
 the number of threads and registers used, the occupancy of the GPU
@@ -350,10 +446,10 @@ To yield a consistent timing of a routine, a timer will need to be wrapped
 around an <code class="docutils literal notranslate"><span class="pre">MFIter</span></code> loop that encompasses the entire set of GPU launches
 contained within. For example:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">BL_PROFILE_VAR</span><span class="p">(</span><span class="s">&quot;A_NAME&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">blp</span><span class="p">);</span><span class="w">     </span><span class="c1">// Profiling start</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">mf</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"></span>
-<span class="p">{</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">mf</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span>
+<span class="p">{</span>
 <span class="w">    </span><span class="c1">// code that runs on the GPU</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 <span class="n">BL_PROFILE_STOP</span><span class="p">(</span><span class="n">blp</span><span class="p">);</span><span class="w">              </span><span class="c1">// Profiling stop</span>
 </pre></div>
 </div>
@@ -361,19 +457,19 @@ contained within. For example:</p>
 If you require further profiling detail, use <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>.</p>
 </section>
 <section id="basic-gpu-debugging">
-<span id="sec-gpudebug"></span><h2>Basic GPU Debugging<a class="headerlink" href="#basic-gpu-debugging" title="Permalink to this headline">¶</a></h2>
+<span id="sec-gpudebug"></span><h2>Basic GPU Debugging<a class="headerlink" href="#basic-gpu-debugging" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>Turn off GPU offloading for some part of the code with</p></li>
 </ul>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
-<span class="p">...</span><span class="w"> </span><span class="p">;</span><span class="w"></span>
-<span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">...</span><span class="w"> </span><span class="p">;</span>
+<span class="n">Gpu</span><span class="o">::</span><span class="n">setLaunchRegion</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
 </div>
 <ul class="simple">
 <li><p>To test if your kernels have launched, run</p></li>
 </ul>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nvprof ./Maestro2d.xxx
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nvprof<span class="w"> </span>./Maestro2d.xxx
 </pre></div>
 </div>
 <ul class="simple">
@@ -390,33 +486,50 @@ conditions.</p></li>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="initial_models.html" class="btn btn-neutral float-left" title="Initial Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="base_state.html" class="btn btn-neutral float-right" title="Base State" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="initial_models.html" class="btn btn-neutral float-left" title="Initial Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
-  </div>
+    <p>
+        &#169; Copyright 2018-2023, MAESTROeX development tem.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
 
 </body>

@@ -1,39 +1,83 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Governing Equations &mdash; MAESTROeX  documentation</title>
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Getting Started" href="getting_started.html" />
     <link rel="prev" title="Introduction to MAESTROeX" href="introduction.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
 
+
+          
             <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -41,11 +85,22 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+
+          
     <div class="branch">
         Branch: <a href="./flowchart.html">main</a> | <a href="./dev/flowchart.html">development</a>
     </div>
 
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
@@ -141,32 +196,73 @@
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Governing Equations</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/flowchart.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="governing-equations">
-<span id="ch-flowchart"></span><h1>Governing Equations<a class="headerlink" href="#governing-equations" title="Permalink to this headline">¶</a></h1>
+<span id="ch-flowchart"></span><h1>Governing Equations<a class="headerlink" href="#governing-equations" title="Permalink to this heading">¶</a></h1>
 <p>The equation set and solution procedure used by MAESTROeX has changed
 and improved over time.  In this chapter, we outline the model
 equations and algorithmic options in the code.  The latest published
@@ -182,7 +278,7 @@ reference to papers I-IV and the multilevel paper (see §
 <a class="reference internal" href="introduction.html#ch-intro"><span class="std std-ref">Introduction to MAESTROeX</span></a>), which describe the developments of the original
 temporal scheme.</p>
 <section id="summary-of-the-maestroex-equation-set">
-<h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this headline">¶</a></h2>
+<h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this heading">¶</a></h2>
 <p>Here we summarize the equations solved by MAESTROeX. We refer the reader
 to papers I through IV for the derivation
 and motivation of the equation set.
@@ -207,7 +303,7 @@ density and pressure linked via hydrostatic equilibrium:</p>
 <span class="eqno">(18)<a class="headerlink" href="#equation-flowchart-4" title="Permalink to this equation">¶</a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
 <p>We discuss each of these equations in further detail below.</p>
 <section id="lateral-average">
-<h3>Lateral Average<a class="headerlink" href="#lateral-average" title="Permalink to this headline">¶</a></h3>
+<h3>Lateral Average<a class="headerlink" href="#lateral-average" title="Permalink to this heading">¶</a></h3>
 <p>A key concept in the MAESTROeX equation set and algorithm is
 the lateral average.  The lateral average represents the average
 value of a quantity at a given radius in spherical simulations
@@ -239,7 +335,7 @@ for the average expansion velocity and numerically integrate
 this expression to obtain <span class="math notranslate nohighlight">\(w_0\)</span>.</p>
 </section>
 <section id="mass">
-<h3>Mass<a class="headerlink" href="#mass" title="Permalink to this headline">¶</a></h3>
+<h3>Mass<a class="headerlink" href="#mass" title="Permalink to this heading">¶</a></h3>
 <p>Conservation of mass gives the same continuity equation we have with
 compressible flow:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-6">
@@ -279,7 +375,7 @@ for all time. This gives</p>
 explicitly compute <span class="math notranslate nohighlight">\(\etarho\)</span> since it appears in other equations.</p>
 </section>
 <section id="energy">
-<h3>Energy<a class="headerlink" href="#energy" title="Permalink to this headline">¶</a></h3>
+<h3>Energy<a class="headerlink" href="#energy" title="Permalink to this heading">¶</a></h3>
 <p>We model the evolution of specific enthalpy, <span class="math notranslate nohighlight">\(h\)</span>.
 Strictly speaking this is not necessary to close the system,
 but a user can enable the option to couple the energy with the
@@ -324,7 +420,7 @@ and differentiating:</p>
 \end{align}\end{split}\]</div>
 </section>
 <section id="base-state">
-<h3>Base State<a class="headerlink" href="#base-state" title="Permalink to this headline">¶</a></h3>
+<h3>Base State<a class="headerlink" href="#base-state" title="Permalink to this heading">¶</a></h3>
 <p>The stratified atmosphere is characterized by a one-dimensional
 time-dependent base state, defined by a base state density, <span class="math notranslate nohighlight">\(\rho_0\)</span>,
 and a base state pressure, <span class="math notranslate nohighlight">\(p_0\)</span>, in hydrostatic equilibrum:</p>
@@ -342,7 +438,7 @@ another in response to heating.</p>
 by laterally averaging the full enthalpy, <span class="math notranslate nohighlight">\(h\)</span>.</p>
 </section>
 <section id="base-state-expansion">
-<h3>Base State Expansion<a class="headerlink" href="#base-state-expansion" title="Permalink to this headline">¶</a></h3>
+<h3>Base State Expansion<a class="headerlink" href="#base-state-expansion" title="Permalink to this heading">¶</a></h3>
 <p>In practice, we calculate <span class="math notranslate nohighlight">\(w_0\)</span> by integrating
 the one-dimensional divergence constraint. For a plane-parallel atmosphere, the
 evolution is:</p>
@@ -356,7 +452,7 @@ evolution is:</p>
 Then we can include this for completeness in the update for <span class="math notranslate nohighlight">\(\ut.\)</span></p>
 </section>
 <section id="momentum">
-<h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this headline">¶</a></h3>
+<h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this heading">¶</a></h3>
 <p>The compressible momentum equation (written in terms of velocity is):</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-13">
 <span class="eqno">(36)<a class="headerlink" href="#equation-flowchart-13" title="Permalink to this equation">¶</a></span>\[\rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla p = -\rho |g| \er\]</div>
@@ -412,7 +508,7 @@ we obtain a divergence constraint for <span class="math notranslate nohighlight"
 <span class="eqno">(44)<a class="headerlink" href="#equation-flowchart-17" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\left(\beta_0\Ubt\right) = \beta_0\left(S-\Sbar\right).\label{eq:utilde divergence}\]</div>
 </section>
 <section id="velocity-constraint">
-<h3>Velocity Constraint<a class="headerlink" href="#velocity-constraint" title="Permalink to this headline">¶</a></h3>
+<h3>Velocity Constraint<a class="headerlink" href="#velocity-constraint" title="Permalink to this heading">¶</a></h3>
 <p>The equation of state is cast into an elliptic constraint on the
 velocity field by differentiating <span class="math notranslate nohighlight">\(p_0(\rho, s, X_k)\)</span> along particle
 paths, giving:</p>
@@ -444,17 +540,12 @@ III). We also look at this in § <a class="reference internal" href="#sec-flow-g
 </section>
 </section>
 <section id="notation">
-<h2>Notation<a class="headerlink" href="#notation" title="Permalink to this headline">¶</a></h2>
+<h2>Notation<a class="headerlink" href="#notation" title="Permalink to this heading">¶</a></h2>
 <p>Throughout the papers describing MAESTROeX, we’ve largely kept our
 notation consistent. The table below defines the
 frequently-used quantities and provides their units.</p>
 <table class="docutils align-default" id="id14">
 <caption><span class="caption-number">Table 1 </span><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id14" title="Permalink to this table">¶</a></caption>
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 54%" />
-<col style="width: 29%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>symbol</p></th>
 <th class="head"><p>description</p></th>
@@ -632,18 +723,19 @@ species
 </tr>
 </tbody>
 </table>
-<dl class="footnote brackets">
-<dt class="label" id="id7"><span class="brackets">1</span></dt>
-<dd><p>Here we see an unfortunate conflict
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id7" role="note">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Here we see an unfortunate conflict
 of notation between the compressible hydro community and the
 incompressible community. In papers on compressible hydrodynamics,
 <span class="math notranslate nohighlight">\(\Ub\)</span> will usually mean the vector of conserved quantities. In
 incompressible / low speed papers, <span class="math notranslate nohighlight">\(\Ub\)</span> will mean the velocity vector.</p>
-</dd>
-</dl>
+</aside>
+</aside>
 </section>
 <section id="time-advancement-algorithm-ingredients">
-<span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Permalink to this headline">¶</a></h2>
+<span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Permalink to this heading">¶</a></h2>
 <p>The full time advancement algorithm is detailed in <span id="id8">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span> for the original
 algorithm and <span id="id9">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span> for the new, simplified algorithm.  We do not repeat
 that here.</p>
@@ -674,7 +766,7 @@ defines <span class="math notranslate nohighlight">\(T^{(2),\star}\)</span>.</sp
 </figure>
 <p>Here are some of the basic ingredients to the solver:</p>
 <section id="definitions">
-<h3>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h3>
+<h3>Definitions<a class="headerlink" href="#definitions" title="Permalink to this heading">¶</a></h3>
 <p>Below we define operations that will be referenced in
 § <a class="reference internal" href="#sec-flow-singlestep"><span class="std std-ref">Volume Discrepancy Changes</span></a>.</p>
 <p><strong>React State</strong><span class="math notranslate nohighlight">\([\rho^{\inp},(\rho h)^{\inp},X_k^{\inp},T^{\inp}, (\rho\Hext)^{\inp}, p_0^{\inp}] \rightarrow [\rho^{\outp}, (\rho h)^{\outp}, X_k^{\outp}, T^{\outp}, (\rho \omegadot_k)^{\outp}, (\rho\Hnuc)^{\outp}]\)</span>
@@ -700,7 +792,7 @@ Note that the density remains unchanged within <strong>React State</strong>, i.e
 <span class="math notranslate nohighlight">\(\rho^{\outp} = \rho^{\inp}\)</span>.</p>
 <p>The source code for this operation can be found in react_state.f90.</p>
 <section id="advect-base-density">
-<h4>Advect Base Density<a class="headerlink" href="#advect-base-density" title="Permalink to this headline">¶</a></h4>
+<h4>Advect Base Density<a class="headerlink" href="#advect-base-density" title="Permalink to this heading">¶</a></h4>
 <p><span class="math notranslate nohighlight">\([\rho_0^\inp,w_0^\inp] \rightarrow [\rho_0^\outp, \rho_0^{\outp,\nph}]\)</span> is the process by which we
 update the base state density through <span class="math notranslate nohighlight">\(\dt\)</span> in time. We keep the
 time-centered edge states, <span class="math notranslate nohighlight">\(\rho_0^{\outp,\nph}\)</span>,
@@ -732,7 +824,7 @@ discretization of <a class="reference internal" href="#equation-eq-flow-base-den
 </ul>
 </section>
 <section id="enforce-hse">
-<h4>Enforce HSE<a class="headerlink" href="#enforce-hse" title="Permalink to this headline">¶</a></h4>
+<h4>Enforce HSE<a class="headerlink" href="#enforce-hse" title="Permalink to this heading">¶</a></h4>
 <p><span class="math notranslate nohighlight">\([p_0^{\inp},\rho_0^{\inp}] \rightarrow [p_0^{\outp}]\)</span> has replaced <strong>Advect Base Pressure</strong>
 from Paper III as the process by which we update the base state
 pressure. Rather than discretizing the evolution equation for
@@ -749,7 +841,7 @@ We are effectively using the location where the <span class="math notranslate no
 <span class="math notranslate nohighlight">\(\rho_{\rm cutoff}\)</span> as the starting point for integration.</p>
 </section>
 <section id="advect-base-enthalpy">
-<h4>Advect Base Enthalpy<a class="headerlink" href="#advect-base-enthalpy" title="Permalink to this headline">¶</a></h4>
+<h4>Advect Base Enthalpy<a class="headerlink" href="#advect-base-enthalpy" title="Permalink to this heading">¶</a></h4>
 <p><span class="math notranslate nohighlight">\([(\rho h)_0^\inp,w_0^\inp,\psi^\inp] \rightarrow [(\rho h)_0^\outp]\)</span>
 is the process by which we update the base state enthalpy through <span class="math notranslate nohighlight">\(\dt\)</span> in time.</p>
 <ul>
@@ -779,7 +871,7 @@ term is added to the forcing, due to the spherical discretization of
 </ul>
 </section>
 <section id="computing-w-0">
-<h4>Computing <span class="math notranslate nohighlight">\(w_0\)</span><a class="headerlink" href="#computing-w-0" title="Permalink to this headline">¶</a></h4>
+<h4>Computing <span class="math notranslate nohighlight">\(w_0\)</span><a class="headerlink" href="#computing-w-0" title="Permalink to this heading">¶</a></h4>
 <p>Here we describe the process by which we compute <span class="math notranslate nohighlight">\(w_0\)</span>. The arguments
 are different for planar and spherical geometries.</p>
 <ul>
@@ -811,7 +903,7 @@ coordinates:</p>
 </section>
 </section>
 <section id="volume-discrepancy-changes">
-<span id="sec-flow-singlestep"></span><h3>Volume Discrepancy Changes<a class="headerlink" href="#volume-discrepancy-changes" title="Permalink to this headline">¶</a></h3>
+<span id="sec-flow-singlestep"></span><h3>Volume Discrepancy Changes<a class="headerlink" href="#volume-discrepancy-changes" title="Permalink to this heading">¶</a></h3>
 <p>Chapter <a class="reference external" href="#ch:volume">[ch:volume]</a> describes the reasoning behind the volume discrepancy
 term—a forcing term added to the constraint equation to bring us back to
 the equation of state. This addition of this term (enabled with dpdt_factor= T) modifies our
@@ -851,7 +943,7 @@ discrepancy term:</p>
 </ul>
 </section>
 <section id="gamma-1-variation-changes">
-<span id="sec-flow-gamma1vary"></span><h3><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#gamma-1-variation-changes" title="Permalink to this headline">¶</a></h3>
+<span id="sec-flow-gamma1vary"></span><h3><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#gamma-1-variation-changes" title="Permalink to this heading">¶</a></h3>
 <p>The constraint we derive from requiring the pressure to be close to
 the background hydrostatic pressure takes the form:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-38">
@@ -976,7 +1068,7 @@ First we construct:</p>
 </ul>
 </section>
 <section id="thermal-diffusion-changes">
-<span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this headline">¶</a></h3>
+<span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this heading">¶</a></h3>
 <p>Thermal diffusion was introduced in the XRB <span id="id10">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
@@ -1033,7 +1125,7 @@ the equation of state. The update is given by</p>
 </section>
 </section>
 <section id="initialization">
-<span id="sec-initialization"></span><h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this headline">¶</a></h2>
+<span id="sec-initialization"></span><h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this heading">¶</a></h2>
 <p>We start each calculation with user-specified initial values for
 <span class="math notranslate nohighlight">\(\rho\)</span>, <span class="math notranslate nohighlight">\(X_k\)</span> and <span class="math notranslate nohighlight">\(T,\)</span> as well as an initial background state. In
 order for the low Mach number assumption to hold, the initial data
@@ -1137,9 +1229,9 @@ and <span class="math notranslate nohighlight">\(\psi^{-\myhalf} = \psi^{\myhalf
 <p>The tolerances for these elliptic solves are described in § <a class="reference internal" href="mg.html#sec-mg"><span class="std std-ref">Multigrid</span></a>.</p>
 </section>
 <section id="changes-from-earlier-implementations">
-<h2>Changes from Earlier Implementations<a class="headerlink" href="#changes-from-earlier-implementations" title="Permalink to this headline">¶</a></h2>
+<h2>Changes from Earlier Implementations<a class="headerlink" href="#changes-from-earlier-implementations" title="Permalink to this heading">¶</a></h2>
 <section id="changes-between-paper-3-and-paper-4">
-<h3>Changes Between Paper 3 and Paper 4<a class="headerlink" href="#changes-between-paper-3-and-paper-4" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between Paper 3 and Paper 4<a class="headerlink" href="#changes-between-paper-3-and-paper-4" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>We defined the mapping of data between a 1D radial array and the 3D Cartesian
 grid for spherical problems (which we improve upon in the multilevel paper).</p></li>
@@ -1164,17 +1256,17 @@ compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS usi
 </ol>
 </section>
 <section id="changes-between-paper-4-and-the-multilevel-paper">
-<h3>Changes Between Paper 4 and the Multilevel Paper<a class="headerlink" href="#changes-between-paper-4-and-the-multilevel-paper" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between Paper 4 and the Multilevel Paper<a class="headerlink" href="#changes-between-paper-4-and-the-multilevel-paper" title="Permalink to this heading">¶</a></h3>
 <p>See the multilevel paper for the latest.</p>
 </section>
 <section id="changes-between-the-multilevel-paper-and-paper-5">
-<h3>Changes Between the Multilevel Paper and Paper 5<a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between the Multilevel Paper and Paper 5<a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>Added rotation.</p></li>
 </ol>
 </section>
 <section id="changes-between-paper-5-and-the-xrb-paper">
-<h3>Changes Between Paper 5 and the XRB Paper<a class="headerlink" href="#changes-between-paper-5-and-the-xrb-paper" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Between Paper 5 and the XRB Paper<a class="headerlink" href="#changes-between-paper-5-and-the-xrb-paper" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>We have added thermal diffusion, controlled by <code class="docutils literal notranslate"><span class="pre">use_thermal_diffusion</span></code>,
 <code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code>, and <code class="docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code>.</p></li>
@@ -1185,7 +1277,7 @@ to prevent large, unphysical velocities from appearing near the edge of the star
 </ol>
 </section>
 <section id="changes-since-the-xrb-paper">
-<h3>Changes Since the XRB Paper<a class="headerlink" href="#changes-since-the-xrb-paper" title="Permalink to this headline">¶</a></h3>
+<h3>Changes Since the XRB Paper<a class="headerlink" href="#changes-since-the-xrb-paper" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p>We switched to the new form of the momentum equation to
 <a class="reference internal" href="#equation-eq-flow-newmomentum">Eq.39</a> to conserve the low-Mach number form of
@@ -1196,7 +1288,7 @@ agreement between the two temperatures.</p></li>
 </section>
 </section>
 <section id="future-considerations">
-<h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Permalink to this headline">¶</a></h2>
+<h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
 <li><p>We are still exploring the effects of <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code> for spherical
 problems. We would eventually like to run in this mode, but <span class="math notranslate nohighlight">\(T=T(\rho,X_k,p_0)\)</span>
@@ -1207,7 +1299,7 @@ been successful.</p></li>
 </section>
 </section>
 <section id="numerical-methodology">
-<span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Permalink to this headline">¶</a></h1>
+<span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Permalink to this heading">¶</a></h1>
 <p>We give an overview of the original MAESTRO algorithm <span id="id12">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>,
 as well as the recently introduced new temporal integration
 scheme <span id="id13">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span>.  These schemes share many of the same algorithmic
@@ -1223,42 +1315,59 @@ through averaging routines, rather than predicting the evolution with
 a split velocity formulation, only to have to correct it with the
 averaging operator in the end regardless.</p>
 <section id="original-temporal-integrator">
-<h2>Original Temporal Integrator<a class="headerlink" href="#original-temporal-integrator" title="Permalink to this headline">¶</a></h2>
+<h2>Original Temporal Integrator<a class="headerlink" href="#original-temporal-integrator" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="new-temporal-integrator">
-<h2>New Temporal Integrator<a class="headerlink" href="#new-temporal-integrator" title="Permalink to this headline">¶</a></h2>
+<h2>New Temporal Integrator<a class="headerlink" href="#new-temporal-integrator" title="Permalink to this heading">¶</a></h2>
 </section>
 </section>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction to MAESTROeX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction to MAESTROeX" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
-  </div>
+    <p>
+        &#169; Copyright 2018-2023, MAESTROeX development tem.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
 
 </body>

@@ -1,39 +1,83 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
   <title>Notes on \(\beta_0\) &mdash; MAESTROeX  documentation</title>
-      <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="_static/js/theme.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Notes on Enthalpy" href="enthalpy.html" />
     <link rel="prev" title="Notes on Thermodynamics" href="thermo_notes.html" /> 
 </head>
 
-<body class="wy-body-for-nav"> 
+<body class="wy-body-for-nav">
+
+   
   <div class="wy-grid-for-nav">
+    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
+          
 
+
+          
             <a href="index.html" class="icon icon-home"> MAESTROeX
+          
+
+          
+            
             <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
+          
           </a>
+
+          
+            
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -41,11 +85,22 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
+
+          
     <div class="branch">
         Branch: <a href="./beta0.html">main</a> | <a href="./dev/beta0.html">development</a>
     </div>
 
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
               <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
@@ -110,32 +165,73 @@
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
+            
+          
         </div>
+        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
+        
       </nav>
 
+
       <div class="wy-nav-content">
+        
         <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
+    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
       <li>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span></li>
+    
+    
       <li class="wy-breadcrumbs-aside">
+        
+          
             <a href="_sources/beta0.rst.txt" rel="nofollow"> View page source</a>
+          
+        
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-             
+            
   <section id="notes-on-beta-0">
-<h1>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#notes-on-beta-0" title="Permalink to this headline">¶</a></h1>
+<h1>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#notes-on-beta-0" title="Permalink to this heading">¶</a></h1>
 <p>The goal of <span class="math notranslate nohighlight">\(\beta_0\)</span> is to capture the expansion of a displaced fluid
 element due to the stratification of the atmosphere. MAESTROeX computes
 <span class="math notranslate nohighlight">\(\beta_0\)</span> as:</p>
@@ -143,7 +239,7 @@ element due to the stratification of the atmosphere. MAESTROeX computes
 <span class="eqno">(360)<a class="headerlink" href="#equation-beta0-0" title="Permalink to this equation">¶</a></span>\[\label{eq:beta_0}
 \beta_0(r,t) = \rho_0 \exp\left (  \int_0^r  \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r^\prime} dr^\prime \right )\]</div>
 <section id="constant-composition">
-<h2>Constant Composition<a class="headerlink" href="#constant-composition" title="Permalink to this headline">¶</a></h2>
+<h2>Constant Composition<a class="headerlink" href="#constant-composition" title="Permalink to this heading">¶</a></h2>
 <p>Consider an isentropically stratified atmosphere, with a constant
 composition as a function of <span class="math notranslate nohighlight">\(r\)</span>. If you displace a parcel of fluid
 upwards, it will expand adabatically and continue to rise until its
@@ -167,7 +263,7 @@ isentropically stratified atmosphere, as we displace a fluid element,
 it will always remain neutrally buoyant.</p>
 </section>
 <section id="composition-gradient">
-<h2>Composition Gradient<a class="headerlink" href="#composition-gradient" title="Permalink to this headline">¶</a></h2>
+<h2>Composition Gradient<a class="headerlink" href="#composition-gradient" title="Permalink to this heading">¶</a></h2>
 <p>If there is a change in composition with <span class="math notranslate nohighlight">\(r\)</span>, the situation is more
 complicated. Consider again an isentropically stratified atmosphere,
 now with a composition gradient. If you displace a parcel of fluid
@@ -178,7 +274,7 @@ will have a different composition that it has. In this case, what is
 the path to equilibrium?</p>
 </section>
 <section id="on-the-effect-of-chemical-potential">
-<span id="sec-on-the-affect-of-chemical-potential"></span><h2>On the Effect of Chemical Potential<a class="headerlink" href="#on-the-effect-of-chemical-potential" title="Permalink to this headline">¶</a></h2>
+<span id="sec-on-the-affect-of-chemical-potential"></span><h2>On the Effect of Chemical Potential<a class="headerlink" href="#on-the-effect-of-chemical-potential" title="Permalink to this heading">¶</a></h2>
 <p>In MAESTRO, we do things in an operator split fashion — the hydro is
 de-coupled from the burning. This means that during the hydro parts
 of the algorithm (where <span class="math notranslate nohighlight">\(\beta_0\)</span> is used), the system is fixed in
@@ -190,7 +286,7 @@ which <em>may</em> be important in the burning step — there appears to
 be very little about this in the literature, but everyone seems to
 assume it makes little difference.</p>
 <section id="derivation-of-alpha">
-<span id="sec-derivation-of-alpha"></span><h3>Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#derivation-of-alpha" title="Permalink to this headline">¶</a></h3>
+<span id="sec-derivation-of-alpha"></span><h3>Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#derivation-of-alpha" title="Permalink to this heading">¶</a></h3>
 <p>In paper I, <span class="math notranslate nohighlight">\(\alpha\)</span> is defined as</p>
 <div class="math notranslate nohighlight" id="equation-eq-alpha">
 <span class="eqno">(365)<a class="headerlink" href="#equation-eq-alpha" title="Permalink to this equation">¶</a></span>\[\alpha\equiv -\left(
@@ -477,7 +573,7 @@ partial derivative of <span class="math notranslate nohighlight">\(e\)</span> wi
 }\]</div>
 </section>
 <section id="recalling-derivation-of-beta-0">
-<span id="recalling-derivation-of-beta0"></span><h3>Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#recalling-derivation-of-beta-0" title="Permalink to this headline">¶</a></h3>
+<span id="recalling-derivation-of-beta0"></span><h3>Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#recalling-derivation-of-beta-0" title="Permalink to this heading">¶</a></h3>
 <p>Recall from paper I that <span class="math notranslate nohighlight">\(\beta_0\)</span> was derived from the equation</p>
 <div class="math notranslate nohighlight" id="equation-beta0-23">
 <span class="eqno">(390)<a class="headerlink" href="#equation-beta0-23" title="Permalink to this equation">¶</a></span>\[\nabla\cdot\mathbf{U} + \alpha\mathbf{U}\cdot\nabla p_0 = \tilde{S}\]</div>
@@ -496,33 +592,50 @@ split fashion.</p>
 
 
            </div>
+           
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="thermo_notes.html" class="btn btn-neutral float-left" title="Notes on Thermodynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="enthalpy.html" class="btn btn-neutral float-right" title="Notes on Enthalpy" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="thermo_notes.html" class="btn btn-neutral float-left" title="Notes on Thermodynamics" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2018-2020, MAESTROeX development tem.</p>
-  </div>
+    <p>
+        &#169; Copyright 2018-2023, MAESTROeX development tem.
 
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
         </div>
       </div>
+
     </section>
+
   </div>
-  <script>
+  
+
+  <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
 
 
 </body>
