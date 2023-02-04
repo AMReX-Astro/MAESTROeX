@@ -136,6 +136,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     }
 #endif
 
+                    state_out.i = i;
+                    state_out.j = j;
+                    state_out.k = k;
+
                     burner(state_out, dt_in);
 
                     for (int n = 0; n < NumSpec; ++n) {
