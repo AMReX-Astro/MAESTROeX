@@ -1,7 +1,7 @@
 # This is a port of production/new/6cm-1536w/inputs_2d_6.0cm in MAESTRO
 
 # INITIAL MODEL
-maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12.000cm.dx_6.000cm.CNO"
+maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12cm.dx_6cm"
 maestro.perturb_model = true
 
 # PROBLEM SIZE
