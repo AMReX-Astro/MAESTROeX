@@ -301,7 +301,7 @@ void Maestro::UpdateVel(
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& uedge,
     const Vector<MultiFab>& force, const Vector<MultiFab>& sponge,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac) {
+    [[maybe_unused]] const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::UpdateVel()", UpdateVel);
 

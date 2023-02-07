@@ -8,7 +8,7 @@ void Maestro::MakeEdgeScal(Vector<MultiFab>& state,
                            Vector<std::array<MultiFab, AMREX_SPACEDIM> >& sedge,
                            Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
                            Vector<MultiFab>& force, const bool is_vel,
-                           const Vector<BCRec>& bcs, int nbccomp,
+                           const Vector<BCRec>& bcs, [[maybe_unused]] int nbccomp,
                            int start_scomp, int start_bccomp, int num_comp,
                            const bool is_conservative) {
     // timer for profiling

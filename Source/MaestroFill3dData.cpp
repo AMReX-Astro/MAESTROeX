@@ -51,7 +51,8 @@ void Maestro::Put1dArrayOnCart(const int lev, const BaseState<Real>& s0,
                                MultiFab& s0_cart,
                                const bool is_input_edge_centered,
                                const bool is_output_a_vector,
-                               const Vector<BCRec>& bcs, const int sbccomp) {
+                               [[maybe_unused]] const Vector<BCRec>& bcs,
+                               [[maybe_unused]] const int sbccomp) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Put1dArrayOnCart_lev()", Put1dArrayOnCart);
 
@@ -355,7 +356,7 @@ Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
 }
 
 void Maestro::Addw0(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& u_edge,
-                    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
+                    [[maybe_unused]] const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
                     const Real& mult) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Addw0()", Addw0);

@@ -2,7 +2,7 @@
 
 # INITIAL MODEL
 maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12cm.dx_6cm"
-maestro.perturb_model = true
+maestro.perturb_model = 0
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0       0.0
@@ -57,21 +57,23 @@ maestro.max_dt_growth = 1.1e0
 maestro.use_tfromp = false
 maestro.dpdt_factor = 0.0e0
 
-maestro.species_pred_type = 3
+maestro.do_burning = 1
+
+#maestro.species_pred_type = 3
 
 maestro.limit_conductivity = true
 
 maestro.anelastic_cutoff_density = 2.e3
 maestro.base_cutoff_density = 2.e3
 
-maestro.do_sponge = true
+maestro.do_sponge = 0
 maestro.sponge_start_factor = 25.e0
 
 maestro.ppm_type = 1
 
 # PLOTFILES
 maestro.plot_base_name  = xrb_    # root name of plot file
-maestro.plot_int   = -1      # number of timesteps between plot files
+maestro.plot_int   = 1      # number of timesteps between plot files
 maestro.plot_deltat = 5.e-4
 maestro.small_plot_base_name = smallxrb_
 maestro.small_plot_deltat = 1.e-5
@@ -103,9 +105,9 @@ maestro.eps_hg_bottom      = 1.e-4
 maestro.burner_threshold_species = "H1"
 
 # LINEAR SOLVERS
-maestro.mg_bottom_solver = 4
-maestro.hg_bottom_solver = 4
-maestro.max_mg_bottom_nlevels = 4
+#maestro.mg_bottom_solver = 4
+#maestro.hg_bottom_solver = 4
+#maestro.max_mg_bottom_nlevels = 4
 
 # override the default values of the probin namelist values here
 # temperature perturbation

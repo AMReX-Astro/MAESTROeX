@@ -19,10 +19,10 @@ class BndryFuncArrayMaestro : public amrex::BndryFuncArray {
 
     void operator()(amrex::Box const& bx, amrex::FArrayBox& dest,
                     const int dcomp, const int numcomp,
-                    amrex::Geometry const& geom, const amrex::Real time,
+                    amrex::Geometry const& geom, [[maybe_unused]] const amrex::Real time,
                     const amrex::Vector<amrex::BCRec>& bcr,
                     const int bcomp,  // BCRec for this box
-                    const int orig_comp) {
+                    [[maybe_unused]] const int orig_comp) {
         BL_ASSERT(m_func != nullptr);
 
         const int* lo = dest.loVect();

@@ -460,8 +460,10 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
             // compute the new etarho
             if (!spherical) {
                 MakeEtarho(etarhoflux);
+#if AMREX_SPACEDIM == 3
             } else {
                 MakeEtarhoSphr(s1, s2, umac, w0mac);
+#endif
             }
 
             // correct the base state density by "averaging"
@@ -847,8 +849,10 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
             // compute the new etarho
             if (!spherical) {
                 MakeEtarho(etarhoflux);
+#if AMREX_SPACEDIM == 3
             } else {
                 MakeEtarhoSphr(s1, s2, umac, w0mac);
+#endif
             }
 
             // correct the base state density by "averaging"
