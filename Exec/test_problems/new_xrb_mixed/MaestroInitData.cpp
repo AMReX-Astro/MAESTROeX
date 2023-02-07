@@ -275,7 +275,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
 }
 
 void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
-             const Real x, const Real y, const Real z) {
+             const Real x, const Real y, [[maybe_unused]] const Real z) {
     Real t0 = s0[Temp];
 
 #if (AMREX_SPACEDIM == 2)
