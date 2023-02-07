@@ -170,7 +170,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             }
 
             // initialize the aux variables
-#ifdef NSE_THERMO
+#ifdef AUX_THERMO
             for (auto comp = 0; comp < NumAux; ++comp) {
                 scal_arr(i, j, k, FirstAux + comp) = 0.0;
             }
@@ -239,7 +239,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 scal_arr(i, j, k, Rho) = perturbations[Rho];
                 scal_arr(i, j, k, RhoH) = perturbations[RhoH];
                 scal_arr(i, j, k, Temp) = perturbations[Temp];
-#ifdef NSE_THERMO
+#ifdef AUX_THERMO
                 // initialize the aux quantities
                 for (auto comp = 0; comp < NumAux; ++comp) {
                     scal_arr(i, j, k, FirstAux + comp) = 0.0;
@@ -249,7 +249,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 for (auto comp = 0; comp < NumSpec; ++comp) {
                     scal_arr(i, j, k, FirstSpec + comp) =
                         perturbations[FirstSpec + comp];
-#ifdef NSE_THERMO
+#ifdef AUX_THERMO
                     // set the aux quantities
                     scal_arr(i, j, k, FirstAux + iye) +=
                         scal_arr(i, j, k, FirstSpec + comp) * zion[comp] *
