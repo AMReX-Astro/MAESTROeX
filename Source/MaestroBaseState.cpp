@@ -166,7 +166,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 #endif
 
             // initialize the aux variables
-#ifdef NSE_THERMO
+#ifdef AUX_THERMO
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 // set the aux quantities
                 aux_ambient[iye] +=
