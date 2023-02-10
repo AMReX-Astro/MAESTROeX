@@ -1327,9 +1327,6 @@ void Maestro::MakeCCtoRadii() {
 
         iMultiFab& cc_to_r = cell_cc_to_r[lev];
 
-        auto dx_lev = geom[lev].CellSizeArray();
-        auto dx_fine_vec = geom[max_level].CellSizeArray();
-
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
