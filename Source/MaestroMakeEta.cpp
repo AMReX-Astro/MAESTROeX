@@ -170,8 +170,10 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
 #endif
 }
 
+#if AMREX_SPACEDIM == 3
 void Maestro::MakeEtarhoSphr(
-    const Vector<MultiFab>& scal_old, const Vector<MultiFab>& scal_new,
+    const Vector<MultiFab>& scal_old,
+    const Vector<MultiFab>& scal_new,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac) {
     // timer for profiling
@@ -192,7 +194,6 @@ void Maestro::MakeEtarhoSphr(
 
     Put1dArrayOnCart(rho0_nph, rho0_nph_cart, false, false, bcs_f, 0);
 
-#if (AMREX_SPACEDIM == 3)
     for (int lev = 0; lev <= finest_level; ++lev) {
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -239,9 +240,6 @@ void Maestro::MakeEtarhoSphr(
         }  // end MFIter loop
     }      // end loop over levels
 
-#else
-    Abort("MakeEtarhoSphr: Spherical is not valid for DIM != 3");
-#endif
 
     // average fine data onto coarser cells & fill ghost cells
     AverageDown(eta_cart, 0, 1);
@@ -280,6 +278,7 @@ void Maestro::MakeEtarhoSphr(
     });
     Gpu::synchronize();
 }
+#endif
 
 void Maestro::MakeEtarhoPlanar(
     const Vector<MultiFab>& scal_old, const Vector<MultiFab>& scal_new,
@@ -288,7 +287,6 @@ void Maestro::MakeEtarhoPlanar(
     BL_PROFILE_VAR("Maestro::MakeEtarhoPlanar()", MakeEtarhoPlanar);
 
     const int max_lev = base_geom.max_radial_level + 1;
-    const int nrf = base_geom.nr_fine + 1;
 
     Vector<MultiFab> eta_cart(finest_level + 1);
     Vector<MultiFab> rho0_nph_cart(finest_level + 1);

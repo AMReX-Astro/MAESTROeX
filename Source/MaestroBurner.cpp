@@ -8,8 +8,8 @@ using namespace amrex;
 void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot, Vector<MultiFab>& rho_Hnuc,
-                     const BaseState<Real>& p0, const Real dt_in,
-                     const Real time_in) {
+                     [[maybe_unused]] const BaseState<Real>& p0, const Real dt_in,
+                     [[maybe_unused]] const Real time_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()", Burner);
 

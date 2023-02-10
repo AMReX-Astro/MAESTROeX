@@ -186,7 +186,7 @@ class Maestro : public amrex::AmrCore {
     /// @param sflux            scalar flux
     /// @param etarhoflux       `eta_rho` flux
     /// @param sedge            edge state of scalars
-    /// @param umac, w0mac      MAC velocity of full and base-state velocity
+    /// @param umac             MAC velocity of full state
     /// @param r0_old           old base-state density
     /// @param r0_edge_old      old base-state density on cell-edges
     /// @param r0mac_old        old MAC-projected base-state density
@@ -202,7 +202,6 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& etarhoflux,
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
         const BaseState<amrex::Real>& rho0_old_in,
         const BaseState<amrex::Real>& rho0_edge_old_state,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
@@ -1067,12 +1066,14 @@ class Maestro : public amrex::AmrCore {
     /// @param etarho_flux  \f$\eta_\rho\f$ flux
     void MakeEtarho(const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
+#if AMREX_SPACEDIM == 3
     void MakeEtarhoSphr(
         const amrex::Vector<amrex::MultiFab>& scal_old,
         const amrex::Vector<amrex::MultiFab>& scal_new,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             w0mac);
+#endif
 
     void MakeEtarhoPlanar(
         const amrex::Vector<amrex::MultiFab>& scal_old,
@@ -1697,8 +1698,6 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Vector<amrex::MultiFab>& s_old,
                            amrex::Vector<amrex::MultiFab>& s_hat,
                            const amrex::Vector<amrex::MultiFab>& s_new,
-                           const BaseState<amrex::Real>& p0old,
-                           const BaseState<amrex::Real>& p0new,
                            const amrex::Vector<amrex::MultiFab>& hcoeff1,
                            const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
                            const amrex::Vector<amrex::MultiFab>& pcoeff1,
