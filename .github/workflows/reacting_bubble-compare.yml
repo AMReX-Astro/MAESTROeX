@@ -26,7 +26,7 @@ jobs:
       - name: Compile reacting_bubble
         run: |
           cd Exec/test_problems/reacting_bubble
-          make DIM-2 USE_MPI=FALSE -j 2
+          make DIM=2 USE_MPI=FALSE -j 2
 
       - name: Run reacting_bubble
         run: |
