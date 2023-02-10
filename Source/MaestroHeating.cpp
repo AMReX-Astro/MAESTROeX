@@ -16,6 +16,7 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
 #endif
         for (MFIter mfi(scal[lev], TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             // Get the index space of the valid region
+
             //const Box& tileBox = mfi.tilebox();
             //const auto dx = geom[lev].CellSizeArray();
 
