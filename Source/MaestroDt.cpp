@@ -189,9 +189,11 @@ void Maestro::EstDt() {
                     if (spdy > eps) {
                         dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     }
+#if AMREX_SPACEDIM == 3
                     if (spdz > eps) {
                         dt_temp = amrex::min(dt_temp, dx[2] / spdz);
                     }
+#endif
                     if (spdr > eps) {
                         dt_temp =
                             amrex::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
