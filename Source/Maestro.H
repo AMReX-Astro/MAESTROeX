@@ -38,6 +38,28 @@ using RealVector = amrex::Vector<amrex::Real>;
 using IntVector = amrex::Vector<int>;
 #endif
 
+
+// helpful enums for different options in the algorithm
+
+// these represent the four types of nodal projections
+enum projection_type {initial_projection_comp = 1,
+                      divu_iters_comp,
+                      pressure_iters_comp,
+                      regular_timestep_comp};
+
+enum species_pred {predict_rhoprime_and_X = 1,
+                   predict_rhoX,
+                   predict_rho_and_X};
+
+enum enthalpy_pred {predict_rhoh = 0,
+                    predict_rhohprime,
+                    predict_h,
+                    predict_T_then_rhohprime,
+                    predict_T_then_h,
+                    predict_hprime,
+                    predict_Tprime_then_h};
+
+
 // function called on GPU only
 AMREX_GPU_DEVICE
 amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
@@ -1880,19 +1902,6 @@ class Maestro : public amrex::AmrCore {
     // these are defined in `VariableSetup()`
     static int ng_s;  //< number of ghost cells for `sold/new` and `uold/new`
 
-    // these are defined in `Maestro.cpp`
-    // these represent the four types of nodal projections
-    static int initial_projection_comp;
-    static int divu_iters_comp;
-    static int pressure_iters_comp;
-    static int regular_timestep_comp;
-
-    // these are defined in `Maestro.cpp`
-    // density and enthalpy edge state prediction
-    static int predict_rhoprime_and_X, predict_rhoX, predict_rho_and_X;
-    static int predict_rhoh, predict_rhohprime, predict_h;
-    static int predict_T_then_rhohprime, predict_T_then_h;
-    static int predict_hprime, predict_Tprime_then_h;
 
     // these are defined in `Maestro.cpp`
     static amrex::IntVect nodal_flag;
