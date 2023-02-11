@@ -196,8 +196,9 @@ void Maestro::UpdateScal(
                          ++comp) {
                         snew_arr(i, j, k, Rho) +=
                             snew_arr(i, j, k, comp) - sold_arr(i, j, k, comp);
-                        if (snew_arr(i, j, k, comp) < 0.0)
+                        if (snew_arr(i, j, k, comp) < 0.0) {
                             has_negative_species = true;
+                        }
                     }
 
 // update auxiliary variables
@@ -411,8 +412,9 @@ void Maestro::UpdateVel(
                         (uedgez(i,j,k+1,n) - uedgez(i,j,k,n))/dx[2];
 #endif
                         // Add the sponge
-                        if (do_sponge)
+                        if (do_sponge) {
                             unew_arr(i, j, k, n) *= sponge_arr(i, j, k);
+                        }
                     }
                 });
             } else {

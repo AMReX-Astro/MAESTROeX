@@ -10,16 +10,16 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     BL_PROFILE_VAR("Maestro::AdvanceTimeStep()", AdvanceTimeStep);
 
     // timers
-    Real advect_time = 0., advect_time_start;
-    Real macproj_time = 0., macproj_time_start;
-    Real ndproj_time = 0., ndproj_time_start;
-    Real thermal_time = 0., thermal_time_start;
-    Real react_time = 0., react_time_start;
-    Real misc_time = 0., misc_time_start;
-    Real base_time = 0., base_time_start;
+    Real advect_time = 0.0;
+    Real macproj_time = 0.0;
+    Real ndproj_time = 0.0;
+    Real thermal_time = 0.0;
+    Real react_time = 0.0;
+    Real misc_time = 0.0;
+    Real base_time = 0.0;
 
     // HACK
-    base_time_start = ParallelDescriptor::second();
+    Real base_time_start = ParallelDescriptor::second();
 
     base_time += ParallelDescriptor::second() - base_time_start;
     ParallelDescriptor::ReduceRealMax(base_time,
@@ -27,7 +27,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     ParallelDescriptor::Bcast(&base_time, 1,
                               ParallelDescriptor::IOProcessorNumber());
 
-    misc_time_start = ParallelDescriptor::second();
+    Real misc_time_start = ParallelDescriptor::second();
 
     // features to be added later:
     // -ppm
@@ -226,7 +226,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 1 -- react the full state and then base state through dt/2
     //////////////////////////////////////////////////////////////////////////////
 
-    react_time_start = ParallelDescriptor::second();
+    Real react_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
@@ -244,7 +244,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
 
-    advect_time_start = ParallelDescriptor::second();
+    Real advect_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
@@ -376,7 +376,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     ParallelDescriptor::Bcast(&advect_time, 1,
                               ParallelDescriptor::IOProcessorNumber());
 
-    macproj_time_start = ParallelDescriptor::second();
+    Real macproj_time_start = ParallelDescriptor::second();
 
     // MAC projection
     // includes spherical option in C++ function
@@ -558,7 +558,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 4a (Option I) -- Add thermal conduction (only enthalpy terms)
     //////////////////////////////////////////////////////////////////////////////
 
-    thermal_time_start = ParallelDescriptor::second();
+    Real thermal_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4a: thermal conduct >>>" << std::endl;
@@ -1039,7 +1039,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 10 -- compute S^{n+1} for the final projection
     //////////////////////////////////////////////////////////////////////////////
 
-    ndproj_time_start = ParallelDescriptor::second();
+    Real ndproj_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 10: make new S >>>" << std::endl;
@@ -1104,7 +1104,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
         w0.copy(w0_old);
     }
 
-    int proj_type;
+    int proj_type{0};
 
     advect_time += ParallelDescriptor::second() - advect_time_start;
     ParallelDescriptor::ReduceRealMax(advect_time,
