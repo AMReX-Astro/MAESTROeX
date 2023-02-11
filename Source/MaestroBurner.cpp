@@ -33,7 +33,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     for (int lev = 0; lev <= finest_level; ++lev) {
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
-        if (lev == finest_level) finelev = finest_level;
+        if (lev == finest_level) {
+            finelev = finest_level;
+        }
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in[lev], fba, IntVect(2));
@@ -62,9 +64,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
             const Array4<const int> mask_arr = mask.array(mfi);
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                if (use_mask && mask_arr(i, j, k))
+                if (use_mask && mask_arr(i, j, k) == 1) {
                     return;  // cell is covered by finer cells
-
+                }
                 auto rho = s_in_arr(i, j, k, Rho);
                 Real x_in[NumSpec];
                 for (int n = 0; n < NumSpec; ++n) {
