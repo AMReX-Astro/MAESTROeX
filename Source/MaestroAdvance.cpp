@@ -244,7 +244,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 2 -- define average expansion at time n+1/2
     //////////////////////////////////////////////////////////////////////////////
 
-    advect_time_start = ParallelDescriptor::second();
+    Real advect_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
@@ -392,7 +392,7 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 4 -- advect the base state and full state through dt
     //////////////////////////////////////////////////////////////////////////////
 
-    Real advect_time_start = ParallelDescriptor::second();
+    advect_time_start = ParallelDescriptor::second();
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4 : advect base >>>" << std::endl;
