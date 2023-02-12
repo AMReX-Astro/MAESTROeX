@@ -1219,9 +1219,6 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << "\n\n";
 
         // species info
-        Real Aion = 0.0;
-        Real Zion = 0.0;
-
         int mlen = 20;
 
         jobInfoFile << PrettyLine;

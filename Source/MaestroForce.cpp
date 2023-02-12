@@ -63,8 +63,9 @@ void Maestro::MakeVelForce(
     for (int lev = 0; lev <= finest_level; ++lev) {
         // Get grid spacing
         const auto dx = geom[lev].CellSizeArray();
+#ifdef ROTATION
         const auto prob_lo = geom[lev].ProbLoArray();
-
+#endif
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -74,13 +75,15 @@ void Maestro::MakeVelForce(
             // Get Array4 inputs
             const Array4<const Real> gpi_arr = gpi[lev].array(mfi);
             const Array4<const Real> rho_arr = rho[lev].array(mfi);
-            const Array4<const Real> uedge = uedge_in[lev][0].array(mfi);
+            [[maybe_unused]] const Array4<const Real> uedge = uedge_in[lev][0].array(mfi);
             const Array4<const Real> vedge = uedge_in[lev][1].array(mfi);
-#if (AMREX_SPACEDIM == 3)
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> wedge = uedge_in[lev][2].array(mfi);
 #endif
             const Array4<const Real> w0_arr = w0_cart[lev].array(mfi);
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> gradw0_arr = gradw0_cart[lev].array(mfi);
+#endif
             const Array4<const Real> w0_force = w0_force_cart[lev].array(mfi);
             const Array4<const Real> grav = grav_cart[lev].array(mfi);
             const Array4<const Real> rho0_arr = rho0_cart[lev].array(mfi);
@@ -261,7 +264,7 @@ void Maestro::ModifyScalForce(
     Vector<MultiFab>& scal_force, const Vector<MultiFab>& state,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac_in,
     const BaseState<Real>& s0_edge, const Vector<MultiFab>& s0_cart, int comp,
-    const Vector<BCRec>& bcs, int fullform) {
+    [[maybe_unused]] const Vector<BCRec>& bcs, int fullform) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ModifyScalForce()", ModifyScalForce);
 
@@ -553,12 +556,14 @@ void Maestro::MakeRhoHForce(
         for (MFIter mfi(scal_force[lev], TilingIfNotGPU()); mfi.isValid();
              ++mfi) {
             // inputs
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> umac = umac_cart[lev][0].array(mfi);
+#endif
             const Array4<const Real> vmac = umac_cart[lev][1].array(mfi);
             const Array4<const Real> p0cart = p0_cart[lev].array(mfi);
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> p0macx = p0mac[lev][0].array(mfi);
             const Array4<const Real> p0macy = p0mac[lev][1].array(mfi);
-#if (AMREX_SPACEDIM == 3)
             const Array4<const Real> wmac = umac_cart[lev][2].array(mfi);
             const Array4<const Real> p0macz = p0mac[lev][2].array(mfi);
 #endif
@@ -720,9 +725,11 @@ void Maestro::MakeTempForce(
 
             const Array4<Real> temp_force_arr = temp_force[lev].array(mfi);
             const Array4<const Real> scal_arr = scal[lev].array(mfi);
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> umac = umac_in[lev][0].array(mfi);
+#endif
             const Array4<const Real> vmac = umac_in[lev][1].array(mfi);
-#if (AMREX_SPACEDIM == 3)
+#if AMREX_SPACEDIM == 3
             const Array4<const Real> wmac = umac_in[lev][2].array(mfi);
 #endif
             const Array4<const Real> thermal_arr = thermal[lev].array(mfi);
@@ -732,7 +739,7 @@ void Maestro::MakeTempForce(
             if (!spherical) {
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     Real gradp0 = 0.0;
-#if (AMREX_SPACEDIM == 2)
+#if AMREX_SPACEDIM == 2
                     if (j == 0) {
                         gradp0 =
                             (p0_arr(i, j + 1, k) - p0_arr(i, j, k)) / dx[1];
@@ -778,7 +785,7 @@ void Maestro::MakeTempForce(
                                  eos_state.p / scal_arr(i, j, k, Rho)) /
                                     (scal_arr(i, j, k, Rho) * eos_state.dpdr);
 
-#if (AMREX_SPACEDIM == 2)
+#if AMREX_SPACEDIM == 2
                     auto veladv = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
 #else
                     auto veladv = 0.5*(wmac(i,j,k)+wmac(i,j,k+1));
@@ -792,7 +799,7 @@ void Maestro::MakeTempForce(
                         (eos_state.cp * scal_arr(i, j, k, Rho));
                 });
             } else {
-#if (AMREX_SPACEDIM == 3)
+#if AMREX_SPACEDIM == 3
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                     eos_t eos_state;
 

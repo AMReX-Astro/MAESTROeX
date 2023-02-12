@@ -3,7 +3,7 @@
 using namespace amrex;
 
 // initializes data on a specific level
-void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
+void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, const MFIter& mfi,
                             const Array4<Real> scal, const Array4<Real> vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -38,7 +38,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     });
 }
 
-void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
+void Maestro::InitLevelDataSphr(const int lev, [[maybe_unused]] const Real time, MultiFab& scal,
                                 MultiFab& vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
