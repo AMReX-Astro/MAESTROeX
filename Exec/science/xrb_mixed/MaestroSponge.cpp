@@ -24,12 +24,13 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
     Real r_top = prob_lo_r + base_geom.r_edge_loc(0, 1);
     r_sp_outer = r_top;
 
-    sponge_start_density = sponge_start_factor * sponge_center_density;
+    // we center the sponge on the anelastic cutoff
+    sponge_start_density = sponge_start_factor * anelastic_cutoff_density;
 
     // set topsponge_lo_r = r_sp_outer;
     for (auto r = 0; r <= base_geom.r_end_coord(0, 1); ++r) {
         if (rho0(0, r) < sponge_start_density) {
-            r_sp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            r_sp_outer = prob_lo_r + (static_cast<Real>(r) + 0.5) * base_geom.dr(0);
             break;
         }
     }
@@ -38,7 +39,7 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
     r_tp_outer = r_top;
     for (auto r = 0; r <= base_geom.r_end_coord(0, 1); ++r) {
         if (rho0(0, r) < anelastic_cutoff_density) {
-            r_tp_outer = prob_lo_r + (Real(r) + 0.5) * base_geom.dr(0);
+            r_tp_outer = prob_lo_r + (static_cast<Real>(r) + 0.5) * base_geom.dr(0);
             break;
         }
     }
@@ -60,12 +61,13 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
     }
 
     if (maestro_verbose >= 1) {
-        Print() << "inner sponge: r_sp      , r_tp      : " << r_sp << ", "
-                << r_tp << std::endl;
-        if (spherical) {
-            Print() << "outer sponge: r_sp_outer, r_tp_outer: " << r_sp_outer
-                    << ", " << r_tp_outer << std::endl;
+        if (xrb_use_bottom_sponge) {
+            Print() << "inner sponge: r_sp      , r_tp      : " << r_sp << ", "
+                    << r_tp << std::endl;
         }
+
+        Print() << "outer sponge: r_sp_outer, r_tp_outer: " << r_sp_outer
+                << ", " << r_tp_outer << std::endl;
     }
 }
 
@@ -102,71 +104,92 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
             const auto lo = tileBox.loVect3d()[AMREX_SPACEDIM - 1];
             const auto hi = tileBox.hiVect3d()[AMREX_SPACEDIM - 1];
 
-            AMREX_PARALLEL_FOR_3D(tileBox, i, j, k,
-                                  { sponge_arr(i, j, k) = 1.0; });
+            ParallelFor(tileBox, [=] (int i, int j, int k)
+                        { sponge_arr(i, j, k) = 1.0; });
 
             if (xrb_use_bottom_sponge) {
-                for (int n = 0; n <= hi - lo; ++n) {
-                    int j = lo + n;
-                    Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+
+                // do both the top and bottom sponges
+
+                // look over the vertical direction
+                for (int j = lo; j <= hi; ++j) {
+                    Real y = prob_lo[1] + (static_cast<Real>(j) + 0.5) * dx[1];
+
                     if (y <= botsponge_lo_r) {
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j)
+                        ParallelFor(tileBox, [=](int ii, int jj, int kk) {
+                            if (jj == j) {
                                 sponge_arr(ii, jj, kk) = sponge_min_loc;
+                            }
                         });
+
                     } else if (y <= botsponge_hi_r) {
-                        smdamp =
-                            -0.5 * (1.0 - sponge_min_loc) *
-                                std::cos(M_PI * (y - botsponge_lo_r) /
-                                         (botsponge_hi_r - botsponge_lo_r)) +
+                        smdamp = -0.5 * (1.0 - sponge_min_loc) *
+                            std::cos(M_PI * (y - botsponge_lo_r) /
+                                     (botsponge_hi_r - botsponge_lo_r)) +
                             0.5 * (1.0 + sponge_min_loc);
 
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j) sponge_arr(ii, jj, kk) = smdamp;
+                        ParallelFor(tileBox, [=](int ii, int jj, int kk) {
+                            if (jj == j) {
+                                sponge_arr(ii, jj, kk) = smdamp;
+                            }
                         });
+
                     } else if (y <= topsponge_lo_r) {
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j) sponge_arr(ii, jj, kk) = 1.0;
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
+                                sponge_arr(ii, jj, kk) = 1.0;
+                            }
                         });
                     } else if (y <= topsponge_hi_r) {
-                        smdamp =
-                            0.5 * (1.0 - sponge_min_loc) *
-                                std::cos(M_PI * (y - topsponge_lo_r) /
-                                         (topsponge_hi_r - topsponge_lo_r)) +
+                        smdamp = 0.5 * (1.0 - sponge_min_loc) *
+                            std::cos(M_PI * (y - topsponge_lo_r) /
+                                     (topsponge_hi_r - topsponge_lo_r)) +
                             0.5 * (1.0 + sponge_min_loc);
 
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j) sponge_arr(ii, jj, kk) = smdamp;
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
+                                sponge_arr(ii, jj, kk) = smdamp;
+                            }
                         });
                     } else {
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j)
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
                                 sponge_arr(ii, jj, kk) = sponge_min_loc;
+                            }
                         });
                     }
+
                 }
+
             } else {
-                for (int n = 0; n <= hi - lo; ++n) {
-                    int j = lo + n;
+
+                // just top sponge
+
+                for (int j = lo; j <= hi; ++j) {
                     Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+
                     if (y <= topsponge_lo_r) {
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j) sponge_arr(ii, jj, kk) = 1.0;
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
+                                sponge_arr(ii, jj, kk) = 1.0;
+                            }
                         });
                     } else if (y <= topsponge_hi_r) {
-                        smdamp =
-                            0.5 * (1.0 - sponge_min_loc) *
-                                std::cos(M_PI * (y - topsponge_lo_r) /
-                                         (topsponge_hi_r - topsponge_lo_r)) +
+                        smdamp = 0.5 * (1.0 - sponge_min_loc) *
+                            std::cos(M_PI * (y - topsponge_lo_r) /
+                                     (topsponge_hi_r - topsponge_lo_r)) +
                             0.5 * (1.0 + sponge_min_loc);
 
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j) sponge_arr(ii, jj, kk) = smdamp;
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
+                                sponge_arr(ii, jj, kk) = smdamp;
+                            }
                         });
                     } else {
-                        AMREX_PARALLEL_FOR_3D(tileBox, ii, jj, kk, {
-                            if (jj == j)
+                        ParallelFor(tileBox, [=] (int ii, int jj, int kk) {
+                            if (jj == j) {
                                 sponge_arr(ii, jj, kk) = sponge_min_loc;
+                            }
                         });
                     }
                 }
