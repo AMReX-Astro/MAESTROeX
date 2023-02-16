@@ -75,7 +75,6 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeSponge()", MakeSponge);
 
-    const Real dt_loc = dt;
     const Real botsponge_lo_r = r_sp;
     const Real botsponge_hi_r = r_tp;
     const Real topsponge_lo_r = r_sp_outer;
