@@ -321,7 +321,7 @@ void Maestro::MakeEtarhoPlanar(
 #endif
             const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
 
-            ParallelFor(tilebox, [=](int i, int j, int k) {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 
 #if AMREX_SPACEDIM == 2
                 Real U_dot_er = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
