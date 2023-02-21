@@ -6,7 +6,7 @@ maestro.perturb_model = true
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0       0.0
-geometry.prob_hi     =  288.0    4608.0
+geometry.prob_hi     =  1152.0    4608.0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -23,7 +23,7 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 48 768
+amr.n_cell             = 192 768
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -46,8 +46,8 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 0
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 3
-maestro.init_iter             = 3
+maestro.init_divu_iter        = 1
+maestro.init_iter             = 1
 
 maestro.grav_const = -2.45e14
 
@@ -72,9 +72,9 @@ maestro.ppm_type = 1
 # PLOTFILES
 maestro.plot_base_name  = xrb_    # root name of plot file
 maestro.plot_int   = -1      # number of timesteps between plot files
-maestro.plot_deltat = 5.e-4
+maestro.plot_deltat = 1.e-3
 maestro.small_plot_base_name = smallxrb_
-maestro.small_plot_deltat = 1.e-5
+maestro.small_plot_deltat = 1.e-4
 
 # CHECKPOINT
 maestro.check_base_name = chk
