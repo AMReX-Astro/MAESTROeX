@@ -473,6 +473,15 @@ void Maestro::MakeRhoHFlux(
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& rh0mac_new,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& h0mac_old,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& h0mac_new) {
+
+    amrex::ignore_unused(w0mac);
+    amrex::ignore_unused(r0mac_old);
+    amrex::ignore_unused(r0mac_new);
+    amrex::ignore_unused(rh0mac_old);
+    amrex::ignore_unused(rh0mac_new);
+    amrex::ignore_unused(h0mac_old);
+    amrex::ignore_unused(h0mac_new);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
 

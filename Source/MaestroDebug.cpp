@@ -204,7 +204,7 @@ void Maestro::WriteMF(const Vector<MultiFab>& mf, const std::string& name) {
     }
 
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy((mf[i]), 0, 0, nComp);
+        plot_mf_data[i]->ParallelCopy((mf[i]), 0, 0, nComp);
     }
 
     // MultiFab to hold plotfile data
