@@ -1321,6 +1321,9 @@ void Maestro::MakeMagvel(
     const Vector<MultiFab>& vel,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     Vector<MultiFab>& magvel) {
+
+    amrex::ignore_unused(w0mac);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()", MakeMagvel);
 
@@ -2184,6 +2187,10 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
                              const BaseState<Real>& gamma1bar,
                              const Vector<MultiFab>& gamma1bar_cart,
                              Vector<MultiFab>& deltagamma) {
+
+    amrex::ignore_unused(p0);
+    amrex::ignore_unused(gamma1bar);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDeltaGamma()", MakeDeltaGamma);
 

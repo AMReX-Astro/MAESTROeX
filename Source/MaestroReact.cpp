@@ -88,6 +88,9 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                        Vector<MultiFab>& rho_Hext, const BaseState<Real>& p0,
                        const Real dt_in, const Real time_in,
                        Vector<MultiFab>& source) {
+
+    amrex::ignore_unused(time_in);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()", ReactSDC);
 
