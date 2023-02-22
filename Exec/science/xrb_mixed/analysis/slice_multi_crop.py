@@ -50,7 +50,7 @@ for i, f in enumerate(fields):
         sp.set_zlim(f, 5.e7, 1.e9)
         sp.set_cmap(f, "viridis")
     elif f == "Hnuc":
-        sp.set_zlim(f, 1.e17, 1.e19)
+        sp.set_zlim(f, 1.e16, 1.e19)
         sp.set_cmap(f, "plasma_r")
     elif f == "vort":
         sp.set_zlim(f, -2.e6, 2.e6)
