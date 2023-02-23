@@ -314,16 +314,16 @@ void Maestro::MakeEtarhoPlanar(
             const Array4<const Real> rho_new = scal_new[lev].array(mfi);
             const Array4<const Real> rho0_nph_cart_arr =
                 rho0_nph_cart[lev].array(mfi);
-#if (AMREX_SPACEDIM == 2)
+#if AMREX_SPACEDIM == 2
             const Array4<const Real> vmac = umac[lev][1].array(mfi);
 #else
             const Array4<const Real> vmac = umac[lev][2].array(mfi);
 #endif
             const Array4<Real> eta_cart_arr = eta_cart[lev].array(mfi);
 
-            AMREX_PARALLEL_FOR_3D(tilebox, i, j, k, {
+            ParallelFor(tilebox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 
-#if (AMREX_SPACEDIM == 2)
+#if AMREX_SPACEDIM == 2
                 Real U_dot_er = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
 #else
                 Real U_dot_er = 0.5 *(vmac(i, j, k) + vmac(i, j, k + 1));

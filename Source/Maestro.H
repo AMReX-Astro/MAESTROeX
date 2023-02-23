@@ -1227,8 +1227,6 @@ class Maestro : public amrex::AmrCore {
     void Makew0Planar(const BaseState<amrex::Real>& w0_old,
                       BaseState<amrex::Real>& w0_force,
                       const BaseState<amrex::Real>& Sbar_in,
-                      const BaseState<amrex::Real>& rho0_old_in,
-                      const BaseState<amrex::Real>& rho0_new_in,
                       const BaseState<amrex::Real>& p0_old_in,
                       const BaseState<amrex::Real>& p0_new_in,
                       const BaseState<amrex::Real>& gamma1bar_old_in,

@@ -9,6 +9,9 @@ void Maestro::VelPred(
     Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     const Vector<MultiFab>& force) {
+
+    amrex::ignore_unused(w0mac);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPred()", VelPred);
 

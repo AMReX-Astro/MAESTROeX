@@ -781,12 +781,13 @@ void Maestro::FirstDt() {
                             Real denom = S_cc_arr(i, j, k) - gp_dot_u;
 
                             if (denom > 0.0 && scal_arr(i, j, k, Rho) > 0.0) {
-                                if (rho_min / scal_arr(i, j, k, Rho) < 1.0)
+                                if (rho_min / scal_arr(i, j, k, Rho) < 1.0) {
                                     tmp_arr(i, j, k) =
                                         0.4 *
                                         (1.0 -
                                          rho_min / scal_arr(i, j, k, Rho)) /
                                         denom;
+                                }
                             }
                         });
                         dt_divu = tmp[mfi].min<RunOn::Device>(tileBox, 0);
