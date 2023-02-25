@@ -30,7 +30,7 @@ jobs:
           make_options: '-j 2 USE_OMP=FALSE USE_MPI=FALSE USE_CUDA=FALSE DIM=3 DEBUG=TRUE'
           ignore_files: 'amrex|Microphysics'
           header_filter: 'MAESTROeX'
-          config_file: "${GITHUB_WORKSPACE}/.clang-tidy"
+          config_file: ${GITHUB_WORKSPACE}/.clang-tidy
 
       - name: Archive clang tidy report
         uses: actions/upload-artifact@v1
