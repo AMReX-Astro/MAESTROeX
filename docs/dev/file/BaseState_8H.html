@@ -13,9 +13,6 @@
   <![endif]-->
   
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/js/theme.js"></script>
@@ -146,7 +143,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="target" id="BaseState_8H_1abbd1608621a7e19d229cf3cd447bf6bc"></span><span class="sig-name descname"><span class="pre">template&lt;typename</span> <span class="pre">T&gt;</span> <span class="pre">AMREX_GPU_HOST_DEVICE</span> <span class="pre">AMREX_FORCE_INLINE</span> <span class="pre">BaseStateArray&lt;</span> <span class="pre">T</span> <span class="pre">&gt;</span> <span class="pre">makeBaseStateArray</span> <span class="pre">(T</span> <span class="pre">*dptr,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">num_levs=1,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">length=1,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">ncomp=1)</span> <span class="pre">noexcept</span></span></dt>
-<dd><p>create a <a class="reference internal" href="#structBaseStateArray"><span class="std std-ref">BaseStateArray</span></a> </p>
+<dd><p>create a <a class="reference internal" href="#structBaseStateArray"><span class="std std-ref">BaseStateArray</span></a></p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -260,7 +257,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N9BaseState6defineEKiKiKiK1T">
 <span id="_CPPv3N9BaseState6defineEKiKiKiK1T"></span><span id="_CPPv2N9BaseState6defineEKiKiKiK1T"></span><span id="BaseState::define__iC.iC.iC.TC"></span><span class="target" id="classBaseState_1ac25e215f1f5d46ba8fc51ee1f1353514"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">define</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_levs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ncomp</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../class/classBaseState.html#_CPPv4I0E9BaseState" title="BaseState::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../class/classBaseState.html#_CPPv4I0E9BaseState" title="BaseState::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>allocate memory for the <a class="reference internal" href="../class/classBaseState.html#classBaseState"><span class="std std-ref">BaseState</span></a> </p>
+<dd><p>allocate memory for the <a class="reference internal" href="../class/classBaseState.html#classBaseState"><span class="std std-ref">BaseState</span></a></p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -666,7 +663,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp">
 <span class="target" id="classBaseState_1ac25e215f1f5d46ba8fc51ee1f1353514"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">define</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_levs</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ncomp</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../class/classBaseState.html#_CPPv4I0E9BaseState" title="BaseState::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../class/classBaseState.html#_CPPv4I0E9BaseState" title="BaseState::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><br /></dt>
-<dd><p>allocate memory for the <a class="reference internal" href="../class/classBaseState.html#classBaseState"><span class="std std-ref">BaseState</span></a> </p>
+<dd><p>allocate memory for the <a class="reference internal" href="../class/classBaseState.html#classBaseState"><span class="std std-ref">BaseState</span></a></p>
 </dd></dl>
 
 <dl class="cpp function">
