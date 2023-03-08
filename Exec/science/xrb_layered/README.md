@@ -16,4 +16,4 @@ This is the multidimensional version of a calculation previously done in MESA in
 * `xrb_layered_3cm.hse`
 
 An initial MESA model is placed into eulerian HSE using the lagrangian_planar routines
-from AMREX/initial_models. More detail in create_initial_model/readme.
+from AMREX/initial_models. More detail in create_initial_model/README.md.

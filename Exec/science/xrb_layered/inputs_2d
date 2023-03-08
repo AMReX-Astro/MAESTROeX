@@ -110,8 +110,8 @@ maestro.max_mg_bottom_nlevels = 4
 
 # override the default values of the probin namelist values here
 # temperature perturbation
-problem.xrb_pert_size = 50
-problem.xrb_pert_factor = 1.0e-5
+problem.xrb_pert_size = 15
+problem.xrb_pert_factor = 5.0e-2
 problem.xrb_pert_type = 1
 problem.xrb_pert_height = 2000.0
 
