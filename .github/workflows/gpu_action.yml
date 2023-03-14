@@ -35,5 +35,6 @@ jobs:
 
       - name: Compile reacting_bubble for GPU
         run: |
+          export PATH=$PATH:/usr/local/cuda/bin
           cd Exec/test_problems/reacting_bubble
           make DIM=2 USE_MPI=FALSE USE_CUDA=TRUE -j 2
