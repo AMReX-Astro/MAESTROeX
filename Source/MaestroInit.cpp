@@ -335,7 +335,7 @@ void Maestro::InitData() {
 // and initialize finer levels.  This function creates a new fine
 // level that did not exist before by interpolating from the coarser level
 // overrides the pure virtual function in AmrCore
-void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
+void Maestro::MakeNewLevelFromScratch(int lev, [[maybe_unused]] Real time, const BoxArray& ba,
                                       const DistributionMapping& dm) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",

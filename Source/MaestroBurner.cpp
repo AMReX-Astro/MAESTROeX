@@ -10,8 +10,8 @@ using namespace amrex;
 void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot, Vector<MultiFab>& rho_Hnuc,
-                     const BaseState<Real>& p0, const Real dt_in,
-                     const Real time_in) {
+                     [[maybe_unused]] const BaseState<Real>& p0, const Real dt_in,
+                     [[maybe_unused]] const Real time_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()", Burner);
 
@@ -48,7 +48,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
-        if (lev == finest_level) finelev = finest_level;
+        if (lev == finest_level) {
+            finelev = finest_level;
+        }
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in[lev], fba, IntVect(2));
@@ -290,9 +292,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
             // solve original input states
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                if (use_mask && mask_arr(i, j, k))
+                if (use_mask && mask_arr(i, j, k) == 1) {
                     return;  // cell is covered by finer cells
-
+                }
                 auto rho = s_in_arr(i, j, k, Rho);
                 Real x_in[NumSpec];
                 for (int n = 0; n < NumSpec; ++n) {
@@ -363,6 +365,10 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                         state_out.aux[n] = aux_in[n];
                     }
 #endif
+
+                    state_out.i = i;
+                    state_out.j = j;
+                    state_out.k = k;
 
                     burner(state_out, dt_in);
 

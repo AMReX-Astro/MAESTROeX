@@ -18,6 +18,9 @@ MICROPHYSICS_HOME ?= $(TOP)/external/Microphysics
 
 AMREX_HOME ?= $(TOP)/external/amrex
 
+# disable AMReX Fortran by default
+BL_NO_FORT ?= TRUE
+
 # Require C++17
 CXXSTD := c++17
 
@@ -136,8 +139,6 @@ ifeq ($(USE_SDC), TRUE)
   DEFINES += -DSDC -DPRIM_SPECIES_HAVE_SOURCES -DSDC_EVOLVE_ENTHALPY
 endif
 
-
-USE_FORT_MICROPHYSICS ?= FALSE
 
 include $(MICROPHYSICS_HOME)/Make.Microphysics_extern
 

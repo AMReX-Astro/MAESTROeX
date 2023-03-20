@@ -21,13 +21,12 @@ void Maestro::MakeRhoXFlux(
     Vector<MultiFab>& etarhoflux,
     Vector<std::array<MultiFab, AMREX_SPACEDIM> >& sedge,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& umac,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     const BaseState<Real>& rho0_old_in,
     const BaseState<Real>& rho0_edge_old_state,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& r0mac_old,
+    [[maybe_unused]] const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& r0mac_old,
     const BaseState<Real>& rho0_new_in,
     const BaseState<Real>& rho0_edge_new_state,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& r0mac_new,
+    [[maybe_unused]] const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& r0mac_new,
     const BaseState<Real>& rho0_predicted_edge_state, int start_comp,
     int num_comp) {
     // timer for profiling
@@ -474,6 +473,15 @@ void Maestro::MakeRhoHFlux(
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& rh0mac_new,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& h0mac_old,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& h0mac_new) {
+
+    amrex::ignore_unused(w0mac);
+    amrex::ignore_unused(r0mac_old);
+    amrex::ignore_unused(r0mac_new);
+    amrex::ignore_unused(rh0mac_old);
+    amrex::ignore_unused(rh0mac_new);
+    amrex::ignore_unused(h0mac_old);
+    amrex::ignore_unused(h0mac_new);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeRhoHFlux()", MakeRhoHFlux);
 

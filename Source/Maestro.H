@@ -43,6 +43,28 @@ using RealVector = amrex::Vector<amrex::Real>;
 using IntVector = amrex::Vector<int>;
 #endif
 
+
+// helpful enums for different options in the algorithm
+
+// these represent the four types of nodal projections
+enum projection_type {initial_projection_comp = 1,
+                      divu_iters_comp,
+                      pressure_iters_comp,
+                      regular_timestep_comp};
+
+enum species_pred {predict_rhoprime_and_X = 1,
+                   predict_rhoX,
+                   predict_rho_and_X};
+
+enum enthalpy_pred {predict_rhoh = 0,
+                    predict_rhohprime,
+                    predict_h,
+                    predict_T_then_rhohprime,
+                    predict_T_then_h,
+                    predict_hprime,
+                    predict_Tprime_then_h};
+
+
 // function called on GPU only
 AMREX_GPU_DEVICE
 amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
@@ -191,7 +213,7 @@ class Maestro : public amrex::AmrCore {
     /// @param sflux            scalar flux
     /// @param etarhoflux       `eta_rho` flux
     /// @param sedge            edge state of scalars
-    /// @param umac, w0mac      MAC velocity of full and base-state velocity
+    /// @param umac             MAC velocity of full state
     /// @param r0_old           old base-state density
     /// @param r0_edge_old      old base-state density on cell-edges
     /// @param r0mac_old        old MAC-projected base-state density
@@ -207,7 +229,6 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<amrex::MultiFab>& etarhoflux,
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
         const BaseState<amrex::Real>& rho0_old_in,
         const BaseState<amrex::Real>& rho0_edge_old_state,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
@@ -1072,12 +1093,14 @@ class Maestro : public amrex::AmrCore {
     /// @param etarho_flux  \f$\eta_\rho\f$ flux
     void MakeEtarho(const amrex::Vector<amrex::MultiFab>& etarho_flux);
 
+#if AMREX_SPACEDIM == 3
     void MakeEtarhoSphr(
         const amrex::Vector<amrex::MultiFab>& scal_old,
         const amrex::Vector<amrex::MultiFab>& scal_new,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>&
             w0mac);
+#endif
 
     void MakeEtarhoPlanar(
         const amrex::Vector<amrex::MultiFab>& scal_old,
@@ -1209,8 +1232,6 @@ class Maestro : public amrex::AmrCore {
     void Makew0Planar(const BaseState<amrex::Real>& w0_old,
                       BaseState<amrex::Real>& w0_force,
                       const BaseState<amrex::Real>& Sbar_in,
-                      const BaseState<amrex::Real>& rho0_old_in,
-                      const BaseState<amrex::Real>& rho0_new_in,
                       const BaseState<amrex::Real>& p0_old_in,
                       const BaseState<amrex::Real>& p0_new_in,
                       const BaseState<amrex::Real>& gamma1bar_old_in,
@@ -1702,8 +1723,6 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Vector<amrex::MultiFab>& s_old,
                            amrex::Vector<amrex::MultiFab>& s_hat,
                            const amrex::Vector<amrex::MultiFab>& s_new,
-                           const BaseState<amrex::Real>& p0old,
-                           const BaseState<amrex::Real>& p0new,
                            const amrex::Vector<amrex::MultiFab>& hcoeff1,
                            const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
                            const amrex::Vector<amrex::MultiFab>& pcoeff1,
@@ -1886,19 +1905,6 @@ class Maestro : public amrex::AmrCore {
     // these are defined in `VariableSetup()`
     static int ng_s;  //< number of ghost cells for `sold/new` and `uold/new`
 
-    // these are defined in `Maestro.cpp`
-    // these represent the four types of nodal projections
-    static int initial_projection_comp;
-    static int divu_iters_comp;
-    static int pressure_iters_comp;
-    static int regular_timestep_comp;
-
-    // these are defined in `Maestro.cpp`
-    // density and enthalpy edge state prediction
-    static int predict_rhoprime_and_X, predict_rhoX, predict_rho_and_X;
-    static int predict_rhoh, predict_rhohprime, predict_h;
-    static int predict_T_then_rhohprime, predict_T_then_h;
-    static int predict_hprime, predict_Tprime_then_h;
 
     // these are defined in `Maestro.cpp`
     static amrex::IntVect nodal_flag;
