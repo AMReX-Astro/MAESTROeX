@@ -4,7 +4,6 @@ COMP	   = gnu
 USE_MPI    = TRUE
 USE_OMP    = FALSE
 USE_REACT  = TRUE
-USE_ML     = 
 
 USE_SDC    = 
 

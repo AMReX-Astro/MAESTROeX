@@ -3,8 +3,3 @@
 pert_temp_factor  real      1.d0
 pert_rad_factor   real      1.d0
 do_small_domain   logical   .false.
-
-# ML normalization constants
-dens_fac          real      5.000500606732890755d7
-temp_fac          real      3.000899961693421364d9
-enuc_fac          real      7.033368299136000000d12
