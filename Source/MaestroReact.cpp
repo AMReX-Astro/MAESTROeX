@@ -9,7 +9,7 @@ using namespace amrex;
 void Maestro::React(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     Vector<MultiFab>& rho_Hext, Vector<MultiFab>& rho_omegadot,
                     Vector<MultiFab>& rho_Hnuc, const BaseState<Real>& p0,
-                    const Real dt_in, const Real time_in) {
+                    const Real dt_in, [[maybe_unused]] const Real time_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::React()", React);
 
@@ -88,6 +88,9 @@ void Maestro::ReactSDC(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                        Vector<MultiFab>& rho_Hext, const BaseState<Real>& p0,
                        const Real dt_in, const Real time_in,
                        Vector<MultiFab>& source) {
+
+    amrex::ignore_unused(time_in);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ReactSDC()", ReactSDC);
 
@@ -382,11 +385,6 @@ void Maestro::MakeReactionRates(Vector<MultiFab>& rho_omegadot,
                         // call the EOS with input rh to set T for rate evaluation
                         eos(eos_input_rh, eos_state);
                         eos_to_burn(eos_state, state);
-
-                        // we don't need the temperature RHS so set self_heat = False
-#ifdef STRANG
-                        state.self_heat = false;
-#endif
 
                         Array1D<Real, 1, neqs> ydot;
                         actual_rhs(state, ydot);

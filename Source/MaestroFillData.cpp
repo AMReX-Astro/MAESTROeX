@@ -515,7 +515,7 @@ void Maestro::FillPatchUedge(
                 fine_src.setVal(1.e200);
 
                 // We want to fill crse_src from coarse uedge
-                crse_src.copy(uedge[lev - 1][dir], 0, 0, 1, 1, 0);
+                crse_src.ParallelCopy(uedge[lev - 1][dir], 0, 0, 1, 1, 0);
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -629,7 +629,7 @@ void Maestro::FillPatchUedge(
                 // Replace pc-interpd fine data with preferred u_mac data at
                 // this level u_mac valid only on surrounding faces of valid
                 // region - this op will not fill grow region.
-                fine_src.copy(uedge[lev][dir]);
+                fine_src.ParallelCopy(uedge[lev][dir]);
 
                 // Interpolate unfilled grow cells using best data from
                 // surrounding faces of valid region, and pc-interpd data
@@ -806,14 +806,14 @@ void Maestro::FillPatchUedge(
                 // make a copy of the original fine uedge but with no ghost cells
                 MultiFab uedge_f_save(uedge[lev][dir].boxArray(),
                                       uedge[lev][dir].DistributionMap(), 1, 0);
-                uedge_f_save.copy(uedge[lev][dir]);
+                uedge_f_save.ParallelCopy(uedge[lev][dir]);
 
                 // copy in the grown data into fine uedge
-                uedge[lev][dir].copy(fine_src, 0, 0, 1, 0, nGrow);
+                uedge[lev][dir].ParallelCopy(fine_src, 0, 0, 1, 0, nGrow);
 
                 // copy the original valid region back into uedge
                 // to we don't change the values on the C-F interface
-                uedge[lev][dir].copy(uedge_f_save);
+                uedge[lev][dir].ParallelCopy(uedge_f_save);
             }
 
         }  // end if

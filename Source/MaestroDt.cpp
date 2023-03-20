@@ -189,9 +189,11 @@ void Maestro::EstDt() {
                     if (spdy > eps) {
                         dt_temp = amrex::min(dt_temp, dx[1] / spdy);
                     }
+#if AMREX_SPACEDIM == 3
                     if (spdz > eps) {
                         dt_temp = amrex::min(dt_temp, dx[2] / spdz);
                     }
+#endif
                     if (spdr > eps) {
                         dt_temp =
                             amrex::min(dt_temp, dx[AMREX_SPACEDIM - 1] / spdr);
@@ -779,12 +781,13 @@ void Maestro::FirstDt() {
                             Real denom = S_cc_arr(i, j, k) - gp_dot_u;
 
                             if (denom > 0.0 && scal_arr(i, j, k, Rho) > 0.0) {
-                                if (rho_min / scal_arr(i, j, k, Rho) < 1.0)
+                                if (rho_min / scal_arr(i, j, k, Rho) < 1.0) {
                                     tmp_arr(i, j, k) =
                                         0.4 *
                                         (1.0 -
                                          rho_min / scal_arr(i, j, k, Rho)) /
                                         denom;
+                                }
                             }
                         });
                         dt_divu = tmp[mfi].min<RunOn::Device>(tileBox, 0);

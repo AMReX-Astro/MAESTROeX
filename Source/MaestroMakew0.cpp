@@ -25,7 +25,7 @@ void Maestro::Makew0(const BaseState<Real>& w0_old, BaseState<Real>& w0_force,
                              gamma1bar_old_in, gamma1bar_new_in,
                              p0_minus_peosbar, dt_in, dtold_in);
         } else {
-            Makew0Planar(w0_old, w0_force, Sbar_in, rho0_old_in, rho0_new_in,
+            Makew0Planar(w0_old, w0_force, Sbar_in,
                          p0_old_in, p0_new_in, gamma1bar_old_in,
                          gamma1bar_new_in, p0_minus_peosbar, dt_in, dtold_in,
                          is_predictor);
@@ -60,8 +60,7 @@ void Maestro::Makew0(const BaseState<Real>& w0_old, BaseState<Real>& w0_force,
 
 void Maestro::Makew0Planar(
     const BaseState<Real>& w0_old, BaseState<Real>& w0_force,
-    const BaseState<Real>& Sbar_in, const BaseState<Real>& rho0_old_in,
-    const BaseState<Real>& rho0_new_in, const BaseState<Real>& p0_old_in,
+    const BaseState<Real>& Sbar_in, const BaseState<Real>& p0_old_in,
     const BaseState<Real>& p0_new_in, const BaseState<Real>& gamma1bar_old_in,
     const BaseState<Real>& gamma1bar_new_in,
     const BaseState<Real>& p0_minus_peosbar, const Real dt_in,
@@ -108,7 +107,7 @@ void Maestro::Makew0Planar(
     const Real dpdt_factor_loc = dpdt_factor;
 
     // pressure correction variables
-    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine);
+    BaseState<Real> int1_over_gamma1bar_p0(base_geom.nr_fine+1);
     auto int1_over_gamma1bar_p0_planar = int1_over_gamma1bar_p0.array();
 
     // Compute w0 on edges at level n
