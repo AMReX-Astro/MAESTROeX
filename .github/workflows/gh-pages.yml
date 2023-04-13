@@ -8,11 +8,11 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install pandoc and doxygen 
+      - name: Install pandoc and doxygen
         run: |
           sudo apt install pandoc doxygen
 
@@ -47,7 +47,7 @@ jobs:
           GITHUB_BRANCH: 'main'
         run: ./deploy_docs_action.sh
 
-      - name: Build docs 
+      - name: Build docs
         if: ${{ endsWith(github.ref, 'development') }}
         env:
           GITHUB_BRANCH: 'development'
@@ -58,4 +58,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./out
-          keep_files: true 
+          keep_files: true
