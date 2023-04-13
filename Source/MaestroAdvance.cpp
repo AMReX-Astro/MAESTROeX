@@ -6,6 +6,8 @@ using namespace amrex;
 
 // advance a single level for a single time step, updates flux registers
 void Maestro::AdvanceTimeStep(bool is_initIter) {
+    algo_step = "0";
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::AdvanceTimeStep()", AdvanceTimeStep);
 
@@ -228,6 +230,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     Real react_time_start = ParallelDescriptor::second();
 
+    algo_step = "1";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 1 : react state >>>" << std::endl;
     }
@@ -245,6 +249,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     Real advect_time_start = ParallelDescriptor::second();
+
+    algo_step = "2";
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 2 : make w0 >>>" << std::endl;
@@ -351,6 +357,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 3 -- construct the advective velocity
     //////////////////////////////////////////////////////////////////////////////
 
+    algo_step = "3";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 3 : create MAC velocities >>>" << std::endl;
     }
@@ -393,6 +401,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     advect_time_start = ParallelDescriptor::second();
+
+    algo_step = "4";
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4 : advect base >>>" << std::endl;
@@ -560,6 +570,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     Real thermal_time_start = ParallelDescriptor::second();
 
+    algo_step = "4a";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 4a: thermal conduct >>>" << std::endl;
     }
@@ -611,6 +623,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     react_time_start = ParallelDescriptor::second();
 
+    algo_step = "5";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 5 : react state >>>" << std::endl;
     }
@@ -658,6 +672,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     advect_time_start = ParallelDescriptor::second();
+
+    algo_step = "6";
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 6 : make new S and new w0 >>>" << std::endl;
@@ -761,6 +777,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     // STEP 7 -- redo the construction of the advective velocity using the current w0
     //////////////////////////////////////////////////////////////////////////////
 
+    algo_step = "7";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 7 : create MAC velocities >>>" << std::endl;
     }
@@ -797,6 +815,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     advect_time_start = ParallelDescriptor::second();
+
+    algo_step = "8";
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8 : advect base >>>" << std::endl;
@@ -952,6 +972,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     thermal_time_start = ParallelDescriptor::second();
 
+    algo_step = "8a";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 8a: thermal conduct >>>" << std::endl;
     }
@@ -997,6 +1019,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     react_time_start = ParallelDescriptor::second();
 
+    algo_step = "9";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 9 : react state >>>" << std::endl;
     }
@@ -1041,6 +1065,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     Real ndproj_time_start = ParallelDescriptor::second();
 
+    algo_step = "10";
+
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 10: make new S >>>" << std::endl;
     }
@@ -1082,6 +1108,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
     //////////////////////////////////////////////////////////////////////////////
 
     advect_time_start = ParallelDescriptor::second();
+
+    algo_step = "11";
 
     if (maestro_verbose >= 1) {
         Print() << "<<< STEP 11: update and project new velocity >>>"
@@ -1180,6 +1208,8 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
             Average(snew, tempbar, Temp);
         }
     }
+
+    algo_step = "endstep";
 
     Print() << "\nTimestep " << istep << " ends with TIME = " << t_new
             << " DT = " << dt << std::endl;

@@ -17,6 +17,11 @@ flame/
    the SNe code show that SDC can overcome these problems.
 
 
+flame_ml/
+
+   The same combustion-mode problem as in flame/ but using ML model to
+   replace the reaction kernel of the solver.
+
 sub_chandra/
 
    Surpise! We're modelling convection.  This time in 3D spherical

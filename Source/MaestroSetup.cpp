@@ -216,6 +216,32 @@ void Maestro::Setup() {
                   << std::endl;
         Error();
     }
+
+#ifdef ML
+    // check to see if ml model is provided
+    // if model file is provided, load model
+    if (ml_model_file.empty()) {
+        use_ml = false;
+        Print() << "Warning: No ML model file provided! Will not use ML." << std::endl;
+    } else {
+        use_ml = true;
+
+        // Load pytorch module via torch script
+        try {
+            // Deserialize the ScriptModule from a file using torch::jit::load().
+            module = torch::jit::load(ml_model_file);
+        }
+        catch (const c10::Error& e) {
+            Abort("Error loading the ML model\n");
+        }
+        Print() << "ML model loaded.\n";
+
+#ifdef AMREX_USE_CUDA
+        module.to(torch::kCUDA);
+        Print() << "Copying model to GPU." << std::endl;
+#endif
+    }
+#endif
 }
 
 // read in some parameters from inputs file
