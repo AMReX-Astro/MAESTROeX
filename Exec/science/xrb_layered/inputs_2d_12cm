@@ -75,7 +75,7 @@ maestro.plot_int   = 500      # number of timesteps between plot files
 maestro.plot_deltat = 1.e-4
 maestro.small_plot_base_name = PLOTS/smallxrb_
 maestro.small_plot_deltat = 1.e-5
-maestro.small_plot_vars = tpert Machnumber enucdot ad_excess 
+maestro.small_plot_vars = Machnumber enucdot ad_excess c12 
 
 # CHECKPOINT
 maestro.check_base_name = CHECKS/chk
@@ -119,7 +119,7 @@ problem.xrb_pert_height = 1100.0
 problem.apply_vel_field = 1
 problem.velpert_scale = 1.0e2
 problem.velpert_amplitude = 1.0e5
-problem.velpert_height_loc = 1990.0
+problem.velpert_height_loc = 1100.0
 problem.velpert_steep = 12.0e0
 problem.num_vortices = 8
 
