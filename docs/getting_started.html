@@ -12,6 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -143,12 +145,12 @@
            <div itemprop="articleBody">
              
   <section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">¶</a></h1>
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading"></a></h1>
 <p>In this chapter we give an overview of MAESTROeX, including some of the
 standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.</p>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
 <p>MAESTROeX requires a C++ compiler that supports the C++17 standard, a
 Fortran compiler that supports the Fortran 2003 standard, and a C compiler
 that supports the C99 standard. Several compiler suites are supported,
@@ -160,7 +162,7 @@ For running on GPUs, CUDA 11 or later is required (see <a class="reference inter
 more information).</p>
 </section>
 <section id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h2>
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this heading"></a></h2>
 <p>Here we will run the standard reacting_bubble problem (three
 reacting bubbles in a plane-parallel stratified atmosphere) on a
 single processor <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This test problem was shown in
@@ -380,7 +382,7 @@ MAESTROeX are assumed to be in CGS units.</p>
 </ol>
 </section>
 <section id="working-with-the-output">
-<h2>Working with the Output<a class="headerlink" href="#working-with-the-output" title="Permalink to this heading">¶</a></h2>
+<h2>Working with the Output<a class="headerlink" href="#working-with-the-output" title="Permalink to this heading"></a></h2>
 <p>Visualization and analysis are done on the plotfiles. A number of
 in-house and externally developed tools can work with AMReX-formatted
 plotfiles <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
@@ -391,11 +393,11 @@ shown in the figure below:</p>
 <figcaption>
 <p><span class="caption-number">Fig. 3 </span><span class="caption-text">Visualization of the final output of the reacting_bubble problem
 showing the temperature field (as derived from the pressure). This
-plot was done with the AmrPostprocessing tools.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+plot was done with the AmrPostprocessing tools.</span><a class="headerlink" href="#id5" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <section id="amrvis">
-<h3>Amrvis<a class="headerlink" href="#amrvis" title="Permalink to this heading">¶</a></h3>
+<h3>Amrvis<a class="headerlink" href="#amrvis" title="Permalink to this heading"></a></h3>
 <p>Amrvis is an easy-to-use visualization tool developed at LBL for
 2- and 3D datasets which can plot slices through 3D datasets as well
 as volume-renderings. It can also very easily extract 1D lines
@@ -416,7 +418,7 @@ on your Linux system, you may also need to install libXpm and
 related development packages (e.g. libXpm-devel).</p>
 </section>
 <section id="amrpostprocessing-scripts">
-<h3>AmrPostprocessing scripts<a class="headerlink" href="#amrpostprocessing-scripts" title="Permalink to this heading">¶</a></h3>
+<h3>AmrPostprocessing scripts<a class="headerlink" href="#amrpostprocessing-scripts" title="Permalink to this heading"></a></h3>
 <p>Several useful analysis scripts (written in Fortran 90) can be found
 in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Postprocessing/F_Src/</span></code>.  The <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> there
 needs to be edited to indicate which of the tools to build. For
@@ -431,7 +433,7 @@ plotfile, <code class="docutils literal notranslate"><span class="pre">plt00200<
 in § <span class="xref std std-ref">sec:vis:python</span>.</p>
 </section>
 <section id="visit">
-<h3>VisIt<a class="headerlink" href="#visit" title="Permalink to this heading">¶</a></h3>
+<h3>VisIt<a class="headerlink" href="#visit" title="Permalink to this heading"></a></h3>
 <p>VisIt is a DOE-supported visualization tool for 2- and 3D datasets. It
 can do contouring, volume rendering, streamlines, …  , directly from
 AMReX plotfiles. Details on VisIt can be found at:
@@ -442,12 +444,12 @@ webpage.</p>
 VisIt to the Header file in the plotfile directory.</p>
 </section>
 <section id="yt">
-<h3>yt<a class="headerlink" href="#yt" title="Permalink to this heading">¶</a></h3>
+<h3>yt<a class="headerlink" href="#yt" title="Permalink to this heading"></a></h3>
 <p>yt (version 3.0 and later) can natively read the MAESTROeX plotfiles. See
 the yt documentation or § <a class="reference internal" href="visualization.html#sec-vis-yt"><span class="std std-ref">Visualizing with yt</span></a>.</p>
 </section>
 <section id="diagnostic-files">
-<h3>Diagnostic Files<a class="headerlink" href="#diagnostic-files" title="Permalink to this heading">¶</a></h3>
+<h3>Diagnostic Files<a class="headerlink" href="#diagnostic-files" title="Permalink to this heading"></a></h3>
 <p>By default, MAESTROeX outputs global diagnostics each timestep into 3
 files called <code class="docutils literal notranslate"><span class="pre">diag_vel.out</span></code>, <code class="docutils literal notranslate"><span class="pre">diag_temp.out</span></code>, and <code class="docutils literal notranslate"><span class="pre">diag_enuc.out</span></code>
 for spherical problems (ex. <code class="docutils literal notranslate"><span class="pre">wdconvect</span></code>).
@@ -459,7 +461,7 @@ directly with GNUplot, for example.</p>
 </section>
 </section>
 <section id="development-model">
-<h2>Development Model<a class="headerlink" href="#development-model" title="Permalink to this heading">¶</a></h2>
+<h2>Development Model<a class="headerlink" href="#development-model" title="Permalink to this heading"></a></h2>
 <p>When you clone MAESTROeX from github, you will be on the main
 branch of the repo. New changes to MAESTROeX are first introduced
 into the development branch in the MAESTROeX git repository.
@@ -474,7 +476,7 @@ through GitHub from your fork of MAESTROeX and target the development
 branch. (If you mistakenly target main, we can change it for you.)</p>
 </section>
 <section id="parallel-jobs">
-<h2>Parallel Jobs<a class="headerlink" href="#parallel-jobs" title="Permalink to this heading">¶</a></h2>
+<h2>Parallel Jobs<a class="headerlink" href="#parallel-jobs" title="Permalink to this heading"></a></h2>
 <p>To run in parallel with MPI, you would set <code class="docutils literal notranslate"><span class="pre">USE_MPI</span> <span class="pre">:=</span> <span class="pre">TRUE</span></code> in your
 GNUmakefile. For a machine with working MPI compiler wrappers
 (mpif90 and mpicc), the build system should find these and

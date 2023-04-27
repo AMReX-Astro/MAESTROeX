@@ -12,6 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -138,7 +140,7 @@
            <div itemprop="articleBody">
              
   <section id="unit-tests">
-<h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading">¶</a></h1>
+<h1>Unit Tests<a class="headerlink" href="#unit-tests" title="Permalink to this heading"></a></h1>
 <p>In addition to the MAESTROeX science problems, which use the full
 capabilities of MAESTROeX, there are a number of unit tests that
 exercise only specific components of the MAESTROeX solvers. These
@@ -146,7 +148,7 @@ tests have their own drivers (a custom varden.f90) that
 initialize only the data needed for the specific test and call
 specific MAESTROeX routines directly.</p>
 <section id="test-advect">
-<h2>test_advect<a class="headerlink" href="#test-advect" title="Permalink to this heading">¶</a></h2>
+<h2>test_advect<a class="headerlink" href="#test-advect" title="Permalink to this heading"></a></h2>
 <p>This test initializes a Gaussian density field (no other scalar
 quantities are used) and a uniform velocity field in any one of the
 coordinate directions. The Gaussian profile is advected through the
@@ -169,25 +171,25 @@ on orientation since we work through the corners in arbitrary order.</p>
 <figure class="align-center" id="id6">
 <a class="reference internal image-reference" href="_images/dens_2d_orig_density.png"><img alt="_images/dens_2d_orig_density.png" src="_images/dens_2d_orig_density.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Initial Gaussian density profile</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Initial Gaussian density profile</span><a class="headerlink" href="#id6" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id7">
 <a class="reference internal image-reference" href="_images/dens_2d_ppm1_xp_final_density.png"><img alt="_images/dens_2d_ppm1_xp_final_density.png" src="_images/dens_2d_ppm1_xp_final_density.png" style="width: 80%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 5 </span><span class="caption-text">density profile after advecting to the right for one period</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">density profile after advecting to the right for one period</span><a class="headerlink" href="#id7" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id8">
 <a class="reference internal image-reference" href="_images/dens_2d_ppm1_xp_final_abserror.png"><img alt="_images/dens_2d_ppm1_xp_final_abserror.png" src="_images/dens_2d_ppm1_xp_final_abserror.png" style="width: 80%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 6 </span><span class="caption-text">absolute error between the final and initial density fields,
-showing the error in the advection scheme</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+showing the error in the advection scheme</span><a class="headerlink" href="#id8" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-average">
-<h2>test_average<a class="headerlink" href="#test-average" title="Permalink to this heading">¶</a></h2>
+<h2>test_average<a class="headerlink" href="#test-average" title="Permalink to this heading"></a></h2>
 <p>This test initializes a 1D radial base state quantity with a
 Gaussian distribution, maps it into the 3D domain (assuming a
 spherical geometry) using the routines provided by
@@ -198,7 +200,7 @@ states. The output from this test was described in detail
 in <span id="id2">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
 </section>
 <section id="test-basestate">
-<h2>test_basestate<a class="headerlink" href="#test-basestate" title="Permalink to this heading">¶</a></h2>
+<h2>test_basestate<a class="headerlink" href="#test-basestate" title="Permalink to this heading"></a></h2>
 <p>This test initializes the base state to contain a hydrostatic
 model and then evolves the state with heating to watch the
 hydrostatic adjustment of the atmosphere. In particular,
@@ -210,7 +212,7 @@ in <span id="id3">[<a class="reference internal" href="zreferences.html#id5" tit
 for a spherical, self-gravitating star in <span id="id4">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
 </section>
 <section id="test-diffusion">
-<h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this heading">¶</a></h2>
+<h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Permalink to this heading"></a></h2>
 <p>This test initializes a Gaussian temperature profile and calls
 the thermal diffusion routines in MAESTROeX to evolve the state
 considering only diffusion. The driver estimates a timestep
@@ -221,7 +223,7 @@ by comparing to the analytic solution. This test is
 described in <span id="id5">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>.</p>
 </section>
 <section id="test-eos">
-<h2>test_eos<a class="headerlink" href="#test-eos" title="Permalink to this heading">¶</a></h2>
+<h2>test_eos<a class="headerlink" href="#test-eos" title="Permalink to this heading"></a></h2>
 <p>This test sets up a 3-d cube with <span class="math notranslate nohighlight">\(\rho\)</span> varying on one axis, <span class="math notranslate nohighlight">\(T\)</span> on
 another, and the composition on the third. The EOS is then called
 in every zone, doing <span class="math notranslate nohighlight">\((\rho, T) \rightarrow  p, h, s, e\)</span> and stores those
@@ -232,7 +234,7 @@ stored holding the results and errors. This allows us to determine
 whether the EOS inversion routines are working right.</p>
 </section>
 <section id="test-projection">
-<h2>test_projection<a class="headerlink" href="#test-projection" title="Permalink to this heading">¶</a></h2>
+<h2>test_projection<a class="headerlink" href="#test-projection" title="Permalink to this heading"></a></h2>
 <p>This tests the projection routines in 2- and 3-d—either the hgprojection
 (project_type = 1) or the MAC projection (project_type =
 2). A divergence-free velocity field is initialized and then
@@ -245,20 +247,20 @@ field, and result of the projection for the hgproject case.</p>
 <figure class="align-center" id="id9">
 <a class="reference internal image-reference" href="_images/wall_u_init_x-velocity.png"><img alt="_images/wall_u_init_x-velocity.png" src="_images/wall_u_init_x-velocity.png" style="width: 60%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Initial divergence free velocity field (x-component)</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Initial divergence free velocity field (x-component)</span><a class="headerlink" href="#id9" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id10">
 <a class="reference internal image-reference" href="_images/wall_u_plus_grad_phi_x-velocity.png"><img alt="_images/wall_u_plus_grad_phi_x-velocity.png" src="_images/wall_u_plus_grad_phi_x-velocity.png" style="width: 60%;" /></a>
 <figcaption>
-<p><span class="caption-number">Fig. 8 </span><span class="caption-text">Velocity field plus gradient of a scalar (x-component)</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">Velocity field plus gradient of a scalar (x-component)</span><a class="headerlink" href="#id10" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id11">
 <a class="reference internal image-reference" href="_images/wall_u_new_x-velocity.png"><img alt="_images/wall_u_new_x-velocity.png" src="_images/wall_u_new_x-velocity.png" style="width: 60%;" /></a>
 <figcaption>
 <p><span class="caption-number">Fig. 9 </span><span class="caption-text">Resulting velocity after projecting out the non-divergence free
-portion (x-component).</span><a class="headerlink" href="#id11" title="Permalink to this image">¶</a></p>
+portion (x-component).</span><a class="headerlink" href="#id11" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <p>This is with slipwall boundary conditions on all sides, a 2-level grid
@@ -271,12 +273,12 @@ tested.</p>
 (middle), and z-velocity (right) initially (top row), after the
 gradient of a scalar is added (center row), and the resulting
 velocity after the projection. This is with slipwall boundary conditions
-on all sides, a 2-level grid with an octant refined, and the hgprojection.</span><a class="headerlink" href="#id12" title="Permalink to this image">¶</a></p>
+on all sides, a 2-level grid with an octant refined, and the hgprojection.</span><a class="headerlink" href="#id12" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="test-react">
-<h2>test_react<a class="headerlink" href="#test-react" title="Permalink to this heading">¶</a></h2>
+<h2>test_react<a class="headerlink" href="#test-react" title="Permalink to this heading"></a></h2>
 <p>This simply tests the reaction network by calling
 the MAESTROeX react_state routine directly. The network is
 selected in the GNUmakefile by setting the <code class="docutils literal notranslate"><span class="pre">NETWORK_DIR</span></code>

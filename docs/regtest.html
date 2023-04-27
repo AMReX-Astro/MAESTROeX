@@ -12,6 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -131,9 +133,9 @@
            <div itemprop="articleBody">
              
   <section id="regression-testing-and-continuous-integration">
-<h1>Regression Testing and Continuous Integration<a class="headerlink" href="#regression-testing-and-continuous-integration" title="Permalink to this heading">¶</a></h1>
+<h1>Regression Testing and Continuous Integration<a class="headerlink" href="#regression-testing-and-continuous-integration" title="Permalink to this heading"></a></h1>
 <section id="regression-testing">
-<h2>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this heading">¶</a></h2>
+<h2>Regression Testing<a class="headerlink" href="#regression-testing" title="Permalink to this heading"></a></h2>
 <p>Nightly regression tests are run on MAESTROeX using the AMReX
 regression testing framework:
 <a class="reference external" href="https://github.com/amrex-codes/regression_testing/">https://github.com/amrex-codes/regression_testing/</a> .  We use the
@@ -172,7 +174,7 @@ at Stony Brook can be used as a starting point and is found here:</p>
 </div></blockquote>
 </section>
 <section id="continuous-integration">
-<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading">¶</a></h2>
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading"></a></h2>
 <p>We use Github Actions to run integration tests on the code and to build and deploy the documentation.</p>
 <p>Currently, Github Actions runs the <a class="reference external" href="https://clang-analyzer.llvm.org/">clang static analyzer</a>, which finds potential bugs in
 the code.  This is run on pull requests to the MAESTROeX github

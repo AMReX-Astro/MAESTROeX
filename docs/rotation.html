@@ -12,6 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -136,26 +138,26 @@
            <div itemprop="articleBody">
              
   <section id="rotation-in-maestroex">
-<h1>Rotation in MAESTROeX<a class="headerlink" href="#rotation-in-maestroex" title="Permalink to this heading">¶</a></h1>
+<h1>Rotation in MAESTROeX<a class="headerlink" href="#rotation-in-maestroex" title="Permalink to this heading"></a></h1>
 <section id="rotation">
-<h2>Rotation<a class="headerlink" href="#rotation" title="Permalink to this heading">¶</a></h2>
+<h2>Rotation<a class="headerlink" href="#rotation" title="Permalink to this heading"></a></h2>
 <p>To handle rotation in MAESTROeX we move to the co-rotating reference frame. Time
 derivatives of a vector in the inertial frame are related to those in the
 co-rotating frame by</p>
 <div class="math notranslate nohighlight" id="equation-eq-derivative-relations">
-<span class="eqno">(295)<a class="headerlink" href="#equation-eq-derivative-relations" title="Permalink to this equation">¶</a></span>\[\left(\frac{D}{Dt}\right)_\text{i} =
+<span class="eqno">(295)<a class="headerlink" href="#equation-eq-derivative-relations" title="Permalink to this equation"></a></span>\[\left(\frac{D}{Dt}\right)_\text{i} =
 \left[\left(\frac{D}{Dt}\right)_\text{rot} + \Omegab\times\ \right],\]</div>
 <p>where i(rot) refers to the inertial(co-rotating) frame and <span class="math notranslate nohighlight">\(\Omegab\)</span> is
 the angular velocity vector. Using <a class="reference internal" href="#equation-eq-derivative-relations">Eq.295</a> and
 assuming <span class="math notranslate nohighlight">\(\Omegab\)</span> is constant, we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-rotational-velocity-relation">
-<span class="eqno">(296)<a class="headerlink" href="#equation-eq-rotational-velocity-relation" title="Permalink to this equation">¶</a></span>\[\frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
+<span class="eqno">(296)<a class="headerlink" href="#equation-eq-rotational-velocity-relation" title="Permalink to this equation"></a></span>\[\frac{Dv_\text{i}}{Dt} = \frac{Dv_\text{rot}}{Dt} +
 2\Omegab \times \mathbf{v_\text{rot}} +
 \Omegab\times\left(\Omegab\times r_\text{rot}\right).\]</div>
 <p>Plugging this into the momentum equation and making use of the continuity
 equation we have a momentum equation in the co-rotating frame:</p>
 <div class="math notranslate nohighlight" id="equation-eq-momentum-equation-with-rotation">
-<span class="eqno">(297)<a class="headerlink" href="#equation-eq-momentum-equation-with-rotation" title="Permalink to this equation">¶</a></span>\[\frac{\partial(\rho\mathbf{U})}{\partial t} +
+<span class="eqno">(297)<a class="headerlink" href="#equation-eq-momentum-equation-with-rotation" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho\mathbf{U})}{\partial t} +
 \nabla\cdot\left(\mathbf{U}(\rho\mathbf{U}) + p \right) =
 \underbrace{-2\rho\Omegab\times\mathbf{U}}_{\text{Coriolis}} -
 \underbrace{\rho\Omegab\times\left(\Omegab\times
@@ -170,7 +172,7 @@ as a gradient, this term would drop out completely in the projection if we were
 doing incompressible flow.
 In what follows we will include the Centrifugal term explicitly.</p>
 <section id="using-spherical-geometry">
-<span id="sec-using-spherical-geometry"></span><h3>Using Spherical Geometry<a class="headerlink" href="#using-spherical-geometry" title="Permalink to this heading">¶</a></h3>
+<span id="sec-using-spherical-geometry"></span><h3>Using Spherical Geometry<a class="headerlink" href="#using-spherical-geometry" title="Permalink to this heading"></a></h3>
 <p>In spherical geometry implementing rotation is straightforward as we don’t have
 to worry about special boundary conditions. We assume a geometry as shown in
 <a class="reference internal" href="#fig-rotation-in-spherical"><span class="std std-numref">Fig. 27</span></a> where the primed coordinate system is
@@ -181,18 +183,18 @@ geometry module. In spherical, the only runtime parameter of importance
 is rotational_frequency in units of Hz. This specifies the angular
 velocity vector which is assumed to be along the <strong>k</strong> direction:</p>
 <div class="math notranslate nohighlight" id="equation-rotation-0">
-<span class="eqno">(298)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation">¶</a></span>\[\Omegab \equiv \Omega {\bf k} = 2\pi *
+<span class="eqno">(298)<a class="headerlink" href="#equation-rotation-0" title="Permalink to this equation"></a></span>\[\Omegab \equiv \Omega {\bf k} = 2\pi *
 \left(\text{rotational_frequency}\right) {\bf k}.\]</div>
 <p>The direction of <span class="math notranslate nohighlight">\(\rb\)</span> is given as the normal vector which is
 passed into mk_vel_force; in particular</p>
 <div class="math notranslate nohighlight" id="equation-rotation-1">
-<span class="eqno">(299)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation">¶</a></span>\[\cos\theta \equiv \frac{\rb\cdot {\bf k}}{r} =
+<span class="eqno">(299)<a class="headerlink" href="#equation-rotation-1" title="Permalink to this equation"></a></span>\[\cos\theta \equiv \frac{\rb\cdot {\bf k}}{r} =
 {\bf normal}\cdot {\bf k} = \text{normal}(3).\]</div>
 <p>The magnitude of <span class="math notranslate nohighlight">\(\rb\)</span> is calculated based on the current zone’s location with
 respect to the center.
 Using this notation we can write the Centrifugal term as</p>
 <div class="math notranslate nohighlight" id="equation-rotation-2">
-<span class="eqno">(300)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+<span class="eqno">(300)<a class="headerlink" href="#equation-rotation-2" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
 \Omegab\times\left(\Omegab\times\rb\right) &amp;=
 \left(\Omegab\cdot\rb\right)\Omegab - \left(\Omegab\cdot\Omegab\right)\rb\\
 &amp;= \Omega^2 r *\left[\text{normal}(3)\right]{\bf k} -
@@ -204,7 +206,7 @@ Using this notation we can write the Centrifugal term as</p>
 \end{align}\end{split}\]</div>
 <p>The Coriolis term is a straightforward cross-product:</p>
 <div class="math notranslate nohighlight" id="equation-rotation-3">
-<span class="eqno">(301)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation">¶</a></span>\[\begin{split}\begin{align}
+<span class="eqno">(301)<a class="headerlink" href="#equation-rotation-3" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
 \Omegab \times \Ub &amp;= \left|
 \begin{array}{ccc}
   {\bf{i}}&amp;{\bf{j}}&amp;{\bf{k}}\\
@@ -221,12 +223,12 @@ Using this notation we can write the Centrifugal term as</p>
 <span id="fig-rotation-in-spherical"></span><img alt="_images/rotation_spherical.png" src="_images/rotation_spherical.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 27 </span><span class="caption-text">Geometry of rotation when spherical_in <span class="math notranslate nohighlight">\(=1\)</span>. We assume the
-star to be rotating about the <span class="math notranslate nohighlight">\(z\)</span> axis with rotational frequency <span class="math notranslate nohighlight">\(\Omega\)</span>.</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+star to be rotating about the <span class="math notranslate nohighlight">\(z\)</span> axis with rotational frequency <span class="math notranslate nohighlight">\(\Omega\)</span>.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="using-plane-parallel-geometry">
-<span id="sec-using-plane-parallel-geometry"></span><h3>Using Plane-Parallel Geometry<a class="headerlink" href="#using-plane-parallel-geometry" title="Permalink to this heading">¶</a></h3>
+<span id="sec-using-plane-parallel-geometry"></span><h3>Using Plane-Parallel Geometry<a class="headerlink" href="#using-plane-parallel-geometry" title="Permalink to this heading"></a></h3>
 </section>
 </section>
 </section>
