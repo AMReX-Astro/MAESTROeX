@@ -1,6 +1,7 @@
 Checks: >
-    '-*,
+     -*,
      bugprone-*,
+       -bugprone-implicit-widening-of-multiplication-result,
      clang-analyzer-*,
      clang-diagnostic-*,
      cppcoreguidelines-*,
@@ -21,6 +22,7 @@ Checks: >
        -modernize-use-using,
      performance-*,
      readability-*,
+       -readability-avoid-const-params-in-decls,
        -readability-braces-around-statements,
        -readability-else-after-return,
        -readability-function-cognitive-complexity,
@@ -31,7 +33,8 @@ Checks: >
        -readability-magic-numbers,
        -readability-named-parameter,
        -readability-simplify-boolean-expr,
+       -readability-static-accessed-through-instance,
      mpi-*,
-     openmp-*'
+     openmp-*
 
-HeaderFilterRegex: '[^n][^o][^l][^i][^n][^t]\.H$'
+HeaderFilterRegex: '(/Source/*|/Source/param/*|/Util/model_parser|/Util/simple_log|^\./|^tmp_build_dir/maestroex_sources/*/).*\.H$'
