@@ -1,5 +1,5 @@
-#ifndef _MODEL_PARSER_H_
-#define _MODEL_PARSER_H_
+#ifndef MODEL_PARSER_H
+#define MODEL_PARSER_H
 
 #include <AMReX_Print.H>
 #include <AMReX_Vector.H>
