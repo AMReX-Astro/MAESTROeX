@@ -215,12 +215,12 @@ algorithm, the coefficients are <span class="math notranslate nohighlight">\(O(\
 initial projection and “divu” solve present a harded linear system
 to solve.</p>
 </li>
-<li><p><em>How can I obtain profiling infomation for my run?</em></p>
+<li><p><em>How can I obtain profiling information for my run?</em></p>
 <p>The code is already instrumented with timers. Simply compile with
 <code class="docutils literal notranslate"><span class="pre">TINY_PROFILE=TRUE</span></code> in the <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code>, or equivalently do
 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">TINY_PROFILE=TRUE</span></code>. A summary of the timings will
 be output to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> at the end of the run.</p>
-<p>With the GNU compliers, you can enabling profiling with <code class="docutils literal notranslate"><span class="pre">gprof</span></code>
+<p>With the GNU compilers, you can enabling profiling with <code class="docutils literal notranslate"><span class="pre">gprof</span></code>
 by compiling with</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_GPROF</span><span class="o">=</span><span class="n">TRUE</span>
 </pre></div>

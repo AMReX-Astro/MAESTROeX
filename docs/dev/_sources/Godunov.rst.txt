@@ -428,7 +428,7 @@ Computing :math:`\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}`, and :math:`\Ubt^
 
 We call make_edge_scal to compute :math:`\rho^{'\edge}, X_k^{\edge},
 (\rho h)^{'\edge}`, and :math:`\Ubt^{\edge}` at each edge.
-The procedure is the same for each quantitiy, so we shall simply denote
+The procedure is the same for each quantity, so we shall simply denote
 the scalar as :math:`s`. We always need to compute :math:`\rho'` and :math:`X_k` to faces,
 and the choice of energy prediction is as follows:
 
