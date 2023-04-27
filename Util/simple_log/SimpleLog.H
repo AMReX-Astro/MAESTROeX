@@ -1,5 +1,5 @@
-#ifndef _SIMPLE_LOG_H_
-#define _SIMPLE_LOG_H_
+#ifndef SIMPLE_LOG_H
+#define SIMPLE_LOG_H
 
 #include <AMReX_Print.H>
 #include <MaestroUtil.H>
