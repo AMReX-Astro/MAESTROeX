@@ -1,5 +1,8 @@
 MAESTROEX_HOME ?= /home/fanduomi/CCSE/MAESTROeX
 
+# clang-tidy support via AMReX
+CLANG_TIDY_CONFIG_FILE := $(MAESTROEX_HOME)/.clang-tidy
+
 TOP := $(MAESTROEX_HOME)
 
 # Microphysics is a git submodule of MAESTROeX. By default
@@ -183,13 +186,12 @@ ifdef MICROPHYSICS_HOME
 endif
 EXTERN_PARAMETERS := $(foreach dir, $(EXTERN_SEARCH),$(realpath $(wildcard $(dir)/_parameters)))
 
-PROBIN_TEMPLATE := $(MAESTROEX_HOME)/Source/param/runtime.probin.template
 PROBIN_PARAMETER_DIRS += .
 PROBIN_PARAMETERS := $(foreach dir, $(PROBIN_PARAMETER_DIRS),$(realpath $(wildcard $(dir)/_parameters)))
 
 $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H
 
-$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS) $(PROBIN_TEMPLATE)
+$(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	@echo " "
 	@echo "${bold}WRITING extern_parameters.cpp${normal}"
