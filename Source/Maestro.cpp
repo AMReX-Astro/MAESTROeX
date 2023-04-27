@@ -1,30 +1,11 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
 // number of ghost cells for sold/new and uold/new
 // overwritten in VariableSetup()
 int Maestro::ng_s = -1;
-
-int Maestro::initial_projection_comp = 1;
-int Maestro::divu_iters_comp = 2;
-int Maestro::pressure_iters_comp = 3;
-int Maestro::regular_timestep_comp = 4;
-
-// species prediction
-int Maestro::predict_rhoprime_and_X = 1;
-int Maestro::predict_rhoX = 2;
-int Maestro::predict_rho_and_X = 3;
-// enthalpy prediction
-int Maestro::predict_rhoh = 0;
-int Maestro::predict_rhohprime = 1;
-int Maestro::predict_h = 2;
-int Maestro::predict_T_then_rhohprime = 3;
-int Maestro::predict_T_then_h = 4;
-int Maestro::predict_hprime = 5;
-int Maestro::predict_Tprime_then_h = 6;
 
 // helper IntVects used to define face/nodal MultiFabs
 #if (AMREX_SPACEDIM == 2)

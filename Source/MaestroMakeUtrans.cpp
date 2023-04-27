@@ -1,13 +1,12 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
 void Maestro::MakeUtrans(
     const Vector<MultiFab>& utilde, const Vector<MultiFab>& ufull,
     Vector<std::array<MultiFab, AMREX_SPACEDIM> >& utrans,
-    const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac) {
+    [[maybe_unused]] const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeUtrans()", MakeUtrans);
 

@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -174,7 +173,7 @@ void Maestro::DensityAdvance(
 #endif
 
         // compute species fluxes
-        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac, rho0_old,
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, rho0_old,
                      rho0_edge_old, rho0mac_old, rho0_old, rho0_edge_old,
                      rho0mac_old, rho0_predicted_edge, FirstSpec, NumSpec);
 
@@ -209,7 +208,7 @@ void Maestro::DensityAdvance(
 #endif
 
         // compute species fluxes
-        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac, rho0_old,
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, rho0_old,
                      rho0_edge_old, rho0mac_old, rho0_new, rho0_edge_new,
                      rho0mac_new, rho0_predicted_edge, FirstSpec, NumSpec);
     }
@@ -420,7 +419,7 @@ void Maestro::DensityAdvanceSDC(
 #endif
 
         // compute species fluxes
-        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac, rho0_old,
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, rho0_old,
                      rho0_edge_old, rho0mac_old, rho0_old, rho0_edge_old,
                      rho0mac_old, rho0_predicted_edge, FirstSpec, NumSpec);
 
@@ -455,7 +454,7 @@ void Maestro::DensityAdvanceSDC(
 #endif
 
         // compute species fluxes
-        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, w0mac, rho0_old,
+        MakeRhoXFlux(scalold, sflux, etarhoflux, sedge, umac, rho0_old,
                      rho0_edge_old, rho0mac_old, rho0_new, rho0_edge_new,
                      rho0mac_new, rho0_predicted_edge, FirstSpec, NumSpec);
     }

@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -161,7 +160,7 @@ void Maestro::TagArray() {
 
 // tag all cells for refinement
 // overrides the pure virtual function in AmrCore
-void Maestro::ErrorEst(int lev, TagBoxArray& tags, Real time, int ng) {
+void Maestro::ErrorEst(int lev, TagBoxArray& tags, Real time, [[maybe_unused]] int ng) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::ErrorEst()", ErrorEst);
 
