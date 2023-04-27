@@ -322,7 +322,7 @@ class Maestro : public amrex::AmrCore {
     ////////////
     // MaestroAverage.cpp functions
 
-    /// Compute the radial average of a quantitiy
+    /// Compute the radial average of a quantity
     ///
     /// @param mf       MultiFab containing quantity to be averaged
     /// @param phibar   Averaged quantity
@@ -1938,7 +1938,7 @@ class Maestro : public amrex::AmrCore {
     amrex::Vector<amrex::MultiFab> S_cc_old;
     amrex::Vector<amrex::MultiFab> S_cc_new;
 
-    // these MultiFabs are persistant and need to be regridded as well
+    // these MultiFabs are persistent and need to be regridded as well
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;     // nodal
