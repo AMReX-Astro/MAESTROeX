@@ -91,14 +91,14 @@ Running
    to solve.
 
    
-#. *How can I obtain profiling infomation for my run?*
+#. *How can I obtain profiling information for my run?*
 
    The code is already instrumented with timers. Simply compile with
    ``TINY_PROFILE=TRUE`` in the ``GNUmakefile``, or equivalently do
    ``make TINY_PROFILE=TRUE``. A summary of the timings will
    be output to ``stdout`` at the end of the run.
 
-   With the GNU compliers, you can enabling profiling with ``gprof``
+   With the GNU compilers, you can enabling profiling with ``gprof``
    by compiling with
 
    ::
