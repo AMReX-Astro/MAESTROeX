@@ -102,7 +102,7 @@ struct BaseStateArray {
         return len;
     }
 
-    /// number of componenets
+    /// number of components
     AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nComp() const noexcept {
         return nvar;
     }

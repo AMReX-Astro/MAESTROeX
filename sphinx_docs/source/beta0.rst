@@ -31,7 +31,7 @@ that
 
 .. math:: \frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz}  .
 
-Comparing to the defintion of :math:`\beta_0` then
+Comparing to the definition of :math:`\beta_0` then
 
 .. math:: \frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}   .
 
@@ -261,7 +261,7 @@ differential (i.e. mixed derivatives are equal) we have
      \frac{p}{\rho}\left(1-\chi_T\right),\end{aligned}
 
 exactly the same result if we were to exclude species information.
-Simlarly, we can find an expression for the derivative of energy with
+Similarly, we can find an expression for the derivative of energy with
 respect to composition
 
 .. math::

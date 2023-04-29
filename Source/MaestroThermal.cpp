@@ -1,7 +1,6 @@
 
 #include <AMReX_VisMF.H>
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -526,8 +525,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
 // SDC version
 void Maestro::ThermalConductSDC(
     int which_step, const Vector<MultiFab>& s_old, Vector<MultiFab>& s_hat,
-    const Vector<MultiFab>& s_new, const BaseState<Real>& p0old,
-    const BaseState<Real>& p0new, const Vector<MultiFab>& hcoeff1,
+    const Vector<MultiFab>& s_new, const Vector<MultiFab>& hcoeff1,
     const Vector<MultiFab>& Xkcoeff1, const Vector<MultiFab>& pcoeff1,
     const Vector<MultiFab>& hcoeff2, const Vector<MultiFab>& Xkcoeff2,
     const Vector<MultiFab>& pcoeff2) {

@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -49,8 +48,10 @@ void Maestro::Setup() {
         Abort("max_level exceeds MAESTROeX's limit!");
     }
 
+#if AMREX_SPACEDIM == 3
     const Real* probLo = geom[0].ProbLo();
     const Real* probHi = geom[0].ProbHi();
+#endif
 
     // set up BCRec definitions for BC types
     BCSetup();

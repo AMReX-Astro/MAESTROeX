@@ -61,7 +61,7 @@ value of a quantity at a given radius in spherical simulations
 (or a given height in planar simulations).  We denote the
 lateral average of a quantity with an overline, e.g., 
 for any quantity :math:`\phi`, we denote
-the average of :math:`\phi` over a layer at constaint radius
+the average of :math:`\phi` over a layer at constant radius
 as :math:`\overline{\phi}`.  For planar problems this routine is
 a trivial average of all the values at a given height.
 For spherical problems there is a
@@ -212,7 +212,7 @@ Base State
 
 The stratified atmosphere is characterized by a one-dimensional
 time-dependent base state, defined by a base state density, :math:`\rho_0`,
-and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
+and a base state pressure, :math:`p_0`, in hydrostatic equilibrium:
 
 .. math:: \nabla p_0 = -\rho_0 |g| \er
 
@@ -223,7 +223,7 @@ monopole constructed by integrating the base state density for
 spherical geometries.
 
 For the time-dependence, we will define a base state velocity, :math:`w_0`,
-which will adjust the base state from one hydrostatic equilibrum to
+which will adjust the base state from one hydrostatic equilibrium to
 another in response to heating.
 
 For convenience, we define a base state enthalphy, :math:`h_0`, as needed

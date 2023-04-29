@@ -1,5 +1,4 @@
 #include <Maestro.H>
-#include <Maestro_F.H>
 #include <extern_parameters.H>
 
 using namespace amrex;

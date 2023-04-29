@@ -3,7 +3,7 @@
 using namespace amrex;
 
 // initializes data on a specific level
-void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
+void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, const MFIter& mfi,
                             const Array4<Real> scal, const Array4<Real> vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -11,13 +11,15 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     const auto s0_arr = s0_init.const_array();
     const auto p0_arr = p0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
@@ -38,7 +40,9 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     if (perturb_model) {
         const auto xcen = center[0];
         const auto ycen = AMREX_SPACEDIM == 2 ? xrb_pert_height : center[1];
-        const auto zcen = AMREX_SPACEDIM == 2 ? 0.0 : xrb_pert_height;
+#if AMREX_SPACEDIM == 3
+        const auto zcen = xrb_pert_height;
+#endif
 
         const auto rad_pert =
             -xrb_pert_size * xrb_pert_size / (4.0 * std::log(0.5));
@@ -48,12 +52,16 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto xrb_pert_factor_loc = xrb_pert_factor;
         const auto rad_pert_loc = rad_pert;
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] (int i, int j, int k) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - xcen;
             const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - ycen;
+#if AMREX_SPACEDIM == 3
             const auto z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - zcen;
+#else
+            const Real z = 0.0;
+#endif
 
             const auto dist = std::sqrt(x * x + y * y + z * z);
 
@@ -113,7 +121,7 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
         const Real* vortices_xloc_p = vortices_xloc.dataPtr();
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] (int i, int j, int k) {
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
             const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
 
@@ -150,5 +158,11 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
 void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                                 MultiFab& vel) {
+
+    amrex::ignore_unused(lev);
+    amrex::ignore_unused(time);
+    amrex::ignore_unused(scal);
+    amrex::ignore_unused(vel);
+
     Abort("InitLevelDataSphr not implemented.");
 }
