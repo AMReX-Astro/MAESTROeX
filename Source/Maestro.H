@@ -79,7 +79,7 @@ class Maestro : public amrex::AmrCore {
     /// constructor
     Maestro();
     /// destructor
-    virtual ~Maestro();
+    ~Maestro();
 
     // in `MaestroSetup.cpp`
     /// Setup the simulation.
@@ -322,7 +322,7 @@ class Maestro : public amrex::AmrCore {
     ////////////
     // MaestroAverage.cpp functions
 
-    /// Compute the radial average of a quantitiy
+    /// Compute the radial average of a quantity
     ///
     /// @param mf       MultiFab containing quantity to be averaged
     /// @param phibar   Averaged quantity
@@ -1497,22 +1497,22 @@ class Maestro : public amrex::AmrCore {
     /// Tag all cells for refinement
     ///
     /// Overrides the pure virtual function in `AmrCore`
-    virtual void ErrorEst(int lev, amrex::TagBoxArray& tags, amrex::Real time,
-                          int ng) override;
+    void ErrorEst(int lev, amrex::TagBoxArray& tags, amrex::Real time,
+                  int ng) override;
 
     /// Within a call to `AmrCore::regrid`, this function fills in data at a level
     /// that existed before, using pre-existing fine and interpolated coarse data
     ///
     /// overrides the pure virtual function in `AmrCore`
-    virtual void RemakeLevel(int lev, amrex::Real time,
-                             const amrex::BoxArray& ba,
-                             const amrex::DistributionMapping& dm) override;
+    void RemakeLevel(int lev, amrex::Real time,
+                     const amrex::BoxArray& ba,
+                     const amrex::DistributionMapping& dm) override;
 
     /// Within a call to `AmrCore::regrid`, this function fills in data at a level
     /// that did NOT exist before, using interpolated coarse data
     ///
     /// overrides the pure virtual function in `AmrCore`
-    virtual void MakeNewLevelFromCoarse(
+    void MakeNewLevelFromCoarse(
         int lev, amrex::Real time, const amrex::BoxArray& ba,
         const amrex::DistributionMapping& dm) override;
 
@@ -1520,7 +1520,7 @@ class Maestro : public amrex::AmrCore {
     /// at a level of refinement that is no longer needed
     ///
     /// overrides the pure virtual function in `AmrCore`
-    virtual void ClearLevel(int lev) override;
+    void ClearLevel(int lev) override;
 
     // end regridding functions
     ////////////
@@ -1938,7 +1938,7 @@ class Maestro : public amrex::AmrCore {
     amrex::Vector<amrex::MultiFab> S_cc_old;
     amrex::Vector<amrex::MultiFab> S_cc_new;
 
-    // these MultiFabs are persistant and need to be regridded as well
+    // these MultiFabs are persistent and need to be regridded as well
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;     // nodal

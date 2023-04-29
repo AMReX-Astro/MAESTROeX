@@ -1,7 +1,6 @@
 
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -409,7 +408,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
 
         // for T_max, we want to know where the hot spot is, so we do a
         // gather on the temperature and find the index corresponding to
-        // the maxiumum.  We then pack the coordinates and velocities
+        // the maximum.  We then pack the coordinates and velocities
         // into a local array and gather that to the I/O processor and
         // pick the values corresponding to the maximum.
         int nprocs = ParallelDescriptor::NProcs();
