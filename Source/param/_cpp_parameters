@@ -118,7 +118,7 @@ minwidth                            int            8
 # parameter for cluster algorithm for making new grids in adaptive problems
 min_eff                             Real               0.9
 
-# pass $T'$ into the tagging routines as the auxillary multifab instead
+# pass $T'$ into the tagging routines as the auxiliary multifab instead
 # of the default $\rho H_\mathrm{nuc}$.
 use_tpert_in_tagging                bool            false     y
 
@@ -561,7 +561,7 @@ sum_per                      Real          -1.0e0
 # display center of mass diagnostics
 show_center_of_mass          int           0
 
-# abort if we exceed CFL = 1 over the cource of a timestep
+# abort if we exceed CFL = 1 over the course of a timestep
 hard_cfl_limit               int           1
 
 # a string describing the simulation that will be copied into the
@@ -612,7 +612,7 @@ do_heating                          bool            false
 # category: SDC
 #-----------------------------------------------------------------------------
 
-# how many SDC iteractions to take (requires the code be compiled with
+# how many SDC iterations to take (requires the code be compiled with
 # {\tt SDC := t}
 sdc_iters                           int            1
 

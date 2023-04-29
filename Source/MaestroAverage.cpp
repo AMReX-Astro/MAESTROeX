@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -251,7 +250,9 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                     // make sure the cell isn't covered by finer cells
                     bool cell_valid = true;
                     if (use_mask) {
-                        if (mask_arr(i, j, k) == 1) cell_valid = false;
+                        if (mask_arr(i, j, k) == 1) {
+                            cell_valid = false;
+                        }
                     }
 
                     if (cell_valid) {

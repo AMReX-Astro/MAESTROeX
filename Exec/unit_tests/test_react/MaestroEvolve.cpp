@@ -1,6 +1,6 @@
 
 #include <Maestro.H>
-#include <Problem_F.H>
+#include <extern_parameters.H>
 
 using namespace amrex;
 
@@ -62,8 +62,6 @@ void Maestro::Evolve() {
     // Explore ten orders of magnitude of the time domain using user inputs.
     do_burning = dbo;
     do_heating = dho;
-    int react_its = 0;
-    get_react_its(&react_its);
 
     for (auto i = 0; i < react_its; ++i) {
         React(sold, snew, rho_Hext, rho_omegadot, rho_Hnuc, p0_old, dt, t_old);

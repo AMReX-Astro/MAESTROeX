@@ -12,7 +12,7 @@ MAESTROEX_HOME  := ../../..
 # define the physics packages to build this problem
 EOS_DIR := helmholtz
 CONDUCTIVITY_DIR := stellar
-NETWORK_DIR := ignition_chamulak
+NETWORK_DIR := aprox13
 
 Bpack   := ./Make.package
 Blocs   := .

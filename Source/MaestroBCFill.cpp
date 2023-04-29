@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 #include <MaestroInletBCs.H>
 
@@ -30,7 +29,7 @@ void Maestro::VelFill(const Array4<Real>& vel, const Box& bx,
 }
 
 void Maestro::FillExtBC(const Array4<Real>& q, const Box& bx,
-                        const Box& domainBox, const Real* dx, const BCRec bcs,
+                        const Box& domainBox, [[maybe_unused]] const Real* dx, const BCRec bcs,
                         const int comp, const bool is_vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillExtBC()", FillExtBC);

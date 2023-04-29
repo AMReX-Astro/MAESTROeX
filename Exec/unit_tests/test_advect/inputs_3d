@@ -48,9 +48,5 @@ maestro.base_cutoff_density = 1.e-10
 maestro.anelastic_cutoff_density = 1.e-10
 maestro.ppm_type = 0
 
-&probin
+problem.advect_test_tol = 5.e-14
 
- advect_test_tol = 5.d-14
-
-
-/

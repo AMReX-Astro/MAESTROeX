@@ -1,7 +1,6 @@
 
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -25,10 +24,6 @@ void Maestro::DiagFile(const int step, const Real t_in,
     // -- w0mac will contain an edge-centered w0 on a Cartesian grid,
     // -- for use in computing divergences.
     Vector<std::array<MultiFab, AMREX_SPACEDIM> > w0mac(finest_level + 1);
-    // -- w0r_cart is w0 but onto a Cartesian grid in cell-centered as
-    // -- a scalar.  Since w0 is the radial expansion velocity, w0r_cart
-    // -- is the radial w0 in a zone
-    Vector<MultiFab> w0r_cart(finest_level + 1);
 
     // rho_Hnuc and rho_Hext are used to determine energy generation
     Vector<MultiFab> stemp(finest_level + 1);
@@ -52,16 +47,11 @@ void Maestro::DiagFile(const int step, const Real t_in,
                 w0mac[lev][idim].setVal(0.);
             }
 
-            w0r_cart[lev].define(grids[lev], dmap[lev], 1, 0);
-            w0r_cart[lev].setVal(0.);
         }
 
         // put w0 on Cartesian edges as a vector
         MakeW0mac(w0mac);
 
-        // put w0 in Cartesian cell-centers as a scalar (the radial
-        // expansion velocity)
-        Put1dArrayOnCart(w0, w0r_cart, true, false, bcs_u, 0, 1);
     }
 #endif
 
@@ -181,10 +171,6 @@ void Maestro::DiagFile(const int step, const Real t_in,
                 spherical ? w0mac[lev][1].array(mfi) : rho_Hnuc[lev].array(mfi);
             const Array4<const Real> w0macz =
                 spherical ? w0mac[lev][2].array(mfi) : rho_Hnuc[lev].array(mfi);
-            const Array4<const Real> normal_arr =
-                spherical ? normal[lev].array(mfi) : rho_Hnuc[lev].array(mfi);
-            const Array4<const Real> w0r =
-                spherical ? w0r_cart[lev].array(mfi) : rho_Hnuc[lev].array(mfi);
 #endif
 
             // The locations of the maxima here make trying to do this on the
@@ -201,7 +187,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                         // make sure the cell isn't covered by finer cells
                         bool cell_valid = true;
                         if (use_mask) {
-                            if (mask_arr(i, j, k) == 1) cell_valid = false;
+                            if (mask_arr(i, j, k) == 1) {
+                                cell_valid = false;
+                            }
                         }
 
                         // For spherical, we only consider cells inside of where the
@@ -237,8 +225,8 @@ void Maestro::DiagFile(const int step, const Real t_in,
 
                                 // velr is the projection of the velocity (including w0) onto
                                 // the radial unit vector
-                                // Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \
-                        //     u(i,j,k,1)*normal_arr(i,j,k,1) + \
+                                // Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \ //
+                        //     u(i,j,k,1)*normal_arr(i,j,k,1) + \ //
                         //     u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
 
                                 // vel is the magnitude of the velocity, including w0
@@ -420,7 +408,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
 
         // for T_max, we want to know where the hot spot is, so we do a
         // gather on the temperature and find the index corresponding to
-        // the maxiumum.  We then pack the coordinates and velocities
+        // the maximum.  We then pack the coordinates and velocities
         // into a local array and gather that to the I/O processor and
         // pick the values corresponding to the maximum.
         int nprocs = ParallelDescriptor::NProcs();

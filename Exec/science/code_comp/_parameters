@@ -1,3 +1,5 @@
+@namespace: problem
+
   heating_factor      real 9.020952262e19
   g0                  real -9.021899571e8
   rho_0                real 1.82094e6

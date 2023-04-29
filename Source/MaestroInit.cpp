@@ -1,8 +1,7 @@
 
 #include <AMReX_VisMF.H>
 #include <Maestro.H>
-#include <Maestro_F.H>
-#include <model_parser_F.H>
+
 using namespace amrex;
 
 // initialize AMR data
@@ -47,8 +46,6 @@ void Maestro::Init() {
     } else {
         Print() << "Initializing from checkpoint " << restart_file << std::endl;
 
-        input_model.ReadFile(model_file);
-
         // read in checkpoint file
         // this builds (defines) and fills the following MultiFabs:
         //
@@ -58,6 +55,9 @@ void Maestro::Init() {
         //
         // rho0_new, p0_new, gamma1bar_new, rhoh0_new, beta0_new, psi, tempbar, etarho_cc, tempbar_init
         ReadCheckPoint();
+
+        // initialize any inlet BC parameters
+        SetInletBCs();
 
         // build (define) the following MultiFabs (that weren't read in from checkpoint):
         // snew, unew, S_cc_new, w0_cart, rhcc_for_nodalproj, normal, pi
@@ -103,7 +103,20 @@ void Maestro::Init() {
         BaseState<int> tag_array_b(tag_array, base_geom.max_radial_level + 1,
                                    base_geom.nr_fine);
         base_geom.InitMultiLevel(finest_level, tag_array_b.array());
-        base_geom.ComputeCutoffCoords(rho0_old.array());
+
+        // average down data and fill ghost cells
+        AverageDown(sold, 0, Nscal);
+        FillPatch(t_old, sold, sold, sold, 0, 0, Nscal, 0, bcs_s);
+        AverageDown(uold, 0, AMREX_SPACEDIM);
+        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, 1);
+
+        if (do_smallscale) {
+            Average(sold, rho0_old, Rho);
+            base_geom.ComputeCutoffCoords(rho0_old.array());
+            rho0_old.setVal(0.);
+        } else {
+            base_geom.ComputeCutoffCoords(rho0_old.array());
+        }
     }
 
 #if (AMREX_SPACEDIM == 3)
@@ -319,7 +332,7 @@ void Maestro::InitData() {
 // and initialize finer levels.  This function creates a new fine
 // level that did not exist before by interpolating from the coarser level
 // overrides the pure virtual function in AmrCore
-void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
+void Maestro::MakeNewLevelFromScratch(int lev, [[maybe_unused]] Real time, const BoxArray& ba,
                                       const DistributionMapping& dm) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeNewLevelFromScratch()",

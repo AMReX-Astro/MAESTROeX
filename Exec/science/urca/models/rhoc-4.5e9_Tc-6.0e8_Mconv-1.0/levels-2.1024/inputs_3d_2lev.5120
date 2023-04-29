@@ -103,46 +103,29 @@ maestro.eps_hg_max         = 1.e-9
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-&probin
+# override the default values of the probin namelist values here
 
-  ! override the default values of the probin namelist values here
-  velpert_amplitude = 1.e2
-  velpert_radius = 2.5e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 1.e8
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
+problem.velpert_amplitude = 1.e2
+problem.velpert_radius = 2.5e7
+problem.velpert_scale = 1.e7
+problem.velpert_steep = 1.e5
+problem.tag_density_1 = 1.e8
+problem.tag_density_2 = 1.e8
+problem.tag_density_3 = 1.e8
+problem.particle_temp_cutoff = 6.e8
+problem.particle_tpert_threshold = 2.e7
 
-  !extern
+eos.use_eos_coulomb = 1
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
+# Set which jacobian to use
+# 1 = analytic jacobian
+# 2 = numerical jacobian
+integrator.jacobian   = 1
 
-  use_eos_coulomb = T
+integrator.retry_burn = 0
+integrator.renormalize_abundances = 1
 
-  ! VODE Reactions ODE settings
-  burner_verbose = .false.
-
-  ! Set which jacobian to use
-  ! 1 = analytic jacobian
-  ! 2 = numerical jacobian
-  jacobian   = 1
-
-  retry_burn = .false.
-  renormalize_abundances = .true.
-
-  rtol_spec = 1.0d-12
-  rtol_enuc = 1.0d-9
-  atol_spec = 1.0d-12
-  atol_enuc = 1.0d-9
-
-/
+integrator.rtol_spec = 1.0e-12
+integrator.rtol_enuc = 1.0e-9
+integrator.atol_spec = 1.0e-12
+integrator.atol_enuc = 1.0e-9

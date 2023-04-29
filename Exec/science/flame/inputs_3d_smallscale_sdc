@@ -1,0 +1,114 @@
+
+# INITIAL MODEL
+maestro.probin_file = "probin"
+maestro.perturb_model = false
+maestro.drdxfac = 5
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0      0.0       0.0
+geometry.prob_hi     =  0.625e0  0.625e0   5.e0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 0 1
+maestro.hi_bc = 0 0 2
+geometry.is_periodic =  1 1 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# GRIDDING AND REFINEMENT
+amr.n_cell             = 32 32 256
+amr.max_grid_size      = 64
+amr.max_level          = 0       # maximum level number allowed
+maestro.regrid_int     = 2       # how often to regrid
+amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
+amr.blocking_factor    = 8       # block factor in grid generation
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+# TAGGING
+maestro.temperr = 6.5e8 6.5e8 6.5e8
+
+# TIME STEPPING
+maestro.max_step  = 200
+maestro.stop_time = 1.e0
+maestro.cfl       = 0.5    # cfl number for hyperbolic system
+                           # In this test problem, the velocity is
+		           # time-dependent.  We could use 0.9 in
+		           # the 3D test, but need to use 0.7 in 2D
+		           # to satisfy CFL condition.
+
+# ALGORITHMIC OPTIONS
+maestro.spherical = 0
+maestro.evolve_base_state = false
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 3
+maestro.init_iter             = 1
+maestro.do_smallscale = true
+maestro.beta0_type = 3
+
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
+maestro.grav_const = 0.e0
+maestro.use_thermal_diffusion = true
+
+maestro.init_shrink = 0.1e0
+maestro.max_dt_growth = 1.2e0
+
+maestro.use_tfromp = true
+maestro.dpdt_factor = 0.e0
+
+maestro.use_delta_gamma1_term = false
+
+maestro.sdc_iters = 1
+maestro.sdc_couple_mac_velocity = true
+
+# PLOTFILES
+maestro.plot_base_name  = sdc_flame_    # root name of plot file
+maestro.plot_int   = 50      # number of timesteps between plot files
+maestro.plot_deltat = 1.e-5
+
+# CHECKPOINT
+maestro.check_base_name = sdc_chk
+maestro.chk_int         = 50
+maestro.chk_deltat = 1.e-5
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-11
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 1.e-11
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-10
+maestro.eps_hg_max         = 1.e-10
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+maestro.do_burning = true
+
+# override the default values of the probin namelist values here
+problem.dens_fuel = 5.e7
+problem.temp_fuel = 1.e8
+problem.xc12_fuel = 0.5e0
+problem.vel_fuel = 1.e5
+problem.temp_ash = 3.e9
+problem.interface_pos_frac = 0.125e0
+problem.smooth_len_frac = 0.025e0
+
+eos.use_eos_coulomb = 1
+
+#eos.eos_gamma = 1.6666666e0

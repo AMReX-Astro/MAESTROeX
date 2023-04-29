@@ -1,7 +1,6 @@
 #include <AMReX_buildInfo.H>
 #include <Maestro.H>
 #include <MaestroPlot.H>
-#include <Maestro_F.H>
 #include <unistd.h>  // getcwd
 #include <iterator>  // std::istream_iterator
 
@@ -277,20 +276,20 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
 
     // velocity
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(u_in[i], 0, dest_comp, AMREX_SPACEDIM);
+        plot_mf_data[i]->ParallelCopy(u_in[i], 0, dest_comp, AMREX_SPACEDIM);
     }
     dest_comp += AMREX_SPACEDIM;
 
     // magvel
     MakeMagvel(u_in, w0mac, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
     // momentum = magvel * rho
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         MultiFab::Multiply(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
     }
     ++dest_comp;
@@ -298,39 +297,39 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     // vorticity
     MakeVorticity(u_in, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
     // rho
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Rho, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Rho, dest_comp, 1);
     }
     ++dest_comp;
 
     // rhoh
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], RhoH, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], RhoH, dest_comp, 1);
     }
     ++dest_comp;
 
     // h
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], RhoH, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], RhoH, dest_comp, 1);
         MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
     }
     ++dest_comp;
 
     // rhoX
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], FirstSpec, dest_comp, NumSpec);
+        plot_mf_data[i]->ParallelCopy(s_in[i], FirstSpec, dest_comp, NumSpec);
     }
     dest_comp += NumSpec;
 
     if (plot_spec) {
         // X
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(s_in[i], FirstSpec, dest_comp, NumSpec);
+            plot_mf_data[i]->ParallelCopy(s_in[i], FirstSpec, dest_comp, NumSpec);
             for (int comp = 0; comp < NumSpec; ++comp) {
                 MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho,
                                  dest_comp + comp, 1, 0);
@@ -341,7 +340,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         // abar
         MakeAbar(s_in, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
@@ -384,7 +383,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         // omegadot
         if (plot_omegadot) {
             for (int i = 0; i <= finest_level; ++i) {
-                plot_mf_data[i]->copy(rho_omegadot[i], 0, dest_comp, NumSpec);
+                plot_mf_data[i]->ParallelCopy(rho_omegadot[i], 0, dest_comp, NumSpec);
                 for (int comp = 0; comp < NumSpec; ++comp) {
                     MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho,
                                      dest_comp + comp, 1, 0);
@@ -397,7 +396,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_Hext) {
         // Hext
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(rho_Hext[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(rho_Hext[i], 0, dest_comp, 1);
             MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
         }
         ++dest_comp;
@@ -406,7 +405,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_Hnuc) {
         // Hnuc
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(rho_Hnuc[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(rho_Hnuc[i], 0, dest_comp, 1);
             MultiFab::Divide(*plot_mf_data[i], s_in[i], Rho, dest_comp, 1, 0);
         }
         ++dest_comp;
@@ -416,7 +415,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         // eta_rho
         Put1dArrayOnCart(etarho_cc, tempmf, true, false, bcs_u, 0, 1);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
@@ -425,7 +424,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     TfromRhoP(s_in, p0_in);
     // tfromp
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Temp, dest_comp, 1);
     }
     ++dest_comp;
 
@@ -433,7 +432,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     TfromRhoH(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
         // tfromh
-        plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Temp, dest_comp, 1);
     }
     ++dest_comp;
 
@@ -442,7 +441,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     PfromRhoH(s_in, s_in, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
         // tfromh
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         MultiFab::Subtract(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
     }
     ++dest_comp;
@@ -451,7 +450,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     // compute & copy tfromp
     TfromRhoP(s_in, p0_in);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Temp, dest_comp, 1);
     }
     // compute tfromh
     TfromRhoH(s_in, p0_in);
@@ -469,20 +468,20 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
 
     // pi
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Pi, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Pi, dest_comp, 1);
     }
     ++dest_comp;
 
     // pioverp0
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Pi, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Pi, dest_comp, 1);
         MultiFab::Divide(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
     }
     ++dest_comp;
 
     // p0pluspi
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Pi, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Pi, dest_comp, 1);
         MultiFab::Add(*plot_mf_data[i], p0_cart[i], 0, dest_comp, 1, 0);
     }
     ++dest_comp;
@@ -490,21 +489,21 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_gpi) {
         // gpi
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(gpi[i], 0, dest_comp, AMREX_SPACEDIM);
+            plot_mf_data[i]->ParallelCopy(gpi[i], 0, dest_comp, AMREX_SPACEDIM);
         }
         dest_comp += AMREX_SPACEDIM;
     }
 
     // rhopert
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], Rho, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], Rho, dest_comp, 1);
         MultiFab::Subtract(*plot_mf_data[i], rho0_cart[i], 0, dest_comp, 1, 0);
     }
     ++dest_comp;
 
     // rhohpert
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(s_in[i], RhoH, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(s_in[i], RhoH, dest_comp, 1);
         MultiFab::Subtract(*plot_mf_data[i], rhoh0_cart[i], 0, dest_comp, 1, 0);
     }
     ++dest_comp;
@@ -515,7 +514,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         Put1dArrayOnCart(tempbar_plot, tempmf, false, false, bcs_f, 0);
 
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(s_in[i], Temp, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(s_in[i], Temp, dest_comp, 1);
             MultiFab::Subtract(*plot_mf_data[i], tempmf[i], 0, dest_comp, 1, 0);
         }
     }
@@ -524,9 +523,9 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_base_state) {
         // rho0, rhoh0, h0 and p0
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(rho0_cart[i], 0, dest_comp, 1);
-            plot_mf_data[i]->copy(rhoh0_cart[i], 0, dest_comp + 1, 1);
-            plot_mf_data[i]->copy(rhoh0_cart[i], 0, dest_comp + 2, 1);
+            plot_mf_data[i]->ParallelCopy(rho0_cart[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(rhoh0_cart[i], 0, dest_comp + 1, 1);
+            plot_mf_data[i]->ParallelCopy(rhoh0_cart[i], 0, dest_comp + 2, 1);
 
             // we have to use protected_divide here to guard against division by zero
             // in the case that there are zeros rho0
@@ -536,7 +535,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
                     plot_mf_data_mf[mfi], dest_comp, dest_comp + 2);
             }
 
-            plot_mf_data[i]->copy(p0_cart[i], 0, dest_comp + 3, 1);
+            plot_mf_data[i]->ParallelCopy(p0_cart[i], 0, dest_comp + 3, 1);
         }
         dest_comp += 4;
     }
@@ -546,28 +545,28 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
 
     // MachNumber
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
     // deltagamma
     MakeDeltaGamma(s_in, p0_in, p0_cart, gamma1bar_in, gamma1bar_cart, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
     // entropy
     MakeEntropy(s_in, tempmf);
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
     // entropypert = (entropy - entropybar) / entropybar
     {
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
 
         Average(tempmf, tempbar_plot, 0);
@@ -584,7 +583,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         // pidivu
         MakePiDivu(u_in, s_in, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
@@ -601,14 +600,14 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         // ad_excess
         MakeAdExcess(s_in, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
 
     // S
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(S_cc_in[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(S_cc_in[i], 0, dest_comp, 1);
     }
     ++dest_comp;
 
@@ -616,7 +615,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_cs) {
         CsfromRhoH(s_in, p0_cart, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
@@ -625,7 +624,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_grav) {
         MakeGrav(rho0_new, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         ++dest_comp;
     }
@@ -633,14 +632,14 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (plot_base_state) {
         // w0
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(w0_cart[i], 0, dest_comp, AMREX_SPACEDIM);
+            plot_mf_data[i]->ParallelCopy(w0_cart[i], 0, dest_comp, AMREX_SPACEDIM);
         }
         dest_comp += AMREX_SPACEDIM;
 
         // divw0
         MakeDivw0(w0mac, tempmf);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         }
         dest_comp++;
     }
@@ -669,14 +668,14 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
         }
     }
     for (int i = 0; i <= finest_level; ++i) {
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
     }
     dest_comp++;
 
     // conductivity
     for (int i = 0; i <= finest_level; ++i) {
         tempmf[i].setVal(0.);
-        plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+        plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
         MultiFab::Subtract(*plot_mf_data[i], Tcoeff[i], 0, dest_comp, 1, 0);
     }
     dest_comp++;
@@ -685,8 +684,8 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     if (spherical) {
         MakeVelrc(u_in, w0r_cart, tempmf, tempmf_scalar1);
         for (int i = 0; i <= finest_level; ++i) {
-            plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
-            plot_mf_data[i]->copy(tempmf_scalar1[i], 0, dest_comp + 1, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
+            plot_mf_data[i]->ParallelCopy(tempmf_scalar1[i], 0, dest_comp + 1, 1);
         }
         dest_comp += 2;
     }
@@ -704,7 +703,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
                 // scalar2 = dt * kappa
                 tempmf_scalar2[i].setVal(dt * sponge_kappa);
                 // plot_mf = 1
-                plot_mf_data[i]->copy(tempmf_scalar1[i], 0, dest_comp, 1);
+                plot_mf_data[i]->ParallelCopy(tempmf_scalar1[i], 0, dest_comp, 1);
                 // plot_mf = 1/sponge
                 MultiFab::Divide(*plot_mf_data[i], tempmf[i], 0, dest_comp, 1,
                                  0);
@@ -717,7 +716,7 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
             }
         } else {
             for (int i = 0; i <= finest_level; ++i) {
-                plot_mf_data[i]->copy(tempmf[i], 0, dest_comp, 1);
+                plot_mf_data[i]->ParallelCopy(tempmf[i], 0, dest_comp, 1);
             }
         }
         dest_comp++;
@@ -758,7 +757,7 @@ Vector<const MultiFab*> Maestro::SmallPlotFileMF(
         for (auto n = 0; n < nPlot; n++) {
             if (it == varnames[n]) {
                 for (int i = 0; i <= finest_level; ++i) {
-                    plot_mf_data[i]->copy(*(mf[i]), n, dest_comp, 1);
+                    plot_mf_data[i]->ParallelCopy(*(mf[i]), n, dest_comp, 1);
                 }
                 ++dest_comp;
                 break;
@@ -1219,9 +1218,6 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << "\n\n";
 
         // species info
-        Real Aion = 0.0;
-        Real Zion = 0.0;
-
         int mlen = 20;
 
         jobInfoFile << PrettyLine;
@@ -1249,19 +1245,10 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << PrettyLine;
 
         // ParmParse::dumpTable(jobInfoFile, true);
+#include "extern_job_info_tests.H"
 #include "maestro_job_info_tests.H"
 
         jobInfoFile.close();
-
-        // now the external parameters
-        const int jobinfo_file_length = FullPathJobInfoFile.length();
-        Vector<int> jobinfo_file_name(jobinfo_file_length);
-
-        for (int i = 0; i < jobinfo_file_length; i++) {
-            jobinfo_file_name[i] = FullPathJobInfoFile[i];
-        }
-
-        runtime_pretty_print(jobinfo_file_name.dataPtr(), &jobinfo_file_length);
     }
 }
 
@@ -1333,6 +1320,9 @@ void Maestro::MakeMagvel(
     const Vector<MultiFab>& vel,
     const Vector<std::array<MultiFab, AMREX_SPACEDIM> >& w0mac,
     Vector<MultiFab>& magvel) {
+
+    amrex::ignore_unused(w0mac);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeMagvel()", MakeMagvel);
 
@@ -2259,6 +2249,10 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
                              const BaseState<Real>& gamma1bar,
                              const Vector<MultiFab>& gamma1bar_cart,
                              Vector<MultiFab>& deltagamma) {
+
+    amrex::ignore_unused(p0);
+    amrex::ignore_unused(gamma1bar);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDeltaGamma()", MakeDeltaGamma);
 

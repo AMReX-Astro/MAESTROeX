@@ -105,19 +105,18 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-&probin
+problem.velpert_amplitude = 1.e5
+problem.velpert_radius = 2.e7
+problem.velpert_scale = 1.e7
+problem.velpert_steep = 1.e5
+problem.tag_density_1 = 6.8e9
+problem.tag_density_2 = 1.e8
+problem.tag_density_3 = 1.e8
+problem.particle_temp_cutoff = 6.e8
+problem.particle_tpert_threshold = 2.e7
 
-  velpert_amplitude = 1.e5
-  velpert_radius = 2.e7
-  velpert_scale = 1.e7
-  velpert_steep = 1.e5
-  tag_density_1 = 6.8e9
-  tag_density_2 = 1.e8
-  tag_density_3 = 1.e8
-  particle_temp_cutoff = 6.e8
-  particle_tpert_threshold = 2.e7
+eos.use_eos_coulomb = 1
 
-  use_eos_coulomb = T
-  retry_burn = T
-/
+integrator.retry_burn = 1
+
 

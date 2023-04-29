@@ -1,12 +1,12 @@
 # This is a port of production/new/6cm-1536w/inputs_2d_6.0cm in MAESTRO
 
 # INITIAL MODEL
-maestro.model_file = "xrb_new.hse.dx_6.000cm"
+maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12cm.dx_6cm"
 maestro.perturb_model = true
 
 # PROBLEM SIZE
 geometry.prob_lo     =  0.0       0.0
-geometry.prob_hi     =  2304.0e0  9216.0e0
+geometry.prob_hi     =  1152.0    4608.0
 
 # BOUNDARY CONDITIONS
 # 0 = Interior   3 = Symmetry
@@ -23,8 +23,8 @@ maestro.v              = 1       # verbosity
 amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 384 1536
-amr.max_grid_size      = 64
+amr.n_cell             = 192 768
+amr.max_grid_size      = 128
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
@@ -36,7 +36,7 @@ maestro.temperr = 6.5e8 6.5e8 6.5e8
 
 # TIME STEPPING
 maestro.max_step  = 30000000
-maestro.stop_time = 2.5e-3
+maestro.stop_time = 1.0
 maestro.cfl       = 0.7    # cfl number for hyperbolic system
                            # In this test problem, the velocity is
 		           # time-dependent.  We could use 0.9 in
@@ -46,8 +46,8 @@ maestro.cfl       = 0.7    # cfl number for hyperbolic system
 # ALGORITHMIC OPTIONS
 maestro.spherical = 0
 maestro.do_initial_projection = true
-maestro.init_divu_iter        = 3
-maestro.init_iter             = 3
+maestro.init_divu_iter        = 1
+maestro.init_iter             = 1
 
 maestro.grav_const = -2.45e14
 
@@ -72,13 +72,13 @@ maestro.ppm_type = 1
 # PLOTFILES
 maestro.plot_base_name  = xrb_    # root name of plot file
 maestro.plot_int   = -1      # number of timesteps between plot files
-maestro.plot_deltat = 5.e-4
+maestro.plot_deltat = 1.e-3
 maestro.small_plot_base_name = smallxrb_
-maestro.small_plot_deltat = 1.e-5
+maestro.small_plot_deltat = 1.e-4
 
 # CHECKPOINT
 maestro.check_base_name = chk
-maestro.chk_int         = -1
+maestro.chk_int         = 1000
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-10
@@ -107,35 +107,31 @@ maestro.mg_bottom_solver = 4
 maestro.hg_bottom_solver = 4
 maestro.max_mg_bottom_nlevels = 4
 
-&probin
+# override the default values of the probin namelist values here
+# temperature perturbation
+problem.xrb_pert_size = 50
+problem.xrb_pert_factor = 1.0e-5
+problem.xrb_pert_type = 1
+problem.xrb_pert_height = 1475.0
 
-  ! override the default values of the probin namelist values here
-  ! temperature perturbation
-   xrb_pert_size = 50
-   xrb_pert_factor = 1.0d-5
-   xrb_pert_type = 1
-   xrb_pert_height = 5760.d0
+# velocity perturbation
+problem.apply_vel_field = 1
+problem.velpert_scale = 1.0e2
+problem.velpert_amplitude = 1.0e5
+problem.velpert_height_loc = 1460.0
+problem.velpert_steep = 12.0e0
+problem.num_vortices = 8
 
-   ! velocity perturbation
-   apply_vel_field    = T
-   velpert_scale      = 1.0d2
-   velpert_amplitude  = 1.0d5
-   velpert_height_loc = 5750.0
-   velpert_steep      = 12.0d0
-   num_vortices = 8
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
 
-  !extern
+eos.use_eos_coulomb = 1
 
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
+integrator.jacobian = 2
+integrator.atol_spec = 1.e-8
+integrator.rtol_spec = 1.e-5
 
-  !eos_gamma = 1.6666666d0
-  use_eos_coulomb = T
-
-/

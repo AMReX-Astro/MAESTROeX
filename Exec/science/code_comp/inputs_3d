@@ -95,26 +95,11 @@ maestro.eps_hg_bottom      = 1.e-4
 
 maestro.do_burning = false
 
-&probin
+# override the default values of the probin namelist values here
+problem.heating_factor = 9.020952262e19
+problem.g0 = -9.021899571e8
+problem.rho_0 = 1.82094e6
+problem.p_0 = 2.7647358e23
+problem.gamma1 = 1.3e0
 
-  ! override the default values of the probin namelist values here
-  heating_factor = 9.020952262e19
-  g0 = -9.021899571e8
-  rho_0 = 1.82094e6
-  p_0 = 2.7647358e23
-  gamma1 = 1.3e0
-
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  eos_gamma = 1.66666667d0
-
-/
+eos.eos_gamma = 1.66666667d0

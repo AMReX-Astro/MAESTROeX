@@ -36,17 +36,14 @@ maestro.chk_int         = -1
 maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
 
-&probin
+problem.heating_time  = 0.5e0
+problem.heating_rad   = 5.850e7
+problem.heating_peak  = 9.065e9
+problem.heating_sigma = 7.208e13
+problem.cooling_rad   = 3.002e7
+problem.cooling_peak  = -1.792e10
+problem.cooling_sigma = 4.169e13
 
- heating_time  = 0.5d0
- heating_rad   = 5.850d7
- heating_peak  = 9.065d9
- heating_sigma = 7.208d13
- cooling_rad   = 3.002d7
- cooling_peak  = -1.792d10
- cooling_sigma = 4.169d13
+problem.prob_type = 4
 
- prob_type = 4
-
- use_eos_coulomb = T
-/
+eos.use_eos_coulomb = 1
