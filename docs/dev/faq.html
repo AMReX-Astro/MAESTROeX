@@ -235,22 +235,12 @@ be processed with <code class="docutils literal notranslate"><span class="pre">g
 line-by-line information can be obtained by passing the <code class="docutils literal notranslate"><span class="pre">-l</span></code>
 argument to <code class="docutils literal notranslate"><span class="pre">gprof</span></code>.</p>
 </li>
-<li><p><em>How can I force MAESTROeX to abort?</em></p>
-<p>In the output directory, do <code class="docutils literal notranslate"><span class="pre">touch</span> <span class="pre">.abort_maestro</span></code>. This
-will cause the code to write out a final checkpoint file, free up
-any allocated memory, and gracefully exit. Be sure to remove the
-<code class="docutils literal notranslate"><span class="pre">.abort_maestro</span></code> file before restarting the code in the
-same directory.</p>
-</li>
-<li><p><em>When I run I get the error</em></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">reading</span> <span class="n">extern</span> <span class="n">runtime</span> <span class="n">parameters</span> <span class="o">...</span>
-<span class="n">ERROR</span><span class="p">:</span> <span class="n">problem</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">namelist</span>
-</pre></div>
-</div>
-<p>This error can occur when MAESTROeX reads in an extern runtime parameter it
-does not understand or is not expecting. A common example is if the problem
-is built with the helmholtz EoS, but the extern namelist has gamma law
-parameters.</p>
+<li><p><em>How can I force MAESTROeX to output?</em></p>
+<p>To generate a checkpoint file, in the output directory do:</p>
+<p>For a plotfile:</p>
+<p>or a small plotfile:</p>
+<p>At the end of a timestep, the code will check if these files exist
+and if so do an output and then remove the file.</p>
 </li>
 <li><p><em>How can I check the compilation parameters of a MAESTROeX executable?</em></p>
 <p>The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as</p>
