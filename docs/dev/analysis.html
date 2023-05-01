@@ -12,6 +12,8 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
@@ -134,16 +136,16 @@
            <div itemprop="articleBody">
              
   <section id="analysis">
-<span id="sec-analysis"></span><h1>Analysis<a class="headerlink" href="#analysis" title="Permalink to this heading">¶</a></h1>
+<span id="sec-analysis"></span><h1>Analysis<a class="headerlink" href="#analysis" title="Permalink to this heading"></a></h1>
 <section id="the-postprocessing-routines">
-<h2>The Postprocessing Routines<a class="headerlink" href="#the-postprocessing-routines" title="Permalink to this heading">¶</a></h2>
+<h2>The Postprocessing Routines<a class="headerlink" href="#the-postprocessing-routines" title="Permalink to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Plotfile/</span></code> directory contains a large
 number of C++-based analysis routines for AMReX datasets. Many
 of these can be used with both MAESTROeX and the compressible
 astrophysics code, CASTRO.</p>
 <p>To compile these routines, run <code class="docutils literal notranslate"><span class="pre">make</span></code> in the directory.</p>
 <section id="general-analysis-routines">
-<h3>General Analysis Routines<a class="headerlink" href="#general-analysis-routines" title="Permalink to this heading">¶</a></h3>
+<h3>General Analysis Routines<a class="headerlink" href="#general-analysis-routines" title="Permalink to this heading"></a></h3>
 <p>The following routines are generally applicable for any AMReX-based
 plotfile. Typing the executable names without any arguments will
 provide usage examples.</p>
@@ -200,7 +202,7 @@ Separate routines exist for 2-d and 3-d datasets.</div>
 </ul>
 </section>
 <section id="horizontal-averaging">
-<h3>Horizontal averaging<a class="headerlink" href="#horizontal-averaging" title="Permalink to this heading">¶</a></h3>
+<h3>Horizontal averaging<a class="headerlink" href="#horizontal-averaging" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Postprocessing/</span></code> directory contains a few more complex
 analysis routines for working with AMReX-based plotfiles.</p>
 <p>Of particular use for MAESTROeX data is the <code class="docutils literal notranslate"><span class="pre">HorizontalAvg.cpp</span></code> routine.
