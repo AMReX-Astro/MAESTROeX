@@ -114,7 +114,7 @@ namespace: ``maestro``
 | ``min_eff``                            | parameter for cluster algorithm for making new grids in | 0.9           |
 |                                        | adaptive problems                                       |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``use_tpert_in_tagging``               | pass $T'$ into the tagging routines as the auxillary    | false         |
+| ``use_tpert_in_tagging``               | pass $T'$ into the tagging routines as the auxiliary    | false         |
 |                                        | multifab instead of the default $\rho H_\mathrm{nuc}$.  |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 
@@ -522,7 +522,7 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``show_center_of_mass``                | display center of mass diagnostics                      | 0             |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``hard_cfl_limit``                     | abort if we exceed CFL = 1 over the cource of a         | 1             |
+| ``hard_cfl_limit``                     | abort if we exceed CFL = 1 over the course of a         | 1             |
 |                                        | timestep                                                |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``job_name``                           | a string describing the simulation that will be copied  | ""            |
@@ -576,7 +576,7 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
-| ``sdc_iters``                          | how many SDC iteractions to take (requires the code be  | 1             |
+| ``sdc_iters``                          | how many SDC iterations to take (requires the code be   | 1             |
 |                                        | compiled with {\tt SDC := t}                            |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``sdc_couple_mac_velocity``            | recompute MAC velocity at the beginning of each SDC     | false         |

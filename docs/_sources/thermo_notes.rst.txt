@@ -189,7 +189,7 @@ Here’s where various assumptions/simplifications get used.
    chemical equilibrium. Or both of these terms can be neglected in
    the rising parcel. This would be justified if the timescale for
    reactions is long compared to the convective timescale, and either
-   the same is ture for ionization or the fluid is fully ionized.
+   the same is true for ionization or the fluid is fully ionized.
 
 #. If we assume that :math:`\bar{\mu}` remains constant in the parcel, then
    :math:`\frac{d \ln \bar{\mu}}{d \ln P}` drops out for the parcel. In this case,
@@ -208,7 +208,7 @@ Here’s where various assumptions/simplifications get used.
    adiabatically.
 
 #. If we assume
-   that the background is in chemical equilibrium and the parcel acheives
+   that the background is in chemical equilibrium and the parcel achieves
    instantaneous chemical equilibrium, then :math:`\bar{\mu} = \bar{\mu}(\rho,T)` for
    the background and the parcel. (Note that we aren’t requiring constant
    composition in the parcel here.)
@@ -231,7 +231,7 @@ Here’s where various assumptions/simplifications get used.
 
    .. math:: d \rho = \frac{\partial \rho}{\partial P} \bigg |_{S} d P + \frac{\partial \rho}{\partial S} \bigg |_{P} dS
 
-   We can subsitute this into :eq:`eqn:basicStability` for stability,
+   We can substitute this into :eq:`eqn:basicStability` for stability,
    and assuming the parcel moves adiabatically, we get
 
    .. math::
@@ -255,7 +255,7 @@ Here’s where various assumptions/simplifications get used.
 
 Determining which stability criterion we want to enforce in creating the
 initial model is complicated by the phenomenon of semiconvection, which
-occurs when the Ledoux criterion is statisfied but the Schwarzchild is not,
+occurs when the Ledoux criterion is satisfied but the Schwarzchild is not,
 i.e.
 
 .. math::
@@ -270,15 +270,15 @@ i.e.
 to mass per particle, and :math:`\frac{d \ln \bar{\mu}}{d \ln P}` is positive, since
 nuclear reactions sythesize more massive particles in the center of the star.)
 In this case, when a rising parcel eventually reaches neutral buoyancy, it will
-have a temperature excess in comparision to it’s surroundings.
+have a temperature excess in comparison to it’s surroundings.
 If the parcel can retain
-it’s identitiy against diffusive mixing with the background long enough for
-significant heat exhange to occur, then the parcel’s temperature will drop, it
+it’s identity against diffusive mixing with the background long enough for
+significant heat exchange to occur, then the parcel’s temperature will drop, it
 will contract increasing it’s density, and the parcel will move inwards.
 The time scale of semiconvection is much longer than the timescale of
 traditional convection.
 
-When we set up an initial model, we want to minimize any initial tendancy
+When we set up an initial model, we want to minimize any initial tendency
 towards convective motions, as we want these to be driven by the heating due
 to nuclear reactions,
 not the initial configuration we supply. Thus I think we want to guard against
