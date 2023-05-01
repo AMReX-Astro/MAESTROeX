@@ -1,3 +1,12 @@
+# 23.05
+
+  * MAESTROeX now monitors the burn_t success flag and aborts if there
+    is a failure.  Previously there was not an abort on GPUs (#379)
+
+  * We can now force a checkpoint or a plotfile by "touch"-ing
+    "dump_and_continue", "plot_and_continue", and
+    "small_plot_and_continue" in the output directory (#377)
+
 # 23.03
 
   * Fixed some clang-tidy issues and compiler warnings (#356, #359,
