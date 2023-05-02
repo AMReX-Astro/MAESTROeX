@@ -40,7 +40,11 @@ void Maestro::WritePlotFile(const int step, const Real t_in, const Real dt_in,
     step_array.resize(maxLevel() + 1, step);
 
     if (step == 2) {
+#if AMREX_SPACEDIM == 2
+        const Vector<std::string> varnames = {"gphix", "gphiy"};
+#else
         const Vector<std::string> varnames = {"gphix", "gphiy", "gphiz"};
+#endif
         const auto& mf = PlotFileMF(nPlot, t_in, dt_in, dummy, dummy, dummy,
                                     dummy, u_in, e, b, b, dummy);
         WriteMultiLevelPlotfile(plotfilename, finest_level + 1, mf, varnames,
