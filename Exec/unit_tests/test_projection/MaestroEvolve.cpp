@@ -131,7 +131,8 @@ void Maestro::Evolve() {
         }
 
         AverageDown(uold, 0, AMREX_SPACEDIM);
-        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+        int variable_type = 1;
+        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, variable_type);
 
     } else {
         // need to initialize the mac velocity
@@ -433,7 +434,8 @@ void Maestro::Evolve() {
 
         // fill ghosts and boundary
         AverageDown(umid, 0, AMREX_SPACEDIM);
-        FillPatch(t_old, umid, umid, umid, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+        int variable_type = 1;
+        FillPatch(t_old, umid, umid, umid, 0, 0, AMREX_SPACEDIM, 0, bcs_u, variable_type);
 
         // write umid
         WritePlotFile(1, t_new, dt, dummy, dummy, dummy, dummy, umid, uold,
