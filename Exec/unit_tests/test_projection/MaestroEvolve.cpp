@@ -1,6 +1,6 @@
 
 #include <Maestro.H>
-#include <Problem_F.H>
+#include <extern_parameters.H>
 
 using namespace amrex;
 
@@ -10,9 +10,6 @@ void Maestro::Evolve() {
     BL_PROFILE_VAR("Maestro::Evolve()", Evolve);
 
     Print() << "Calling Evolve()" << std::endl;
-
-    int project_type;
-    get_project_type(&project_type);
 
     // -------------------------------------------------------------------------
     //  allocate arrays
@@ -90,6 +87,7 @@ void Maestro::Evolve() {
         for (int lev = 0; lev <= finest_level; ++lev) {
             MultiFab& vel = uold[lev];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
             // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -97,16 +95,44 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(vel, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                init_vel(ARLIM_3D(lo), ARLIM_3D(hi), BL_TO_FORTRAN_3D(vel[mfi]),
-                         ZFILL(dx));
+                Array4<Real> const vel_arr = vel.array(mfi);
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                    Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM == 3)
+                    Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if (AMREX_SPACEDIM==2)
+                    vel_arr(i,j,k,0) = -std::pow(std::sin(M_PI*x), 2) * std::sin(2.0_rt*M_PI*y);
+                    vel_arr(i,j,k,1) = std::pow(std::sin(M_PI*y), 2) * std::sin(2.0_rt*M_PI*x);
+
+#else
+                    vel_arr(i,j,k,0) =
+                        2.0_rt * M_PI * std::sin(4.0_rt*M_PI*x) * std::cos(2.0_rt*M_PI*y) -
+                        4.0_rt * M_PI * std::sin(2.0_rt*M_PI*x) * std::cos(4.0_rt*M_PI*z);
+
+                    vel_arr(i,j,k,1) =
+                        2.0_rt * M_PI * std::sin(4.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*z) -
+                        4.0_rt * M_PI * std::cos(4.0_rt*M_PI*x) * std::sin(2.0_rt*M_PI*y);
+
+                    vel_arr(i,j,k,2) =
+                        2.0_rt * M_PI * std::cos(2.0_rt*M_PI*x) * std::sin(4.0_rt*M_PI*z) -
+                        4.0_rt * M_PI * std::cos(4.0_rt*M_PI*y) * std::sin(2.0_rt*M_PI*z);
+#endif
+                });
             }
+
         }
 
         AverageDown(uold, 0, AMREX_SPACEDIM);
-        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+        int variable_type = 1;
+        FillPatch(t_old, uold, uold, uold, 0, 0, AMREX_SPACEDIM, 0, bcs_u, variable_type);
 
     } else {
         // need to initialize the mac velocity
@@ -115,22 +141,80 @@ void Maestro::Evolve() {
             MultiFab& vmac_mf = umac_old[lev][1];
             MultiFab& wmac_mf = umac_old[lev][2];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
-                const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                init_mac_vel(ARLIM_3D(lo), ARLIM_3D(hi),
-                             BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                             BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                             BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                Array4<Real> const umac_arr = umac_mf.array(mfi);
+                Array4<Real> const vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
+                Array4<Real> const wmac_arr = wmac_mf.array(mfi);
 #endif
-                             ZFILL(dx));
+
+                // x-velocity  (x are edges, y and z are centers)
+
+                amrex::ParallelFor(mfi.nodaltilebox(0),
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    Real x = static_cast<Real>(i) * dx[0] + prob_lo[0];
+                    Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                    Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if (AMREX_SPACEDIM==2)
+                    umac_arr(i,j,k) = -std::pow(std::sin(M_PI*x), 2) * std::sin(2.0_rt*M_PI*y);
+#else
+                    umac_arr(i,j,k) =
+                        2.0_rt * M_PI * std::sin(4.0_rt*M_PI*x) * std::cos(2.0_rt*M_PI*y) -
+                        4.0_rt * M_PI * std::sin(2.0_rt*M_PI*x) * std::cos(4.0_rt*M_PI*z);
+#endif
+                });
+
+                // y-velocity  (x and z are centers, y are edges)
+
+                amrex::ParallelFor(mfi.nodaltilebox(1),
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                    Real y = static_cast<Real>(j) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                    Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if AMREX_SPACEDIM == 2
+                    vmac_arr(i,j,k) = std::pow(std::sin(M_PI*y), 2) * std::sin(2.0_rt*M_PI*x);
+#else
+
+                    vmac_arr(i,j,k) =
+                        2.0_rt * M_PI * std::sin(4.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*z) -
+                        4.0_rt * M_PI * std::cos(4.0_rt*M_PI*x) * std::sin(2.0_rt*M_PI*y);
+#endif
+                });
+
+#if (AMREX_SPACEDIM == 3)
+                // z-velocity  (x and y are centers, z are edges)
+
+                amrex::ParallelFor(mfi.nodaltilebox(2),
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                    Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+                    Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
+
+                    wmac_arr(i,j,k) =
+                        2.0_rt * M_PI * std::cos(2.0_rt*M_PI*x) * std::sin(4.0_rt*M_PI*z) -
+                        4.0_rt * M_PI * std::cos(4.0_rt*M_PI*y) * std::sin(2.0_rt*M_PI*z);
+
+                });
+#endif
+
             }
         }
 
@@ -175,18 +259,28 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
+                auto wmac_arr = wmac_mf.array(mfi);
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
+#endif
+
+                });
             }
         }
+
         // write umac_old
         WritePlotFile(0, t_new, dt, dummy, dummy, dummy, dummy, utemp, uold,
                       uold);
@@ -212,25 +306,136 @@ void Maestro::Evolve() {
             MultiFab& gphi_mf = gphi[lev];
             MultiFab& umid_mf = umid[lev];
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
 
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
+            FArrayBox phi;
+
             for (MFIter mfi(gphi_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
+                const Box& gbox = amrex::grow(tilebox, 1);
 
-                add_grad_scalar(ARLIM_3D(lo), ARLIM_3D(hi),
-                                BL_TO_FORTRAN_FAB(gphi_mf[mfi]),
-                                BL_TO_FORTRAN_FAB(umid_mf[mfi]),
-                                phys_bc.dataPtr(), ZFILL(dx));
+                if (   phys_bc[0] == SlipWall
+                    && phys_bc[1] == SlipWall
+#if AMREX_SPACEDIM == 3
+                    && phys_bc[2] == SlipWall
+#endif
+                    && phys_bc[AMREX_SPACEDIM] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM+1] == SlipWall
+#if AMREX_SPACEDIM == 3
+                    && phys_bc[AMREX_SPACEDIM+2] == SlipWall
+#endif
+                    ) {
+
+                    Array4<Real> const gphi_arr = gphi_mf.array(mfi);
+                    Array4<Real> const umid_arr = umid_mf.array(mfi);
+
+                    amrex::ParallelFor(tilebox,
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if AMREX_SPACEDIM == 3
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if AMREX_SPACEDIM == 2
+                        gphi_arr(i,j,k,0) = 4.0_rt * x * (1.0_rt - x);
+                        gphi_arr(i,j,k,1) = 4.0_rt * y * (1.0_rt - y);
+#else
+                        gphi_arr(i,j,k,0) = 160.0_rt * x * (1.0_rt - x);
+                        gphi_arr(i,j,k,1) = 160.0_rt * y * (1.0_rt - y);
+                        gphi_arr(i,j,k,2) = 160.0_rt * z * (1.0_rt - z);
+#endif
+
+                        umid_arr(i,j,k,0) += gphi_arr(i,j,k,0);
+                        umid_arr(i,j,k,1) += gphi_arr(i,j,k,1);
+#if AMREX_SPACEDIM == 3
+                        umid_arr(i,j,k,2) += gphi_arr(i,j,k,2);
+#endif
+
+                        });
+
+                } else if (    phys_bc[0] == Interior
+                            && phys_bc[1] == Interior
+#if AMREX_SPACEDIM == 3
+                            && phys_bc[2] == Interior
+#endif
+                            && phys_bc[AMREX_SPACEDIM] == Interior
+                            && phys_bc[AMREX_SPACEDIM+1] == Interior
+#if AMREX_SPACEDIM == 3
+                            && phys_bc[AMREX_SPACEDIM+2] == Interior
+#endif
+                ) {
+
+                    // first fill phi on a local FAB on a grown tile box
+
+                    phi.resize(gbox, 1);
+                    Elixir elix_phi = phi.elixir();
+                    auto phi_arr = phi.array();
+
+                    // now we can explicitly difference phi
+
+                    amrex::ParallelFor(gbox,
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if AMREX_SPACEDIM == 3
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if AMREX_SPACEDIM == 2
+                        //std::cout << "here: " << i << " " << j << " " << k << std::endl;
+                        phi_arr(i,j,k) = 0.1_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x);
+#else
+                        phi_arr(i,j,k) = 5.0_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x) * std::cos(2.0_rt*M_PI*z);
+#endif
+
+                    });
+
+                    Array4<Real> const gphi_arr = gphi_mf.array(mfi);
+                    Array4<Real> const umid_arr = umid_mf.array(mfi);
+
+
+                    amrex::ParallelFor(tilebox,
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+                        gphi_arr(i,j,k,0) = (phi_arr(i+1,j,k) - phi_arr(i-1,j,k)) / (2.0_rt * dx[0]);
+                        gphi_arr(i,j,k,1) = (phi_arr(i,j+1,k) - phi_arr(i,j-1,k)) / (2.0_rt * dx[1]);
+#if (AMREX_SPACEDIM==3)
+                        gphi_arr(i,j,k,2) = (phi_arr(i,j,k+1) - phi_arr(i,j,k-1)) / (2.0_rt * dx[2]);
+#endif
+
+                        umid_arr(i,j,k,0) += gphi_arr(i,j,k,0);
+                        umid_arr(i,j,k,1) += gphi_arr(i,j,k,1);
+#if (AMREX_SPACEDIM==3)
+                        umid_arr(i,j,k,2) += gphi_arr(i,j,k,2);
+#endif
+
+                    });
+
+                } else {
+                    amrex::Error("Not set up for these boundary conditions");
+                }
             }
         }
 
         // fill ghosts and boundary
         AverageDown(umid, 0, AMREX_SPACEDIM);
-        FillPatch(t_old, umid, umid, umid, 0, 0, AMREX_SPACEDIM, 0, bcs_u);
+        int variable_type = 1;
+        FillPatch(t_old, umid, umid, umid, 0, 0, AMREX_SPACEDIM, 0, bcs_u, variable_type);
 
         // write umid
         WritePlotFile(1, t_new, dt, dummy, dummy, dummy, dummy, umid, uold,
@@ -260,31 +465,228 @@ void Maestro::Evolve() {
             MultiFab& wmac_mid_mf = umac_mid[lev][2];
 #endif
             const Real* dx = geom[lev].CellSize();
+            const auto prob_lo = geom[lev].ProbLoArray();
+
 #ifdef _OPENMP
 #pragma omp parallel
 #endif
+            FArrayBox phi;
+
             for (MFIter mfi(gphix_mac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
+                const Box& gbox = amrex::grow(tilebox, 1);
 
-                // NOTE: I have no idea what 'box_phys_bc' is in MAESTROeX, so am
-                // just going to pass in bcs_u[0].data, as is used for velpred
-                // and mkutrans
+                if (   phys_bc[0] == SlipWall
+                    && phys_bc[1] == SlipWall
+#if AMREX_SPACEDIM == 3
+                    && phys_bc[2] == SlipWall
+#endif
+                    && phys_bc[AMREX_SPACEDIM] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM+1] == SlipWall
+#if AMREX_SPACEDIM == 3
+                    && phys_bc[AMREX_SPACEDIM+2] == SlipWall
+#endif
+                    ) {
 
-                add_grad_scalar_mac(ARLIM_3D(lo), ARLIM_3D(hi),
-                                    BL_TO_FORTRAN_3D(gphix_mac_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(gphiy_mac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                    BL_TO_FORTRAN_3D(gphiz_mac_mf[mfi]),
+
+                    // Add on the gradient of a scalar (phi) that satisfies
+                    // grad(phi).n = 0.
+
+                    // x-velocity  (x are edges, y and z are centers)
+
+                    Array4<Real> const gphix_arr = gphix_mac_mf.array(mfi);
+                    Array4<Real> const umac_arr = umac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(0),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
 #endif
-                                    BL_TO_FORTRAN_3D(umac_mid_mf[mfi]),
-                                    BL_TO_FORTRAN_3D(vmac_mid_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                    BL_TO_FORTRAN_3D(wmac_mid_mf[mfi]),
+
+#if AMREX_SPACEDIM == 2
+                        gphix_arr(i,j,k) = 4.0_rt * x * (1.0_rt - x);
+#else
+                        gphix_arr(i,j,k) = 160.0_rt * x * (1.0_rt - x);
 #endif
-                                    phys_bc.dataPtr(), bcs_u[0].data(),
-                                    ZFILL(dx));
+                        umac_arr(i,j,k) += gphix_arr(i,j,k);
+
+                    });
+
+                    // y-velocity  (x and z are centers, y are edges)
+
+                    Array4<Real> const gphiy_arr = gphiy_mac_mf.array(mfi);
+                    Array4<Real> const vmac_arr = vmac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(1),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = static_cast<Real>(j) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+#if AMREX_SPACEDIM == 2
+                        gphiy_arr(i,j,k) = 4.0_rt * y * (1.0_rt - y);
+#else
+                        gphiy_arr(i,j,k) = 160.0_rt * y * (1.0_rt - y);
+#endif
+                        vmac_arr(i,j,k) += gphiy_arr(i,j,k);
+
+                    });
+
+#if (AMREX_SPACEDIM==3)
+
+                    // z-velocity  (x and y are centers, z are edges)
+
+                    Array4<Real> const gphiz_arr = gphiz_mac_mf.array(mfi);
+                    Array4<Real> const wmac_arr = wmac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(2),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+                        Real z = static_cast<Real>(k) * dx[2] + prob_lo[2];
+
+                        gphiz_arr(i,j,k) = 160.0_rt * z * (1.0_rt - z);
+                        wmac_arr(i,j,k) += gphiz_arr(i,j,k);
+
+                    });
+#endif
+
+                } else if (    phys_bc[0] == Interior
+                            && phys_bc[1] == Interior
+#if AMREX_SPACEDIM == 3
+                            && phys_bc[2] == Interior
+#endif
+                            && phys_bc[AMREX_SPACEDIM] == Interior
+                            && phys_bc[AMREX_SPACEDIM+1] == Interior
+#if AMREX_SPACEDIM == 3
+                            && phys_bc[AMREX_SPACEDIM+2] == Interior
+#endif
+                ) {
+
+                    // first fill phi on a local FAB on a grown tile box
+
+                    phi.resize(gbox, 1);
+                    Elixir elix_phi = phi.elixir();
+                    auto phi_arr = phi.array();
+
+                    // now we can explicitly difference phi
+
+                    amrex::ParallelFor(gbox,
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = (static_cast<Real>(i)+0.5_rt) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+
+#if AMREX_SPACEDIM == 2
+                        phi_arr(i,j,k) = 0.1_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x);
+#else
+                        phi_arr(i,j,k) = 5.0_rt * std::cos(2.0_rt*M_PI*y) * std::cos(2.0_rt*M_PI*x) * std::cos(2.0_rt*M_PI*z);
+#endif
+
+                    });
+
+                    // lo and hi for the valid box for imposing BCs
+
+                    const Box& tilebox = mfi.tilebox();
+                    const int* lo = tilebox.loVect();
+                    const int* hi = tilebox.hiVect();
+
+                    // x-velocity  (x are edges, y and z are centers)
+
+                    Array4<Real> const gphix_arr = gphix_mac_mf.array(mfi);
+                    Array4<Real> const umac_arr = umac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(0),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        Real x = static_cast<Real>(i) * dx[0] + prob_lo[0];
+                        Real y = (static_cast<Real>(j)+0.5_rt) * dx[1] + prob_lo[1];
+#if (AMREX_SPACEDIM==3)
+                        Real z = (static_cast<Real>(k)+0.5_rt) * dx[2] + prob_lo[2];
+#endif
+
+                        gphix_arr(i,j,k) = (phi_arr(i,j,k) - phi_arr(i-1,j,k)) / dx[0];
+                        umac_arr(i,j,k) += gphix_arr(i,j,k);
+
+                        // impose BCs
+                        if (phys_bc[0] == SlipWall && i == lo[0]) {
+                            umac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                        if (phys_bc[AMREX_SPACEDIM] == SlipWall && i == hi[0]+1) {
+                            umac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                    });
+
+                    // y-velocity  (x and z are centers, y are edges)
+
+                    Array4<Real> const gphiy_arr = gphiy_mac_mf.array(mfi);
+                    Array4<Real> const vmac_arr = vmac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(1),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        gphiy_arr(i,j,k) = (phi_arr(i,j,k) - phi_arr(i,j-1,k)) / dx[1];
+                        vmac_arr(i,j,k) += gphiy_arr(i,j,k);
+
+                        // impose BCs
+                        if (phys_bc[1] == SlipWall && j == lo[1]) {
+                            vmac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                        if (phys_bc[AMREX_SPACEDIM+1] == SlipWall && j == hi[1]+1) {
+                            vmac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                    });
+
+#if (AMREX_SPACEDIM==3)
+
+                    // z-velocity  (x and y are centers, z are edges)
+
+                    Array4<Real> const gphiz_arr = gphiz_mac_mf.array(mfi);
+                    Array4<Real> const wmac_arr = wmac_mid_mf.array(mfi);
+
+                    amrex::ParallelFor(mfi.nodaltilebox(2),
+                    [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                    {
+
+                        gphiz_arr(i,j,k) = (phi_arr(i,j,k) - phi_arr(i,j,k-1)) / dx[2];
+                        wmac_arr(i,j,k) += gphiz_arr(i,j,k);
+
+                        // impose BCs
+                        if (phys_bc[2] == SlipWall && k == lo[2]) {
+                            wmac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                        if (phys_bc[AMREX_SPACEDIM+2] == SlipWall && k == hi[2]+1) {
+                            wmac_arr(i,j,k) = 0.0_rt;
+                        }
+
+                    });
+#endif
+                } else {
+                    amrex::Error("Not set up for these boundary conditions");
+                }
+
             }
         }
 
@@ -317,16 +719,26 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
+                auto wmac_arr = wmac_mf.array(mfi);
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
+#endif
+
+                });
+
             }
         }
 
@@ -345,16 +757,25 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
+                auto wmac_arr = wmac_mf.array(mfi);
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
+#endif
+
+                });
             }
         }
 
@@ -492,16 +913,26 @@ void Maestro::Evolve() {
 #endif
             for (MFIter mfi(umac_mf, true); mfi.isValid(); ++mfi) {
                 const Box& tilebox = mfi.tilebox();
-                const int* lo = tilebox.loVect();
-                const int* hi = tilebox.hiVect();
 
-                convert_MAC_to_cc(ARLIM_3D(lo), ARLIM_3D(hi),
-                                  BL_TO_FORTRAN_3D(umac_mf[mfi]),
-                                  BL_TO_FORTRAN_3D(vmac_mf[mfi]),
-#if (AMREX_SPACEDIM == 3)
-                                  BL_TO_FORTRAN_3D(wmac_mf[mfi]),
+                auto utemp_arr = utemp_mf.array(mfi);
+                auto umac_arr = umac_mf.array(mfi);
+                auto vmac_arr = vmac_mf.array(mfi);
+#if AMREX_SPACEDIM == 3
+                auto wmac_arr = wmac_mf.array(mfi);
 #endif
-                                  BL_TO_FORTRAN_3D(utemp_mf[mfi]));
+
+                amrex::ParallelFor(tilebox,
+                [=] AMREX_GPU_HOST_DEVICE (int i, int j, int k)
+                {
+
+                    utemp_arr(i,j,k,0) = 0.5_rt * (umac_arr(i,j,k) + umac_arr(i+1,j,k));
+                    utemp_arr(i,j,k,1) = 0.5_rt * (vmac_arr(i,j,k) + vmac_arr(i,j+1,k));
+#if (AMREX_SPACEDIM==3)
+                    utemp_arr(i,j,k,2) = 0.5_rt * (wmac_arr(i,j,k) + wmac_arr(i,j,k+1));
+#endif
+
+                });
+
             }
         }
 
