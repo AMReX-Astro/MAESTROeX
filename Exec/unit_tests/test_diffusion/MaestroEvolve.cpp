@@ -201,4 +201,8 @@ void Maestro::Evolve() {
             std::swap(pcoeff2[lev], pcoeff1[lev]);
         }
     }
+
+    WritePlotFile(istep, t_new, dt, dummy, dummy, dummy, dummy, sold, analytic,
+                  error);
+
 }
