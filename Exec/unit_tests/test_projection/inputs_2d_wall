@@ -14,6 +14,8 @@ maestro.lo_bc = 4 4
 maestro.hi_bc = 4 4
 geometry.is_periodic =  0 0
 
+maestro.max_step = 1
+
 # PLOTFILES
 maestro.plot_base_name  = nodal_wall    # root name of plot file
 
@@ -21,11 +23,11 @@ maestro.plot_base_name  = nodal_wall    # root name of plot file
 maestro.v              = 1       # verbosity
 
 # tolerances for the initial projection
-maestro.eps_init_proj_cart = 1.e-12
+maestro.eps_init_proj_cart = 1.e-11
 maestro.eps_init_proj_sph  = 1.e-10
 
 # tolerances for the divu iterations
-maestro.eps_divu_cart      = 1.e-12
+maestro.eps_divu_cart      = 1.e-11
 maestro.eps_divu_sph       = 1.e-10
 maestro.divu_iter_factor   = 100.
 maestro.divu_level_factor  = 10.

@@ -1,6 +1,6 @@
 # INITIAL MODEL
-maestro.max_step =  60
-maestro.stop_time = 2.5
+maestro.max_step =  1000
+maestro.stop_time = 0.06
 
 # GRIDDING AND REFINEMENT
 amr.max_level          = 0       # maximum level number allowed
@@ -69,7 +69,7 @@ problem.dt_mult_factor = 1.0e0
 
 problem.outputfile = "norms.out"
 
-problem.t0 = 1.0e-1
+problem.t0 = 5.e-2
 
 problem.peak_h = 1.0e1
 problem.ambient_h = 1.0e0
