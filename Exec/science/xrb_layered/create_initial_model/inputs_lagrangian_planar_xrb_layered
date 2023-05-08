@@ -1,0 +1,17 @@
+problem.model_file = profile37.raw
+
+problem.model_prefix = xrb_layered
+
+problem.nx = 1024
+
+problem.temp_cutoff = 1.e7
+
+problem.model_shift = 1.2e6
+
+problem.xmin = 0.0
+problem.xmax = 3072.0
+
+problem.g_const = -1.29e14
+
+problem.low_density_cutoff = 1.e-2
+
