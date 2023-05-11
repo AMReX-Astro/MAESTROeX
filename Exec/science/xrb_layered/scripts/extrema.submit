@@ -1,0 +1,16 @@
+#!/bin/bash
+#SBATCH --account=m3018
+#SBATCH --constraint=cpu
+#SBATCH --nodes=1
+#SBATCH --time=01:00:00
+#SBATCH --qos=regular
+
+# Run directory
+RUN_DIR=$PSCRATCH/xrb_layered
+PLOT_DIR=PLOTS
+PLOT_BASENAME="xrb_0"
+
+VARS="tfromp MachNumber Hnuc"
+
+fextrema=$AMREX_HOME/Tools/Plotfile/fextrema.gnu.x86-milan.ex
+$fextrema -v "$VARS" $RUN_DIR/$PLOT_DIR/$PLOT_BASENAME* > $RUN_DIR/"extrema.txt"

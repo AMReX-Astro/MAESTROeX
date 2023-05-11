@@ -16,6 +16,9 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 from yt.units import cm, amu
 from yt.frontends.boxlib.api import MaestroDataset
 
+# Disable excessive printing
+yt.set_log_level(50)
+
 plotfile = sys.argv[1]
 if plotfile[-1] == '/': plotfile=plotfile[:-1]
 #ds = MaestroDataset(plotfile)
@@ -34,7 +37,6 @@ L_y = ymax - ymin
 
 
 fig = plt.figure()
-#fig.set_size_inches(10.0, 12.0)
 
 fields = ["tfromp", "MachNumber", "Hnuc", "X(h1)", "X(he4)", "X(c12)"]
 
@@ -52,7 +54,7 @@ for i, f in enumerate(fields):
         sp.set_zlim(f, 5.e7, 3.e9)
         sp.set_cmap(f, "hot")
     elif f == "Hnuc":
-        sp.set_zlim(f, 1.e16, 1.e20)
+        sp.set_zlim(f, 1.e14, 1.e20)
         sp.set_cmap(f, "inferno")
     elif f == "MachNumber":
         sp.set_zlim(f, 1.e-4, 1.e0)
@@ -84,10 +86,10 @@ for i, f in enumerate(fields):
 
     sp._setup_plots()
 
-#fig.text(0.5, 0.99, fr"time = {float(ds.current_time):8.5f} s", transform=fig.transFigure, fontsize=15)
 fig.suptitle(fr"time = {float(ds.current_time):8.5f} s", fontsize=15)
 
-fig.set_size_inches(14,14.5)
+#fig.set_size_inches(14,14.5)
+fig.set_size_inches(22,14.5)
 plt.tight_layout()
 
 basename = os.path.basename(plotfile)
