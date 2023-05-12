@@ -30,27 +30,28 @@ class Parameter:
         self.default = ""
         self.description = []
         self.category = ""
-        self.namespace=""
+        self.namespace = ""
 
     def value(self):
         """ the value is what we sort based on """
         return self.category + "." + self.var
 
     def __lt__(self, other):
-        self.value() < other.value()
+        return self.value() < other.value()
 
 
 def make_rest_table(param_files):
 
-    params_list=[]
+    params_list = []
 
     for pf in param_files:
 
         # each file is a category
-        category = os.path.basename(os.path.dirname(pf)).replace("_", r"\_")
+        category = os.path.basename(os.path.dirname(pf))
 
         # open the file
-        try: f = open(pf)
+        try:
+            f = open(pf)
         except OSError:
             sys.exit(f"ERROR: {pf} does not exist")
 
@@ -99,7 +100,10 @@ def make_rest_table(param_files):
             # find the description
             if line.startswith("#"):
                 # handle descriptions here
-                descr += line[1:].rstrip().replace("@@",r"\newline")
+                tmp = line[1:].rstrip()
+                if tmp.endswith("@@"):
+                    tmp = tmp.replace("@@", "")
+                descr += tmp
                 line = f.readline()
                 continue
 
@@ -115,7 +119,7 @@ def make_rest_table(param_files):
                 if current_param.var.startswith("("):
                     current_param.var = re.findall(r"\w+", fields[0])[0]
 
-                current_param.default = fields[2].replace("_", r"\_")
+                current_param.default = fields[2]
                 current_param.description = descr
                 current_param.category = category.strip()
                 current_param.namespace = namespace.strip()
@@ -148,6 +152,10 @@ def make_rest_table(param_files):
                 print(f"**{c}**\n")
 
             params = [q for q in params_list if q.namespace == nm and q.category == c]
+
+            # print the index stuff
+            fmt = [f"{nm}.{q.var}" for q in params]
+            print(".. index:: {}\n\n".format(", ".join(fmt)))
 
             print(MAIN_HEADER.strip())
 
