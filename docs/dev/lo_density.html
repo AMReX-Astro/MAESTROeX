@@ -17,7 +17,9 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
-        <script>window.MathJax = {"tex": {"macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}}</script>
         <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -84,10 +86,10 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#when-are-the-cutoff-coordinates-updated">When are the Cutoff Coordinates Updated?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#usage-of-cutoff-densities">Usage of Cutoff Densities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#anelastic-cutoff-density">anelastic_cutoff_density</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#base-cutoff-density">base_cutoff_density</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#burning-cutoff">burning_cutoff</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#buoyancy-cutoff-factor">buoyancy_cutoff_factor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#anelastic-cutoff-density"><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#base-cutoff-density"><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#burning-cutoff"><code class="docutils literal notranslate"><span class="pre">burning_cutoff</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#buoyancy-cutoff-factor"><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -289,8 +291,8 @@ the coordinates to the base-time values using <span class="math notranslate nohi
 </section>
 <section id="usage-of-cutoff-densities">
 <h2>Usage of Cutoff Densities<a class="headerlink" href="#usage-of-cutoff-densities" title="Permalink to this heading"></a></h2>
-<section id="anelastic-cutoff-density">
-<span id="sec-anelastic-cutoff"></span><h3>anelastic_cutoff_density<a class="headerlink" href="#anelastic-cutoff-density" title="Permalink to this heading"></a></h3>
+<span class="target" id="sec-anelastic-cutoff"></span><section id="anelastic-cutoff-density">
+<span id="index-0"></span><h3><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code><a class="headerlink" href="#anelastic-cutoff-density" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is the density below which we modify the constraint.</p>
 <ul class="simple">
 <li><p>In probin, <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default.  The user
@@ -303,9 +305,9 @@ to zero for <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_c
 if you are running with <code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span> <span class="pre">=</span> <span class="pre">T</span></code>.</p></li>
 <li><p>Some versions of sponge, use <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> in a problem dependent way.</p></li>
 </ul>
-</section>
+<span class="target" id="sec-base-cutoff-density"></span></section>
 <section id="base-cutoff-density">
-<span id="sec-base-cutoff-density"></span><h3>base_cutoff_density<a class="headerlink" href="#base-cutoff-density" title="Permalink to this heading"></a></h3>
+<span id="index-1"></span><h3><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code><a class="headerlink" href="#base-cutoff-density" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is the lowest density that we model.</p>
 <ul class="simple">
 <li><p>In probin, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default. The user
@@ -339,7 +341,7 @@ we set it to <span class="math notranslate nohighlight">\({\tt base\_cutoff\_den
 </ul>
 </section>
 <section id="burning-cutoff">
-<h3>burning_cutoff<a class="headerlink" href="#burning-cutoff" title="Permalink to this heading"></a></h3>
+<span id="index-2"></span><h3><code class="docutils literal notranslate"><span class="pre">burning_cutoff</span></code><a class="headerlink" href="#burning-cutoff" title="Permalink to this heading"></a></h3>
 <p>The burning cutoff determines where we call the reaction network to
 get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.</p>
@@ -351,7 +353,7 @@ densities below the burning cutoff, we do not call the network.</p>
 </ul>
 </section>
 <section id="buoyancy-cutoff-factor">
-<h3>buoyancy_cutoff_factor<a class="headerlink" href="#buoyancy-cutoff-factor" title="Permalink to this heading"></a></h3>
+<span id="index-3"></span><h3><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code><a class="headerlink" href="#buoyancy-cutoff-factor" title="Permalink to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code> is used to zero out the forcing terms
 to the velocity equation at low densities.</p>
 <ul>

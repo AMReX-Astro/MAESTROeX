@@ -17,6 +17,10 @@
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -220,7 +224,7 @@ timestep constraint</p></td>
 <td><p>0.5</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">init_shrink</span></code></p></td>
-<td><p>the multiplicative factor ($le 1$) to reduce the
+<td><p>the multiplicative factor (<span class="math notranslate nohighlight">\(\le 1\)</span>) to reduce the
 initial timestep as computed by the various timestep
 estimators</p></td>
 <td><p>1.0</p></td>
@@ -245,10 +249,10 @@ step.</p></td>
 <td><p>-1.0</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nuclear_dt_fac</span></code></p></td>
-<td><p>If $T_{max}^n &gt; T_{max}^{n-1}$ set the new dt =
-min[dt, dt*{tt nuclear_dt_fac}*( $T_{max}^{n-1}$ /
-$(T_{max}^n-T_{max}^{n-1})$ ) ] for example, {tt
-nuclear_dt_fac} = 0.01 means don’t let the max temp
+<td><p>If <span class="math notranslate nohighlight">\(T_{max}^n &gt; T_{max}^{n-1}\)</span> set the new dt =
+min[dt, dt*{\tt nuclear\_dt\_fac}*( <span class="math notranslate nohighlight">\(T_{max}^{n-1}\)</span> /
+<span class="math notranslate nohighlight">\((T_{max}^n-T_{max}^{n-1})\)</span> ) ] for example, {\tt
+nuclear\_dt\_fac} = 0.01 means don’t let the max temp
 grow more than approximately 1 percent not checkpoint-
 compatible yet since it wouldn’t be backwards
 compatible</p></td>
@@ -315,8 +319,8 @@ adaptive problems</p></td>
 <td><p>0.9</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_tpert_in_tagging</span></code></p></td>
-<td><p>pass $T’$ into the tagging routines as the auxiliary
-multifab instead of the default $rho <a href="#id1"><span class="problematic" id="id2">H_</span></a>mathrm{nuc}$.</p></td>
+<td><p>pass <span class="math notranslate nohighlight">\(T'\)</span> into the tagging routines as the auxiliary
+multifab instead of the default $\rho <a href="#id1"><span class="problematic" id="id2">H_</span></a>mathrm{nuc}$.</p></td>
 <td><p>false</p></td>
 </tr>
 </tbody>
@@ -386,7 +390,7 @@ IMPLEMENTED YET</p></td>
 <td><p>true</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">plot_eta</span></code></p></td>
-<td><p>plot $etarho$ in plotfile</p></td>
+<td><p>plot <span class="math notranslate nohighlight">\(\etarho\)</span> in plotfile</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">plot_trac</span></code></p></td>
@@ -619,11 +623,11 @@ off)</p></td>
 <td><p>0.0</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">do_planar_invsq_grav</span></code></p></td>
-<td><p>are we doing 1/r$^2$ gravity for plane-parallel</p></td>
+<td><p>are we doing 1/r<span class="math notranslate nohighlight">\(^2\)</span> gravity for plane-parallel</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">planar_invsq_mass</span></code></p></td>
-<td><p>the point mass for planar 1/r$^2$ gravity</p></td>
+<td><p>the point mass for planar 1/r<span class="math notranslate nohighlight">\(^2\)</span> gravity</p></td>
 <td><p>0.0</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evolve_base_state</span></code></p></td>
@@ -647,8 +651,8 @@ advecting</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">do_smallscale</span></code></p></td>
-<td><p>force $rho_0 = (rho h)_0 = 0$, {tt
-evolve_base_state = F} and {tt beta_type} = 3</p></td>
+<td><p>force <span class="math notranslate nohighlight">\(\rho_0 = (\rho h)_0 = 0\)</span>, {\tt
+evolve\_base\_state = F} and {\tt beta\_type} = 3</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_eos_h_above_cutoff</span></code></p></td>
@@ -665,11 +669,11 @@ predict_Tprime_then_h = 6.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
 <td><p>Which quantities do we predict to the edges for
-computing the ($rho X$) edge states?   {tt
-species_pred_type} = 1 means predict $rho^prime$
-and $X$ separately.   {tt species_pred_type} = 2
-means predict the full ($rho X$) itself.  {tt
-species_pred_type} = 3 means predict $rho$ and $X$
+computing the (<span class="math notranslate nohighlight">\(\rho X\)</span>) edge states?   {\tt
+species\_pred\_type} = 1 means predict <span class="math notranslate nohighlight">\(\rho^\prime\)</span>
+and <span class="math notranslate nohighlight">\(X\)</span> separately.   {\tt species\_pred\_type} = 2
+means predict the full (<span class="math notranslate nohighlight">\(\rho X\)</span>) itself.  {\tt
+species\_pred\_type} = 3 means predict <span class="math notranslate nohighlight">\(\rho\)</span> and <span class="math notranslate nohighlight">\(X\)</span>
 separately.</p></td>
 <td><p>1</p></td>
 </tr>
@@ -692,7 +696,7 @@ Options are 0, 2, or 4.</p></td>
 <td><p>4</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></p></td>
-<td><p>the gravitational acceleration (cm~s$^{-2}$) for plane-
+<td><p>the gravitational acceleration (cm~s<span class="math notranslate nohighlight">\(^{-2}\)</span>) for plane-
 parallel geometry</p></td>
 <td><p>-1.5e10</p></td>
 </tr>
@@ -716,14 +720,14 @@ the interface over dt</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
 <td><p>what type of coefficient to use inside the velocity
-divergence constraint.  {tt beta0_type} = 1 uses
-$beta_0$;  {tt beta0_type} = 2 uses $rho_0$
-(anelastic);  {tt beta0_type} = 3 uses 1 (small-scale
+divergence constraint.  {\tt beta0\_type} = 1 uses
+<span class="math notranslate nohighlight">\(\beta_0\)</span>;  {\tt beta0\_type} = 2 uses <span class="math notranslate nohighlight">\(\rho_0\)</span>
+(anelastic);  {\tt beta0\_type} = 3 uses 1 (small-scale
 combustion).</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
-<td><p>how to represent gravity in the $beta_0$ integration:
+<td><p>how to represent gravity in the <span class="math notranslate nohighlight">\(\beta_0\)</span> integration:
 true = piecewise linear false = piecewise constant</p></td>
 <td><p>false</p></td>
 </tr>
@@ -772,9 +776,9 @@ zeroed.</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
-<td><p>modify the momentum equation to have $(beta_0/rho)
-nabla (pi/beta_0)$ instead of just $(1/rho) nabla
-(pi)$</p></td>
+<td><p>modify the momentum equation to have <span class="math notranslate nohighlight">\((\beta_0/\rho)
+\nabla (\pi/\beta_0)\)</span> instead of just <span class="math notranslate nohighlight">\((1/\rho) \nabla
+(\pi)\)</span></p></td>
 <td><p>true</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
@@ -799,7 +803,7 @@ constraint RHS source S?</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code></p></td>
 <td><p>How to compute the explicit thermal diffusion term.   1
-= in terms of $T$;  2 = in terms of $rho,p_0,X$.</p></td>
+= in terms of <span class="math notranslate nohighlight">\(T\)</span>;  2 = in terms of <span class="math notranslate nohighlight">\(\rho,p_0,X\)</span>.</p></td>
 <td><p>2</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code></p></td>
@@ -809,8 +813,8 @@ constraint RHS source S?</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">limit_conductivity</span></code></p></td>
 <td><p>apply the conductivity limiting—if T, then we set the
-thermal coefficients all to 0 for $rho &lt;$ {tt
-buoyancy_cutoff_factor} * {tt base_cutoff_density}</p></td>
+thermal coefficients all to 0 for <span class="math notranslate nohighlight">\(\rho &lt;\)</span> {\tt
+buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}</p></td>
 <td><p>false</p></td>
 </tr>
 </tbody>
@@ -868,13 +872,13 @@ within this tolerance, we abort)</p></td>
 <td><p>1.e-5</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_tfromp</span></code></p></td>
-<td><p>When updating temperature, use $T=T(rho,p_0,X) $
-rather than $T=T(rho,h,X)$.</p></td>
+<td><p>When updating temperature, use <span class="math notranslate nohighlight">\(T=T(\rho,p_0,X) \)</span>
+rather than <span class="math notranslate nohighlight">\(T=T(\rho,h,X)\)</span>.</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_eos_e_instead_of_h</span></code></p></td>
-<td><p>In deriving the temperature from the $h$, first
-subtract off $p_0/rho$ to define $e$, and use that as
+<td><p>In deriving the temperature from the <span class="math notranslate nohighlight">\(h\)</span>, first
+subtract off <span class="math notranslate nohighlight">\(p_0/\rho\)</span> to define <span class="math notranslate nohighlight">\(e\)</span>, and use that as
 the input to the EOS.</p></td>
 <td><p>false</p></td>
 </tr>
