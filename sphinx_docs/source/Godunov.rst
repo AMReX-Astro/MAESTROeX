@@ -1226,18 +1226,18 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
    .. math:: \xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.
 
 -  **Step 3:** Integrate quadratic profiles to get the average value swept over the face
-     over time.
+   over time.
    Define the following integrals, where :math:`\sigma = |u|\Delta t/h`:
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         \mathcal{I}_{i,+}(\sigma) &=& \frac{1}{\sigma h}\int_{(i+\myhalf)h-\sigma h}^{(i+\myhalf)h}s_i^I(x)dx \\
         \mathcal{I}_{i,-}(\sigma) &=& \frac{1}{\sigma h}\int_{(i-\myhalf)h}^{(i-\myhalf)h+\sigma h}s_i^I(x)dx\end{aligned}
 
-     Plugging in (`[Quadratic Interp] <#Quadratic Interp>`__) gives:
+   Plugging in (`[Quadratic Interp] <#Quadratic Interp>`__) gives:
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         \mathcal{I}_{i,+}(\sigma) &=& s_{j,+} - \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}-\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right], \\
@@ -1247,7 +1247,7 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
    Perform a 1D extrapolation, without source terms, to get
    left and right edge states. Add the source terms later if desired/necessary.
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         s_{L,i-\myhalf} &=&

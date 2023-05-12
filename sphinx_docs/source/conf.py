@@ -19,10 +19,11 @@
 #
 import os
 import re
-import sys
-import breathe
 import shlex
 import subprocess
+import sys
+
+import breathe
 
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.append(os.path.dirname(breathe.__file__))
@@ -49,6 +50,7 @@ def get_version():
 # ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
+              'sphinx_math_dollar',
               'sphinx.ext.ifconfig',
               'sphinx.ext.viewcode',
               'sphinxcontrib.bibtex',
@@ -56,6 +58,8 @@ extensions = ['sphinx.ext.autodoc',
               'numpydoc',
               'sphinx.ext.githubpages',
               'sphinx_rtd_theme',
+              'sphinx_copybutton',
+              'sphinx-prompt',
               'breathe',
               'IPython.sphinxext.ipython_console_highlighting',
               'sphinx.ext.intersphinx']
@@ -127,6 +131,12 @@ with open('mathsymbols.tex', 'r') as f:
                 mathjax3_config['tex']['macros'][macro[0]] = [
                     "{" + macro[3] + "}", int(macro[2])]
 
+
+# for sphinx-math-dollar
+mathjax3_config["tex"] = {
+    "inlineMath": [['\\(', '\\)']],
+    "displayMath": [["\\[", "\\]"]],
+  }
 
 math_eqref_format = "Eq.{number}"
 math_number_all = True
