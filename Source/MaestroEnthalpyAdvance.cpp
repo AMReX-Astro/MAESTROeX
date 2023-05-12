@@ -508,7 +508,7 @@ void Maestro::EnthalpyAdvanceSDC(
     } else {
         // use the advective form of the prediction
         MakeEdgeScal(scalold, sedge, umac, scal_force, false, bcs_s, Nscal,
-                     pred_comp, pred_comp, 1, true);
+                     pred_comp, pred_comp, 1, false);
     }
 
     if (enthalpy_pred_type == predict_rhohprime) {

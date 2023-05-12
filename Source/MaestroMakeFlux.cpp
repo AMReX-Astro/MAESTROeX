@@ -97,6 +97,8 @@ void Maestro::MakeRhoXFlux(
 
             const auto w0_arr = w0.const_array();
 
+            // NOTE: umac already has w0 included (it remains added from DensityAdvance)
+
 #if (AMREX_SPACEDIM == 2)
 
             // x-direction
