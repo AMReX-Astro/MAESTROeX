@@ -58,6 +58,8 @@ extensions = ['sphinx.ext.autodoc',
               'numpydoc',
               'sphinx.ext.githubpages',
               'sphinx_rtd_theme',
+              'sphinx_copybutton',
+              'sphinx-prompt',
               'breathe',
               'IPython.sphinxext.ipython_console_highlighting',
               'sphinx.ext.intersphinx']
