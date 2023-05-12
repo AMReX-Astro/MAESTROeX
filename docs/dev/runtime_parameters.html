@@ -140,7 +140,7 @@
   <section id="namespace-maestro">
 <span id="sec-runtime-parameters-tables"></span><h1>namespace: <code class="docutils literal notranslate"><span class="pre">maestro</span></code><a class="headerlink" href="#namespace-maestro" title="Permalink to this heading"></a></h1>
 <p><strong>synchronization</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-0">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -158,7 +158,7 @@ and average down velocities</p></td>
 </tbody>
 </table>
 <p><strong>general MAESTRO</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-1">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -173,7 +173,7 @@ and average down velocities</p></td>
 </tbody>
 </table>
 <p><strong>problem initialization</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-2">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -198,7 +198,7 @@ initial model</p></td>
 </tbody>
 </table>
 <p><strong>timestepping</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-3">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -267,7 +267,7 @@ step.</p></td>
 </tbody>
 </table>
 <p><strong>grid</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-4">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -322,7 +322,7 @@ multifab instead of the default $rho <a href="#id1"><span class="problematic" id
 </tbody>
 </table>
 <p><strong>output</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-5">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -449,7 +449,7 @@ of energy</p></td>
 </tbody>
 </table>
 <p><strong>algorithm initialization</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-6">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -481,7 +481,7 @@ restart</p></td>
 </tbody>
 </table>
 <p><strong>linear solvers</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-7">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -547,7 +547,7 @@ Laplacian (true) or 7-point Laplacian (false).</p></td>
 </tbody>
 </table>
 <p><strong>hydrodynamics</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-8">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -657,21 +657,20 @@ enthalpy if we are below the base cutoff density.</p></td>
 <td><p>true</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code></p></td>
-<td><p>predict_rhoh = 0; newline predict_rhohprime = 1;
-newline predict_h = 2; newline
-predict_T_then_rhohprime = 3; newline
-predict_T_then_h = 4; newline predict_hprime = 5;
-newline predict_Tprime_then_h = 6.</p></td>
+<td><p>predict_rhoh = 0;  predict_rhohprime = 1;  predict_h
+= 2;  predict_T_then_rhohprime = 3;
+predict_T_then_h = 4;  predict_hprime = 5;
+predict_Tprime_then_h = 6.</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
 <td><p>Which quantities do we predict to the edges for
-computing the ($rho X$) edge states?  newline {tt
+computing the ($rho X$) edge states?   {tt
 species_pred_type} = 1 means predict $rho^prime$
-and $X$ separately.  newline {tt species_pred_type}
-= 2 means predict the full ($rho X$) itself. newline
-{tt species_pred_type} = 3 means predict $rho$ and
-$X$ separately.</p></td>
+and $X$ separately.   {tt species_pred_type} = 2
+means predict the full ($rho X$) itself.  {tt
+species_pred_type} = 3 means predict $rho$ and $X$
+separately.</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span></code></p></td>
@@ -698,13 +697,13 @@ parallel geometry</p></td>
 <td><p>-1.5e10</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></p></td>
-<td><p>0 = no ppm (piecewise linear slopes instead) newline 1
-= 1984 ppm newline 2 = Hybrid Sekora/Colella and
-McCorquodale/Colella 2009/2010 ppm</p></td>
+<td><p>0 = no ppm (piecewise linear slopes instead)  1 = 1984
+ppm  2 = Hybrid Sekora/Colella and McCorquodale/Colella
+2009/2010 ppm</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></p></td>
-<td><p>0 = use ppm instead for multi-d integrator newline 1 =
+<td><p>0 = use ppm instead for multi-d integrator  1 =
 bilinear</p></td>
 <td><p>0</p></td>
 </tr>
@@ -717,10 +716,10 @@ the interface over dt</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
 <td><p>what type of coefficient to use inside the velocity
-divergence constraint. newline {tt beta0_type} = 1
-uses $beta_0$; newline {tt beta0_type} = 2 uses
-$rho_0$ (anelastic); newline {tt beta0_type} = 3
-uses 1 (small-scale combustion).</p></td>
+divergence constraint.  {tt beta0_type} = 1 uses
+$beta_0$;  {tt beta0_type} = 2 uses $rho_0$
+(anelastic);  {tt beta0_type} = 3 uses 1 (small-scale
+combustion).</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
@@ -786,7 +785,7 @@ constraint RHS source S?</p></td>
 </tbody>
 </table>
 <p><strong>thermal diffusion</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-9">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -799,9 +798,8 @@ constraint RHS source S?</p></td>
 <td><p>false</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code></p></td>
-<td><p>How to compute the explicit thermal diffusion term.
-newline 1 = in terms of $T$; newline 2 = in terms of
-$rho,p_0,X$.</p></td>
+<td><p>How to compute the explicit thermal diffusion term.   1
+= in terms of $T$;  2 = in terms of $rho,p_0,X$.</p></td>
 <td><p>2</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code></p></td>
@@ -818,7 +816,7 @@ buoyancy_cutoff_factor} * {tt base_cutoff_density}</p></td>
 </tbody>
 </table>
 <p><strong>burning</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-10">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -853,7 +851,7 @@ within this tolerance, we abort)</p></td>
 </tbody>
 </table>
 <p><strong>EOS</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-11">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -887,7 +885,7 @@ the input to the EOS.</p></td>
 </tbody>
 </table>
 <p><strong>base state mapping</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-12">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -897,43 +895,40 @@ the input to the EOS.</p></td>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">s0_interp_type</span></code></p></td>
 <td><p>The interpolation for filling a cell-centered multifab
-from a 1D bin-centered array. newline 1 = piecewise
-constant; newline 2 = piecewise linear; newline 3 =
-quadratic</p></td>
+from a 1D bin-centered array.  1 = piecewise constant;
+2 = piecewise linear;  3 = quadratic</p></td>
 <td><p>3</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">w0_interp_type</span></code></p></td>
 <td><p>The interpolation for filling a cell-centered multifab
-from a 1D edge-centered array. newline 1 = piecewise
-constant; newline 2 = piecewise linear; newline 3 =
-quadratic</p></td>
+from a 1D edge-centered array.  1 = piecewise constant;
+2 = piecewise linear;  3 = quadratic</p></td>
 <td><p>2</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">s0mac_interp_type</span></code></p></td>
 <td><p>The interpolation for filling an edge based multifab
-from a 1D bin-centered array. newline 1 = Interpolate
-s0 to cell centers (with s0_interp_type), then
-average to edges; newline 2 = Interpolate s0 to edges
-directly using linear interpolation; newline 3 =
-Interpolate s0 to edges directly using quadratic
-interpolation.</p></td>
+from a 1D bin-centered array.  1 = Interpolate s0 to
+cell centers (with s0_interp_type), then average to
+edges;  2 = Interpolate s0 to edges directly using
+linear interpolation;  3 = Interpolate s0 to edges
+directly using quadratic interpolation.</p></td>
 <td><p>1</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">w0mac_interp_type</span></code></p></td>
 <td><p>The interpolation for putting w0 on edges.  We only
-compute the normal component. newline 1 = Interpolate
-w0 to cell centers (with w0_interp_type), then
-average to edges; newline 2 = Interpolate w0 to edges
-directly using linear interpolation; newline 3 =
-Interpolate w0 to edges directly using quadratic
-interpolation; newline 4 = Interpolate w0 to nodes
-using linear interpolation, then average to edges.</p></td>
+compute the normal component.  1 = Interpolate w0 to
+cell centers (with w0_interp_type), then average to
+edges;  2 = Interpolate w0 to edges directly using
+linear interpolation;  3 = Interpolate w0 to edges
+directly using quadratic interpolation;  4 =
+Interpolate w0 to nodes using linear interpolation,
+then average to edges.</p></td>
 <td><p>1</p></td>
 </tr>
 </tbody>
 </table>
 <p><strong>diagnostics, I/O</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-13">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -1001,7 +996,7 @@ default value.</p></td>
 </tbody>
 </table>
 <p><strong>particles</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-14">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -1021,7 +1016,7 @@ routines.</p></td>
 </tbody>
 </table>
 <p><strong>heating</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-15">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -1036,7 +1031,7 @@ routines.</p></td>
 </tbody>
 </table>
 <p><strong>SDC</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-16">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -1057,7 +1052,7 @@ iter</p></td>
 </tbody>
 </table>
 <p><strong>GPU</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-17">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
@@ -1074,7 +1069,7 @@ solution?</p></td>
 </tbody>
 </table>
 <p><strong>solver tolerances</strong></p>
-<table class="docutils align-default">
+<table class="docutils align-default" id="index-18">
 <thead>
 <tr class="row-odd"><th class="head"><p>parameter</p></th>
 <th class="head"><p>description</p></th>
