@@ -118,7 +118,15 @@ todo_include_todos = False
 
 
 # -- Options for MathJax
-mathjax3_config = {'tex': {'macros': {}}}
+# for sphinx-math-dollar
+mathjax3_config = {}
+
+mathjax3_config["tex"] = {
+    "inlineMath": [['\\(', '\\)']],
+    "displayMath": [["\\[", "\\]"]],
+  }
+
+mathjax3_config["tex"]["macros"] = {}
 
 with open('mathsymbols.tex', 'r') as f:
     for line in f:
@@ -132,11 +140,6 @@ with open('mathsymbols.tex', 'r') as f:
                     "{" + macro[3] + "}", int(macro[2])]
 
 
-# for sphinx-math-dollar
-mathjax3_config["tex"] = {
-    "inlineMath": [['\\(', '\\)']],
-    "displayMath": [["\\[", "\\]"]],
-  }
 
 math_eqref_format = "Eq.{number}"
 math_number_all = True
