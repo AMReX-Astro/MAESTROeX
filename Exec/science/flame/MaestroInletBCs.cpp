@@ -3,6 +3,7 @@
 #include <MaestroInletBCs.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 Real InletBCs::INLET_RHO;
 Real InletBCs::INLET_RHOH;

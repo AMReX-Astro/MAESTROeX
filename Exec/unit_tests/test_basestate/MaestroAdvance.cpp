@@ -2,6 +2,7 @@
 #include <Maestro.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 // advance a single level for a single time step, updates flux registers
 void Maestro::AdvanceTimeStep(bool is_initIter) {

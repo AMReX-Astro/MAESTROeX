@@ -274,7 +274,7 @@ void Maestro::FirstDt() {
 #pragma omp parallel reduction(min : dt_lev) reduction(max : umax_lev)
 #endif
         for (MFIter mfi(sold_mf); mfi.isValid(); ++mfi) {
-            Real dt_grid = initial_dt;
+            Real dt_grid = problem_rp::initial_dt;
             Real umax_grid = 0.;
 
             dt_lev = amrex::min(dt_lev, dt_grid);

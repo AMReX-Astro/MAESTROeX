@@ -2,6 +2,7 @@
 #include <Maestro.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 void Maestro::EstDt() {
     // timer for profiling

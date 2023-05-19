@@ -197,6 +197,7 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS)
 	@echo "${bold}WRITING extern_parameters.cpp${normal}"
 	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
+          --use_namespace \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
 

@@ -1,6 +1,7 @@
 #include <Maestro.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
                             BaseState<Real>& p0, const int lev) {
