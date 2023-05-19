@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -8,8 +7,8 @@ using namespace amrex;
 void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                      const Vector<MultiFab>& rho_Hext,
                      Vector<MultiFab>& rho_omegadot, Vector<MultiFab>& rho_Hnuc,
-                     const BaseState<Real>& p0, const Real dt_in,
-                     const Real time_in) {
+                     [[maybe_unused]] const BaseState<Real>& p0, const Real dt_in,
+                     [[maybe_unused]] const Real time_in) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Burner()", Burner);
 
@@ -33,10 +32,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
     for (int lev = 0; lev <= finest_level; ++lev) {
         // create mask assuming refinement ratio = 2
         int finelev = lev + 1;
-        if (lev == finest_level) finelev = finest_level;
+        if (lev == finest_level) {
+            finelev = finest_level;
+        }
 
         const BoxArray& fba = s_in[finelev].boxArray();
         const iMultiFab& mask = makeFineMask(s_in[lev], fba, IntVect(2));
+
+        ReduceOps<ReduceOpSum> reduce_op;
+        ReduceData<Real> reduce_data(reduce_op);
+        using ReduceTuple = typename decltype(reduce_data)::Type;
 
         // loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
@@ -61,10 +66,13 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                           : rho_Hext[lev].array(mfi);
             const Array4<const int> mask_arr = mask.array(mfi);
 
-            ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                if (use_mask && mask_arr(i, j, k))
-                    return;  // cell is covered by finer cells
 
+            reduce_op.eval(tileBox, reduce_data,
+            [=] AMREX_GPU_HOST_DEVICE(int i, int j, int k) -> ReduceTuple
+            {
+                if (use_mask && mask_arr(i, j, k) == 1) {
+                    return {0.0};  // cell is covered by finer cells
+                }
                 auto rho = s_in_arr(i, j, k, Rho);
                 Real x_in[NumSpec];
                 for (int n = 0; n < NumSpec; ++n) {
@@ -95,6 +103,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 burn_t state_in;
                 burn_t state_out;
 
+
                 Real x_out[NumSpec];
 #if NAUX_NET > 0
                 Real aux_out[NumAux];
@@ -102,14 +111,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 Real rhowdot[NumSpec];
                 Real rhoH = 0.0;
 
+                Real burn_failed = 0.0_rt;
+
                 // if the threshold species is not in the network, then we burn
                 // normally.  if it is in the network, make sure the mass
                 // fraction is above the cutoff.
                 if ((rho > burning_cutoff_density_lo &&
                      rho < burning_cutoff_density_hi) &&
                     (ispec_threshold < 0 ||
-                     (ispec_threshold > 0 &&
-                      x_test > burner_threshold_cutoff))) {
+                     (ispec_threshold > 0 && x_test > burner_threshold_cutoff))) {
+
                     // Initialize burn state_in and state_out
                     state_in.e = 0.0;
                     state_in.rho = rho;
@@ -124,6 +135,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 #endif
 
                     // initialize state_out the same as state_in
+                    state_out.success = true;
+
                     state_out.e = 0.0;
                     state_out.rho = rho;
                     state_out.T = T_in;
@@ -136,7 +149,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                     }
 #endif
 
+                    state_out.i = i;
+                    state_out.j = j;
+                    state_out.k = k;
+
                     burner(state_out, dt_in);
+
+                    // if we were unsuccessful, update the failure count
+                    if (!state_out.success) {
+                        burn_failed = 1.0;
+                    }
 
                     for (int n = 0; n < NumSpec; ++n) {
                         x_out[n] = state_out.xn[n];
@@ -169,11 +191,9 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 if (fabs(sumX - 1.0) > reaction_sum_tol) {
 #ifndef AMREX_USE_GPU
-                    Abort("ERROR: abundances do not sum to 1");
+                    amrex::Print() << "ERROR: abundances do not sum to 1";
 #endif
-                    for (int n = 0; n < NumSpec; ++n) {
-                        state_out.xn[n] /= sumX;
-                    }
+                    burn_failed = 1.0_rt;
                 }
 
                 // pass the density and pi through
@@ -202,7 +222,16 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 s_out_arr(i, j, k, RhoH) = s_in_arr(i, j, k, RhoH) +
                                            dt_in * rho_Hnuc_arr(i, j, k) +
                                            dt_in * rho_Hext_arr(i, j, k);
+
+                return {burn_failed};
             });
+        }
+
+        ReduceTuple hv = reduce_data.value();
+        Real burn_failed = amrex::get<0>(hv);
+
+        if (burn_failed != 0.0) {
+            amrex::Abort("burning failed");
         }
     }
 }

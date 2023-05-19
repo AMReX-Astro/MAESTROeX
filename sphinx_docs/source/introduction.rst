@@ -36,7 +36,7 @@ large-scale stratification in the star. The method closest in spirit
 to MAESTROeX is the pseudo-incompressible method of Durran
 :cite:`durran`, developed for terrestrial atmospheric flows (assuming
 an ideal gas). Part of the complexity of the equations in MAESTROeX
-stems from the need to descibe a general equation of state.
+stems from the need to describe a general equation of state.
 Additionally, since reactions can significantly alter the hydrostatic
 structure of a star, we incorporated extensions that capture the
 expansion of the background state :cite:`almgren:2000`. The low Mach

@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -489,7 +488,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
     if (use_thermal_diffusion) {
         // 1 = predictor, 2 = corrector
-        ThermalConductSDC(1, sold, shat, snew, p0_old, p0_new, hcoeff1,
+        ThermalConductSDC(1, sold, shat, snew, hcoeff1,
                           Xkcoeff1, pcoeff1, hcoeff2, Xkcoeff2, pcoeff2);
 
         // note p0_new => p0_hat if evolve_base_state = T
@@ -558,8 +557,10 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
             // compute the new etarho
             if (!spherical) {
                 MakeEtarho(etarhoflux_dummy);
+#if AMREX_SPACEDIM == 3
             } else {
                 MakeEtarhoSphr(sold, snew, umac, w0mac_dummy);
+#endif
             }
         }
 
@@ -878,7 +879,7 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
 
         if (use_thermal_diffusion) {
             // 1 = predictor, 2 = corrector
-            ThermalConductSDC(2, sold, shat, snew, p0_old, p0_new, hcoeff1,
+            ThermalConductSDC(2, sold, shat, snew, hcoeff1,
                               Xkcoeff1, pcoeff1, hcoeff2, Xkcoeff2, pcoeff2);
 
             // compute diff_hat using shat, p0_new, and new coefficients from previous iteration
@@ -956,8 +957,10 @@ void Maestro::AdvanceTimeStepSDC(bool is_initIter) {
                 // compute the new etarho
                 if (!spherical) {
                     MakeEtarho(etarhoflux_dummy);
+#if AMREX_SPACEDIM == 3
                 } else {
                     MakeEtarhoSphr(sold, snew, umac, w0mac_dummy);
+#endif
                 }
             }
 

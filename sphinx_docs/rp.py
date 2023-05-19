@@ -1,30 +1,28 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function
-
 import os
 import re
 import sys
 import textwrap
 from more_itertools import unique_everseen
 
-main_header = """
+MAIN_HEADER = """
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
 """
 
-separator = """
+SEPARATOR = """
 +----------------------------------------+---------------------------------------------------------+---------------+
 """
 
-entry = """
+ENTRY = """
 | {:38} | {:55} | {:13} |
 """
 
 WRAP_LEN = 55
 
-class Parameter(object):
+class Parameter:
     # container class for the parameters
 
     def __init__(self):
@@ -32,29 +30,30 @@ class Parameter(object):
         self.default = ""
         self.description = []
         self.category = ""
-        self.namespace=""
+        self.namespace = ""
 
     def value(self):
         """ the value is what we sort based on """
         return self.category + "." + self.var
 
     def __lt__(self, other):
-        self.value() < other.value()
+        return self.value() < other.value()
 
 
 def make_rest_table(param_files):
 
-    params_list=[]
+    params_list = []
 
     for pf in param_files:
 
         # each file is a category
-        category = os.path.basename(os.path.dirname(pf)).replace("_", "\_")
+        category = os.path.basename(os.path.dirname(pf))
 
         # open the file
-        try: f = open(pf, "r")
-        except IOError:
-            sys.exit("ERROR: {} does not exist".format(pf))
+        try:
+            f = open(pf)
+        except OSError:
+            sys.exit(f"ERROR: {pf} does not exist")
 
         descr = r""
         category = ""
@@ -101,7 +100,10 @@ def make_rest_table(param_files):
             # find the description
             if line.startswith("#"):
                 # handle descriptions here
-                descr += line[1:].rstrip().replace("@@",r"\newline")
+                tmp = line[1:].rstrip()
+                if tmp.endswith("@@"):
+                    tmp = tmp.replace("@@", "")
+                descr += tmp
                 line = f.readline()
                 continue
 
@@ -117,7 +119,7 @@ def make_rest_table(param_files):
                 if current_param.var.startswith("("):
                     current_param.var = re.findall(r"\w+", fields[0])[0]
 
-                current_param.default = fields[2].replace("_", "\_")
+                current_param.default = fields[2]
                 current_param.description = descr
                 current_param.category = category.strip()
                 current_param.namespace = namespace.strip()
@@ -134,7 +136,7 @@ def make_rest_table(param_files):
     for nm in sorted(namespaces):
 
         # print the heading
-        heading_name = r"namespace: ``{}``".format(nm)
+        heading_name = fr"namespace: ``{nm}``"
         nmlen = len(heading_name)
         print(".. _sec:runtime-parameters-tables:\n")
         print(heading_name)
@@ -147,24 +149,28 @@ def make_rest_table(param_files):
 
             # print the subheading
             if c != "":
-                print("**{}**\n".format(c))
+                print(f"**{c}**\n")
 
             params = [q for q in params_list if q.namespace == nm and q.category == c]
 
-            print(main_header.strip())
+            # print the index stuff
+            fmt = [f"{nm}.{q.var}" for q in params]
+            print(".. index:: {}\n\n".format(", ".join(fmt)))
+
+            print(MAIN_HEADER.strip())
 
             for p in params:
                 desc = list(textwrap.wrap(p.description.strip(), WRAP_LEN))
-                if len(desc) == 0:
+                if not desc:
                     desc = [""]
 
                 for n, d in enumerate(desc):
                     if n == 0:
-                        print(entry.format("``"+p.var+"``", d, p.default).strip())
+                        print(ENTRY.format("``"+p.var+"``", d, p.default).strip())
                     else:
-                        print(entry.format(" ", d, " ").strip())
+                        print(ENTRY.format(" ", d, " ").strip())
 
-                print(separator.strip())
+                print(SEPARATOR.strip())
 
             print("\n\n")
 

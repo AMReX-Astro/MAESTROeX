@@ -337,7 +337,7 @@ Outstanding Questions
    equation for :math:`(\rho h)`.
 
 #. Should we call the EOS with :math:`h` as is, or call the EOS with :math:`e =
-     h - p_0 / \rho`?
+   h - p_0 / \rho`?
 
 #. When we stay on the constraint, i.e. :math:`p_{EOS} = p_0`, then the
    equations for :math:`e` and for :math:`h` are identical. However, once we are

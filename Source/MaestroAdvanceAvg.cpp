@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -469,8 +468,10 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         // compute the new etarho
         if (!spherical) {
             MakeEtarhoPlanar(s1, s2, umac);
+#if AMREX_SPACEDIM == 3
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
+#endif
         }
     }
 
@@ -751,8 +752,10 @@ void Maestro::AdvanceTimeStepAverage(bool is_initIter) {
         // compute the new etarho
         if (!spherical) {
             MakeEtarhoPlanar(s1, s2, umac);
+#if AMREX_SPACEDIM == 3
         } else {
             MakeEtarhoSphr(s1, s2, umac, w0mac_dummy);
+#endif
         }
     }
 

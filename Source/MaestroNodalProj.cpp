@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 #include <AMReX_MLMG.H>
 #include <AMReX_MLNodeLaplacian.H>
@@ -19,6 +18,9 @@ using namespace amrex;
 // the projection (done below)
 void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
                         int istep_divu_iter, bool sdc_off) {
+
+    amrex::ignore_unused(sdc_off);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::NodalProj()", NodalProj);
 

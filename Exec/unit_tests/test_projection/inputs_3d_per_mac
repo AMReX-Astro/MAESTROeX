@@ -15,6 +15,8 @@ maestro.lo_bc = 0 0 0
 maestro.hi_bc = 0 0 0
 geometry.is_periodic =  1 1 1
 
+maestro.max_step = 1
+
 # VERBOSITY
 maestro.v              = 1       # verbosity
 

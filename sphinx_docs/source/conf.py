@@ -19,11 +19,11 @@
 #
 import os
 import re
-import sys
-import sphinx_rtd_theme
-import breathe
 import shlex
 import subprocess
+import sys
+
+import breathe
 
 sys.path.insert(0, os.path.abspath('../../'))
 sys.path.append(os.path.dirname(breathe.__file__))
@@ -50,15 +50,18 @@ def get_version():
 # ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.mathjax',
+              'sphinx_math_dollar',
               'sphinx.ext.ifconfig',
               'sphinx.ext.viewcode',
               'sphinxcontrib.bibtex',
               'sphinx.ext.autosummary',
               'numpydoc',
               'sphinx.ext.githubpages',
+              'sphinx_rtd_theme',
+              'sphinx_copybutton',
+              'sphinx-prompt',
               'breathe',
-              'sphinxfortran.fortran_domain',
-              'sphinxfortran.fortran_autodoc',
+              'IPython.sphinxext.ipython_console_highlighting',
               'sphinx.ext.intersphinx']
 
 # bibtex
@@ -81,7 +84,7 @@ main_doc = 'index'
 
 # General information about the project.
 project = 'MAESTROeX'
-copyright = '2018-2020, MAESTROeX development tem'
+copyright = '2018-2023, MAESTROeX development tem'
 author = 'MAESTROeX development team'
 
 html_logo = "maestroex_logo.png"
@@ -115,7 +118,15 @@ todo_include_todos = False
 
 
 # -- Options for MathJax
-mathjax3_config = {'tex': {'macros': {}}}
+# for sphinx-math-dollar
+mathjax3_config = {}
+
+mathjax3_config["tex"] = {
+    "inlineMath": [['\\(', '\\)']],
+    "displayMath": [["\\[", "\\]"]],
+  }
+
+mathjax3_config["tex"]["macros"] = {}
 
 with open('mathsymbols.tex', 'r') as f:
     for line in f:
@@ -127,6 +138,7 @@ with open('mathsymbols.tex', 'r') as f:
             else:
                 mathjax3_config['tex']['macros'][macro[0]] = [
                     "{" + macro[3] + "}", int(macro[2])]
+
 
 
 math_eqref_format = "Eq.{number}"
@@ -141,7 +153,6 @@ numfig = True
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -246,12 +257,6 @@ breathe_default_members = ('members', 'undoc-members', 'protected-members',
 breathe_doxygen_config_options = {'EXTRACT_ALL': 'YES',
                                   'SHOW_USED_FILES': 'YES', 'RECURSIVE': 'YES'
                                   }
-
-# -- Options for sphinx-fortran -----------------------------------------
-
-fortran_src = [os.path.abspath('preprocessed_files')]
-
-fortran_ext = ['f90', 'F90']
 
 
 # -- Options for intersphinx --------------------------------------------

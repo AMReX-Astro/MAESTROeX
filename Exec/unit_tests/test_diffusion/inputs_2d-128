@@ -1,0 +1,82 @@
+# INITIAL MODEL
+maestro.max_step =  1000
+maestro.stop_time = 0.02
+
+# GRIDDING AND REFINEMENT
+amr.max_level          = 0       # maximum level number allowed
+amr.n_cell             = 128 128
+amr.max_grid_size      = 64
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0    0.0
+geometry.prob_hi     =  2.0e0    2.0e0
+
+maestro.do_sponge = 0
+
+maestro.evolve_base_state = false
+maestro.do_initial_projection = false
+maestro.init_divu_iter        = 0
+maestro.init_iter             = 0
+
+# PLOTFILES
+maestro.plot_base_name  = diffuse_128_    # root name of plot file
+maestro.plot_int   = -1   # number of timesteps between plot files
+maestro.plot_deltat = 0.02
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = -1
+
+# TIME STEPPING
+maestro.fixed_dt = 5.e-4
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 2 2
+maestro.hi_bc = 2 2
+geometry.is_periodic =  0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+maestro.mg_verbose = 0
+maestro.cg_verbose = 0
+
+# DIFFUSION parameters
+maestro.use_thermal_diffusion = true
+maestro.thermal_diffusion_type = 1
+
+# GRAVITY parameters
+maestro.grav_const = 0.0e0
+
+# linear solvers
+maestro.mg_bottom_solver = 4
+maestro.hg_bottom_solver = 4
+maestro.max_mg_bottom_nlevels = 4
+
+maestro.small_temp = 1.e-10
+maestro.small_dens = 1.e-10
+maestro.small_dt = 1.e-10
+
+maestro.anelastic_cutoff_density = 3.e6
+maestro.base_cutoff_density = 3.e6
+
+
+conductivity.const_conductivity = 1.e7
+
+problem.dt_mult_factor = 1.0e0
+
+problem.outputfile = "norms.out"
+
+problem.t0 = 5.e-2
+
+problem.peak_h = 1.0e1
+problem.ambient_h = 1.0e0
+
+problem.ambient_dens = 1.0e0
+
+problem.ambient_he4 = 0.5e0
+problem.ambient_c12 = 0.25e0
+problem.ambient_fe56 = 0.25e0

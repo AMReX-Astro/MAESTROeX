@@ -4,7 +4,7 @@ using namespace amrex;
 using namespace problem_rp;
 
 // initializes data on a specific level
-void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
+void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, const MFIter& mfi,
                             const Array4<Real> scal, const Array4<Real> vel) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
@@ -12,13 +12,15 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     const auto tileBox = mfi.tilebox();
 
     // set velocity to zero
-    AMREX_PARALLEL_FOR_4D(tileBox, AMREX_SPACEDIM, i, j, k, n,
-                          { vel(i, j, k, n) = 0.0; });
+    ParallelFor(tileBox, AMREX_SPACEDIM,
+                [=] AMREX_GPU_DEVICE(int i, int j, int k, int n) {
+                    vel(i, j, k, n) = 0.0;
+                });
 
     const auto s0_arr = s0_init.const_array();
     const auto p0_arr = p0_init.const_array();
 
-    AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+    ParallelFor(tileBox, [=] AMREX_GPU_DEVICE (int i, int j, int k) {
         int r = AMREX_SPACEDIM == 2 ? j : k;
 
         // set the scalars using s0
@@ -39,7 +41,9 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
     if (perturb_model) {
         const auto xcen = center[0];
         const auto ycen = AMREX_SPACEDIM == 2 ? xrb_pert_height : center[1];
-        const auto zcen = AMREX_SPACEDIM == 2 ? 0.0 : xrb_pert_height;
+#if AMREX_SPACEDIM == 3
+        const auto zcen = xrb_pert_height;
+#endif
 
         const auto rad_pert =
             -xrb_pert_size * xrb_pert_size / (4.0 * std::log(0.5));
@@ -49,12 +53,16 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto xrb_pert_factor_loc = xrb_pert_factor;
         const auto rad_pert_loc = rad_pert;
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] (int i, int j, int k) {
             int r = AMREX_SPACEDIM == 2 ? j : k;
 
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - xcen;
             const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - ycen;
+#if AMREX_SPACEDIM == 3
             const auto z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - zcen;
+#else
+            const Real z = 0.0;
+#endif
 
             const auto dist = std::sqrt(x * x + y * y + z * z);
 
@@ -104,17 +112,17 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
         const auto num_vortices_loc = num_vortices;
         const auto velpert_height = velpert_height_loc;
 
-        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices + 1);
+        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices);
 
         // vortex x-coords
         RealVector vortices_xloc(num_vortices);
         for (auto i = 0; i < num_vortices; ++i) {
-            vortices_xloc[i] = (Real(i) + 0.5) * offset;
+            vortices_xloc[i] = (static_cast<Real>(i) + 0.5_rt) * offset;
         }
 
         const Real* vortices_xloc_p = vortices_xloc.dataPtr();
 
-        AMREX_PARALLEL_FOR_3D(tileBox, i, j, k, {
+        ParallelFor(tileBox, [=] (int i, int j, int k) {
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
             const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
 
@@ -126,24 +134,23 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
             for (auto vortex = 0; vortex < num_vortices_loc; ++vortex) {
                 Real xdist = x - vortices_xloc_p[vortex];
 
-                Real rad = std::sqrt(x * x + y * y);
+                Real rad = std::sqrt(xdist * xdist + ydist * ydist);
 
                 // e.g. Calder et al. ApJSS 143, 201-229 (2002)
                 // we set things up so that every other vortex has the same
                 // orientation
                 upert -=
-                    ydist / velpert_scale_loc * velpert_amplitude_loc *
+                    ydist * velpert_amplitude_loc *
                     std::exp(-rad * rad /
                              (2.0 * velpert_scale_loc * velpert_scale_loc)) *
                     pow(-1.0, vortex + 1);
 
                 vpert +=
-                    xdist / velpert_scale_loc * velpert_amplitude_loc *
+                    xdist * velpert_amplitude_loc *
                     std::exp(-rad * rad /
                              (2.0 * velpert_scale_loc * velpert_scale_loc)) *
                     pow(-1.0, vortex + 1);
             }
-
             vel(i, j, k, 0) += upert;
             vel(i, j, k, 1) += vpert;
         });
@@ -152,5 +159,11 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
 void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                                 MultiFab& vel) {
+
+    amrex::ignore_unused(lev);
+    amrex::ignore_unused(time);
+    amrex::ignore_unused(scal);
+    amrex::ignore_unused(vel);
+
     Abort("InitLevelDataSphr not implemented.");
 }

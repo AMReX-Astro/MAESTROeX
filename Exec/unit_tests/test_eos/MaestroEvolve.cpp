@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <Problem_F.H>
 
 using namespace amrex;
 using namespace problem_rp;

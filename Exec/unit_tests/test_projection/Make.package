@@ -1,3 +1,0 @@
-F90EXE_sources += test_projection.F90
-
-FEXE_headers += Problem_F.H

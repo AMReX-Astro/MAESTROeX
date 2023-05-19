@@ -1,3 +1,21 @@
+# 23.05
+
+  * MAESTROeX now monitors the burn_t success flag and aborts if there
+    is a failure.  Previously there was not an abort on GPUs (#379)
+
+  * We can now force a checkpoint or a plotfile by "touch"-ing
+    "dump_and_continue", "plot_and_continue", and
+    "small_plot_and_continue" in the output directory (#377)
+
+# 23.03
+
+  * Fixed some clang-tidy issues and compiler warnings (#356, #359,
+    #360, #364)
+
+  * Updated xrb_mixed so it works again (#330, #362)
+
+  * Fixed some memory access issues (#337, #338, #349, #352, #353)
+
 # 22.07
 
   * No changes since last release
@@ -26,13 +44,15 @@
 
   * Remove all Fortran Microphysics
 
-  * Remove old Fortran constants module, sponge, inlet BC, extern parameter support, and files that are no longer used
-  
+  * Remove old Fortran constants module, sponge, inlet BC, extern
+    parameter support, and files that are no longer used
+
   * Add problem namespace to the problem runtime parameters
 
   * Convert embedded probins to C++ inputs for all problems
 
-  * Change networks for test problems: xrb_mixed (xrb_simple -> rprox), wdconvect (ignition_chamulak -> ignition_simple)
+  * Change networks for test problems: xrb_mixed (xrb_simple ->
+    rprox), wdconvect (ignition_chamulak -> ignition_simple)
 
   * Remove Travis references (Travis is no longer used)
 
@@ -60,7 +80,7 @@
 
 # 21.07
 
-  * Fix sphinx4 latex macro rendering 
+  * Fix sphinx4 latex macro rendering
 
 # 21.06
 
@@ -84,7 +104,7 @@
 
 # 21.02
 
-  * Bug fix for exact base state algorithm 
+  * Bug fix for exact base state algorithm
 
   * Sync up with latest updates of Microphysics
 
@@ -102,7 +122,7 @@
 
 # 20.12
 
-  * Set default in SDC algorithm to use split projection for both planar and spherical problems 
+  * Set default in SDC algorithm to use split projection for both planar and spherical problems
 
   * Bug fix: spherical SDC with split projection
 
@@ -139,7 +159,7 @@
   * Fixed dpdt implementation and SDC algorithm for thermal diffusion
 
   * Various bug fixes
-  
+
   * Implemented clang-format
 
   * Added Github actions: version release, checkout submodule development branches
@@ -166,9 +186,9 @@
   * SDC bug fixes: use_tfromp=T
 
   * Fixed probin issue when compiling with PGI
-  
+
   * Added AMReX as a submodule
-  
+
   * Switch docs build to a Github action instead of Travis
 
 # 20.05

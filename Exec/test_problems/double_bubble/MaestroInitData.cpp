@@ -60,7 +60,11 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
             Real x = prob_lo[0] + (Real(i) + 0.5) * dx[0];
             Real y = prob_lo[1] + (Real(j) + 0.5) * dx[1];
+#if AMREX_SPACEDIM == 3
             Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2];
+#else
+            Real z = 0.0;
+#endif
 
             Real perturbations[Nscal];
             Real s0[Nscal];

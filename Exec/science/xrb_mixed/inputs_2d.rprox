@@ -1,0 +1,137 @@
+# This is a port of production/new/6cm-1536w/inputs_2d_6.0cm in MAESTRO
+
+# INITIAL MODEL
+maestro.model_file = "toy_xrb.hi_dens.hse.tanh.delta_12cm.dx_6cm"
+maestro.perturb_model = true
+
+# PROBLEM SIZE
+geometry.prob_lo     =  0.0       0.0
+geometry.prob_hi     =  1152.0    4608.0
+
+# BOUNDARY CONDITIONS
+# 0 = Interior   3 = Symmetry
+# 1 = Inflow     4 = Slipwall
+# 2 = Outflow    5 = NoSlipWall
+maestro.lo_bc = 0 4 2
+maestro.hi_bc = 0 2 2
+geometry.is_periodic =  1 0 0
+
+# VERBOSITY
+maestro.v              = 1       # verbosity
+
+# DEBUG FOR NAN
+amrex.fpe_trap_invalid = 1       # floating point exception
+
+# GRIDDING AND REFINEMENT
+amr.n_cell             = 192 768
+amr.max_grid_size      = 128
+amr.max_level          = 0       # maximum level number allowed
+maestro.regrid_int     = 2       # how often to regrid
+amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
+amr.blocking_factor    = 8       # block factor in grid generation
+amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
+
+# TAGGING
+maestro.temperr = 6.5e8 6.5e8 6.5e8
+
+# TIME STEPPING
+maestro.max_step  = 30000000
+maestro.stop_time = 1.0
+maestro.cfl       = 0.7    # cfl number for hyperbolic system
+                           # In this test problem, the velocity is
+		           # time-dependent.  We could use 0.9 in
+		           # the 3D test, but need to use 0.7 in 2D
+		           # to satisfy CFL condition.
+
+# ALGORITHMIC OPTIONS
+maestro.spherical = 0
+maestro.do_initial_projection = true
+maestro.init_divu_iter        = 1
+maestro.init_iter             = 1
+
+maestro.grav_const = -2.45e14
+
+maestro.init_shrink = 0.1e0
+maestro.max_dt_growth = 1.1e0
+
+maestro.use_tfromp = false
+maestro.dpdt_factor = 0.0e0
+
+maestro.species_pred_type = 3
+
+maestro.limit_conductivity = true
+
+maestro.anelastic_cutoff_density = 2.e3
+maestro.base_cutoff_density = 2.e3
+
+maestro.do_sponge = true
+maestro.sponge_start_factor = 25.e0
+
+maestro.ppm_type = 1
+
+# PLOTFILES
+maestro.plot_base_name  = xrb_    # root name of plot file
+maestro.plot_int   = -1      # number of timesteps between plot files
+maestro.plot_deltat = 1.e-3
+maestro.small_plot_base_name = smallxrb_
+maestro.small_plot_deltat = 1.e-4
+
+# CHECKPOINT
+maestro.check_base_name = chk
+maestro.chk_int         = 1000
+
+# tolerances for the initial projection
+maestro.eps_init_proj_cart = 1.e-10
+maestro.eps_init_proj_sph  = 1.e-10
+# tolerances for the divu iterations
+maestro.eps_divu_cart      = 5.e-11
+maestro.eps_divu_sph       = 1.e-10
+maestro.divu_iter_factor   = 100.
+maestro.divu_level_factor  = 10.
+# tolerances for the MAC projection
+maestro.eps_mac            = 1.e-10
+maestro.eps_mac_max        = 1.e-8
+maestro.mac_level_factor   = 10.
+maestro.eps_mac_bottom     = 1.e-3
+# tolerances for the nodal projection
+maestro.eps_hg             = 1.e-11
+maestro.eps_hg_max         = 1.e-10
+maestro.hg_level_factor    = 10.
+maestro.eps_hg_bottom      = 1.e-4
+
+# BURNING
+maestro.burner_threshold_species = "H1"
+
+# LINEAR SOLVERS
+maestro.mg_bottom_solver = 4
+maestro.hg_bottom_solver = 4
+maestro.max_mg_bottom_nlevels = 4
+
+# override the default values of the probin namelist values here
+# temperature perturbation
+problem.xrb_pert_size = 50
+problem.xrb_pert_factor = 1.0e-5
+problem.xrb_pert_type = 1
+problem.xrb_pert_height = 1475.0
+
+# velocity perturbation
+problem.apply_vel_field = 1
+problem.velpert_scale = 1.0e2
+problem.velpert_amplitude = 1.0e5
+problem.velpert_height_loc = 1460.0
+problem.velpert_steep = 12.0e0
+problem.num_vortices = 8
+
+# Note that some of the parameters in this
+# namelist are specific to the default EOS,
+# network, and/or integrator used in the
+# makefile. If you try a different set of
+# microphysics routines be sure to check that
+# the parameters in here are consistent.
+
+eos.use_eos_coulomb = 1
+
+integrator.jacobian = 2
+integrator.atol_spec = 1.e-8
+integrator.rtol_spec = 1.e-5
+

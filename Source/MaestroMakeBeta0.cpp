@@ -1,5 +1,4 @@
 #include <Maestro.H>
-#include <Maestro_F.H>
 
 using namespace amrex;
 
@@ -228,7 +227,7 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
 
                     } else {  // r >= anelastic_cutoff_density
 
-                        if (amrex::Math::abs(rho0(n, r - 1)) > rel_eps) {
+                        if (amrex::Math::abs(rho0(n, r - 1)) > 0.0_rt) {
                             beta0(n, r) =
                                 beta0(n, r - 1) * (rho0(n, r) / rho0(n, r - 1));
                         } else {

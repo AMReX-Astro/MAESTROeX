@@ -1,0 +1,46 @@
+name: reacting_bubble
+
+on: [pull_request]
+jobs:
+  reacting_bubble-2d:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get submodules
+        run: |
+          git submodule update --init
+          cd external/Microphysics
+          git fetch; git checkout development
+          cd ../amrex
+          git fetch; git checkout development
+          cd ../..
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y -qq
+          sudo apt-get -qq -y install curl g++>=9.3.0
+
+      - name: Compile reacting_bubble
+        run: |
+          cd Exec/test_problems/reacting_bubble
+          make DIM=2 USE_MPI=FALSE -j 2
+
+      - name: Run reacting_bubble
+        run: |
+          cd Exec/test_problems/reacting_bubble
+          ./Maestro2d.gnu.ex inputs_2d_regression maestro.max_step=10
+
+      - name: Build the fextrema tool
+        run: |
+          cd external/amrex/Tools/Plotfile
+          make programs=fextrema -j 2
+
+      - name: Check the extrema
+        run: |
+          cd Exec/test_problems/reacting_bubble
+          ../../../external/amrex/Tools/Plotfile/fextrema.gnu.ex reacting_bubble_2d_plt0000010 > fextrema.out
+          diff fextrema.out ci-benchmarks/reacting_bubble_2d_extrema.out
+

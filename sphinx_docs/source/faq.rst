@@ -18,7 +18,7 @@ Compiling
    subroutine ends. Fortran 90 does not do this. Most
    MAESTROeX routines rely on this Fortran 95 feature.
 
-   
+
 #. *The code doesn’t compile, but complains right away that there
    is “No rule to make target ‘AMReX_constants_mod.o’, needed by ‘tmp_build_dir/d/2d.gnu.MPI/f90.depends’”*
 
@@ -26,7 +26,7 @@ Compiling
    to the ``amrex/`` directory. You cannot use ‘:math:`\sim`’ as a shortcut
    for your home directory.
 
-   
+
 #. *make issues an error like:*
 
    ::
@@ -78,7 +78,7 @@ Running
    can be overridden on a problem-by-problem basis by setting the relevant
    parameters in the problem's inputs file (see the `solver tolerances` section in the § :ref:`runtime parameters tables<sec:runtime-parameters-tables>`).
 
-   
+
 #. *Why do the initial projection and “divu” iters sometimes
    have a harder time converging than the multigrid solves in the main algorithm?*
 
@@ -90,15 +90,15 @@ Running
    initial projection and “divu” solve present a harded linear system
    to solve.
 
-   
-#. *How can I obtain profiling infomation for my run?*
+
+#. *How can I obtain profiling information for my run?*
 
    The code is already instrumented with timers. Simply compile with
    ``TINY_PROFILE=TRUE`` in the ``GNUmakefile``, or equivalently do
    ``make TINY_PROFILE=TRUE``. A summary of the timings will
    be output to ``stdout`` at the end of the run.
 
-   With the GNU compliers, you can enabling profiling with ``gprof``
+   With the GNU compilers, you can enabling profiling with ``gprof``
    by compiling with
 
    ::
@@ -118,31 +118,34 @@ Running
    line-by-line information can be obtained by passing the ``-l``
    argument to ``gprof``.
 
-   
-#. *How can I force MAESTROeX to abort?*
 
-   In the output directory, do ``touch .abort_maestro``. This
-   will cause the code to write out a final checkpoint file, free up
-   any allocated memory, and gracefully exit. Be sure to remove the
-   ``.abort_maestro`` file before restarting the code in the
-   same directory.
+#. *How can I force MAESTROeX to output?*
 
-   
-#. *When I run I get the error*
+   To generate a checkpoint file, in the output directory do:
 
-   ::
+   .. prompt:: bash
 
-      reading extern runtime parameters ...
-      ERROR: problem in the namelist
+      touch dump_and_continue
 
-   This error can occur when MAESTROeX reads in an extern runtime parameter it
-   does not understand or is not expecting. A common example is if the problem
-   is built with the helmholtz EoS, but the extern namelist has gamma law
-   parameters.
+   For a plotfile:
+
+   .. prompt:: bash
+
+      touch plot_and_continue
+
+   or a small plotfile:
+
+   .. prompt::
+
+      touch small_plot_and_continue
+
+   At the end of a timestep, the code will check if these files exist
+   and if so do an output and then remove the file.
+
 
 #. *How can I check the compilation parameters of a MAESTROeX executable?*
 
-   The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as 
+   The build information (including git hashes, modules, EoS, network, etc.) can be displayed by running the executable as
 
    ::
 
@@ -162,7 +165,7 @@ Debugging
            VisMF::Write(umac[0][0],"a_umacx");
 
    This plotfile is visualized using Amrvis using the flag ``-mf``.
-	   
+
 #. *How can I print out a MultiFab’s contents from within the code?*
 
    There is a print subroutine in ``MaestroDebug.cpp`` file. This can
@@ -196,22 +199,22 @@ Debugging
 #. *How can I get more information about floating point exceptions?*
 
    AMReX can intercept floating point exceptions and provide a helpful
-   backtrace file that shows you where they were generated. 
+   backtrace file that shows you where they were generated.
 
 #. *How can I get information about potential bugs before running the code?*
 
-   We run `clang-tidy <https://clang.llvm.org/extra/clang-tidy/>`_ on all pull requests using a `GitHub action <https://github.com/AMReX-Astro/cpp-linter-action>`_. ``clang-tidy`` analyzes the source code, produces warnings for potential bugs and offers suggestions for performance improvements. 
+   We run `clang-tidy <https://clang.llvm.org/extra/clang-tidy/>`_ on all pull requests using a `GitHub action <https://github.com/AMReX-Astro/cpp-linter-action>`_. ``clang-tidy`` analyzes the source code, produces warnings for potential bugs and offers suggestions for performance improvements.
 
    ``clang-tidy`` can also be run locally. This requires the ``clang-tidy`` and ``bear`` packages (installed using e.g. ``sudo apt install bear clang-tidy`` on Ubuntu), and the python script
    ``run-clang-tidy.py`` (which can be downloaded from `here <https://github.com/AMReX-Astro/cpp-linter-action/blob/main/run-clang-tidy.py>`_). The analysis is performed by first compiling a problem using the ``bear`` package, then running the python script to analyze the source files. From within a problem directory, run
 
    .. code-block:: bash
 
-      bear make -j 20 USE_OMP=FALSE USE_MPI=FALSE DEBUG=TRUE 
+      bear make -j 20 USE_OMP=FALSE USE_MPI=FALSE DEBUG=TRUE
 
       python3 run-clang-tidy.py -header-filter='MAESTROeX' -ignore-files='amrex|Microphysics' -j 20 > clang-tidy-report.txt
 
-   The compiler flags can be modified to suit the problem to be analyzed, but the ``DEBUG`` flag must be set to ``TRUE``. The ``header-filter`` option for the python script tells the script to only analyze header files containing the given regex pattern, and the ``ignore-files`` flag tells it to ignore any source files containing the given regex pattern. The ``-j`` option tells the script to run a given number of processes in parallel. The output is then redirected to a text file. 
+   The compiler flags can be modified to suit the problem to be analyzed, but the ``DEBUG`` flag must be set to ``TRUE``. The ``header-filter`` option for the python script tells the script to only analyze header files containing the given regex pattern, and the ``ignore-files`` flag tells it to ignore any source files containing the given regex pattern. The ``-j`` option tells the script to run a given number of processes in parallel. The output is then redirected to a text file.
 
 I/O
 ===
