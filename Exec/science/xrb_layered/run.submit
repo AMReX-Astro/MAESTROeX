@@ -3,26 +3,37 @@
 #SBATCH --constraint=cpu
 
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=100
+###SBATCH --nodes=2
+###SBATCH --nodes=4
+###SBATCH --nodes=5
 
-#SBATCH --time=00:02:00
-#SBATCH --qos=debug
+#SBATCH --ntasks-per-node=64
 
-###SBATCH --time=10:00:00
-###SBATCH --qos=regular
+###SBATCH --ntasks-per-node=100
+###SBATCH --ntasks-per-node=50 
+###SBATCH --ntasks-per-node=20
+
+
+###SBATCH --time=00:02:00
+###SBATCH --qos=debug
+
+#SBATCH --time=10:00:00
+#SBATCH --qos=regular
 
 #SBATCH --mail-type=end
 #SBATCH --mail-user=simon.guichandut@mail.mcgill.ca
 
-export XRB=$MAESTROEX_HOME/Exec/science/xrb_layered
-export MAESTRO_EXEC=$XRB/Maestro2d.gnu.x86-milan.MPI.ex
-export INPUTS=$XRB/inputs/inputs_2d_high_square_6cm_bigpert
+XRB=$MAESTROEX_HOME/Exec/science/xrb_layered
+MAESTRO_EXEC=$XRB/Maestro2d.gnu.x86-milan.MPI.ex
+XRB_SCRATCH=$PSCRATCH/xrb_layered
+
+INPUTS=$XRB/inputs/inputs_2d_toy_3cm
+RUN_DIR="RUN6"
 
 # Path of checks dir from *inside* run directory
-export CHECKS_DIR=CHECKS
+CHECKS_DIR=CHECKS
 
-export XRB_SCRATCH=$PSCRATCH/xrb_layered
-cd $XRB_SCRATCH
+cd $XRB_SCRATCH/$RUN_DIR
 
 # Look for check file
 # https://amrex-astro.github.io/workflow/nersc-workflow.html
@@ -60,12 +71,22 @@ echo $restartString
 (sleep 595m && echo -e "\n    Nearing end of job, dumping checkfile now\n" && touch dump_and_continue)& 
 
 # debug this bash script
-#${MAESTRO_EXEC} ${INPUTS} ${restartString}
+${MAESTRO_EXEC} ${INPUTS} ${restartString}
 
 # srun command
 # -n is total number of tasks
 # -c is cpus per task
 # in perlmutter: 2*floor(128/#tasks per node)
 
+# 64 tasks
+# 1 node, -c = 2*floor(128/64) = 4
+#srun -n 64 --cpu-bind=cores -c 4 ${MAESTRO_EXEC} ${INPUTS} ${restartString}
+
+# 100 tasks
 # 1 node, -c = 2*floor(128/100) = 2
-srun -n 100 --cpu-bind=cores -c 2 ${MAESTRO_EXEC} ${INPUTS} ${restartString}
+#srun -n 100 --cpu-bind=cores -c 2 ${MAESTRO_EXEC} ${INPUTS} ${restartString}
+# 2 nodes, -c = 2*floor(128/50) = 4
+#srun -n 50 --cpu-bind=cores -c 4 ${MAESTRO_EXEC} ${INPUTS} ${restartString}
+# 5 nodes, -c = 2*floor(128/20) = 12
+#srun -n 20 --cpu-bind=cores -c 12 ${MAESTRO_EXEC} ${INPUTS} ${restartString}
+
