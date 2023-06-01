@@ -5,6 +5,9 @@ namespace: ``maestro``
 
 **synchronization**
 
+.. index:: maestro.reflux_type
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -18,6 +21,9 @@ namespace: ``maestro``
 
 **general MAESTRO**
 
+.. index:: maestro.maestro_verbose
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -27,6 +33,9 @@ namespace: ``maestro``
 
 
 **problem initialization**
+
+.. index:: maestro.model_file, maestro.perturb_model, maestro.print_init_hse_diag
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -43,6 +52,9 @@ namespace: ``maestro``
 
 
 **timestepping**
+
+.. index:: maestro.stop_time, maestro.max_step, maestro.cfl, maestro.init_shrink, maestro.small_dt, maestro.max_dt_growth, maestro.max_dt, maestro.fixed_dt, maestro.nuclear_dt_fac, maestro.use_soundspeed_firstdt, maestro.use_divu_firstdt
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -88,6 +100,9 @@ namespace: ``maestro``
 
 **grid**
 
+.. index:: maestro.spherical, maestro.octant, maestro.do_2d_planar_octant, maestro.regrid_int, maestro.amr_buf_width, maestro.drdxfac, maestro.minwidth, maestro.min_eff, maestro.use_tpert_in_tagging
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -121,6 +136,9 @@ namespace: ``maestro``
 
 
 **output**
+
+.. index:: maestro.plot_int, maestro.small_plot_int, maestro.plot_deltat, maestro.small_plot_deltat, maestro.chk_int, maestro.chk_deltat, maestro.plot_h_with_use_tfromp, maestro.plot_spec, maestro.plot_omegadot, maestro.plot_aux, maestro.plot_Hext, maestro.plot_Hnuc, maestro.plot_eta, maestro.plot_trac, maestro.plot_base_state, maestro.plot_gpi, maestro.plot_cs, maestro.plot_grav, maestro.plot_base_name, maestro.small_plot_base_name, maestro.check_base_name, maestro.diag_buf_size, maestro.plot_ad_excess, maestro.plot_processors, maestro.plot_pidivu, maestro.small_plot_vars
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -194,6 +212,9 @@ namespace: ``maestro``
 
 **algorithm initialization**
 
+.. index:: maestro.init_iter, maestro.init_divu_iter, maestro.restart_file, maestro.restart_into_finer, maestro.do_initial_projection
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -212,6 +233,9 @@ namespace: ``maestro``
 
 
 **linear solvers**
+
+.. index:: maestro.mg_verbose, maestro.cg_verbose, maestro.mg_cycle_type, maestro.hg_cycle_type, maestro.hg_bottom_solver, maestro.mg_bottom_solver, maestro.max_mg_bottom_nlevels, maestro.mg_bottom_nu, maestro.mg_nu_1, maestro.mg_nu_2, maestro.hg_dense_stencil
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -253,6 +277,9 @@ namespace: ``maestro``
 
 
 **hydrodynamics**
+
+.. index:: maestro.do_sponge, maestro.sponge_kappa, maestro.sponge_center_density, maestro.sponge_start_factor, maestro.plot_sponge_fdamp, maestro.anelastic_cutoff_density, maestro.base_cutoff_density, maestro.burning_cutoff_density_lo, maestro.burning_cutoff_density_hi, maestro.heating_cutoff_density_lo, maestro.heating_cutoff_density_hi, maestro.buoyancy_cutoff_factor, maestro.dpdt_factor, maestro.do_planar_invsq_grav, maestro.planar_invsq_mass, maestro.evolve_base_state, maestro.use_exact_base_state, maestro.fix_base_state, maestro.average_base_state, maestro.do_smallscale, maestro.do_eos_h_above_cutoff, maestro.enthalpy_pred_type, maestro.species_pred_type, maestro.use_delta_gamma1_term, maestro.use_etarho, maestro.add_pb, maestro.slope_order, maestro.grav_const, maestro.ppm_type, maestro.bds_type, maestro.ppm_trace_forces, maestro.beta0_type, maestro.use_linear_grav_in_beta0, maestro.rotational_frequency, maestro.co_latitude, maestro.rotation_radius, maestro.use_centrifugal, maestro.mach_max_abort, maestro.drive_initial_convection, maestro.stop_initial_convection, maestro.restart_with_vel_field, maestro.use_alt_energy_fix, maestro.use_omegadot_terms_in_S
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -316,19 +343,18 @@ namespace: ``maestro``
 | ``do_eos_h_above_cutoff``              | After the advective enthalpy update, recompute the      | true          |
 |                                        | enthalpy if we are below the base cutoff density.       |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``enthalpy_pred_type``                 | predict\_rhoh = 0; \newline predict\_rhohprime = 1;     | 1             |
-|                                        | \newline predict\_h = 2; \newline                       |               |
-|                                        | predict\_T\_then\_rhohprime = 3; \newline               |               |
-|                                        | predict\_T\_then\_h = 4; \newline predict\_hprime = 5;  |               |
-|                                        | \newline predict\_Tprime\_then\_h = 6.                  |               |
+| ``enthalpy_pred_type``                 | predict\_rhoh = 0;  predict\_rhohprime = 1;  predict\_h | 1             |
+|                                        | = 2;  predict\_T\_then\_rhohprime = 3;                  |               |
+|                                        | predict\_T\_then\_h = 4;  predict\_hprime = 5;          |               |
+|                                        | predict\_Tprime\_then\_h = 6.                           |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``species_pred_type``                  | Which quantities do we predict to the edges for         | 1             |
-|                                        | computing the ($\rho X$) edge states?  \newline {\tt    |               |
+|                                        | computing the ($\rho X$) edge states?   {\tt            |               |
 |                                        | species\_pred\_type} = 1 means predict $\rho^\prime$    |               |
-|                                        | and $X$ separately.  \newline {\tt species\_pred\_type} |               |
-|                                        | = 2 means predict the full ($\rho X$) itself. \newline  |               |
-|                                        | {\tt species\_pred\_type} = 3 means predict $\rho$ and  |               |
-|                                        | $X$ separately.                                         |               |
+|                                        | and $X$ separately.   {\tt species\_pred\_type} = 2     |               |
+|                                        | means predict the full ($\rho X$) itself.  {\tt         |               |
+|                                        | species\_pred\_type} = 3 means predict $\rho$ and $X$   |               |
+|                                        | separately.                                             |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``use_delta_gamma1_term``              | turns on second order correction to delta gamma1 term   | true          |
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -343,11 +369,11 @@ namespace: ``maestro``
 | ``grav_const``                         | the gravitational acceleration (cm~s$^{-2}$) for plane- | -1.5e10       |
 |                                        | parallel geometry                                       |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``ppm_type``                           | 0 = no ppm (piecewise linear slopes instead) \newline 1 | 1             |
-|                                        | = 1984 ppm \newline 2 = Hybrid Sekora/Colella and       |               |
-|                                        | McCorquodale/Colella 2009/2010 ppm                      |               |
+| ``ppm_type``                           | 0 = no ppm (piecewise linear slopes instead)  1 = 1984  | 1             |
+|                                        | ppm  2 = Hybrid Sekora/Colella and McCorquodale/Colella |               |
+|                                        | 2009/2010 ppm                                           |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``bds_type``                           | 0 = use ppm instead for multi-d integrator \newline 1 = | 0             |
+| ``bds_type``                           | 0 = use ppm instead for multi-d integrator  1 =         | 0             |
 |                                        | bilinear                                                |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``ppm_trace_forces``                   | if 1, then perform parabolic reconstruction on the      | 0             |
@@ -356,10 +382,10 @@ namespace: ``maestro``
 |                                        | the interface over dt                                   |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``beta0_type``                         | what type of coefficient to use inside the velocity     | 1             |
-|                                        | divergence constraint. \newline {\tt beta0\_type} = 1   |               |
-|                                        | uses $\beta_0$; \newline {\tt beta0\_type} = 2 uses     |               |
-|                                        | $\rho_0$ (anelastic); \newline {\tt beta0\_type} = 3    |               |
-|                                        | uses 1 (small-scale combustion).                        |               |
+|                                        | divergence constraint.  {\tt beta0\_type} = 1 uses      |               |
+|                                        | $\beta_0$;  {\tt beta0\_type} = 2 uses $\rho_0$         |               |
+|                                        | (anelastic);  {\tt beta0\_type} = 3 uses 1 (small-scale |               |
+|                                        | combustion).                                            |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``use_linear_grav_in_beta0``           | how to represent gravity in the $\beta_0$ integration:  | false         |
 |                                        | true = piecewise linear false = piecewise constant      |               |
@@ -404,14 +430,16 @@ namespace: ``maestro``
 
 **thermal diffusion**
 
+.. index:: maestro.use_thermal_diffusion, maestro.temp_diffusion_formulation, maestro.thermal_diffusion_type, maestro.limit_conductivity
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
 | ``use_thermal_diffusion``              | Use thermal diffusion.                                  | false         |
 +----------------------------------------+---------------------------------------------------------+---------------+
-| ``temp_diffusion_formulation``         | How to compute the explicit thermal diffusion term.     | 2             |
-|                                        | \newline 1 = in terms of $T$; \newline 2 = in terms of  |               |
-|                                        | $\rho,p_0,X$.                                           |               |
+| ``temp_diffusion_formulation``         | How to compute the explicit thermal diffusion term.   1 | 2             |
+|                                        | = in terms of $T$;  2 = in terms of $\rho,p_0,X$.       |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``thermal_diffusion_type``             | In the thermal diffusion solver, 1 = Crank-Nicholson; 2 | 1             |
 |                                        | = Backward Euler.                                       |               |
@@ -424,6 +452,9 @@ namespace: ``maestro``
 
 
 **burning**
+
+.. index:: maestro.do_burning, maestro.burner_threshold_species, maestro.burner_threshold_cutoff, maestro.do_subgrid_burning, maestro.reaction_sum_tol
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -447,6 +478,9 @@ namespace: ``maestro``
 
 **EOS**
 
+.. index:: maestro.small_temp, maestro.small_dens, maestro.use_tfromp, maestro.use_eos_e_instead_of_h, maestro.use_pprime_in_tfromp
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -468,46 +502,47 @@ namespace: ``maestro``
 
 **base state mapping**
 
+.. index:: maestro.s0_interp_type, maestro.w0_interp_type, maestro.s0mac_interp_type, maestro.w0mac_interp_type
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
 | ``s0_interp_type``                     | The interpolation for filling a cell-centered multifab  | 3             |
-|                                        | from a 1D bin-centered array. \newline 1 = piecewise    |               |
-|                                        | constant; \newline 2 = piecewise linear; \newline 3 =   |               |
-|                                        | quadratic                                               |               |
+|                                        | from a 1D bin-centered array.  1 = piecewise constant;  |               |
+|                                        | 2 = piecewise linear;  3 = quadratic                    |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``w0_interp_type``                     | The interpolation for filling a cell-centered multifab  | 2             |
-|                                        | from a 1D edge-centered array. \newline 1 = piecewise   |               |
-|                                        | constant; \newline 2 = piecewise linear; \newline 3 =   |               |
-|                                        | quadratic                                               |               |
+|                                        | from a 1D edge-centered array.  1 = piecewise constant; |               |
+|                                        | 2 = piecewise linear;  3 = quadratic                    |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``s0mac_interp_type``                  | The interpolation for filling an edge based multifab    | 1             |
-|                                        | from a 1D bin-centered array. \newline 1 = Interpolate  |               |
-|                                        | s0 to cell centers (with s0\_interp\_type), then        |               |
-|                                        | average to edges; \newline 2 = Interpolate s0 to edges  |               |
-|                                        | directly using linear interpolation; \newline 3 =       |               |
-|                                        | Interpolate s0 to edges directly using quadratic        |               |
-|                                        | interpolation.                                          |               |
+|                                        | from a 1D bin-centered array.  1 = Interpolate s0 to    |               |
+|                                        | cell centers (with s0\_interp\_type), then average to   |               |
+|                                        | edges;  2 = Interpolate s0 to edges directly using      |               |
+|                                        | linear interpolation;  3 = Interpolate s0 to edges      |               |
+|                                        | directly using quadratic interpolation.                 |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``w0mac_interp_type``                  | The interpolation for putting w0 on edges.  We only     | 1             |
-|                                        | compute the normal component. \newline 1 = Interpolate  |               |
-|                                        | w0 to cell centers (with w0\_interp\_type), then        |               |
-|                                        | average to edges; \newline 2 = Interpolate w0 to edges  |               |
-|                                        | directly using linear interpolation; \newline 3 =       |               |
-|                                        | Interpolate w0 to edges directly using quadratic        |               |
-|                                        | interpolation; \newline 4 = Interpolate w0 to nodes     |               |
-|                                        | using linear interpolation, then average to edges.      |               |
+|                                        | compute the normal component.  1 = Interpolate w0 to    |               |
+|                                        | cell centers (with w0\_interp\_type), then average to   |               |
+|                                        | edges;  2 = Interpolate w0 to edges directly using      |               |
+|                                        | linear interpolation;  3 = Interpolate w0 to edges      |               |
+|                                        | directly using quadratic interpolation;  4 =            |               |
+|                                        | Interpolate w0 to nodes using linear interpolation,     |               |
+|                                        | then average to edges.                                  |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 
 
 
 **diagnostics, I/O**
 
+.. index:: maestro.print_update_diagnostics, maestro.track_grid_losses, maestro.sum_interval, maestro.sum_per, maestro.show_center_of_mass, maestro.hard_cfl_limit, maestro.job_name, maestro.output_at_completion, maestro.reset_checkpoint_time, maestro.reset_checkpoint_step
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
-| ``print_fortran_warnings``             | display warnings in Fortran90 routines                  | (0, 1)        |
-+----------------------------------------+---------------------------------------------------------+---------------+
 | ``print_update_diagnostics``           | display information about updates to the state (how     | (0, 1)        |
 |                                        | much mass, momentum, energy added)                      |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -550,6 +585,9 @@ namespace: ``maestro``
 
 **particles**
 
+.. index:: maestro.use_particles, maestro.store_particle_vels
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -563,6 +601,9 @@ namespace: ``maestro``
 
 **heating**
 
+.. index:: maestro.do_heating
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -572,6 +613,9 @@ namespace: ``maestro``
 
 
 **SDC**
+
+.. index:: maestro.sdc_iters, maestro.sdc_couple_mac_velocity
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
@@ -587,6 +631,9 @@ namespace: ``maestro``
 
 **GPU**
 
+.. index:: maestro.deterministic_nodal_solve
+
+
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |
 +========================================+=========================================================+===============+
@@ -598,6 +645,9 @@ namespace: ``maestro``
 
 
 **solver tolerances**
+
+.. index:: maestro.eps_init_proj_cart, maestro.eps_init_proj_sph, maestro.eps_divu_cart, maestro.eps_divu_sph, maestro.divu_iter_factor, maestro.divu_level_factor, maestro.eps_mac, maestro.eps_mac_max, maestro.mac_level_factor, maestro.eps_mac_bottom, maestro.eps_hg, maestro.eps_hg_max, maestro.hg_level_factor, maestro.eps_hg_bottom
+
 
 +----------------------------------------+---------------------------------------------------------+---------------+
 | parameter                              | description                                             | default value |

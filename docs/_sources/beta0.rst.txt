@@ -204,8 +204,7 @@ the chemical potential; or per unit mass we have
 
 where we have used :math:`X_i \equiv \rho_i/\rho = A_in_i/\rho N_\text{A}`
 and the chemical potential has been replaced with
-:math:`\mu_i = \frac{A_i}{N_\text{A}}\left(\frac{\partial e}{\partial X_i}
-  \right)_{\rho,\text{AD},(X_j,j\neq i)}`.
+:math:`\mu_i = \frac{A_i}{N_\text{A}}\left(\frac{\partial e}{\partial X_i}  \right)_{\rho,\text{AD},(X_j,j\neq i)}`.
 Using this and expressing the specific internal energy as :math:`e=e(\rho,T,X)`
 we then have
 
