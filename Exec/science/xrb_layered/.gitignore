@@ -1,1 +1,4 @@
 *.ipynb_checkpoints/
+**/.vscode
+
+create_initial_model/toy_atm/all_models

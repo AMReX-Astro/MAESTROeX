@@ -1,0 +1,54 @@
+problem.model_prefix = "toy_xrb_layered"
+
+problem.nx = 1024
+problem.xmin = 0.0
+problem.xmax = 3072.0
+
+problem.dens_base = 1.7e6
+problem.low_density_cutoff = 1.e-2
+
+problem.T_star = 2.0e8
+problem.T_base = 2.75e8
+problem.T_lo   = 1.e7
+
+problem.H_star = 1070.0
+problem.delta  = 10.0
+
+problem.H_rad = 1330.0
+#problem.F_rad = 1.0e21
+#problem.F_rad = 2.0e21
+
+### Lots of trial and error here to find the best-fitting flux, see notebook
+#problem.F_rad = 2.1e21
+#problem.F_rad = 2.2e21
+#problem.F_rad = 2.3e21
+problem.F_rad = 2.307e21
+#problem.F_rad = 2.31e21
+#problem.F_rad = 2.32e21
+#problem.F_rad = 2.32e21
+#problem.F_rad = 2.35e21
+#problem.F_rad = 2.4e21
+#problem.F_rad = 2.5e21
+#problem.F_rad = 3.0e21
+#problem.F_rad = 4.0e21
+#problem.F_rad = 5.0e21
+
+problem.H_sig = 1655.0
+problem.alpha_sig = 171.0
+problem.beta_sig = 0.087
+
+problem.fuel1_name = "hydrogen-1"
+problem.fuel1_frac = 0.70
+
+problem.fuel2_name = "helium-4"
+problem.fuel2_frac = 0.28
+
+problem.fuel3_name = "carbon-12"
+problem.fuel3_frac = 0.02
+
+problem.ash1_name  = "iron-56"
+problem.ash1_frac = 1.0
+
+problem.g_const = -1.29e14
+
+problem.index_base_from_temp = 1

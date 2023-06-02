@@ -1,0 +1,69 @@
+@namespace: problem
+
+nx             integer      640
+
+dens_base      real         2.e6
+
+T_star         real         1.e8
+T_base         real         5.e8
+T_lo           real         5.e7
+
+H_rad          real         700.e0
+F_rad          real         1.0e22
+
+H_star         real         500.e0
+delta          real         25.0
+
+H_sig          real         1000.e0
+alpha_sig      real         1.0
+beta_sig       real         0.0
+
+fuel1_name     character    "hydrogen-1"
+fuel2_name     character    "helium-4"
+fuel3_name     character    "carbon-12"
+fuel4_name     character    ""
+fuel5_name     character    ""
+fuel6_name     character    ""
+fuel7_name     character    ""
+
+ash1_name      character    "iron-56"
+ash2_name      character    ""
+ash3_name      character    ""
+ash4_name      character    ""
+
+fuel1_frac     real         1.0
+fuel2_frac     real         0.0
+fuel3_frac     real         0.0
+fuel4_frac     real         0.0
+fuel5_frac     real         0.0
+fuel6_frac     real         0.0
+fuel7_frac     real         0.0
+
+ash1_frac      real         0.0
+ash2_frac      real         0.0
+ash3_frac      real         0.0
+ash4_frac      real         0.0
+
+xmin           real         0.0
+xmax           real         2.e3
+
+model_prefix   character    "model"
+
+index_base_from_temp  integer   0
+
+do_isothermal_instead integer   0
+
+# if do_invsq_grav = .false. we will use g_const for the
+# gravitational acceleration.  Otherwise, we will compute gravity
+# from M_enclosed and the distance from the origin
+
+M_enclosed     real         2.e33
+g_const        real         -2.450e14
+do_invsq_grav  integer      0
+
+low_density_cutoff  real    1.e-4
+
+smallx         real         1.e-10
+
+small_temp     real         -1.e200
+small_dens     real         -1.e200
