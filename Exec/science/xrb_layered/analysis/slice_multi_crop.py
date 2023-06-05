@@ -38,7 +38,8 @@ L_y = ymax - ymin
 
 fig = plt.figure()
 
-fields = ["tfromp", "MachNumber", "Hnuc", "X(h1)", "X(he4)", "X(c12)"]
+#fields = ["tfromp", "MachNumber", "Hnuc", "X(h1)", "X(he4)", "X(c12)"]
+fields = ["tfromp", "vort", "Hnuc", "X(h1)", "X(he4)", "X(c12)"]
 
 #grid = ImageGrid(fig, 111, nrows_ncols=(1, len(fields)),
 #                 axes_pad=1.0, cbar_pad=0.2, label_mode="L", cbar_mode="each")
@@ -54,7 +55,9 @@ for i, f in enumerate(fields):
         sp.set_zlim(f, 5.e7, 3.e9)
         sp.set_cmap(f, "hot")
     elif f == "Hnuc":
-        sp.set_zlim(f, 1.e14, 1.e20)
+        #sp.set_zlim(f, 1.e14, 1.e20)
+        sp.set_zlim(f, 1.e15, 1.e17)
+        
         sp.set_cmap(f, "inferno")
     elif f == "MachNumber":
         sp.set_zlim(f, 1.e-4, 1.e0)
@@ -66,6 +69,11 @@ for i, f in enumerate(fields):
         sp.set_zlim(f, 1e-3, 1)
 
         sp.set_cmap(f, "viridis")
+
+    elif f == "vort":
+        sp.set_log(f, False)
+        sp.set_cmap(f, "PiYG")
+        sp.set_zlim(f, -2e5, 2e5)
 
     #if f != "density":
     #    # now do a contour of density
