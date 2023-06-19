@@ -63,10 +63,6 @@ ifdef NEED_EOS_NETWORK
 
 endif
 
-# Add EXTRA_THERMO to FPP_DEFINES to calculate dpdA, etc.
-EXTRA_THERMO := t
-FPP_DEFINES += -DEXTRA_THERMO=$(EXTRA_THERMO)
-
 # we are not using the CUDA stuff
 FPP_DEFINES += -DAMREX_DEVICE=""
 

@@ -306,7 +306,7 @@ void Maestro::MakeThermalCoeffs(const Vector<MultiFab>& scal,
                         Xkcoeff_arr(i, j, k, comp) = 0.0;
                     }
                 } else {
-                    eos_t eos_state;
+                    eos_extra_t eos_state;
                     eos_state.rho = scal_arr(i, j, k, Rho);
                     eos_state.T = scal_arr(i, j, k, Temp);
                     for (auto comp = 0; comp < NumSpec; ++comp) {
