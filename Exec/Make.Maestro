@@ -64,9 +64,6 @@ all: $(executable)
 # Maestro uses a coarse grained OMP approach
 DEFINES += -DCRSEGRNDOMP
 
-# Maestro needs to compute additional thermodynamic derivatives in the EOS
-DEFINES += -DEXTRA_THERMO
-
 USE_MG = FALSE
 
 ifeq ($(DIM), 1)
@@ -125,10 +122,6 @@ USE_CXX_REACTIONS := TRUE
 
 ifeq ($(USE_REACT), TRUE)
   DEFINES += -DREACTIONS
-  ifeq ($(USE_SDC), TRUE)
-    # we need the compositional derivatives for SDC
-    DEFINES += -DEXTRA_THERMO
-   endif
 endif
 
 # Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics

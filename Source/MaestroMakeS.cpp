@@ -126,7 +126,7 @@ void Maestro::Make_S_cc(
                 const Array4<const Real> normal_arr = normal[lev].array(mfi);
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    eos_t eos_state;
+                    eos_extra_t eos_state;
 
                     eos_state.rho = scal_arr(i, j, k, Rho);
                     eos_state.T = scal_arr(i, j, k, Temp);
@@ -199,7 +199,7 @@ void Maestro::Make_S_cc(
                     base_geom.anelastic_cutoff_density_coord(lev);
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    eos_t eos_state;
+                    eos_extra_t eos_state;
 
                     eos_state.rho = scal_arr(i, j, k, Rho);
                     eos_state.T = scal_arr(i, j, k, Temp);
