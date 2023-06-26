@@ -1,6 +1,2 @@
 *.ipynb_checkpoints/
 **/.vscode
-slurm*
-*.submit
-
-create_initial_model/toy_atm/all_models
