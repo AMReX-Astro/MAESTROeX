@@ -3,7 +3,6 @@ CEXE_sources += BaseStateGeometry.cpp
 CEXE_sources += Maestro.cpp
 CEXE_sources += MaestroAdvance.cpp
 CEXE_sources += MaestroAdvanceAvg.cpp
-CEXE_sources += MaestroAdvanceSdc.cpp
 CEXE_sources += MaestroAdvectBase.cpp
 CEXE_sources += MaestroAdvection.cpp
 CEXE_sources += MaestroAverage.cpp
