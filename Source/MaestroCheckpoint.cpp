@@ -111,10 +111,6 @@ void Maestro::WriteCheckPoint(int step) {
         VisMF::Write(S_cc_new[lev],
                      amrex::MultiFabFileFullPrefix(lev, checkpointname,
                                                    "Level_", "S_cc_new"));
-#ifdef SDC
-        VisMF::Write(intra[lev], amrex::MultiFabFileFullPrefix(
-                                     lev, checkpointname, "Level_", "intra"));
-#endif
     }
 
     // Restore the previous FAB format.
@@ -267,10 +263,6 @@ int Maestro::ReadCheckPoint() {
                     amrex::MultiFabFileFullPrefix(lev, restart_file, "Level_",
                                                   "S_cc_new"));
 
-#ifdef SDC
-        VisMF::Read(intra[lev], amrex::MultiFabFileFullPrefix(
-                                    lev, restart_file, "Level_", "intra"));
-#endif
     }
 
     // get the elapsed CPU time to now;
