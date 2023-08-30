@@ -3,6 +3,7 @@
 #include <actual_network.H>
 #include <network_properties.H>
 using namespace amrex;
+using namespace problem_rp;
 
 // prototype for pertubation function to be called on the
 // device (if USE_CUDA=TRUE)

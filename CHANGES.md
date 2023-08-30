@@ -1,3 +1,8 @@
+# 23.06
+
+  * the test_diffusion unit test was cleaned up and now gives the
+    expected convergence (#336, #381)
+    
 # 23.05
 
   * MAESTROeX now monitors the burn_t success flag and aborts if there

@@ -57,7 +57,7 @@ for i, f in enumerate(fields):
     elif f == "Hnuc":
         #sp.set_zlim(f, 1.e14, 1.e20)
         sp.set_zlim(f, 1.e15, 1.e17)
-        
+        sp.set_zlim(f, 1.e16, 1.e20)
         sp.set_cmap(f, "inferno")
     elif f == "MachNumber":
         sp.set_zlim(f, 1.e-4, 1.e0)

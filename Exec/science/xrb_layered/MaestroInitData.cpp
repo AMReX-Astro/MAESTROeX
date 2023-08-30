@@ -1,5 +1,6 @@
 #include <Maestro.H>
 #include <random>
+
 using namespace amrex;
 
 // initializes data on a specific level
@@ -94,4 +95,3 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
         }
     }
 }
-

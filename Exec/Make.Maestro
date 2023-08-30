@@ -2,6 +2,8 @@ MAESTROEX_HOME ?= /home/fanduomi/CCSE/MAESTROeX
 
 # clang-tidy support via AMReX
 CLANG_TIDY_CONFIG_FILE := $(MAESTROEX_HOME)/.clang-tidy
+# space-separated list of paths to skip when running clang-tidy
+CLANG_TIDY_IGNORE_SOURCES = $(AMREX_HOME)/Src $(MICROPHYSICS_HOME)
 
 TOP := $(MAESTROEX_HOME)
 
@@ -62,9 +64,6 @@ all: $(executable)
 # Maestro uses a coarse grained OMP approach
 DEFINES += -DCRSEGRNDOMP
 
-# Maestro needs to compute additional thermodynamic derivatives in the EOS
-DEFINES += -DEXTRA_THERMO
-
 USE_MG = FALSE
 
 ifeq ($(DIM), 1)
@@ -123,10 +122,6 @@ USE_CXX_REACTIONS := TRUE
 
 ifeq ($(USE_REACT), TRUE)
   DEFINES += -DREACTIONS
-  ifeq ($(USE_SDC), TRUE)
-    # we need the compositional derivatives for SDC
-    DEFINES += -DEXTRA_THERMO
-   endif
 endif
 
 # Maestro SDC uses the SDC_EVOLVE_ENTHALPY mode in StarKiller Microphysics
@@ -197,6 +192,7 @@ $(MAESTROEX_AUTO_SOURCE_DIR)/extern_parameters.H: $(PROBIN_PARAMETERS)
 	@echo "${bold}WRITING extern_parameters.cpp${normal}"
 	$(MICROPHYSICS_HOME)/util/build_scripts/write_probin.py \
           --pa "$(PROBIN_PARAMETERS) $(EXTERN_PARAMETERS)" \
+          --use_namespace \
           --cxx_prefix $(MAESTROEX_AUTO_SOURCE_DIR)/extern
 	@echo " "
 

@@ -3,6 +3,7 @@
 #include <Maestro.H>
 
 using namespace amrex;
+using namespace problem_rp;
 
 void Maestro::Init() {
     // timer for profiling
