@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH --account=m3018
+#SBATCH --constraint=cpu
+#SBATCH --nodes=1
+#SBATCH --time=01:00:00
+#SBATCH --qos=regular
+
+# Run directory
+RUN_DIR=$PSCRATCH/xrb_layered/RUN13
+
+PLOT_DIR=PLOTS
+PLOT_BASENAME="xrb_0"
+
+script=~/amrex-astro-diag/source/convective_grad/fconvgrad2d.gnu.x86-milan.ex
+
+cd $RUN_DIR
+
+for plotfile in $PLOT_DIR/$PLOT_BASENAME*; do
+    [[ ! -d "$plotfile" ]] && continue
+    [[ "$plotfile" == *.old.* ]] && continue
+    [[ -e "$plotfile/convgrad" ]] && continue
+    $script diag.plotfile=$plotfile
+done
+
+#mv *.convgrad PLOTS

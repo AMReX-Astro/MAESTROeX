@@ -101,4 +101,4 @@ fig.set_size_inches(22,14.5)
 plt.tight_layout()
 
 basename = os.path.basename(plotfile)
-plt.savefig("plt/" + basename + "_slice.png")
+plt.savefig("plt_slice/" + basename + ".png")
