@@ -197,6 +197,7 @@ AMREX_INLINE void init_1d()
     xn_top_layer[ifuel1] = fuel1_frac;
     xn_top_layer[ifuel2] = fuel2_frac;
     xn_top_layer[ifuel3] = fuel3_frac;
+    xn_top_layer[ifuel4] = fuel4_frac;
 
 
     // check if they sum to 1
