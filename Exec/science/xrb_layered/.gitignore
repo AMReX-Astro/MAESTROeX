@@ -1,4 +1,4 @@
 *.ipynb_checkpoints/
 **/.vscode
 *slurm*
-RUN_LOG.md
+log.md

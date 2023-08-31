@@ -26,7 +26,7 @@ XRB=$MAESTROEX_HOME/Exec/science/xrb_layered
 MAESTRO_EXEC=$XRB/Maestro2d.gnu.x86-milan.MPI.ex
 XRB_SCRATCH=$PSCRATCH/xrb_layered
 
-INPUTS=$XRB/inputs/inputs_2d_toy_rad_wide_6cm
+INPUTS=inputs
 RUN_DIR="RUN0"
 
 # Path of checks dir from *inside* run directory
@@ -62,7 +62,14 @@ find_chk_file "*chk???????"
 
 # restartString will be empty if no chk files are found -- i.e. new run
 if [ "${restartFile}" = "" ]; then
-    restartString=""
+    #restartString=""
+
+    rm output.txt # we are starting over
+
+    # In this case, we need to run the first step not in parallel
+    ${MAESTRO_EXEC} ${INPUTS} maestro.max_step=1
+    restartString="maestro.restart_file=chk0000000"
+
 else
     restartString="maestro.restart_file=${restartFile}"
 fi
