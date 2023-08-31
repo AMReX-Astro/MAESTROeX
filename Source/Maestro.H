@@ -141,10 +141,6 @@ class Maestro : public amrex::AmrCore {
     /// @param is_initIter is it the initial iteration?
     void AdvanceTimeStepAverage(bool is_initIter);
 
-    // advance solution at all levels for a single time step using SDC
-    // instead of Strang splitting
-    void AdvanceTimeStepSDC(bool is_initIter);
-
     // end MaestroAdvance.cpp functions
     ////////////
 
@@ -498,19 +494,6 @@ class Maestro : public amrex::AmrCore {
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
         const BaseState<amrex::Real>& rho0_predicted_edge);
 
-    // SDC
-    void DensityAdvanceSDC(
-        int which_step, amrex::Vector<amrex::MultiFab>& scalold,
-        amrex::Vector<amrex::MultiFab>& scalnew,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sflux,
-        amrex::Vector<amrex::MultiFab>& scal_force,
-        amrex::Vector<amrex::MultiFab>& etarhoflux,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        const BaseState<amrex::Real>& rho0_predicted_edge);
-    ////////////////////////
-
     ////////////
     // MaestroDiag.cpp functions
 
@@ -576,18 +559,6 @@ class Maestro : public amrex::AmrCore {
         amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
         const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
         const amrex::Vector<amrex::MultiFab>& thermal);
-
-    // SDC
-    void EnthalpyAdvanceSDC(
-        int which_step, amrex::Vector<amrex::MultiFab>& scalold,
-        amrex::Vector<amrex::MultiFab>& scalnew,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sedge,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& sflux,
-        amrex::Vector<amrex::MultiFab>& scal_force,
-        amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& umac,
-        const amrex::Vector<std::array<amrex::MultiFab, AMREX_SPACEDIM>>& w0mac,
-        const amrex::Vector<amrex::MultiFab>& thermal);
-    ////////////////////////
 
     ////////////////////////
     // MaestroFillData.cpp functions
@@ -809,8 +780,6 @@ class Maestro : public amrex::AmrCore {
 
     /// Performs the divu iteration
     void DivuIter(int istep_divu_iter);
-    // SDC
-    void DivuIterSDC(int istep_divu_iter);
 
     /// Performs the initial iteration to initialize `gradpi`
     void InitIter();
@@ -1436,14 +1405,6 @@ class Maestro : public amrex::AmrCore {
                const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
                const amrex::Real time_in);
 
-    void ReactSDC(const amrex::Vector<amrex::MultiFab>& s_in,
-                  amrex::Vector<amrex::MultiFab>& s_out,
-                  amrex::Vector<amrex::MultiFab>& rho_Hext,
-                  const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
-                  const amrex::Real time_in,
-                  amrex::Vector<amrex::MultiFab>& source);
-
-#ifndef SDC
     void Burner(const amrex::Vector<amrex::MultiFab>& s_in,
                 amrex::Vector<amrex::MultiFab>& s_out,
                 const amrex::Vector<amrex::MultiFab>& rho_Hext,
@@ -1452,19 +1413,7 @@ class Maestro : public amrex::AmrCore {
                 const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
                 const amrex::Real time_in);
 
-#else
-    void Burner(const amrex::Vector<amrex::MultiFab>& s_in,
-                amrex::Vector<amrex::MultiFab>& s_out,
-                const BaseState<amrex::Real>& p0, const amrex::Real dt_in,
-                const amrex::Real time_in,
-                const amrex::Vector<amrex::MultiFab>& source);
-#endif
-
     // compute heating terms, rho_omegadot and rho_Hnuc
-    void MakeReactionRates(amrex::Vector<amrex::MultiFab>& rho_omegadot,
-                           amrex::Vector<amrex::MultiFab>& rho_Hnuc,
-                           const amrex::Vector<amrex::MultiFab>& scal);
-
     void MakeIntraCoeffs(const amrex::Vector<amrex::MultiFab>& scal1,
                          const amrex::Vector<amrex::MultiFab>& scal2,
                          amrex::Vector<amrex::MultiFab>& cp,
@@ -1714,17 +1663,6 @@ class Maestro : public amrex::AmrCore {
                         const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
                         const amrex::Vector<amrex::MultiFab>& pcoeff2);
 
-    void ThermalConductSDC(int which_step,
-                           const amrex::Vector<amrex::MultiFab>& s_old,
-                           amrex::Vector<amrex::MultiFab>& s_hat,
-                           const amrex::Vector<amrex::MultiFab>& s_new,
-                           const amrex::Vector<amrex::MultiFab>& hcoeff1,
-                           const amrex::Vector<amrex::MultiFab>& Xkcoeff1,
-                           const amrex::Vector<amrex::MultiFab>& pcoeff1,
-                           const amrex::Vector<amrex::MultiFab>& hcoeff2,
-                           const amrex::Vector<amrex::MultiFab>& Xkcoeff2,
-                           const amrex::Vector<amrex::MultiFab>& pcoeff2);
-
     void MakeExplicitThermalHterm(amrex::Vector<amrex::MultiFab>& thermal,
                                   const amrex::Vector<amrex::MultiFab>& scal,
                                   const amrex::Vector<amrex::MultiFab>& hcoeff);
@@ -1942,7 +1880,6 @@ class Maestro : public amrex::AmrCore {
     amrex::Vector<amrex::MultiFab> gpi;
     amrex::Vector<amrex::MultiFab> dSdt;
     amrex::Vector<amrex::MultiFab> pi;     // nodal
-    amrex::Vector<amrex::MultiFab> intra;  // for sdc
 
     /// this doesn't have to be persistent, but we make it so that we avoid
     /// continually creating and filling temporaries

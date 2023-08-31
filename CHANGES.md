@@ -1,3 +1,8 @@
+# 23.08
+
+  * remove the SDC code paths.  This is no longer supported by
+    Microphysics and is not being tested.
+
 # 23.06
 
   * the test_diffusion unit test was cleaned up and now gives the
