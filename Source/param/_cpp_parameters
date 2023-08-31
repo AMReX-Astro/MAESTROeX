@@ -601,18 +601,6 @@ do_heating                          bool            false
 
 
 #-----------------------------------------------------------------------------
-# category: SDC
-#-----------------------------------------------------------------------------
-
-# how many SDC iterations to take (requires the code be compiled with
-# {\tt SDC := t}
-sdc_iters                           int            1
-
-# recompute MAC velocity at the beginning of each SDC iter
-sdc_couple_mac_velocity             bool            false
-
-
-#-----------------------------------------------------------------------------
 # category: GPU
 #-----------------------------------------------------------------------------
 
