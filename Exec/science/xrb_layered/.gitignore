@@ -2,3 +2,5 @@
 **/.vscode
 *slurm*
 log.md
+analysis
+scripts
