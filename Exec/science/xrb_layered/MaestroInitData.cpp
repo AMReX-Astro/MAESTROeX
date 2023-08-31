@@ -42,8 +42,8 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
         
         // Generate random seed (or get from input), and RNG
         int seed = 0;
-        if (pert_seed != -1) {
-            seed = pert_seed;
+        if (problem_rp::pert_seed != -1) {
+            seed = problem_rp::pert_seed;
         } else {
             std::random_device r;
             seed = r();
