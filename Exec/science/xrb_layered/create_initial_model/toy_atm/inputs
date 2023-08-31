@@ -17,7 +17,7 @@ problem.H_star = 1070.0
 problem.delta  = 10.0
 
 problem.H_rad = 1330.0
-problem.F_rad = 5.0e21
+problem.F_rad = 4.0e21
 
 problem.H_sig = 1655.0
 problem.alpha_sig = 171.0

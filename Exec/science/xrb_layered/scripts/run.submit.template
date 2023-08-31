@@ -29,9 +29,6 @@ XRB_SCRATCH=$PSCRATCH/xrb_layered
 INPUTS=inputs
 RUN_DIR="RUN0"
 
-# Path of checks dir from *inside* run directory
-CHECKS_DIR=CHECKS
-
 cd $XRB_SCRATCH/$RUN_DIR
 mkdir -p PLOTS
 mkdir -p CHECKS
@@ -45,7 +42,7 @@ function find_chk_file {
 
     # find the latest 2 restart files.  This way if the latest didn't
     # complete we fall back to the previous one.
-    temp_files=$(find $CHECKS_DIR -maxdepth 1 -name "${chk}" -print | sort | tail -2)
+    temp_files=$(find CHECKS -maxdepth 1 -name "${chk}" -print | sort | tail -2)
     restartFile=""
     for f in ${temp_files}
     do
@@ -68,7 +65,7 @@ if [ "${restartFile}" = "" ]; then
 
     # In this case, we need to run the first step not in parallel
     ${MAESTRO_EXEC} ${INPUTS} maestro.max_step=1
-    restartString="maestro.restart_file=chk0000000"
+    restartString="maestro.restart_file=CHECKS/chk0000001"
 
 else
     restartString="maestro.restart_file=${restartFile}"

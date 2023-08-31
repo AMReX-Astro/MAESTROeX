@@ -47,7 +47,7 @@ ash4_frac      real         0.0
 xmin           real         0.0
 xmax           real         2.e3
 
-model_prefix   character    "model"
+model_prefix   character    "toy_atm"
 
 index_base_from_temp  integer   0
 
