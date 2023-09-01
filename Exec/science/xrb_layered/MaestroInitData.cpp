@@ -83,7 +83,7 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
                     
                     auto eos_input_flag = eos_input_tp; // temperature & pressure eos
                     eos(eos_input_flag, eos_state);
-                    scal(i, j, j, Rho) = eos_state.rho;
+                    scal(i, j, k, Rho) = eos_state.rho;
                     scal(i, j, k, RhoH) = eos_state.rho * eos_state.h; // re-compute enthalpy
                     scal(i, j, k, Temp) = eos_state.T;
                     for (auto comp=0; comp < NumSpec; comp++) {
