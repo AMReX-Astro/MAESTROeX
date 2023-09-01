@@ -612,23 +612,6 @@ namespace: ``maestro``
 
 
 
-**SDC**
-
-.. index:: maestro.sdc_iters, maestro.sdc_couple_mac_velocity
-
-
-+----------------------------------------+---------------------------------------------------------+---------------+
-| parameter                              | description                                             | default value |
-+========================================+=========================================================+===============+
-| ``sdc_iters``                          | how many SDC iterations to take (requires the code be   | 1             |
-|                                        | compiled with {\tt SDC := t}                            |               |
-+----------------------------------------+---------------------------------------------------------+---------------+
-| ``sdc_couple_mac_velocity``            | recompute MAC velocity at the beginning of each SDC     | false         |
-|                                        | iter                                                    |               |
-+----------------------------------------+---------------------------------------------------------+---------------+
-
-
-
 **GPU**
 
 .. index:: maestro.deterministic_nodal_solve
