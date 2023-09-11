@@ -1,4 +1,4 @@
-problem.model_prefix = "toy_atm"
+problem.model_prefix = "toy_atm_hot"
 
 problem.nx = 1024
 problem.xmin = 0.0
@@ -21,7 +21,7 @@ problem.H_star = 1070.0
 problem.delta  = 10.0
 
 problem.H_rad = 1330.0
-problem.F0 = 1.e22
+problem.F0 = 1.8e22
 
 problem.X0 = 0.70
 problem.Zcno = 0.02
