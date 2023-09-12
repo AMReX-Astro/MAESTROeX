@@ -1,5 +1,5 @@
 # INITIAL MODEL
-maestro.model_file = "toy_atm_3cm.hse"
+maestro.model_file = "toy_atm_hot_3cm.hse"
 maestro.perturb_model = true
 maestro.use_soundspeed_firstdt = 1
 #maestro.use_thermal_diffusion = true
