@@ -15,7 +15,7 @@ problem.T_star = 2.0e8
 #problem.T_base = 2.75e8
 problem.T_base = 3.5e8
 
-problem.T_lo = 1.e7
+problem.T_lo = 1.e6
 
 problem.H_star = 1070.0
 problem.delta  = 10.0
