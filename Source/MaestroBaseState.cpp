@@ -193,8 +193,13 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             }
 #endif
 
-            // (rho,T) --> p,h
-            eos(eos_input_rt, eos_state);
+            if (basestate_use_pres_model) {
+                // (rho,p) --> T,h
+                eos(eos_input_rp, eos_state);
+            } else {
+                // (rho,T) --> p,h
+                eos(eos_input_rt, eos_state);
+            }
 
             s0_init_arr(n, r, Rho) = d_ambient;
             s0_init_arr(n, r, RhoH) = d_ambient * eos_state.h;
@@ -209,7 +214,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             }
 #endif
             p0_init_arr(n, r) = eos_state.p;  // p_ambient !
-            s0_init_arr(n, r, Temp) = t_ambient;
+            s0_init_arr(n, r, Temp) = eos_state.T;
 
             // keep track of the height where we drop below the cutoff density
             if (s0_init_arr(n, r, Rho) <= base_cutoff_density &&
