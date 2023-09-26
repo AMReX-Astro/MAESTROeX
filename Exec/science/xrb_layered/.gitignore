@@ -1,6 +1,9 @@
 *.ipynb_checkpoints/
 **/.vscode
 *slurm*
+*submit*
+*out*
+*debug*
 log.md
 analysis
 scripts
