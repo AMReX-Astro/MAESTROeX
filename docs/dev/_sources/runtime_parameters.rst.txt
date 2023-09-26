@@ -34,7 +34,7 @@ namespace: ``maestro``
 
 **problem initialization**
 
-.. index:: maestro.model_file, maestro.perturb_model, maestro.print_init_hse_diag
+.. index:: maestro.model_file, maestro.perturb_model, maestro.print_init_hse_diag, maestro.basestate_use_pres_model
 
 
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -47,6 +47,9 @@ namespace: ``maestro``
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``print_init_hse_diag``                | print out HSE diagnostics as a function of r for the    | false         |
 |                                        | initial model                                           |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``basestate_use_pres_model``           | do we use rho, T or rho, P from the initial model to    | 0             |
+|                                        | establish thermodynamics                                |               |
 +----------------------------------------+---------------------------------------------------------+---------------+
 
 
