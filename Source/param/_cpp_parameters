@@ -43,6 +43,9 @@ perturb_model                       bool        false          y
 # print out HSE diagnostics as a function of r for the initial model
 print_init_hse_diag                 bool        false          y
 
+# do we use rho, T or rho, P from the initial model to establish thermodynamics
+basestate_use_pres_model            int         0              y
+
 #-----------------------------------------------------------------------------
 # category: timestepping
 #-----------------------------------------------------------------------------
