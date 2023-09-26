@@ -107,9 +107,43 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
     const auto temp_min_l = temp_min;
     const auto dens_min_l = dens_min;
 
-    GpuArray<Real, NumSpec> xn_zone;
-    // FIXME: need to allocate the xns here
+    //read in composition
+    Array2D<Real, 0, N_XN_ZONES, 0, NumSpec> xn_zone;
+    if (xin_file == "uniform"){
+        for (auto k = 0; k < xn_hi; ++k){
+            for (auto comp = 0; comp < NumSpec; ++comp) {
+                xn_zone(k, comp) = 1./NumSpec;
+            } 
+        }
+    }
+    else {
+        // open the file
+        std::ifstream xn_file_s(xin_file);
+        Print() << " xin file = " << xin_file << std::endl;
 
+        if (!xn_file_s.is_open()) {
+            Abort("Could not open xin file!");
+        }
+
+        // start reading in the data
+        int comp = 0;
+        std::string line;
+        while (std::getline(xn_file_s, line)) {
+            //skip comments w/ nuc name
+            if (line.at(0) != '#'){
+                std::istringstream iss(line);
+                for (auto k = 0; k < xn_hi; ++k) {
+                    iss >> xn_zone(k, comp);
+                }
+                ++comp;
+            } 
+        }
+        xn_file_s.close();
+        if (comp != NumSpec){
+        Abort("Number of species in xinfile does not match number in Network");
+        }
+    }
+ 
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel
@@ -133,7 +167,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
             eos_state.T = temp_zone;
             eos_state.rho = dens_zone;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                eos_state.xn[comp] = xn_zone[comp];
+                eos_state.xn[comp] = xn_zone(k, comp);
             }
 
             eos(eos_input_rt, eos_state);
@@ -143,7 +177,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
             scal(i, j, k, RhoH) = dens_zone * eos_state.h;
             scal(i, j, k, Temp) = temp_zone;
             for (auto comp = 0; comp < NumSpec; ++comp) {
-                scal(i, j, k, FirstSpec + comp) = dens_zone * xn_zone[comp];
+                scal(i, j, k, FirstSpec + comp) = dens_zone * xn_zone(k, comp);
             }
         });
     }
