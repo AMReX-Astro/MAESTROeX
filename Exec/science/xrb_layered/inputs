@@ -2,6 +2,7 @@
 maestro.model_file = "toy_atm_hot_3cm.hse"
 maestro.perturb_model = true
 maestro.use_soundspeed_firstdt = 1
+maestro.basestate_use_pres_model = 1
 #maestro.use_thermal_diffusion = true
 
 # PROBLEM SIZE
