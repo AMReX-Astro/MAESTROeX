@@ -268,7 +268,7 @@ i.e.
 
 (Note that :math:`\chi_{\bar{\mu}}` is negative, as pressure is inversely proportional
 to mass per particle, and :math:`\frac{d \ln \bar{\mu}}{d \ln P}` is positive, since
-nuclear reactions sythesize more massive particles in the center of the star.)
+nuclear reactions synthesize more massive particles in the center of the star.)
 In this case, when a rising parcel eventually reaches neutral buoyancy, it will
 have a temperature excess in comparison to it’s surroundings.
 If the parcel can retain

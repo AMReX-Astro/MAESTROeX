@@ -3,7 +3,7 @@
 using namespace amrex;
 using namespace problem_rp;
 
-// prototype for pertubation function to be called on the
+// prototype for perturbation function to be called on the
 // device (if USE_CUDA=TRUE)
 AMREX_GPU_DEVICE
 void Perturb(const Real p0, const Real* s0, Real* perturbations,

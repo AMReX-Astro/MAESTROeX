@@ -29,7 +29,7 @@ http://amrex-astro.github.io/MAESTROeX/
   required, as is Python (>= 3.6) and standard tools available in any
   Unix-like environments (e.g., Perl and `sed`).
 
-  For GPU computing, CUDA 10 or later is requred.
+  For GPU computing, CUDA 10 or later is required.
 
 - To stay up-to-date with MAESTROeX, you will want to periodically
   pull changes from the repository by typing `git pull`.
@@ -43,7 +43,7 @@ http://amrex-astro.github.io/MAESTROeX/
   git clone --recursive https://github.com/AMReX-Astro/MAESTROeX.git
   ```
 
-  To add the submodules to an exisiting clone, from the top-level
+  To add the submodules to an existing clone, from the top-level
   MAESTROeX directory, do:
 
   ```

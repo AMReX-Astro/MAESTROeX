@@ -183,7 +183,7 @@ subroutine fplotfile_get_comps(pltfile, comps_sz, comps)
   !characters.
 
   !Perhaps there is a more elegant solution, but I've just resized the array to
-  !accomodate all of the characters and it works as a rudimentary work-around if
+  !accommodate all of the characters and it works as a rudimentary work-around if
   !one is really determined to have a string returned.
 
 !f2py intent(in) :: pltfile
@@ -340,7 +340,7 @@ subroutine fplotfile_get_data_3d(pltfile, component, mydata, nx, ny, nz, ierr)
 
 
   ! get the index bounds and dx for the coarse level.  Note, lo and
-  ! hi are ZERO based indicies
+  ! hi are ZERO based indices
   lo = lwb(plotfile_get_pd_box(pf, 1))
   hi = upb(plotfile_get_pd_box(pf, 1))
 

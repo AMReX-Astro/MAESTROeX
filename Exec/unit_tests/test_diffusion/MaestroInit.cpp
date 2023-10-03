@@ -124,7 +124,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
             const auto x = prob_lo[0] + (Real(i) + 0.5) * dx[0] - center_p[0];
             const auto y = prob_lo[1] + (Real(j) + 0.5) * dx[1] - center_p[1];
 
-            // apply the guassian enthalpy pulse at constant density
+            // apply the Gaussian enthalpy pulse at constant density
             const auto dist2 = x * x + y * y;
 
             const auto h_zone =

@@ -24,8 +24,8 @@ V-cycle.
 The MG solvers are located in amrex/Src/LinearSolvers/F_MG/.
 There are two MG solvers, for cell-centered and nodal data.
 Generally, the routines specific to the cell-centered solver will have
-cc in their name, and those specific to the nodal solver will have
-nd in their name.
+``cc`` in their name, and those specific to the nodal solver will have
+``nd`` in their name.
 
 Support for :math:`\Delta x \ne \Delta y \ne \Delta z`
 
@@ -241,7 +241,7 @@ The allowed values are:
 
 -  mg_bottom_solver / hg_bottom_solver = 4: a special
    bottom solver that extends the range of the multigrid coarsening
-   by aggregrating coarse grids on the original mesh together and
+   by aggregating coarse grids on the original mesh together and
    further coarsening.
 
 You should use the special bottom solver (4) whenever possible, even

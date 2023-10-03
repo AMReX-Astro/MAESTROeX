@@ -99,7 +99,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         // do HSE using RK2
 
-        // out intergration starts at y - h
+        // out integration starts at y - h
         Real h = r == 0 ? base_geom.dr(n) * 0.5 : base_geom.dr(n);
 
         auto k = dUdy(y - h, U_old);
