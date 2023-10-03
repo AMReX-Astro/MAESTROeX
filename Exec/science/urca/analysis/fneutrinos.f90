@@ -108,7 +108,7 @@ program fneutrinos
   dx = plotfile_get_dx(pf, 1)
 
   ! get the index bounds for the finest level.
-  ! Note, lo and hi are ZERO-based indicies
+  ! Note, lo and hi are ZERO-based indices
   flo = lwb(plotfile_get_pd_box(pf, pf%flevel))
   fhi = upb(plotfile_get_pd_box(pf, pf%flevel))
 

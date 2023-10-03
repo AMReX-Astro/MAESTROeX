@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-import yt
-import numpy as np
 import matplotlib.pylab as pl
-
-from yt.visualization.api import Streamlines
-from yt.units import cm
+import numpy as np
+import yt
 from mpl_toolkits.mplot3d import Axes3D
+from yt.units import cm
+from yt.visualization.api import Streamlines
 
 # Load the dataset
 ds = yt.load('wd_512_rhoc4-5_plt64636')
@@ -24,7 +23,7 @@ pos = pos_dx
 streamlines = Streamlines(ds, pos, ('boxlib', 'x_vel'), ('boxlib', 'y_vel'), ('boxlib', 'z_vel'), get_magnitude=True, volume=ds.all_data())
 streamlines.integrate_through_volume()
 
-# Create a 3D plot, trace the streamlines throught the 3D volume of the plot
+# Create a 3D plot, trace the streamlines through the 3D volume of the plot
 fig=pl.figure()
 ax = Axes3D(fig)
 for stream in streamlines.streamlines:

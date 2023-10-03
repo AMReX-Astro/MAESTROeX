@@ -1,8 +1,9 @@
 #!/usr/bin/env python
+import argparse
+
+import numpy as np
 import yt
 from yt import derived_field
-import numpy as np
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
@@ -15,7 +16,7 @@ parser.add_argument('-sign', '--sign', action='store_true', help='If supplied, p
 parser.add_argument('-fmin', '--field_min', type=float, help='Minimum scale for colorbar.')
 parser.add_argument('-fmax', '--field_max', type=float, help='Maximum scale for colorbar.')
 parser.add_argument('-log', '--logscale', action='store_true', help='If supplied, use a log scale for the field.')
-parser.add_argument('-symlog', '--symlog', action='store_true', help='If supplied, use symlog scaling, which is linear near zero, to accomodate positive and negative values.')
+parser.add_argument('-symlog', '--symlog', action='store_true', help='If supplied, use symlog scaling, which is linear near zero, to accommodate positive and negative values.')
 parser.add_argument('-linthresh', '--linthresh', type=float, help='Linear threshold for symlog scaling. (Default is 0.1)')
 parser.add_argument('-dc', '--drawcells', action='store_true', help='If supplied, draw the cell edges.')
 parser.add_argument('-dg', '--drawgrids', action='store_true', help='If supplied, draw the grids.')

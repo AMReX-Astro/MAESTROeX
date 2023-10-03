@@ -68,7 +68,7 @@ program fad_excess
 
   plot_name(1) = "adiabatic excess"
 
-  ! parse the arguements
+  ! parse the arguments
   narg = command_argument_count()
 
   farg = 1
