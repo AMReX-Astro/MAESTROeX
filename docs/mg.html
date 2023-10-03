@@ -179,8 +179,8 @@ V-cycle.</p>
 <p>The MG solvers are located in amrex/Src/LinearSolvers/F_MG/.
 There are two MG solvers, for cell-centered and nodal data.
 Generally, the routines specific to the cell-centered solver will have
-cc in their name, and those specific to the nodal solver will have
-nd in their name.</p>
+<code class="docutils literal notranslate"><span class="pre">cc</span></code> in their name, and those specific to the nodal solver will have
+<code class="docutils literal notranslate"><span class="pre">nd</span></code> in their name.</p>
 <p>Support for <span class="math notranslate nohighlight">\(\Delta x \ne \Delta y \ne \Delta z\)</span></p>
 <section id="data-structures">
 <h3>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this heading"></a></h3>
@@ -354,7 +354,7 @@ gradient stabilized—this is the default.</p></li>
 gradient method</p></li>
 <li><p>mg_bottom_solver / hg_bottom_solver = 4: a special
 bottom solver that extends the range of the multigrid coarsening
-by aggregrating coarse grids on the original mesh together and
+by aggregating coarse grids on the original mesh together and
 further coarsening.</p></li>
 </ul>
 <p>You should use the special bottom solver (4) whenever possible, even
