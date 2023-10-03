@@ -1,4 +1,10 @@
-# 23.08
+# 23.10
+
+  * a new option, `basestate_use_pres_model` was added (#398)
+    this allows us to use (rho, p) from the initial model instead of
+    (rho, T) to establish the thermodynamics.
+
+# 23.09
 
   * remove the SDC code paths.  This is no longer supported by
     Microphysics and is not being tested.
@@ -7,7 +13,7 @@
 
   * the test_diffusion unit test was cleaned up and now gives the
     expected convergence (#336, #381)
-    
+
 # 23.05
 
   * MAESTROeX now monitors the burn_t success flag and aborts if there
