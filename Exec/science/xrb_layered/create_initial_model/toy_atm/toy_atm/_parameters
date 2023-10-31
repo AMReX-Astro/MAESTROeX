@@ -2,41 +2,32 @@
 
 model_prefix   character    "model"
 
-# Domain
+g_const        real         -2.450e14
+
 nx             integer      640
 xmin           real         0.0
 xmax           real         2.e3
 
-# Gravity
-g_const        real         -2.45e14
+dens_base      real         2.e6
+low_density_cutoff  real    1.e-4
 
-# Substrate
 T_star         real         1.e8
+T_base         real         5.e8
+T_lo           real         5.e7
+
 H_star         real         500.e0
 delta          real         25.0
 
-# Base
-dens_base      real         2.e6
-T_base         real         5.e8
+H_rad          real         700.e0
+F0             real         -1
 
-# Temperature profiles
-del1           real         0.4
-y2             real         1.e8
-del2           real         0.1
-y3             real         1.e7
-del3           real         0.2
-
-# Outer boundary
-low_density_cutoff  real    1.e-4
-T_lo           real         5.e7
-
-# Composition
 X0             real         0.7
 Zcno           real         0.02
 yd             real         1.e7
 ash_name       character    "iron-56"
 
-# Other
 index_base_from_temp  integer   0
+
+smallx         real         1.e-10
 small_temp     real         -1.e200
 small_dens     real         -1.e200

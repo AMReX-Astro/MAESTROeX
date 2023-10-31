@@ -1,0 +1,32 @@
+problem.model_prefix = "toy_atm_hot_high"
+
+problem.nx = 1024
+problem.xmin = 0.0
+problem.xmax = 3072.0
+
+problem.g_const = -1.29e14
+
+problem.dens_base = 1.7e6
+#problem.dens_base = 2.0e6
+problem.low_density_cutoff = 1.e-2
+
+problem.T_star = 2.0e8
+
+#problem.T_base = 2.75e8
+problem.T_base = 3.5e8
+
+problem.T_lo   = 1.e7
+
+problem.H_star = 1070.0
+problem.delta  = 10.0
+
+problem.H_rad = 1330.0
+#problem.F0 = 1.8e22
+problem.F0 = 1.845e22
+
+problem.X0 = 0.70
+problem.Zcno = 0.02
+problem.yd = 3.7e7
+problem.ash_name = "iron-56"
+
+problem.index_base_from_temp = 1

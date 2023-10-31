@@ -7,25 +7,22 @@
 //  peak temperature (T_base) representing the base of an accreted
 //  layer at r=H_star, an isentropic profile representing the convective
 //  region at ignition, then a radiative profile from r=H_rad. 
-//  Below, three different power-laws set the temperature profile 
-//  T = T0*(y/y0)^del
-//  where y is the column depth (=pressure/gravity) and, del is the power-law
-//  index, and T0 and y0 are the values at the beginning of a given region.
-//  Those regions have different physics: 1) an adiabatic zone
-//  where helium is burning and generating convection, 2) a stable region
-//  where nothing is burning, 3) a stable region with hot CNO burning.
 
-//  The composition transitions from pure ash, to helium and CNO, to a solar 
-//  mixture including hydrogen, with initial hydrogen fraction X0 and CNO fraction
+//  The composition transitions from pure ash, to pure helium, to a solar 
+//  and CNO mixture, with initial hydrogen fraction X0 and CNO fraction
 //  Zcno (inputs file).  The CNO is split between o14 and o15 with ratio
 //  determined by their beta decay times (70.606/122.24). Because hot CNO burns
 //  hydrogen at a constant rate:
 //  X = X0(1-y/yd),
 //  where yd is the depletion column depth, another input parameter.
+//  
+//  In the radiative layer,
+//  dF/dy = -eps,
+//  where eps is the constant hot CNO burning rate.
 
 //  This can serve as an initial model for a He-triggered XRB with an
-//  overlying hydrogen rich shell.
-
+//  overlying hydrogen rich shell
+//
 //  The temperature profile is:
 //
 //         T
@@ -34,28 +31,26 @@
 //  T_base +        /\
 //         |       /  \
 //         |      /  . \
-//  T_star +-----+      \  T ~ y^del_1 (del_1~del_ad)
+//  T_star +-----+      \  nabla=nabla_ad
 //         |     .   .   \
-//         |     .   .    \
-//         |     .   .     +__
-//         |     .   .     .  `---   T ~ y^del_2
-//         |     .   .     .      `---+
-//         |     .   .     .          .`-  
-//         |     .   .     .          .   `-   T ~ y^del_3
-//         |     .   .     .          .      `-
-//         |     .   .     .          .         `-
+//         |              \
+//  T_lo   +     .   .     +_
+//         |     .   .     .  `-
+//         |     .   .     .     `-  nabla=nabla_rad
+//         |     .   .     .        `-
+//         |     .   .     .           `-
+//         |     .   .     .              `-
 //         +-----+---+-----+---------------------> r
 //         |      \  /
 //         |      delta
 //         |< H_star>|
-//         |-----<y_2>----| 
-//         |----------<y_3>---------| 
+//         |---<H_rad>----| 
 //
 //  The composition profile is:
 //
 //         X
 //         ^
-//         |  star  | reg 1 | reg 2  |  region 3 
+//         |  star    layer1      layer2 
 //    1.0  +--------*----------                 
 //         |  ash   .          \
 //         |        .           \    +--------- X0 (hydrogen)
@@ -64,14 +59,21 @@
 //         |        .             /\
 //         |        .            /  \
 //         |        .           /    +--------- 1-X0-Zcno (helium)
-//         |        .----------/--------------- Zcno (o14/o15)
+//         |        .          /     +--------- Zcno (o14/o15)
 //    0.0  +--------+---------+-----------------> r
 //         |<H_star>|    
-//         |------<y_d>------|     
+//         |---<H_rad>----| 
+//         |------<y_d>-----|     
 //         |
 //
-//  The transition from ash to fuel is a hyperbolic tangent, parametrized
-//  by delta (the half-width of the tanh), and starting at H_star.
+//  The transition from ash to fuel2 is a hyperbolic tangent, parametrized
+//  by delta (the half-width of the tanh).  The transition from layer1 to
+//  layer2 is a sigmoid, parametrized by alpha_sig and beta_sig.  H_star and
+//  H_sig controls the location of these transitions.
+//
+//  The fuel and ash compositions are specified by the fuel?_name,
+//  fuel?_frac and ash?_name, ash?_frac parameters (name of the species
+//  and mass fraction).  Where ? = 1,2,3.
 //
 //  The model is placed into HSE by the following differencing:
 //
@@ -79,7 +81,7 @@
 //
 //  This will be iterated over in tandem with the EOS call,
 //  P(i-1) = P_eos(rho(i-1), T(i-1), X(i-1))
-
+//
 
 #include <AMReX_Array.H>
 
@@ -182,6 +184,9 @@ AMREX_INLINE void init_1d()
 
     eos(eos_input_rt, eos_state);
 
+    // store the conditions at the base -- we'll use the entropy later
+    // to constrain the isentropic layer
+  
     Real pres_base = eos_state.p;
     Real entropy_base = eos_state.s;
 
@@ -237,6 +242,27 @@ AMREX_INLINE void init_1d()
     std::cout << "index_base = " << index_base << "; x=" << xzn_hse(index_base) << std::endl;
 
 
+    // find the index of the radiative zone height
+    int index_rad = -1;
+
+    if (problem_rp::H_rad < problem_rp::H_star) {
+        amrex::Error("ERROR: H_rad<H_star. Adiabatic (base) layer should be below radiative layer");
+    }
+
+    for (int i = index_base; i < problem_rp::nx; ++i) {
+        if (xzn_hse(i) >= problem_rp::xmin + problem_rp::H_rad) {
+            index_rad = i;
+            break;
+        }
+    }
+
+    if (index_rad == -1) {
+        amrex::Error("ERROR: rad_height not found on grid");
+    }
+
+    std::cout << "index_rad = " << index_rad << "; x=" << xzn_hse(index_rad) << std::endl;
+
+
     // make the base thermodynamics consistent for this base point -- that is
     // what we will integrate from!
 
@@ -250,40 +276,220 @@ AMREX_INLINE void init_1d()
 
     model_hse(index_base, ipres) = eos_state.p;
 
-    Real y_base = -1.*eos_state.p/problem_rp::g_const;
-    std::cout << "base column depth y8 = " << y_base/1.e8 << std::endl;
+    std::cout << "base column depth y8 = " << -1.*eos_state.p/problem_rp::g_const/1.e8 << std::endl;
 
 
     // HSE solve
 
-    // the HSE state will be done by fixing the temperature according to the power-law
-    // then iterating until the pressure from HSE and from EOS agree
+    // the HSE state will be done putting creating an isentropic state until
+    // reaching H_rad. Then, we set the radiative profile using the flux
+
+    // once the density goes below low_density_cutoff, we stop HSE
 
     Real dens_zone;
     Real temp_zone;
     Real pres_zone;
-    Real y_zone;
 
     Real p_want;
-    Real y_want;
     Real drho;
     Real dtemp;
+    Real entropy;
 
-    // Keep track of which power-law we are currently in
-    // We know which one is first
-    Real current_T0 = eos_state.T;
-    Real current_y0 = y_base;
-    Real current_del = problem_rp::del1;
-
-    bool cross_y2 = false;
-    bool cross_y3 = false;
-
-
-    // Integrate up to the top of the model
-
-    for (int i = index_base+1; i < problem_rp::nx; ++i) {
+    // integrate up until radiative zone
+    for (int i = index_base+1; i < index_rad+1; ++i) {
 
         Real delx = xzn_hse(i) - xzn_hse(i-1);
+
+        // we've already set initial guesses for density, temperature, and  composition
+        dens_zone = model_hse(i, idens);
+        temp_zone = model_hse(i, itemp);
+        for (int n = 0; n < NumSpec; ++n) {
+            xn[n] = model_hse(i, ispec+n);
+        }
+
+        // iteration loop
+        // start off the Newton loop by saying that the zone has not converged
+        bool converged_hse = false;
+
+        for (int iter = 0; iter < MAX_ITER; ++iter) {
+
+            // get the pressure we want from the HSE equation, just the
+            // zone below the current.  Note, we are using an average of
+            // the density of the two zones as an approximation of the
+            // interface value -- this means that we need to iterate for
+            // find the density and pressure that are consistent
+
+            // furthermore, we need to get the entropy that we need,
+            // which will come from adjusting the temperature in
+            // addition to the density.
+
+            // HSE differencing
+        
+            p_want = model_hse(i-1, ipres) +
+            delx * 0.5_rt * (dens_zone + model_hse(i-1, idens)) * problem_rp::g_const;
+
+            // pressure also sets the hydrogen fraction
+            // (+ P/g/yd because g is defined negative)
+            xn[ih1] = problem_rp::X0 * (1 + p_want/problem_rp::g_const/problem_rp::yd);
+            xn[ihe4] = 1.0 - problem_rp::Zcno - xn[ih1];
+            if (xn[ih1]<0) {
+                xn[ih1] = 0;
+                xn[ihe4] = 1.0 - problem_rp::Zcno;
+            }
+
+
+            // now we have two functions to zero:
+            //   A = p_want - p(rho,T)
+            //   B = entropy_base - s(rho,T)
+            // We use a two dimensional Taylor expansion and find the deltas
+            // for both density and temperature
+
+            // now we know the pressure and the entropy that we want, so we
+            // need to find the temperature and density through a two
+            // dimensional root find
+
+            // (t, rho) -> (p, s)
+            eos_state.T = temp_zone;
+            eos_state.rho = dens_zone;
+            for (int n = 0; n < NumSpec; ++n) {
+                eos_state.xn[n] = xn[n];
+            }
+
+            eos(eos_input_rt, eos_state);
+
+            entropy = eos_state.s;
+            pres_zone = eos_state.p;
+
+            Real A = p_want - pres_zone;
+            Real B = entropy_base - entropy;
+
+            // Solve F(rho,T) = [A(rho,T),B(rho,T)] = [0,0] with Newton-Raphson method
+            // [drho,dT] = -inv(J_F) [A,B]
+            // J_F is the jacobian matrix {{dA/drho,dA/dT},{dB/drho,dB/dT}}
+            // Work out algebraically the expression below for the updates drho and dT
+
+            // EOS quantities
+            Real dpt = eos_state.dpdT; // dp/dT
+            Real dpd = eos_state.dpdr; // dp/drho
+            Real dst = eos_state.dsdT; // ds/dT
+            Real dsd = eos_state.dsdr; // ds/drho
+
+            dtemp = ((dsd / (dpd - 0.5_rt * delx * problem_rp::g_const)) * A - B)/
+                (dsd * dpt / (dpd - 0.5_rt * delx * problem_rp::g_const) - dst);
+
+            drho = (A - dpt * dtemp) / (dpd - 0.5_rt * delx * problem_rp::g_const);
+
+            // Update density and temperature in the zone
+            // This assumes both values are going down
+            dens_zone = amrex::max(0.9_rt * dens_zone,
+                                    amrex::min(dens_zone + drho, 1.1_rt * dens_zone));
+
+            temp_zone = amrex::max(0.9_rt * temp_zone,
+                                    amrex::min(temp_zone + dtemp, 1.1_rt * temp_zone));
+
+
+            // check if the density falls below our minimum cut-off --
+            // if so, floor it
+            if (dens_zone < problem_rp::low_density_cutoff) {
+                dens_zone = problem_rp::low_density_cutoff;
+                temp_zone = problem_rp::T_lo;
+                converged_hse = true;
+                fluff = true;
+
+                // raise a warning because this happens before the radiative part
+                std::cout << "\nWarning: reached cut-off density before radiative zone!!" << std::endl;
+
+                break;
+            }
+
+            // Stop if converged
+            if (std::abs(drho) < TOL * dens_zone &&
+                std::abs(dtemp) < TOL*temp_zone) {
+                converged_hse = true;
+                break;
+            }
+        
+        }
+
+        if (! converged_hse) {
+            std::cout << "\nError zone " << i << " did not converge in init_1d" << std::endl;
+            std::cout << "x = " << xzn_hse(i) << "(isentropic layer)" << std::endl;
+            std::cout << "\ndens_zone   temp_zone" << std::endl;
+            std::cout << dens_zone << "   " << temp_zone << std::endl;
+            std::cout << "\np_want   entropy_base   entropy" << std::endl;
+            std::cout << p_want << " " << entropy_base << " " << entropy << std::endl;
+            std::cout << "\nX(h1)   X(he4)   X(ash)" << std::endl;
+            std::cout << xn[ih1] << " " << xn[ihe4] << " " << xn[iash] << std::endl;
+            std::cout << "\ndrho   dT" << std::endl;
+            std::cout << drho << " " << dtemp << std::endl;
+            amrex::Error("Error: HSE non-convergence\n");
+        }
+
+        // call the EOS one more time for this zone and then go on to the next
+        // (t, rho) -> (p)
+     
+        eos_state.T = temp_zone;
+        eos_state.rho = dens_zone;
+        for (int n = 0; n < NumSpec; ++n) {
+            eos_state.xn[n] = xn[n];
+            model_hse(i, ispec+n) = xn[n];
+        }
+
+        eos(eos_input_rt, eos_state);
+
+        pres_zone = eos_state.p;
+
+        // update the thermodynamics in this zone
+        model_hse(i, idens) = dens_zone;
+        model_hse(i, itemp) = temp_zone;
+        model_hse(i, ipres) = pres_zone;
+
+        // to make this process converge faster, set the density in the
+        // next zone to the density in this zone
+        model_hse(i+1,idens) = dens_zone;
+
+    }
+
+    std::cout << "Reached end of adiabatic region at r=" << xzn_hse(index_rad) <<" T8=" << model_hse(index_rad,itemp)/1.e8 << std::endl;
+    std::cout << "radiative column depth y8 = " << -1.*pres_zone/problem_rp::g_const/1.e8 << std::endl;
+
+
+
+
+    // Above is the radiative layer
+
+    // Get the radiative flux at the edge of the adiabatic zone
+
+    int i0 = index_rad;
+
+    Real rad_D = C::a_rad * C::c_light /
+        (3 * 0.2 * 0.5 * (
+            (1 + model_hse(i0, ispec+Species::H1-1)) * model_hse(i0, idens) +
+            (1 + model_hse(i0-1, ispec+Species::H1-1)) * model_hse(i0-1, idens)
+        ));
+
+    Real dT4_dr = (pow(model_hse(i0, itemp), 4) - pow(model_hse(i0-1, itemp), 4)) / 
+                  (xzn_hse(i0) - xzn_hse(i0-1));
+
+    Real F0 = problem_rp::F0;
+    if (F0 == -1) {
+        F0 = -rad_D * dT4_dr;
+    }
+    std::cout << "Flux at bottom of rad zone F22 = " << F0/1.e22 << std::endl;
+
+    Array1D<Real, 0, NPTS_MODEL-1> rad_flux;
+    for (int i = 0; i < problem_rp::nx; ++i) {
+        rad_flux(i) = F0;
+    }
+
+
+    // Now integrate up to the top of the model
+    Real t4 = 0.0;
+
+    for (int i = index_rad; i < problem_rp::nx; ++i) {
+
+        Real delx = xzn_hse(i) - xzn_hse(i-1);
+
 
         // we've already set initial guesses for density, temperature, and composition
         dens_zone = model_hse(i, idens);
@@ -310,22 +516,54 @@ AMREX_INLINE void init_1d()
                 p_want = model_hse(i-1, ipres) +
                     delx * 0.5_rt * (dens_zone + model_hse(i-1, idens)) * problem_rp::g_const;
 
-                // The column depth determines both the temperature and hydrogen fraction
-                y_want = -p_want/problem_rp::g_const;
-                // std::cout << y_want << " " << current_del << std::endl;
-
-                temp_zone = current_T0 * pow(y_want/current_y0, current_del);
-
-                xn[ih1] = problem_rp::X0 * (1 - y_want/problem_rp::yd);
+                // pressure also sets the hydrogen fraction
+                xn[ih1] = problem_rp::X0 * (1 + p_want/problem_rp::g_const/problem_rp::yd);
                 xn[ihe4] = 1.0 - problem_rp::Zcno - xn[ih1];
                 if (xn[ih1] < 0) {
                     xn[ih1] = 0;
                     xn[ihe4] = 1.0 - problem_rp::Zcno;
                 }
 
-                // set to isothermal if hit threshold
-                if (temp_zone < problem_rp::T_lo) {
-                    temp_zone = problem_rp::T_lo; 
+
+                // In optically thick medium, radiation energy density is transported
+                // according to a diffusion law:
+                // Flux = -D d(T^4)/dx
+                // where the diffusion coefficient is D = ac/(3*kappa*rho)
+                // kappa is not included in EOS, just use classical electron scattering
+                // kap = 0.2*(1+X), where X is the hydrogen fraction
+                // Flux increments from constant hot CNO burning, i.e.
+                // dF/dy = -5.8e13 (Zcno/0.01) (or 0 if y>yd)
+
+                // std::cout << "hydrogen1 index in the network is:" << Species::H1-1 << std::endl; 
+
+                // Average the diffusion coefficient over two zones
+                rad_D = C::a_rad * C::c_light /
+                        (3 * 0.2 * 0.5 * (
+                            (1 + xn[ih1]) * dens_zone +
+                            (1 + model_hse(i-1, ispec+Species::H1-1)) * model_hse(i-1, idens)
+                        ));
+
+                // Update the flux
+                if (xn[ih1] < smallx) {
+                    rad_flux(i) = rad_flux(i-1);
+                } else {
+                    rad_flux(i) = rad_flux(i-1) + 0.5 * (dens_zone + model_hse(i-1, idens)) * delx *
+                                                    5.8e13 * problem_rp::Zcno/0.01;
+                }
+
+                // Update T^4
+                t4 = pow(model_hse(i-1, itemp), 4) - 0.5 * (rad_flux(i) + rad_flux(i-1)) / rad_D;
+
+                // std::cout << pow(t4,0.25) << std::endl;
+                // break;
+
+                if (t4 < pow(problem_rp::T_lo, 4.0_rt)) {
+                // if (t4 < 0.0) {
+                // if (true) {
+                    // amrex::Error("Error: T<0");
+                    temp_zone = problem_rp::T_lo; // set to isothermal
+                } else {
+                    temp_zone = pow(t4, 0.25_rt);
                 }
             
                 // std::cout << "T=" << temp_zone << std::endl;
@@ -340,6 +578,7 @@ AMREX_INLINE void init_1d()
 
             eos(eos_input_rt, eos_state);
 
+            entropy = eos_state.s;
             pres_zone = eos_state.p;
 
             Real dpd = eos_state.dpdr;
@@ -349,19 +588,19 @@ AMREX_INLINE void init_1d()
             dens_zone = amrex::max(0.9_rt * dens_zone,
                                     amrex::min(dens_zone + drho, 1.1_rt * dens_zone));
 
+            // if (!fluff) {
+            //     std::cout << rad_flux(i) << std::endl;
+            // }
 
             if (std::abs(drho) < TOL * dens_zone) {
                 converged_hse = true;
                 break;
             }
 
-            if (dens_zone <= problem_rp::low_density_cutoff) {
+            if (dens_zone < problem_rp::low_density_cutoff) {
                 dens_zone = problem_rp::low_density_cutoff;
                 temp_zone = problem_rp::T_lo;
                 converged_hse = true;
-                if (!fluff) {
-                    std::cout << "Hit fluff at x=" << xzn_hse(i) << ", y=" << y_want << std::endl;
-                }
                 fluff = true;
                 break;
             }
@@ -398,29 +637,9 @@ AMREX_INLINE void init_1d()
         // next zone to the density in this zone
         model_hse(i+1,idens) = dens_zone;
 
-        // Update the power-law
-        y_zone = -1*pres_zone/problem_rp::g_const;
-
-        if ( !cross_y2 and y_zone < problem_rp::y2 ) {
-            current_T0 = temp_zone;
-            current_y0 = y_zone;
-            current_del = problem_rp::del2;
-            cross_y2 = true;
-
-            std::cout << "crossed y2 at x=" << xzn_hse(i) << std::endl;
-
-        } else if ( !cross_y3 and y_zone < problem_rp::y3 ) {
-            current_T0 = temp_zone;
-            current_y0 = y_zone;
-            current_del = problem_rp::del3;
-            cross_y3 = true;
-
-            std::cout << "crossed y3 at x=" << xzn_hse(i) << std::endl;
-        }
-
     }
 
-    std::cout << "top column depth y = " << -1.*pres_zone/problem_rp::g_const << std::endl;
+        std::cout << "top column depth y = " << -1.*pres_zone/problem_rp::g_const << std::endl;
 
 
     // integrate down -- using the temperature profile defined above
