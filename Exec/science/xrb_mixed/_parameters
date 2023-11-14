@@ -15,7 +15,7 @@ xrb_pert_type                       integer            1
 xrb_pert_height                     real               -1.0d0
 
 # Turn on (.true.) or off (.false.) sponging at the bottom of the domain.
-xrb_use_bottom_sponge               logical            .false.
+xrb_use_bottom_sponge               integer            0
 
 # minimum value to use for the sponge
 sponge_min                          real               0.01d0
@@ -25,7 +25,7 @@ sponge_min                          real               0.01d0
 diag_define_layer                real               0.1
 
 # Velocity field initialization
-apply_vel_field                     logical            .false.
+apply_vel_field                     integer            0
 
 # Initial velocity field vortex scale (2-d); thickness of velocity layer (3-d)
 velpert_scale                       real               1.0d2
@@ -43,7 +43,7 @@ velpert_steep                       real               12.d0
 num_vortices                        integer            1
 
 # look at the deltap diagnostic
-do_deltap_diag                      logical            .false.
+do_deltap_diag                      integer            0
 
 # minimum value to use for species in tag_boxes
 tag_minval                          real               1.0d-4
@@ -56,7 +56,7 @@ tag_maxval                          real               0.99d0
 tag_xfac                           real                1.d-16
 
 # density tagging
-do_dens_tagging                    logical             .false.
+do_dens_tagging                    integer             0
 
 lo_dens_tag                        real                5.4d5
 hi_dens_tag                        real                1.75d6
