@@ -6,7 +6,7 @@ scale_height    real      1d9
 pert_amp        real      0.1d0
 k_hoz           real      4.0d0
 k_vert          real      2.0d0
-do_isentropic   logical   .false.
-do_uniform      logical   .false.
-use_p_dens_g    logical   .false.
-use_p_H_g       logical   .true.
+do_isentropic   integer   0
+do_uniform      integer   0
+use_p_dens_g    integer   0
+use_p_H_g       integer   1

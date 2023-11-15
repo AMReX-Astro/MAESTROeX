@@ -5,5 +5,5 @@ pres_base       real      1.65d6
 dens_base       real      1.65d-3
 y_pert_center   real      0.7d0
 pert_width      real      0.025d0
-do_isentropic   logical   .true.
-single          logical   .false.
+do_isentropic   integer   1
+single          integer   0

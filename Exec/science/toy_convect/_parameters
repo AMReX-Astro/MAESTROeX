@@ -1,7 +1,7 @@
 @namespace: problem
 
 # Velocity field initialization
-apply_vel_field                     logical            .false.
+apply_vel_field                     integer            0
 
 # Initial velocity field vortex scale
 velpert_scale                       real               1.0d2

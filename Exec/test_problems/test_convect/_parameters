@@ -1,6 +1,6 @@
 @namespace: problem
 
-apply_vel_field     logical   .true.
+apply_vel_field     integer   1
 velpert_scale       real      5.d6
 velpert_amplitude   real      1.d5
 velpert_height_loc  real      1.2d8
