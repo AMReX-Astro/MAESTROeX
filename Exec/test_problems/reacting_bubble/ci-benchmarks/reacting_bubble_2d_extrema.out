@@ -1,4 +1,4 @@
- plotfile = reacting_bubble_2d_plt0000010/
+ plotfile = reacting_bubble_2d_plt0000010
  time = 0.0075572031485620673
               variables          minimum value          maximum value
  velx                            -69379.106064           69727.434216
