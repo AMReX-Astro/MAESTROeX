@@ -537,12 +537,17 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
 
                     } else if (k == klo + 1) {
                         // Recalculate the slope at lo(2)+1 using the revised dzl
+                        Real del = -16.0 / 15.0 * s(i, j, k - 2, n) +
+                                   0.5 * s(i, j, k - 1, n) +
+                                   2.0 / 3.0 * s(i, j, k, n) -
+                                   0.1 * s(i, j, k + 1, n);
                         dmin = 2.0 * (s(i, j, k - 1, n) - s(i, j, k - 2, n));
                         dpls = 2.0 * (s(i, j, k, n) - s(i, j, k - 1, n));
                         Real slim = amrex::min(amrex::Math::abs(dpls),
                                                amrex::Math::abs(dmin));
                         slim = dpls * dmin > 0.0 ? slim : 0.0;
-                        dzl = slz(i, j, k - 1, n);
+                        Real sflag = amrex::Math::copysign(1.0, del);
+                        dzl = sflag * amrex::min(slim, amrex::Math::abs(del));
                         ds = 4.0 / 3.0 * dcen - (dzr + dzl) / 6.0;
                         slz(i, j, k, n) =
                             dflag * amrex::min(amrex::Math::abs(ds), dlim);
@@ -568,12 +573,17 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
 
                     } else if (k == khi - 1) {
                         // Recalculate the slope at lo(3)+1 using the revised dzr
+                        Real del = -(-16.0 / 15.0 * s(i, j, k + 2, n) +
+                                     0.5 * s(i, j, k + 1, n) +
+                                     2.0 / 3.0 * s(i, j, k, n) -
+                                     0.1 * s(i, j, k - 1, n));
                         dmin = 2.0 * (s(i, j, k + 1, n) - s(i, j, k, n));
                         dpls = 2.0 * (s(i, j, k + 2, n) - s(i, j, k + 1, n));
                         Real slim = amrex::min(amrex::Math::abs(dpls),
                                                amrex::Math::abs(dmin));
                         slim = dpls * dmin > 0.0 ? slim : 0.0;
-                        dzr = slz(i, j, k + 1, n);
+                        Real sflag = amrex::Math::copysign(1.0, del);
+                        dzr = sflag * amrex::min(slim, amrex::Math::abs(del));
                         ds = 4.0 / 3.0 * dcen - (dzl + dzr) / 6.0;
                         slz(i, j, k, n) =
                             dflag * amrex::min(amrex::Math::abs(ds), dlim);
