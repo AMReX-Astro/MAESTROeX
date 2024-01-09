@@ -68,7 +68,7 @@ of density and pressure stratification.
 The code leverages the new AMReX software framework [@AMReX] for block-structured
 adaptive mesh refinement (AMR) applications, allowing for scalability
 to large fractions of leadership-class machines.
-Our approach to parallization uses a hybrid MPI/OpenMP approach, with increasing GPU support.
+Our approach to parallelization uses a hybrid MPI/OpenMP approach, with increasing GPU support.
 Microphysics are provided by the Starkiller-Astro libraries [@starkiller].
 The code contains documentation through sphinx, a large suite of test problems, and
 nightly regression tests on a number of architectures.

@@ -86,7 +86,7 @@ program fconv_radial
   component_names(2) = "adiabatic gradient"
   component_names(3) = "ledoux gradient"
 
-  ! parse the arguements
+  ! parse the arguments
   narg = command_argument_count()
 
   farg = 1

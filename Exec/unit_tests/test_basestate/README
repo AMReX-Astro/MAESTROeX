@@ -42,7 +42,7 @@ plane-parallel test problem:
 ------------------------------------------------------------------------------
 analytical CNO cycle test problem:
 
-  make sure to change the nework in GNUmakefile to H_core_null
+  make sure to change the network in GNUmakefile to H_core_null
 
 
 ------------------------------------------------------------------------------

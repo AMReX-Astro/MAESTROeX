@@ -1,6 +1,6 @@
 MAESTROeX derives from MAESTRO.  When citing the code, please cite the
-two primary alrogithm papers below as well as any of the MAESTRO papers appropriate
-to the discussion.
+two primary algorithm papers below as well as any of the MAESTRO
+papers appropriate to the discussion.
 
    @ARTICLE{2019ApJ...887..212F,
           author = {{Fan}, Duoming and {Nonaka}, Andrew and {Almgren}, Ann S. and

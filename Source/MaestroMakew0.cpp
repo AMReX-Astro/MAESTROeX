@@ -948,7 +948,7 @@ void Maestro::Tridiag(const BaseStateArray<Real>& a,
     auto gam = gam_s.array();
 
     if (b(0) == 0) {
-        Abort("tridiag: CANT HAVE B(0) = 0.0");
+        Abort("tridiag: CAN NOT HAVE B(0) = 0.0");
     }
 
     Real bet = b(0);
