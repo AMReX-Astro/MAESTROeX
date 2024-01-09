@@ -206,7 +206,7 @@ def parse_params(infile, out_directory):
 
         for p in params_nm:
             cq.write(p.get_default_string())
-            cq.write(p.get_query_string("C++"))
+            cq.write(p.get_query_string())
             cq.write("\n")
 
         cq.close()
