@@ -3,10 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
-
-#ifndef WIN32
 #include <unistd.h>
-#endif
 
 #include <AMReX_Arena.H>
 #include <AMReX_REAL.H>
