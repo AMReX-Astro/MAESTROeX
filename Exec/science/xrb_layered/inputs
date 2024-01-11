@@ -26,7 +26,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 amr.n_cell             = 512 512
 amr.max_grid_size      = 64
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
@@ -120,6 +120,9 @@ maestro.max_mg_bottom_nlevels = 4
 # override the default values of the probin namelist values here
 # temperature perturbation
 problem.pert_seed = 42
+
+# refinement
+#problem.do_height_based_refinement = 0
 
 # Note that some of the parameters in this
 # namelist are specific to the default EOS,
