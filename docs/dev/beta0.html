@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -145,39 +145,39 @@
            <div itemprop="articleBody">
              
   <section id="notes-on-beta-0">
-<h1>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#notes-on-beta-0" title="Permalink to this heading"></a></h1>
+<h1>Notes on <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#notes-on-beta-0" title="Link to this heading"></a></h1>
 <p>The goal of <span class="math notranslate nohighlight">\(\beta_0\)</span> is to capture the expansion of a displaced fluid
 element due to the stratification of the atmosphere. MAESTROeX computes
 <span class="math notranslate nohighlight">\(\beta_0\)</span> as:</p>
 <div class="math notranslate nohighlight" id="equation-beta0-0">
-<span class="eqno">(360)<a class="headerlink" href="#equation-beta0-0" title="Permalink to this equation"></a></span>\[\label{eq:beta_0}
+<span class="eqno">(360)<a class="headerlink" href="#equation-beta0-0" title="Link to this equation"></a></span>\[\label{eq:beta_0}
 \beta_0(r,t) = \rho_0 \exp\left (  \int_0^r  \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r^\prime} dr^\prime \right )\]</div>
 <section id="constant-composition">
-<h2>Constant Composition<a class="headerlink" href="#constant-composition" title="Permalink to this heading"></a></h2>
+<h2>Constant Composition<a class="headerlink" href="#constant-composition" title="Link to this heading"></a></h2>
 <p>Consider an isentropically stratified atmosphere, with a constant
 composition as a function of <span class="math notranslate nohighlight">\(r\)</span>. If you displace a parcel of fluid
 upwards, it will expand adabatically and continue to rise until its
 density matches the background density. Even if <span class="math notranslate nohighlight">\(\gammabar\)</span> is not
 constant in <span class="math notranslate nohighlight">\(r\)</span>, following from the definition of <span class="math notranslate nohighlight">\(\beta_0\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-beta0-1">
-<span class="eqno">(361)<a class="headerlink" href="#equation-beta0-1" title="Permalink to this equation"></a></span>\[\frac{1}{\beta_0} \frac{d\beta_0}{dr} = \frac{1}{\gammabar p_0} \frac{dp_0}{dr}\]</div>
+<span class="eqno">(361)<a class="headerlink" href="#equation-beta0-1" title="Link to this equation"></a></span>\[\frac{1}{\beta_0} \frac{d\beta_0}{dr} = \frac{1}{\gammabar p_0} \frac{dp_0}{dr}\]</div>
 <p>and the definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-beta0-2">
-<span class="eqno">(362)<a class="headerlink" href="#equation-beta0-2" title="Permalink to this equation"></a></span>\[\Gamma_1 = \left . \frac{d \log p}{d \log \rho} \right |_s\]</div>
+<span class="eqno">(362)<a class="headerlink" href="#equation-beta0-2" title="Link to this equation"></a></span>\[\Gamma_1 = \left . \frac{d \log p}{d \log \rho} \right |_s\]</div>
 <p>So, at constant entropy, from the definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span>, it must hold
 that</p>
 <div class="math notranslate nohighlight" id="equation-beta0-3">
-<span class="eqno">(363)<a class="headerlink" href="#equation-beta0-3" title="Permalink to this equation"></a></span>\[\frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz}  .\]</div>
+<span class="eqno">(363)<a class="headerlink" href="#equation-beta0-3" title="Link to this equation"></a></span>\[\frac{1}{\rho} \frac{d \rho}{dr} = \frac{1}{\Gamma_1 p} \frac{d p}{dz}  .\]</div>
 <p>Comparing to the definition of <span class="math notranslate nohighlight">\(\beta_0\)</span> then</p>
 <div class="math notranslate nohighlight" id="equation-beta0-4">
-<span class="eqno">(364)<a class="headerlink" href="#equation-beta0-4" title="Permalink to this equation"></a></span>\[\frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}   .\]</div>
+<span class="eqno">(364)<a class="headerlink" href="#equation-beta0-4" title="Link to this equation"></a></span>\[\frac{1}{\beta_0} \frac{\beta_0}{dr} =\frac{1}{\gammabar p_0}\frac{dp_0}{dr} = \frac{1}{\rho_0} \frac{d\rho_0}{dr}   .\]</div>
 <p>Therefore, <span class="math notranslate nohighlight">\(\beta_0 = \rho_0\)</span>.</p>
 <p>This means that if we have a constant composition and an
 isentropically stratified atmosphere, as we displace a fluid element,
 it will always remain neutrally buoyant.</p>
 </section>
 <section id="composition-gradient">
-<h2>Composition Gradient<a class="headerlink" href="#composition-gradient" title="Permalink to this heading"></a></h2>
+<h2>Composition Gradient<a class="headerlink" href="#composition-gradient" title="Link to this heading"></a></h2>
 <p>If there is a change in composition with <span class="math notranslate nohighlight">\(r\)</span>, the situation is more
 complicated. Consider again an isentropically stratified atmosphere,
 now with a composition gradient. If you displace a parcel of fluid
@@ -188,7 +188,7 @@ will have a different composition that it has. In this case, what is
 the path to equilibrium?</p>
 </section>
 <section id="on-the-effect-of-chemical-potential">
-<span id="sec-on-the-affect-of-chemical-potential"></span><h2>On the Effect of Chemical Potential<a class="headerlink" href="#on-the-effect-of-chemical-potential" title="Permalink to this heading"></a></h2>
+<span id="sec-on-the-affect-of-chemical-potential"></span><h2>On the Effect of Chemical Potential<a class="headerlink" href="#on-the-effect-of-chemical-potential" title="Link to this heading"></a></h2>
 <p>In MAESTRO, we do things in an operator split fashion — the hydro is
 de-coupled from the burning. This means that during the hydro parts
 of the algorithm (where <span class="math notranslate nohighlight">\(\beta_0\)</span> is used), the system is fixed in
@@ -200,14 +200,14 @@ which <em>may</em> be important in the burning step — there appears to
 be very little about this in the literature, but everyone seems to
 assume it makes little difference.</p>
 <section id="derivation-of-alpha">
-<span id="sec-derivation-of-alpha"></span><h3>Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#derivation-of-alpha" title="Permalink to this heading"></a></h3>
+<span id="sec-derivation-of-alpha"></span><h3>Derivation of <span class="math notranslate nohighlight">\(\alpha\)</span><a class="headerlink" href="#derivation-of-alpha" title="Link to this heading"></a></h3>
 <p>In paper I, <span class="math notranslate nohighlight">\(\alpha\)</span> is defined as</p>
 <div class="math notranslate nohighlight" id="equation-eq-alpha">
-<span class="eqno">(365)<a class="headerlink" href="#equation-eq-alpha" title="Permalink to this equation"></a></span>\[\alpha\equiv -\left(
+<span class="eqno">(365)<a class="headerlink" href="#equation-eq-alpha" title="Link to this equation"></a></span>\[\alpha\equiv -\left(
 \frac{(1-\rho h_p)p_T-\rho c_p}{\rho^2c_pp_\rho}\right)\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight" id="equation-beta0-5">
-<span class="eqno">(366)<a class="headerlink" href="#equation-beta0-5" title="Permalink to this equation"></a></span>\[h_p \equiv \left(\frac{\partial h}{\partial p}\right)_{T,X}, \quad
+<span class="eqno">(366)<a class="headerlink" href="#equation-beta0-5" title="Link to this equation"></a></span>\[h_p \equiv \left(\frac{\partial h}{\partial p}\right)_{T,X}, \quad
 c_p \equiv \left(\frac{\partial h}{\partial T}\right)_{p,X}, \quad
 p_T \equiv \left(\frac{\partial p}{\partial T}\right)_{\rho,X}, \quad
 p_\rho \equiv \left(\frac{\partial p}{\partial \rho}\right)_{T,X}\]</div>
@@ -222,7 +222,7 @@ CG) call the former type of system a “simple system” and therefore
 the latter a “non-simple system” in chemical equilibrium. The
 analysis in paper I that reduced <a class="reference internal" href="#equation-eq-alpha">Eq.365</a> to</p>
 <div class="math notranslate nohighlight" id="equation-eq-alpha-simp-no-rxn">
-<span class="eqno">(367)<a class="headerlink" href="#equation-eq-alpha-simp-no-rxn" title="Permalink to this equation"></a></span>\[\alpha = \frac{1}{\Gamma_1p_0}\]</div>
+<span class="eqno">(367)<a class="headerlink" href="#equation-eq-alpha-simp-no-rxn" title="Link to this equation"></a></span>\[\alpha = \frac{1}{\Gamma_1p_0}\]</div>
 <p>used CG’s discussion of the various adiabatic <span class="math notranslate nohighlight">\(\Gamma\)</span>’s. However,
 their discussion only pertains to “simple systems” or “non-simple
 systems” in chemical equilibrium. In general, nuclear reactions will
@@ -230,11 +230,11 @@ be important and therefore this analysis needs to be reformed.</p>
 <p>Even in the presence of reactions, <a class="reference internal" href="#equation-eq-alpha">Eq.365</a> can be rewritten
 as was done in paper I:</p>
 <div class="math notranslate nohighlight" id="equation-eq-alpha2">
-<span class="eqno">(368)<a class="headerlink" href="#equation-eq-alpha2" title="Permalink to this equation"></a></span>\[\alpha = -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
+<span class="eqno">(368)<a class="headerlink" href="#equation-eq-alpha2" title="Link to this equation"></a></span>\[\alpha = -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
 - \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right],\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight" id="equation-beta0-6">
-<span class="eqno">(369)<a class="headerlink" href="#equation-beta0-6" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(369)<a class="headerlink" href="#equation-beta0-6" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \chi_{\rho} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln\rho}
 \right)_{T,X} \\
 \chi_{T} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln T}
@@ -243,32 +243,32 @@ as was done in paper I:</p>
 between <span class="math notranslate nohighlight">\(p\chi_\rho\)</span> and <span class="math notranslate nohighlight">\(\Gamma_1\)</span>.</p>
 <p>For an equation of state <span class="math notranslate nohighlight">\(p=p(\rho,T,X)\)</span> we have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-7">
-<span class="eqno">(370)<a class="headerlink" href="#equation-beta0-7" title="Permalink to this equation"></a></span>\[d\ln p = \left(\frac{\partial\ln p}{\partial\ln\rho}\right)_{T,X}d\ln\rho +
+<span class="eqno">(370)<a class="headerlink" href="#equation-beta0-7" title="Link to this equation"></a></span>\[d\ln p = \left(\frac{\partial\ln p}{\partial\ln\rho}\right)_{T,X}d\ln\rho +
 \left(\frac{\partial\ln p}{\partial\ln T}\right)_{\rho,X}d\ln T +
 \sum_i\left(\frac{\partial\ln p}{\partial\ln X_i}\right)_{\rho,T,(X_j,j
 \neq i)} d\ln X_i.\]</div>
 <p>We define another logarithmic derivative</p>
 <div class="math notranslate nohighlight" id="equation-beta0-8">
-<span class="eqno">(371)<a class="headerlink" href="#equation-beta0-8" title="Permalink to this equation"></a></span>\[\begin{aligned}
+<span class="eqno">(371)<a class="headerlink" href="#equation-beta0-8" title="Link to this equation"></a></span>\[\begin{aligned}
 \chi_{X_{i}} &amp;\equiv \left(\frac{\partial\ln p}{\partial\ln X_i}
 \right)_{\rho,T,(X_j,j\neq i)}\end{aligned}\]</div>
 <p>and therefore</p>
 <div class="math notranslate nohighlight" id="equation-beta0-9">
-<span class="eqno">(372)<a class="headerlink" href="#equation-beta0-9" title="Permalink to this equation"></a></span>\[d\ln p = \chi_\rho \ d\ln\rho + \chi_T \ d\ln T + \sum_i \chi_{X_i}\
+<span class="eqno">(372)<a class="headerlink" href="#equation-beta0-9" title="Link to this equation"></a></span>\[d\ln p = \chi_\rho \ d\ln\rho + \chi_T \ d\ln T + \sum_i \chi_{X_i}\
 d\ln X_i.\]</div>
 <p>From here we get the general statement</p>
 <div class="math notranslate nohighlight" id="equation-beta0-10">
-<span class="eqno">(373)<a class="headerlink" href="#equation-beta0-10" title="Permalink to this equation"></a></span>\[\frac{\partial\ln p}{\partial \ln \rho} = \chi_\rho +
+<span class="eqno">(373)<a class="headerlink" href="#equation-beta0-10" title="Link to this equation"></a></span>\[\frac{\partial\ln p}{\partial \ln \rho} = \chi_\rho +
 \chi_T\frac{\partial \ln T}{\partial\ln \rho} +
 \sum_i\chi_{X_i}\frac{\partial\ln X_i}{\partial\ln \rho}\]</div>
 <p>which must hold for an adiabatic process as well, and therefore we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-gamma1">
-<span class="eqno">(374)<a class="headerlink" href="#equation-eq-gamma1" title="Permalink to this equation"></a></span>\[\Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
+<span class="eqno">(374)<a class="headerlink" href="#equation-eq-gamma1" title="Link to this equation"></a></span>\[\Gamma_1 = \chi_\rho + \chi_T\left(\Gamma_3-1\right)
   + \sum_i\chi_{X_i}\Gamma_{4,i}\]</div>
 <p>where we use CG’s definition of <span class="math notranslate nohighlight">\(\Gamma_1\)</span> and <span class="math notranslate nohighlight">\(\Gamma_3\)</span> and introduce a
 fourth gamma function:</p>
 <div class="math notranslate nohighlight" id="equation-beta0-11">
-<span class="eqno">(375)<a class="headerlink" href="#equation-beta0-11" title="Permalink to this equation"></a></span>\[\Gamma_1 \equiv \left(
+<span class="eqno">(375)<a class="headerlink" href="#equation-beta0-11" title="Link to this equation"></a></span>\[\Gamma_1 \equiv \left(
 \frac{\partial \ln p}{\partial \ln \rho}\right)_{\text{AD}},\quad
 \Gamma_3-1\equiv \left(
 \frac{\partial \ln T}{\partial \ln \rho}\right)_{\text{AD}},\quad
@@ -278,12 +278,12 @@ fourth gamma function:</p>
 for <span class="math notranslate nohighlight">\(\Gamma_3\)</span>.</p>
 <p>The first law of thermodynamics can be written as</p>
 <div class="math notranslate nohighlight" id="equation-beta0-12">
-<span class="eqno">(376)<a class="headerlink" href="#equation-beta0-12" title="Permalink to this equation"></a></span>\[dQ = dE + pdV - \sum_i\mu_idN_i\]</div>
+<span class="eqno">(376)<a class="headerlink" href="#equation-beta0-12" title="Link to this equation"></a></span>\[dQ = dE + pdV - \sum_i\mu_idN_i\]</div>
 <p>where <span class="math notranslate nohighlight">\(\mu_i=\left(
 \frac{\partial E}{\partial N_i}\right)_{\text{AD},\rho,(N_j,j\neq i)}\)</span> is
 the chemical potential; or per unit mass we have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-13">
-<span class="eqno">(377)<a class="headerlink" href="#equation-beta0-13" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(377)<a class="headerlink" href="#equation-beta0-13" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
   dq &amp;= de - \frac{p}{\rho^2}d\rho - \sum_i\mu_id
   \left(\frac{n_i}{\rho}\right)\\
   &amp;= de - \frac{p}{\rho^2}d\rho - \sum_i
@@ -295,7 +295,7 @@ and the chemical potential has been replaced with
 Using this and expressing the specific internal energy as <span class="math notranslate nohighlight">\(e=e(\rho,T,X)\)</span>
 we then have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-14">
-<span class="eqno">(378)<a class="headerlink" href="#equation-beta0-14" title="Permalink to this equation"></a></span>\[dq = c_vdT +
+<span class="eqno">(378)<a class="headerlink" href="#equation-beta0-14" title="Link to this equation"></a></span>\[dq = c_vdT +
 \left[\left(\frac{\partial e}{\partial \rho}\right)_{T,X} -\frac{p}{\rho^2}
   \right]d\rho +
 \sum_i\left[
@@ -304,7 +304,7 @@ we then have</p>
   \right)_{\rho,\text{AD},(X_j,j\neq i)}\right]dX_i\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight" id="equation-eq-gamma3-first">
-<span class="eqno">(379)<a class="headerlink" href="#equation-eq-gamma3-first" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(379)<a class="headerlink" href="#equation-eq-gamma3-first" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \left(\frac{d\ln T}{d\ln\rho}\right)_\text{AD} \equiv \Gamma_3-1
 &amp;= \frac{1}{c_vT}\left[
 \frac{p}{\rho} - \left(\frac{\partial e}{\partial\ln\rho}\right)_{T,X} +
@@ -320,7 +320,7 @@ we then have</p>
 Again using the first law and the fact that <span class="math notranslate nohighlight">\(ds=dq/T\)</span> is an exact
 differential (i.e. mixed derivatives are equal) we have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-15">
-<span class="eqno">(380)<a class="headerlink" href="#equation-beta0-15" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(380)<a class="headerlink" href="#equation-beta0-15" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \label{eq:dedlnrho}
   \left(
   \frac{\partial}{\partial\rho}\left[\frac{c_v}{T}\right]\right)_{T,X} &amp;=
@@ -341,7 +341,7 @@ differential (i.e. mixed derivatives are equal) we have</p>
 Similarly, we can find an expression for the derivative of energy with
 respect to composition</p>
 <div class="math notranslate nohighlight" id="equation-beta0-16">
-<span class="eqno">(381)<a class="headerlink" href="#equation-beta0-16" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(381)<a class="headerlink" href="#equation-beta0-16" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
   \left(\frac{\partial}{\partial X_i}\left[
     \frac{c_v}{T}\right]\right)_{\rho,T,(X_j,j\neq i)} &amp;=
   \left(\frac{\partial}{\partial T}\left[
@@ -371,14 +371,14 @@ respect to composition</p>
   \right)_{\rho,X}.\end{aligned}\end{split}\]</div>
 <p>Plugging these back into <a class="reference internal" href="#equation-eq-gamma3-first">Eq.379</a> we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-gamma3-second">
-<span class="eqno">(382)<a class="headerlink" href="#equation-eq-gamma3-second" title="Permalink to this equation"></a></span>\[\Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
+<span class="eqno">(382)<a class="headerlink" href="#equation-eq-gamma3-second" title="Link to this equation"></a></span>\[\Gamma_3-1 = \frac{1}{c_vT}\left[\frac{p}{\rho}\chi_T +\sum_i
     \left(\frac{\partial}{\partial\ln T}\left(
     \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
     \right)_{\rho,X}X_i
     \Gamma_{4,i}\right],\]</div>
 <p>or</p>
 <div class="math notranslate nohighlight" id="equation-eq-cv">
-<span class="eqno">(383)<a class="headerlink" href="#equation-eq-cv" title="Permalink to this equation"></a></span>\[c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
+<span class="eqno">(383)<a class="headerlink" href="#equation-eq-cv" title="Link to this equation"></a></span>\[c_v = \frac{1}{T(\Gamma_3-1)}\left[\frac{p}{\rho}\chi_T +\sum_i
     \left(\frac{\partial}{\partial\ln T}\left(
     \frac{\partial e}{\partial X_i}\right)_{\rho,\text{AD},(X_j,j\neq i)}
     \right)_{\rho,X}X_i
@@ -386,7 +386,7 @@ respect to composition</p>
 <p>We can obtain an expression for the specific heat at constant pressure
 from the enthalpy</p>
 <div class="math notranslate nohighlight" id="equation-beta0-17">
-<span class="eqno">(384)<a class="headerlink" href="#equation-beta0-17" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(384)<a class="headerlink" href="#equation-beta0-17" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
   c_p \equiv \left(\frac{\partial h}{\partial T}\right)_{p,X} &amp;=
   \left(\frac{\partial e}{\partial T}\right)_{p,X} - \frac{p}{\rho^2}
   \left(\frac{\partial \rho}{\partial T}\right)_{p,X}\\
@@ -398,7 +398,7 @@ from the enthalpy</p>
 <p>The first term on the rhs can be obtained from writing <span class="math notranslate nohighlight">\(e=e(p,T,X)\)</span> and
 <span class="math notranslate nohighlight">\(p=p(\rho,T,X)\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-beta0-18">
-<span class="eqno">(385)<a class="headerlink" href="#equation-beta0-18" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(385)<a class="headerlink" href="#equation-beta0-18" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
   de &amp;= \left(\frac{\partial e}{\partial p}\right)_{T,X}dp
   + \left(\frac{\partial e}{\partial T}\right)_{p,X}dT +
   \sum_i \left(\frac{\partial e}{\partial X_i}\right)_{p,T,(X_j,j\neq i)}
@@ -417,11 +417,11 @@ from the enthalpy</p>
   &amp;= c_v - \frac{p\chi_T}{\rho T\chi_\rho}\left(1-\chi_T\right)\end{aligned}\end{split}\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight" id="equation-beta0-19">
-<span class="eqno">(386)<a class="headerlink" href="#equation-beta0-19" title="Permalink to this equation"></a></span>\[c_p = \frac{p}{\rho T}\frac{\chi_T^2}{\chi_\rho} + c_v\]</div>
+<span class="eqno">(386)<a class="headerlink" href="#equation-beta0-19" title="Link to this equation"></a></span>\[c_p = \frac{p}{\rho T}\frac{\chi_T^2}{\chi_\rho} + c_v\]</div>
 <p>Dividing this by <a class="reference internal" href="#equation-eq-cv">Eq.383</a> and using the relation between the
 <span class="math notranslate nohighlight">\(\Gamma\)</span> ’s, <a class="reference internal" href="#equation-eq-gamma1">Eq.374</a>, we then have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-20">
-<span class="eqno">(387)<a class="headerlink" href="#equation-beta0-20" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(387)<a class="headerlink" href="#equation-beta0-20" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \label{eq:pchirho}
   \gamma \equiv \frac{c_p}{c_v} &amp;= 1 + \frac{p(\Gamma_3-1)}{\rho }
   \frac{\chi_T^2}{\chi_\rho}\left[\frac{p}{\rho}\chi_T +\sum_i
@@ -451,7 +451,7 @@ from the enthalpy</p>
 <p>Plugging <a class="reference external" href="#eq:pchirho">[eq:pchirho]</a> into <a class="reference internal" href="#equation-eq-alpha2">Eq.368</a> and rewriting the
 partial derivative of <span class="math notranslate nohighlight">\(e\)</span> with the help of <a class="reference external" href="#eq:dedlnrho">[eq:dedlnrho]</a> we have</p>
 <div class="math notranslate nohighlight" id="equation-beta0-21">
-<span class="eqno">(388)<a class="headerlink" href="#equation-beta0-21" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(388)<a class="headerlink" href="#equation-beta0-21" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \alpha &amp;= -\frac{1}{p\chi_\rho c_p}\left[\left(\frac{1}{\rho\chi_\rho}
   - \frac{\rho e_\rho}{p\chi_\rho}\right)\frac{p\chi_T}{T} - c_p\right] \\
 &amp;=\frac{\gamma}{c_p}\frac{c_p\chi_T + \left(\rho
@@ -476,7 +476,7 @@ partial derivative of <span class="math notranslate nohighlight">\(e\)</span> wi
     \right)_{\rho,\text{AD},(X_j,j\neq i)}\right)_{\rho,X}X_i -
     \chi_{X_i}\right]\frac{\Gamma_{4,i}}{\Gamma_1}\right]^{-1}\\\end{aligned}\end{split}\]</div>
 <div class="math notranslate nohighlight" id="equation-beta0-22">
-<span class="eqno">(389)<a class="headerlink" href="#equation-beta0-22" title="Permalink to this equation"></a></span>\[\boxed{
+<span class="eqno">(389)<a class="headerlink" href="#equation-beta0-22" title="Link to this equation"></a></span>\[\boxed{
   \alpha = \frac{1}{\Gamma_1p}\left[1 + \sum_i\left[\frac{\rho^2p_\rho}
       {pp_T}(1-\gamma)\frac{N_\text{A}}{A_i}
       \left(\frac{\partial\mu_i}{\partial T}\right)_{\rho,X}X_i -
@@ -484,13 +484,13 @@ partial derivative of <span class="math notranslate nohighlight">\(e\)</span> wi
 }\]</div>
 </section>
 <section id="recalling-derivation-of-beta-0">
-<span id="recalling-derivation-of-beta0"></span><h3>Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#recalling-derivation-of-beta-0" title="Permalink to this heading"></a></h3>
+<span id="recalling-derivation-of-beta0"></span><h3>Recalling Derivation of <span class="math notranslate nohighlight">\(\beta_0\)</span><a class="headerlink" href="#recalling-derivation-of-beta-0" title="Link to this heading"></a></h3>
 <p>Recall from paper I that <span class="math notranslate nohighlight">\(\beta_0\)</span> was derived from the equation</p>
 <div class="math notranslate nohighlight" id="equation-beta0-23">
-<span class="eqno">(390)<a class="headerlink" href="#equation-beta0-23" title="Permalink to this equation"></a></span>\[\nabla\cdot\mathbf{U} + \alpha\mathbf{U}\cdot\nabla p_0 = \tilde{S}\]</div>
+<span class="eqno">(390)<a class="headerlink" href="#equation-beta0-23" title="Link to this equation"></a></span>\[\nabla\cdot\mathbf{U} + \alpha\mathbf{U}\cdot\nabla p_0 = \tilde{S}\]</div>
 <p>in such a fashion that we ended up with an equation of the form</p>
 <div class="math notranslate nohighlight" id="equation-beta0-24">
-<span class="eqno">(391)<a class="headerlink" href="#equation-beta0-24" title="Permalink to this equation"></a></span>\[\label{eq:beta constraint}
+<span class="eqno">(391)<a class="headerlink" href="#equation-beta0-24" title="Link to this equation"></a></span>\[\label{eq:beta constraint}
 \nabla\cdot\left(\beta_0(r)\mathbf{U}\right) = \beta_0\tilde{S}.\]</div>
 <p>The derivation in Appendix B of paper I for a <span class="math notranslate nohighlight">\(\beta_0\)</span> that
 satisfies <a class="reference external" href="#eq:betaconstraint">[eq:beta constraint]</a> automatically assumed <span class="math notranslate nohighlight">\(\alpha

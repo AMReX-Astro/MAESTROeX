@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -146,9 +146,9 @@
            <div itemprop="articleBody">
              
   <section id="reaction-networks">
-<h1>Reaction Networks<a class="headerlink" href="#reaction-networks" title="Permalink to this heading"></a></h1>
+<h1>Reaction Networks<a class="headerlink" href="#reaction-networks" title="Link to this heading"></a></h1>
 <section id="introduction-to-maestroex-networks">
-<h2>Introduction to MAESTROeX Networks<a class="headerlink" href="#introduction-to-maestroex-networks" title="Permalink to this heading"></a></h2>
+<h2>Introduction to MAESTROeX Networks<a class="headerlink" href="#introduction-to-maestroex-networks" title="Link to this heading"></a></h2>
 <p>MAESTROeX models multiple species, described by the mass density of
 the fluid, <span class="math notranslate nohighlight">\(\rho\)</span>, and the mass fraction of the species, <span class="math notranslate nohighlight">\(X_k \equiv
 \rho_k/\rho\)</span>, where <span class="math notranslate nohighlight">\(\rho_k\)</span> is the mass density of species <span class="math notranslate nohighlight">\(k\)</span>. All
@@ -160,9 +160,9 @@ the equation of state to compute.</p>
 will have interfaces for both MAESTROeX and CASTRO.</p>
 </section>
 <section id="notes-of-specific-networks">
-<h2>Notes of Specific Networks<a class="headerlink" href="#notes-of-specific-networks" title="Permalink to this heading"></a></h2>
+<h2>Notes of Specific Networks<a class="headerlink" href="#notes-of-specific-networks" title="Link to this heading"></a></h2>
 <section id="general-null">
-<h3>general_null<a class="headerlink" href="#general-null" title="Permalink to this heading"></a></h3>
+<h3>general_null<a class="headerlink" href="#general-null" title="Link to this heading"></a></h3>
 <p>This is a ’null’ network – i.e. no burning, just define the
 properties of the species for thermodynamics. The twist is that you
 can create an inputs file to define what species you want to carry.
@@ -186,7 +186,7 @@ compiled. (For the curious, the rule to build network.f90 lives in
 extern/networks/general_null/GPackage.mak)</p>
 </section>
 <section id="ignition-chamulak">
-<h3>ignition_chamulak<a class="headerlink" href="#ignition-chamulak" title="Permalink to this heading"></a></h3>
+<h3>ignition_chamulak<a class="headerlink" href="#ignition-chamulak" title="Link to this heading"></a></h3>
 <p>This network was introduced in our paper on convection in white dwarfs
 as a model of Type Ia supernovae <span id="id2">[<a class="reference internal" href="zreferences.html#id30" title="M. Zingale, A. Nonaka, A. S. Almgren, J. B. Bell, C. M. Malone, and S. E. Woosley. The Convective Phase Preceding Type Ia Supernovae. \apj , 740:8, October 2011. doi:10.1088/0004-637X/740/1/8.">ZingaleNonakaAlmgren+11</a>]</span>. It models
 carbon burning in a regime appropriate for a simmering white dwarf,
@@ -194,14 +194,14 @@ and captures the effects of a much larger network by setting the ash
 state and energetics to the values suggested in <span id="id3">[<a class="reference internal" href="zreferences.html#id39" title="D. A. Chamulak, E. F. Brown, F. X. Timmes, and K. Dupczak. The Reduction of the Electron Abundance during the Pre-explosion Simmering in White Dwarf Supernovae. \apj , 677:160-168, April 2008. arXiv:0801.1643, doi:10.1086/528944.">ChamulakBrownTimmesDupczak08</a>]</span>.</p>
 </section>
 <section id="ignition-simple">
-<h3>ignition_simple<a class="headerlink" href="#ignition-simple" title="Permalink to this heading"></a></h3>
+<h3>ignition_simple<a class="headerlink" href="#ignition-simple" title="Link to this heading"></a></h3>
 <p>This is the original network used in our white dwarf convection
 studies <span id="id4">[<a class="reference internal" href="zreferences.html#id10" title="M. Zingale, A. S. Almgren, J. B. Bell, A. Nonaka, and S. E. Woosley. Low Mach Number Modeling of Type IA Supernovae. IV. White Dwarf Convection. \apj , 704:196-210, October 2009. arXiv:0908.2668, doi:10.1088/0004-637X/704/1/196.">ZingaleAlmgrenBell+09</a>]</span>. It includes a single reaction,
 <span class="math notranslate nohighlight">\(^{12}\mathrm{C}({}^{12}\mathrm{C},\gamma){}^{24}\mathrm{Mg}\)</span>, using
 the rate from Caughlin and Fowler <span id="id5">[<a class="reference internal" href="zreferences.html#id40" title="G. R. Caughlan and W. A. Fowler. Thermonuclear reaction rates V. Atomic Data and Nuclear Data Tables, 40(2):283–334, 1988. see also http://www.phy.ornl.gov/astrophysics/data/cf88/index.html.">CF88</a>]</span>.</p>
 </section>
 <section id="rprox">
-<h3>rprox<a class="headerlink" href="#rprox" title="Permalink to this heading"></a></h3>
+<h3>rprox<a class="headerlink" href="#rprox" title="Link to this heading"></a></h3>
 <p>This is a network introduced in a paper modeling mixed H/He X-ray
 bursts <span id="id6">[<a class="reference internal" href="zreferences.html#id36" title="C. M. Malone, M. Zingale, A. Nonaka, A. S. Almgren, and J. B. Bell. Multidimensional Modeling of Type I X-Ray Bursts. II. Two-dimensional Convection in a Mixed H/He Accretor. \apj , 788:115, June 2014. doi:10.1088/0004-637X/788/2/115.">MaloneZingaleNonaka+14</a>]</span>. rprox that has 10 species approximates hit
 CNO burning, triple-<span class="math notranslate nohighlight">\(\alpha\)</span>, and rp-process breakout up through

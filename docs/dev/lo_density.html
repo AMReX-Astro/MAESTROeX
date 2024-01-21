@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -151,7 +151,7 @@
            <div itemprop="articleBody">
              
   <section id="low-density-cutoffs">
-<h1>Low Density Cutoffs<a class="headerlink" href="#low-density-cutoffs" title="Permalink to this heading"></a></h1>
+<h1>Low Density Cutoffs<a class="headerlink" href="#low-density-cutoffs" title="Link to this heading"></a></h1>
 <p>These are working notes for the low density parameters in MAESTROeX.
 In low density regions, we modify the behavior of the algorithm. Here
 is a summary of some parameters, and a brief description of what they
@@ -204,11 +204,11 @@ divergence constraint.</div>
 </li>
 </ul>
 <section id="computing-the-cutoff-values">
-<h2>Computing the Cutoff Values<a class="headerlink" href="#computing-the-cutoff-values" title="Permalink to this heading"></a></h2>
+<h2>Computing the Cutoff Values<a class="headerlink" href="#computing-the-cutoff-values" title="Link to this heading"></a></h2>
 <p>We compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord(:)</span></code>, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>,
 and <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_coord(:)</span></code> in analogous fashion.</p>
 <section id="single-level-planar-or-any-spherical">
-<h3>Single-Level Planar or any Spherical<a class="headerlink" href="#single-level-planar-or-any-spherical" title="Permalink to this heading"></a></h3>
+<h3>Single-Level Planar or any Spherical<a class="headerlink" href="#single-level-planar-or-any-spherical" title="Link to this heading"></a></h3>
 <p>Here the base state exists as a single one-dimensional array with constant grid
 spacing <span class="math notranslate nohighlight">\(\Delta r\)</span>. Basically, we set the corresponding coordinate equal to <span class="math notranslate nohighlight">\(r\)</span> as soon
 as <span class="math notranslate nohighlight">\(\rho_0(r)\)</span> is less than or equal to that particular cutoff value.
@@ -217,7 +217,7 @@ See the figure below for a graphical representation.</p>
 <img alt="_images/cutoff.png" src="_images/cutoff.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 16 </span><span class="caption-text">Image of how the cutoff density and cutoff coordinates
-are related for single-level planar and all spherical problems.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+are related for single-level planar and all spherical problems.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Note that for single-level planar or any spherical problem, saying
@@ -228,7 +228,7 @@ are related for single-level planar and all spherical problems.</span><a class="
 <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord</span></code>.</p>
 </section>
 <section id="multilevel-planar">
-<h3>Multilevel Planar<a class="headerlink" href="#multilevel-planar" title="Permalink to this heading"></a></h3>
+<h3>Multilevel Planar<a class="headerlink" href="#multilevel-planar" title="Link to this heading"></a></h3>
 <p>In this case, the base state exists as several one-dimensional arrays, each with
 different grid spacing. Refer to the figure below in the following examples.
 The guiding principle is to check whether <span class="math notranslate nohighlight">\(\rho_0\)</span> falls below <span class="math notranslate nohighlight">\(\rho_{\rm cutoff}\)</span> on the finest
@@ -237,7 +237,7 @@ Some examples are in order:</p>
 <figure class="align-center" id="id2">
 <img alt="_images/cutoff_multi.png" src="_images/cutoff_multi.png" />
 <figcaption>
-<p><span class="caption-number">Fig. 17 </span><span class="caption-text">Multilevel cutoff density example.</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+<p><span class="caption-number">Fig. 17 </span><span class="caption-text">Multilevel cutoff density example.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <ul>
@@ -279,7 +279,7 @@ coordinate to the coarser levels.</p>
 </section>
 </section>
 <section id="when-are-the-cutoff-coordinates-updated">
-<h2>When are the Cutoff Coordinates Updated?<a class="headerlink" href="#when-are-the-cutoff-coordinates-updated" title="Permalink to this heading"></a></h2>
+<h2>When are the Cutoff Coordinates Updated?<a class="headerlink" href="#when-are-the-cutoff-coordinates-updated" title="Link to this heading"></a></h2>
 <p>At several points in the algorithm, we compute <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density_coord(:)</span></code>,
 <code class="docutils literal notranslate"><span class="pre">base_cutoff_density_coord(:)</span></code>, and <code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_coord(:)</span></code>:</p>
 <ul class="simple">
@@ -293,9 +293,9 @@ the coordinates to the base-time values using <span class="math notranslate nohi
 </ul>
 </section>
 <section id="usage-of-cutoff-densities">
-<h2>Usage of Cutoff Densities<a class="headerlink" href="#usage-of-cutoff-densities" title="Permalink to this heading"></a></h2>
-<span class="target" id="sec-anelastic-cutoff"></span><section id="anelastic-cutoff-density">
-<span id="index-0"></span><h3><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code><a class="headerlink" href="#anelastic-cutoff-density" title="Permalink to this heading"></a></h3>
+<h2>Usage of Cutoff Densities<a class="headerlink" href="#usage-of-cutoff-densities" title="Link to this heading"></a></h2>
+<section id="anelastic-cutoff-density">
+<span id="index-0"></span><span id="sec-anelastic-cutoff"></span><h3><code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code><a class="headerlink" href="#anelastic-cutoff-density" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is the density below which we modify the constraint.</p>
 <ul class="simple">
 <li><p>In probin, <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default.  The user
@@ -308,9 +308,9 @@ to zero for <span class="math notranslate nohighlight">\(r \ge {\tt anelastic\_c
 if you are running with <code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span> <span class="pre">=</span> <span class="pre">T</span></code>.</p></li>
 <li><p>Some versions of sponge, use <code class="docutils literal notranslate"><span class="pre">anelastic_cutoff_density</span></code> in a problem dependent way.</p></li>
 </ul>
-<span class="target" id="sec-base-cutoff-density"></span></section>
+</section>
 <section id="base-cutoff-density">
-<span id="index-1"></span><h3><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code><a class="headerlink" href="#base-cutoff-density" title="Permalink to this heading"></a></h3>
+<span id="index-1"></span><span id="sec-base-cutoff-density"></span><h3><code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code><a class="headerlink" href="#base-cutoff-density" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is the lowest density that we model.</p>
 <ul class="simple">
 <li><p>In probin, <code class="docutils literal notranslate"><span class="pre">base_cutoff_density</span></code> is set to <span class="math notranslate nohighlight">\(-1\)</span> by default. The user
@@ -344,7 +344,7 @@ we set it to <span class="math notranslate nohighlight">\({\tt base\_cutoff\_den
 </ul>
 </section>
 <section id="burning-cutoff">
-<span id="index-2"></span><h3><code class="docutils literal notranslate"><span class="pre">burning_cutoff</span></code><a class="headerlink" href="#burning-cutoff" title="Permalink to this heading"></a></h3>
+<span id="index-2"></span><h3><code class="docutils literal notranslate"><span class="pre">burning_cutoff</span></code><a class="headerlink" href="#burning-cutoff" title="Link to this heading"></a></h3>
 <p>The burning cutoff determines where we call the reaction network to
 get the nuclear energy generation rate and composition changes. For
 densities below the burning cutoff, we do not call the network.</p>
@@ -356,7 +356,7 @@ densities below the burning cutoff, we do not call the network.</p>
 </ul>
 </section>
 <section id="buoyancy-cutoff-factor">
-<span id="index-3"></span><h3><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code><a class="headerlink" href="#buoyancy-cutoff-factor" title="Permalink to this heading"></a></h3>
+<span id="index-3"></span><h3><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code><a class="headerlink" href="#buoyancy-cutoff-factor" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code> is used to zero out the forcing terms
 to the velocity equation at low densities.</p>
 <ul>

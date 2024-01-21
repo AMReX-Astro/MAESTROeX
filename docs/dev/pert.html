@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -205,24 +205,24 @@
            <div itemprop="articleBody">
              
   <section id="interface-state-details">
-<span id="ch-pert"></span><h1>Interface State Details<a class="headerlink" href="#interface-state-details" title="Permalink to this heading"></a></h1>
+<span id="ch-pert"></span><h1>Interface State Details<a class="headerlink" href="#interface-state-details" title="Link to this heading"></a></h1>
 <section id="predicting-interface-states">
-<h2>Predicting interface states<a class="headerlink" href="#predicting-interface-states" title="Permalink to this heading"></a></h2>
+<h2>Predicting interface states<a class="headerlink" href="#predicting-interface-states" title="Link to this heading"></a></h2>
 <p>The MAESTROeX hyperbolic equations come in two forms: advective and
 conservative. The procedure for predicting interface states differs
 slightly depending on which form we are dealing with.</p>
 <section id="advective-form">
-<h3>Advective form<a class="headerlink" href="#advective-form" title="Permalink to this heading"></a></h3>
+<h3>Advective form<a class="headerlink" href="#advective-form" title="Link to this heading"></a></h3>
 <p>Most of the time, we are dealing with equations in advective form.
 Here, a scalar, <span class="math notranslate nohighlight">\(\phi\)</span>, obeys:</p>
 <div class="math notranslate nohighlight" id="equation-pert-0">
-<span class="eqno">(134)<a class="headerlink" href="#equation-pert-0" title="Permalink to this equation"></a></span>\[\frac{\partial \phi}{\partial t} = -\Ub \cdot \nabla \phi + f\]</div>
+<span class="eqno">(134)<a class="headerlink" href="#equation-pert-0" title="Link to this equation"></a></span>\[\frac{\partial \phi}{\partial t} = -\Ub \cdot \nabla \phi + f\]</div>
 <p>where <span class="math notranslate nohighlight">\(f\)</span> is the force. This is the form that the perturbation
 equations take, as well as the equation for <span class="math notranslate nohighlight">\(X_k\)</span> itself.</p>
 <p>A piecewise linear prediction of <span class="math notranslate nohighlight">\(\phi\)</span> to the interface
 would appear as:</p>
 <div class="math notranslate nohighlight" id="equation-pert-1">
-<span class="eqno">(135)<a class="headerlink" href="#equation-pert-1" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(135)<a class="headerlink" href="#equation-pert-1" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \phi_{i+1/2,j}^{n+1/2} &amp;=&amp; \phi_{i,j}^n
     + \left . \frac{\Delta x}{2} \frac{\partial \phi}{\partial x} \right |_{i,j}
     + \left . \frac{\Delta t}{2} \frac{\partial \phi}{\partial t} \right |_{i,j} \\
@@ -240,13 +240,13 @@ of equations, we add additional advection-like terms to <span class="math notran
 <code class="docutils literal notranslate"><span class="pre">modify_scal_force</span></code>. This will be noted below.</p>
 </section>
 <section id="conservative-form">
-<h3>Conservative form<a class="headerlink" href="#conservative-form" title="Permalink to this heading"></a></h3>
+<h3>Conservative form<a class="headerlink" href="#conservative-form" title="Link to this heading"></a></h3>
 <p>A conservative equation takes the form:</p>
 <div class="math notranslate nohighlight" id="equation-pert-2">
-<span class="eqno">(136)<a class="headerlink" href="#equation-pert-2" title="Permalink to this equation"></a></span>\[\frac{\partial \phi}{\partial t} = -\nabla \cdot ( \phi \Ub) + f\]</div>
+<span class="eqno">(136)<a class="headerlink" href="#equation-pert-2" title="Link to this equation"></a></span>\[\frac{\partial \phi}{\partial t} = -\nabla \cdot ( \phi \Ub) + f\]</div>
 <p>Now a piecewise linear prediction of <span class="math notranslate nohighlight">\(\phi\)</span> to the interface is</p>
 <div class="math notranslate nohighlight" id="equation-pert-3">
-<span class="eqno">(137)<a class="headerlink" href="#equation-pert-3" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(137)<a class="headerlink" href="#equation-pert-3" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \phi_{i+1/2,j}^{n+1/2} &amp;=&amp; \phi_{i,j}^n
     + \left . \frac{\Delta x}{2} \frac{\partial \phi}{\partial x} \right |_{i,j}
     + \left . \frac{\Delta t}{2} \frac{\partial \phi}{\partial t} \right |_{i,j} \\
@@ -266,25 +266,25 @@ with <code class="docutils literal notranslate"><span class="pre">is_conservativ
 </section>
 </section>
 <section id="density-evolution">
-<span id="sec-pred-density"></span><h2>Density Evolution<a class="headerlink" href="#density-evolution" title="Permalink to this heading"></a></h2>
+<span id="sec-pred-density"></span><h2>Density Evolution<a class="headerlink" href="#density-evolution" title="Link to this heading"></a></h2>
 <section id="basic-equations">
-<h3>Basic equations<a class="headerlink" href="#basic-equations" title="Permalink to this heading"></a></h3>
+<h3>Basic equations<a class="headerlink" href="#basic-equations" title="Link to this heading"></a></h3>
 <p>The full density evolution equation is</p>
 <div class="math notranslate nohighlight" id="equation-rho-equation">
-<span class="eqno">(138)<a class="headerlink" href="#equation-rho-equation" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(138)<a class="headerlink" href="#equation-rho-equation" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \frac{\partial\rho}{\partial t} &amp;=&amp; -\nabla\cdot(\rho\Ub) \nonumber \\
 &amp;=&amp; -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, .
 \end{aligned}\end{split}\]</div>
 <p>The species are evolved according to</p>
 <div class="math notranslate nohighlight" id="equation-species-equation">
-<span class="eqno">(139)<a class="headerlink" href="#equation-species-equation" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(139)<a class="headerlink" href="#equation-species-equation" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho X_k)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho\Ub X_k) + \rho \omegadot_k \nonumber \\
 &amp;=&amp; -\Ub\cdot\nabla(\rho X_k) - \rho X_k \nabla\cdot\Ub + \rho \omegadot_k \, .
 \end{aligned}\end{split}\]</div>
 <p>In practice, only the species evolution equation is evolved, and the
 total density is set as</p>
 <div class="math notranslate nohighlight" id="equation-pert-4">
-<span class="eqno">(140)<a class="headerlink" href="#equation-pert-4" title="Permalink to this equation"></a></span>\[\rho = \sum_k (\rho X_k)\]</div>
+<span class="eqno">(140)<a class="headerlink" href="#equation-pert-4" title="Link to this equation"></a></span>\[\rho = \sum_k (\rho X_k)\]</div>
 <p>To advance <span class="math notranslate nohighlight">\((\rho X_k)\)</span> to the next timestep, we need to predict a
 time-centered, interface state. Algebraically, there are multiple
 paths to get this interface state—we can predict <span class="math notranslate nohighlight">\((\rho X)\)</span> to the
@@ -296,7 +296,7 @@ edges are controlled by the <code class="docutils literal notranslate"><span cla
 quantities predicted to edges and the
 resulting edge state are shown in the <a class="reference internal" href="#table-pred-species"><span class="std std-numref">Table 4</span></a>.</p>
 <span id="table-pred-species"></span><table class="docutils align-default" id="id11">
-<caption><span class="caption-number">Table 4 </span><span class="caption-text">Summary of species edge state construction</span><a class="headerlink" href="#id11" title="Permalink to this table"></a></caption>
+<caption><span class="caption-number">Table 4 </span><span class="caption-text">Summary of species edge state construction</span><a class="headerlink" href="#id11" title="Link to this table"></a></caption>
 <tbody>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
 <td><p>quantities predicted
@@ -326,29 +326,29 @@ edge state</p></td>
 module.</p>
 </section>
 <section id="method-1-species-pred-type-predict-rhoprime-and-x">
-<h3>Method 1: species_pred_type = predict_rhoprime_and_X<a class="headerlink" href="#method-1-species-pred-type-predict-rhoprime-and-x" title="Permalink to this heading"></a></h3>
+<h3>Method 1: species_pred_type = predict_rhoprime_and_X<a class="headerlink" href="#method-1-species-pred-type-predict-rhoprime-and-x" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\((\rho_0^{n+\myhalf,{\rm avg}}
 + \rho'_\mathrm{edge})(X_k)_\mathrm{edge}\)</span>.</p>
 <p>We predict both <span class="math notranslate nohighlight">\(\rho'\)</span> and <span class="math notranslate nohighlight">\(\rho_0\)</span> to edges separately and later use them to
 reconstruct <span class="math notranslate nohighlight">\(\rho\)</span> at edges. The base state density evolution equation is</p>
 <div class="math notranslate nohighlight" id="equation-rho0-equation">
-<span class="eqno">(141)<a class="headerlink" href="#equation-rho0-equation" title="Permalink to this equation"></a></span>\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r) =
+<span class="eqno">(141)<a class="headerlink" href="#equation-rho0-equation" title="Link to this equation"></a></span>\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r) =
 -w_0\frac{\partial\rho_0}{\partial r}
 \underbrace{-\rho_0\frac{\partial w_0}{\partial r}}_{``\rho_0 ~ \text{force&quot;}}.\]</div>
 <p>Subtract <a class="reference internal" href="#equation-rho0-equation">Eq.141</a> from <a class="reference internal" href="#equation-rho-equation">Eq.138</a> and rearrange
 terms, noting that <span class="math notranslate nohighlight">\(\Ub = \Ubt + w_o\eb_r\)</span>, to obtain the
 perturbational density equation,</p>
 <div class="math notranslate nohighlight" id="equation-rhoprime-equation">
-<span class="eqno">(142)<a class="headerlink" href="#equation-rhoprime-equation" title="Permalink to this equation"></a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' \underbrace{- \rho'\nabla\cdot\Ub
+<span class="eqno">(142)<a class="headerlink" href="#equation-rhoprime-equation" title="Link to this equation"></a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' \underbrace{- \rho'\nabla\cdot\Ub
 - \nabla\cdot(\rho_0\Ubt)}_{\rho' ~ \text{force}} \, .\]</div>
 <p>We also need <span class="math notranslate nohighlight">\(X_k\)</span> at the edges. Here, we subtract <span class="math notranslate nohighlight">\(X_k \times\)</span>
 <a class="reference internal" href="#equation-rho-equation">Eq.138</a> from <a class="reference internal" href="#equation-species-equation">Eq.139</a> to obtain</p>
 <div class="math notranslate nohighlight" id="equation-pert-5">
-<span class="eqno">(143)<a class="headerlink" href="#equation-pert-5" title="Permalink to this equation"></a></span>\[\frac{\partial X_k}{\partial t} = -\Ub \cdot \nabla X_k + \omegadot_k\]</div>
+<span class="eqno">(143)<a class="headerlink" href="#equation-pert-5" title="Link to this equation"></a></span>\[\frac{\partial X_k}{\partial t} = -\Ub \cdot \nabla X_k + \omegadot_k\]</div>
 <p>When using Strang-splitting, we ignore the <span class="math notranslate nohighlight">\(\omegadot_k\)</span> source terms, and
 then the species equation is a pure advection equation with no force.</p>
 <section id="predicting-rho-at-edges">
-<h4>Predicting <span class="math notranslate nohighlight">\(\rho'\)</span> at edges<a class="headerlink" href="#predicting-rho-at-edges" title="Permalink to this heading"></a></h4>
+<h4>Predicting <span class="math notranslate nohighlight">\(\rho'\)</span> at edges<a class="headerlink" href="#predicting-rho-at-edges" title="Link to this heading"></a></h4>
 <p>We define <span class="math notranslate nohighlight">\(\rho' = \rho^{(1)} - \rho_0^n\)</span>. Then we predict <span class="math notranslate nohighlight">\(\rho'\)</span> to
 edges using <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">density_advance</span></code> and the
 underbraced term in <a class="reference internal" href="#equation-rhoprime-equation">Eq.142</a> as the forcing. This
@@ -356,7 +356,7 @@ force is computed in <code class="docutils literal notranslate"><span class="pre
 done in advective form.</p>
 </section>
 <section id="predicting-rho-0-at-edges">
-<span id="predicting-rho0-at-edges"></span><h4>Predicting <span class="math notranslate nohighlight">\(\rho_0\)</span> at edges<a class="headerlink" href="#predicting-rho-0-at-edges" title="Permalink to this heading"></a></h4>
+<span id="predicting-rho0-at-edges"></span><h4>Predicting <span class="math notranslate nohighlight">\(\rho_0\)</span> at edges<a class="headerlink" href="#predicting-rho-0-at-edges" title="Link to this heading"></a></h4>
 <p>There are two ways to predict <span class="math notranslate nohighlight">\(\rho_0\)</span> at edges.</p>
 <ol class="arabic simple">
 <li><p>We call make_edge_state_1d using the underbraced term
@@ -387,7 +387,7 @@ average of <span class="math notranslate nohighlight">\(\rho\)</span> to the int
 of the algorithm.</p>
 </section>
 <section id="computing-rho-at-edges">
-<span id="id1"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho\)</span> at edges<a class="headerlink" href="#computing-rho-at-edges" title="Permalink to this heading"></a></h4>
+<span id="id1"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho\)</span> at edges<a class="headerlink" href="#computing-rho-at-edges" title="Link to this heading"></a></h4>
 <p>For the non-radial edges, we directly add <span class="math notranslate nohighlight">\(\rho_0^{n+\myhalf,{\rm avg}}\)</span>
 to <span class="math notranslate nohighlight">\(\rho'\)</span> since <span class="math notranslate nohighlight">\(\rho_0^{n+\myhalf,{\rm avg}}\)</span> is a cell-centered
 quantity. For the radial edges, we interpolate to obtain
@@ -395,7 +395,7 @@ quantity. For the radial edges, we interpolate to obtain
 <span class="math notranslate nohighlight">\(\rho'\)</span>.</p>
 </section>
 <section id="predicting-x-k-at-edges">
-<span id="sec-pert-predict-x"></span><h4>Predicting <span class="math notranslate nohighlight">\(X_k\)</span> at edges<a class="headerlink" href="#predicting-x-k-at-edges" title="Permalink to this heading"></a></h4>
+<span id="sec-pert-predict-x"></span><h4>Predicting <span class="math notranslate nohighlight">\(X_k\)</span> at edges<a class="headerlink" href="#predicting-x-k-at-edges" title="Link to this heading"></a></h4>
 <p>Predicting <span class="math notranslate nohighlight">\(X_k\)</span> is straightforward. We convert the cell-centered
 <span class="math notranslate nohighlight">\((\rho X_k)\)</span> to <span class="math notranslate nohighlight">\(X_k\)</span> by dividing by <span class="math notranslate nohighlight">\(\rho\)</span> in each zone and then we
 just call <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">density_advance</span></code> on <span class="math notranslate nohighlight">\(X_k\)</span>.
@@ -404,12 +404,12 @@ done in advective form.</p>
 </section>
 </section>
 <section id="method-2-species-pred-type-predict-rhox">
-<h3>Method 2: species_pred_type = predict_rhoX<a class="headerlink" href="#method-2-species-pred-type-predict-rhox" title="Permalink to this heading"></a></h3>
+<h3>Method 2: species_pred_type = predict_rhoX<a class="headerlink" href="#method-2-species-pred-type-predict-rhox" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\((\rho X_k)_\mathrm{edge}\)</span> by predicting
 <span class="math notranslate nohighlight">\((\rho X_k)\)</span> to the edges as a single quantity. We recall
 <a class="reference internal" href="#equation-species-equation">Eq.139</a>:</p>
 <div class="math notranslate nohighlight" id="equation-pert-6">
-<span class="eqno">(144)<a class="headerlink" href="#equation-pert-6" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho X_k)}{\partial t} =
+<span class="eqno">(144)<a class="headerlink" href="#equation-pert-6" title="Link to this equation"></a></span>\[\frac{\partial(\rho X_k)}{\partial t} =
   -\nabla \cdot (\rho \Ub X_k) + \rho \omegadot_k \, . \nonumber\]</div>
 <p>The edge state is created by calling <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in
 <code class="docutils literal notranslate"><span class="pre">density_advance</span></code> with <code class="docutils literal notranslate"><span class="pre">is_conservative</span> <span class="pre">=</span> <span class="pre">.true.</span></code>.
@@ -420,14 +420,14 @@ Strang-splitting.</p>
 enthalpy formulations need it.</p>
 </section>
 <section id="method-3-species-pred-type-predict-rho-and-x">
-<h3>Method 3: species_pred_type = predict_rho_and_X<a class="headerlink" href="#method-3-species-pred-type-predict-rho-and-x" title="Permalink to this heading"></a></h3>
+<h3>Method 3: species_pred_type = predict_rho_and_X<a class="headerlink" href="#method-3-species-pred-type-predict-rho-and-x" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\(\rho_\mathrm{edge} (X_k)_\mathrm{edge}\)</span>
 by predicting <span class="math notranslate nohighlight">\(\rho\)</span> and <span class="math notranslate nohighlight">\(X_k\)</span> to the edges separately.</p>
 <p>Predicting <span class="math notranslate nohighlight">\(X_k\)</span> to the edges proceeds exactly as described in
 § <a class="reference external" href="#sec:pert:predict_X">2.2.4</a>.</p>
 <p>Predicting the full <span class="math notranslate nohighlight">\(\rho\)</span> begins with <a class="reference internal" href="#equation-rho-equation">Eq.138</a>:</p>
 <div class="math notranslate nohighlight" id="equation-rho-equation-labeled">
-<span class="eqno">(145)<a class="headerlink" href="#equation-rho-equation-labeled" title="Permalink to this equation"></a></span>\[\frac{\partial\rho}{\partial t}
+<span class="eqno">(145)<a class="headerlink" href="#equation-rho-equation-labeled" title="Link to this equation"></a></span>\[\frac{\partial\rho}{\partial t}
 = -\Ub\cdot\nabla\rho \, \underbrace{- \rho\nabla\cdot\Ub}_{``\rho~\text{force''}} \, .\]</div>
 <p>Using this, <span class="math notranslate nohighlight">\(\rho\)</span> is predicted to the edges using
 <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">density_advance</span></code>, with the underbraced
@@ -435,38 +435,38 @@ force computed in <code class="docutils literal notranslate"><span class="pre">m
 <span class="pre">.true.</span></code>.</p>
 </section>
 <section id="advancing-rho-x-k">
-<span id="advancing-rhox-k"></span><h3>Advancing <span class="math notranslate nohighlight">\(\rho X_k\)</span><a class="headerlink" href="#advancing-rho-x-k" title="Permalink to this heading"></a></h3>
+<span id="advancing-rhox-k"></span><h3>Advancing <span class="math notranslate nohighlight">\(\rho X_k\)</span><a class="headerlink" href="#advancing-rho-x-k" title="Link to this heading"></a></h3>
 <p>The evolution equation for <span class="math notranslate nohighlight">\(\rho X_k\)</span>, ignoring the reaction
 terms that were already accounted for in <code class="docutils literal notranslate"><span class="pre">react_state</span></code>, and the
 associated discretization is:</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rhoprime_and_X</span></code> :</p>
 <div class="math notranslate nohighlight" id="equation-pert-7">
-<span class="eqno">(146)<a class="headerlink" href="#equation-pert-7" title="Permalink to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
+<span class="eqno">(146)<a class="headerlink" href="#equation-pert-7" title="Link to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left({\rho_0}^{n+\myhalf,{\rm avg}}
 + \rho'_\mathrm{edge} \right)(X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rhoX</span></code> :</p>
 <div class="math notranslate nohighlight" id="equation-pert-8">
-<span class="eqno">(147)<a class="headerlink" href="#equation-pert-8" title="Permalink to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
+<span class="eqno">(147)<a class="headerlink" href="#equation-pert-8" title="Link to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\left(\rho X_k \right)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">predict_rho_and_X</span></code> :</p>
 <div class="math notranslate nohighlight" id="equation-pert-9">
-<span class="eqno">(148)<a class="headerlink" href="#equation-pert-9" title="Permalink to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
+<span class="eqno">(148)<a class="headerlink" href="#equation-pert-9" title="Link to this equation"></a></span>\[\frac{\partial\rho X_k}{\partial t} =
 -\nabla\cdot\left\{\left[\rho_\mathrm{edge} (X_k)_\mathrm{edge} \right](\Ubt+w_0\eb_r)\right\}.\]</div>
 </li>
 </ul>
 </section>
 </section>
 <section id="energy-evolution">
-<span id="sec-pred-enthalpy"></span><h2>Energy Evolution<a class="headerlink" href="#energy-evolution" title="Permalink to this heading"></a></h2>
+<span id="sec-pred-enthalpy"></span><h2>Energy Evolution<a class="headerlink" href="#energy-evolution" title="Link to this heading"></a></h2>
 <section id="basic-equations-1">
-<span id="id2"></span><h3>Basic equations<a class="headerlink" href="#basic-equations-1" title="Permalink to this heading"></a></h3>
+<span id="id2"></span><h3>Basic equations<a class="headerlink" href="#basic-equations-1" title="Link to this heading"></a></h3>
 <p>MAESTROeX solves an enthalpy equation.
 The full enthalpy equation is</p>
 <div class="math notranslate nohighlight" id="equation-pert-10">
-<span class="eqno">(149)<a class="headerlink" href="#equation-pert-10" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(149)<a class="headerlink" href="#equation-pert-10" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)}{\partial t} &amp;=&amp; -\nabla\cdot(\rho h \Ub) + \frac{Dp_0}{Dt}
 + \nabla\cdot \kth \nabla T + \rho H_{\rm nuc} + \rho H_{\rm ext} \nonumber \\
 &amp;=&amp; \underbrace{-\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub}_{-\nabla\cdot(\rho h\Ub)}
@@ -479,11 +479,11 @@ enthalpy equation that does not include the <span class="math notranslate nohigh
 <span class="math notranslate nohighlight">\(\rho H_{\rm ext}\)</span> terms, where were already accounted for in
 react_state, so our equation becomes</p>
 <div class="math notranslate nohighlight" id="equation-rhoh-equation">
-<span class="eqno">(150)<a class="headerlink" href="#equation-rhoh-equation" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} = -\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub
+<span class="eqno">(150)<a class="headerlink" href="#equation-rhoh-equation" title="Link to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} = -\Ub\cdot\nabla(\rho h) - \rho h\nabla\cdot\Ub
 + \underbrace{\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla\cdot\kth\nabla T}_{``(\rho h) ~ \text{force}&quot;}\]</div>
 <p>We define the base state enthalpy evolution equation as</p>
 <div class="math notranslate nohighlight" id="equation-rhoh0-equation">
-<span class="eqno">(151)<a class="headerlink" href="#equation-rhoh0-equation" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(151)<a class="headerlink" href="#equation-rhoh0-equation" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)_0}{\partial t} &amp;=&amp; -\nabla\cdot[(\rho h)_0 w_0\eb_r]
 + \frac{D_0p_0}{Dt} \nonumber \\
 &amp;=&amp; -w_0\frac{\partial(\rho h)_0}{\partial r}
@@ -491,11 +491,11 @@ react_state, so our equation becomes</p>
  .
 \end{aligned}\end{split}\]</div>
 <section id="perturbational-enthalpy-formulation">
-<h4>Perturbational enthalpy formulation<a class="headerlink" href="#perturbational-enthalpy-formulation" title="Permalink to this heading"></a></h4>
+<h4>Perturbational enthalpy formulation<a class="headerlink" href="#perturbational-enthalpy-formulation" title="Link to this heading"></a></h4>
 <p>Subtracting <a class="reference internal" href="#equation-rhoh0-equation">Eq.151</a> from <a class="reference internal" href="#equation-rhoh-equation">Eq.150</a> and
 rearranging terms gives the perturbational enthalpy equation</p>
 <div class="math notranslate nohighlight" id="equation-rhohprime-equation">
-<span class="eqno">(152)<a class="headerlink" href="#equation-rhohprime-equation" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(152)<a class="headerlink" href="#equation-rhohprime-equation" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 \frac{\partial(\rho h)'}{\partial t} &amp;=&amp; -\nabla\cdot[(\rho h)'\Ub]
 - \nabla\cdot[(\rho h)_0\Ubt] + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r}
 + \nabla\cdot\kth\nabla T\nonumber \\
@@ -505,11 +505,11 @@ rearranging terms gives the perturbational enthalpy equation</p>
 \end{aligned}\end{split}\]</div>
 </section>
 <section id="temperature-formulation">
-<h4>Temperature formulation<a class="headerlink" href="#temperature-formulation" title="Permalink to this heading"></a></h4>
+<h4>Temperature formulation<a class="headerlink" href="#temperature-formulation" title="Link to this heading"></a></h4>
 <p>Alternately, we can consider an temperature evolution equation, derived
 from enthalpy, as:</p>
 <div class="math notranslate nohighlight" id="equation-pert-11">
-<span class="eqno">(153)<a class="headerlink" href="#equation-pert-11" title="Permalink to this equation"></a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
+<span class="eqno">(153)<a class="headerlink" href="#equation-pert-11" title="Link to this equation"></a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
 + \frac{1}{\rho c_p}\left\{(1-\rho h_p)\left[\psi
 + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}\right]
 + \nabla \cdot \kth \nabla T
@@ -518,26 +518,26 @@ from enthalpy, as:</p>
 <p>Again, we neglect the reaction terms, since that will be handled during
 the reaction step, so we can write this as:</p>
 <div class="math notranslate nohighlight" id="equation-t-equation-labeled">
-<span class="eqno">(154)<a class="headerlink" href="#equation-t-equation-labeled" title="Permalink to this equation"></a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
+<span class="eqno">(154)<a class="headerlink" href="#equation-t-equation-labeled" title="Link to this equation"></a></span>\[\frac{\partial T}{\partial t} = -\Ub\cdot\nabla T
 \underbrace{
 + \frac{1}{\rho c_p}\left\{(1-\rho h_p)\left[\psi
 + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}\right]
 + \nabla \cdot \kth \nabla T \right \} }_{``T~\text{force''}} \, .\]</div>
 </section>
 <section id="pure-enthalpy-formulation">
-<h4>Pure enthalpy formulation<a class="headerlink" href="#pure-enthalpy-formulation" title="Permalink to this heading"></a></h4>
+<h4>Pure enthalpy formulation<a class="headerlink" href="#pure-enthalpy-formulation" title="Link to this heading"></a></h4>
 <p>A final alternative is to consider an evolution equation for <span class="math notranslate nohighlight">\(h\)</span>
 alone. This can be derived by expanding the derivative of <span class="math notranslate nohighlight">\((\rho h)\)</span>
 in <a class="reference internal" href="#equation-rhoh-equation">Eq.150</a> and subtracting off <span class="math notranslate nohighlight">\(h \times\)</span> the
 continuity equation (<a class="reference internal" href="#equation-rho-equation">Eq.138</a>):</p>
 <div class="math notranslate nohighlight" id="equation-h-equation-labeled">
-<span class="eqno">(155)<a class="headerlink" href="#equation-h-equation-labeled" title="Permalink to this equation"></a></span>\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h
+<span class="eqno">(155)<a class="headerlink" href="#equation-h-equation-labeled" title="Link to this equation"></a></span>\[\frac{\partial h}{\partial t} = -\Ub \cdot \nabla h
 \underbrace{+ \frac{1}{\rho}
 \left \{ \psi + (\Ubt \cdot \er )\frac{\partial p_0}{\partial r}
 + \nabla \cdot \kth \nabla T \right \} }_{``h~\text{force''}} \, .\]</div>
 </section>
 <section id="prediction-requirements">
-<h4>Prediction requirements<a class="headerlink" href="#prediction-requirements" title="Permalink to this heading"></a></h4>
+<h4>Prediction requirements<a class="headerlink" href="#prediction-requirements" title="Link to this heading"></a></h4>
 <p>To update the enthalpy, we need to compute an interface state for
 <span class="math notranslate nohighlight">\((\rho h)\)</span>. As with the species evolution, there are multiple
 quantities we can predict to the interfaces to form this state,
@@ -578,27 +578,27 @@ combination of parameters.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">0</span></code> (<code class="docutils literal notranslate"><span class="pre">predict_rhoh</span></code>) :
 we predict <span class="math notranslate nohighlight">\((\rho h)\)</span>.  The advective force is:</p>
 <div class="math notranslate nohighlight" id="equation-pert-12">
-<span class="eqno">(156)<a class="headerlink" href="#equation-pert-12" title="Permalink to this equation"></a></span>\[\left [\psi + (\Ubt \cdot  \er)   \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]\]</div>
+<span class="eqno">(156)<a class="headerlink" href="#equation-pert-12" title="Link to this equation"></a></span>\[\left [\psi + (\Ubt \cdot  \er)   \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> (<code class="docutils literal notranslate"><span class="pre">predict_rhohprime</span></code>) :
 we predict <span class="math notranslate nohighlight">\((\rho h)^\prime\)</span>.  The advective force is:</p>
 <div class="math notranslate nohighlight" id="equation-pert-13">
-<span class="eqno">(157)<a class="headerlink" href="#equation-pert-13" title="Permalink to this equation"></a></span>\[-(\rho h)^\prime \; \nabla \cdot (\Ubt+w_0 \er) - \nabla \cdot (\Ubt (\rho h)_0) + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T\]</div>
+<span class="eqno">(157)<a class="headerlink" href="#equation-pert-13" title="Link to this equation"></a></span>\[-(\rho h)^\prime \; \nabla \cdot (\Ubt+w_0 \er) - \nabla \cdot (\Ubt (\rho h)_0) + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code> (<code class="docutils literal notranslate"><span class="pre">predict_h</span></code>) :
 we predict <span class="math notranslate nohighlight">\(h\)</span>.  The advective force is:</p>
 <div class="math notranslate nohighlight" id="equation-pert-14">
-<span class="eqno">(158)<a class="headerlink" href="#equation-pert-14" title="Permalink to this equation"></a></span>\[\frac{1}{\rho} \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]\]</div>
+<span class="eqno">(158)<a class="headerlink" href="#equation-pert-14" title="Link to this equation"></a></span>\[\frac{1}{\rho} \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} + \nabla \cdot \kth \nabla T \right ]\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">3</span></code> (<code class="docutils literal notranslate"><span class="pre">predict_T_then_rhohprime</span></code>) :
 we predict <span class="math notranslate nohighlight">\(T\)</span>.  The advective force is:</p>
 <div class="math notranslate nohighlight" id="equation-pert-15">
-<span class="eqno">(159)<a class="headerlink" href="#equation-pert-15" title="Permalink to this equation"></a></span>\[\frac{1}{\rho c_p} \left \{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} \right ] + \nabla \cdot \kth \nabla T \right \}\]</div>
+<span class="eqno">(159)<a class="headerlink" href="#equation-pert-15" title="Link to this equation"></a></span>\[\frac{1}{\rho c_p} \left \{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r} \right ] + \nabla \cdot \kth \nabla T \right \}\]</div>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code> (<code class="docutils literal notranslate"><span class="pre">predict_T_then_h</span></code>) :
 we predict <span class="math notranslate nohighlight">\(T\)</span>.  The advective force is:</p>
 <div class="math notranslate nohighlight" id="equation-pert-16">
-<span class="eqno">(160)<a class="headerlink" href="#equation-pert-16" title="Permalink to this equation"></a></span>\[\frac{1}{\rho c_p} \left\{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}\right ] +  \nabla \cdot \kth \nabla T \right\}\]</div>
+<span class="eqno">(160)<a class="headerlink" href="#equation-pert-16" title="Link to this equation"></a></span>\[\frac{1}{\rho c_p} \left\{ (1 - \rho h_p) \left [\psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}\right ] +  \nabla \cdot \kth \nabla T \right\}\]</div>
 </li>
 </ul>
 <p>The combination of <code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code> and <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code> determine how we construct the edge state.  The variations are:</p>
@@ -727,18 +727,18 @@ we predict <span class="math notranslate nohighlight">\(T\)</span>.  The advecti
 </section>
 </section>
 <section id="method-0-enthalpy-pred-type-predict-rhoh">
-<h3>Method 0: enthalpy_pred_type = predict_rhoh<a class="headerlink" href="#method-0-enthalpy-pred-type-predict-rhoh" title="Permalink to this heading"></a></h3>
+<h3>Method 0: enthalpy_pred_type = predict_rhoh<a class="headerlink" href="#method-0-enthalpy-pred-type-predict-rhoh" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\((\rho h)_\mathrm{edge}\)</span> by predicting
 <span class="math notranslate nohighlight">\((\rho h)\)</span> to the edges directly. We use <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> with
 <code class="docutils literal notranslate"><span class="pre">is_conservative</span> <span class="pre">=</span> <span class="pre">.true.</span></code> on <span class="math notranslate nohighlight">\((\rho h)\)</span>, with the underbraced term
 in <a class="reference internal" href="#equation-rhoh-equation">Eq.150</a> as the force (computed in <code class="docutils literal notranslate"><span class="pre">mkrhohforce</span></code>).</p>
 </section>
 <section id="method-1-enthalpy-pred-type-predict-rhohprime">
-<h3>Method 1: enthalpy_pred_type = predict_rhohprime<a class="headerlink" href="#method-1-enthalpy-pred-type-predict-rhohprime" title="Permalink to this heading"></a></h3>
+<h3>Method 1: enthalpy_pred_type = predict_rhohprime<a class="headerlink" href="#method-1-enthalpy-pred-type-predict-rhohprime" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\(\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho
 h)'_\mathrm{edge} \right ]\)</span> by predicting <span class="math notranslate nohighlight">\((\rho h)'\)</span> to the edges.</p>
 <section id="predicting-rho-h-at-edges">
-<span id="predicting-rhohprime-at-edges"></span><h4>Predicting <span class="math notranslate nohighlight">\((\rho h)'\)</span> at edges<a class="headerlink" href="#predicting-rho-h-at-edges" title="Permalink to this heading"></a></h4>
+<span id="predicting-rhohprime-at-edges"></span><h4>Predicting <span class="math notranslate nohighlight">\((\rho h)'\)</span> at edges<a class="headerlink" href="#predicting-rho-h-at-edges" title="Link to this heading"></a></h4>
 <p>We define <span class="math notranslate nohighlight">\((\rho h)' = (\rho h)^{(1)} - (\rho h)_0^n\)</span>. Then we predict
 <span class="math notranslate nohighlight">\((\rho h)'\)</span> to edges using <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">enthalpy_advance</span></code>
 and the underbraced term in <a class="reference internal" href="#equation-rhohprime-equation">Eq.152</a> as the forcing (see
@@ -749,11 +749,11 @@ The first two terms in <span class="math notranslate nohighlight">\((\rho h)'\)<
 representation of the pressure term in the <span class="math notranslate nohighlight">\((\rho h)'\)</span> force gives better
 results, namely:</p>
 <div class="math notranslate nohighlight" id="equation-pert-17">
-<span class="eqno">(161)<a class="headerlink" href="#equation-pert-17" title="Permalink to this equation"></a></span>\[(\Ubt \cdot \er)\frac{\partial p_0}{\partial r} \equiv \Ubt\cdot\nabla p_0 =
+<span class="eqno">(161)<a class="headerlink" href="#equation-pert-17" title="Link to this equation"></a></span>\[(\Ubt \cdot \er)\frac{\partial p_0}{\partial r} \equiv \Ubt\cdot\nabla p_0 =
 \nabla\cdot(\Ubt p_0) - p_0\nabla\cdot\Ubt.\]</div>
 </section>
 <section id="predicting-rho-h-0-at-edges">
-<h4>Predicting <span class="math notranslate nohighlight">\((\rho h)_0\)</span> at edges<a class="headerlink" href="#predicting-rho-h-0-at-edges" title="Permalink to this heading"></a></h4>
+<h4>Predicting <span class="math notranslate nohighlight">\((\rho h)_0\)</span> at edges<a class="headerlink" href="#predicting-rho-h-0-at-edges" title="Link to this heading"></a></h4>
 <p>We use an analogous procedure described in Section <a class="reference internal" href="#predicting-rho0-at-edges"><span class="std std-ref">Predicting \rho_0 at edges</span></a> for computing <span class="math notranslate nohighlight">\(\rho_0^{n+\myhalf,\rm{avg}}\)</span> to
 obtain <span class="math notranslate nohighlight">\((\rho h)_0^{n+\myhalf,\rm{avg}}\)</span>, i.e., <span class="math notranslate nohighlight">\((\rho
 h)_0^{n+\myhalf,{\rm avg}} = [(\rho h)_0^{n} + (\rho h)_0^{n+1}]/2\)</span>.</p>
@@ -762,13 +762,13 @@ directly, we compute <span class="math notranslate nohighlight">\(\rho_0\)</span
 multiply to get <span class="math notranslate nohighlight">\((\rho h)_0\)</span>.</p>
 </section>
 <section id="computing-rho-h-at-edges">
-<h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges" title="Permalink to this heading"></a></h4>
+<h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges" title="Link to this heading"></a></h4>
 <p>We use an analogous procedure described in Section <a class="reference internal" href="#computing-rho-at-edges"><span class="std std-ref">Computing \rho at edges</span></a> for computing <span class="math notranslate nohighlight">\(\rho\)</span> at edges to compute <span class="math notranslate nohighlight">\(\rho
 h\)</span> at edges.</p>
 </section>
 </section>
 <section id="method-2-enthalpy-pred-type-predict-h">
-<h3>Method 2: enthalpy_pred_type = predict_h<a class="headerlink" href="#method-2-enthalpy-pred-type-predict-h" title="Permalink to this heading"></a></h3>
+<h3>Method 2: enthalpy_pred_type = predict_h<a class="headerlink" href="#method-2-enthalpy-pred-type-predict-h" title="Link to this heading"></a></h3>
 <p>Here, the construction of the interface state depends on what species
 quantities are present. In all cases, the enthalpy state is found
 by predicting <span class="math notranslate nohighlight">\(h\)</span> to the edges.</p>
@@ -777,7 +777,7 @@ by predicting <span class="math notranslate nohighlight">\(h\)</span> to the edg
 <p>For <code class="docutils literal notranslate"><span class="pre">species_pred_types</span></code>: <code class="docutils literal notranslate"><span class="pre">predict_rho_and_X</span></code> or
 <code class="docutils literal notranslate"><span class="pre">predict_rhoX</span></code>, we wish to construct <span class="math notranslate nohighlight">\(\rho_\mathrm{edge} h_\mathrm{edge}\)</span>.</p>
 <section id="predicting-h-at-edges">
-<h4>Predicting <span class="math notranslate nohighlight">\(h\)</span> at edges<a class="headerlink" href="#predicting-h-at-edges" title="Permalink to this heading"></a></h4>
+<h4>Predicting <span class="math notranslate nohighlight">\(h\)</span> at edges<a class="headerlink" href="#predicting-h-at-edges" title="Link to this heading"></a></h4>
 <p>We define <span class="math notranslate nohighlight">\(h = (\rho h)^{(1)}/\rho^{(1)}\)</span>. Then we predict <span class="math notranslate nohighlight">\(h\)</span> to edges
 using <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in <code class="docutils literal notranslate"><span class="pre">enthalpy_advance</span></code> and the
 underbraced term in <a class="reference internal" href="#equation-h-equation-labeled">Eq.155</a> as the forcing (see
@@ -787,7 +787,7 @@ knows about the different <code class="docutils literal notranslate"><span class
 the correct force for this type.</p>
 </section>
 <section id="computing-rho-h-at-edges-1">
-<span id="id3"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-1" title="Permalink to this heading"></a></h4>
+<span id="id3"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-1" title="Link to this heading"></a></h4>
 <div class="line-block">
 <div class="line"><code class="docutils literal notranslate"><span class="pre">species_pred_types</span></code>: <code class="docutils literal notranslate"><span class="pre">predict_rhoprime_and_X</span></code>:</div>
 <div class="line">We use the same procedure described in Section <a class="reference external" href="#Computingrhoatedges">[Computing rho at
@@ -809,11 +809,11 @@ the correct force for this type.</p>
 </section>
 </section>
 <section id="method-3-enthalpy-pred-type-predict-t-then-rhohprime">
-<h3>Method 3: enthalpy_pred_type = predict_T_then_rhohprime<a class="headerlink" href="#method-3-enthalpy-pred-type-predict-t-then-rhohprime" title="Permalink to this heading"></a></h3>
+<h3>Method 3: enthalpy_pred_type = predict_T_then_rhohprime<a class="headerlink" href="#method-3-enthalpy-pred-type-predict-t-then-rhohprime" title="Link to this heading"></a></h3>
 <p>Here we wish to construct <span class="math notranslate nohighlight">\(\left [ (\rho h)_0 + (\rho h)'_\mathrm{edge} \right ]\)</span> by predicting <span class="math notranslate nohighlight">\(T\)</span> to the edges and then
 converting this to <span class="math notranslate nohighlight">\((\rho h)'_\mathrm{edge}\)</span> via the EOS.</p>
 <section id="predicting-t-at-edges">
-<h4>Predicting <span class="math notranslate nohighlight">\(T\)</span> at edges<a class="headerlink" href="#predicting-t-at-edges" title="Permalink to this heading"></a></h4>
+<h4>Predicting <span class="math notranslate nohighlight">\(T\)</span> at edges<a class="headerlink" href="#predicting-t-at-edges" title="Link to this heading"></a></h4>
 <p>We predict <span class="math notranslate nohighlight">\(T\)</span> to edges using <code class="docutils literal notranslate"><span class="pre">make_edge_scal</span></code> in
 <code class="docutils literal notranslate"><span class="pre">enthalpy_advance</span></code> and the underbraced term in Eq. <a href="#id4"><span class="problematic" id="id5">`</span></a>[T equation</p>
 <blockquote>
@@ -823,7 +823,7 @@ labeled&gt;`__ as the forcing (see also <code class="xref std std-numref docutil
 <p>This force is computed by <code class="docutils literal notranslate"><span class="pre">mktempforce</span></code>.</p>
 </section>
 <section id="converting-t-mathrm-edge-to-rho-h-mathrm-edge">
-<h4>Converting <span class="math notranslate nohighlight">\(T_\mathrm{edge}\)</span> to <span class="math notranslate nohighlight">\((\rho h)'_\mathrm{edge}\)</span><a class="headerlink" href="#converting-t-mathrm-edge-to-rho-h-mathrm-edge" title="Permalink to this heading"></a></h4>
+<h4>Converting <span class="math notranslate nohighlight">\(T_\mathrm{edge}\)</span> to <span class="math notranslate nohighlight">\((\rho h)'_\mathrm{edge}\)</span><a class="headerlink" href="#converting-t-mathrm-edge-to-rho-h-mathrm-edge" title="Link to this heading"></a></h4>
 <p>We call the EOS in <code class="docutils literal notranslate"><span class="pre">makeHfromRhoT_edge</span></code> (called from
 <code class="docutils literal notranslate"><span class="pre">enthalpy_advance</span></code>) to convert from <span class="math notranslate nohighlight">\(T_\mathrm{edge}\)</span> to <span class="math notranslate nohighlight">\((\rho
 h)'_\mathrm{edge}\)</span>. For the EOS call, we need <span class="math notranslate nohighlight">\(X_\mathrm{edge}\)</span> and
@@ -870,13 +870,13 @@ edge}\)</span></p></td>
 <span class="math notranslate nohighlight">\((\rho h)'_\mathrm{edge}\)</span>.</p>
 </section>
 <section id="computing-rho-h-at-edges-2">
-<span id="id8"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-2" title="Permalink to this heading"></a></h4>
+<span id="id8"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-2" title="Link to this heading"></a></h4>
 <p>The computation of the final <span class="math notranslate nohighlight">\((\rho h)\)</span> edge state is done identically
 as the <code class="docutils literal notranslate"><span class="pre">predict_rhohprime</span></code> version.</p>
 </section>
 </section>
 <section id="method-4-enthalpy-pred-type-predict-t-then-h">
-<h3>Method 4: enthalpy_pred_type = predict_T_then_h<a class="headerlink" href="#method-4-enthalpy-pred-type-predict-t-then-h" title="Permalink to this heading"></a></h3>
+<h3>Method 4: enthalpy_pred_type = predict_T_then_h<a class="headerlink" href="#method-4-enthalpy-pred-type-predict-t-then-h" title="Link to this heading"></a></h3>
 <p>Here, the construction of the interface state depends on what species
 quantities are present. In all cases, the enthalpy state is found by
 predicting <span class="math notranslate nohighlight">\(T\)</span> to the edges and then converting this to
@@ -888,29 +888,29 @@ construct <span class="math notranslate nohighlight">\(\sum(\rho X_k)_\mathrm{ed
 <p>For <code class="docutils literal notranslate"><span class="pre">species_pred_types</span></code>: <code class="docutils literal notranslate"><span class="pre">predict_rho_and_X</span></code>, we wish to
 construct <span class="math notranslate nohighlight">\(\rho_\mathrm{edge} h_\mathrm{edge}\)</span>.</p>
 <section id="predicting-t-at-edges-1">
-<span id="id9"></span><h4>Predicting <span class="math notranslate nohighlight">\(T\)</span> at edges<a class="headerlink" href="#predicting-t-at-edges-1" title="Permalink to this heading"></a></h4>
+<span id="id9"></span><h4>Predicting <span class="math notranslate nohighlight">\(T\)</span> at edges<a class="headerlink" href="#predicting-t-at-edges-1" title="Link to this heading"></a></h4>
 <p>The prediction of <span class="math notranslate nohighlight">\(T\)</span> to the edges is done identically as the
 <code class="docutils literal notranslate"><span class="pre">predict_T_then_rhohprime</span></code> version.</p>
 </section>
 <section id="converting-t-mathrm-edge-to-h-mathrm-edge">
-<h4>Converting <span class="math notranslate nohighlight">\(T_\mathrm{edge}\)</span> to <span class="math notranslate nohighlight">\(h_\mathrm{edge}\)</span><a class="headerlink" href="#converting-t-mathrm-edge-to-h-mathrm-edge" title="Permalink to this heading"></a></h4>
+<h4>Converting <span class="math notranslate nohighlight">\(T_\mathrm{edge}\)</span> to <span class="math notranslate nohighlight">\(h_\mathrm{edge}\)</span><a class="headerlink" href="#converting-t-mathrm-edge-to-h-mathrm-edge" title="Link to this heading"></a></h4>
 <p>This is identical to the <code class="docutils literal notranslate"><span class="pre">predict_T_then_rhohprime</span></code> version,
 except that on output, we compute <span class="math notranslate nohighlight">\(h_\mathrm{edge}\)</span>.</p>
 </section>
 <section id="computing-rho-h-at-edges-3">
-<span id="id10"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-3" title="Permalink to this heading"></a></h4>
+<span id="id10"></span><h4>Computing <span class="math notranslate nohighlight">\(\rho h\)</span> at edges<a class="headerlink" href="#computing-rho-h-at-edges-3" title="Link to this heading"></a></h4>
 <p>The computation of the final <span class="math notranslate nohighlight">\((\rho h)\)</span> edge state is done identically
 as the <code class="docutils literal notranslate"><span class="pre">predict_h</span> <span class="pre">version</span></code>.</p>
 </section>
 </section>
 <section id="advancing-rho-h">
-<h3>Advancing <span class="math notranslate nohighlight">\(\rho h\)</span><a class="headerlink" href="#advancing-rho-h" title="Permalink to this heading"></a></h3>
+<h3>Advancing <span class="math notranslate nohighlight">\(\rho h\)</span><a class="headerlink" href="#advancing-rho-h" title="Link to this heading"></a></h3>
 <p>We update the enthalpy analogously to the species update in
 Section <a class="reference external" href="#AdvancingrhoX_k">2.5</a>. The forcing term does not include reaction
 source terms accounted for in <strong>React State</strong>, and is the same
 for all enthalpy_pred_types.</p>
 <div class="math notranslate nohighlight" id="equation-pert-18">
-<span class="eqno">(162)<a class="headerlink" href="#equation-pert-18" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
+<span class="eqno">(162)<a class="headerlink" href="#equation-pert-18" title="Link to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
 -\nabla\cdot\left\{\left \langle (\rho h) \right \rangle_\mathrm{edge}
  \left(\Ubt + w_0\eb_r\right)\right\} + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r} + \psi   .\]</div>
 <p>where <span class="math notranslate nohighlight">\(\left \langle (\rho h) \right \rangle_\mathrm{edge}\)</span> is the
@@ -920,9 +920,9 @@ and <code class="docutils literal notranslate"><span class="pre">species_pred_ty
 </section>
 </section>
 <section id="experience-from-toy-convect">
-<span id="sec-toyconvect"></span><h2>Experience from toy_convect<a class="headerlink" href="#experience-from-toy-convect" title="Permalink to this heading"></a></h2>
+<span id="sec-toyconvect"></span><h2>Experience from toy_convect<a class="headerlink" href="#experience-from-toy-convect" title="Link to this heading"></a></h2>
 <section id="why-is-toy-convect-interesting">
-<h3>Why is toy_convect Interesting?<a class="headerlink" href="#why-is-toy-convect-interesting" title="Permalink to this heading"></a></h3>
+<h3>Why is toy_convect Interesting?<a class="headerlink" href="#why-is-toy-convect-interesting" title="Link to this heading"></a></h3>
 <p>The toy_convect problem consists of a carbon-oxygen white dwarf with
 an accreted layer of solar composition. There is a steep composition
 gradient between the white dwarf and the accreted layer. The convection
@@ -930,7 +930,7 @@ that begins as a result of the accretion is extremely sensitive to the
 amount of mixing.</p>
 </section>
 <section id="initial-observations">
-<h3>Initial Observations<a class="headerlink" href="#initial-observations" title="Permalink to this heading"></a></h3>
+<h3>Initial Observations<a class="headerlink" href="#initial-observations" title="Link to this heading"></a></h3>
 <p>With <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> there is a large
 difference between <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and species_pred_type =
 2,3 as seen in <code class="xref std std-numref docutils literal notranslate"><span class="pre">fig:spec1_vs_23`</span></code>. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>
@@ -943,7 +943,7 @@ features in the momentum plots shown in <a class="reference internal" href="#fig
 <span id="fig-spec1-vs-23"></span><img alt="_images/spec1_vs_23.png" src="_images/spec1_vs_23.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 18 </span><span class="caption-text">Compare species_pred_type = 1,2,3 with use_tfromp =
-T, enthalpy_pred_type = 1, cflfac = 0.7</span><a class="headerlink" href="#id12" title="Permalink to this image"></a></p>
+T, enthalpy_pred_type = 1, cflfac = 0.7</span><a class="headerlink" href="#id12" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id13">
@@ -951,7 +951,7 @@ T, enthalpy_pred_type = 1, cflfac = 0.7</span><a class="headerlink" href="#id12"
 <figcaption>
 <p><span class="caption-number">Fig. 19 </span><span class="caption-text">There are strange filament type features at the bottom of the
 domain. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>,
-<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id13" title="Permalink to this image"></a></p>
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id13" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id14">
@@ -959,7 +959,7 @@ domain. <code class="docutils literal notranslate"><span class="pre">species_pre
 <figcaption>
 <p><span class="caption-number">Fig. 20 </span><span class="caption-text">There are strange filament type features at the bottom of the
 domain. <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>, <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code>,
-<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id14" title="Permalink to this image"></a></p>
+<code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">T</span></code></span><a class="headerlink" href="#id14" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Using <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code> and <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span></code> <span class="math notranslate nohighlight">\(&gt;\)</span> 0 results in many runs
@@ -970,7 +970,7 @@ crashing very quickly and gives unphyiscal temperature profiles as seen in
 <figcaption>
 <p><span class="caption-number">Fig. 21 </span><span class="caption-text">Compare <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> with <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> for
 <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>,
-<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id15" title="Permalink to this image"></a></p>
+<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id15" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id16">
@@ -978,12 +978,12 @@ crashing very quickly and gives unphyiscal temperature profiles as seen in
 <figcaption>
 <p><span class="caption-number">Fig. 22 </span><span class="caption-text">Compare <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code> with <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> for
 <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>, <code class="docutils literal notranslate"><span class="pre">dpdt_factor</span> <span class="pre">=</span> <span class="pre">0.0</span></code>, <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">2</span></code>,
-<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id16" title="Permalink to this image"></a></p>
+<code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span> <span class="pre">=</span> <span class="pre">4</span></code></span><a class="headerlink" href="#id16" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="change-cflfac-and-enthalpy-pred-type">
-<h3>Change cflfac and enthalpy_pred_type<a class="headerlink" href="#change-cflfac-and-enthalpy-pred-type" title="Permalink to this heading"></a></h3>
+<h3>Change cflfac and enthalpy_pred_type<a class="headerlink" href="#change-cflfac-and-enthalpy-pred-type" title="Link to this heading"></a></h3>
 <p>With <code class="docutils literal notranslate"><span class="pre">species_pred_type</span> <span class="pre">=</span> <span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.1</span></code>, there is much
 less heating (peak T vs. t) than the <code class="docutils literal notranslate"><span class="pre">cflfac</span> <span class="pre">=</span> <span class="pre">0.7</span></code> (default). There
 is also a lower overall Mach number (see <a class="reference internal" href="#fig-spec1-cfl-1vs7"><span class="std std-numref">Fig. 23</span></a>)
@@ -1001,7 +1001,7 @@ case shows excellent agreement between <code class="docutils literal notranslate
 <figcaption>
 <p><span class="caption-number">Fig. 23 </span><span class="caption-text">Illustrate the comparable cooling rates between
 use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
-using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id17" title="Permalink to this image"></a></p>
+using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id17" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id18">
@@ -1009,7 +1009,7 @@ using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink
 <figcaption>
 <p><span class="caption-number">Fig. 24 </span><span class="caption-text">Illustrate the comparable cooling rates between
 use_tfromp = T and use_tfromp = F with dpdt_factor = 0.0
-using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id18" title="Permalink to this image"></a></p>
+using species_pred_type = 2, enthalpy_pred_type = 3,1</span><a class="headerlink" href="#id18" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>For a given <code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code> and <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code>,
@@ -1028,35 +1028,35 @@ the onset of the heating is delayed in <code class="docutils literal notranslate
 <span id="fig-compare-tf-d0-h1-s123"></span><img alt="_images/compare_tF_d0_h1_s123.png" src="_images/compare_tF_d0_h1_s123.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 25 </span><span class="caption-text">Compare the castro.ppm_type CASTRO runs with the
-species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id19" title="Permalink to this image"></a></p>
+species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id19" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id20">
 <span id="fig-compare-castro"></span><img alt="_images/compare_castro.png" src="_images/compare_castro.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 26 </span><span class="caption-text">Compare the castro.ppm_type CASTRO runs with the
-species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id20" title="Permalink to this image"></a></p>
+species_pred_type MAESTROeX runs.</span><a class="headerlink" href="#id20" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="additional-runs">
-<h3>Additional Runs<a class="headerlink" href="#additional-runs" title="Permalink to this heading"></a></h3>
+<h3>Additional Runs<a class="headerlink" href="#additional-runs" title="Link to this heading"></a></h3>
 <section id="bds-type-1">
-<h4>bds_type = 1<a class="headerlink" href="#bds-type-1" title="Permalink to this heading"></a></h4>
+<h4>bds_type = 1<a class="headerlink" href="#bds-type-1" title="Link to this heading"></a></h4>
 <p>Using bds_type = 1, use_tfromp = F, dpdt_factor = 0.0,
 species_pred_type = 2, enthalpy_pred_type = 4 and
 cflfac = 0.7 seems to cool off faster, perhaps due to less mixing.
 There is also no momentum filaments in the bottom of the domain.</p>
 </section>
 <section id="evolve-base-state-f">
-<h4>evolve_base_state = F<a class="headerlink" href="#evolve-base-state-f" title="Permalink to this heading"></a></h4>
+<h4>evolve_base_state = F<a class="headerlink" href="#evolve-base-state-f" title="Link to this heading"></a></h4>
 <p>Using evolve_base_state = F, use_tfromp = F, dpdt_factor = 0.0,
 species_pred_type = 2 and enthalpy_pred_type = 4 seems to agree
 well with the normal evolve_base_state = T run.</p>
 </section>
 </section>
 <section id="toy-convect-in-castro">
-<h3>toy_convect in CASTRO<a class="headerlink" href="#toy-convect-in-castro" title="Permalink to this heading"></a></h3>
+<h3>toy_convect in CASTRO<a class="headerlink" href="#toy-convect-in-castro" title="Link to this heading"></a></h3>
 <p>toy_convect was also run using CASTRO with
 castro.ppm_type = 0,1. These runs show temperatures that cool
 off rather than increase (see <a class="reference internal" href="#fig-compare-castro"><span class="std std-numref">Fig. 26</span></a>) which
@@ -1064,7 +1064,7 @@ suggests using species_pred_type = 2,3 instead of
 species_pred_type = 1.</p>
 </section>
 <section id="recommendations">
-<h3>Recommendations<a class="headerlink" href="#recommendations" title="Permalink to this heading"></a></h3>
+<h3>Recommendations<a class="headerlink" href="#recommendations" title="Link to this heading"></a></h3>
 <p>All of these runs suggest that running under species_pred_type =
 2 or 3, enthalpy_pred_type = 3 or 4 with either use_tfromp = F and
 dpdt_factor = 0.0 or use_tfromp = T gives the most

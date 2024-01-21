@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -146,9 +146,9 @@
            <div itemprop="articleBody">
              
   <section id="adding-a-new-problem">
-<span id="sec-adding-problems"></span><h1>Adding A New Problem<a class="headerlink" href="#adding-a-new-problem" title="Permalink to this heading"></a></h1>
+<span id="sec-adding-problems"></span><h1>Adding A New Problem<a class="headerlink" href="#adding-a-new-problem" title="Link to this heading"></a></h1>
 <section id="introduction-to-adding-a-new-problem">
-<h2>Introduction to Adding a New Problem<a class="headerlink" href="#introduction-to-adding-a-new-problem" title="Permalink to this heading"></a></h2>
+<h2>Introduction to Adding a New Problem<a class="headerlink" href="#introduction-to-adding-a-new-problem" title="Link to this heading"></a></h2>
 <p>Different MAESTROeX problems are defined in sub-directories under
 <code class="docutils literal notranslate"><span class="pre">Exec/</span></code> in <code class="docutils literal notranslate"><span class="pre">SCIENCE/</span></code>, <code class="docutils literal notranslate"><span class="pre">TEST_PROBLEMS/</span></code>, or <code class="docutils literal notranslate"><span class="pre">UNIT_TESTS/</span></code>.
 To add a problem, start by creating a new sub-directory—this is
@@ -167,7 +167,7 @@ called GPackage.mak in the problem-directory (and this needs to
 be told to the build system—see below).</p>
 </section>
 <section id="the-gnumakefile">
-<span id="sec-makefile"></span><h2>The GNUmakefile<a class="headerlink" href="#the-gnumakefile" title="Permalink to this heading"></a></h2>
+<span id="sec-makefile"></span><h2>The GNUmakefile<a class="headerlink" href="#the-gnumakefile" title="Link to this heading"></a></h2>
 <p>A basic GNUmakefile begins with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span>   <span class="o">:=</span> <span class="n">FALSE</span>
 <span class="n">USE_MPI</span> <span class="o">:=</span>
@@ -242,7 +242,7 @@ build the executable.</p>
 </pre></div>
 </div>
 <section id="handling-problem-specific-source-files">
-<h3>Handling Problem-Specific Source Files<a class="headerlink" href="#handling-problem-specific-source-files" title="Permalink to this heading"></a></h3>
+<h3>Handling Problem-Specific Source Files<a class="headerlink" href="#handling-problem-specific-source-files" title="Link to this heading"></a></h3>
 <p>As mentioned above, any source files placed in the problem directory
 override a files with the same name found elsewhere in the source
 tree. This allows you to create a problem-specific version of any
@@ -254,7 +254,7 @@ and <code class="docutils literal notranslate"><span class="pre">Blocs</span></c
 </section>
 </section>
 <section id="defining-runtime-parameters">
-<span id="sec-def-runtime-param"></span><h2>Defining Runtime Parameters<a class="headerlink" href="#defining-runtime-parameters" title="Permalink to this heading"></a></h2>
+<span id="sec-def-runtime-param"></span><h2>Defining Runtime Parameters<a class="headerlink" href="#defining-runtime-parameters" title="Link to this heading"></a></h2>
 <p>The runtime parameters for the core MAESTROeX algorithm are listed in
 <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code> file in <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Source/param/</span></code> folder.
 That file is parsed at compile-time by the <code class="docutils literal notranslate"><span class="pre">parse_maestro_params.py</span></code>
@@ -285,7 +285,7 @@ problem-directory in a file called <code class="docutils literal notranslate"><s
 be automatically found at compile time.</p>
 </section>
 <section id="preparing-the-initial-model">
-<span id="sec-initial-models"></span><h2>Preparing the Initial Model<a class="headerlink" href="#preparing-the-initial-model" title="Permalink to this heading"></a></h2>
+<span id="sec-initial-models"></span><h2>Preparing the Initial Model<a class="headerlink" href="#preparing-the-initial-model" title="Link to this heading"></a></h2>
 <p>MAESTROeX models subsonic, non-hydrostatic flows as deviations from
 a background state in hydrostatic equilibrium.
 The solution in MAESTROeX is broken up into a 1D base state and the 2-
@@ -311,7 +311,7 @@ by integrating the condition of hydrostatic equilibrium together with
 a simplifying assumption on the energy (e.g. isothermal or
 isentropic). In both cases hydrostatic equilibrium is enforced as:</p>
 <div class="math notranslate nohighlight" id="equation-addproblem-0">
-<span class="eqno">(94)<a class="headerlink" href="#equation-addproblem-0" title="Permalink to this equation"></a></span>\[\frac{p_{i+1} - p_i}{\Delta r} = \frac{1}{2} (\rho_i + \rho_{i+1})
+<span class="eqno">(94)<a class="headerlink" href="#equation-addproblem-0" title="Link to this equation"></a></span>\[\frac{p_{i+1} - p_i}{\Delta r} = \frac{1}{2} (\rho_i + \rho_{i+1})
 g_{i+1/2}\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(g_{i+1/2}\)</span> is the edge-centered gravitational acceleration.</p>
 <p>Full details on which initial model routine matches each problem and
@@ -319,7 +319,7 @@ how the initial models are used to initialize the full state data can
 be found in § <a class="reference internal" href="initial_models.html#sec-initial-models-main"><span class="std std-ref">Initial Models</span></a>.</p>
 </section>
 <section id="customizing-the-initialization">
-<h2>Customizing the Initialization<a class="headerlink" href="#customizing-the-initialization" title="Permalink to this heading"></a></h2>
+<h2>Customizing the Initialization<a class="headerlink" href="#customizing-the-initialization" title="Link to this heading"></a></h2>
 <p>The best way to customize the initialization (e.g. add perturbations)
 is to copy from one of the existing problems.
 The file <code class="docutils literal notranslate"><span class="pre">initdata.f90</span></code> controls initialization of scalars

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -136,18 +136,18 @@
            <div itemprop="articleBody">
              
   <section id="volume-discrepancy-factor">
-<h1>Volume Discrepancy Factor<a class="headerlink" href="#volume-discrepancy-factor" title="Permalink to this heading"></a></h1>
+<h1>Volume Discrepancy Factor<a class="headerlink" href="#volume-discrepancy-factor" title="Link to this heading"></a></h1>
 <p>The volume discrepancy term is used in the constraint equation to
 force the system back to the equation of state. We write our velocity
 constraint equation as</p>
 <div class="math notranslate nohighlight" id="equation-eq-fullconstraint">
-<span class="eqno">(108)<a class="headerlink" href="#equation-eq-fullconstraint" title="Permalink to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .\]</div>
+<span class="eqno">(108)<a class="headerlink" href="#equation-eq-fullconstraint" title="Link to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ub)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .\]</div>
 <p>Here, <span class="math notranslate nohighlight">\(f\)</span> is the volume discrepancy factor and ranges from 0 to 1, and
 <span class="math notranslate nohighlight">\(p_\mathrm{EOS}\)</span> is the thermodynamic pressure as returned by the EOS,
 using the full state as input.
 In practice we evaluate this as</p>
 <div class="math notranslate nohighlight" id="equation-volume-discrepancy-0">
-<span class="eqno">(109)<a class="headerlink" href="#equation-volume-discrepancy-0" title="Permalink to this equation"></a></span>\[p_\mathrm{EOS} = p(\rho,h,X_k)\]</div>
+<span class="eqno">(109)<a class="headerlink" href="#equation-volume-discrepancy-0" title="Link to this equation"></a></span>\[p_\mathrm{EOS} = p(\rho,h,X_k)\]</div>
 <p>The idea behind this forcing term is that if <span class="math notranslate nohighlight">\(p_\mathrm{EOS} &gt; p_0\)</span> then
 <span class="math notranslate nohighlight">\(\nablab \cdotb (\beta_0 \Ub) &gt; 0\)</span>, and the cell will evacuate. This
 has the effect of returning us to <span class="math notranslate nohighlight">\(p_\mathrm{EOS} = p_0\)</span>.</p>
@@ -156,26 +156,26 @@ and a local component. The base state constraint equation is simply
 the horizontal average of the full constraint. Starting with
 <span class="math notranslate nohighlight">\(\Ub = \Ubt + w_0 \er\)</span> in <a class="reference internal" href="#equation-eq-fullconstraint">Eq.108</a>, we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-fullconstraint2">
-<span class="eqno">(110)<a class="headerlink" href="#equation-eq-fullconstraint2" title="Permalink to this equation"></a></span>\[\nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .\]</div>
+<span class="eqno">(110)<a class="headerlink" href="#equation-eq-fullconstraint2" title="Link to this equation"></a></span>\[\nablab \cdotb (\beta_0 w_0 \er) + \nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - p_\mathrm{EOS}}{\Delta t} \right )  .\]</div>
 <p>Averaging this over a layer, we note that <span class="math notranslate nohighlight">\(\overline{\nablab \cdotb (\beta_0 \Ubt)} = 0\)</span>,
 yielding</p>
 <div class="math notranslate nohighlight" id="equation-eq-w0constraint-vd">
-<span class="eqno">(111)<a class="headerlink" href="#equation-eq-w0constraint-vd" title="Permalink to this equation"></a></span>\[\nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right )\]</div>
+<span class="eqno">(111)<a class="headerlink" href="#equation-eq-w0constraint-vd" title="Link to this equation"></a></span>\[\nablab \cdotb (\beta_0 w_0 \er)  = \beta_0 \left(\overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t} \right )\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight" id="equation-eq-utconstraint-vd">
-<span class="eqno">(112)<a class="headerlink" href="#equation-eq-utconstraint-vd" title="Permalink to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right )  .\]</div>
+<span class="eqno">(112)<a class="headerlink" href="#equation-eq-utconstraint-vd" title="Link to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ubt)  = \beta_0 \left(S - \overline{S} + \frac{f}{\gammabar p_0} \frac{p_\mathrm{EOS} - \overline{p_\mathrm{EOS}}}{\Delta t} \right )  .\]</div>
 <p>In solving the <span class="math notranslate nohighlight">\(w_0\)</span> evolution <a class="reference internal" href="#equation-eq-w0constraint-vd">Eq.111</a>, we expand the divergence, giving</p>
 <div class="math notranslate nohighlight" id="equation-volume-discrepancy-1">
-<span class="eqno">(113)<a class="headerlink" href="#equation-volume-discrepancy-1" title="Permalink to this equation"></a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} -
+<span class="eqno">(113)<a class="headerlink" href="#equation-volume-discrepancy-1" title="Link to this equation"></a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} -
 w_0 \er  \cdotb \frac{1}{\beta_0} \nablab \beta_0  - \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .\]</div>
 <p>Recalling that</p>
 <div class="math notranslate nohighlight" id="equation-volume-discrepancy-2">
-<span class="eqno">(114)<a class="headerlink" href="#equation-volume-discrepancy-2" title="Permalink to this equation"></a></span>\[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} =
+<span class="eqno">(114)<a class="headerlink" href="#equation-volume-discrepancy-2" title="Link to this equation"></a></span>\[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} =
  \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r}\]</div>
 <p>(see Paper I), and that <span class="math notranslate nohighlight">\(\psi \equiv D_0 p_0 / Dt \equiv \partial p_0 / \partial t +
 w_0 \partial p_0 / \partial r\)</span>, we have</p>
 <div class="math notranslate nohighlight" id="equation-volume-discrepancy-3">
-<span class="eqno">(115)<a class="headerlink" href="#equation-volume-discrepancy-3" title="Permalink to this equation"></a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -
+<span class="eqno">(115)<a class="headerlink" href="#equation-volume-discrepancy-3" title="Link to this equation"></a></span>\[\nablab \cdotb (w_0 \er)  = \overline{S} - \frac{1}{\gammabar p_0} \psi -
  \frac{f}{\gammabar p_0} \frac{p_0 - \overline{p_\mathrm{EOS}}}{\Delta t}  .\]</div>
 <p>This is the form that is solved in <code class="docutils literal notranslate"><span class="pre">make_w0</span></code>.</p>
 </section>
