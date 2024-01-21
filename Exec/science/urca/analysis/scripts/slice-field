@@ -4,11 +4,12 @@ Use yt to slice a boxlib plotfile supplied through the domain center.
 
 Donald E. Willcox
 """
-import yt
-from yt import derived_field
-import numpy as np
 import argparse
+
+import numpy as np
+import yt
 from UrcaAnalysis.yt_extensions import UrcaShellFields
+from yt import derived_field
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
@@ -19,7 +20,7 @@ parser.add_argument('-axis', '--axis', type=str, default='x',
 parser.add_argument('-w', '--width', type=float,
                     help='Width of slice (cm). Default is domain width.')
 parser.add_argument('-log', '--logscale', action='store_true', help='If supplied, use a log scale for the field.')
-parser.add_argument('-symlog', '--symlog', type=float, help='If supplied, use symlog scaling, which is linear near zero, to accomodate positive and negative values of the field. Pass the value of the field at which to linearize the colorbar.')
+parser.add_argument('-symlog', '--symlog', type=float, help='If supplied, use symlog scaling, which is linear near zero, to accommodate positive and negative values of the field. Pass the value of the field at which to linearize the colorbar.')
 parser.add_argument('-rho', '--rhocontours', type=float, nargs='+', help='Draws contours for the densities provided (g/cm^3).')
 parser.add_argument('-rhocolors', '--rhocolors', type=str, nargs='+', default='cyan', help='Color(s) of density contours.')
 parser.add_argument('-ctr', '--center', type=float, nargs='+', help='Centers the plot on the coordinates provided (x, y, z).')

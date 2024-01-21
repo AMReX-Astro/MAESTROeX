@@ -166,7 +166,7 @@ are energy sources due to reactions and user-defined external heating.
 When we are using thermal diffusion, there will be an additional term in
 the enthalpy equation (see § :ref:`sec:flow:diffusion`).
 
-In the original temporal scheme, we utlized a base state enthlpy that effectively
+In the original temporal scheme, we utilized a base state enthlpy that effectively
 represents the average over a layer; its evolution equation can be
 found by laterally averaging :eq:`eq:flow:enthalpy`
 

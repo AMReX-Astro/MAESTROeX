@@ -33,7 +33,7 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
         varnames_stored[i] = maestro::trim(line.substr(ipos));
     }
 
-    // alocate storage for the model data
+    // allocate storage for the model data
     model_state.resize(npts_model);
     for (auto i = 0; i < npts_model; ++i) {
         model_state[i].resize(nvars_model);

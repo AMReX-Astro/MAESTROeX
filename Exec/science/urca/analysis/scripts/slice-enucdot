@@ -1,15 +1,16 @@
 #!/usr/bin/env python
+import argparse
+
+import numpy as np
 import yt
 from yt import derived_field
-import numpy as np
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('infile', type=str, help='Name of input plotfile.')
 parser.add_argument('-w', '--width', type=float,
                     help='Width of slice (cm). Default is domain width.')
 parser.add_argument('-axis', '--axis', type=str, default='x', help='Axis along which to slice. Should be "x", "y", or "z".')
-parser.add_argument('-symlog', '--symlog', action='store_true', help='If supplied, use symlog scaling, which is linear near zero, to accomodate positive and negative values of Hnuc.')
+parser.add_argument('-symlog', '--symlog', action='store_true', help='If supplied, use symlog scaling, which is linear near zero, to accommodate positive and negative values of Hnuc.')
 parser.add_argument('-logmax', '--logmax', type=float,
                     help='Log of the +/- maximum Hnuc value.')
 parser.add_argument('-rho', '--rhocontours', type=float, nargs='+', help='Draws contours for the densities provided (g/cm^3).')

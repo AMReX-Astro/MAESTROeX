@@ -388,7 +388,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     } else if (proj_type == pressure_iters_comp) {
         // Vproj = Vproj - sig*grad(phi)
         // we do this manually instead of using mlndlap.updateVelocity() because
-        // for alt_energy_fix we neet beta0*grad(phi)
+        // for alt_energy_fix we need beta0*grad(phi)
         for (int lev = 0; lev <= finest_level; ++lev) {
             for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
                 MultiFab::Multiply(gphi[lev], sig[lev], 0, dir, 1, 0);
@@ -404,7 +404,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     } else if (proj_type == regular_timestep_comp) {
         // Vproj = Vproj - sig*grad(phi)
         // we do this manually instead of using mlndlap.updateVelocity() because
-        // for alt_energy_fix we neet beta0*grad(phi)
+        // for alt_energy_fix we need beta0*grad(phi)
         for (int lev = 0; lev <= finest_level; ++lev) {
             for (int dir = 0; dir < AMREX_SPACEDIM; ++dir) {
                 MultiFab::Multiply(gphi[lev], sig[lev], 0, dir, 1, 0);

@@ -7,6 +7,14 @@ using namespace problem_rp;
 
 // advance solution to final time
 void Maestro::Evolve() {
+
+    if (fixed_dt != -1.0) {
+        dt = fixed_dt;
+        if (maestro_verbose > 0) {
+            Print() << "Setting fixed dt = " << dt;
+        }
+    }
+
     Vector<MultiFab> rho_omegadot(finest_level + 1);
     Vector<MultiFab> rho_Hnuc(finest_level + 1);
     Vector<MultiFab> rho_Hext(finest_level + 1);
@@ -60,13 +68,14 @@ void Maestro::Evolve() {
     WritePlotFile(-4, t_new, dt, dummy, dummy, dummy, dummy, rho_omegadot,
                   rho_Hnuc, rho_Hext);
 
-    // Explore ten orders of magnitude of the time domain using user inputs.
+    // Explore orders of magnitude of the time domain using user inputs.
     do_burning = dbo;
     do_heating = dho;
-
+    dt = min_time_step;
     for (auto i = 0; i < react_its; ++i) {
         React(sold, snew, rho_Hext, rho_omegadot, rho_Hnuc, p0_old, dt, t_old);
         WritePlotFile(i, t_new, dt, dummy, dummy, dummy, dummy, rho_omegadot,
                       rho_Hnuc, rho_Hext);
+        dt*=10._rt;
     }
 }

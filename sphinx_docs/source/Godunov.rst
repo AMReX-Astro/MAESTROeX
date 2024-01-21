@@ -892,7 +892,7 @@ Then upwind based on :math:`v_{\ib-\half\eb_y}^{1D}`:
    u_{R,\ib-\half\eb_y}^{y|z}, & v_{\ib-\half\eb_y}^{1D} < 0.
    \end{cases}
 
-We use an analogous procedure to compute five more intemediate states,
+We use an analogous procedure to compute five more intermediate states,
 :math:`u_{\ib-\half\eb_z}^{z|y}, v_{\ib-\half\eb_x}^{x|z},
 v_{\ib-\half\eb_z}^{z|x}, w_{\ib-\half\eb_x}^{x|y}`, and
 :math:`w_{\ib-\half\eb_y}^{y|x}`. Then we do a full-dimensional

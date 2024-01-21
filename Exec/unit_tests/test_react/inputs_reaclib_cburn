@@ -38,9 +38,9 @@ maestro.hi_bc = 0 0 0
 geometry.is_periodic =  1 1 1
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
-maestro.mg_verbose = 0
-maestro.cg_verbose = 0
+maestro.maestro_verbose = 1       # verbosity
+maestro.mg_verbose      = 0
+maestro.cg_verbose      = 0
 
 # DIFFUSION parameters
 maestro.do_heating = true

@@ -8,6 +8,9 @@ USE_REACT  = TRUE
 # define the location of the MAESTROEX home directory
 MAESTROEX_HOME  := ../../..
 
+MAX_ZONES := 4096
+
+DEFINES += -DN_XN_ZONES=$(MAX_ZONES)
 
 # define the physics packages to build this problem
 EOS_DIR := helmholtz
