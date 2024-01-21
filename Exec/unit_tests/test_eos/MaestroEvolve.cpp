@@ -191,7 +191,7 @@ void Maestro::Evolve() {
             // const int* lo  = tilebox.loVect();
             // const int* hi  = tilebox.hiVect();
 
-            // do_tests(ARLIM_3D(lo), ARLIM_3D(hi),
+            // do_tests(AMREX_ARLIM_3D(lo), AMREX_ARLIM_3D(hi),
             //          BL_TO_FORTRAN_3D(scal[mfi]),
             //          BL_TO_FORTRAN_FAB(error_mf[mfi]),
             //          domainBox.loVect(), domainBox.hiVect());
