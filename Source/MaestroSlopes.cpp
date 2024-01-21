@@ -50,7 +50,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                 slx(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (i == ilo - 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ilo) {
@@ -68,7 +68,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (i == ihi + 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ihi) {
@@ -125,7 +125,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                 slx(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (i == ilo - 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ilo) {
@@ -161,7 +161,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (i == ihi + 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ihi) {
@@ -247,7 +247,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                 sly(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (j == jlo - 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jlo) {
@@ -265,7 +265,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (j == jhi + 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jhi) {
@@ -322,7 +322,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                 sly(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (j == jlo - 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jlo) {
@@ -357,7 +357,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (j == jhi + 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jhi) {
@@ -443,7 +443,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                 slz(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (k == klo - 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == klo) {
@@ -461,7 +461,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (k == khi + 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == khi) {
@@ -518,7 +518,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                 slz(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (k == klo - 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == klo) {
@@ -554,7 +554,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (k == khi + 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == khi) {
