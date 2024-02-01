@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -164,9 +164,9 @@
            <div itemprop="articleBody">
              
   <section id="multigrid">
-<span id="sec-mg"></span><h1>Multigrid<a class="headerlink" href="#multigrid" title="Permalink to this heading"></a></h1>
+<span id="sec-mg"></span><h1>Multigrid<a class="headerlink" href="#multigrid" title="Link to this heading"></a></h1>
 <section id="amrex-multigrid-philosophy">
-<h2>AMReX Multigrid Philosophy<a class="headerlink" href="#amrex-multigrid-philosophy" title="Permalink to this heading"></a></h2>
+<h2>AMReX Multigrid Philosophy<a class="headerlink" href="#amrex-multigrid-philosophy" title="Link to this heading"></a></h2>
 <p>Here we describe some of the general ideas behind the AMReX multigrid (MG).</p>
 <p>We solve MG on an AMR hierarchy, which means in places we will encounter
 C-F interfaces. The AMReX MG will modify the stencil for the Laplacian
@@ -185,9 +185,9 @@ Generally, the routines specific to the cell-centered solver will have
 <code class="docutils literal notranslate"><span class="pre">nd</span></code> in their name.</p>
 <p>Support for <span class="math notranslate nohighlight">\(\Delta x \ne \Delta y \ne \Delta z\)</span></p>
 <section id="data-structures">
-<h3>Data Structures<a class="headerlink" href="#data-structures" title="Permalink to this heading"></a></h3>
+<h3>Data Structures<a class="headerlink" href="#data-structures" title="Link to this heading"></a></h3>
 <section id="mg-tower">
-<h4>mg_tower<a class="headerlink" href="#mg-tower" title="Permalink to this heading"></a></h4>
+<h4>mg_tower<a class="headerlink" href="#mg-tower" title="Link to this heading"></a></h4>
 <p>The mg_tower is a special Fortran derived type that carries all the
 information required for a AMReX multigrid solve.</p>
 <p>The following parameters are specified when building the mg_tower:</p>
@@ -249,7 +249,7 @@ or Neumann. There is no skew in nodal.</p>
 </ul>
 </section>
 <section id="bndry-reg">
-<h4>bndry_reg<a class="headerlink" href="#bndry-reg" title="Permalink to this heading"></a></h4>
+<h4>bndry_reg<a class="headerlink" href="#bndry-reg" title="Link to this heading"></a></h4>
 <p>There are two types of bndry_reg objects, each of which is a set of
 dim multifabs. The first, which is built with the
 bndry_reg_build call, is defined on all cells immediately outside
@@ -281,7 +281,7 @@ multifab.</p>
 </section>
 </section>
 <section id="stencils">
-<h3>Stencils<a class="headerlink" href="#stencils" title="Permalink to this heading"></a></h3>
+<h3>Stencils<a class="headerlink" href="#stencils" title="Link to this heading"></a></h3>
 <p>There are several different stencil types that we can use for
 the discretization. For cell-centered, these are:</p>
 <ul class="simple">
@@ -313,7 +313,7 @@ once, at the beginning of the solve. For the nodal solver, the coefficients
 are hard-coded into the smoothers.</p>
 </section>
 <section id="smoothers">
-<h3>Smoothers<a class="headerlink" href="#smoothers" title="Permalink to this heading"></a></h3>
+<h3>Smoothers<a class="headerlink" href="#smoothers" title="Link to this heading"></a></h3>
 <p>The following smoothers are available (but not necessarily for both the
 cell-centered and nodal solvers):</p>
 <ul class="simple">
@@ -326,12 +326,12 @@ the dense nodal stencil)</p></li>
 </ul>
 </section>
 <section id="cycling">
-<h3>Cycling<a class="headerlink" href="#cycling" title="Permalink to this heading"></a></h3>
+<h3>Cycling<a class="headerlink" href="#cycling" title="Link to this heading"></a></h3>
 <p>The default cycling is a V-cycle, but W-cycles and full multigrid are
 supported as well.</p>
 </section>
 <section id="bottom-solvers">
-<h3>Bottom Solvers<a class="headerlink" href="#bottom-solvers" title="Permalink to this heading"></a></h3>
+<h3>Bottom Solvers<a class="headerlink" href="#bottom-solvers" title="Link to this heading"></a></h3>
 <p>The multigrid cycling coarsens the grids as part of the solve. When
 the coarsest grid is reached, the individual boxes that comprise that
 level are coarsened as much as then can, down to <span class="math notranslate nohighlight">\(2^3\)</span> zones. Depending
@@ -363,7 +363,7 @@ further coarsening.</p></li>
 if it means changing your gridding strategy (as discussed below) to
 make it more efficient.</p>
 <section id="special-bottom-solver">
-<h4>Special Bottom Solver<a class="headerlink" href="#special-bottom-solver" title="Permalink to this heading"></a></h4>
+<h4>Special Bottom Solver<a class="headerlink" href="#special-bottom-solver" title="Link to this heading"></a></h4>
 <p>The special solver takes the data from the coarsest level of the
 original multigrid V-cycle and copies it onto a new grid structure with
 the same number of total cells in each direction, but with a fewer
@@ -412,10 +412,10 @@ structure is not appropriate for the fancy bottom solver.</p></li>
 </section>
 </section>
 <section id="flowchart">
-<h2>Flowchart<a class="headerlink" href="#flowchart" title="Permalink to this heading"></a></h2>
+<h2>Flowchart<a class="headerlink" href="#flowchart" title="Link to this heading"></a></h2>
 <p>MAESTROeX multigrid solves always involve the full AMR hierarchy.</p>
 <section id="cell-centered-mg">
-<h3>Cell-Centered MG<a class="headerlink" href="#cell-centered-mg" title="Permalink to this heading"></a></h3>
+<h3>Cell-Centered MG<a class="headerlink" href="#cell-centered-mg" title="Link to this heading"></a></h3>
 <p>The flowchart below shows the structure of a cell-centered multigrid
 solve using pure V-cycles.</p>
 <ul class="simple">
@@ -454,7 +454,7 @@ convergence at each level.</p></li>
 </ul>
 </section>
 <section id="nodal-mg">
-<h3>Nodal MG<a class="headerlink" href="#nodal-mg" title="Permalink to this heading"></a></h3>
+<h3>Nodal MG<a class="headerlink" href="#nodal-mg" title="Link to this heading"></a></h3>
 <p>The flowchart below shows the structure of a cell-centered multigrid
 solve using pure V-cycles.</p>
 <ul class="simple">
@@ -492,7 +492,7 @@ convergence at each level.</p></li>
 </section>
 </section>
 <section id="maestroexs-multigrid-use">
-<h2>MAESTROeX’s Multigrid Use<a class="headerlink" href="#maestroexs-multigrid-use" title="Permalink to this heading"></a></h2>
+<h2>MAESTROeX’s Multigrid Use<a class="headerlink" href="#maestroexs-multigrid-use" title="Link to this heading"></a></h2>
 <p>MAESTROeX uses multigrid to enforce the velocity constraint through
 projections at the half-time (the MAC projection) and end of the time
 step (the HG projection). Two multigrid solvers are provided by
@@ -503,14 +503,14 @@ the cell-interfaces at the half-time. The edge-centered velocities
 are shown in <code class="xref std std-numref docutils literal notranslate"><span class="pre">fig:mg:MAC</span></code>. If we consider purely
 incompressible flow, the projection appears as:</p>
 <div class="math notranslate nohighlight" id="equation-mg-0">
-<span class="eqno">(288)<a class="headerlink" href="#equation-mg-0" title="Permalink to this equation"></a></span>\[D G \phi = D U\]</div>
+<span class="eqno">(288)<a class="headerlink" href="#equation-mg-0" title="Link to this equation"></a></span>\[D G \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(D\)</span> is the divergence operator and <span class="math notranslate nohighlight">\(G\)</span> is the gradient operator.
 In this discretization, <span class="math notranslate nohighlight">\(\phi\)</span> is cell-centered (see
 <code class="xref std std-numref docutils literal notranslate"><span class="pre">fig:mg:MAC</span></code>. The remaining quantities are discretized as:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is cell-centered,</p>
 <div class="math notranslate nohighlight" id="equation-mg-1">
-<span class="eqno">(289)<a class="headerlink" href="#equation-mg-1" title="Permalink to this equation"></a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
+<span class="eqno">(289)<a class="headerlink" href="#equation-mg-1" title="Link to this equation"></a></span>\[(DU)_{i,j} = \frac{u_{i+1/2,j} - u_{i-1/2,j}}{\Delta x} +
                \frac{v_{i,j+1/2} - v_{i,j-1/2}}{\Delta y}\]</div>
 </li>
 <li><p><span class="math notranslate nohighlight">\(G\phi\)</span> is edge-centered, on the MAC grid, as shown in
@@ -527,7 +527,7 @@ shows the locations of the various quantities involved in the HG
 projection. Again considering simple incompressible flow, we now
 solve:</p>
 <div class="math notranslate nohighlight" id="equation-mg-2">
-<span class="eqno">(290)<a class="headerlink" href="#equation-mg-2" title="Permalink to this equation"></a></span>\[L \phi = D U\]</div>
+<span class="eqno">(290)<a class="headerlink" href="#equation-mg-2" title="Link to this equation"></a></span>\[L \phi = D U\]</div>
 <p>where <span class="math notranslate nohighlight">\(L\)</span> is a discretization of the Laplacian operator. In this
 sense, the HG projection is an <em>approximate projection</em>, that is,
 <span class="math notranslate nohighlight">\(L \neq DG\)</span> (in discretized form). The various operations have the
@@ -535,7 +535,7 @@ following centerings:</p>
 <ul>
 <li><p><span class="math notranslate nohighlight">\(DU\)</span> is node-centered. This is computed as:</p>
 <div class="math notranslate nohighlight" id="equation-mg-3">
-<span class="eqno">(291)<a class="headerlink" href="#equation-mg-3" title="Permalink to this equation"></a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
+<span class="eqno">(291)<a class="headerlink" href="#equation-mg-3" title="Link to this equation"></a></span>\[(DU)_{i-1/2,j-1/2} = \frac{\frac{1}{2} (u_{i,j} + u_{i,j-1}) -
                              \frac{1}{2} (u_{i-1,j} + u_{i-1,j-1})}{\Delta x} +
                        \frac{\frac{1}{2} (v_{i,j} + v_{i-1,j}) -
                              \frac{1}{2} (v_{i,j-1} + v_{i-1,j-1})}{\Delta y}\]</div>
@@ -553,10 +553,10 @@ uses 5-points in 2-d, 7-points in 3-d.</p>
 </ul>
 </section>
 <section id="convergence-criteria">
-<h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Permalink to this heading"></a></h2>
+<h2>Convergence Criteria<a class="headerlink" href="#convergence-criteria" title="Link to this heading"></a></h2>
 <p>All MAESTROeX multigrid solves consist of pure V-cycles.</p>
 <section id="multigrid-solver-tolerances">
-<span id="sec-mgtol"></span><h3>Multigrid Solver Tolerances<a class="headerlink" href="#multigrid-solver-tolerances" title="Permalink to this heading"></a></h3>
+<span id="sec-mgtol"></span><h3>Multigrid Solver Tolerances<a class="headerlink" href="#multigrid-solver-tolerances" title="Link to this heading"></a></h3>
 <p>Beginning at the start of execution, there are several places where
 either cell-centered multigrid or node-centered multigrid solves are
 performed. The outline below lists the solves one encounters, in order,
@@ -604,7 +604,7 @@ the init_divu_iter runtime parameter.</p>
 We start with a loose tolerance and progressively get tighter. The
 tolerances (set in divu_iter) are, for Cartesian:</p>
 <div class="math notranslate nohighlight" id="equation-mg-4">
-<span class="eqno">(292)<a class="headerlink" href="#equation-mg-4" title="Permalink to this equation"></a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
+<span class="eqno">(292)<a class="headerlink" href="#equation-mg-4" title="Link to this equation"></a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{lll}
                   \min\, \{&amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt                     {divu\_level\_factor}^{(\mathtt{nlevs}-1)}, \\
                          &amp; \!\!\!\mathtt{eps\_divu\_cart} \cdot \mathtt{divu\_iter\_factor}^2 \cdot \mathtt{divu\_level\_factor}^2 \, \} &amp;
                           \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \\[2mm]
@@ -618,7 +618,7 @@ tolerances (set in divu_iter) are, for Cartesian:</p>
                  \right .\end{split}\]</div>
 <p>and for spherical:</p>
 <div class="math notranslate nohighlight" id="equation-mg-5">
-<span class="eqno">(293)<a class="headerlink" href="#equation-mg-5" title="Permalink to this equation"></a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
+<span class="eqno">(293)<a class="headerlink" href="#equation-mg-5" title="Link to this equation"></a></span>\[\begin{split}\epsilon_\mathrm{divu} = \left  \{ \begin{array}{ll}
                     \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}^2 &amp;
                           \quad \mathrm{for}~ i \le \mathtt{init\_divu\_iter} - 2 \, \\[2mm]
                    \mathtt{eps\_divu\_sph} \cdot \mathtt{divu\_iter\_factor}  &amp;
@@ -656,7 +656,7 @@ the predictor and corrector portions of the main algorithm.</p>
 <p>There are two tolerances here. The norm of the residual is required
 to be reduced by a relative tolerance of</p>
 <div class="math notranslate nohighlight" id="equation-mg-6">
-<span class="eqno">(294)<a class="headerlink" href="#equation-mg-6" title="Permalink to this equation"></a></span>\[\epsilon =
+<span class="eqno">(294)<a class="headerlink" href="#equation-mg-6" title="Link to this equation"></a></span>\[\epsilon =
  \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
  \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .\]</div>
 <p>A separate tolerance is used for the bottom solver,
@@ -715,7 +715,7 @@ solver, <span class="math notranslate nohighlight">\(\epsilon_\mathrm{bottom} = 
 </section>
 </section>
 <section id="general-remarks">
-<h2>General Remarks<a class="headerlink" href="#general-remarks" title="Permalink to this heading"></a></h2>
+<h2>General Remarks<a class="headerlink" href="#general-remarks" title="Link to this heading"></a></h2>
 <p>If MAESTRO has trouble converging in the multigrid solves, try
 setting the verbosity mg_verbose or cg_verbose to
 higher values to get more information about the solve.</p>

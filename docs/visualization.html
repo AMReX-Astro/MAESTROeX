@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -150,9 +150,9 @@
            <div itemprop="articleBody">
              
   <section id="visualization">
-<h1>Visualization<a class="headerlink" href="#visualization" title="Permalink to this heading"></a></h1>
+<h1>Visualization<a class="headerlink" href="#visualization" title="Link to this heading"></a></h1>
 <section id="plotfiles">
-<h2>Plotfiles<a class="headerlink" href="#plotfiles" title="Permalink to this heading"></a></h2>
+<h2>Plotfiles<a class="headerlink" href="#plotfiles" title="Link to this heading"></a></h2>
 <p>MAESTROeX outputs plotfiles specifically for visualization and
 analysis.  The table below lists the quantities stored in a plotfile.
 Not all of these may be present, dependent on what options were used
@@ -165,7 +165,7 @@ in creating the plotfile.</p>
 converted to single precision before outputting—this is done to
 reduce file sizes.</p>
 <table class="docutils align-default" id="id2">
-<caption><span class="caption-number">Table 3 </span><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id2" title="Permalink to this table"></a></caption>
+<caption><span class="caption-number">Table 3 </span><span class="caption-text">Plotfile quantities</span><a class="headerlink" href="#id2" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>plotfile variable
 name</p></th>
@@ -424,7 +424,7 @@ conservation)</p></td>
 </tbody>
 </table>
 <section id="small-vs-regular-plotfiles">
-<span id="vis-sec-miniplotfile"></span><h3>Small vs. regular plotfiles<a class="headerlink" href="#small-vs-regular-plotfiles" title="Permalink to this heading"></a></h3>
+<span id="vis-sec-miniplotfile"></span><h3>Small vs. regular plotfiles<a class="headerlink" href="#small-vs-regular-plotfiles" title="Link to this heading"></a></h3>
 <p>MAESTROeX can manage two independent sets of plotfiles. This allows you to
 output the default plotfiles, which contain a lot of variables, sparsely,
 and output small-plotfiles much more frequently. A small-plotfile is controlled
@@ -441,7 +441,7 @@ parameter names to be included in the plot file.</p>
 </section>
 </section>
 <section id="visualizing-with-amrvis">
-<h2>Visualizing with Amrvis<a class="headerlink" href="#visualizing-with-amrvis" title="Permalink to this heading"></a></h2>
+<h2>Visualizing with Amrvis<a class="headerlink" href="#visualizing-with-amrvis" title="Link to this heading"></a></h2>
 <div class="line-block">
 <div class="line">Amrvis is a tool developed together with AMReX to visualize datasets
 from codes built around the AMReX library. To
@@ -466,11 +466,11 @@ the palette line points to the Palette file, e.g.:</p>
 </div>
 </section>
 <section id="visualizing-with-visit">
-<h2>Visualizing with VisIt<a class="headerlink" href="#visualizing-with-visit" title="Permalink to this heading"></a></h2>
+<h2>Visualizing with VisIt<a class="headerlink" href="#visualizing-with-visit" title="Link to this heading"></a></h2>
 <p>VisIt recognizes MAESTROeX plotfiles as being in the BoxLib format.</p>
 </section>
 <section id="visualizing-with-yt">
-<span id="sec-vis-yt"></span><h2>Visualizing with yt<a class="headerlink" href="#visualizing-with-yt" title="Permalink to this heading"></a></h2>
+<span id="sec-vis-yt"></span><h2>Visualizing with yt<a class="headerlink" href="#visualizing-with-yt" title="Link to this heading"></a></h2>
 <p>yt is a Python package for analyzing and visualizing simulation data,
 and understand that AMReX data from MAESTROeX and CASTRO (along
 with many other simulation codes). For more
@@ -479,7 +479,7 @@ information, see the yt homepage at <a class="reference external" href="http://y
 <p>Some sample scripts that use yt with MAESTROeX data are contained in
 <code class="docutils literal notranslate"><span class="pre">MAESTROeX/Util/yt/</span></code>.</p>
 <section id="plotsinglevar-py">
-<h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Permalink to this heading"></a></h3>
+<h3>plotsinglevar.py<a class="headerlink" href="#plotsinglevar-py" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> does visualizations of 2-d AMReX plotfiles,
 and slices through 3-d AMReX plotfiles. A simple plot can be made
 via:</p>
@@ -494,7 +494,7 @@ plotfile name + component will be used.</p>
 <img alt="_images/plt00000_tfromp.png" src="_images/plt00000_tfromp.png" />
 <figcaption>
 <p><span class="caption-number">Fig. 14 </span><span class="caption-text">Plot of reacting_bubble done with the python
-script <code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code>.</span><a class="headerlink" href="#id3" title="Permalink to this image"></a></p>
+script <code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code>.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>If you list 2 different variables after the plotfile name, then they
@@ -508,7 +508,7 @@ will be plotted side-by-side in a single figure. For example,</p>
 <figcaption>
 <p><span class="caption-number">Fig. 15 </span><span class="caption-text">Plot of reacting_bubble done with the python script
 <code class="docutils literal notranslate"><span class="pre">plotsinglevar.py</span></code> showing 2 variables plotted from a single
-plotfile.</span><a class="headerlink" href="#id4" title="Permalink to this image"></a></p>
+plotfile.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Additional options include ‘-min’ to specify the minimum data
@@ -519,7 +519,7 @@ and variable, it will plot slices (<span class="math notranslate nohighlight">\(
 through the center of the domain.</p>
 </section>
 <section id="contourcompare-py">
-<h3>contourcompare.py<a class="headerlink" href="#contourcompare-py" title="Permalink to this heading"></a></h3>
+<h3>contourcompare.py<a class="headerlink" href="#contourcompare-py" title="Link to this heading"></a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">contourcompare.py</span></code> takes two or three plotfiles and a single variable as arguments
 and plots contours of the datasets on the same set of axes. This is
 facilitates comparisons of different runs. Running the script with the flag <code class="docutils literal notranslate"><span class="pre">-h</span></code>
@@ -532,7 +532,7 @@ will give the full list of available options.</p>
 <code class="docutils literal notranslate"><span class="pre">plt00000</span></code> and <code class="docutils literal notranslate"><span class="pre">other_plt00000</span></code> shown on the same axes.</p>
 </section>
 <section id="runtimevis-py">
-<h3>runtimevis.py<a class="headerlink" href="#runtimevis-py" title="Permalink to this heading"></a></h3>
+<h3>runtimevis.py<a class="headerlink" href="#runtimevis-py" title="Link to this heading"></a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">runtimevis.py</span></code> script is designed to be run from a submission
 script to produce plots from plotfiles as they are produced.</p>
 <p>The script itself reads in an inputs file, <code class="docutils literal notranslate"><span class="pre">vis.in</span></code>, that

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/js/theme.js"></script>
@@ -105,7 +105,11 @@
 <li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="BaseStateGeometry_8H.html">File BaseStateGeometry.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">File MaestroBCThreads.H</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">File MaestroBCThreads.H</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv410prepare_bcPKiKi"><code class="docutils literal notranslate"><span class="pre">prepare_bc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv48clean_bcPi"><code class="docutils literal notranslate"><span class="pre">clean_bc()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroPlot_8H.html">File MaestroPlot.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="PhysBCFunctMaestro_8H.html">File PhysBCFunctMaestro.H</a></li>
@@ -144,17 +148,17 @@
            <div itemprop="articleBody">
              
   <section id="file-maestrobcthreads-h">
-<h1>File MaestroBCThreads.H<a class="headerlink" href="#file-maestrobcthreads-h" title="Permalink to this heading"></a></h1>
+<h1>File MaestroBCThreads.H<a class="headerlink" href="#file-maestrobcthreads-h" title="Link to this heading"></a></h1>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv410prepare_bcPKiKi">
-<span id="_CPPv310prepare_bcPKiKi"></span><span id="_CPPv210prepare_bcPKiKi"></span><span id="prepare_bc__iCP.iC"></span><span class="target" id="MaestroBCThreads_8H_1a5a8ca9f58d605e999c2837bf14ef5e06"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">prepare_bc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nvar</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410prepare_bcPKiKi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv310prepare_bcPKiKi"></span><span id="_CPPv210prepare_bcPKiKi"></span><span id="prepare_bc__iCP.iC"></span><span class="target" id="MaestroBCThreads_8H_1a5a8ca9f58d605e999c2837bf14ef5e06"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">prepare_bc</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nvar</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410prepare_bcPKiKi" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv48clean_bcPi">
-<span id="_CPPv38clean_bcPi"></span><span id="_CPPv28clean_bcPi"></span><span id="clean_bc__iP"></span><span class="target" id="MaestroBCThreads_8H_1a5d2da13e580d5808c80616ccab657f63"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clean_bc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bc_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48clean_bcPi" title="Permalink to this definition"></a><br /></dt>
+<span id="_CPPv38clean_bcPi"></span><span id="_CPPv28clean_bcPi"></span><span id="clean_bc__iP"></span><span class="target" id="MaestroBCThreads_8H_1a5d2da13e580d5808c80616ccab657f63"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clean_bc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">bc_f</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48clean_bcPi" title="Link to this definition"></a><br /></dt>
 <dd></dd></dl>
 
 </div>

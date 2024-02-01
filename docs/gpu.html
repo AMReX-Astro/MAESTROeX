@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/js/theme.js"></script>
@@ -145,19 +145,19 @@
            <div itemprop="articleBody">
              
   <section id="gpu">
-<span id="sec-gpu"></span><h1>GPU<a class="headerlink" href="#gpu" title="Permalink to this heading"></a></h1>
+<span id="sec-gpu"></span><h1>GPU<a class="headerlink" href="#gpu" title="Link to this heading"></a></h1>
 <p>In this chapter, we will present the GPU support in MAESTROeX,
 including necessary build parameters, how to offload a routine
 to GPU, and some basic profiling and debugging options.
 Note that currently MAESTROeX only supports NVIDIA GPUs.</p>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading"></a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>Since MAESTROeX uses primarily CUDA C++ and CUDA Fortran,
 it requires a recent version of CUDA (e.g., &gt;= 9) and the device
 must have compute capability of &gt;= 6.</p>
 </section>
 <section id="building-gpu-support">
-<span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Permalink to this heading"></a></h2>
+<span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Link to this heading"></a></h2>
 <p>To build MAESTROeX with GPU support, add the following argument
 to the GNUmakefile:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">USE_CUDA</span> <span class="o">:=</span> <span class="n">TRUE</span>
@@ -189,7 +189,7 @@ capability 6.x, the flag should be set to:</p>
 </div>
 </section>
 <section id="offloading-a-routine-to-gpu">
-<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Permalink to this heading"></a></h2>
+<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Link to this heading"></a></h2>
 <p>In order to offload a routine to the GPU, we insert a <code class="docutils literal notranslate"><span class="pre">#pragma</span> <span class="pre">gpu</span></code>
 statement on the line before the call. This tells the preprocessor to
 generate a CUDA device version of the function, with all the
@@ -197,7 +197,7 @@ additional CUDA GPU management. In addition to this, there are a few
 other modifications required to ensure the function operates correctly
 on the GPU. We summarize these below.</p>
 <section id="c">
-<h3>C++<a class="headerlink" href="#c" title="Permalink to this heading"></a></h3>
+<h3>C++<a class="headerlink" href="#c" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>Make sure that the box <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> are the first two arguments
 and use <code class="docutils literal notranslate"><span class="pre">AMREX_INT_ANYD</span></code> as the macro wrapping <code class="docutils literal notranslate"><span class="pre">bx.loVect()</span></code> and
@@ -239,7 +239,7 @@ The MultiFab counterparts are on the GPU.</p></li>
 </div>
 </section>
 <section id="fortran">
-<h3>Fortran<a class="headerlink" href="#fortran" title="Permalink to this heading"></a></h3>
+<h3>Fortran<a class="headerlink" href="#fortran" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>The routine must only operate on a single zone in <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p>
 <ul>
@@ -348,7 +348,7 @@ variables, but before the main body of the function.</p></li>
 </section>
 </section>
 <section id="profiling-with-gpus">
-<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Permalink to this heading"></a></h2>
+<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Link to this heading"></a></h2>
 <p>NVIDIA’s profiler, <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>, is recommended when profiling for GPUs.
 It returns data on how long each kernel launch lasted on the GPU,
 the number of threads and registers used, the occupancy of the GPU
@@ -371,7 +371,7 @@ contained within. For example:</p>
 If you require further profiling detail, use <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>.</p>
 </section>
 <section id="basic-gpu-debugging">
-<span id="sec-gpudebug"></span><h2>Basic GPU Debugging<a class="headerlink" href="#basic-gpu-debugging" title="Permalink to this heading"></a></h2>
+<span id="sec-gpudebug"></span><h2>Basic GPU Debugging<a class="headerlink" href="#basic-gpu-debugging" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Turn off GPU offloading for some part of the code with</p></li>
 </ul>

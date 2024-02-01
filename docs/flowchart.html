@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -179,7 +179,7 @@
            <div itemprop="articleBody">
              
   <section id="governing-equations">
-<span id="ch-flowchart"></span><h1>Governing Equations<a class="headerlink" href="#governing-equations" title="Permalink to this heading"></a></h1>
+<span id="ch-flowchart"></span><h1>Governing Equations<a class="headerlink" href="#governing-equations" title="Link to this heading"></a></h1>
 <p>The equation set and solution procedure used by MAESTROeX has changed
 and improved over time.  In this chapter, we outline the model
 equations and algorithmic options in the code.  The latest published
@@ -195,7 +195,7 @@ reference to papers I-IV and the multilevel paper (see §
 <a class="reference internal" href="introduction.html#ch-intro"><span class="std std-ref">Introduction to MAESTROeX</span></a>), which describe the developments of the original
 temporal scheme.</p>
 <section id="summary-of-the-maestroex-equation-set">
-<h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Permalink to this heading"></a></h2>
+<h2>Summary of the MAESTROeX Equation Set<a class="headerlink" href="#summary-of-the-maestroex-equation-set" title="Link to this heading"></a></h2>
 <p>Here we summarize the equations solved by MAESTROeX. We refer the reader
 to papers I through IV for the derivation
 and motivation of the equation set.
@@ -205,22 +205,22 @@ The resulting model is a series of evolution equations for mass, energy,
 and momentum, subject to an additional constraint on velocity, with a base state
 density and pressure linked via hydrostatic equilibrium:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-0">
-<span class="eqno">(14)<a class="headerlink" href="#equation-flowchart-0" title="Permalink to this equation"></a></span>\[\frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k\]</div>
+<span class="eqno">(14)<a class="headerlink" href="#equation-flowchart-0" title="Link to this equation"></a></span>\[\frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k\]</div>
 <div class="math notranslate nohighlight" id="equation-flowchart-1">
-<span class="eqno">(15)<a class="headerlink" href="#equation-flowchart-1" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
+<span class="eqno">(15)<a class="headerlink" href="#equation-flowchart-1" title="Link to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
    -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,\]</div>
 <div class="math notranslate nohighlight" id="equation-flowchart-2">
-<span class="eqno">(16)<a class="headerlink" href="#equation-flowchart-2" title="Permalink to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
+<span class="eqno">(16)<a class="headerlink" href="#equation-flowchart-2" title="Link to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
    \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <div class="math notranslate nohighlight" id="equation-flowchart-3">
-<span class="eqno">(17)<a class="headerlink" href="#equation-flowchart-3" title="Permalink to this equation"></a></span>\[\nabla \cdot (\beta_0 \Ub) =
+<span class="eqno">(17)<a class="headerlink" href="#equation-flowchart-3" title="Link to this equation"></a></span>\[\nabla \cdot (\beta_0 \Ub) =
    \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )\]</div>
 <div class="math notranslate nohighlight" id="equation-flowchart-4">
-<span class="eqno">(18)<a class="headerlink" href="#equation-flowchart-4" title="Permalink to this equation"></a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
+<span class="eqno">(18)<a class="headerlink" href="#equation-flowchart-4" title="Link to this equation"></a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
 <p>We discuss each of these equations in further detail below.</p>
 <section id="lateral-average">
-<h3>Lateral Average<a class="headerlink" href="#lateral-average" title="Permalink to this heading"></a></h3>
+<h3>Lateral Average<a class="headerlink" href="#lateral-average" title="Link to this heading"></a></h3>
 <p>A key concept in the MAESTROeX equation set and algorithm is
 the lateral average.  The lateral average represents the average
 value of a quantity at a given radius in spherical simulations
@@ -237,7 +237,7 @@ Details can be found in <span id="id3">[<a class="reference internal" href="zref
 <p>For the velocity field, we can decompose the full velocity
 field into a base state velocity and a local velocity,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-5">
-<span class="eqno">(19)<a class="headerlink" href="#equation-flowchart-5" title="Permalink to this equation"></a></span>\[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
+<span class="eqno">(19)<a class="headerlink" href="#equation-flowchart-5" title="Link to this equation"></a></span>\[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
 <p>where <span class="math notranslate nohighlight">\(r\)</span> is a 1D radial coordinate,
 <span class="math notranslate nohighlight">\(\xb\)</span> is a 3D Cartesian grid coordinate, and
 <span class="math notranslate nohighlight">\(\eb_r\)</span> is the unit vector in the outward radial direction.
@@ -252,11 +252,11 @@ for the average expansion velocity and numerically integrate
 this expression to obtain <span class="math notranslate nohighlight">\(w_0\)</span>.</p>
 </section>
 <section id="mass">
-<h3>Mass<a class="headerlink" href="#mass" title="Permalink to this heading"></a></h3>
+<h3>Mass<a class="headerlink" href="#mass" title="Link to this heading"></a></h3>
 <p>Conservation of mass gives the same continuity equation we have with
 compressible flow:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-6">
-<span class="eqno">(20)<a class="headerlink" href="#equation-flowchart-6" title="Permalink to this equation"></a></span>\[\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \Ub) = 0,
+<span class="eqno">(20)<a class="headerlink" href="#equation-flowchart-6" title="Link to this equation"></a></span>\[\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \Ub) = 0,
 \label{eq:flow:continuity}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\rho\)</span> is the total mass density.
 Additionally, we model the evolution of individual species that advect and react.
@@ -264,35 +264,35 @@ The creation and destruction
 of the species is described by their create rate, <span class="math notranslate nohighlight">\(\omegadot_k\)</span>, and the species
 are defined by their mass fractions, <span class="math notranslate nohighlight">\(X_k \equiv \rho_k / \rho\)</span>, giving</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-rhox">
-<span class="eqno">(21)<a class="headerlink" href="#equation-eq-flow-rhox" title="Permalink to this equation"></a></span>\[\frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k\]</div>
+<span class="eqno">(21)<a class="headerlink" href="#equation-eq-flow-rhox" title="Link to this equation"></a></span>\[\frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-7">
-<span class="eqno">(22)<a class="headerlink" href="#equation-flowchart-7" title="Permalink to this equation"></a></span>\[\sum_k X_k = 1\]</div>
+<span class="eqno">(22)<a class="headerlink" href="#equation-flowchart-7" title="Link to this equation"></a></span>\[\sum_k X_k = 1\]</div>
 <p>In the original temporal scheme, we need to model the evolution of a base state density,
 <span class="math notranslate nohighlight">\(\rho_0\)</span>.  The governing equation can be obtained by laterally averaging the
 full continuity equation, giving:</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-base-density">
-<span class="eqno">(23)<a class="headerlink" href="#equation-eq-flow-base-density" title="Permalink to this equation"></a></span>\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r),\]</div>
+<span class="eqno">(23)<a class="headerlink" href="#equation-eq-flow-base-density" title="Link to this equation"></a></span>\[\frac{\partial\rho_0}{\partial t} = -\nabla\cdot(\rho_0 w_0 \eb_r),\]</div>
 <p>Subtracting these two yields the evolution equation for the perturbational
 density, <span class="math notranslate nohighlight">\(\rho^\prime \equiv \rho - \rho_0\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-8">
-<span class="eqno">(24)<a class="headerlink" href="#equation-flowchart-8" title="Permalink to this equation"></a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' -
+<span class="eqno">(24)<a class="headerlink" href="#equation-flowchart-8" title="Link to this equation"></a></span>\[\frac{\partial\rho'}{\partial t} = -\Ub\cdot\nabla\rho' -
   \rho'\nabla\cdot\Ub - \nabla\cdot\left(\rho_0\Ubt\right) \label{eq:flow:rhoprime}\]</div>
 <p>As first discussed in paper III and then refined in the multilevel paper, we capture
 the changes that can occur due to significant convective
 overturning by imposing the constraint that <span class="math notranslate nohighlight">\(\overline{\rho'}=0\)</span>
 for all time. This gives</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-9">
-<span class="eqno">(25)<a class="headerlink" href="#equation-flowchart-9" title="Permalink to this equation"></a></span>\[\frac{\partial\overline{\rho'}}{\partial t} = -\nabla\cdot(\etarho\eb_r).\]</div>
+<span class="eqno">(25)<a class="headerlink" href="#equation-flowchart-9" title="Link to this equation"></a></span>\[\frac{\partial\overline{\rho'}}{\partial t} = -\nabla\cdot(\etarho\eb_r).\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-etarho">
-<span class="eqno">(26)<a class="headerlink" href="#equation-eq-flow-etarho" title="Permalink to this equation"></a></span>\[\etarho = \overline{\left(\rho'\Ub\cdot\eb_r\right)}\]</div>
+<span class="eqno">(26)<a class="headerlink" href="#equation-eq-flow-etarho" title="Link to this equation"></a></span>\[\etarho = \overline{\left(\rho'\Ub\cdot\eb_r\right)}\]</div>
 <p>In practice, we correct the drift by simply setting <span class="math notranslate nohighlight">\(\rho_0 =
 \overline{\rho}\)</span> after the advective update of <span class="math notranslate nohighlight">\(\rho\)</span>. However we still need to
 explicitly compute <span class="math notranslate nohighlight">\(\etarho\)</span> since it appears in other equations.</p>
 </section>
 <section id="energy">
-<h3>Energy<a class="headerlink" href="#energy" title="Permalink to this heading"></a></h3>
+<h3>Energy<a class="headerlink" href="#energy" title="Link to this heading"></a></h3>
 <p>We model the evolution of specific enthalpy, <span class="math notranslate nohighlight">\(h\)</span>.
 Strictly speaking this is not necessary to close the system,
 but a user can enable the option to couple the energy with the
@@ -300,7 +300,7 @@ rest of the system by using the enthalpy to define the temperature.
 The advantages of this coupling is an area of active research.
 The evolution equation is</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-enthalpy">
-<span class="eqno">(27)<a class="headerlink" href="#equation-eq-flow-enthalpy" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
+<span class="eqno">(27)<a class="headerlink" href="#equation-eq-flow-enthalpy" title="Link to this equation"></a></span>\[\frac{\partial(\rho h)}{\partial t} =
    -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,\]</div>
 <p>where <span class="math notranslate nohighlight">\(p_0\)</span> is the 1D base state pressure, <span class="math notranslate nohighlight">\(\Hnuc\)</span> and <span class="math notranslate nohighlight">\(\Hext\)</span>
 are energy sources due to reactions and user-defined external heating.</p>
@@ -310,26 +310,26 @@ the enthalpy equation (see § <a class="reference internal" href="#sec-flow-diff
 represents the average over a layer; its evolution equation can be
 found by laterally averaging <a class="reference internal" href="#equation-eq-flow-enthalpy">Eq.27</a></p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-enthalpy-base">
-<span class="eqno">(28)<a class="headerlink" href="#equation-eq-flow-enthalpy-base" title="Permalink to this equation"></a></span>\[\frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
+<span class="eqno">(28)<a class="headerlink" href="#equation-eq-flow-enthalpy-base" title="Link to this equation"></a></span>\[\frac{\partial(\rho h)_0}{\partial t} = -\nabla\cdot\left[(\rho h)_0w_0\eb_r\right] +
   \psi + \overline{\rho \Hnuc} + \overline{\rho \Hext}.\]</div>
 <p>We will often expand <span class="math notranslate nohighlight">\(Dp_0/Dt\)</span> as</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-10">
-<span class="eqno">(29)<a class="headerlink" href="#equation-flowchart-10" title="Permalink to this equation"></a></span>\[\frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}\]</div>
+<span class="eqno">(29)<a class="headerlink" href="#equation-flowchart-10" title="Link to this equation"></a></span>\[\frac{Dp_0}{Dt} = \psi + (\Ubt \cdot \er) \frac{\partial p_0}{\partial r}\]</div>
 <p>where we defined</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-11">
-<span class="eqno">(30)<a class="headerlink" href="#equation-flowchart-11" title="Permalink to this equation"></a></span>\[\psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}\]</div>
+<span class="eqno">(30)<a class="headerlink" href="#equation-flowchart-11" title="Link to this equation"></a></span>\[\psi \equiv \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r}\]</div>
 <p>In paper III, we showed that for a plane-parallel atmosphere with
 constant gravity, <span class="math notranslate nohighlight">\(\psi = \etarho g\)</span></p>
 <p>At times, we will define a temperature equation by writing <span class="math notranslate nohighlight">\(h = h(T,p,X_k)\)</span>
 and differentiating:</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-temp">
-<span class="eqno">(31)<a class="headerlink" href="#equation-eq-flow-temp" title="Permalink to this equation"></a></span>\[\frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
+<span class="eqno">(31)<a class="headerlink" href="#equation-eq-flow-temp" title="Link to this equation"></a></span>\[\frac{DT}{Dt} = \frac{1}{\rho c_p} \left\{ \left(1 - \rho h_p\right) \left
   [ \psi + (\Ubt \cdotb \er) \frac{\partial p_0}{\partial r} \right ]
  - \sum_k \rho \xi_k {\omegadot}_k
  + \rho \Hnuc + \rho \Hext \right \}   .\]</div>
 <p>Subtracting it from the full enthalpy equation gives:</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-rhohprime">
-<span class="eqno">(32)<a class="headerlink" href="#equation-eq-flow-rhohprime" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(32)<a class="headerlink" href="#equation-eq-flow-rhohprime" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
 \frac{\partial(\rho h)'}{\partial t} = &amp;-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
   \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\
 &amp;\Ubt\cdot\nabla p_0
@@ -337,12 +337,12 @@ and differentiating:</p>
 \end{align}\end{split}\]</div>
 </section>
 <section id="base-state">
-<h3>Base State<a class="headerlink" href="#base-state" title="Permalink to this heading"></a></h3>
+<h3>Base State<a class="headerlink" href="#base-state" title="Link to this heading"></a></h3>
 <p>The stratified atmosphere is characterized by a one-dimensional
 time-dependent base state, defined by a base state density, <span class="math notranslate nohighlight">\(\rho_0\)</span>,
 and a base state pressure, <span class="math notranslate nohighlight">\(p_0\)</span>, in hydrostatic equilibrium:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-12">
-<span class="eqno">(33)<a class="headerlink" href="#equation-flowchart-12" title="Permalink to this equation"></a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
+<span class="eqno">(33)<a class="headerlink" href="#equation-flowchart-12" title="Link to this equation"></a></span>\[\nabla p_0 = -\rho_0 |g| \er\]</div>
 <p>The gravitational acceleration, <span class="math notranslate nohighlight">\(g\)</span> is either constant or a
 point-mass with a <span class="math notranslate nohighlight">\(1/r^2\)</span> dependence (see §
 <a class="reference internal" href="planar_invsq_basestate.html#sec-planarinvsqgravity"><span class="std std-ref">Modifications for a 1/r^2 Plane-Parallel Basestate</span></a>) for plane-parallel geometries, or a
@@ -355,32 +355,32 @@ another in response to heating.</p>
 by laterally averaging the full enthalpy, <span class="math notranslate nohighlight">\(h\)</span>.</p>
 </section>
 <section id="base-state-expansion">
-<h3>Base State Expansion<a class="headerlink" href="#base-state-expansion" title="Permalink to this heading"></a></h3>
+<h3>Base State Expansion<a class="headerlink" href="#base-state-expansion" title="Link to this heading"></a></h3>
 <p>In practice, we calculate <span class="math notranslate nohighlight">\(w_0\)</span> by integrating
 the one-dimensional divergence constraint. For a plane-parallel atmosphere, the
 evolution is:</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-dw0dr-planar">
-<span class="eqno">(34)<a class="headerlink" href="#equation-eq-flow-dw0dr-planar" title="Permalink to this equation"></a></span>\[\frac{\partial w_0}{\partial r} = \Sbar - \frac{1}{\gammabar p_0} \etarho g\]</div>
+<span class="eqno">(34)<a class="headerlink" href="#equation-eq-flow-dw0dr-planar" title="Link to this equation"></a></span>\[\frac{\partial w_0}{\partial r} = \Sbar - \frac{1}{\gammabar p_0} \etarho g\]</div>
 <p>Then we define</p>
 <div class="math notranslate nohighlight" id="equation-eq-pizero">
-<span class="eqno">(35)<a class="headerlink" href="#equation-eq-pizero" title="Permalink to this equation"></a></span>\[- \frac{\beta_0}{\rho_0} \frac{\partial (\pizero/\beta_0)}{\partial r} = \frac{\partial w_0}{\partial t} +
+<span class="eqno">(35)<a class="headerlink" href="#equation-eq-pizero" title="Link to this equation"></a></span>\[- \frac{\beta_0}{\rho_0} \frac{\partial (\pizero/\beta_0)}{\partial r} = \frac{\partial w_0}{\partial t} +
    w_0 \frac{\partial w_0}{\partial r} ,\]</div>
 <p>once <span class="math notranslate nohighlight">\(w_0\)</span> at the old and new times is known, and the advective term is computed explicitly.
 Then we can include this for completeness in the update for <span class="math notranslate nohighlight">\(\ut.\)</span></p>
 </section>
 <section id="momentum">
-<h3>Momentum<a class="headerlink" href="#momentum" title="Permalink to this heading"></a></h3>
+<h3>Momentum<a class="headerlink" href="#momentum" title="Link to this heading"></a></h3>
 <p>The compressible momentum equation (written in terms of velocity is):</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-13">
-<span class="eqno">(36)<a class="headerlink" href="#equation-flowchart-13" title="Permalink to this equation"></a></span>\[\rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla p = -\rho |g| \er\]</div>
+<span class="eqno">(36)<a class="headerlink" href="#equation-flowchart-13" title="Link to this equation"></a></span>\[\rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla p = -\rho |g| \er\]</div>
 <p>Subtracting off the equation of hydrostatic equilibrium, and defining the perturbational
 pressure (sometimes called the dynamic pressure) as <span class="math notranslate nohighlight">\(\pi \equiv p - p_0\)</span>,
 and perturbational density as <span class="math notranslate nohighlight">\(\rho' \equiv \rho - \rho_0\)</span>, we have:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-14">
-<span class="eqno">(37)<a class="headerlink" href="#equation-flowchart-14" title="Permalink to this equation"></a></span>\[\rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla \pi = -\rho' |g| \er\]</div>
+<span class="eqno">(37)<a class="headerlink" href="#equation-flowchart-14" title="Link to this equation"></a></span>\[\rho \frac{\partial \Ub}{\partial t} + \rho \Ub \cdot \nabla \Ub + \nabla \pi = -\rho' |g| \er\]</div>
 <p>or</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-15">
-<span class="eqno">(38)<a class="headerlink" href="#equation-flowchart-15" title="Permalink to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub + \frac{1}{\rho} \nabla \pi =
+<span class="eqno">(38)<a class="headerlink" href="#equation-flowchart-15" title="Link to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub + \frac{1}{\rho} \nabla \pi =
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <p>This is the form of the momentum equation that we solved in papers
 I–IV and in the multilevel paper.</p>
@@ -389,7 +389,7 @@ conservation in a low Mach number system and found that an additional
 term (which can look like a buoyancy) is needed in the low Mach number
 formulation, yielding:</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-newmomentum">
-<span class="eqno">(39)<a class="headerlink" href="#equation-eq-flow-newmomentum" title="Permalink to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
+<span class="eqno">(39)<a class="headerlink" href="#equation-eq-flow-newmomentum" title="Link to this equation"></a></span>\[\frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
    \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
    -\frac{\rho^\prime}{\rho} |g| \er\]</div>
 <p>This is the form that we enforce in MAESTROeX, and the choice is controlled
@@ -398,16 +398,16 @@ by <code class="docutils literal notranslate"><span class="pre">use_alt_energy_f
 <span class="math notranslate nohighlight">\(w_0\)</span>, that governs the base state dynamics, and a local velocity,
 <span class="math notranslate nohighlight">\(\Ubt\)</span>, that governs the local dynamics, i.e.,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-16">
-<span class="eqno">(40)<a class="headerlink" href="#equation-flowchart-16" title="Permalink to this equation"></a></span>\[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
+<span class="eqno">(40)<a class="headerlink" href="#equation-flowchart-16" title="Link to this equation"></a></span>\[\Ub = w_0(r,t)\eb_r + \Ubt(\xb,t).\]</div>
 <p>with
 <span class="math notranslate nohighlight">\(\overline{(\Ubt\cdot\eb_r)} = 0\)</span> and
 <span class="math notranslate nohighlight">\(w_0 = \overline{(\Ub\cdot\eb_r)}\)</span>—the motivation for this splitting was given in paper II.
 The velocity evolution equations are then</p>
 <div class="math notranslate nohighlight" id="equation-eq-w0-evolution">
-<span class="eqno">(41)<a class="headerlink" href="#equation-eq-w0-evolution" title="Permalink to this equation"></a></span>\[\frac{\partial w_0}{\partial t} = -w_0\frac{\partial w_0}{\partial
+<span class="eqno">(41)<a class="headerlink" href="#equation-eq-w0-evolution" title="Link to this equation"></a></span>\[\frac{\partial w_0}{\partial t} = -w_0\frac{\partial w_0}{\partial
   r} - \frac{\beta_0}{\rho_0}\frac{\partial(\pi_0/\beta_0)}{\partial r}\]</div>
 <div class="math notranslate nohighlight" id="equation-eq-flow-utildeupd">
-<span class="eqno">(42)<a class="headerlink" href="#equation-eq-flow-utildeupd" title="Permalink to this equation"></a></span>\[\frac{\partial\Ubt}{\partial t} = -(\Ubt + w_0\er)\cdot\nabla\Ubt
+<span class="eqno">(42)<a class="headerlink" href="#equation-eq-flow-utildeupd" title="Link to this equation"></a></span>\[\frac{\partial\Ubt}{\partial t} = -(\Ubt + w_0\er)\cdot\nabla\Ubt
   - \left(\Ubt\cdot\eb_r\right)\frac{\partial w_0}{\partial r}\eb_r -
 \frac{\beta_0}{\rho}\nabla\left(\frac{\pi}{\beta_0} \right) +
 \frac{\beta_0}{\rho_0}\frac{\partial(\pi_0/\beta_0)}{\partial r}\eb_r -
@@ -416,29 +416,29 @@ The velocity evolution equations are then</p>
 By laterally averaging to <a class="reference internal" href="#equation-eq-u-divergence">Eq.45</a>,
 we obtain a divergence constraint for <span class="math notranslate nohighlight">\(w_0\)</span>:</p>
 <div class="math notranslate nohighlight" id="equation-eq-w0-divergence">
-<span class="eqno">(43)<a class="headerlink" href="#equation-eq-w0-divergence" title="Permalink to this equation"></a></span>\[\nabla\cdot(\beta_0 w_0 \eb_r) =
+<span class="eqno">(43)<a class="headerlink" href="#equation-eq-w0-divergence" title="Link to this equation"></a></span>\[\nabla\cdot(\beta_0 w_0 \eb_r) =
     \beta_0\left(\Sbar - \frac{1}{\gammabar p_0}
            \frac{\partial p_0}{\partial t}\right).\]</div>
 <p>The divergence constraint for <span class="math notranslate nohighlight">\(\Ubt\)</span> can be found by subtracting
 <a class="reference internal" href="#equation-eq-w0-divergence">Eq.43</a> into <a class="reference internal" href="#equation-eq-u-divergence">Eq.45</a>, resulting in</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-17">
-<span class="eqno">(44)<a class="headerlink" href="#equation-flowchart-17" title="Permalink to this equation"></a></span>\[\nabla\cdot\left(\beta_0\Ubt\right) = \beta_0\left(S-\Sbar\right).\label{eq:utilde divergence}\]</div>
+<span class="eqno">(44)<a class="headerlink" href="#equation-flowchart-17" title="Link to this equation"></a></span>\[\nabla\cdot\left(\beta_0\Ubt\right) = \beta_0\left(S-\Sbar\right).\label{eq:utilde divergence}\]</div>
 </section>
 <section id="velocity-constraint">
-<h3>Velocity Constraint<a class="headerlink" href="#velocity-constraint" title="Permalink to this heading"></a></h3>
+<h3>Velocity Constraint<a class="headerlink" href="#velocity-constraint" title="Link to this heading"></a></h3>
 <p>The equation of state is cast into an elliptic constraint on the
 velocity field by differentiating <span class="math notranslate nohighlight">\(p_0(\rho, s, X_k)\)</span> along particle
 paths, giving:</p>
 <div class="math notranslate nohighlight" id="equation-eq-u-divergence">
-<span class="eqno">(45)<a class="headerlink" href="#equation-eq-u-divergence" title="Permalink to this equation"></a></span>\[\nabla \cdot (\beta_0 \Ub) =
+<span class="eqno">(45)<a class="headerlink" href="#equation-eq-u-divergence" title="Link to this equation"></a></span>\[\nabla \cdot (\beta_0 \Ub) =
    \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )\]</div>
 <p>where <span class="math notranslate nohighlight">\(\beta_0\)</span> is a density-like variable that carries background
 stratification, defined as</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-18">
-<span class="eqno">(46)<a class="headerlink" href="#equation-flowchart-18" title="Permalink to this equation"></a></span>\[\beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),\]</div>
+<span class="eqno">(46)<a class="headerlink" href="#equation-flowchart-18" title="Link to this equation"></a></span>\[\beta_0(r,t) = \rho_0(0,t)\exp\left(\int_0^r\frac{1}{\gammabar p_0}\frac{\partial p_0}{\partial r'}dr'\right),\]</div>
 <p>and</p>
 <div class="math notranslate nohighlight" id="equation-eq-flow-s">
-<span class="eqno">(47)<a class="headerlink" href="#equation-eq-flow-s" title="Permalink to this equation"></a></span>\[S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T\]</div>
+<span class="eqno">(47)<a class="headerlink" href="#equation-eq-flow-s" title="Link to this equation"></a></span>\[S = -\sigma\sum_k\xi_k\omegadot_k + \frac{1}{\rho p_\rho}\sum_k p_{X_k}\omegadot_k + \sigma\Hnuc + \sigma\Hext + \frac{\sigma}{\rho} \nabla \cdot \kth \nabla T\]</div>
 <p>where <span class="math notranslate nohighlight">\(p_{X_k} \equiv \left. \partial p / \partial X_k
 \right|_{\rho,T,X_{j,j\ne k}}\)</span>, <span class="math notranslate nohighlight">\(\xi_k \equiv \left. \partial h /
 \partial X_k \right |_{p,T,X_{j,j\ne k}},
@@ -457,12 +457,12 @@ III). We also look at this in § <a class="reference internal" href="#sec-flow-g
 </section>
 </section>
 <section id="notation">
-<h2>Notation<a class="headerlink" href="#notation" title="Permalink to this heading"></a></h2>
+<h2>Notation<a class="headerlink" href="#notation" title="Link to this heading"></a></h2>
 <p>Throughout the papers describing MAESTROeX, we’ve largely kept our
 notation consistent. The table below defines the
 frequently-used quantities and provides their units.</p>
 <table class="docutils align-default" id="id14">
-<caption><span class="caption-number">Table 1 </span><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id14" title="Permalink to this table"></a></caption>
+<caption><span class="caption-number">Table 1 </span><span class="caption-text">Definition of symbols.</span><a class="headerlink" href="#id14" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>symbol</p></th>
 <th class="head"><p>description</p></th>
@@ -652,7 +652,7 @@ incompressible / low speed papers, <span class="math notranslate nohighlight">\(
 </aside>
 </section>
 <section id="time-advancement-algorithm-ingredients">
-<span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Permalink to this heading"></a></h2>
+<span id="sec-time-advancement-algorithm"></span><h2>Time Advancement Algorithm Ingredients<a class="headerlink" href="#time-advancement-algorithm-ingredients" title="Link to this heading"></a></h2>
 <p>The full time advancement algorithm is detailed in <span id="id8">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span> for the original
 algorithm and <span id="id9">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span> for the new, simplified algorithm.  We do not repeat
 that here.</p>
@@ -667,7 +667,7 @@ step. The predictor-corrector steps are outlined by the dotted
 box. The blue text indicates state variables that are the same in
 Step 6 as they are in Step 2, i.e., they are unchanged by the
 predictor steps. The diffusion steps (4a and 8a) are optional,
-depending on use_thermal_diffusion.</span><a class="headerlink" href="#id15" title="Permalink to this image"></a></p>
+depending on use_thermal_diffusion.</span><a class="headerlink" href="#id15" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id16">
@@ -678,26 +678,26 @@ and base state variables are indicated in each step. Red text
 indicates that quantity was updated during that step. Note, for
 Step 4, the updated quantities should also have a <span class="math notranslate nohighlight">\(⋆\)</span>
 superscript, e.g., Step 8I defines <span class="math notranslate nohighlight">\(T^{(2)}\)</span> while Step 4I
-defines <span class="math notranslate nohighlight">\(T^{(2),\star}\)</span>.</span><a class="headerlink" href="#id16" title="Permalink to this image"></a></p>
+defines <span class="math notranslate nohighlight">\(T^{(2),\star}\)</span>.</span><a class="headerlink" href="#id16" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <p>Here are some of the basic ingredients to the solver:</p>
 <section id="definitions">
-<h3>Definitions<a class="headerlink" href="#definitions" title="Permalink to this heading"></a></h3>
+<h3>Definitions<a class="headerlink" href="#definitions" title="Link to this heading"></a></h3>
 <p>Below we define operations that will be referenced in
 § <a class="reference internal" href="#sec-flow-singlestep"><span class="std std-ref">Volume Discrepancy Changes</span></a>.</p>
 <p><strong>React State</strong><span class="math notranslate nohighlight">\([\rho^{\inp},(\rho h)^{\inp},X_k^{\inp},T^{\inp}, (\rho\Hext)^{\inp}, p_0^{\inp}] \rightarrow [\rho^{\outp}, (\rho h)^{\outp}, X_k^{\outp}, T^{\outp}, (\rho \omegadot_k)^{\outp}, (\rho\Hnuc)^{\outp}]\)</span>
 evolves the species and enthalpy due to reactions through
 <span class="math notranslate nohighlight">\(\Delta t/2\)</span> according to:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-19">
-<span class="eqno">(48)<a class="headerlink" href="#equation-flowchart-19" title="Permalink to this equation"></a></span>\[\frac{dX_k}{dt} = \omegadot_k(\rho,X_k,T) ; \qquad
+<span class="eqno">(48)<a class="headerlink" href="#equation-flowchart-19" title="Link to this equation"></a></span>\[\frac{dX_k}{dt} = \omegadot_k(\rho,X_k,T) ; \qquad
 \frac{dT}{dt}   = \frac{1}{c_p} \left ( -\sum_k \xi_k  \omegadot_k  + \Hnuc \right ).\]</div>
 <p>Here the temperature equation comes from <a class="reference internal" href="#equation-eq-flow-temp">Eq.31</a> with <span class="math notranslate nohighlight">\(Dp_0/Dt = 0\)</span> for
 the burning part of the evolution.</p>
 <p>Full details of the solution procedure can be found in Paper III. We
 then define:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-20">
-<span class="eqno">(49)<a class="headerlink" href="#equation-flowchart-20" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(49)<a class="headerlink" href="#equation-flowchart-20" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 (\rho\omegadot_k)^{\outp} &amp;=&amp; \frac{\rho^{\outp} ( X_k^{\outp} - X_k^{\inp})}{\dt/2}, \\
 (\rho h)^{\outp} &amp;=&amp; (\rho h)^{\inp} + \frac{\dt}{2} (\rho\Hnuc)^{\outp} + \frac{\dt}{2} (\rho\Hext)^{\inp}.\end{aligned}\end{split}\]</div>
 <p>where the enthalpy update includes external heat sources <span class="math notranslate nohighlight">\((\rho\Hext)^{\inp}\)</span>.
@@ -709,7 +709,7 @@ Note that the density remains unchanged within <strong>React State</strong>, i.e
 <span class="math notranslate nohighlight">\(\rho^{\outp} = \rho^{\inp}\)</span>.</p>
 <p>The source code for this operation can be found in react_state.f90.</p>
 <section id="advect-base-density">
-<h4>Advect Base Density<a class="headerlink" href="#advect-base-density" title="Permalink to this heading"></a></h4>
+<h4>Advect Base Density<a class="headerlink" href="#advect-base-density" title="Link to this heading"></a></h4>
 <p><span class="math notranslate nohighlight">\([\rho_0^\inp,w_0^\inp] \rightarrow [\rho_0^\outp, \rho_0^{\outp,\nph}]\)</span> is the process by which we
 update the base state density through <span class="math notranslate nohighlight">\(\dt\)</span> in time. We keep the
 time-centered edge states, <span class="math notranslate nohighlight">\(\rho_0^{\outp,\nph}\)</span>,
@@ -719,29 +719,29 @@ since they are used later in discretization of <span class="math notranslate noh
 <p>We discretize equation <a class="reference internal" href="#equation-eq-flow-base-density">Eq.23</a> to
 compute the new base state density,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-21">
-<span class="eqno">(50)<a class="headerlink" href="#equation-flowchart-21" title="Permalink to this equation"></a></span>\[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{\dt}{\dr} \left [ \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right ].\]</div>
+<span class="eqno">(50)<a class="headerlink" href="#equation-flowchart-21" title="Link to this equation"></a></span>\[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{\dt}{\dr} \left [ \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right ].\]</div>
 <p>We compute the time-centered edge states,
 <span class="math notranslate nohighlight">\({\rho_0}^{\outp,\nph}_{j\pm\myhalf}\)</span>, by discretizing an
 expanded form of <a class="reference internal" href="#equation-eq-flow-base-density">Eq.23</a>:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-22">
-<span class="eqno">(51)<a class="headerlink" href="#equation-flowchart-22" title="Permalink to this equation"></a></span>\[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r},\]</div>
+<span class="eqno">(51)<a class="headerlink" href="#equation-flowchart-22" title="Link to this equation"></a></span>\[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r},\]</div>
 <p>where the right hand side is used as the force term.</p>
 </li>
 <li><p>spherical:</p>
 <p>The base state density update now includes the area factors in the
 divergences:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-23">
-<span class="eqno">(52)<a class="headerlink" href="#equation-flowchart-23" title="Permalink to this equation"></a></span>\[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{1}{r_j^2} \frac{\dt}{\dr} \left [ \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right].\]</div>
+<span class="eqno">(52)<a class="headerlink" href="#equation-flowchart-23" title="Link to this equation"></a></span>\[\rho_{0,j}^{\outp} = \rho_{0,j}^{\inp} - \frac{1}{r_j^2} \frac{\dt}{\dr} \left [ \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j+\myhalf} - \left( r^2 \rho_0^{\outp,\nph} w_0^{\inp}\right)_{j-\myhalf} \right].\]</div>
 <p>In order to compute the time-centered edge states, an additional
 geometric term is added to the forcing, due to the spherical
 discretization of <a class="reference internal" href="#equation-eq-flow-base-density">Eq.23</a>:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-24">
-<span class="eqno">(53)<a class="headerlink" href="#equation-flowchart-24" title="Permalink to this equation"></a></span>\[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r} - \frac{2 \rho_0 w_0}{r}.\]</div>
+<span class="eqno">(53)<a class="headerlink" href="#equation-flowchart-24" title="Link to this equation"></a></span>\[\frac{\partial \rho_0}{\partial t} + w_0 \frac{\partial \rho_0}{\partial r} = - \rho_0 \frac{\partial w_0}{\partial r} - \frac{2 \rho_0 w_0}{r}.\]</div>
 </li>
 </ul>
 </section>
 <section id="enforce-hse">
-<h4>Enforce HSE<a class="headerlink" href="#enforce-hse" title="Permalink to this heading"></a></h4>
+<h4>Enforce HSE<a class="headerlink" href="#enforce-hse" title="Link to this heading"></a></h4>
 <p><span class="math notranslate nohighlight">\([p_0^{\inp},\rho_0^{\inp}] \rightarrow [p_0^{\outp}]\)</span> has replaced <strong>Advect Base Pressure</strong>
 from Paper III as the process by which we update the base state
 pressure. Rather than discretizing the evolution equation for
@@ -749,7 +749,7 @@ pressure. Rather than discretizing the evolution equation for
 and analytically equivalent. We first set
 <span class="math notranslate nohighlight">\(p_{0,j=0}^{\outp} = p_{0,j=0}^{\inp}\)</span> and then update <span class="math notranslate nohighlight">\(p_0^\outp\)</span> using:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-25">
-<span class="eqno">(54)<a class="headerlink" href="#equation-flowchart-25" title="Permalink to this equation"></a></span>\[p_{0,j+1}^{\outp} = p_{0,j}^{\outp} + \Delta r g_{j+\myhalf}\frac{\left(\rho_{0,j+1}^{\inp}+\rho_{0,j}^{\inp}\right)}{2},\]</div>
+<span class="eqno">(54)<a class="headerlink" href="#equation-flowchart-25" title="Link to this equation"></a></span>\[p_{0,j+1}^{\outp} = p_{0,j}^{\outp} + \Delta r g_{j+\myhalf}\frac{\left(\rho_{0,j+1}^{\inp}+\rho_{0,j}^{\inp}\right)}{2},\]</div>
 <p>where <span class="math notranslate nohighlight">\(g=g(\rho_0^\inp)\)</span>. As soon as <span class="math notranslate nohighlight">\(\rho_{0,j}^\inp &lt; \rho_{\rm cutoff}\)</span>, we set
 <span class="math notranslate nohighlight">\(p_{0,j+1}^\outp = p_{0,j}^\outp\)</span> for all remaining values of <span class="math notranslate nohighlight">\(j\)</span>.
 Then we compare <span class="math notranslate nohighlight">\(p_{0,j_{\rm max}}^\outp\)</span> with <span class="math notranslate nohighlight">\(p_{0,j_{\rm max}}^\inp\)</span> and offset
@@ -758,7 +758,7 @@ We are effectively using the location where the <span class="math notranslate no
 <span class="math notranslate nohighlight">\(\rho_{\rm cutoff}\)</span> as the starting point for integration.</p>
 </section>
 <section id="advect-base-enthalpy">
-<h4>Advect Base Enthalpy<a class="headerlink" href="#advect-base-enthalpy" title="Permalink to this heading"></a></h4>
+<h4>Advect Base Enthalpy<a class="headerlink" href="#advect-base-enthalpy" title="Link to this heading"></a></h4>
 <p><span class="math notranslate nohighlight">\([(\rho h)_0^\inp,w_0^\inp,\psi^\inp] \rightarrow [(\rho h)_0^\outp]\)</span>
 is the process by which we update the base state enthalpy through <span class="math notranslate nohighlight">\(\dt\)</span> in time.</p>
 <ul>
@@ -766,29 +766,29 @@ is the process by which we update the base state enthalpy through <span class="m
 <p>We discretize <a class="reference internal" href="#equation-eq-flow-enthalpy-base">Eq.28</a>, neglecting reaction source terms, to
 compute the new base state enthalpy,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-26">
-<span class="eqno">(55)<a class="headerlink" href="#equation-flowchart-26" title="Permalink to this equation"></a></span>\[(\rho h)_{0,j}^{\outp} = (\rho h)_{0,j}^{\inp} - \frac{\dt}{\Delta r} \left\{ \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j+\myhalf} - \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j-\myhalf} \right\} + \dt\psi_j^{\inp}.\]</div>
+<span class="eqno">(55)<a class="headerlink" href="#equation-flowchart-26" title="Link to this equation"></a></span>\[(\rho h)_{0,j}^{\outp} = (\rho h)_{0,j}^{\inp} - \frac{\dt}{\Delta r} \left\{ \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j+\myhalf} - \left[ (\rho h)_0^{\nph} w_0^{\inp}\right]_{j-\myhalf} \right\} + \dt\psi_j^{\inp}.\]</div>
 <p>We compute the time-centered edge states, <span class="math notranslate nohighlight">\((\rho h)_0^{\nph}\)</span>, by discretizing
 an expanded form of <a class="reference internal" href="#equation-eq-flow-enthalpy-base">Eq.28</a>:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-27">
-<span class="eqno">(56)<a class="headerlink" href="#equation-flowchart-27" title="Permalink to this equation"></a></span>\[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} + \psi.\]</div>
+<span class="eqno">(56)<a class="headerlink" href="#equation-flowchart-27" title="Link to this equation"></a></span>\[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} + \psi.\]</div>
 </li>
 <li><p>spherical:</p>
 <p>The base state enthalpy update now includes the area factors
 in the divergences:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-28">
-<span class="eqno">(57)<a class="headerlink" href="#equation-flowchart-28" title="Permalink to this equation"></a></span>\[\begin{split}\begin{aligned}
+<span class="eqno">(57)<a class="headerlink" href="#equation-flowchart-28" title="Link to this equation"></a></span>\[\begin{split}\begin{aligned}
 (\rho h)_{0,j}^{\outp} &amp;= (\rho h)_{0,j}^{\inp} \nonumber \\
 &amp; - \frac{1}{r_j^2} \frac{\dt}{\dr} \left \{ \left[ r^2 (\rho h)_0^{\nph} w_0^{\inp}\right]_{j+\myhalf} - \left[ r^2 (\rho h)_0^{\nph} w_0^{\inp}\right]_{j-\myhalf} \right\} +\dt\psi^{\inp,\nph}.\nonumber\\\end{aligned}\end{split}\]</div>
 <p>In order to compute the time-centered edge states, an additional geometric
 term is added to the forcing, due to the spherical discretization of
 <a class="reference internal" href="#equation-eq-flow-enthalpy-base">Eq.28</a>:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-29">
-<span class="eqno">(58)<a class="headerlink" href="#equation-flowchart-29" title="Permalink to this equation"></a></span>\[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} - \frac{2 (\rho h)_0 w_0}{r} + \psi.\]</div>
+<span class="eqno">(58)<a class="headerlink" href="#equation-flowchart-29" title="Link to this equation"></a></span>\[\frac{\partial (\rho h)_0}{\partial t} + w_0 \frac{\partial (\rho h)_0}{\partial r} = -(\rho h)_0 \frac{\partial w_0}{\partial r} - \frac{2 (\rho h)_0 w_0}{r} + \psi.\]</div>
 </li>
 </ul>
 </section>
 <section id="computing-w-0">
-<h4>Computing <span class="math notranslate nohighlight">\(w_0\)</span><a class="headerlink" href="#computing-w-0" title="Permalink to this heading"></a></h4>
+<h4>Computing <span class="math notranslate nohighlight">\(w_0\)</span><a class="headerlink" href="#computing-w-0" title="Link to this heading"></a></h4>
 <p>Here we describe the process by which we compute <span class="math notranslate nohighlight">\(w_0\)</span>. The arguments
 are different for planar and spherical geometries.</p>
 <ul>
@@ -799,7 +799,7 @@ geometries, and derived derived <a class="reference internal" href="#equation-eq
 alternate expression for eq:<cite>eq:w0 divergence</cite>. We discretize this
 as:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-30">
-<span class="eqno">(59)<a class="headerlink" href="#equation-flowchart-30" title="Permalink to this equation"></a></span>\[\frac{w_{0,j+\myhalf}^\outp-w_{0,j-\myhalf}^\outp}{\Delta r} = \left(\Sbar^{\inp} - \frac{1}{\gammabar^{\inp} p_0^{\inp}}\psi^{\inp}\right)_j,\]</div>
+<span class="eqno">(59)<a class="headerlink" href="#equation-flowchart-30" title="Link to this equation"></a></span>\[\frac{w_{0,j+\myhalf}^\outp-w_{0,j-\myhalf}^\outp}{\Delta r} = \left(\Sbar^{\inp} - \frac{1}{\gammabar^{\inp} p_0^{\inp}}\psi^{\inp}\right)_j,\]</div>
 <p>with <span class="math notranslate nohighlight">\(w_{0,-\myhalf}=0\)</span>.</p>
 </li>
 <li><p>spherical:</p>
@@ -807,20 +807,20 @@ as:</p>
 <p>We begin with <a class="reference internal" href="#equation-eq-w0-divergence">Eq.43</a> written in spherical
 coordinates:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-31">
-<span class="eqno">(60)<a class="headerlink" href="#equation-flowchart-31" title="Permalink to this equation"></a></span>\[\frac{1}{r^2}\frac{\partial}{\partial r} \left (r^2 \beta_0 w_0 \right ) = \beta_0 \left ( \Sbar - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right ).\]</div>
+<span class="eqno">(60)<a class="headerlink" href="#equation-flowchart-31" title="Link to this equation"></a></span>\[\frac{1}{r^2}\frac{\partial}{\partial r} \left (r^2 \beta_0 w_0 \right ) = \beta_0 \left ( \Sbar - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right ).\]</div>
 <p>We expand the spatial derivative and recall from Paper I that</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-32">
-<span class="eqno">(61)<a class="headerlink" href="#equation-flowchart-32" title="Permalink to this equation"></a></span>\[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} = \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r},\]</div>
+<span class="eqno">(61)<a class="headerlink" href="#equation-flowchart-32" title="Link to this equation"></a></span>\[\frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial r} = \frac{1}{\beta_0} \frac{\partial \beta_0}{\partial r},\]</div>
 <p>giving:</p>
 <div class="math notranslate nohighlight" id="equation-eq-psi-def">
-<span class="eqno">(62)<a class="headerlink" href="#equation-eq-psi-def" title="Permalink to this equation"></a></span>\[\frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 w_0 \right ) = \Sbar - \frac{1}{\gammabar p_0} \underbrace{\left( \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r} \right)}_{\psi} .\]</div>
+<span class="eqno">(62)<a class="headerlink" href="#equation-eq-psi-def" title="Link to this equation"></a></span>\[\frac{1}{r^2} \frac{\partial}{\partial r} \left (r^2 w_0 \right ) = \Sbar - \frac{1}{\gammabar p_0} \underbrace{\left( \frac{\partial p_0}{\partial t} + w_0 \frac{\partial p_0}{\partial r} \right)}_{\psi} .\]</div>
 <p>We solve this equation for <span class="math notranslate nohighlight">\(w_0\)</span> as described in Appendix B of the multilevel paper.</p>
 </li>
 </ul>
 </section>
 </section>
 <section id="volume-discrepancy-changes">
-<span id="sec-flow-singlestep"></span><h3>Volume Discrepancy Changes<a class="headerlink" href="#volume-discrepancy-changes" title="Permalink to this heading"></a></h3>
+<span id="sec-flow-singlestep"></span><h3>Volume Discrepancy Changes<a class="headerlink" href="#volume-discrepancy-changes" title="Link to this heading"></a></h3>
 <p>Chapter <a class="reference external" href="#ch:volume">[ch:volume]</a> describes the reasoning behind the volume discrepancy
 term—a forcing term added to the constraint equation to bring us back to
 the equation of state. This addition of this term (enabled with dpdt_factor= T) modifies our
@@ -829,11 +829,11 @@ equation set in the following way:</p>
 <li><p>In <strong>Step 2B</strong>, to compute <span class="math notranslate nohighlight">\(w_0\)</span>, we need to account for the volume discrepancy
 term by first defining <span class="math notranslate nohighlight">\(p_{\rm EOS}^n = \overline{p(\rho,h,X_k)^n}\)</span>, and then using:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-33">
-<span class="eqno">(63)<a class="headerlink" href="#equation-flowchart-33" title="Permalink to this equation"></a></span>\[\frac{\partial w_0^{\nph,\star}}{\partial r} = \overline{S^{\nph,\star\star}} - \frac{1}{\overline{\Gamma_1^n}p_0^n}\psi^{\nmh} - \underbrace{\frac{f}{\overline{\Gamma_1^n}p_0^n}\left(\frac{p_0^n-\overline{p_{\rm EOS}^n}}{\Delta t}\right)}_{\delta\chi_{w_0}}.\]</div>
+<span class="eqno">(63)<a class="headerlink" href="#equation-flowchart-33" title="Link to this equation"></a></span>\[\frac{\partial w_0^{\nph,\star}}{\partial r} = \overline{S^{\nph,\star\star}} - \frac{1}{\overline{\Gamma_1^n}p_0^n}\psi^{\nmh} - \underbrace{\frac{f}{\overline{\Gamma_1^n}p_0^n}\left(\frac{p_0^n-\overline{p_{\rm EOS}^n}}{\Delta t}\right)}_{\delta\chi_{w_0}}.\]</div>
 </li>
 <li><p>In <strong>Step 3</strong>, the MAC projection should account for the volume discrepancy term:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-34">
-<span class="eqno">(64)<a class="headerlink" href="#equation-flowchart-34" title="Permalink to this equation"></a></span>\[\nabla \cdot \left(\beta_0^n \uadvone\right) =
+<span class="eqno">(64)<a class="headerlink" href="#equation-flowchart-34" title="Link to this equation"></a></span>\[\nabla \cdot \left(\beta_0^n \uadvone\right) =
 \beta_0^n \left[ \left(S^{\nph,\star\star} - \overline{S^{\nph,\star\star}}\right)
 + \underbrace{\frac{f}{\gammabar^n p_0^n}
 \left(\frac{p_{\rm EOS}^n - \overline{p_{\rm EOS}^n}}{\Delta t^n}\right)}_{\delta\chi}\right].\]</div>
@@ -843,46 +843,46 @@ term by first defining <span class="math notranslate nohighlight">\(p_{\rm EOS}^
 <span class="math notranslate nohighlight">\(\overline{\Gamma_1^{\nph,\star}} = (\overline{\Gamma_1^{n}}+\overline{\Gamma_1^{n+1,\star}})/2\)</span>,
 and <span class="math notranslate nohighlight">\(p^{\nph,\star} = (p^{n}+p^{n+1,\star})/2\)</span>, and then using:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-35">
-<span class="eqno">(65)<a class="headerlink" href="#equation-flowchart-35" title="Permalink to this equation"></a></span>\[\frac{\partial w_0^{\nph}}{\partial r} = \overline{S^{\nph,\star}} - \frac{1}{\overline{\Gamma_1^{\nph,\star}}p_0^{\nph,\star}}\psi^{\nph,\star} - \frac{f}{\overline{\Gamma_1^{n+1,\star}}p_0^{n+1,\star}}\left(\frac{p_0^{n+1,\star}-\overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t}\right) - \delta\chi_{w_0}\]</div>
+<span class="eqno">(65)<a class="headerlink" href="#equation-flowchart-35" title="Link to this equation"></a></span>\[\frac{\partial w_0^{\nph}}{\partial r} = \overline{S^{\nph,\star}} - \frac{1}{\overline{\Gamma_1^{\nph,\star}}p_0^{\nph,\star}}\psi^{\nph,\star} - \frac{f}{\overline{\Gamma_1^{n+1,\star}}p_0^{n+1,\star}}\left(\frac{p_0^{n+1,\star}-\overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t}\right) - \delta\chi_{w_0}\]</div>
 </li>
 <li><p>In <strong>Step 7</strong>, the MAC projection should account for the volume discrepancy term:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-36">
-<span class="eqno">(66)<a class="headerlink" href="#equation-flowchart-36" title="Permalink to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) = \beta_0^{\nph,\star}\left[\left(S^{\nph,\star} - \overline{S^{\nph,\star}}\right) + \frac{f}{\overline{\Gamma_1^{n+1,\star}} p_0^{n+1,\star}} \left(\frac{p_{\rm EOS}^{n+1,\star} - \overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t^n}\right) + \delta\chi\right],\]</div>
+<span class="eqno">(66)<a class="headerlink" href="#equation-flowchart-36" title="Link to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) = \beta_0^{\nph,\star}\left[\left(S^{\nph,\star} - \overline{S^{\nph,\star}}\right) + \frac{f}{\overline{\Gamma_1^{n+1,\star}} p_0^{n+1,\star}} \left(\frac{p_{\rm EOS}^{n+1,\star} - \overline{p_{\rm EOS}^{n+1,\star}}}{\Delta t^n}\right) + \delta\chi\right],\]</div>
 <p>where <span class="math notranslate nohighlight">\(p(\rho,h,X_k)^{\nph,\star} = \left[p(\rho,h,X_k)^n +p(\rho,h,X_k)^{n+1,\star}\right]/2\)</span>.</p>
 </li>
 <li><p>In <strong>Step 11</strong>, the approximate projection should account for the volume
 discrepancy term:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-37">
-<span class="eqno">(67)<a class="headerlink" href="#equation-flowchart-37" title="Permalink to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)  = \beta_0^{\nph}\left\{  \left(S^{n+1} - \overline{S^{n+1}} \right)
+<span class="eqno">(67)<a class="headerlink" href="#equation-flowchart-37" title="Link to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)  = \beta_0^{\nph}\left\{  \left(S^{n+1} - \overline{S^{n+1}} \right)
 + \frac{f}{\overline{\Gamma_1^{n+1}} p_0^{n+1}}
 \left[\frac{p(\rho,h,X_k)^{n+1} - \overline{p(\rho,h,X_k)^{n+1}}}{\Delta t^n}\right]\right\}.\]</div>
 </li>
 </ul>
 </section>
 <section id="gamma-1-variation-changes">
-<span id="sec-flow-gamma1vary"></span><h3><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#gamma-1-variation-changes" title="Permalink to this heading"></a></h3>
+<span id="sec-flow-gamma1vary"></span><h3><span class="math notranslate nohighlight">\(\Gamma_1\)</span> Variation Changes<a class="headerlink" href="#gamma-1-variation-changes" title="Link to this heading"></a></h3>
 <p>The constraint we derive from requiring the pressure to be close to
 the background hydrostatic pressure takes the form:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-38">
-<span class="eqno">(68)<a class="headerlink" href="#equation-flowchart-38" title="Permalink to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{\Gamma_1 p_0} \frac{Dp_0}{Dt} = S  .\]</div>
+<span class="eqno">(68)<a class="headerlink" href="#equation-flowchart-38" title="Link to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{\Gamma_1 p_0} \frac{Dp_0}{Dt} = S  .\]</div>
 <p>The default MAESTROeX algorithm replaces <span class="math notranslate nohighlight">\(\Gamma_1\)</span> with <span class="math notranslate nohighlight">\(\gammabar\)</span>,
 allowing us to write this as a divergence constraint. In paper III,
 we explored the effects of localized variations in <span class="math notranslate nohighlight">\(\Gamma_1\)</span> by
 writing <span class="math notranslate nohighlight">\(\Gamma_1 = \gammabar + \delta \Gamma_1\)</span>. This gives us:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-39">
-<span class="eqno">(69)<a class="headerlink" href="#equation-flowchart-39" title="Permalink to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{(\gammabar + \delta \Gamma_1) \; p_0}
+<span class="eqno">(69)<a class="headerlink" href="#equation-flowchart-39" title="Link to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{(\gammabar + \delta \Gamma_1) \; p_0}
   \Ub \cdotb \nablab p_0 = S - \frac{1}{(\gammabar + \delta \Gamma_1) \; p_0}
   \frac{\partial p_0}{\partial t}  .\]</div>
 <p>Assuming that <span class="math notranslate nohighlight">\(\delta \Gamma_1 \ll \gammabar\)</span>, we then
 have</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-40">
-<span class="eqno">(70)<a class="headerlink" href="#equation-flowchart-40" title="Permalink to this equation"></a></span>\[\begin{split}\nablab \cdotb \Ub + \frac{1}{\gammabar p_0} \Ub \cdotb \nablab p_0
+<span class="eqno">(70)<a class="headerlink" href="#equation-flowchart-40" title="Link to this equation"></a></span>\[\begin{split}\nablab \cdotb \Ub + \frac{1}{\gammabar p_0} \Ub \cdotb \nablab p_0
  \left [ 1 - \frac{\delta\Gamma_1}{\gammabar} + \frac{(\delta\Gamma_1)^2}{\gammabar^2} \right ]
 = S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t}
  \left [ 1 - \frac{\delta\Gamma_1}{\gammabar} + \frac{(\delta\Gamma_1)^2}{\gammabar^2} \right ] \\\end{split}\]</div>
 <p>Grouping by order of the correction, we have</p>
 <div class="math notranslate nohighlight" id="equation-eq-gammafull">
-<span class="eqno">(71)<a class="headerlink" href="#equation-eq-gammafull" title="Permalink to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{\gammabar p_0} \Ub \cdotb \nablab p_0
+<span class="eqno">(71)<a class="headerlink" href="#equation-eq-gammafull" title="Link to this equation"></a></span>\[\nablab \cdotb \Ub + \frac{1}{\gammabar p_0} \Ub \cdotb \nablab p_0
 = S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} +
 \underbrace{\frac{\delta \Gamma_1}{\gammabar^2 p_0}
             \left [\frac{\partial p_0}{\partial t} + \Ub \cdotb \nablab p_0\right ]}_{\mbox{first order corrections}}
@@ -890,29 +890,29 @@ have</p>
   \underbrace{\frac{(\delta\Gamma_1)^2}{\gammabar^3 p_0}
             \left [ \frac{\partial p_0}{\partial t} + \Ub \cdotb \nablab p_0 \right ]}_{\mbox{second order corrections}}\]</div>
 <section id="keeping-to-first-order-in-delta-gamma-1">
-<h4>Keeping to First Order in <span class="math notranslate nohighlight">\(\delta\Gamma_1\)</span><a class="headerlink" href="#keeping-to-first-order-in-delta-gamma-1" title="Permalink to this heading"></a></h4>
+<h4>Keeping to First Order in <span class="math notranslate nohighlight">\(\delta\Gamma_1\)</span><a class="headerlink" href="#keeping-to-first-order-in-delta-gamma-1" title="Link to this heading"></a></h4>
 <p>The base state evolution equation is the average of <a class="reference internal" href="#equation-eq-gammafull">Eq.71</a> over a layer</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-41">
-<span class="eqno">(72)<a class="headerlink" href="#equation-flowchart-41" title="Permalink to this equation"></a></span>\[\nablab \cdot w_0 \er + \frac{1}{\gammabar p_0} w_0 \er \cdotb \nablab p_0 =
+<span class="eqno">(72)<a class="headerlink" href="#equation-flowchart-41" title="Link to this equation"></a></span>\[\nablab \cdot w_0 \er + \frac{1}{\gammabar p_0} w_0 \er \cdotb \nablab p_0 =
 \Sbar - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} + \overline{
   \left ( \frac{\delta \Gamma_1}{\gammabar^2 p_0} \Ubt \cdotb \nablab p_0
   \right ) }  .\]</div>
 <p>where we see that the <span class="math notranslate nohighlight">\([\delta \Gamma_1/(\Gamma_1^2 p_0)] \partial p_0/\partial t\)</span> terms averages to zero, since the average of <span class="math notranslate nohighlight">\(\delta\Gamma_1\)</span> term is zero.
 Subtracting this from <a class="reference internal" href="#equation-eq-gammafull">Eq.71</a>, we have</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-42">
-<span class="eqno">(73)<a class="headerlink" href="#equation-flowchart-42" title="Permalink to this equation"></a></span>\[\nablab \cdotb \Ubt + \frac{1}{\gammabar p_0} \Ubt \cdotb \nablab p_0 = S -
+<span class="eqno">(73)<a class="headerlink" href="#equation-flowchart-42" title="Link to this equation"></a></span>\[\nablab \cdotb \Ubt + \frac{1}{\gammabar p_0} \Ubt \cdotb \nablab p_0 = S -
 \Sbar + \frac{\delta \Gamma_1}{\gammabar^2 p_0} \left (\psi + \Ubt \cdotb
 \nablab p_0 \right ) - \overline{ \left ( \frac{\delta \Gamma_1}{\gammabar^2 p_0} \Ubt
 \cdotb \nablab p_0 \right ) }  .\]</div>
 <p>These can be written more compactly as:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-43">
-<span class="eqno">(74)<a class="headerlink" href="#equation-flowchart-43" title="Permalink to this equation"></a></span>\[\frac{\partial w_0}{\partial r} = \Sbar -\frac{1}{\gammabar p_0}\psi +
+<span class="eqno">(74)<a class="headerlink" href="#equation-flowchart-43" title="Link to this equation"></a></span>\[\frac{\partial w_0}{\partial r} = \Sbar -\frac{1}{\gammabar p_0}\psi +
 \overline{ \left ( \frac{\delta \Gamma_1}{\gammabar^2 p_0} \Ubt \cdotb \nablab
   p_0 \right ) }  , \label{eq:base_w0_with_dgamma1}\]</div>
 <p>for plane-parallel geometries (analogous to
 <a class="reference internal" href="#equation-eq-flow-dw0dr-planar">Eq.34</a>, and</p>
 <div class="math notranslate nohighlight" id="equation-eq-constraint-with-delta-gamma">
-<span class="eqno">(75)<a class="headerlink" href="#equation-eq-constraint-with-delta-gamma" title="Permalink to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ubt) = \beta_0 \left [ S - \Sbar + \frac{\delta
+<span class="eqno">(75)<a class="headerlink" href="#equation-eq-constraint-with-delta-gamma" title="Link to this equation"></a></span>\[\nablab \cdotb (\beta_0 \Ubt) = \beta_0 \left [ S - \Sbar + \frac{\delta
     \Gamma_1}{\gammabar^2 p_0} \psi + \frac{\delta \Gamma_1}{\gammabar^2 p_0}
   \Ubt \cdotb \nablab p_0 - \overline{ \left ( \frac{\delta
       \Gamma_1}{\gammabar^2 p_0} \Ubt \cdotb \nablab p_0 \right ) } ~ \right ]\]</div>
@@ -930,24 +930,24 @@ all the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> te
 <span class="math notranslate nohighlight">\(S^{\nph,\star}\)</span> and the base state velocity, <span class="math notranslate nohighlight">\(w_0^\nph\)</span>. Now we can
 incorporate the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> effect. First we construct:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-44">
-<span class="eqno">(76)<a class="headerlink" href="#equation-flowchart-44" title="Permalink to this equation"></a></span>\[\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0 \approx
+<span class="eqno">(76)<a class="headerlink" href="#equation-flowchart-44" title="Link to this equation"></a></span>\[\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0 \approx
    \frac{\Gamma_1^{n+1,\star} - \overline{\Gamma_1^{n+1,\star}}}
          {{\overline{\Gamma_1^{n+1,\star}}}^2} \frac{1}{p_0^n} \Ubt^n \cdotb \nablab p_0^n\]</div>
 <p>Then we call <strong>average</strong> to construct the lateral average of this</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-45">
-<span class="eqno">(77)<a class="headerlink" href="#equation-flowchart-45" title="Permalink to this equation"></a></span>\[\overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0} =
+<span class="eqno">(77)<a class="headerlink" href="#equation-flowchart-45" title="Link to this equation"></a></span>\[\overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0} =
    \mathbf{Avg} \left (\frac{\Gamma_1^{n+1,\star} - \overline{\Gamma_1^{n+1,\star}}}
          {{\overline{\Gamma_1^{n+1,\star}}}^2} \frac{1}{p_0^n} \Ubt^n \cdotb \nablab p_0^n \right )\]</div>
 <p>Since the average of this is needed in advancing <span class="math notranslate nohighlight">\(w_0\)</span>, we modify <span class="math notranslate nohighlight">\(\overline{S}\)</span>
 to include this average:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-46">
-<span class="eqno">(78)<a class="headerlink" href="#equation-flowchart-46" title="Permalink to this equation"></a></span>\[\overline{S^{\nph,\star}} \leftarrow \overline{S^{\nph,\star}} +
+<span class="eqno">(78)<a class="headerlink" href="#equation-flowchart-46" title="Link to this equation"></a></span>\[\overline{S^{\nph,\star}} \leftarrow \overline{S^{\nph,\star}} +
    \overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0}\]</div>
 </li>
 <li><p>In <strong>Step 7</strong>, we now include the <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> term in the righthand
 side for the constraint by solving:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-47">
-<span class="eqno">(79)<a class="headerlink" href="#equation-flowchart-47" title="Permalink to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) =
+<span class="eqno">(79)<a class="headerlink" href="#equation-flowchart-47" title="Link to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph,\star} \uadvtwo\right) =
 \beta_0^{\nph,\star}\left( S^{\nph,\star} - \overline{S^{\nph,\star}} +
    \frac{\Gamma_1^{n+1,\star} - \overline{\Gamma_1^{n+1,\star}}}
          {{\overline{\Gamma_1^{n+1,\star}}}^2} \frac{1}{p_0^n}
@@ -961,23 +961,23 @@ in <a class="reference internal" href="#equation-eq-constraint-with-delta-gamma"
 but with the time-centerings of some of the quantities changed.
 First we construct:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-48">
-<span class="eqno">(80)<a class="headerlink" href="#equation-flowchart-48" title="Permalink to this equation"></a></span>\[\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0 \approx
+<span class="eqno">(80)<a class="headerlink" href="#equation-flowchart-48" title="Link to this equation"></a></span>\[\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0 \approx
    \frac{\Gamma_1^{n+1} - \overline{\Gamma_1^{n+1}}}
          {{\overline{\Gamma_1^{n+1}}}^2} \frac{1}{p_0^{n+1}} \Ubt^n \cdotb \nablab p_0^{n+1}\]</div>
 <p>Then we call <strong>average</strong> to construct the lateral average of this</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-49">
-<span class="eqno">(81)<a class="headerlink" href="#equation-flowchart-49" title="Permalink to this equation"></a></span>\[\overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0} =
+<span class="eqno">(81)<a class="headerlink" href="#equation-flowchart-49" title="Link to this equation"></a></span>\[\overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0} =
    \mathbf{Avg} \left (\frac{\Gamma_1^{n+1} - \overline{\Gamma_1^{n+1}}}
          {{\overline{\Gamma_1^{n+1}}}^2} \frac{1}{p_0^{n+1}} \Ubt^n \cdotb \nablab p_0^{n+1} \right )\]</div>
 <p>Again we modify <span class="math notranslate nohighlight">\(\overline{S}\)</span> to include this average:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-50">
-<span class="eqno">(82)<a class="headerlink" href="#equation-flowchart-50" title="Permalink to this equation"></a></span>\[\overline{S^{n+1}} \leftarrow \overline{S^{n+1}} +
+<span class="eqno">(82)<a class="headerlink" href="#equation-flowchart-50" title="Link to this equation"></a></span>\[\overline{S^{n+1}} \leftarrow \overline{S^{n+1}} +
    \overline{\frac{\delta \Gamma_1}{\Gamma_1^2 p_0} \Ubt \cdotb \nablab p_0}\]</div>
 </li>
 <li><p>In <strong>Step 11</strong>, we modify the source of the constraint to include the
 <span class="math notranslate nohighlight">\(\delta \Gamma_1\)</span> information. In particular, we solve:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-51">
-<span class="eqno">(83)<a class="headerlink" href="#equation-flowchart-51" title="Permalink to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)
+<span class="eqno">(83)<a class="headerlink" href="#equation-flowchart-51" title="Link to this equation"></a></span>\[\nabla \cdot \left(\beta_0^{\nph} \Ubt^{n+1} \right)
 = \beta_0^{\nph} \left(S^{n+1} - \overline{S^{n+1}} +
    \frac{\Gamma_1^{n+1} - \overline{\Gamma_1^{n+1}}}
          {{\overline{\Gamma_1^{n+1}}}^2} \frac{1}{p_0^{n+1}}
@@ -988,7 +988,7 @@ First we construct:</p>
 </section>
 </section>
 <section id="thermal-diffusion-changes">
-<span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Permalink to this heading"></a></h3>
+<span id="sec-flow-diffusion"></span><h3>Thermal Diffusion Changes<a class="headerlink" href="#thermal-diffusion-changes" title="Link to this heading"></a></h3>
 <p>Thermal diffusion was introduced in the XRB <span id="id10">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>. This
 introduces a new term to <span class="math notranslate nohighlight">\(S\)</span> as well as the enthalpy equation.
 Treating the enthalpy equation now requires a parabolic solve. We describe
@@ -999,27 +999,27 @@ We recompute <span class="math notranslate nohighlight">\((\rho h)^{(2),\star}\)
 with the enthalpy equation, but consider only the
 diffusion terms,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-52">
-<span class="eqno">(84)<a class="headerlink" href="#equation-flowchart-52" title="Permalink to this equation"></a></span>\[\frac{\partial (\rho h)}{\partial t} = \nabla\cdot\kth\nabla T.\]</div>
+<span class="eqno">(84)<a class="headerlink" href="#equation-flowchart-52" title="Link to this equation"></a></span>\[\frac{\partial (\rho h)}{\partial t} = \nabla\cdot\kth\nabla T.\]</div>
 <p>We can recast this as an enthalpy-diffusion equation by applying the
 chain-rule to <span class="math notranslate nohighlight">\(h(p_0,T,X_k)\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-53">
-<span class="eqno">(85)<a class="headerlink" href="#equation-flowchart-53" title="Permalink to this equation"></a></span>\[\nabla h = h_p \nabla p_0 + c_p \nabla T + \sum_k \xi_k \nabla X_k  ,\]</div>
+<span class="eqno">(85)<a class="headerlink" href="#equation-flowchart-53" title="Link to this equation"></a></span>\[\nabla h = h_p \nabla p_0 + c_p \nabla T + \sum_k \xi_k \nabla X_k  ,\]</div>
 <p>giving</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-54">
-<span class="eqno">(86)<a class="headerlink" href="#equation-flowchart-54" title="Permalink to this equation"></a></span>\[\frac{\partial (\rho h)}{\partial t}  =
+<span class="eqno">(86)<a class="headerlink" href="#equation-flowchart-54" title="Link to this equation"></a></span>\[\frac{\partial (\rho h)}{\partial t}  =
  \nabla\cdot \frac{\kth}{c_p}\nabla h -
  \sum_k \nabla\cdot \frac{\xi_k \kth}{c_p}\nabla X_k -
  \nabla\cdot \frac{h_p \kth}{c_p}\nabla p_0.\]</div>
 <p>Compute <span class="math notranslate nohighlight">\(\kth^{(1)}, c_p^{(1)}\)</span>, and <span class="math notranslate nohighlight">\(\xi_k^{(1)}\)</span> from <span class="math notranslate nohighlight">\(\rho^{(1)}, T^{(1)}\)</span>, and <span class="math notranslate nohighlight">\(X_k^{(1)}\)</span> as inputs to the equation of state. The update is given by</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-55">
-<span class="eqno">(87)<a class="headerlink" href="#equation-flowchart-55" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(87)<a class="headerlink" href="#equation-flowchart-55" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
 (\rho h)^{(2),\star} &amp;= (\rho h)^{(1a),\star} + \frac{\dt}{2}\nabla\cdot\left(\frac{\kth^{(1)}}{c_p^{(1)}}\nabla h^{(2),\star} + \frac{\kth^{(1)}}{c_p^{(1)}}\nabla h^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\sum_k\nabla\cdot\left(\frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(2),\star} + \frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\nabla\cdot\left(\frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n+1,\star} + \frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n}\right),
 \end{align}\end{split}\]</div>
 <p>which is numerically implemented as a diffusion equation for <span class="math notranslate nohighlight">\(h^{(2),\star}\)</span>,</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-56">
-<span class="eqno">(88)<a class="headerlink" href="#equation-flowchart-56" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(88)<a class="headerlink" href="#equation-flowchart-56" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
 \left(\rho^{(2),\star} - \frac{\dt}{2}\nabla\cdot\frac{\kth^{(1)}}{c_p^{(1)}}\nabla\right)h^{(2),\star} &amp;= (\rho h)^{(1a),\star} + \frac{\dt}{2}\nabla\cdot\frac{\kth^{(1)}}{c_p^{(1)}}\nabla h^{(1)}\nonumber\\
 &amp;- \frac{\dt}{2}\sum_k\nabla\cdot\left(\frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(2),\star} + \frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\nabla\cdot\left(\frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n+1,\star} + \frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n}\right),
@@ -1030,14 +1030,14 @@ account for thermal diffusion. Compute <span class="math notranslate nohighlight
 <span class="math notranslate nohighlight">\(\xi_k^{(2),\star}\)</span>, from <span class="math notranslate nohighlight">\(\rho^{(2),\star}, T^{(2),\star}\)</span>, and <span class="math notranslate nohighlight">\(X_k^{(2),\star}\)</span> as inputs to
 the equation of state. The update is given by</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-57">
-<span class="eqno">(89)<a class="headerlink" href="#equation-flowchart-57" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(89)<a class="headerlink" href="#equation-flowchart-57" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
 (\rho h)^{(2)} &amp;= (\rho h)^{(1a)} + \frac{\dt}{2}\nabla\cdot\left(\frac{\kth^{(2),\star}}{c_p^{(2),\star}}\nabla h^{(2)} + \frac{\kth^{(1)}}{c_p^{(1)}}\nabla h^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\sum_k\nabla\cdot\left(\frac{\xi_k^{(2),\star}\kth^{(2),\star}}{c_p^{(2),\star}}\nabla X_k^{(2)} + \frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\nabla\cdot\left(\frac{h_p^{(2),\star}\kth^{(2),\star}}{c_p^{(2),\star}}\nabla p_0^{n+1} + \frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n}\right),
 \end{align}\end{split}\]</div>
 <p>which is numerically implemented as a diffusion equation for <span class="math notranslate nohighlight">\(h^{(2)}\)</span>.</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-58">
-<span class="eqno">(90)<a class="headerlink" href="#equation-flowchart-58" title="Permalink to this equation"></a></span>\[\begin{split}\begin{align}
+<span class="eqno">(90)<a class="headerlink" href="#equation-flowchart-58" title="Link to this equation"></a></span>\[\begin{split}\begin{align}
 \left(\rho^{(2)} - \frac{\dt}{2}\nabla\cdot\frac{\kth^{(2),\star}}{c_p^{(2),\star}}\nabla\right)h^{(2)} &amp;= (\rho h)^{(1a)} + \frac{\dt}{2}\nabla\cdot\frac{\kth^{(1)}}{c_p^{(1)}}\nabla h^{(1)}\nonumber\\
 &amp;- \frac{\dt}{2}\sum_k\nabla\cdot\left(\frac{\xi_k^{(2),\star}\kth^{(2),\star}}{c_p^{(2),\star}}\nabla X_k^{(2)} + \frac{\xi_k^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla X_k^{(1)}\right)\nonumber\\
 &amp;- \frac{\dt}{2}\nabla\cdot\left(\frac{h_p^{(2),\star}\kth^{(2),\star}}{c_p^{(2),\star}}\nabla p_0^{n+1} + \frac{h_p^{(1)}\kth^{(1)}}{c_p^{(1)}}\nabla p_0^{n}\right),
@@ -1045,7 +1045,7 @@ the equation of state. The update is given by</p>
 </section>
 </section>
 <section id="initialization">
-<span id="sec-initialization"></span><h2>Initialization<a class="headerlink" href="#initialization" title="Permalink to this heading"></a></h2>
+<span id="sec-initialization"></span><h2>Initialization<a class="headerlink" href="#initialization" title="Link to this heading"></a></h2>
 <p>We start each calculation with user-specified initial values for
 <span class="math notranslate nohighlight">\(\rho\)</span>, <span class="math notranslate nohighlight">\(X_k\)</span> and <span class="math notranslate nohighlight">\(T,\)</span> as well as an initial background state. In
 order for the low Mach number assumption to hold, the initial data
@@ -1084,7 +1084,7 @@ need an estimate of the velocity
 field in order to derive the time step that will be used as a time scale.
 The elliptic equation we solve is</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-59">
-<span class="eqno">(91)<a class="headerlink" href="#equation-flowchart-59" title="Permalink to this equation"></a></span>\[\nabla \cdot \beta_0^0 \nabla \phi = \underbrace{\beta_0^0(S - \Sbar)}_\mathrm{0~ except~ for~ diffusion} - \nabla \cdot (\beta_0^0 \Ub^{\initp})\]</div>
+<span class="eqno">(91)<a class="headerlink" href="#equation-flowchart-59" title="Link to this equation"></a></span>\[\nabla \cdot \beta_0^0 \nabla \phi = \underbrace{\beta_0^0(S - \Sbar)}_\mathrm{0~ except~ for~ diffusion} - \nabla \cdot (\beta_0^0 \Ub^{\initp})\]</div>
 <p>This <span class="math notranslate nohighlight">\(\phi\)</span> is then used to correct the velocity field to obtain <span class="math notranslate nohighlight">\(\Ub^{0,0}\)</span>.
 If do_initial_projection = F, set <span class="math notranslate nohighlight">\(\Ub^{0,0} = \Ub^{\initp}\)</span>.</p>
 </li>
@@ -1108,7 +1108,7 @@ using <span class="math notranslate nohighlight">\((\rho \omegadot_k)^{0,\nu}\)<
 This yields <span class="math notranslate nohighlight">\(\Ub^{0,\nu}.\)</span> In this projection, again the density is
 set to 1, and the elliptic equation we solve is:</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-60">
-<span class="eqno">(92)<a class="headerlink" href="#equation-flowchart-60" title="Permalink to this equation"></a></span>\[\nabla \cdot \beta_0^0 \nabla \phi = \beta_0 (S - \Sbar)- \nabla \cdot (\beta_0^0 \Ub^{0,\nu-1})\]</div>
+<span class="eqno">(92)<a class="headerlink" href="#equation-flowchart-60" title="Link to this equation"></a></span>\[\nabla \cdot \beta_0^0 \nabla \phi = \beta_0 (S - \Sbar)- \nabla \cdot (\beta_0^0 \Ub^{0,\nu-1})\]</div>
 </li>
 </ol>
 <p><strong>End do.</strong></p>
@@ -1129,7 +1129,7 @@ approximation for the lagged pressure:</p>
 The only other difference in the time advancement is that in <strong>Step 11</strong>
 we define <span class="math notranslate nohighlight">\({\bf V} = (\Ubt^{1,\star} - \Ubt^0)\)</span> and solve</p>
 <div class="math notranslate nohighlight" id="equation-flowchart-61">
-<span class="eqno">(93)<a class="headerlink" href="#equation-flowchart-61" title="Permalink to this equation"></a></span>\[L_\beta^\rho \phi = D \left ( \beta_0^{\myhalf} {\bf V} \right) - \beta_0^{\myhalf} \left[ \left(S^{1}-\overline{S^{1}}\right) - \left(S^{0}-\overline{S^{0}}\right) \right]  .\]</div>
+<span class="eqno">(93)<a class="headerlink" href="#equation-flowchart-61" title="Link to this equation"></a></span>\[L_\beta^\rho \phi = D \left ( \beta_0^{\myhalf} {\bf V} \right) - \beta_0^{\myhalf} \left[ \left(S^{1}-\overline{S^{1}}\right) - \left(S^{0}-\overline{S^{0}}\right) \right]  .\]</div>
 <p>(The motivation for this form of the projection in the initial pressure iterations
 is discussed in <span id="id11">[<a class="reference internal" href="zreferences.html#id19" title="A. S. Almgren, J. B. Bell, and W. Y. Crutchfield. Approximate projection methods: part I. Inviscid analysis. SIAM J. Sci. Comput., 22(4):1139–59, 2000.">ABC00</a>]</span>.)
 We discard the new velocity resulting from this, but keep the new
@@ -1149,9 +1149,9 @@ and <span class="math notranslate nohighlight">\(\psi^{-\myhalf} = \psi^{\myhalf
 <p>The tolerances for these elliptic solves are described in § <a class="reference internal" href="mg.html#sec-mg"><span class="std std-ref">Multigrid</span></a>.</p>
 </section>
 <section id="changes-from-earlier-implementations">
-<h2>Changes from Earlier Implementations<a class="headerlink" href="#changes-from-earlier-implementations" title="Permalink to this heading"></a></h2>
+<h2>Changes from Earlier Implementations<a class="headerlink" href="#changes-from-earlier-implementations" title="Link to this heading"></a></h2>
 <section id="changes-between-paper-3-and-paper-4">
-<h3>Changes Between Paper 3 and Paper 4<a class="headerlink" href="#changes-between-paper-3-and-paper-4" title="Permalink to this heading"></a></h3>
+<h3>Changes Between Paper 3 and Paper 4<a class="headerlink" href="#changes-between-paper-3-and-paper-4" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>We defined the mapping of data between a 1D radial array and the 3D Cartesian
 grid for spherical problems (which we improve upon in the multilevel paper).</p></li>
@@ -1176,17 +1176,17 @@ compute <span class="math notranslate nohighlight">\(h\)</span> with the EOS usi
 </ol>
 </section>
 <section id="changes-between-paper-4-and-the-multilevel-paper">
-<h3>Changes Between Paper 4 and the Multilevel Paper<a class="headerlink" href="#changes-between-paper-4-and-the-multilevel-paper" title="Permalink to this heading"></a></h3>
+<h3>Changes Between Paper 4 and the Multilevel Paper<a class="headerlink" href="#changes-between-paper-4-and-the-multilevel-paper" title="Link to this heading"></a></h3>
 <p>See the multilevel paper for the latest.</p>
 </section>
 <section id="changes-between-the-multilevel-paper-and-paper-5">
-<h3>Changes Between the Multilevel Paper and Paper 5<a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5" title="Permalink to this heading"></a></h3>
+<h3>Changes Between the Multilevel Paper and Paper 5<a class="headerlink" href="#changes-between-the-multilevel-paper-and-paper-5" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>Added rotation.</p></li>
 </ol>
 </section>
 <section id="changes-between-paper-5-and-the-xrb-paper">
-<h3>Changes Between Paper 5 and the XRB Paper<a class="headerlink" href="#changes-between-paper-5-and-the-xrb-paper" title="Permalink to this heading"></a></h3>
+<h3>Changes Between Paper 5 and the XRB Paper<a class="headerlink" href="#changes-between-paper-5-and-the-xrb-paper" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>We have added thermal diffusion, controlled by <code class="docutils literal notranslate"><span class="pre">use_thermal_diffusion</span></code>,
 <code class="docutils literal notranslate"><span class="pre">temp_diffusion_formulation</span></code>, and <code class="docutils literal notranslate"><span class="pre">thermal_diffusion_type</span></code>.</p></li>
@@ -1197,7 +1197,7 @@ to prevent large, unphysical velocities from appearing near the edge of the star
 </ol>
 </section>
 <section id="changes-since-the-xrb-paper">
-<h3>Changes Since the XRB Paper<a class="headerlink" href="#changes-since-the-xrb-paper" title="Permalink to this heading"></a></h3>
+<h3>Changes Since the XRB Paper<a class="headerlink" href="#changes-since-the-xrb-paper" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>We switched to the new form of the momentum equation to
 <a class="reference internal" href="#equation-eq-flow-newmomentum">Eq.39</a> to conserve the low-Mach number form of
@@ -1208,7 +1208,7 @@ agreement between the two temperatures.</p></li>
 </section>
 </section>
 <section id="future-considerations">
-<h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Permalink to this heading"></a></h2>
+<h2>Future Considerations<a class="headerlink" href="#future-considerations" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>We are still exploring the effects of <code class="docutils literal notranslate"><span class="pre">use_tfromp</span> <span class="pre">=</span> <span class="pre">F</span></code> for spherical
 problems. We would eventually like to run in this mode, but <span class="math notranslate nohighlight">\(T=T(\rho,X_k,p_0)\)</span>
@@ -1219,7 +1219,7 @@ been successful.</p></li>
 </section>
 </section>
 <section id="numerical-methodology">
-<span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Permalink to this heading"></a></h1>
+<span id="ch-methodology"></span><h1>Numerical Methodology<a class="headerlink" href="#numerical-methodology" title="Link to this heading"></a></h1>
 <p>We give an overview of the original MAESTRO algorithm <span id="id12">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>,
 as well as the recently introduced new temporal integration
 scheme <span id="id13">[<a class="reference internal" href="zreferences.html#id41" title="Duoming Fan, Andrew Nonaka, Ann S. Almgren, Alice Harpole, and Michael Zingale. MAESTROeX: A Massively Parallel Low Mach Number Astrophysical Solver. arXiv e-prints, pages arXiv:1908.03634, Aug 2019. arXiv:1908.03634.">FanNonakaAlmgren+19</a>]</span>.  These schemes share many of the same algorithmic
@@ -1235,10 +1235,10 @@ through averaging routines, rather than predicting the evolution with
 a split velocity formulation, only to have to correct it with the
 averaging operator in the end regardless.</p>
 <section id="original-temporal-integrator">
-<h2>Original Temporal Integrator<a class="headerlink" href="#original-temporal-integrator" title="Permalink to this heading"></a></h2>
+<h2>Original Temporal Integrator<a class="headerlink" href="#original-temporal-integrator" title="Link to this heading"></a></h2>
 </section>
 <section id="new-temporal-integrator">
-<h2>New Temporal Integrator<a class="headerlink" href="#new-temporal-integrator" title="Permalink to this heading"></a></h2>
+<h2>New Temporal Integrator<a class="headerlink" href="#new-temporal-integrator" title="Link to this heading"></a></h2>
 </section>
 </section>
 

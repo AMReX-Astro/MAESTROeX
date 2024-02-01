@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
         <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
@@ -152,9 +152,9 @@
            <div itemprop="articleBody">
              
   <section id="runtime-parameters">
-<span id="sec-runtime-parameters"></span><h1>Runtime Parameters<a class="headerlink" href="#runtime-parameters" title="Permalink to this heading"></a></h1>
+<span id="sec-runtime-parameters"></span><h1>Runtime Parameters<a class="headerlink" href="#runtime-parameters" title="Link to this heading"></a></h1>
 <section id="introduction-to-runtime-parameters">
-<h2>Introduction to Runtime Parameters<a class="headerlink" href="#introduction-to-runtime-parameters" title="Permalink to this heading"></a></h2>
+<h2>Introduction to Runtime Parameters<a class="headerlink" href="#introduction-to-runtime-parameters" title="Link to this heading"></a></h2>
 <p>MAESTROeX has 2 sets of runtime parameters—those controlled by
 C++ and those controlled by Fortran. The C++ parameters are set
 in the inputs file and managed by the AMReX <code class="docutils literal notranslate"><span class="pre">ParmParse</span></code>
@@ -174,7 +174,7 @@ parameters into a module named <code class="docutils literal notranslate"><span 
 <code class="docutils literal notranslate"><span class="pre">write_probin.py</span></code> script). The parameters are set in the <code class="docutils literal notranslate"><span class="pre">&amp;probin</span></code> namelist
 in the problem inputs file.</p>
 <section id="c-parameter-format">
-<h3>C++ parameter format<a class="headerlink" href="#c-parameter-format" title="Permalink to this heading"></a></h3>
+<h3>C++ parameter format<a class="headerlink" href="#c-parameter-format" title="Link to this heading"></a></h3>
 <p>The C parameters take the form of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span># comment describing the parameter
 name   type   default   need in Fortran?   ifdef    fortran name    fortran type
@@ -217,7 +217,7 @@ parameter definition will be used to generate the documentation
 describing the parameters.</p>
 </section>
 <section id="microphysics-extern-parameter-format">
-<h3>Microphysics/extern parameter format<a class="headerlink" href="#microphysics-extern-parameter-format" title="Permalink to this heading"></a></h3>
+<h3>Microphysics/extern parameter format<a class="headerlink" href="#microphysics-extern-parameter-format" title="Link to this heading"></a></h3>
 <p>The microphysics/extern parameter definitions take the form of:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># comment describing the parameter</span>
 <span class="n">name</span>              <span class="n">data</span><span class="o">-</span><span class="nb">type</span>       <span class="n">default</span><span class="o">-</span><span class="n">value</span>      <span class="n">priority</span>
@@ -230,9 +230,9 @@ specific implementations to override the general parameter defaults.</p>
 </section>
 </section>
 <section id="common-runtime-parameters">
-<h2>Common Runtime Parameters<a class="headerlink" href="#common-runtime-parameters" title="Permalink to this heading"></a></h2>
+<h2>Common Runtime Parameters<a class="headerlink" href="#common-runtime-parameters" title="Link to this heading"></a></h2>
 <section id="controlling-timestepping-and-output">
-<h3>Controlling Timestepping and Output<a class="headerlink" href="#controlling-timestepping-and-output" title="Permalink to this heading"></a></h3>
+<h3>Controlling Timestepping and Output<a class="headerlink" href="#controlling-timestepping-and-output" title="Link to this heading"></a></h3>
 <p>Parameters that set the maximum time for the simulation to run
 include:</p>
 <ul class="simple">
@@ -269,7 +269,7 @@ that store a small subset of the fields, intended to be output more frequently.
 These are described in § <a class="reference external" href="#vis:sec:miniplotfile">[vis:sec:miniplotfile]</a>.</p>
 </section>
 <section id="defining-the-grid-and-boundary-conditions">
-<h3>Defining the Grid and Boundary Conditions<a class="headerlink" href="#defining-the-grid-and-boundary-conditions" title="Permalink to this heading"></a></h3>
+<h3>Defining the Grid and Boundary Conditions<a class="headerlink" href="#defining-the-grid-and-boundary-conditions" title="Link to this heading"></a></h3>
 <p>Parameters that determine the spatial extent of the grid,
 the types of boundaries, and the number of computational cells include:</p>
 <ul>
@@ -302,7 +302,7 @@ boundary condition types at the lower (‘lo’) and upper
 coordinate directions. The different types are set via integer
 flags listed in table <a class="reference internal" href="#table-bc-flags"><span class="std std-ref">Boundary condition flags</span></a>.</p>
 <span id="table-bc-flags"></span><table class="docutils align-default" id="id1">
-<caption><span class="caption-number">Table 2 </span><span class="caption-text">Boundary condition flags</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<caption><span class="caption-number">Table 2 </span><span class="caption-text">Boundary condition flags</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>BC type</p></th>
 <th class="head"><p>integer flag</p></th>
@@ -346,7 +346,7 @@ number of zones on the finest grid in the <span class="math notranslate nohighli
 </section>
 </section>
 <section id="parameters-by-namespace">
-<h2>Parameters by Namespace<a class="headerlink" href="#parameters-by-namespace" title="Permalink to this heading"></a></h2>
+<h2>Parameters by Namespace<a class="headerlink" href="#parameters-by-namespace" title="Link to this heading"></a></h2>
 <p>The following tables list all of the general
 MAESTROeX runtime parameters.
 These tables are generated automatically using the

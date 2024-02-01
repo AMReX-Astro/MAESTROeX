@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
@@ -17,9 +17,9 @@
   
         <script src="../_static/jquery.js?v=5d32c60e"></script>
         <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b3ba4146"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
         <script src="../_static/doctools.js?v=888ff710"></script>
-        <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="../_static/copybutton.js?v=f281be69"></script>
     <script src="../_static/js/theme.js"></script>
@@ -103,7 +103,43 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../filelist.html">File list</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="BaseState_8H.html">File BaseState.H</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">File BaseStateGeometry.H</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">File BaseStateGeometry.H</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv417BaseStateGeometry"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry17BaseStateGeometryEv"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::BaseStateGeometry()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry4InitEKiKiKN5amrex4RealEKiRKN5amrex6VectorIN5amrex8GeometryEEEKiRN5amrex8GpuArrayIN5amrex4RealEXL3EEEE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::Init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry19ComputeCutoffCoordsERK14BaseStateArrayIN5amrex4RealEE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::ComputeCutoffCoords()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry14InitMultiLevelEKiRK14BaseStateArrayIiE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::InitMultiLevel()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry16max_radial_levelE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::max_radial_level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry19finest_radial_levelE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::finest_radial_level</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry7nr_fineE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::nr_fine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry7dr_fineE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::dr_fine</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry8nr_irregE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::nr_irreg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry2nrE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::nr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry2drE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::dr</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry8r_cc_locE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_cc_loc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry10r_edge_locE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_edge_loc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry25base_cutoff_density_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::base_cutoff_density_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry30anelastic_cutoff_density_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::anelastic_cutoff_density_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry31burning_cutoff_density_lo_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::burning_cutoff_density_lo_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry31burning_cutoff_density_hi_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::burning_cutoff_density_hi_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry17numdisjointchunksE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::numdisjointchunks</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry13r_start_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_start_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry11r_end_coordE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_end_coord</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry4nr_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::nr_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry4dr_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::dr_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry10r_cc_loc_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_cc_loc_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry12r_edge_loc_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_edge_loc_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry27base_cutoff_density_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::base_cutoff_density_coord_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry32anelastic_cutoff_density_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::anelastic_cutoff_density_coord_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry33burning_cutoff_density_lo_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::burning_cutoff_density_lo_coord_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry33burning_cutoff_density_hi_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::burning_cutoff_density_hi_coord_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry19numdisjointchunks_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::numdisjointchunks_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry15r_start_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_start_coord_d</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N17BaseStateGeometry13r_end_coord_dE"><code class="docutils literal notranslate"><span class="pre">BaseStateGeometry::r_end_coord_d</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="Maestro_8H.html">File Maestro.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroBCThreads_8H.html">File MaestroBCThreads.H</a></li>
 <li class="toctree-l2"><a class="reference internal" href="MaestroInletBCs_8H.html">File MaestroInletBCs.H</a></li>
@@ -144,7 +180,7 @@
            <div itemprop="articleBody">
              
   <section id="file-basestategeometry-h">
-<h1>File BaseStateGeometry.H<a class="headerlink" href="#file-basestategeometry-h" title="Permalink to this heading"></a></h1>
+<h1>File BaseStateGeometry.H<a class="headerlink" href="#file-basestategeometry-h" title="Link to this heading"></a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv417BaseStateGeometry">
 <span id="_CPPv317BaseStateGeometry"></span><span id="_CPPv217BaseStateGeometry"></span><span id="BaseStateGeometry"></span><span class="target" id="classBaseStateGeometry"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BaseStateGeometry</span></span></span><br /></dt>
