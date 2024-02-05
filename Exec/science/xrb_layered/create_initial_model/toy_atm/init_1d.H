@@ -18,7 +18,7 @@
 //  The composition transitions from pure ash, to helium and CNO, to a solar 
 //  mixture including hydrogen, with initial hydrogen fraction X0 and CNO fraction
 //  Zcno (inputs file).  The CNO is split between o14 and o15 with ratio
-//  determined by their beta decay times (70.606/122.24). Because hot CNO burns
+//  determined by their beta decay times (70.621/122.266). Because hot CNO burns
 //  hydrogen at a constant rate:
 //  X = X0(1-y/yd),
 //  where yd is the depletion column depth, another input parameter.
@@ -129,7 +129,7 @@ AMREX_INLINE void init_1d()
     // to column depth, or pressure
 
     Real xn_base[NumSpec] = {smallx};
-    xn_base[io15] = problem_rp::Zcno / (1.0 + 70.606/122.24);
+    xn_base[io15] = problem_rp::Zcno / (1.0 + 70.621/122.266);
     xn_base[io14] = problem_rp::Zcno - xn_base[io15];
     xn_base[ihe4] = 1.0 - problem_rp::Zcno;
 
@@ -175,15 +175,38 @@ AMREX_INLINE void init_1d()
 
     eos_t eos_state;
     eos_state.T = problem_rp::T_base;
-    eos_state.rho = problem_rp::dens_base;
     for (int n = 0; n < NumSpec; ++n) {
         eos_state.xn[n] = xn_base[n];
     }
 
+    // We know the pressure (from y1) and the temperature
+    Real pres_base = -problem_rp::g_const * problem_rp::y1;
+
+    // However there is know (p,T) input option, so we need to iterate
+    // to find the base density.
+    // We know that it is roughly 1.3-1.5e6 (Initial_Model notebook)
+
+    Real err_min = 1.0e99;
+    Real n_best = 0;
+    for (int n=0; n<200; ++n) {
+        eos_state.rho = (1.3 + n*0.001)*1.e6;
+        eos(eos_input_rt, eos_state);
+
+        Real error = std::abs(eos_state.p - pres_base);
+        if (error < err_min) {
+            err_min = error;
+            n_best = n;
+        } 
+    }
+
+    Real dens_base = (1.3 + n_best*0.001)*1.e6;
+
+    std::cout << "Best fitting base density = " << dens_base << std::endl;
+
+    eos_state.rho = dens_base;
     eos(eos_input_rt, eos_state);
 
-    Real pres_base = eos_state.p;
-    Real entropy_base = eos_state.s;
+    pres_base = eos_state.p;
 
 
     // set an initial temperature profile and composition
@@ -206,7 +229,7 @@ AMREX_INLINE void init_1d()
 
         // the density and pressure will be determined via HSE,
         // for now, set them to the base conditions
-        model_hse(i, idens) = problem_rp::dens_base;
+        model_hse(i, idens) = dens_base;
         model_hse(i, ipres) = pres_base;
     }
 
@@ -251,7 +274,7 @@ AMREX_INLINE void init_1d()
     model_hse(index_base, ipres) = eos_state.p;
 
     Real y_base = -1.*eos_state.p/problem_rp::g_const;
-    std::cout << "base column depth y8 = " << y_base/1.e8 << std::endl;
+    std::cout << "Recovered base column depth y8 = " << y_base/1.e8 << std::endl;
 
 
     // HSE solve

@@ -7,13 +7,12 @@ problem.xmax = 3072.0
 problem.g_const = -1.29e14
 
 problem.T_star = 1.0e8
-#problem.H_star = 1120.0
-problem.H_star = 1100.0
-problem.delta  = 24.0
+problem.H_star = 1120.0
+problem.delta  = 5.0
 
-problem.dens_base = 1.45e6
 problem.T_base = 2.75e8
 
+problem.y1 = 4.5e8
 problem.del1 = 0.37
 problem.y2 = 1.5e8
 problem.del2 = 0.12
