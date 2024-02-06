@@ -78,7 +78,7 @@ C++
   and use ``AMREX_INT_ANYD`` as the macro wrapping ``bx.loVect()`` and
   ``bx.hiVect()``
 
-- Likewise, inplace of ``ZFILL()``, use ``AMREX_REAL_ANYD``
+- Likewise, inplace of ``AMREX_ZFILL()``, use ``AMREX_REAL_ANYD``
 
 - Scalars must be passed by value to Fortran functions (not by
   reference)
@@ -102,9 +102,9 @@ To illustrate these modifications, consider the function ``mk_sponge``. To call 
 
         const Box& tileBox = mfi.tilebox();
 
-        mk_sponge(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+        mk_sponge(AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()),
                   BL_TO_FORTRAN_3D(sponge_mf[mfi]),
-		  ZFILL(dx), &dt);
+		  AMREX_ZFILL(dx), &dt);
      }
 
 Implementing the changes described above to offload this to GPU, this becomes

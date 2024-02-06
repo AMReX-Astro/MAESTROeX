@@ -153,14 +153,14 @@ int main(int argc, char* argv[]) {
             const Box& bx = mfi.tilebox();
 
 #if (AMREX_SPACEDIM == 1)
-            fextract1d(ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
+            fextract1d(AMREX_ARLIM_3D(bx.loVect()), AMREX_ARLIM_3D(bx.hiVect()),
                        BL_TO_FORTRAN_FAB(lev_data_mf[mfi]), nbins,
                        dens_bin.dataPtr(), vel_bin.dataPtr(), X_bin.dataPtr(),
                        imask.dataPtr(), mask_size, r1, dens_comp, magvel_comp,
                        X_comp);
 #elif (AMREX_SPACEDIM == 2)
             if (sphr) {
-                fextract2d_sph(ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
+                fextract2d_sph(AMREX_ARLIM_3D(bx.loVect()), AMREX_ARLIM_3D(bx.hiVect()),
                                BL_TO_FORTRAN_FAB(lev_data_mf[mfi]), nbins,
                                dens_bin.dataPtr(), vel_bin.dataPtr(),
                                X_bin.dataPtr(), volcount.dataPtr(),
@@ -169,7 +169,7 @@ int main(int argc, char* argv[]) {
                                xctr, yctr);
 
             } else {
-                fextract2d_cyl(ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
+                fextract2d_cyl(AMREX_ARLIM_3D(bx.loVect()), AMREX_ARLIM_3D(bx.hiVect()),
                                BL_TO_FORTRAN_FAB(lev_data_mf[mfi]), nbins,
                                dens_bin.dataPtr(), vel_bin.dataPtr(),
                                X_bin.dataPtr(), ncount.dataPtr(),
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
             }
 #else
             if (sphr) {
-                fextract3d_sph(ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
+                fextract3d_sph(AMREX_ARLIM_3D(bx.loVect()), AMREX_ARLIM_3D(bx.hiVect()),
                                BL_TO_FORTRAN_FAB(lev_data_mf[mfi]), nbins,
                                dens_bin.dataPtr(), vel_bin.dataPtr(),
                                X_bin.dataPtr(), ncount.dataPtr(),
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
                                xctr, yctr, zctr);
 
             } else {
-                fextract3d_cyl(ARLIM_3D(bx.loVect()), ARLIM_3D(bx.hiVect()),
+                fextract3d_cyl(AMREX_ARLIM_3D(bx.loVect()), AMREX_ARLIM_3D(bx.hiVect()),
                                BL_TO_FORTRAN_FAB(lev_data_mf[mfi]), nbins,
                                dens_bin.dataPtr(), vel_bin.dataPtr(),
                                X_bin.dataPtr(), ncount.dataPtr(),

@@ -109,42 +109,42 @@ void Maestro::MakeUtrans(
                 // impose lo i side bc's
                 if (i == domlo[0]) {
                     switch (bclo) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             ulx = utilde_arr(i - 1, j, k, 0);
                             urx = utilde_arr(i - 1, j, k, 0);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             ulx = 0.0;
                             urx = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             ulx = amrex::min(urx, 0.0);
                             urx = ulx;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
 
                     // impose hi i side bc's
                 } else if (i == domhi[0] + 1) {
                     switch (bchi) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             ulx = utilde_arr(i, j, k, 0);
                             urx = utilde_arr(i, j, k, 0);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             ulx = 0.0;
                             urx = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             ulx = amrex::max(ulx, 0.0);
                             urx = ulx;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
                 }
@@ -210,42 +210,42 @@ void Maestro::MakeUtrans(
                 // impose lo side bc's
                 if (j == domlo[1]) {
                     switch (bclo) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j - 1, k, 1);
                             vry = utilde_arr(i, j - 1, k, 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             vry = 0.0;
                             vry = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             vly = amrex::min(vry, 0.0);
                             vry = vly;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
 
                     // impose hi side bc's
                 } else if (j == domhi[1] + 1) {
                     switch (bchi) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j, k, 1);
                             vry = utilde_arr(i, j, k, 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             vly = 0.0;
                             vry = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             vly = amrex::max(vly, 0.0);
                             vry = vly;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
                 }
@@ -325,42 +325,42 @@ void Maestro::MakeUtrans(
                 // impose lo side bc's
                 if (i == domlo[0]) {
                     switch (bclo) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             ulx = utilde_arr(i - 1, j, k, 0);
                             urx = utilde_arr(i - 1, j, k, 0);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             ulx = 0.0;
                             urx = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             ulx = amrex::min(urx, 0.0);
                             urx = ulx;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
 
                     // impose hi side bc's
                 } else if (i == domhi[0] + 1) {
                     switch (bchi) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             ulx = utilde_arr(i + 1, j, k, 0);
                             urx = utilde_arr(i + 1, j, k, 0);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             ulx = 0.0;
                             urx = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             ulx = amrex::max(ulx, 0.0);
                             urx = ulx;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
                 }
@@ -441,42 +441,42 @@ void Maestro::MakeUtrans(
                 // impose lo side bc's
                 if (j == domlo[1]) {
                     switch (bclo) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j - 1, k, 1);
                             vry = utilde_arr(i, j - 1, k, 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             vly = 0.0;
                             vry = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             vly = amrex::min(vry, 0.0);
                             vry = vly;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
 
                     // impose hi side bc's
                 } else if (j == domhi[1] + 1) {
                     switch (bchi) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j + 1, k, 1);
                             vry = utilde_arr(i, j + 1, k, 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             vly = 0.0;
                             vry = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             vly = amrex::max(vly, 0.0);
                             vry = vly;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
                 }
@@ -556,42 +556,42 @@ void Maestro::MakeUtrans(
                 // impose lo side bc's
                 if (k == domlo[2]) {
                     switch (bclo) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             wlz = utilde_arr(i, j, k - 1, 2);
                             wrz = utilde_arr(i, j, k - 1, 2);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             wlz = 0.0;
                             wrz = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             wlz = amrex::min(wrz, 0.0);
                             wrz = wlz;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
 
                     // impose hi side bc's
                 } else if (k == domhi[2] + 1) {
                     switch (bchi) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             wlz = utilde_arr(i, j, k + 1, 2);
                             wrz = utilde_arr(i, j, k + 1, 2);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
-                        case Symmetry:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
+                        case amrex::PhysBCType::symmetry:
                             wlz = 0.0;
                             wrz = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             wlz = amrex::max(wlz, 0.0);
                             wrz = wlz;
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             break;
                     }
                 }

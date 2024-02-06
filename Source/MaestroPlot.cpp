@@ -1698,34 +1698,34 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
                 Real vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
                 Real uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
 
-                if (i == ilo && (physbc[0] == Inflow || physbc[0] == SlipWall ||
-                                 physbc[0] == NoSlipWall)) {
+                if (i == ilo && (physbc[0] == amrex::PhysBCType::inflow || physbc[0] == amrex::PhysBCType::slipwall ||
+                                 physbc[0] == amrex::PhysBCType::noslipwall)) {
                     vx = (u(i + 1, j, k, 1) + 3.0 * u(i, j, k, 1) -
                           4.0 * u(i - 1, j, k, 1)) /
                          hx;
                     uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
 
                 } else if (i == ihi + 1 &&
-                           (physbc[AMREX_SPACEDIM] == Inflow ||
-                            physbc[AMREX_SPACEDIM] == SlipWall ||
-                            physbc[AMREX_SPACEDIM] == NoSlipWall)) {
+                           (physbc[AMREX_SPACEDIM] == amrex::PhysBCType::inflow ||
+                            physbc[AMREX_SPACEDIM] == amrex::PhysBCType::slipwall ||
+                            physbc[AMREX_SPACEDIM] == amrex::PhysBCType::noslipwall)) {
                     vx = -(u(i - 1, j, k, 1) + 3.0 * u(i, j, k, 1) -
                            4.0 * u(i + 1, j, k, 1)) /
                          hx;
                     uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
                 }
 
-                if (j == jlo && (physbc[1] == Inflow || physbc[1] == SlipWall ||
-                                 physbc[1] == NoSlipWall)) {
+                if (j == jlo && (physbc[1] == amrex::PhysBCType::inflow || physbc[1] == amrex::PhysBCType::slipwall ||
+                                 physbc[1] == amrex::PhysBCType::noslipwall)) {
                     vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 0)) / hx;
                     uy = (u(i, j + 1, k, 0) + 3.0 * u(i, j, k, 0) -
                           4.0 * u(i, j - 1, k, 0)) /
                          hy;
 
                 } else if (j == jhi + 1 &&
-                           (physbc[AMREX_SPACEDIM + 1] == Inflow ||
-                            physbc[AMREX_SPACEDIM + 1] == SlipWall ||
-                            physbc[AMREX_SPACEDIM + 1] == NoSlipWall)) {
+                           (physbc[AMREX_SPACEDIM + 1] == amrex::PhysBCType::inflow ||
+                            physbc[AMREX_SPACEDIM + 1] == amrex::PhysBCType::slipwall ||
+                            physbc[AMREX_SPACEDIM + 1] == amrex::PhysBCType::noslipwall)) {
                     vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
                     uy = -(u(i, j - 1, k, 0) + 3.0 * u(i, j, k, 0) -
                            4.0 * u(i, j + 1, k, 0)) /
@@ -1745,19 +1745,19 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
                 Real wy = 0.5 * (u(i, j + 1, k, 2) - u(i, j - 1, k, 2)) / hy;
 
                 bool fix_lo_x =
-                    (physbc[0] == Inflow || physbc[0] == NoSlipWall);
-                bool fix_hi_x = (physbc[AMREX_SPACEDIM] == Inflow ||
-                                 physbc[AMREX_SPACEDIM] == NoSlipWall);
+                    (physbc[0] == amrex::PhysBCType::inflow || physbc[0] == amrex::PhysBCType::noslipwall);
+                bool fix_hi_x = (physbc[AMREX_SPACEDIM] == amrex::PhysBCType::inflow ||
+                                 physbc[AMREX_SPACEDIM] == amrex::PhysBCType::noslipwall);
 
                 bool fix_lo_y =
-                    (physbc[1] == Inflow || physbc[1] == NoSlipWall);
-                bool fix_hi_y = (physbc[AMREX_SPACEDIM + 1] == Inflow ||
-                                 physbc[AMREX_SPACEDIM + 1] == NoSlipWall);
+                    (physbc[1] == amrex::PhysBCType::inflow || physbc[1] == amrex::PhysBCType::noslipwall);
+                bool fix_hi_y = (physbc[AMREX_SPACEDIM + 1] == amrex::PhysBCType::inflow ||
+                                 physbc[AMREX_SPACEDIM + 1] == amrex::PhysBCType::noslipwall);
 
                 bool fix_lo_z =
-                    (physbc[2] == Inflow || physbc[2] == NoSlipWall);
-                bool fix_hi_z = (physbc[AMREX_SPACEDIM + 2] == Inflow ||
-                                 physbc[AMREX_SPACEDIM + 2] == NoSlipWall);
+                    (physbc[2] == amrex::PhysBCType::inflow || physbc[2] == amrex::PhysBCType::noslipwall);
+                bool fix_hi_z = (physbc[AMREX_SPACEDIM + 2] == amrex::PhysBCType::inflow ||
+                                 physbc[AMREX_SPACEDIM + 2] == amrex::PhysBCType::noslipwall);
 
                 // First do all the faces
                 if (fix_lo_x && i == ilo) {
