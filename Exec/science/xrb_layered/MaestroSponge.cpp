@@ -60,7 +60,7 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
     }
 
     if (maestro_verbose >= 1) {
-        if (xrb_use_bottom_sponge) {
+        if (problem_rp::xrb_use_bottom_sponge) {
             Print() << "inner sponge: r_sp      , r_tp      : " << r_sp << ", "
                     << r_tp << std::endl;
         }
@@ -78,7 +78,7 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
     const Real botsponge_hi_r = r_tp;
     const Real topsponge_lo_r = r_sp_outer;
     const Real topsponge_hi_r = r_tp_outer;
-    const Real sponge_min_loc = sponge_min;
+    const Real sponge_min_loc = problem_rp::sponge_min;
 
     if (AMREX_SPACEDIM != 2) {
         Abort("ERROR: sponge only supported for 2d in xrb_mixed");
@@ -105,7 +105,7 @@ void Maestro::MakeSponge(Vector<MultiFab>& sponge) {
             ParallelFor(tileBox, [=] (int i, int j, int k)
                         { sponge_arr(i, j, k) = 1.0; });
 
-            if (xrb_use_bottom_sponge) {
+            if (problem_rp::xrb_use_bottom_sponge) {
 
                 // do both the top and bottom sponges
 

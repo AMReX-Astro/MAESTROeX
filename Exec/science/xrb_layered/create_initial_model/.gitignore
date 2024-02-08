@@ -1,2 +1,8 @@
 .ipynb_checkpoints/
 __pycache__/
+plots/
+*old*
+**.ex
+
+construct_toy_model.ipynb
+ignition_analysis.ipynb

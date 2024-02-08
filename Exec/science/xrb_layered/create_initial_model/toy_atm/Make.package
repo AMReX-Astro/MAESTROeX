@@ -1,0 +1,3 @@
+# the local sources needed to build the initial model generator
+CEXE_headers += init_1d.H
+CEXE_sources += main.cpp
