@@ -1334,16 +1334,16 @@ void Maestro::MakeMagvel(
                             0.5 * (w0_arr(i, j, k, 1) + w0_arr(i, j + 1, k, 1));
                     }
                     magvel_arr(i, j, k) =
-                        sqrt(vel_arr(i, j, k, 0) * vel_arr(i, j, k, 0) +
-                             v_total * v_total);
+                        std::sqrt(vel_arr(i, j, k, 0) * vel_arr(i, j, k, 0) +
+                                  v_total * v_total);
 #else
                     Real w_total = vel_arr(i,j,k,2);
                     if (!average_base_state) {
                         w_total += 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     }
-                    magvel_arr(i,j,k) = sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
-                        vel_arr(i,j,k,1)*vel_arr(i,j,k,1) + 
-                        w_total*w_total);
+                    magvel_arr(i,j,k) = std::sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
+                                                  vel_arr(i,j,k,1)*vel_arr(i,j,k,1) + 
+                                                  w_total*w_total);
 #endif
                 });
             }
@@ -1373,8 +1373,8 @@ void Maestro::MakeMagvel(
                         vel_arr(i, j, k, 2) +
                         0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1));
                     magvel_arr(i, j, k) =
-                        sqrt(u_total * u_total + v_total * v_total +
-                             w_total * w_total);
+                        std::sqrt(u_total * u_total + v_total * v_total +
+                                  w_total * w_total);
                 });
             }
 #endif
@@ -1422,7 +1422,7 @@ void Maestro::MakeVelrc(const Vector<MultiFab>& vel,
                     circvel_arr(i, j, k) += circ_comp * circ_comp;
                 }
 
-                circvel_arr(i, j, k) = sqrt(circvel_arr(i, j, k));
+                circvel_arr(i, j, k) = std::sqrt(circvel_arr(i, j, k));
 
                 // add base state vel to get full radial velocity
                 radvel_arr(i, j, k) += w0rcart_arr(i, j, k);
@@ -2154,8 +2154,8 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
                 }
 
                 vort(i, j, k) =
-                    sqrt((wy - vz) * (wy - vz) + (uz - wx) * (uz - wx) +
-                         (vx - uy) * (vx - uy));
+                    std::sqrt((wy - vz) * (wy - vz) + (uz - wx) * (uz - wx) +
+                              (vx - uy) * (vx - uy));
             });
 #endif
         }
