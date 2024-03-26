@@ -969,8 +969,7 @@ void Maestro::Tridiag(const BaseStateArray<Real>& a,
 }
 
 void Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml_s,
-                                   BaseState<Real>& base_fine_s)
-
+                                   BaseState<Real>& base_fine_s) const
 {
     // the mask array will keep track of whether we've filled in data
     // in a corresponding radial bin.  .false. indicates that we've

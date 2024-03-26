@@ -399,7 +399,7 @@ class Maestro : public amrex::AmrCore {
     // MaestroCelltoEdge.cpp functions
 
     void CelltoEdge(const BaseState<amrex::Real>& s0_cell_s,
-                    BaseState<amrex::Real>& s0_edge_s);
+                    BaseState<amrex::Real>& s0_edge_s) const;
 
     // end MaestroCelltoEdge.cpp functions
     ////////////
@@ -934,7 +934,7 @@ class Maestro : public amrex::AmrCore {
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
                                const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
-                               int comp, int bccomp, bool is_vel);
+                               int comp, int bccomp, bool is_vel) const;
 
     void MakeEdgeScalEdges(const amrex::MFIter& mfi,
                            amrex::Array4<amrex::Real> const slx,
@@ -955,13 +955,13 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Vector<amrex::BCRec>& bcs,
                            const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
                            int comp, int bccomp, const bool is_vel,
-                           const bool is_conservative);
+                           const bool is_conservative) const;
 #else
     void MakeDivU(const amrex::Box& bx, amrex::Array4<amrex::Real> const divu,
                   amrex::Array4<amrex::Real> const umac,
                   amrex::Array4<amrex::Real> const vmac,
                   amrex::Array4<amrex::Real> const wmac,
-                  const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                  const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,
@@ -983,7 +983,7 @@ class Maestro : public amrex::AmrCore {
                                const amrex::Box& domainBox,
                                const amrex::Vector<amrex::BCRec>& bcs,
                                const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
-                               int comp, int bccomp, const bool is_vel);
+                               int comp, int bccomp, const bool is_vel) const;
 
     void MakeEdgeScalTransverse(const amrex::MFIter& mfi,
                                 amrex::Array4<amrex::Real> const slx,
@@ -1010,7 +1010,7 @@ class Maestro : public amrex::AmrCore {
                                 const amrex::Vector<amrex::BCRec>& bcs,
                                 const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
                                 int comp, int bccomp, const bool is_vel,
-                                const bool is_conservative);
+                                const bool is_conservative) const;
 
     void MakeEdgeScalEdges(const amrex::MFIter& mfi,
                            amrex::Array4<amrex::Real> const slx,
@@ -1039,7 +1039,7 @@ class Maestro : public amrex::AmrCore {
                            const amrex::Vector<amrex::BCRec>& bcs,
                            const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
                            int comp, int bccomp, const bool is_vel,
-                           const bool is_conservative);
+                           const bool is_conservative) const;
 #endif
     // end MaestroMakeEdgeScal.cpp functions
     ////////////
@@ -1052,11 +1052,11 @@ class Maestro : public amrex::AmrCore {
 
     void MakeEdgeState1dSphr(BaseState<amrex::Real>& s_state,
                              BaseState<amrex::Real>& sedge_state,
-                             BaseState<amrex::Real>& force_state);
+                             BaseState<amrex::Real>& force_state) const;
 
     void MakeEdgeState1dPlanar(BaseState<amrex::Real>& s_state,
                                BaseState<amrex::Real>& sedge_state,
-                               BaseState<amrex::Real>& force_state);
+                               BaseState<amrex::Real>& force_state) const;
     // end MaestroMakeEdgeState.cpp functions
     ////////////
 
@@ -1402,7 +1402,7 @@ class Maestro : public amrex::AmrCore {
              amrex::Array4<amrex::Real> const Im, const amrex::Box& domainBox,
              const amrex::Vector<amrex::BCRec>& bcs,
              const amrex::GpuArray<Real, AMREX_SPACEDIM> dx, const bool is_umac,
-             const int comp, const int bccomp);
+             const int comp, const int bccomp) const;
     ////////////
 
     ////////////
