@@ -1,5 +1,5 @@
-#ifndef _MaestroBCThreads_H_
-#define _MaestroBCThreads_H_
+#ifndef MaestroBCThreads_H
+#define MaestroBCThreads_H
 
 #include <AMReX_BLFort.H>
 #include <Maestro.H>

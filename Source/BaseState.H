@@ -1,5 +1,5 @@
-#ifndef BaseState_H_
-#define BaseState_H_
+#ifndef BaseState_H
+#define BaseState_H
 
 #ifdef _OPENMP
 #include <omp.h>
