@@ -257,7 +257,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
 
                     if (cell_valid) {
                         // compute distance to center
-                        Real radius = sqrt(x * x + y * y + z * z);
+                        Real radius = std::sqrt(x * x + y * y + z * z);
 
                         // figure out which radii index this point maps into
                         auto index = (int)amrex::Math::round(
@@ -444,7 +444,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
                 amrex::min(stencil_coord, max_rcoord(which_lev(r)) - 1);
 
             bool limit =
-                (r <= nrf - 1 - drdxfac_loc * pow(2.0, (fine_lev - 2)));
+                (r <= nrf - 1 - drdxfac_loc * std::pow(2.0, (fine_lev - 2)));
 
             phibar_arr(0, r) =
                 QuadInterp(radius, radii(which_lev(r), stencil_coord),

@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <MaestroBCThreads.H>
 
 using namespace amrex;
 
