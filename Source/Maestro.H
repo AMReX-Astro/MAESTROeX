@@ -1246,7 +1246,7 @@ class Maestro : public amrex::AmrCore {
                  const BaseStateArray<Real>& u, const int n);
 
     void ProlongBasetoUniform(const BaseState<amrex::Real>& base_ml_s,
-                              BaseState<amrex::Real>& base_fine_s);
+                              BaseState<amrex::Real>& base_fine_s) const;
 
     // end MaestroMakew0.cpp functions
     ////////////
