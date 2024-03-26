@@ -184,8 +184,8 @@ Visualizing with Amrvis
 =======================
 
 | Amrvis is a tool developed together with AMReX to visualize datasets
-  from codes built around the AMReX library. To 
-  download and build Amrvis, follow the instructions in the AMReX 
+  from codes built around the AMReX library. To
+  download and build Amrvis, follow the instructions in the AMReX
   documentation: https://amrex-codes.github.io/amrex/docs_html/Visualization.html
 
 Once the code is built, you visualize a dataset as:
@@ -260,7 +260,7 @@ will be plotted side-by-side in a single figure. For example,
 
 produces the output shown below:
 
-.. figure:: plt00000_tfromp_Hnuc.png 
+.. figure:: plt00000_tfromp_Hnuc.png
    :align: center
 
    Plot of reacting_bubble done with the python script
@@ -268,12 +268,12 @@ produces the output shown below:
    plotfile.
 
 Additional options include ‘-min’ to specify the minimum data
-value, and ‘-max’ to specify the maximum data value. Running the script with 
+value, and ‘-max’ to specify the maximum data value. Running the script with
 the flag ``-h`` will list the available options.
 
 3-d support is available. When run as with a plotfile name
 and variable, it will plot slices (:math:`x`-:math:`y`, :math:`x`-:math:`z`, and :math:`y`-:math:`z`)
-through the center of the domain. 
+through the center of the domain.
 
 contourcompare.py
 -----------------
@@ -296,7 +296,7 @@ runtimevis.py
 -------------
 
 The ``runtimevis.py`` script is designed to be run from a submission
-script to produce plots from plotfiles as they are produced. 
+script to produce plots from plotfiles as they are produced.
 
 The script itself reads in an inputs file, ``vis.in``, that
 describes the variables to plot. From 1 to 6 variables can be
