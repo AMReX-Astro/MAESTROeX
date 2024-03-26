@@ -43,6 +43,7 @@ Checks: >
        -readability-simplify-boolean-expr,
        -readability-static-accessed-through-instance,
      mpi-*,
-     openmp-*
+     openmp-*,
+       -openmp-use-default-none
 
 HeaderFilterRegex: '(/Source/*|/Source/param/*|/Util/model_parser|/Util/simple_log|^\./|^tmp_build_dir/maestroex_sources/*/).*\.H$'
