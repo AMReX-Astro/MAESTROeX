@@ -615,8 +615,7 @@ void Maestro::FirstDt() {
                 const Real eps = 1.e-8;
                 const Real rho_min = 1.e-20;
 
-                FArrayBox spd(tileBox);
-                Elixir e_s = spd.elixir();
+                FArrayBox spd(tileBox, 1, The_Async_Arena());
 
                 const Array4<Real> spd_arr = spd.array();
 
