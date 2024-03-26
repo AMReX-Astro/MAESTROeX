@@ -1077,8 +1077,8 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
 
         const std::time_t now = time(nullptr);
 
-        jobInfoFile << "output data / time: "
-                    << std::put_time(std::localtime(&now), "%c\n") << "\n";
+        jobInfoFile << "output date / time: "
+                    << std::put_time(std::localtime(&now), "%c\n");
 
         char currentDir[FILENAME_MAX];
         if (getcwd(currentDir, FILENAME_MAX) != nullptr) {
