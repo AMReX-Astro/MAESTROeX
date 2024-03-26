@@ -90,11 +90,11 @@ program fconv_radial
   narg = command_argument_count()
 
   farg = 1
-  do while (farg <= narg) 
+  do while (farg <= narg)
      call get_command_argument(farg, value = fname)
 
      select case(fname)
-        
+
      case ('-i', '--input')
         farg = farg + 1
         call get_command_argument(farg, value = pltfile)
@@ -138,7 +138,7 @@ program fconv_radial
   ! For the URCA-simple network
   spec_comp = plotfile_var_index(pf, "X(n)")
   ! For the Chamulak network
-  ! spec_comp = plotfile_var_index(pf, "X(C12)")  
+  ! spec_comp = plotfile_var_index(pf, "X(C12)")
   temp_comp = plotfile_var_index(pf, "tfromp")
 
   actl_comp = 1
@@ -154,7 +154,7 @@ program fconv_radial
   flo(1:dim) = lwb(plotfile_get_pd_box(pf, nlevs))
   fhi(1:dim) = upb(plotfile_get_pd_box(pf, nlevs))
 
-  ! get dx for the coarse level.  
+  ! get dx for the coarse level.
   dx = plotfile_get_dx(pf, 1)
 
   ! the default for the center of the star will be the geometric center
@@ -178,7 +178,7 @@ program fconv_radial
      call build(ba,bl)
 
      call layout_build_ba(la, ba, boxarray_bbox(ba))
-     
+
      call destroy(bl)
      call destroy(ba)
 
@@ -189,21 +189,21 @@ program fconv_radial
      call multifab_build(conv_grad(i),la,3,0)
 
   enddo
-     
+
   ! loop over the plotfile data starting at the first
   do i = pf%flevel, 1, -1
 
      ! rr is the factor between the COARSEST level grid spacing and
      ! the current level
      rr = product(pf%refrat(1:i-1,1))
-     
+
      ! loop over each box at this level
      do j = 1, nboxes(pf, i)
 
         ! read in the data 1 patch at a time
         call fab_bind(pf, i, j)
 
-        ! get the integer bounds of the current box, in terms of this 
+        ! get the integer bounds of the current box, in terms of this
         ! level's index space
         lo(1:dim) = lwb(get_box(pf,i,j))
         hi(1:dim) = upb(get_box(pf,i,j))
@@ -219,7 +219,7 @@ program fconv_radial
         do kk = lo(3), hi(3)
            do jj = lo(2), hi(2)
               do ii = lo(1), hi(1)
-        
+
                  eos_state % rho = p(ii,jj,kk,dens_comp)
                  eos_state % T = p(ii,jj,kk,temp_comp)
                  eos_state % xn(:) = p(ii,jj,kk,spec_comp:spec_comp+nspec-1)
@@ -232,7 +232,7 @@ program fconv_radial
            enddo
         enddo
         !$OMP END PARALLEL DO
-        
+
         !$OMP PARALLEL DO PRIVATE(kk, dzz, zz, jj, dyy, yy, ii, dxx, xx) &
         !$OMP PRIVATE(eos_state, chi_rho, chi_t, chi_X, dXdP, n, nabla) &
         !$OMP PRIVATE(dtdxx, dpdxx, dxdxx) &
@@ -244,15 +244,15 @@ program fconv_radial
         do kk = lo(3), hi(3)
            dzz = dx(3)/rr
            zz = (kk + HALF)*dzz
-           
+
            do jj = lo(2), hi(2)
               dyy = dx(2)/rr
               yy = (jj + HALF)*dyy
-              
+
               do ii = lo(1), hi(1)
                  dxx = dx(1)/rr
                  xx = (ii + HALF)*dxx
-                 
+
                  eos_state % rho = p(ii,jj,kk,dens_comp)
                  eos_state % T = p(ii,jj,kk,temp_comp)
                  eos_state % xn(:) = p(ii,jj,kk,spec_comp:spec_comp+nspec-1)
@@ -278,16 +278,16 @@ program fconv_radial
                     dtdxx = p(ii+1,jj,kk,temp_comp) - p(ii,jj,kk,temp_comp)
                     dpdxx = pres(ii+1,jj,kk) - pres(ii,jj,kk)
                     dxdxx(:) = p(ii+1,jj,kk,spec_comp:spec_comp+nspec-1) - p(ii,jj,kk,spec_comp:spec_comp+nspec-1)
-                    dpdxx = dpdxx/dxx                    
-                    dtdxx = dtdxx/dxx                    
+                    dpdxx = dpdxx/dxx
+                    dtdxx = dtdxx/dxx
                     dxdxx(:) = dxdxx(:)/dxx
                  else if (ii == hi(1)) then
                     ! backward difference
                     dtdxx = p(ii,jj,kk,temp_comp) - p(ii-1,jj,kk,temp_comp)
                     dpdxx = pres(ii,jj,kk) - pres(ii-1,jj,kk)
                     dxdxx(:) = p(ii,jj,kk,spec_comp:spec_comp+nspec-1) - p(ii-1,jj,kk,spec_comp:spec_comp+nspec-1)
-                    dpdxx = dpdxx/dxx                    
-                    dtdxx = dtdxx/dxx                    
+                    dpdxx = dpdxx/dxx
+                    dtdxx = dtdxx/dxx
                     dxdxx(:) = dxdxx(:)/dxx
                  else
                     ! centered difference
@@ -298,23 +298,23 @@ program fconv_radial
                     dtdxx = HALF*dtdxx/dxx
                     dxdxx(:) = HALF*dxdxx(:)/dxx
                  endif
-                 
+
                  ! calculate gradients along y
                  if (jj==lo(2)) then
                     ! forward difference
                     dtdyy = p(ii,jj+1,kk,temp_comp) - p(ii,jj,kk,temp_comp)
                     dpdyy = pres(ii,jj+1,kk) - pres(ii,jj,kk)
                     dxdyy(:) = p(ii,jj+1,kk,spec_comp:spec_comp+nspec-1) - p(ii,jj,kk,spec_comp:spec_comp+nspec-1)
-                    dpdyy = dpdyy/dyy                    
-                    dtdyy = dtdyy/dyy                    
+                    dpdyy = dpdyy/dyy
+                    dtdyy = dtdyy/dyy
                     dxdyy(:) = dxdyy(:)/dyy
                  else if (jj == hi(2)) then
                     ! backward difference
                     dtdyy = p(ii,jj,kk,temp_comp) - p(ii,jj-1,kk,temp_comp)
                     dpdyy = pres(ii,jj,kk) - pres(ii,jj-1,kk)
                     dxdyy(:) = p(ii,jj,kk,spec_comp:spec_comp+nspec-1) - p(ii,jj-1,kk,spec_comp:spec_comp+nspec-1)
-                    dpdyy = dpdyy/dyy                    
-                    dtdyy = dtdyy/dyy                    
+                    dpdyy = dpdyy/dyy
+                    dtdyy = dtdyy/dyy
                     dxdyy(:) = dxdyy(:)/dyy
                  else
                     ! centered difference
@@ -332,16 +332,16 @@ program fconv_radial
                     dtdzz = p(ii,jj,kk+1,temp_comp) - p(ii,jj,kk,temp_comp)
                     dpdzz = pres(ii,jj,kk+1) - pres(ii,jj,kk)
                     dxdzz(:) = p(ii,jj,kk+1,spec_comp:spec_comp+nspec-1) - p(ii,jj,kk,spec_comp:spec_comp+nspec-1)
-                    dpdzz = dpdzz/dzz                    
-                    dtdzz = dtdzz/dzz                    
+                    dpdzz = dpdzz/dzz
+                    dtdzz = dtdzz/dzz
                     dxdzz(:) = dxdzz(:)/dzz
                  else if (kk == hi(3)) then
                     ! backward difference
                     dtdzz = p(ii,jj,kk,temp_comp) - p(ii,jj,kk-1,temp_comp)
                     dpdzz = pres(ii,jj,kk) - pres(ii,jj,kk-1)
                     dxdzz(:) = p(ii,jj,kk,spec_comp:spec_comp+nspec-1) - p(ii,jj,kk-1,spec_comp:spec_comp+nspec-1)
-                    dpdzz = dpdzz/dzz                    
-                    dtdzz = dtdzz/dzz                    
+                    dpdzz = dpdzz/dzz
+                    dtdzz = dtdzz/dzz
                     dxdzz(:) = dxdzz(:)/dzz
                  else
                     ! centered difference
@@ -363,7 +363,7 @@ program fconv_radial
                  ! now calculate radial gradients
                  dtdrr = dtdxx * xpos/rpos + dtdyy * ypos/rpos + dtdzz * zpos/rpos
                  dpdrr = dpdxx * xpos/rpos + dpdyy * ypos/rpos + dpdzz * zpos/rpos
-                 dxdrr = dxdxx(:) * xpos/rpos + dxdyy(:) * ypos/rpos + dxdzz(:) * zpos/rpos                 
+                 dxdrr = dxdxx(:) * xpos/rpos + dxdyy(:) * ypos/rpos + dxdzz(:) * zpos/rpos
 
                  ! actual gradient
                  if (p(ii,jj,kk,dens_comp) <= low_cutoff .or. abs(dpdrr*drr) <= small) then
@@ -377,7 +377,7 @@ program fconv_radial
                  ap(ii,jj,kk,actl_comp) = nabla
 
                  ! calculate ledoux gradient
-                 
+
                  ! initialize ledoux nabla to adiabatic nabla
                  nabla = ap(ii,jj,kk,adic_comp)
 
@@ -393,7 +393,7 @@ program fconv_radial
                  enddo
 
                  ap(ii,jj,kk,ledx_comp) = nabla
-                 
+
               enddo
            enddo
         enddo
@@ -403,7 +403,7 @@ program fconv_radial
 
      enddo
   enddo
-  
+
   pd = plotfile_get_pd_box(pf,1)
   prob_lo(1:dim) = pf%plo
   prob_hi(1:dim) = pf%phi

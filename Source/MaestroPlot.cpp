@@ -1341,8 +1341,8 @@ void Maestro::MakeMagvel(
                     if (!average_base_state) {
                         w_total += 0.5 * (w0_arr(i,j,k,2) + w0_arr(i,j,k+1,2));
                     }
-                    magvel_arr(i,j,k) = std::sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) + 
-                                                  vel_arr(i,j,k,1)*vel_arr(i,j,k,1) + 
+                    magvel_arr(i,j,k) = std::sqrt(vel_arr(i,j,k,0)*vel_arr(i,j,k,0) +
+                                                  vel_arr(i,j,k,1)*vel_arr(i,j,k,1) +
                                                   w_total*w_total);
 #endif
                 });
@@ -1519,7 +1519,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
                                     state_arr(i, j - 1, k, Temp);
                             dp = pres(i, j + 1, k) - pres(i, j - 1, k);
                         }
-#else 
+#else
                         // forward difference
                         if (k == lo[2]) {
                             dtemp = state_arr(i,j,k+1,Temp) - state_arr(i,j,k,Temp);

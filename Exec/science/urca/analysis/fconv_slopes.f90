@@ -13,7 +13,7 @@ program fconv_slopes
   use bl_constants_module
   use bl_error_module
   use bl_types
-  
+
   implicit none
 
   !f2kcli stuff
@@ -32,13 +32,13 @@ program fconv_slopes
   real(kind=dp_t), allocatable :: r(:), model_data(:,:)
   real(kind=dp_t), allocatable :: actual(:), adiabatic(:), ledoux(:)
 
-  ! the chi_* variables are (\partial p / \partial *) at constant everything 
+  ! the chi_* variables are (\partial p / \partial *) at constant everything
   ! else
   real(kind=dp_t) :: chi_rho, chi_t, chi_X(nspec)
   real(kind=dp_t) :: dT, dP, dcomp(nspec), dXdP(nspec)
 
   type(eos_t) :: eos_state
-  
+
   character(len=80), allocatable :: varnames_stored(:)
   real(kind=dp_t), allocatable :: vars_stored(:)
 
@@ -64,7 +64,7 @@ program fconv_slopes
   farg = 1
   do while (farg <= narg)
      call get_command_argument(farg, value=fname)
-     
+
      select case(fname)
      case('-i','--input')
         farg = farg + 1
@@ -94,7 +94,7 @@ program fconv_slopes
   ! initialize
   call network_init()
   call eos_init()
-  
+
   ! open the data file
   u_in = 11
   open(u_in, file=inputfile)
@@ -134,9 +134,9 @@ program fconv_slopes
         case("temperature")
            model_data(i,itemp) = vars_stored(j)
            found = .true.
-        case("pressure") 
+        case("pressure")
            model_data(i,ipres) = vars_stored(j)
-           found = .true. 
+           found = .true.
         case default
            do n = 1, nspec
               if (trim(varnames_stored(j)) == spec_names(n)) then
@@ -214,9 +214,9 @@ program fconv_slopes
   do i = 1, npoints
      write(u_out,*) r(i), actual(i), adiabatic(i), ledoux(i)
   enddo
-  
+
   close(unit=u_out)
-     
+
 100 format(a256)
 
 contains
@@ -241,5 +241,5 @@ contains
     print *, ''
 
   end subroutine print_usage
-  
+
 end program fconv_slopes

@@ -9,7 +9,7 @@
 ! This module stores the runtime parameters.  The probin_init() routine is
 ! used to initialize the runtime parameters
 
-! this version is a stub -- useful for when we only need a container for 
+! this version is a stub -- useful for when we only need a container for
 ! parameters, but not for MAESTRO use.
 
 module probin_module
@@ -22,7 +22,7 @@ module probin_module
 
   integer, save, public :: a_dummy_var = 0
 
-#ifdef AMREX_USE_CUDA  
+#ifdef AMREX_USE_CUDA
 #endif
 
 end module probin_module
@@ -119,7 +119,7 @@ module extern_probin_module
   real (kind=rt), save, public :: reactions_energy_scale = 1.d0
   !$acc declare create(reactions_energy_scale)
 
-#ifdef AMREX_USE_CUDA  
+#ifdef AMREX_USE_CUDA
 #endif
 
 end module extern_probin_module

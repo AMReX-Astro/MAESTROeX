@@ -89,7 +89,7 @@ The full density evolution equation is
 .. math::
    \begin{aligned}
    \frac{\partial\rho}{\partial t} &=& -\nabla\cdot(\rho\Ub) \nonumber \\
-   &=& -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, . 
+   &=& -\Ub\cdot\nabla\rho - \rho\nabla\cdot\Ub \, .
    \end{aligned}
    :label: rho equation
 
@@ -370,7 +370,7 @@ rearranging terms gives the perturbational enthalpy equation
    + \nabla\cdot\kth\nabla T\nonumber \\
    &=& -\Ub\cdot\nabla(\rho h)' \underbrace{- (\rho h)'\nabla\cdot\Ub
    - \nabla\cdot[(\rho h)_0\Ubt] + (\Ubt \cdot \er)\frac{\partial p_0}{\partial r}
-   + \nabla\cdot\kth\nabla T}_{``(\rho h)' ~ \text{force}"}, 
+   + \nabla\cdot\kth\nabla T}_{``(\rho h)' ~ \text{force}"},
    \end{aligned}
    :label: rhohprime equation
 
@@ -506,10 +506,10 @@ The combination of ``species_pred_type`` and ``enthalpy_pred_type`` determine ho
 
 * ``species_pred_type = 1`` (``predict_rhoprime_and\_X``) and ``enthalpy_pred_type = 1`` (``predict_rhohprime``) :
 
-  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)'` 
+  * cell-centered quantity predicted in ``make_edge_scal`` : :math:`(\rho h)'`
 
-  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}` 
- 
+  * intermediate "enthalpy" edge state : :math:`(\rho h)'_\mathrm{edge}`
+
   * species quantity available in ``mkflux`` : :math:`X_\mathrm{edge}`, :math:`\rho'_\mathrm{edge}`
 
   * final :math:`(\rho h)` edge state : :math:`\left [ (\rho h)_0^{n+\myhalf,{\rm avg}} + (\rho h)'_\mathrm{edge} \right ]`

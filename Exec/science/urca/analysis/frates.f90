@@ -56,7 +56,7 @@ program frates
   pltfile =''
   outputfile = 'rates'
   use_tfromp = .false.
-  
+
   ! parse arguments
   narg = command_argument_count()
 
@@ -92,8 +92,8 @@ program frates
 
   call network_init()
   call eos_init()
-  call burner_init()  
-  
+  call burner_init()
+
   ! build the input plotfile
   call build(pf,pltfile,uin)
 
@@ -179,7 +179,7 @@ program frates
         !$OMP END PARALLEL DO
 
         call fab_unbind(pf,i,j)
-        
+
      end do
   end do
 
@@ -195,7 +195,7 @@ contains
 
   subroutine print_usage()
     implicit none
-    
+
     print *,""
     print *, "This program takes a 3D plotfile, calls evaluate_rates in actual_rhs_module, and "
     print *, "dumps a new plotfile containing the reaction rates and screening factors in each zone."
@@ -204,7 +204,7 @@ contains
     print *, ""
     print *, "usage: "
     print *, " *frates* -i|--input <pltfile in> [-o|--output <pltfile out>]", &
-         " [--tfromp]"    
+         " [--tfromp]"
     print *, ""
     print *, "    -i|--input: <pltfile in>"
     print *, "        Specify which plotfile to work on. (Required)"
@@ -220,7 +220,7 @@ contains
 
   function int_to_str(i) result(s)
     implicit none
-    
+
     character(:), allocatable :: s
     integer, intent(in) :: i
     character(range(i)+2) :: scratch
@@ -250,5 +250,5 @@ contains
        rflat(i + 5*nrates + nrat_tabular) = rate_state % add_energy_rate(i)
     end do
   end subroutine flatten_rate_state
-  
+
 end program frates
