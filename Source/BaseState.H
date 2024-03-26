@@ -160,8 +160,9 @@ class BaseState {
     // no copy assignment
     BaseState& operator= (const BaseState<T>& src) = delete;
 
-    // no move constructor
-    BaseState(BaseState<T>&& src) = delete;
+    // default move constructor -- we might want to explicitly
+    // implement this, since the compiler might default to copy
+    BaseState(BaseState<T>&& src) = default;
 
     // no move assignment
     BaseState& operator= (BaseState<T>&& src) = delete;
