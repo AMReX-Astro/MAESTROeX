@@ -155,13 +155,13 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         } else {
-            if (phys_bc[idim] == Outflow) {
+            if (phys_bc[idim] == amrex::PhysBCType::outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
-            if (phys_bc[AMREX_SPACEDIM + idim] == Outflow) {
+            if (phys_bc[AMREX_SPACEDIM + idim] == amrex::PhysBCType::outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -505,8 +505,8 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
         const Box& domainBox = geom[lev].Domain();
 
         for (int idir = 0; idir < BL_SPACEDIM; idir++) {
-            if (phys_bc[idir] != Inflow &&
-                phys_bc[AMREX_SPACEDIM + idir] != Inflow) {
+            if (phys_bc[idir] != amrex::PhysBCType::inflow &&
+                phys_bc[AMREX_SPACEDIM + idir] != amrex::PhysBCType::inflow) {
                 vel[lev].setBndry(0.0, idir, 1);
             } else {
 #ifdef _OPENMP
@@ -521,7 +521,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
 
                     BoxList bxlist(reg);
 
-                    if (phys_bc[idir] == Inflow &&
+                    if (phys_bc[idir] == amrex::PhysBCType::inflow &&
                         reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
                         Box bx;  // bx is the region we *protect* from zero'ing
 
@@ -545,7 +545,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
                         bxlist.push_back(bx);
                     }
 
-                    if (phys_bc[AMREX_SPACEDIM + idir] == Inflow &&
+                    if (phys_bc[AMREX_SPACEDIM + idir] == amrex::PhysBCType::inflow &&
                         reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
                         Box bx;  // bx is the region we *protect* from zero'ing
 

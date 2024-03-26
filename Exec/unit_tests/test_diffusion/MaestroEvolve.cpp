@@ -160,7 +160,7 @@ void Maestro::Evolve() {
                         ambient_h_loc;
                 });
 
-                // make_analytic_solution(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), ZFILL(dx), t_new);
+                // make_analytic_solution(AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()), BL_TO_FORTRAN_3D(analytic_mf[mfi]), AMREX_ZFILL(dx), t_new);
             }
         }
 

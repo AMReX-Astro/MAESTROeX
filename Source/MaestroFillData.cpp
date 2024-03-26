@@ -221,36 +221,36 @@ void Maestro::FillUmacGhost(
                 // lo x-faces
                 if (i == domlo[0] - 1) {
                     switch (physbc_p[0]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j, k) = umac(i + 1, j, k);
                             vmac(i, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = 0.0;
 #endif
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j, k) = 0.0;
                             vmac(i, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = 0.0;
 #endif
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j, k) = umac(i + 1, j, k);
                             vmac(i, j, k) = vmac(i + 1, j, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = wmac(i + 1, j, k);
 #endif
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j, k) = -umac(i + 2, j, k);
                             vmac(i, j, k) = vmac(i + 1, j, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = wmac(i + 1, j, k);
 #endif
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }
@@ -259,36 +259,36 @@ void Maestro::FillUmacGhost(
                 // hi x-faces
                 if (i == domhi[0] + 2) {
                     switch (physbc_p[AMREX_SPACEDIM]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j, k) = umac(i - 1, j, k);
                             vmac(i - 1, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i - 1, j, k) = 0.0;
 #endif
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j, k) = 0.0;
                             vmac(i - 1, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i - 1, j, k) = 0.0;
 #endif
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j, k) = umac(i - 1, j, k);
                             vmac(i - 1, j, k) = vmac(i - 2, j, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i - 1, j, k) = wmac(i - 2, j, k);
 #endif
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j, k) = -umac(i - 2, j, k);
                             vmac(i - 1, j, k) = vmac(i - 2, j, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i - 1, j, k) = wmac(i - 2, j, k);
 #endif
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }
@@ -301,36 +301,36 @@ void Maestro::FillUmacGhost(
                 // lo y-faces
                 if (j == domlo[1] - 1) {
                     switch (physbc_p[1]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j, k) = 0.0;
                             vmac(i, j, k) = vmac(i, j + 1, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = 0.0;
 #endif
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j, k) = 0.0;
                             vmac(i, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = 0.0;
 #endif
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j, k) = umac(i, j + 1, k);
                             vmac(i, j, k) = vmac(i, j + 1, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = wmac(i, j + 1, k);
 #endif
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j, k) = umac(i, j + 1, k);
                             vmac(i, j, k) = -vmac(i, j + 2, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j, k) = wmac(i, j + 1, k);
 #endif
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }
@@ -339,36 +339,36 @@ void Maestro::FillUmacGhost(
                 // hi y-faces
                 if (j == domhi[1] + 2) {
                     switch (physbc_p[AMREX_SPACEDIM + 1]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j - 1, k) = 0.0;
                             vmac(i, j, k) = vmac(i, j - 1, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j - 1, k) = 0.0;
 #endif
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j - 1, k) = 0.0;
                             vmac(i, j, k) = 0.0;
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j - 1, k) = 0.0;
 #endif
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j - 1, k) = umac(i, j - 2, k);
                             vmac(i, j, k) = vmac(i, j - 1, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j - 1, k) = wmac(i, j - 2, k);
 #endif
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j - 1, k) = umac(i, j - 2, k);
                             vmac(i, j, k) = -vmac(i, j - 2, k);
 #if (AMREX_SPACEDIM == 3)
                             wmac(i, j - 1, k) = wmac(i, j - 2, k);
 #endif
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }
@@ -383,28 +383,28 @@ void Maestro::FillUmacGhost(
                 // lo z-faces
                 if (k == domlo[2] - 1) {
                     switch (physbc_p[2]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j, k) = 0.0;
                             vmac(i, j, k) = 0.0;
                             wmac(i, j, k) = wmac(i, j, k + 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j, k) = 0.0;
                             vmac(i, j, k) = 0.0;
                             wmac(i, j, k) = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j, k) = umac(i, j, k + 1);
                             vmac(i, j, k) = vmac(i, j, k + 1);
                             wmac(i, j, k) = wmac(i, j, k + 1);
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j, k) = umac(i, j, k + 1);
                             vmac(i, j, k) = vmac(i, j, k + 1);
                             wmac(i, j, k) = -wmac(i, j, k + 2);
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }
@@ -413,28 +413,28 @@ void Maestro::FillUmacGhost(
                 // hi z-faces
                 if (k == domhi[2] + 2) {
                     switch (physbc_p[2 + AMREX_SPACEDIM]) {
-                        case Inflow:
+                        case amrex::PhysBCType::inflow:
                             umac(i, j, k - 1) = 0.0;
                             vmac(i, j, k - 1) = 0.0;
                             wmac(i, j, k) = wmac(i, j, k - 1);
                             break;
-                        case SlipWall:
-                        case NoSlipWall:
+                        case amrex::PhysBCType::slipwall:
+                        case amrex::PhysBCType::noslipwall:
                             umac(i, j, k - 1) = 0.0;
                             vmac(i, j, k - 1) = 0.0;
                             wmac(i, j, k) = 0.0;
                             break;
-                        case Outflow:
+                        case amrex::PhysBCType::outflow:
                             umac(i, j, k - 1) = umac(i, j, k - 2);
                             vmac(i, j, k - 1) = vmac(i, j, k - 2);
                             wmac(i, j, k) = wmac(i, j, k - 1);
                             break;
-                        case Symmetry:
+                        case amrex::PhysBCType::symmetry:
                             umac(i, j, k - 1) = umac(i, j, k - 2);
                             vmac(i, j, k - 1) = vmac(i, j, k - 2);
                             wmac(i, j, k) = -wmac(i, j, k - 2);
                             break;
-                        case Interior:
+                        case amrex::PhysBCType::interior:
                             // do nothing
                             break;
                     }

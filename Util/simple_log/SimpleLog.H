@@ -21,7 +21,6 @@ class SimpleLog {
    public:
     SimpleLog() {
         log_data.resize(MAX_LINES);
-        log_lines = 0;
     };
 
     void Log(const std::string& str, const amrex::Real d);
@@ -33,7 +32,7 @@ class SimpleLog {
    private:
     static constexpr int MAX_LINES = 128;
 
-    int log_lines;
+    int log_lines{0};
 
     std::vector<std::string> log_data;
 };

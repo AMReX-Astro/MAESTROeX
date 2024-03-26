@@ -1,3 +1,7 @@
+# 24.01
+
+  * Fixed a race condition on GPUs (#402)
+
 # 23.10
 
   * a new option, `basestate_use_pres_model` was added (#398)

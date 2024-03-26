@@ -1,5 +1,5 @@
-#ifndef PhysBCFunctMaestro_H_
-#define PhysBCFunctMaestro_H_
+#ifndef PhysBCFunctMaestro_H
+#define PhysBCFunctMaestro_H
 
 #include <AMReX_PhysBCFunct.H>
 
@@ -13,7 +13,7 @@ typedef void (*BndryFuncDefaultMaestro)(
 /// This version calls function working on array
 class BndryFuncArrayMaestro : public amrex::BndryFuncArray {
    public:
-    BndryFuncArrayMaestro() noexcept {}
+    BndryFuncArrayMaestro() = default;
     BndryFuncArrayMaestro(BndryFuncDefaultMaestro inFunc) noexcept
         : m_func(inFunc) {}
 
