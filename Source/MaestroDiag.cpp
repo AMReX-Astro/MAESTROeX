@@ -146,7 +146,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
             // weight is the factor by which the volume of a cell at the current level
             // relates to the volume of a cell at the coarsest level of refinement.
             const auto weight =
-                AMREX_SPACEDIM == 2 ? 1.0 / pow(4.0, lev) : 1.0 / pow(8.0, lev);
+                AMREX_SPACEDIM == 2 ? 1.0 / std::pow(4.0, lev) : 1.0 / std::pow(8.0, lev);
 
 #if (AMREX_SPACEDIM == 3)
             // for non-spherical we have to set these to be a valid array as

@@ -190,13 +190,12 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                 Real coeff3 = kappa * lambda / (mu * nu);
 
                                 integral =
-                                    coeff1 * log((gamma1bar(n, r) +
-                                                  0.5 * mu * dr(n)) /
-                                                 (gamma1bar(n, r) -
-                                                  0.5 * mu * dr(n))) +
-                                    coeff2 *
-                                        log((p0(n, r) + 0.5 * nu * dr(n)) /
-                                            (p0(n, r) - 0.5 * nu * dr(n))) -
+                                    coeff1 * std::log((gamma1bar(n, r) +
+                                                       0.5 * mu * dr(n)) /
+                                                      (gamma1bar(n, r) -
+                                                       0.5 * mu * dr(n))) +
+                                    coeff2 * std::log((p0(n, r) + 0.5 * nu * dr(n)) /
+                                                      (p0(n, r) - 0.5 * nu * dr(n))) -
                                     coeff3 * dr(n);
 
                             } else {
@@ -211,12 +210,12 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                 integral =
                                     (amrex::Math::abs(grav_cell(n, r)) /
                                      denom) *
-                                    (coeff1 * log((gamma1bar(n, r) +
-                                                   0.5 * mu * drp) /
-                                                  (gamma1bar(n, r) -
-                                                   0.5 * mu * drm)) -
-                                     coeff2 * log((p0(n, r) + 0.5 * nu * drp) /
-                                                  (p0(n, r) - 0.5 * nu * drm)));
+                                    (coeff1 * std::log((gamma1bar(n, r) +
+                                                        0.5 * mu * drp) /
+                                                       (gamma1bar(n, r) -
+                                                        0.5 * mu * drm)) -
+                                     coeff2 * std::log((p0(n, r) + 0.5 * nu * drp) /
+                                                       (p0(n, r) - 0.5 * nu * drm)));
                             }
                         }
 
@@ -247,7 +246,7 @@ void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                                    (base_geom.r_end_coord(n, j) + 1) / 2);
 
                     for (int i = n - 1; i >= 0; --i) {
-                        auto refrat = (int)amrex::Math::round(pow(2, n - i));
+                        auto refrat = (int)amrex::Math::round(std::pow(2, n - i));
 
                         // Offset the centered beta on level i above this point so the total
                         // integral is consistent

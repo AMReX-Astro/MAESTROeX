@@ -91,12 +91,12 @@ void BaseStateGeometry::Init(const int max_radial_level_in,
             const Real* dx_fine = geom[max_level].CellSize();
             // nr_fine = nr_irreg + 1
             for (auto i = 0; i < nr_fine; ++i) {
-                r_cc_loc(0, i) = sqrt(0.75 + 2.0 * Real(i)) * dx_fine[0];
+                r_cc_loc(0, i) = std::sqrt(0.75 + 2.0 * Real(i)) * dx_fine[0];
             }
             r_edge_loc(0) = 0.0;
             for (auto i = 0; i < nr_fine; ++i) {
                 r_edge_loc(0, i + 1) =
-                    sqrt(0.75 + 2.0 * (Real(i) + 0.5)) * dx_fine[0];
+                    std::sqrt(0.75 + 2.0 * (Real(i) + 0.5)) * dx_fine[0];
             }
         } else {
             for (auto i = 0; i < nr_fine; ++i) {
