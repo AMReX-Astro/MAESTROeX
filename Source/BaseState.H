@@ -154,6 +154,19 @@ class BaseState {
     /// copy constructor. This makes a deep copy of the src.
     BaseState(const BaseState<T>& src);
 
+    // destructor
+    ~BaseState() = default;
+
+    // no copy assignment
+    BaseState& operator= (const BaseState<T>& src) = delete;
+
+    // default move constructor -- we might want to explicitly
+    // implement this, since the compiler might default to copy
+    BaseState(BaseState<T>&& src) = default;
+
+    // no move assignment
+    BaseState& operator= (BaseState<T>&& src) = delete;
+
     /// return a BaseStateArray object to allow for accessing
     /// the underlying data
      [[nodiscard]] AMREX_FORCE_INLINE
@@ -221,7 +234,7 @@ class BaseState {
     void toVector(amrex::Gpu::ManagedVector<T>& vec) const;
 
     /// swap the data with src
-    void swap(BaseState<T>& src);
+    void swap(BaseState<T>& src) noexcept;
 
     T* dataPtr() noexcept { return base_data.dataPtr(); };
 
@@ -478,7 +491,7 @@ void BaseState<T>::toVector(amrex::Gpu::ManagedVector<T>& vec) const {
 }
 
 template <class T>
-void BaseState<T>::swap(BaseState<T>& src) {
+void BaseState<T>::swap(BaseState<T>& src) noexcept {
     AMREX_ASSERT(nlev == src.nlev);
     AMREX_ASSERT(nvar == src.nvar);
     AMREX_ASSERT(len == src.len);
