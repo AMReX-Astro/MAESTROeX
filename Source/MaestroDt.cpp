@@ -854,7 +854,7 @@ void Maestro::FirstDt() {
 }
 
 void Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0,
-                         const BaseState<Real>& gamma1bar) {
+                         const BaseState<Real>& gamma1bar) const {
     auto gp0_arr = gp0.array();
     const auto p0_arr = p0.const_array();
     const auto gamma1bar_arr = gamma1bar.const_array();

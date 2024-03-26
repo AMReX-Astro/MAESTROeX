@@ -534,7 +534,7 @@ class Maestro : public amrex::AmrCore {
 
     void EstDt_Divu(BaseState<amrex::Real>& gp0,
                     const BaseState<amrex::Real>& p0,
-                    const BaseState<amrex::Real>& gamma1bar);
+                    const BaseState<amrex::Real>& gamma1bar) const;
 
     // end MaestroDt.cpp functions
     ////////////////////////
@@ -880,7 +880,7 @@ class Maestro : public amrex::AmrCore {
                    const BaseState<amrex::Real>& rho0_s,
                    const BaseState<amrex::Real>& p0_s,
                    const BaseState<amrex::Real>& gamma1bar_s,
-                   const BaseState<amrex::Real>& grav_cell_s);
+                   const BaseState<amrex::Real>& grav_cell_s) const;
 
     // end MaestroMakeBeta0.cpp functions
     ////////////

@@ -5,7 +5,7 @@ using namespace amrex;
 void Maestro::MakeBeta0(BaseState<Real>& beta0_s, const BaseState<Real>& rho0_s,
                         const BaseState<Real>& p0_s,
                         const BaseState<Real>& gamma1bar_s,
-                        const BaseState<Real>& grav_cell_s) {
+                        const BaseState<Real>& grav_cell_s) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeBeta0()", MakeBeta0);
 
