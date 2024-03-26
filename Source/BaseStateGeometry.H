@@ -1,5 +1,5 @@
-#ifndef BaseStateGeometry_H_
-#define BaseStateGeometry_H_
+#ifndef BaseStateGeometry_H
+#define BaseStateGeometry_H
 
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFab.H>

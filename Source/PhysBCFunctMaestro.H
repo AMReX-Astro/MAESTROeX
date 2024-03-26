@@ -1,5 +1,5 @@
-#ifndef PhysBCFunctMaestro_H_
-#define PhysBCFunctMaestro_H_
+#ifndef PhysBCFunctMaestro_H
+#define PhysBCFunctMaestro_H
 
 #include <AMReX_PhysBCFunct.H>
 
