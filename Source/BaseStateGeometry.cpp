@@ -109,7 +109,7 @@ void BaseStateGeometry::Init(const int max_radial_level_in,
     }
 }
 
-void BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<Real>& rho0) {
+void BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<Real>& rho0) const {
     // timer for profiling
     BL_PROFILE_VAR("BaseStateGeometry::ComputeCutoffCoords",
                    ComputeCutoffCoords);
@@ -300,11 +300,7 @@ void BaseStateGeometry::ComputeCutoffCoords(const BaseStateArray<Real>& rho0) {
 
     // set the burning cutoff coordinate on the coarser levels
     for (auto n = which_lev - 1; n >= 0; --n) {
-        if (burning_cutoff_density_hi_coord(n + 1) % 2 == 0) {
-            burning_cutoff_density_hi_coord(n) = 0;
-        } else {
-            burning_cutoff_density_hi_coord(n) = 0;
-        }
+        burning_cutoff_density_hi_coord(n) = 0;
     }
 }
 

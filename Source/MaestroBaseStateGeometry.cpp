@@ -38,7 +38,7 @@ void Maestro::InitBaseStateMapSphr(
 }
 #endif
 
-void Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state) {
+void Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state) const {
     // compute the coordinates of the anelastic cutoff
     bool found = false;
     int which_lev = 0;
@@ -229,20 +229,16 @@ void Maestro::ComputeCutoffCoords(const BaseState<Real>& rho0_state) {
 
     // set the burning cutoff coordinate on the coarser levels
     for (auto n = which_lev - 1; n >= 0; --n) {
-        if (base_geom.burning_cutoff_density_hi_coord(n + 1) % 2 == 0) {
-            base_geom.burning_cutoff_density_hi_coord(n) = 0;
-        } else {
-            base_geom.burning_cutoff_density_hi_coord(n) = 0;
-        }
+        base_geom.burning_cutoff_density_hi_coord(n) = 0;
     }
 }
 
-void Maestro::RestrictBase(BaseState<Real>& s0, const bool is_cell_centered) {
+void Maestro::RestrictBase(BaseState<Real>& s0, const bool is_cell_centered) const {
     RestrictBase(s0.array(), is_cell_centered);
 }
 
 void Maestro::RestrictBase(const BaseStateArray<Real>& s0,
-                           const bool is_cell_centered) {
+                           const bool is_cell_centered) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RestrictBase()", RestrictBase);
 
@@ -265,12 +261,12 @@ void Maestro::RestrictBase(const BaseStateArray<Real>& s0,
     }
 }
 
-void Maestro::FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered) {
+void Maestro::FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered) const {
     FillGhostBase(s0.array(), is_cell_centered);
 }
 
 void Maestro::FillGhostBase(const BaseStateArray<Real>& s0,
-                            const bool is_cell_centered) {
+                            const bool is_cell_centered) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::FillGhostBase()", FillGhostBase);
 

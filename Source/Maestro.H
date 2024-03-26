@@ -361,15 +361,15 @@ class Maestro : public amrex::AmrCore {
         const amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx_fine,
         const amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx_lev);
 #endif
-    void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0_state);
+    void ComputeCutoffCoords(const BaseState<amrex::Real>& rho0_state) const;
 
-    void RestrictBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void RestrictBase(BaseState<Real>& s0, const bool is_cell_centered) const;
     void RestrictBase(const BaseStateArray<Real>& s0,
-                      const bool is_cell_centered);
+                      const bool is_cell_centered) const;
 
-    void FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered);
+    void FillGhostBase(BaseState<Real>& s0, const bool is_cell_centered) const;
     void FillGhostBase(const BaseStateArray<Real>& s0,
-                       const bool is_cell_centered);
+                       const bool is_cell_centered) const;
 
     // end MaestroBaseStateGeometry.cpp functions
     ////////////
