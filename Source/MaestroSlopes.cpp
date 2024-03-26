@@ -17,15 +17,17 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
     int ihi = domainBox.hiVect()[0];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[0];
-        bchi[i] = bcs[bc_start_comp + i].hi()[0];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
@@ -214,15 +216,17 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
     int jhi = domainBox.hiVect()[1];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[1];
-        bchi[i] = bcs[bc_start_comp + i].hi()[1];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
@@ -410,15 +414,17 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
     int khi = domainBox.hiVect()[2];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[2];
-        bchi[i] = bcs[bc_start_comp + i].hi()[2];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
