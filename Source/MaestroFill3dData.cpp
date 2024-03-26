@@ -423,7 +423,7 @@ void Maestro::Addw0(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& u_edge,
     }
 
     if (finest_level == 0) {
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
         // FillBoundary can be non-deterministic on the GPU for non-cell
         // centered data (like u_edge here). If this flag is true, run
         // on the CPU instead
@@ -441,7 +441,7 @@ void Maestro::Addw0(Vector<std::array<MultiFab, AMREX_SPACEDIM> >& u_edge,
             }
         }
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
         if (deterministic_nodal_solve) {
             // turn GPU back on
             if (launched) Gpu::setLaunchRegion(true);

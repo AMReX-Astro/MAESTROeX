@@ -28,9 +28,9 @@ using namespace maestro;
 #include <PhysBCFunctMaestro.H>
 #include <SimpleLog.H>
 
-/// Define Real vector types for CUDA-compatability. If `AMREX_USE_CUDA`, then
-/// this will be stored in CUDA managed memory.
-#ifdef AMREX_USE_CUDA
+/// Define Real vector types for GPU-compatability. If `AMREX_USE_GPU`, then
+/// this will be stored in GPU managed memory.
+#ifdef AMREX_USE_GPU
 using RealVector = amrex::Gpu::ManagedVector<amrex::Real>;
 using IntVector = amrex::Gpu::ManagedVector<int>;
 #else
