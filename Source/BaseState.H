@@ -29,6 +29,22 @@ struct BaseStateArray {
     constexpr BaseStateArray(BaseStateArray<T> const& rhs) noexcept
         : dptr(rhs.dptr), nlev(rhs.nlev), len(rhs.len), nvar(rhs.nvar) {}
 
+    /// destructor
+    AMREX_GPU_HOST_DEVICE
+    ~BaseStateArray() = default;
+
+    // no copy assignment
+    AMREX_GPU_HOST_DEVICE
+    BaseStateArray& operator= (const BaseStateArray<T>& other) = delete;
+
+    // no move constructor
+    AMREX_GPU_HOST_DEVICE
+    BaseStateArray(BaseStateArray<T>&& other) = delete;
+
+    // no move assignment
+    AMREX_GPU_HOST_DEVICE
+    BaseStateArray& operator= (BaseStateArray<T>&& other) = delete;
+
     /// initialize from pointer
     AMREX_GPU_HOST_DEVICE
     constexpr BaseStateArray(T* ptr, const int num_levs = 1,
@@ -83,8 +99,8 @@ struct BaseStateArray {
         return dptr[i];
     }
 
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE T* ptr(int lev, int i = 0,
-                                                    int n = 0) const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE T* ptr(int lev, int i = 0,
+                                                                  int n = 0) const noexcept {
         return dptr + (lev * len + i) * nvar + n;
     }
 
@@ -93,17 +109,17 @@ struct BaseStateArray {
     }
 
     /// number of levels in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nLevels() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int nLevels() const noexcept {
         return nlev;
     }
 
     /// number of cells in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int length() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int length() const noexcept {
         return len;
     }
 
     /// number of components
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nComp() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int nComp() const noexcept {
         return nvar;
     }
 };
@@ -140,7 +156,7 @@ class BaseState {
 
     /// return a BaseStateArray object to allow for accessing
     /// the underlying data
-    AMREX_FORCE_INLINE
+     [[nodiscard]] AMREX_FORCE_INLINE
     BaseStateArray<T const> array() const noexcept {
         return makeBaseStateArray<T const>(base_data.dataPtr(), nlev, len,
                                            nvar);
@@ -153,7 +169,7 @@ class BaseState {
         return makeBaseStateArray<T>(base_data.dataPtr(), nlev, len, nvar);
     }
 
-    AMREX_FORCE_INLINE
+     [[nodiscard]] AMREX_FORCE_INLINE
     BaseStateArray<const T> const_array() const noexcept {
         return makeBaseStateArray<const T>(base_data.dataPtr(), nlev, len,
                                            nvar);
@@ -181,17 +197,17 @@ class BaseState {
     void setVal(const int comp, const T& val);
 
     /// number of levels in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nLevels() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int nLevels() const noexcept {
         return nlev;
     };
 
     /// number of cells in base
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int length() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int length() const noexcept {
         return len;
     };
 
     /// number of components
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE int nComp() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE int nComp() const noexcept {
         return nvar;
     };
 
@@ -209,7 +225,7 @@ class BaseState {
 
     T* dataPtr() noexcept { return base_data.dataPtr(); };
 
-    AMREX_GPU_HOST_DEVICE AMREX_FORCE_INLINE T* dataPtr() const noexcept {
+    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE T* dataPtr() const noexcept {
         return this->dptr;
     }
 
@@ -359,7 +375,7 @@ void BaseState<T>::define(const int num_levs, const int length, const int ncomp,
 template <class T>
 void BaseState<T>::resize(const int num_levs, const int length, const int ncomp,
                           const T val) {
-    if (base_data.size() > 0) {
+    if (! base_data.empty()) {
         base_data.resize(0);
         amrex::Gpu::streamSynchronize();
     }
