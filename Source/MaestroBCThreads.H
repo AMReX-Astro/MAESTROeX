@@ -4,7 +4,7 @@
 #include <AMReX_BLFort.H>
 #include <Maestro.H>
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
 #include <AMReX_Arena.H>
 #include <cuda_runtime_api.h>
 #endif
@@ -15,7 +15,7 @@ extern "C" {
 
 // Define some routines to allow boundary conditions
 // to be passed to offloaded Fortran subroutines
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
 
 // Return a pointer to bc valid for use in Fortran. For the CPU this is a no-op.
 

@@ -1,7 +1,7 @@
 
 #include <Maestro.H>
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
 #include <AMReX_Arena.H>
 #include <cuda_runtime_api.h>
 #endif

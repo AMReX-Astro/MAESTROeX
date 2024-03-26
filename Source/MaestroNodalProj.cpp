@@ -212,7 +212,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         rhcc[lev].mult(-1.0, 0, 1, 1);
     }
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     // compRHS is non-deterministic on the GPU. If this flag is true, run
     // on the CPU instead
     bool launched;
@@ -228,7 +228,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal), amrex::GetVecOfPtrs(Vproj),
                     {},  // pass in null rhnd
                     amrex::GetVecOfPtrs(rhcc));
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         // turn GPU back on
         if (launched) Gpu::setLaunchRegion(true);
@@ -288,7 +288,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 
     // solve for phi
     Print() << "Calling nodal solver" << std::endl;
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         launched = !Gpu::notInLaunchRegion();
         // turn off GPU
@@ -297,7 +297,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 #endif
     mlmg.solve(amrex::GetVecOfPtrs(phi), amrex::GetVecOfConstPtrs(rhstotal),
                rel_tol, abs_tol);
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         // turn GPU back on
         if (launched) Gpu::setLaunchRegion(true);
