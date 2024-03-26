@@ -91,7 +91,7 @@ void Maestro::Setup() {
                 leny = 0.5 * (probHi[1] - probLo[1]);
                 lenz = 0.5 * (probHi[2] - probLo[2]);
             }
-            max_dist = sqrt(lenx * lenx + leny * leny + lenz * lenz);
+            max_dist = std::sqrt(lenx * lenx + leny * leny + lenz * lenz);
             base_geom.nr_fine = int(max_dist / base_geom.dr_fine) + 1;
         }
 #endif

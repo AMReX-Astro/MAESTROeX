@@ -184,11 +184,11 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 // check if sum{X_k} = 1
                 Real sumX = 0.0;
-                for (int n = 0; n < NumSpec; ++n) {
-                    sumX += x_out[n];
+                for (auto X : x_out) {
+                    sumX += X;
                 }
 
-                if (fabs(sumX - 1.0) > reaction_sum_tol) {
+                if (std::abs(sumX - 1.0) > reaction_sum_tol) {
 #ifndef AMREX_USE_GPU
                     amrex::Print() << "ERROR: abundances do not sum to 1";
 #endif
