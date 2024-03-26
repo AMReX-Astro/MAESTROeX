@@ -1075,11 +1075,10 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
         jobInfoFile << " Plotfile Information\n";
         jobInfoFile << PrettyLine;
 
-        time_t now = time(nullptr);
+        const std::time_t now = time(nullptr);
 
-        // Convert now to tm struct for local timezone
-        tm* localtm = localtime(&now);
-        jobInfoFile << "output data / time: " << asctime(localtm);
+        jobInfoFile << "output data / time: "
+                    << std::put_time(std::localtime(&now), "%c\n") << "\n";
 
         char currentDir[FILENAME_MAX];
         if (getcwd(currentDir, FILENAME_MAX) != nullptr) {
