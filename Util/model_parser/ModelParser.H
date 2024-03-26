@@ -20,7 +20,7 @@ typedef amrex::Vector<int> IntVector;
 
 class ModelParser {
    public:
-    ModelParser() { model_initialized = false; };
+    ModelParser() = default;
 
     void ReadFile(const std::string& model_file);
 
@@ -33,7 +33,7 @@ class ModelParser {
 
     int npts_model;
 
-    bool model_initialized;
+    bool model_initialized{false};
 
     // integer keys for indexing the model_state array
     static constexpr int idens_model = 0;
