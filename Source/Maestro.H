@@ -1,5 +1,5 @@
-#ifndef Maestro_H_
-#define Maestro_H_
+#ifndef Maestro_H
+#define Maestro_H
 
 #ifdef _OPENMP
 #include <omp.h>
