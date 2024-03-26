@@ -310,7 +310,7 @@ void Maestro::MakeEdgeScalPredictor(
     Array4<Real> const vmac, Array4<Real> const simhx, Array4<Real> const simhy,
     const Box& domainBox, const Vector<BCRec>& bcs,
     const amrex::GpuArray<Real, AMREX_SPACEDIM> dx, int comp, int bccomp,
-    bool is_vel) {
+    bool is_vel) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScalPredictor()", MakeEdgeScalPredictor);
 
@@ -459,7 +459,7 @@ void Maestro::MakeEdgeScalEdges(
     Array4<Real> const Ipf, Array4<Real> const Imf, Array4<Real> const simhx,
     Array4<Real> const simhy, const Box& domainBox, const Vector<BCRec>& bcs,
     const amrex::GpuArray<Real, AMREX_SPACEDIM> dx, int comp, int bccomp,
-    const bool is_vel, const bool is_conservative) {
+    const bool is_vel, const bool is_conservative) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScalEdges()", MakeEdgeScalEdges);
 
@@ -648,7 +648,7 @@ void Maestro::MakeEdgeScalEdges(
 void Maestro::MakeDivU(const Box& bx, Array4<Real> const divu,
                        Array4<Real> const umac, Array4<Real> const vmac,
                        Array4<Real> const wmac,
-                       const GpuArray<Real, AMREX_SPACEDIM> dx) {
+                       const GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDivU()", MakeDivU);
 
@@ -667,7 +667,7 @@ void Maestro::MakeEdgeScalPredictor(
     Array4<Real> const vmac, Array4<Real> const wmac, Array4<Real> const simhx,
     Array4<Real> const simhy, Array4<Real> const simhz, const Box& domainBox,
     const Vector<BCRec>& bcs, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
-    int comp, int bccomp, bool is_vel) {
+    int comp, int bccomp, bool is_vel) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScalPredictor()", MakeEdgeScalPredictor);
 
@@ -873,7 +873,7 @@ void Maestro::MakeEdgeScalTransverse(
     Array4<Real> const simhyz, Array4<Real> const simhzx,
     Array4<Real> const simhzy, const Box& domainBox, const Vector<BCRec>& bcs,
     const amrex::GpuArray<Real, AMREX_SPACEDIM> dx, int comp, int bccomp,
-    const bool is_vel, const bool is_conservative) {
+    const bool is_vel, const bool is_conservative) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScalTransverse()", MakeEdgeScalTransverse);
 
@@ -1369,7 +1369,7 @@ void Maestro::MakeEdgeScalEdges(
     Array4<Real> const simhyx, Array4<Real> const simhyz,
     Array4<Real> const simhzx, Array4<Real> const simhzy, const Box& domainBox,
     const Vector<BCRec>& bcs, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
-    int comp, int bccomp, const bool is_vel, const bool is_conservative) {
+    int comp, int bccomp, const bool is_vel, const bool is_conservative) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeScalEdges()", MakeEdgeScalEdges);
 

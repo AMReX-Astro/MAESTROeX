@@ -11,7 +11,7 @@ void Maestro::PPM(const Box& bx, Array4<const Real> const s,
                   Array4<Real> const Ip, Array4<Real> const Im,
                   const Box& domainBox, const Vector<BCRec>& bcs,
                   const amrex::GpuArray<Real, AMREX_SPACEDIM> dx,
-                  const bool is_umac, const int comp, const int bccomp) {
+                  const bool is_umac, const int comp, const int bccomp) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PPM()", PPM);
 

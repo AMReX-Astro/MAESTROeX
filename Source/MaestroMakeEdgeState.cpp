@@ -16,7 +16,7 @@ void Maestro::MakeEdgeState1d(BaseState<Real>& s, BaseState<Real>& sedge,
 
 void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                                   BaseState<Real>& sedge_state,
-                                  BaseState<Real>& force_state) {
+                                  BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()", MakeEdgeState1dSphr);
 
@@ -387,7 +387,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
 
 void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     BaseState<Real>& sedge_state,
-                                    BaseState<Real>& force_state) {
+                                    BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dPlanar()", MakeEdgeState1dPlanar);
 
