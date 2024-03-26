@@ -47,7 +47,7 @@ def plot():
         throughput_list.append(nzones / time / 1.e6)
 
 
-    
+
 
     # Now we have all the results, so plot them.
 

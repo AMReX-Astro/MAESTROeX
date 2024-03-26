@@ -248,7 +248,7 @@ void Maestro::EstDt() {
                                 (p0_arr(i, j + 1, k) - p0_arr(i, j - 1, k)) /
                                 dx[1];
                         }
-#else 
+#else
                         if (k == 0) {
                             gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                         } else if (k == nr_lev-1) {
@@ -739,7 +739,7 @@ void Maestro::FirstDt() {
                                           p0_arr(i, j - 1, k)) /
                                          dx[1];
                             }
-#else 
+#else
                             if (k == 0) {
                                 gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                             } else if (k == nr_lev-1) {

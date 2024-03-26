@@ -107,8 +107,8 @@ void Maestro::Evolve() {
             // on the first step, just copy coeffs for the time centering
             if (istep == start_step) {
 
-	        // compute diffusion coefficients and hold constant over simulation
-	        MakeThermalCoeffs(sold, Tcoeff1, hcoeff1, Xkcoeff1, pcoeff1);
+            // compute diffusion coefficients and hold constant over simulation
+            MakeThermalCoeffs(sold, Tcoeff1, hcoeff1, Xkcoeff1, pcoeff1);
                 for (int lev = 0; lev <= finest_level; ++lev) {
                     MultiFab::Copy(Tcoeff2[lev], Tcoeff1[lev], 0, 0, 1, 1);
                     MultiFab::Copy(hcoeff2[lev], hcoeff1[lev], 0, 0, 1, 1);
@@ -195,7 +195,7 @@ void Maestro::Evolve() {
 
         // fill the mfs for the next timestep by switching pointers
         for (int lev = 0; lev <= finest_level; ++lev) {
-	     MultiFab::Copy(sold[lev], snew[lev], 0, 0, Nscal, ng_s);
+         MultiFab::Copy(sold[lev], snew[lev], 0, 0, Nscal, ng_s);
         }
     }
 

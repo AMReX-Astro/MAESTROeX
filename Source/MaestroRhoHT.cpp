@@ -250,8 +250,8 @@ void Maestro::MachfromRhoH(const Vector<MultiFab>& scal,
                                           (u(i, j, k, 1) + w0_arr(i, j, k)) *
                                           (u(i, j, k, 1) + w0_arr(i, j, k)));
 #else
-                Real velocity = std::sqrt(u(i,j,k,0)*u(i,j,k,0) + 
-                    u(i,j,k,1)*u(i,j,k,1) + 
+                Real velocity = std::sqrt(u(i,j,k,0)*u(i,j,k,0) +
+                    u(i,j,k,1)*u(i,j,k,1) +
                     (u(i,j,k,2) + w0_arr(i,j,k))*(u(i,j,k,2) + w0_arr(i,j,k)));
 #endif
 

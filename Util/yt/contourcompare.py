@@ -1,10 +1,10 @@
 """
-This script takes one, two or three plotfiles and a single variable 
-as arguments and plots contours of the datasets on the same 
-set of axes. 
+This script takes one, two or three plotfiles and a single variable
+as arguments and plots contours of the datasets on the same
+set of axes.
 """
 
-import yt 
+import yt
 import sys
 import numpy as np
 import argparse
@@ -12,15 +12,15 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams["mathtext.fontset"] = "stix"
 
-def contour_compare(plotfiles, outputfile_name, var, norm_axis, 
+def contour_compare(plotfiles, outputfile_name, var, norm_axis,
                     nlevels, minimum, maximum):
 
     if len(plotfiles) > 3:
         sys.exit("contourcompare.py: ERROR: Must provide no more than plotfiles")
 
     # dictionary of coordinates so can map our norm axis
-    geometries = {'cartesian': ['x', 'y', 'z'], 
-                  'cylindrical': ['r', 'z', 'theta'], 
+    geometries = {'cartesian': ['x', 'y', 'z'],
+                  'cylindrical': ['r', 'z', 'theta'],
                   'spherical': ['r', 'theta', 'phi']}
 
     linestyles = ['-', ':', '--']
@@ -30,10 +30,10 @@ def contour_compare(plotfiles, outputfile_name, var, norm_axis,
     labels = []
     contours = []
 
-    # for each plot, extract the data then plot as a contour 
+    # for each plot, extract the data then plot as a contour
     for i, pf in enumerate(plotfiles):
 
-        # load data 
+        # load data
         ds = yt.load(pf)
 
         # first take a slice through the center
@@ -73,7 +73,7 @@ def contour_compare(plotfiles, outputfile_name, var, norm_axis,
         if maximum is not None:
             dat[dat > maximum] = maximum
 
-        cntr = ax.contour(X.v, Y.v, dat, linestyles=linestyles[i], 
+        cntr = ax.contour(X.v, Y.v, dat, linestyles=linestyles[i],
                           colors=f"C{i}", levels=nlevels)
         c,_ = cntr.legend_elements()
         contours.append(c[0])

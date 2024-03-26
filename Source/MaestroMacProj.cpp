@@ -282,7 +282,7 @@ void Maestro::MultFacesByBeta0(
                 ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     int r = j;
-#else 
+#else
                     int r = k;
 #endif
                     uedge(i, j, k) *= beta0(lev, r);
@@ -291,7 +291,7 @@ void Maestro::MultFacesByBeta0(
                 ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     vedge(i, j, k) *= beta0_edge(lev, j);
-#else 
+#else
                     vedge(i,j,k) *= beta0(lev,k);
 #endif
                 });
@@ -305,7 +305,7 @@ void Maestro::MultFacesByBeta0(
                 ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     int r = j;
-#else 
+#else
                     int r = k;
 #endif
                     uedge(i, j, k) /= beta0(lev, r);
@@ -314,7 +314,7 @@ void Maestro::MultFacesByBeta0(
                 ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
 #if (AMREX_SPACEDIM == 2)
                     vedge(i, j, k) /= beta0_edge(lev, j);
-#else 
+#else
                     vedge(i,j,k) /= beta0(lev,k);
 #endif
                 });

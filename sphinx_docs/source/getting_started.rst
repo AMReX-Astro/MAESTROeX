@@ -10,13 +10,13 @@ Requirements
 ============
 
 MAESTROeX requires a C++ compiler that supports the C++17 standard, a
-Fortran compiler that supports the Fortran 2003 standard, and a C compiler 
-that supports the C99 standard. Several compiler suites are supported, 
-including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also required, 
-as is Python (>= 3.6) and standard tools available in any Unix-like 
-environments (e.g., Perl and ``sed``). 
+Fortran compiler that supports the Fortran 2003 standard, and a C compiler
+that supports the C99 standard. Several compiler suites are supported,
+including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also required,
+as is Python (>= 3.6) and standard tools available in any Unix-like
+environments (e.g., Perl and ``sed``).
 
-For running in parallel, an MPI library and/or OpenMP is required. 
+For running in parallel, an MPI library and/or OpenMP is required.
 For running on GPUs, CUDA 11 or later is required (see :ref:`sec:gpu` for
 more information).
 
@@ -70,7 +70,7 @@ paper 3.
    behavior::
 
      git config --global submodule.recurse true
-      
+
    If you choose to use the Microphysics repo directly, it is
    available on github and can be obtained via::
 
@@ -80,7 +80,7 @@ paper 3.
    a global environment variable on your machine, ``MICROPHYSICS_HOME``
 
    You will periodic want to update Microphysics by doing::
-   
+
        git pull
 
    in the ``Microphysics/`` directory.

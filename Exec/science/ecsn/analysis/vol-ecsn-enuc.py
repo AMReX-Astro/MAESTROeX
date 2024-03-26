@@ -21,7 +21,7 @@ def doit(plotfile):
 
     field = ('boxlib', 'Hnuc')
     ds._get_field_info(field).take_log = True
-        
+
     sc = Scene()
 
 
@@ -55,10 +55,10 @@ def doit(plotfile):
 
     sc.get_source(0).transfer_function = tf
 
-    cam = sc.add_camera(ds, lens_type="perspective")        
+    cam = sc.add_camera(ds, lens_type="perspective")
     cam.resolution = (1080, 1080)
     cam.position = 1.0*ds.domain_right_edge
-    
+
     # look toward the center -- we are dealing with an octant
     center = ds.domain_left_edge
     normal = (center - cam.position)
@@ -75,11 +75,11 @@ def doit(plotfile):
 
     sc.render()
     sc.save("{}_Hnuc".format(plotfile), sigma_clip=4.0)
-    sc.save_annotated("{}_Hnuc_annotated.png".format(plotfile), 
-                      text_annotate=[[(0.05, 0.05), 
+    sc.save_annotated("{}_Hnuc_annotated.png".format(plotfile),
+                      text_annotate=[[(0.05, 0.05),
                                       "t = {}".format(ds.current_time.d),
                                       dict(horizontalalignment="left")],
-                                     [(0.5,0.95), 
+                                     [(0.5,0.95),
                                       "MAESTROeX simulation of ECSN convection",
                                       dict(color="y", fontsize="24",
                                            horizontalalignment="center")]])
@@ -96,4 +96,4 @@ if __name__ == "__main__":
     doit(plotfile)
 
 
-        
+

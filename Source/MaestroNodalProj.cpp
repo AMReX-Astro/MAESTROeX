@@ -673,9 +673,9 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart) {
                     0.25 * (pi_arr(i, j, k) + pi_arr(i + 1, j, k) +
                             pi_arr(i, j + 1, k) + pi_arr(i + 1, j + 1, k));
 #else
-                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
-                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1) 
-                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1) 
+                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k)
+                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1)
+                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1)
                     + pi_arr(i,j+1,k+1) + pi_arr(i+1,j+1,k+1));
 #endif
                 if (use_alt_energy_fix_loc) {

@@ -12,7 +12,7 @@ program furcashell
   use eos_type_module, only: eos_t, eos_input_rt
 
   use extern_probin_module, only: table_interpolation_scheme
-  
+
   use rpar_indices
   use bl_space, only: MAX_SPACEDIM
   use bl_error_module
@@ -68,7 +68,7 @@ program furcashell
   pltfile =''
   outputfile = 'urca'
   use_tfromp = .false.
-  
+
   ! parse arguments
   narg = command_argument_count()
 
@@ -106,7 +106,7 @@ program furcashell
   call network_init()
   call burner_init()
   call eos_init()
-  
+
   ! build the input plotfile
   call build(pf,pltfile,uin)
 
@@ -194,7 +194,7 @@ program furcashell
                  burn_state % ydot(1:nspec) = ydot_nuc
                  call ener_gener_rate(ydot_nuc, enucion)
                  enuc = enucion
-                 
+
                  ! Electron capture rate (A=23)
                  r(ii,jj,kk,1) = rate_state % screened_rates(k_na23__ne23)
 
@@ -208,15 +208,15 @@ program furcashell
                  ! Particle energy from beta decay (A=23) (erg/g/s)
                  r(ii,jj,kk,4) = rate_state % epart(j_ne23_na23) * y_nuc(jne23) * N_AVO
                  enuc = enuc + r(ii,jj,kk,4)
-                 
+
                  ! dQ energy correction from electron capture (A=23) (erg/g/s)
                  r(ii,jj,kk,5) = rate_state % dqweak(j_na23_ne23) * ydot_nuc(jna23) * N_AVO
                  enuc = enuc + r(ii,jj,kk,5)
-                 
+
                  ! dQ energy correction from beta decay (A=23) (erg/g/s)
                  r(ii,jj,kk,6) = rate_state % dqweak(j_ne23_na23) * ydot_nuc(jne23) * N_AVO
                  enuc = enuc + r(ii,jj,kk,6)
-                 
+
                  ! Mass fraction of Na-23
                  r(ii,jj,kk,7) = burn_state % xn(jna23)
 
@@ -257,7 +257,7 @@ program furcashell
                     print *, "got negative energy in enu_ecap23 with energy loss ", table_entries(jtab_nuloss), &
                              " and rate ", table_entries(jtab_rate)
                  end if
-                 
+
                  ! Average neutrino energy for beta decay (A=23)
                  call get_entries(table_meta(j_ne23_na23), &
                                   burn_state % rho * burn_state % y_e, &
@@ -281,7 +281,7 @@ program furcashell
         !$OMP END PARALLEL DO
 
         call fab_unbind(pf,i,j)
-        
+
      end do
   end do
 
@@ -297,7 +297,7 @@ contains
 
   subroutine print_usage()
     implicit none
-    
+
     print *,""
     print *, "This program takes a 3D plotfile and extracts the electron capture, "
     print *, " beta decay rate, mass fractions, ... "
