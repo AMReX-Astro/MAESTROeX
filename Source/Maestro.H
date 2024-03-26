@@ -68,7 +68,7 @@ amrex::Real QuadInterp(const amrex::Real x, const amrex::Real x0,
                        const amrex::Real y2, const bool limit = true);
 
 /// hard code a maximum level limit
-#define MAESTRO_MAX_LEVELS 15
+constexpr int MAESTRO_MAX_LEVELS{15};
 
 class Maestro : public amrex::AmrCore {
    public:
