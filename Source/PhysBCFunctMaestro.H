@@ -13,7 +13,7 @@ typedef void (*BndryFuncDefaultMaestro)(
 /// This version calls function working on array
 class BndryFuncArrayMaestro : public amrex::BndryFuncArray {
    public:
-    BndryFuncArrayMaestro() noexcept {}
+    BndryFuncArrayMaestro() = default;
     BndryFuncArrayMaestro(BndryFuncDefaultMaestro inFunc) noexcept
         : m_func(inFunc) {}
 

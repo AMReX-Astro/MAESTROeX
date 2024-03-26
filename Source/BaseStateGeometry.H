@@ -7,7 +7,7 @@
 
 class BaseStateGeometry {
    public:
-    BaseStateGeometry() noexcept {};
+    BaseStateGeometry() noexcept = default;
 
     void Init(const int max_radial_level_in, const int nr_fine_in,
               const amrex::Real dr_fine_in, const int nr_irreg_in,

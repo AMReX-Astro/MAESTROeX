@@ -78,8 +78,21 @@ class Maestro : public amrex::AmrCore {
 
     /// constructor
     Maestro();
+
     /// destructor
-    ~Maestro();
+    ~Maestro() override;
+
+    // copy constructor
+    Maestro(Maestro& other) = delete;
+
+    // move constructor
+    Maestro(Maestro&& other) = delete;
+
+    // copy assignment
+    Maestro& operator= (const Maestro& other) = delete;
+
+    // move assignment
+    Maestro& operator= (Maestro&& other) = delete;
 
     // in `MaestroSetup.cpp`
     /// Setup the simulation.
@@ -771,7 +784,7 @@ class Maestro : public amrex::AmrCore {
     /// finer levels.  This function creates a new fine
     /// level that did not exist before by interpolating from the coarser level
     /// overrides the pure virtual function in `AmrCore`
-    virtual void MakeNewLevelFromScratch(
+    void MakeNewLevelFromScratch(
         int lev, amrex::Real time, const amrex::BoxArray& ba,
         const amrex::DistributionMapping& dm) override;
 
