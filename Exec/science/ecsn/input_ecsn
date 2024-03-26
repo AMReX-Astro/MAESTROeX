@@ -8,10 +8,9 @@ maestro.drdxfac = 5
 amr.max_level          = 3       # maximum level number allowed
 amr.n_cell             = 128 128 128
 amr.max_grid_size      = 64
-#amr.ref_ratio          = 2 2 2 2  
+#amr.ref_ratio          = 2 2 2 2
 
-amr.refine_grid_layout = 1       # chop grids up into smaller grids
-if nprocs > ngrids
+amr.refine_grid_layout = 1       # chop grids up into smaller grids if nprocs > ngrids
 
 maestro.anelastic_cutoff_density = 1.e6
 maestro.base_cutoff_density = 1.e5
@@ -118,5 +117,3 @@ problem.particle_tpert_threshold = 2.e7
 eos.use_eos_coulomb = 1
 
 integrator.retry_burn = 1
-
-
