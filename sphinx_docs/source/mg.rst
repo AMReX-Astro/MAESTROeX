@@ -32,6 +32,11 @@ Support for :math:`\Delta x \ne \Delta y \ne \Delta z`
 Data Structures
 ---------------
 
+.. note::
+
+   This information is outdated
+
+
 mg_tower
 ~~~~~~~~
 

@@ -110,10 +110,11 @@ By default, some of the runtime parameters are listed in
 
     PROBIN_PARAMETER_DIRS := .
 
-They are parsed at compile time and the file ``extern.F90``
-is written and compiled. This is a Fortran module that holds the values of
-the runtime parameters and makes them available to any routine via
-``probin_module``.
+These are combined with the runtime parameters specified by Microphysics
+and parsed at compile time.  A C++ header and source file is written
+(``extern_parameters.cpp`` and ``extern_parameters.H``) that define
+the parameters and their defaults.
+
 
 The final line in the GNUmakefile includes the rules to actually
 build the executable.
@@ -148,15 +149,14 @@ Each line in the ``_cpp_parameters`` file has the form::
 
   *parameter*    *data-type*    *value*    *need in Fortran?*
 
-where *parameter* is the name of the runtime parameter,
-*data-type* is one of {string, Real, int, bool},
-the *value* specifies the default value for the runtime parameter,
-and *need in Fortran?* is marked *y* only if that parameter is
-used in Fortran. Comments are indicated by a ‘#’ character and are
+where *parameter* is the name of the runtime parameter, *data-type* is
+one of {string, Real, int, bool}, the *value* specifies the default
+value for the runtime parameter.  A fourth column, *need in Fortran?*,
+is no longer used.  Comments are indicated by a ‘#’ character and are
 used to produce documentation about the available runtime parameters.
-For the documentation, runtime parameters are grouped together
-in the ``_cpp_parameters`` file into categories. The category headings
-are defined by comments in the ``_cpp_parameters`` file and any comments
+For the documentation, runtime parameters are grouped together in the
+``_cpp_parameters`` file into categories. The category headings are
+defined by comments in the ``_cpp_parameters`` file and any comments
 following that heading are placed into that category.
 
 At runtime, the default values for the parameters can be overridden
