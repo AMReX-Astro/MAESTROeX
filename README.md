@@ -22,12 +22,11 @@ http://amrex-astro.github.io/MAESTROeX/
 
 ## Getting started
 
-- MAESTROeX requires a C++ compiler that supports the C++11 standard,
-  a Fortran compiler that supports the Fortran 2003 standard, and a C
-  compiler that supports the C99 standard. Several compiler suites are
-  supported, including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also
-  required, as is Python (>= 3.6) and standard tools available in any
-  Unix-like environments (e.g., Perl and `sed`).
+- MAESTROeX requires a C++ compiler that supports the C++17 standard
+  and a C compiler that supports the C99 standard. Several compiler
+  suites are supported, including GNU, Intel, LLVM, and Cray. GNU Make
+  (>= 3.82) is also required, as is Python (>= 3.9) and standard tools
+  available in any Unix-like environments (e.g., Perl and `sed`).
 
   For GPU computing, CUDA 10 or later is required.
 
@@ -66,7 +65,7 @@ http://amrex-astro.github.io/MAESTROeX/
 
   ```
   export AMREX_HOME="/path/to/amrex/"
-  export MICROPHYSICS_HOME='/path/to/Microphysics" 
+  export MICROPHYSICS_HOME='/path/to/Microphysics"
   ```
 
   Note: you must specify the full path to the directories.  Do not use
@@ -99,8 +98,8 @@ https://amrex-astro.github.io/MAESTROeX/docs/getting_started.html
 ## Regression and unit testing
 
 MAESTROeX needs to be tested in tandem with the AMReX and Microphysics
-repo updates.  This testing is done on local machines using the AMReX
-regression test framework
+repo updates.  We use github CI as well as testing on local machines
+using the AMReX regression test framework
 (https://github.com/AMReX-Codes/regression_testing).  Tests are run
 nightly and reported here:
 
@@ -183,6 +182,11 @@ Join the mailing list to ask for help or stay up-to-date:
 
 https://groups.google.com/forum/#!forum/maestro-help
 
-For answers to frequently asked questions and solutions to common problems, consult the [FAQ section](https://amrex-astro.github.io/MAESTROeX/docs/faq.html) of the User's Guide. 
+For answers to frequently asked questions and solutions to common
+problems, consult the [FAQ
+section](https://amrex-astro.github.io/MAESTROeX/docs/faq.html) of the
+User's Guide.
 
-If you discover any bugs in the code or would like to request further help, then please submit a issue to the MAESTROeX Github repository describing your problem.
+If you discover any bugs in the code or would like to request further
+help, then please submit a issue to the MAESTROeX Github repository
+describing your problem.
