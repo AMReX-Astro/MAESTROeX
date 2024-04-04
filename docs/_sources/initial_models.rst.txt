@@ -10,8 +10,8 @@ both the base state and the full Cartesian state.
 
 .. note::
 
-   When run, MAESTROeX outputs info that's useful to check, including ``dr`` of 
-   base state and ``dr`` of the input file, which should be the same at the 
+   When run, MAESTROeX outputs info that's useful to check, including ``dr`` of
+   base state and ``dr`` of the input file, which should be the same at the
    finest level; and Maximum HSE Error, which should be some small number.
 
 .. _Sec:Creating the Model Data from Raw Data:
@@ -24,15 +24,15 @@ We have found that for the best performance, the MAESTROeX
 initialization procedure should be given model data with the same
 resolution as the base state resolution, :math:`\Delta r`.
 
-* For planar problems, :math:`\Delta r = \Delta x`. 
+* For planar problems, :math:`\Delta r = \Delta x`.
 
 * For multilevel planar problems, we use :math:`\Delta r` equal to :math:`\Delta x`
-  at the finest resolution. 
+  at the finest resolution.
 
-* For spherical problems we set :math:`\Delta r = \Delta x/\mathtt{drdxfac}`. 
+* For spherical problems we set :math:`\Delta r = \Delta x/\mathtt{drdxfac}`.
 
 We generate our initial model either analytically or from raw data,
-:math:`\rho^{\raw}, T^{\raw}, p^{\raw}`, and :math:`X^{\raw}`. 
+:math:`\rho^{\raw}, T^{\raw}, p^{\raw}`, and :math:`X^{\raw}`.
 
 Here is the raw data file for each test
 problem:
@@ -53,7 +53,7 @@ is thermodynamically consistent with the MAESTROeX equation of
 state (EOS), and also satisfies our chosen hydrostatic equilibrium
 (HSE) discretization,
 
-.. math:: 
+.. math::
    \frac{p_r - p_{r-1}}{\Delta r} = \frac{\rho_r + \rho_{r-1}}{2}g_{r-\myhalf},
    :label: eq:hse_discretization
 
@@ -157,7 +157,7 @@ Coarse-Fine enforce_HSE Discretization
 --------------------------------------
 
 When integrating the HSE discretization upward, we must use a
-different differencing procedure at coarse-fine interfaces.  The 
+different differencing procedure at coarse-fine interfaces.  The
 figure below shows the transition from coarse (level
 :math:`l-1`) to fine (level :math:`l`), with the zone center indices
 noted.

@@ -565,9 +565,9 @@ two (optional) thermal diffusion solves, and the final velocity projection.
    the predictor and corrector portions of the main algorithm.
 
    There are two tolerances here. The norm of the residual is required
-   to be reduced by a relative tolerance of 
+   to be reduced by a relative tolerance of
 
-   .. math:: 
+   .. math::
       \epsilon =
        \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
        \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .

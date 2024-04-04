@@ -7,14 +7,14 @@ GPU
 In this chapter, we will present the GPU support in MAESTROeX,
 including necessary build parameters, how to offload a routine
 to GPU, and some basic profiling and debugging options.
-Note that currently MAESTROeX only supports NVIDIA GPUs. 
+Note that currently MAESTROeX only supports NVIDIA GPUs.
 
 Requirements
 ============
 
 Since MAESTROeX uses primarily CUDA C++ and CUDA Fortran,
 it requires a recent version of CUDA (e.g., >= 9) and the device
-must have compute capability of >= 6. 
+must have compute capability of >= 6.
 
 .. _sec:gpubuild:
 
@@ -29,7 +29,7 @@ to the GNUmakefile:
       USE_CUDA := TRUE
 
 We also need to set ``USE_OMP = FALSE`` because OpenMP is currently
-not compatible with building with CUDA. 
+not compatible with building with CUDA.
 ``USE_CUDA = TRUE`` and ``USE_OMP = TRUE`` will fail to compile.
 However, you may use MPI with CUDA for additional parallelization.
 
@@ -37,7 +37,7 @@ Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be s
 
 ::
 
-      COMP := pgi 
+      COMP := pgi
 
 The integrator used by the Microphysics library must be set to ``VODE90``:
 
@@ -45,14 +45,14 @@ The integrator used by the Microphysics library must be set to ``VODE90``:
 
     INTEGRATOR_DIR   := VODE90
 
-Depending on which system you are running on, it may be necessary to specify 
-the CUDA Capability using the ``CUDA_ARCH`` flag. The CUDA Capability will 
-depend on the specific GPU hardware you are running on. On a Linux system, the 
-capability of your device can typically be found by compiling and running the ``deviceQuery`` 
-script found in the CUDA samples directory: 
-``/usr/local/cuda/samples/1_Utilities/deviceQuery`` (its exact location may 
-vary depending on where CUDA is installed on your system). The default value of 
-this flag is 70, corresponding to a capability of 7.x. For a device with 
+Depending on which system you are running on, it may be necessary to specify
+the CUDA Capability using the ``CUDA_ARCH`` flag. The CUDA Capability will
+depend on the specific GPU hardware you are running on. On a Linux system, the
+capability of your device can typically be found by compiling and running the ``deviceQuery``
+script found in the CUDA samples directory:
+``/usr/local/cuda/samples/1_Utilities/deviceQuery`` (its exact location may
+vary depending on where CUDA is installed on your system). The default value of
+this flag is 70, corresponding to a capability of 7.x. For a device with
 capability 6.x, the flag should be set to:
 
 ::
@@ -69,7 +69,7 @@ statement on the line before the call. This tells the preprocessor to
 generate a CUDA device version of the function, with all the
 additional CUDA GPU management. In addition to this, there are a few
 other modifications required to ensure the function operates correctly
-on the GPU. We summarize these below. 
+on the GPU. We summarize these below.
 
 C++
 ---
@@ -78,7 +78,7 @@ C++
   and use ``AMREX_INT_ANYD`` as the macro wrapping ``bx.loVect()`` and
   ``bx.hiVect()``
 
-- Likewise, inplace of ``ZFILL()``, use ``AMREX_REAL_ANYD``
+- Likewise, inplace of ``AMREX_ZFILL()``, use ``AMREX_REAL_ANYD``
 
 - Scalars must be passed by value to Fortran functions (not by
   reference)
@@ -102,9 +102,9 @@ To illustrate these modifications, consider the function ``mk_sponge``. To call 
 
         const Box& tileBox = mfi.tilebox();
 
-        mk_sponge(ARLIM_3D(tileBox.loVect()), ARLIM_3D(tileBox.hiVect()),
+        mk_sponge(AMREX_ARLIM_3D(tileBox.loVect()), AMREX_ARLIM_3D(tileBox.hiVect()),
                   BL_TO_FORTRAN_3D(sponge_mf[mfi]),
-		  ZFILL(dx), &dt);
+          AMREX_ZFILL(dx), &dt);
      }
 
 Implementing the changes described above to offload this to GPU, this becomes
@@ -118,7 +118,7 @@ Implementing the changes described above to offload this to GPU, this becomes
     #pragma gpu box(tileBox)
         mk_sponge(AMREX_INT_ANYD(tileBox.loVect()), AMREX_INT_ANYD(tileBox.hiVect()),
                   BL_TO_FORTRAN_ANYD(sponge_mf[mfi]),
-		  AMREX_REAL_ANYD(dx), dt);
+          AMREX_REAL_ANYD(dx), dt);
      }
 
 Fortran
@@ -178,13 +178,13 @@ subroutine ``estdt`` in ``compute_dt.F90``:
 
    subroutine estdt(lev, dt, umax, lo, hi, dx, &
                     scal,  s_lo, s_hi, nc_s, &
-		    u,     u_lo, u_hi, nc_u, &
-		    force, f_lo, f_hi, nc_f, &
-		    divu,  d_lo, d_hi, &
-		    dSdt,  t_lo, t_hi, &
-		    w0_cart, w_lo, w_hi, &
-		    p0_cart, p_lo, p_hi, &
-		    gamma1bar_cart, g_lo, g_hi) bind (C,name="estdt")
+            u,     u_lo, u_hi, nc_u, &
+            force, f_lo, f_hi, nc_f, &
+            divu,  d_lo, d_hi, &
+            dSdt,  t_lo, t_hi, &
+            w0_cart, w_lo, w_hi, &
+            p0_cart, p_lo, p_hi, &
+            gamma1bar_cart, g_lo, g_hi) bind (C,name="estdt")
 
       use amrex_constants_module, only: HALF
       use amrex_fort_module, only: amrex_min ! function
@@ -211,8 +211,8 @@ subroutine ``estdt`` in ``compute_dt.F90``:
       do k = lo(3), hi(3)
          do j = lo(2), hi(2)
             do i = lo(1), hi(1)
-	       spdx = max(spdx ,abs(u(i,j,k,1)))
-	    
+           spdx = max(spdx ,abs(u(i,j,k,1)))
+
       ...
 
    end subroutine estdt
@@ -235,7 +235,7 @@ subroutine ``estdt`` in ``compute_dt.F90``:
 ..
 .. when do we need to mark stuff as attributes(managed)?
 
-   
+
 .. _sec:gpuprofile:
 
 Profiling with GPUs
@@ -277,7 +277,7 @@ Basic GPU Debugging
     Gpu::setLaunchRegion(0);
     ... ;
     Gpu::setLaunchRegion(1);
-    
+
 - To test if your kernels have launched, run
 
 .. code-block:: sh
@@ -286,11 +286,11 @@ Basic GPU Debugging
 
 - Run under ``nvprof -o profile%p.nvvp ./Maestro2d.xxx`` for
   a small problem and examine page faults using NVIDIA's visual profiler, `nvvp`
-		  
+
 - Run under ``cuda-memcheck``
 
 - Run under ``cuda-gdb``
-  
+
 - Run with ``CUDA_LAUNCH_BLOCKING=1``.  This means that only one
   kernel will run at a time.  This can help identify if there are race
   conditions.
