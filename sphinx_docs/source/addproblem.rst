@@ -111,7 +111,7 @@ By default, some of the runtime parameters are listed in
     PROBIN_PARAMETER_DIRS := .
 
 These are combined with the runtime parameters specified by Microphysics
-and parsed at compile time.  A C++ header and source file is written 
+and parsed at compile time.  A C++ header and source file is written
 (``extern_parameters.cpp`` and ``extern_parameters.H``) that define
 the parameters and their defaults.
 
