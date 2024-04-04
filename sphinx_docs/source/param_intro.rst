@@ -8,14 +8,11 @@ Runtime Parameters
 Introduction to Runtime Parameters
 ==================================
 
-MAESTROeX has 2 sets of runtime parameters—those controlled by
-C++ and those controlled by Fortran. The C++ parameters are set
+MAESTROeX runtime parameters are set
 in the inputs file and managed by the AMReX ``ParmParse``
 class. For MAESTROeX-specific parameters, we list the runtime
 parameters in a file ``Source/param/_cpp_parameters`` and generate the
-C++ code and headers using the ``Source/param/mk_params.sh`` script—note
-this script needs to be run every time the ``_cpp_parameters``
-file is updated.
+C++ code and headers automatically at compilation time.
 
 The behavior of the network, EOS, and other microphysics routines are
 controlled by a different set of runtime parameters. These parameters are defined
@@ -52,23 +49,7 @@ Here,
 
   * ``default`` is the default value of the parameter.
 
-The next columns are optional, but you need to fill in all of the
-information up to and including any of the optional columns you need
-(e.g., if you are going to provide the fortran name, you also need to
-provide ``need in Fortran?`` and ``ifdef``.
-
-  * ``need in Fortran?`` is ``y`` if the runtime parameter should be
-    made available in Fortran (through ``meth_params_module``).
-
-  * ``ifdef`` provides the name of a preprocessor name that should
-    wrap this parameter definition—it will only be compiled in if that
-    name is defined to the preprocessor.
-
-  * ``fortran name`` is the name that the parameter should use in
-    Fortran—by default it will be the same as ``name``.
-
-  * ``fortran type`` is the data type of the parameter in Fortran—by
-    default it will be the Fortran-equivalent to ``type``.
+The next columns are outdated.
 
 Finally, any comment (starting with ``#``) immediately before the
 parameter definition will be used to generate the documentation
