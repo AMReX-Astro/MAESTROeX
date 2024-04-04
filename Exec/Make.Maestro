@@ -203,6 +203,8 @@ AUTO_BUILD_SOURCES += $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
 
 CPP_PARAMETERS := $(TOP)/Source/param/_cpp_parameters
 
+$(MAESTROEX_AUTO_SOURCE_DIR)/runtime_params.cpp: $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H
+
 $(MAESTROEX_AUTO_SOURCE_DIR)/maestro_params.H: $(CPP_PARAMETERS)
 	@if [ ! -d $(MAESTROEX_AUTO_SOURCE_DIR) ]; then mkdir -p $(MAESTROEX_AUTO_SOURCE_DIR); fi
 	PYTHONPATH=$(MICROPHYSICS_HOME)/util/build_scripts $(TOP)/Source/param/parse_maestro_params.py -o $(MAESTROEX_AUTO_SOURCE_DIR) $(CPP_PARAMETERS)
