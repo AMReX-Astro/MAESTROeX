@@ -8,7 +8,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEtarho()", MakeEtarho);
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     bool launched;
     if (deterministic_nodal_solve) {
         launched = !Gpu::notInLaunchRegion();
@@ -161,7 +161,7 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
     RestrictBase(etarho_cc, true);
     FillGhostBase(etarho_cc, true);
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         // turn GPU back on
         if (launched) Gpu::setLaunchRegion(true);

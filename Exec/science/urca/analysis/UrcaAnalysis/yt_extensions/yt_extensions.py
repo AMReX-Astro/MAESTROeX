@@ -9,7 +9,7 @@ import numpy as np
 
 class PhysicalConstants:
     N_AVO = 6.02214129e23
-    
+
 class DatasetHelpers:
     @staticmethod
     def get_field(ds, field_name):
@@ -79,7 +79,7 @@ class UrcaShellFields(object):
         except yt.utilities.exceptions.YTFieldNotFound:
             print('WARNING: enucdot_dqweak_urca23 could not be added because it relies on a field not in the dataset.')
             pass
-        
+
         try:
             ds.add_field(('boxlib','enucloss_sneut'), sampling_type='cell', units='g',
                          function=UrcaShellFields._enucloss_sneut)
@@ -128,7 +128,7 @@ class UrcaShellFields(object):
         except yt.utilities.exceptions.YTFieldNotFound:
             print('WARNING: xc12_complement could not be added because it relies on a field not in the dataset.')
             pass
-        
+
     @staticmethod
     def _urca23_shell_unscaled(field, data):
         return data['boxlib','ecap23']*data['boxlib','beta23']*data['boxlib','X(na23)']*data['boxlib','X(ne23)']

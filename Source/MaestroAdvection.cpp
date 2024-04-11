@@ -1,6 +1,5 @@
 
 #include <Maestro.H>
-#include <MaestroBCThreads.H>
 
 using namespace amrex;
 
@@ -397,7 +396,7 @@ void Maestro::UpdateVel(
                     Real w0bar =
                         0.5 * (w0_arr(i, j, k, AMREX_SPACEDIM - 1) +
                                w0_arr(i, j + 1, k, AMREX_SPACEDIM - 1));
-#else 
+#else
                     Real w0bar = 0.5*(w0_arr(i,j,k,AMREX_SPACEDIM-1) + w0_arr(i,j,k+1,AMREX_SPACEDIM-1));
 #endif
 

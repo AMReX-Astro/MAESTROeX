@@ -261,7 +261,7 @@ divergence-free quantity and the gradient of a scalar. For the
 velocity, we can write:
 
 .. math::
-   \Ub^\star = \Ub^d + \nabla \phi 
+   \Ub^\star = \Ub^d + \nabla \phi
    :label: decomposition
 
 where :math:`\Ub^d` is the divergence free portion of the velocity vector,

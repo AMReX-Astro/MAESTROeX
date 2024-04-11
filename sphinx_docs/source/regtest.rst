@@ -47,7 +47,7 @@ at Stony Brook can be used as a starting point and is found here:
 Continuous Integration
 ======================
 
-We use Github Actions to run integration tests on the code and to build and deploy the documentation. 
+We use Github Actions to run integration tests on the code and to build and deploy the documentation.
 
 Currently, Github Actions runs the `clang static analyzer
 <https://clang-analyzer.llvm.org/>`_, which finds potential bugs in

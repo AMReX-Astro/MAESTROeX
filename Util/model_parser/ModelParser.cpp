@@ -15,13 +15,13 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
     // the first line has the number of points in the model
     std::string line;
     std::getline(model_file, line);
-    int ipos = line.find('=') + 1;
-    npts_model = stoi(line.substr(ipos));
+    std::string npts_string = line.substr(line.find('=')+1, line.length());
+    npts_model = std::stoi(npts_string);
 
     // now read in the number of variables
     std::getline(model_file, line);
-    ipos = line.find('=') + 1;
-    static const int nvars_model_file = std::stoi(line.substr(ipos));
+    std::string num_vars_string = line.substr(line.find('=')+1, line.length());
+    static const int nvars_model_file = std::stoi(num_vars_string);
 
     RealVector vars_stored(nvars_model_file);
     std::vector<std::string> varnames_stored(nvars_model_file);
@@ -29,8 +29,8 @@ void ModelParser::ReadFile(const std::string& model_file_name) {
     // now read in the names of the variables
     for (auto i = 0; i < nvars_model_file; ++i) {
         std::getline(model_file, line);
-        ipos = line.find('#') + 1;
-        varnames_stored[i] = maestro::trim(line.substr(ipos));
+        std::string var_string = line.substr(line.find('#')+1, line.length());
+        varnames_stored[i] = maestro::trim(var_string);
     }
 
     // allocate storage for the model data

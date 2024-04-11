@@ -55,7 +55,7 @@ program fad_excess
   character(len=20) :: plot_name(1)
 
   logical :: do_diag = .true.
-  
+
   real(kind=dp_t), parameter :: small = 1.e-14
 
 
@@ -72,11 +72,11 @@ program fad_excess
   narg = command_argument_count()
 
   farg = 1
-  do while (farg <= narg) 
+  do while (farg <= narg)
      call get_command_argument(farg, value = fname)
 
      select case(fname)
-        
+
      case ('-i', '--input')
         farg = farg + 1
         call get_command_argument(farg, value = pltfile)
@@ -117,7 +117,7 @@ program fad_excess
   dim = pf%dim
 
   dens_comp = plotfile_var_index(pf, "density")
-  spec_comp = plotfile_var_index(pf, "X(n)")  
+  spec_comp = plotfile_var_index(pf, "X(n)")
   temp_comp = plotfile_var_index(pf, "tfromp")
 
   if (dens_comp < 0 .or. spec_comp < 0 .or. temp_comp < 0) &
@@ -145,7 +145,7 @@ program fad_excess
      call build(ba,bl)
 
      call layout_build_ba(la, ba, boxarray_bbox(ba))
-     
+
      call destroy(bl)
      call destroy(ba)
 
@@ -153,7 +153,7 @@ program fad_excess
      call multifab_build(ad_excess(i),la,1,0)
 
   enddo
-     
+
   ! loop over the plotfile data starting at the first
   do i = pf%flevel, 1, -1
 
@@ -163,7 +163,7 @@ program fad_excess
         ! read in the data 1 patch at a time
         call fab_bind(pf, i, j)
 
-        ! get the integer bounds of the current box, in terms of this 
+        ! get the integer bounds of the current box, in terms of this
         ! level's index space
         lo(1:dim) = lwb(get_box(pf,i,j))
         hi(1:dim) = upb(get_box(pf,i,j))
@@ -178,7 +178,7 @@ program fad_excess
               eos_state % rho = p(ii,jj,1,dens_comp)
               eos_state % T = p(ii,jj,1,temp_comp)
               eos_state % xn(:) = p(ii,jj,1,spec_comp:spec_comp+nspec-1)
-              
+
               call eos(eos_input_rt, eos_state)
 
               pres(ii,jj) = eos_state % p
@@ -186,7 +186,7 @@ program fad_excess
               chi_rho = eos_state % rho * eos_state % dPdr / eos_state % p
               chi_t   = eos_state % T * eos_state % dPdT / eos_state % p
               nabla_ad(ii,jj) = (eos_state % gam1 - chi_rho) / (eos_state % gam1 * chi_t)
-              
+
            enddo
         enddo
 
@@ -212,7 +212,7 @@ program fad_excess
               else
                  nabla = pres(ii,jj) * dt / (dp*p(ii,jj,1,temp_comp))
               endif
-              
+
               ap(ii,jj,1,1) = nabla - nabla_ad(ii,jj)
 
            enddo

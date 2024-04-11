@@ -1,8 +1,8 @@
 """
-This script produces a slice plot for a given plotfile and variable. 
+This script produces a slice plot for a given plotfile and variable.
 """
 
-import yt 
+import yt
 import sys
 import argparse
 from mpl_toolkits.axes_grid1 import AxesGrid
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams["mathtext.fontset"] = "stix"
 
-def plot_single_var(plotfile_name, outputfile_name, var_names, 
+def plot_single_var(plotfile_name, outputfile_name, var_names,
                     use_log, norm_axis, minimum, maximum):
 
     if outputfile_name is None:
@@ -19,8 +19,8 @@ def plot_single_var(plotfile_name, outputfile_name, var_names,
             outputfile_name = plotfile_name[:-1] + suffix
         else:
             outputfile_name = plotfile_name + suffix
-        
-    # load data 
+
+    # load data
     ds = yt.load(plotfile_name)
 
     fig = plt.figure()
@@ -48,9 +48,9 @@ def plot_single_var(plotfile_name, outputfile_name, var_names,
                 cbar_size="3%",
                 cbar_pad="0%")
 
-    # make the slice plot 
+    # make the slice plot
     plots = yt.SlicePlot(ds, norm_axis, var_names)
-        
+
     if minimum is None:
         minimum = 'min'
     if maximum is None:
@@ -62,14 +62,14 @@ def plot_single_var(plotfile_name, outputfile_name, var_names,
 
         p = plots.plots[var]
         p.figure = fig
-        p.axes = grid[i].axes 
+        p.axes = grid[i].axes
         p.cax = grid.cbar_axes[i]
 
         plots.set_zlim(var, minimum, maximum)
         plots.set_log(var, use_log)
 
     plots._setup_plots()
-            
+
     fig.savefig(outputfile_name, bbox_inches='tight')
 
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    use_log = args.log 
+    use_log = args.log
 
     if use_log is None:
         use_log = False

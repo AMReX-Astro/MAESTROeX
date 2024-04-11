@@ -30,7 +30,7 @@ def image_animator(args):
 
     # Sort if necessary
     if args.sort is not None:
-        
+
         # Descending or ascending
         desc = args.sort < 0
         # Starting index
@@ -43,21 +43,21 @@ def image_animator(args):
         else:
             key = lambda filename: filename[start:start+nchars]
         images.sort(key=key, reverse=desc)
-        
+
     if args.out.endswith(".mp4"):
         args.out = args.out[:-4]
     if not args.out:
         sys.exit("Invalid output file!")
 
     with tf.TemporaryDirectory() as dir:
-        
+
         # The files are numbered
         # Padding with zeros preserves sort order
         ndigits = len(str(len(images)))
         baselink = "__fftemp_{:0%dd}.png" % ndigits
 
         for i, image in enumerate(map(os.path.abspath, images)):
-            
+
             # Create a symlink for each file
             linkname = baselink.format(i)
             linkname = os.path.join(dir, linkname)
@@ -75,4 +75,3 @@ if __name__ == "__main__":
     args = parse_args()
 
     image_animator(args)
-    

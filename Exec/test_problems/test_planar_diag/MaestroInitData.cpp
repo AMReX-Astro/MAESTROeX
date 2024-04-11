@@ -59,9 +59,9 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
         // This seems to work ok with sealed box?
         // Real rho_local = rho0 * (1.0 +
-        // 			    pert_amp_loc * std::exp(-y/(2.0 * scale_height_loc)) *
-        // 			    std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]) ) *
-        // 			    sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]) ) );
+        //                 pert_amp_loc * std::exp(-y/(2.0 * scale_height_loc)) *
+        //                 std::cos(x * k_hoz_loc * M_PI / (prob_hi[0] - prob_lo[0]) ) *
+        //                 sin(y * k_vert_loc * M_PI / (prob_hi[1] - prob_lo[1]) ) );
 
         // What about this ?
 

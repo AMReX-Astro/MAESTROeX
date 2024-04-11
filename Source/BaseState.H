@@ -139,7 +139,7 @@ class BaseState {
       public member functions
     */
 
-    BaseState() : nlev(0), len(0), nvar(0) {}
+    BaseState() noexcept : nlev(0), len(0), nvar(0) {}
 
     explicit BaseState(const int num_levs, const int length = 1,
                        const int ncomp = 1, const T val = T());

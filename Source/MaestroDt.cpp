@@ -1,7 +1,7 @@
 
 #include <Maestro.H>
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
 #include <AMReX_Arena.H>
 #include <cuda_runtime_api.h>
 #endif
@@ -248,7 +248,7 @@ void Maestro::EstDt() {
                                 (p0_arr(i, j + 1, k) - p0_arr(i, j - 1, k)) /
                                 dx[1];
                         }
-#else 
+#else
                         if (k == 0) {
                             gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                         } else if (k == nr_lev-1) {
@@ -615,8 +615,7 @@ void Maestro::FirstDt() {
                 const Real eps = 1.e-8;
                 const Real rho_min = 1.e-20;
 
-                FArrayBox spd(tileBox);
-                Elixir e_s = spd.elixir();
+                FArrayBox spd(tileBox, 1, The_Async_Arena());
 
                 const Array4<Real> spd_arr = spd.array();
 
@@ -740,7 +739,7 @@ void Maestro::FirstDt() {
                                           p0_arr(i, j - 1, k)) /
                                          dx[1];
                             }
-#else 
+#else
                             if (k == 0) {
                                 gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                             } else if (k == nr_lev-1) {
@@ -855,7 +854,7 @@ void Maestro::FirstDt() {
 }
 
 void Maestro::EstDt_Divu(BaseState<Real>& gp0, const BaseState<Real>& p0,
-                         const BaseState<Real>& gamma1bar) {
+                         const BaseState<Real>& gamma1bar) const {
     auto gp0_arr = gp0.array();
     const auto p0_arr = p0.const_array();
     const auto gamma1bar_arr = gamma1bar.const_array();

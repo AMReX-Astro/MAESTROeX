@@ -58,7 +58,7 @@ lines of the form:
 
 where ``file.cpp`` is a C++ source file and ``file.F90`` is a Fortran
 source file that should be built when this directory is added to the
-list of build directories. 
+list of build directories.
 
 The AMReX build system relies on the ``vpath`` functionality of
 make. In a makefile, the ``vpath`` variable holds search path used to
@@ -77,7 +77,7 @@ There is no need to explicitly define the dependencies between the
 source files for Fortran modules. Scripts in
 AMReX are run at the start of the build
 process and parse all the source files and make an explicit list of
-the dependency pairs. 
+the dependency pairs.
 
 Files Created at Compile-time
 -----------------------------
@@ -128,7 +128,7 @@ Problem-specific Files
 
 If a problem has a unique file that is needed as part of the build,
 then that file should be added to a ``Make.package`` file in the
-problem’s directory. 
+problem’s directory.
 
 Note that this is not necessary if you place a custom version of
 a source file in the problem’s directory. Since that file is already
@@ -193,7 +193,7 @@ Core MAESTROeX modules
 ----------------------
 
 Several modules are included in all MAESTROeX builds by default.
-In addition to the AMReX sources, we also include 
+In addition to the AMReX sources, we also include
 
 -  ``MAESTROeX/Source``
 
@@ -243,7 +243,7 @@ that are not found could indicate an incomplete ``vpath``.
 ---------------------------
 
 Typing ``make clean`` deletes the object and module files for the
-current build (i.e., the current choice of ``USE_MPI``, ``DEBUG``, 
+current build (i.e., the current choice of ``USE_MPI``, ``DEBUG``,
 ``COMP``, and ``USE_OMP``). This also removes any of the compile-time
 generated source files. Any other builds are left unchanged.
 
@@ -327,7 +327,7 @@ Properties for different compilers are already defined in
 ``${AMREX_HOME}/Tools/GNUmake``. Each compiler is given its
 own file in the ``comps/`` sub-directory.  These
 compiler files define the compiler flags for both optimized and debug
-compiling. 
+compiling.
 
 Parallel (MPI) Builds
 ---------------------
@@ -335,6 +335,6 @@ Parallel (MPI) Builds
 When building with MPI, the build system needs to know about the
 location of the MPI libraries. If your local MPI has the ``mpif90``
 and ``mpicxx`` wrappers installed and working, then MAESTROeX will
-attempt to use these. Otherwise, you will need to add a site to the 
+attempt to use these. Otherwise, you will need to add a site to the
 ``sites/`` sub-directory in the AMReX build system specifying the
 details of your environment.

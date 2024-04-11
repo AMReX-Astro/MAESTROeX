@@ -1,14 +1,14 @@
 """
-This script is designed to be run from a submission script to produce plots from 
-plotfiles as they are produced. It reads in variables and parameters from 
+This script is designed to be run from a submission script to produce plots from
+plotfiles as they are produced. It reads in variables and parameters from
 an inputs file.
 
-If no output file name is provided, then it will append '.png' to the 
+If no output file name is provided, then it will append '.png' to the
 name of the plotfile and save it there.
 """
 
-import yt 
-import numpy as np 
+import yt
+import numpy as np
 import sys
 import re
 import argparse
@@ -35,14 +35,14 @@ def read_inputs_file(inputs_file):
             var = m.group(1)
             variables[var] = {}
 
-            # we only want to search up to either the end of file or to the 
+            # we only want to search up to either the end of file or to the
             # position of the start of the next variable name
             if i == len(matches)-1:
                 endpoint = -1
             else:
                 endpoint = matches[i+1].start()
 
-            # find all the parameters associated with that variable 
+            # find all the parameters associated with that variable
             for p in re.finditer(values_re, txt[m.end():endpoint]):
 
                 param = p.group(1)
@@ -51,7 +51,7 @@ def read_inputs_file(inputs_file):
                 variables[var][param] = value
 
     return variables
-    
+
 
 def runtime_vis(plotfile_name, outputfile_name, inputs_file):
 
@@ -62,8 +62,8 @@ def runtime_vis(plotfile_name, outputfile_name, inputs_file):
             outputfile_name = plotfile_name[:-1] + '.png'
         else:
             outputfile_name = plotfile_name + '.png'
-        
-    # load data 
+
+    # load data
     ds = yt.load(plotfile_name)
 
     fig = plt.figure(figsize=(16,9))
@@ -93,13 +93,13 @@ def runtime_vis(plotfile_name, outputfile_name, inputs_file):
 
     plots = yt.SlicePlot(ds, 'z', list(variables.keys()))
 
-    # iterate over the variables, assign them to the grid and update their 
+    # iterate over the variables, assign them to the grid and update their
     # parameters
     for i, (var, params) in enumerate(variables.items()):
 
         p = plots.plots[var]
-        p.figure = fig 
-        p.axes = grid[i].axes 
+        p.figure = fig
+        p.axes = grid[i].axes
         p.cax = grid.cbar_axes[i]
 
         plots.set_zlim(var, params.get('min', 'min'), params.get('max', 'max'))
@@ -108,12 +108,12 @@ def runtime_vis(plotfile_name, outputfile_name, inputs_file):
         if use_log == '1':
             use_log = True
         else:
-            use_log = False 
+            use_log = False
 
         plots.set_log(var, use_log)
 
     plots._setup_plots()
-            
+
     fig.savefig(outputfile_name, bbox_inches='tight', dpi=80)
 
 

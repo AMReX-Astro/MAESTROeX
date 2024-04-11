@@ -16,7 +16,7 @@ void Maestro::MakeEdgeState1d(BaseState<Real>& s, BaseState<Real>& sedge,
 
 void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                                   BaseState<Real>& sedge_state,
-                                  BaseState<Real>& force_state) {
+                                  BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()", MakeEdgeState1dSphr);
 
@@ -315,7 +315,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                         if (sgn * (delam - alpham) >= 1.e-10) {
                             alphap = (-2.0 * delam -
                                       2.0 * sgn *
-                                          sqrt(delam * delam - delam * alpham));
+                                          std::sqrt(delam * delam - delam * alpham));
                         } else {
                             alphap = -2.0 * alpham;
                         }
@@ -329,7 +329,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                         if (sgn * (delap - alphap) >= 1.e-10) {
                             alpham = (-2.0 * delap -
                                       2.0 * sgn *
-                                          sqrt(delap * delap - delap * alphap));
+                                          std::sqrt(delap * delap - delap * alphap));
                         } else {
                             alpham = -2.0 * alphap;
                         }
@@ -387,7 +387,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
 
 void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     BaseState<Real>& sedge_state,
-                                    BaseState<Real>& force_state) {
+                                    BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dPlanar()", MakeEdgeState1dPlanar);
 
@@ -861,8 +861,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     if (sgn * (delam - alpham) >= 1.e-10) {
                                         alphap = (-2.0 * delam -
                                                   2.0 * sgn *
-                                                      sqrt(delam * delam -
-                                                           delam * alpham));
+                                                      std::sqrt(delam * delam -
+                                                                delam * alpham));
                                     } else {
                                         alphap = -2.0 * alpham;
                                     }
@@ -877,8 +877,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     if (sgn * (delap - alphap) >= 1.e-10) {
                                         alpham = (-2.0 * delap -
                                                   2.0 * sgn *
-                                                      sqrt(delap * delap -
-                                                           delap * alphap));
+                                                      std::sqrt(delap * delap -
+                                                                delap * alphap));
                                     } else {
                                         alpham = -2.0 * alphap;
                                     }
