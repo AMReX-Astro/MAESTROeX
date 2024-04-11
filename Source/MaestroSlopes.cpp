@@ -219,8 +219,8 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
     Vector<int> bclo_v(ncomp);
     Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
-        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[1];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[1];
     }
 
     AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
@@ -417,8 +417,8 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
     Vector<int> bclo_v(ncomp);
     Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
-        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[2];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[2];
     }
 
     AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
