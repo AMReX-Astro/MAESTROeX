@@ -155,13 +155,13 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         if (Geom(0).isPeriodic(idim)) {
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         } else {
-            if (phys_bc[idim] == Outflow) {
+            if (phys_bc[idim] == amrex::PhysBCType::outflow) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
             } else {
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             }
 
-            if (phys_bc[AMREX_SPACEDIM + idim] == Outflow) {
+            if (phys_bc[AMREX_SPACEDIM + idim] == amrex::PhysBCType::outflow) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;
             } else {
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
@@ -212,7 +212,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
         rhcc[lev].mult(-1.0, 0, 1, 1);
     }
 
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     // compRHS is non-deterministic on the GPU. If this flag is true, run
     // on the CPU instead
     bool launched;
@@ -228,7 +228,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
     mlndlap.compRHS(amrex::GetVecOfPtrs(rhstotal), amrex::GetVecOfPtrs(Vproj),
                     {},  // pass in null rhnd
                     amrex::GetVecOfPtrs(rhcc));
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         // turn GPU back on
         if (launched) Gpu::setLaunchRegion(true);
@@ -261,34 +261,34 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
             } else if (istep_divu_iter == init_divu_iter - 1) {
                 rel_tol = eps_divu_sph * divu_iter_factor;
             } else if (istep_divu_iter <= init_divu_iter - 2) {
-                rel_tol = eps_divu_sph * pow(divu_iter_factor, 2);
+                rel_tol = eps_divu_sph * std::pow(divu_iter_factor, 2);
             }
         } else {
             if (istep_divu_iter == init_divu_iter) {
                 rel_tol = amrex::min(
-                    eps_divu_cart * pow(divu_level_factor, finest_level),
-                    eps_divu_cart * pow(divu_level_factor, 2));
+                    eps_divu_cart * std::pow(divu_level_factor, finest_level),
+                    eps_divu_cart * std::pow(divu_level_factor, 2));
             } else if (istep_divu_iter == init_divu_iter - 1) {
                 rel_tol = amrex::min(eps_divu_cart * divu_iter_factor *
-                                         pow(divu_level_factor, finest_level),
+                                         std::pow(divu_level_factor, finest_level),
                                      eps_divu_cart * divu_iter_factor *
-                                         pow(divu_level_factor, 2));
+                                         std::pow(divu_level_factor, 2));
             } else if (istep_divu_iter <= init_divu_iter - 2) {
-                rel_tol = amrex::min(eps_divu_cart * pow(divu_iter_factor, 2) *
-                                         pow(divu_level_factor, finest_level),
-                                     eps_divu_cart * pow(divu_iter_factor, 2) *
-                                         pow(divu_level_factor, 2));
+                rel_tol = amrex::min(eps_divu_cart * std::pow(divu_iter_factor, 2) *
+                                         std::pow(divu_level_factor, finest_level),
+                                     eps_divu_cart * std::pow(divu_iter_factor, 2) *
+                                         std::pow(divu_level_factor, 2));
             }
         }
     } else if (proj_type == pressure_iters_comp ||
                proj_type == regular_timestep_comp) {
         rel_tol =
-            amrex::min(eps_hg_max, eps_hg * pow(hg_level_factor, finest_level));
+            amrex::min(eps_hg_max, eps_hg * std::pow(hg_level_factor, finest_level));
     }
 
     // solve for phi
     Print() << "Calling nodal solver" << std::endl;
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         launched = !Gpu::notInLaunchRegion();
         // turn off GPU
@@ -297,7 +297,7 @@ void Maestro::NodalProj(int proj_type, Vector<MultiFab>& rhcc,
 #endif
     mlmg.solve(amrex::GetVecOfPtrs(phi), amrex::GetVecOfConstPtrs(rhstotal),
                rel_tol, abs_tol);
-#ifdef AMREX_USE_CUDA
+#ifdef AMREX_USE_GPU
     if (deterministic_nodal_solve) {
         // turn GPU back on
         if (launched) Gpu::setLaunchRegion(true);
@@ -505,8 +505,8 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
         const Box& domainBox = geom[lev].Domain();
 
         for (int idir = 0; idir < BL_SPACEDIM; idir++) {
-            if (phys_bc[idir] != Inflow &&
-                phys_bc[AMREX_SPACEDIM + idir] != Inflow) {
+            if (phys_bc[idir] != amrex::PhysBCType::inflow &&
+                phys_bc[AMREX_SPACEDIM + idir] != amrex::PhysBCType::inflow) {
                 vel[lev].setBndry(0.0, idir, 1);
             } else {
 #ifdef _OPENMP
@@ -521,7 +521,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
 
                     BoxList bxlist(reg);
 
-                    if (phys_bc[idir] == Inflow &&
+                    if (phys_bc[idir] == amrex::PhysBCType::inflow &&
                         reg.smallEnd(idir) == domainBox.smallEnd(idir)) {
                         Box bx;  // bx is the region we *protect* from zero'ing
 
@@ -545,7 +545,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
                         bxlist.push_back(bx);
                     }
 
-                    if (phys_bc[AMREX_SPACEDIM + idir] == Inflow &&
+                    if (phys_bc[AMREX_SPACEDIM + idir] == amrex::PhysBCType::inflow &&
                         reg.bigEnd(idir) == domainBox.bigEnd(idir)) {
                         Box bx;  // bx is the region we *protect* from zero'ing
 
@@ -673,9 +673,9 @@ void Maestro::MakePiCC(const Vector<MultiFab>& beta0_cart) {
                     0.25 * (pi_arr(i, j, k) + pi_arr(i + 1, j, k) +
                             pi_arr(i, j + 1, k) + pi_arr(i + 1, j + 1, k));
 #else
-                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k) 
-                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1) 
-                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1) 
+                pi_cc(i,j,k) = 0.125 * (pi_arr(i,j,k) + pi_arr(i+1,j,k)
+                    + pi_arr(i,j+1,k) + pi_arr(i,j,k+1)
+                    + pi_arr(i+1,j+1,k) + pi_arr(i+1,j,k+1)
                     + pi_arr(i,j+1,k+1) + pi_arr(i+1,j+1,k+1));
 #endif
                 if (use_alt_energy_fix_loc) {

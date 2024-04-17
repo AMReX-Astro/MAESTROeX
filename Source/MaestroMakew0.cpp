@@ -190,7 +190,7 @@ void Maestro::Makew0Planar(
                     w0_arr(n - 1, (base_geom.r_end_coord(n, j) + 1) / 2);
 
                 for (auto i = n - 1; i >= 0; --i) {
-                    auto refrat = (int)amrex::Math::round(pow(2, n - i));
+                    auto refrat = (int)amrex::Math::round(std::pow(2, n - i));
 
                     // Restrict w0 from level n to level i
                     for (auto r = base_geom.r_start_coord(n, j);
@@ -969,8 +969,7 @@ void Maestro::Tridiag(const BaseStateArray<Real>& a,
 }
 
 void Maestro::ProlongBasetoUniform(const BaseState<Real>& base_ml_s,
-                                   BaseState<Real>& base_fine_s)
-
+                                   BaseState<Real>& base_fine_s) const
 {
     // the mask array will keep track of whether we've filled in data
     // in a corresponding radial bin.  .false. indicates that we've

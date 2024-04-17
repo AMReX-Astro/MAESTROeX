@@ -21,7 +21,7 @@ void Maestro::MakeGravCell(BaseState<Real>& grav_cell,
             // does not contribute to the gravitational acceleration.
             for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
-                ParallelFor(nr_lev, [=] AMREX_GPU_DEVICE(long r) {
+                ParallelFor(nr_lev, [=] AMREX_GPU_DEVICE(int r) {
                     grav_cell_arr(n, r) = -Gconst * planar_invsq_mass_loc /
                                           (r_cc_loc(n, r) * r_cc_loc(n, r));
                 });
@@ -223,7 +223,7 @@ void Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
             //
             for (auto n = 0; n <= base_geom.finest_radial_level; ++n) {
                 const int nr_lev = base_geom.nr(n);
-                ParallelFor(nr_lev, [=] AMREX_GPU_DEVICE(long r) {
+                ParallelFor(nr_lev, [=] AMREX_GPU_DEVICE(int r) {
                     grav_edge(n, r) = -Gconst * planar_invsq_mass_loc /
                                       (r_edge_loc(n, r) * r_edge_loc(n, r));
                 });

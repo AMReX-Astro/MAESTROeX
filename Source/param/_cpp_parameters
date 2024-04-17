@@ -5,7 +5,7 @@
 # Problem-specific runtime parameters should be defined in a _parameters
 # file in the problem directory.
 
-# name   type   default   need in Fortran?   ifdef    fortran name    fortran type
+# name   type   default   ifdef
 #
 # note, name can have two values, as (a, b).  a will be the name used
 # in the inputs file, b is the variable name in the C++ class.
@@ -28,36 +28,36 @@ reflux_type                         int         1
 #-----------------------------------------------------------------------------
 
 # General verbosity
-maestro_verbose                     int         1       y
+maestro_verbose                     int         1
 
 #-----------------------------------------------------------------------------
 # category: problem initialization
 #-----------------------------------------------------------------------------
 
 # input model file
-model_file                          string      ""             y
+model_file                          string      ""
 
 # Turn on a perturbation in the initial data.  Problem specific.
-perturb_model                       bool        false          y
+perturb_model                       bool        false
 
 # print out HSE diagnostics as a function of r for the initial model
-print_init_hse_diag                 bool        false          y
+print_init_hse_diag                 bool        false
 
 # do we use rho, T or rho, P from the initial model to establish thermodynamics
-basestate_use_pres_model            int         0              y
+basestate_use_pres_model            int         0
 
 #-----------------------------------------------------------------------------
 # category: timestepping
 #-----------------------------------------------------------------------------
 
 # simulation stop time
-stop_time                           Real        -1.0           y
+stop_time                           Real        -1.0
 
 # Maximum number of steps in the simulation.
-max_step                            int         -1             y
+max_step                            int         -1
 
 # CFL factor to use in the computation of the advection timestep constraint
-cfl                                 Real              0.5        y
+cfl                                 Real              0.5
 
 # the multiplicative factor ($\le 1$) to reduce the initial timestep as
 # computed by the various timestep estimators
@@ -85,24 +85,24 @@ fixed_dt                            Real               -1.0
 nuclear_dt_fac                      Real               -1.0
 
 # Use the soundspeed constraint when computing the first time step.
-use_soundspeed_firstdt              bool            false     y
+use_soundspeed_firstdt              bool            false
 
 # Use the divu constraint when computing the first time step.
-use_divu_firstdt                    bool            false       y
+use_divu_firstdt                    bool            false
 
 #-----------------------------------------------------------------------------
 # category: grid
 #-----------------------------------------------------------------------------
 
 # Set to true if you are doing a spherical problem.
-spherical                           bool            false    y
+spherical                           bool            false
 
 # set octant = T if you just want to model an octant of a sphere
 # (note: only takes effect for spherical geometry)
-octant                              bool            false       y
+octant                              bool            false
 
 # Set to true if using the 2D simplified (planar) model of an octant.
-do_2d_planar_octant                 bool            false       y
+do_2d_planar_octant                 bool            false
 
 # How often we regrid.
 regrid_int                          int            -1
@@ -113,7 +113,7 @@ amr_buf_width                       int            -1
 
 # ratio of radial base state zones to Cartesian full state zones for
 # spherical geometry
-drdxfac                             int            1    y
+drdxfac                             int            1
 
 # The minimum size on a side for a grid created using make\_new\_grids.
 minwidth                            int            8
@@ -123,7 +123,7 @@ min_eff                             Real               0.9
 
 # pass $T'$ into the tagging routines as the auxiliary multifab instead
 # of the default $\rho H_\mathrm{nuc}$.
-use_tpert_in_tagging                bool            false     y
+use_tpert_in_tagging                bool            false
 
 
 #-----------------------------------------------------------------------------
@@ -282,16 +282,16 @@ hg_dense_stencil                    bool            true
 #-----------------------------------------------------------------------------
 
 # Use sponging.
-do_sponge                           bool            false       y
+do_sponge                           bool            false
 
 # Parameter for sponge.  Problem dependent.
-sponge_kappa                        Real               10.e0            y
+sponge_kappa                        Real               10.e0
 
 # Center of the inner sponge.
-sponge_center_density               Real               3.e6             y
+sponge_center_density               Real               3.e6
 
 # The sponge begins at sponge\_center\_density * sponge\_start\_factor.
-sponge_start_factor                 Real               3.333e0          y
+sponge_start_factor                 Real               3.333e0
 
 # plot fdamp rather than sponge
 # assumes sponge has the form 1/(1+dt*{\tt sponge\_kappa}*fdamp)
@@ -302,42 +302,42 @@ plot_sponge_fdamp                   bool            false
 # the anelastic constraint, instead of the low Mach constraint.  This
 # prevents velocities from getting out of hand at the edge of the star.
 # Refer to Section \ref{Sec:Anelastic Cutoff}.
-anelastic_cutoff_density            Real               -1.0     y
+anelastic_cutoff_density            Real               -1.0
 
 # The density below which we keep the initial model constant.
 # Refer to Section \ref{Sec:Base Cutoff Density}
-base_cutoff_density                 Real               -1.0     y
+base_cutoff_density                 Real               -1.0
 
 # The density below which we disable burning
-burning_cutoff_density_lo           Real               -1.0     y
+burning_cutoff_density_lo           Real               -1.0
 
 # The density above which we disable burning
-burning_cutoff_density_hi           Real               1.e100     y
+burning_cutoff_density_hi           Real               1.e100
 
 # The density below which we disable heating
-heating_cutoff_density_lo           Real               -1.0     y
+heating_cutoff_density_lo           Real               -1.0
 
 # The density above which we disable heating
-heating_cutoff_density_hi           Real               1.e100     y
+heating_cutoff_density_hi           Real               1.e100
 
 # The multiplicative factor (over base\_cutoff\_density) below which we
 # do zero out the buoyancy term in the momentum equation.
-buoyancy_cutoff_factor              Real               5.0      y
+buoyancy_cutoff_factor              Real               5.0
 
 # factor in front of the volume discrepancy term (0.0 = off)
-dpdt_factor                         Real               0.0      y
+dpdt_factor                         Real               0.0
 
 # are we doing 1/r$^2$ gravity for plane-parallel
-do_planar_invsq_grav                bool            false       y
+do_planar_invsq_grav                bool            false
 
 # the point mass for planar 1/r$^2$ gravity
-planar_invsq_mass                   Real               0.0      y
+planar_invsq_mass                   Real               0.0
 
 # turn on (true) or off (false) basestate evolution
-evolve_base_state                   bool            true        y
+evolve_base_state                   bool            true
 
 # turn on (true) or off (false) irregularly-spaced basestate
-use_exact_base_state                bool            false       y
+use_exact_base_state                bool            false
 
 # if true, don't call average to reset the base state at all, even during
 # initialization
@@ -345,15 +345,15 @@ fix_base_state                      bool            false
 
 # turn on (true) or off (false) basestate evolution that uses averages
 # of cell-centered data instead of advecting
-average_base_state                  bool            false       y
+average_base_state                  bool            false
 
 # force $\rho_0 = (\rho h)_0 = 0$, {\tt evolve\_base\_state = F}
 # and {\tt beta\_type} = 3
-do_smallscale                       bool            false       y
+do_smallscale                       bool            false
 
 # After the advective enthalpy update, recompute the enthalpy if we are
 # below the base cutoff density.
-do_eos_h_above_cutoff               bool            true        y
+do_eos_h_above_cutoff               bool            true
 
 # predict\_rhoh = 0; @@
 # predict\_rhohprime = 1; @@
@@ -362,7 +362,7 @@ do_eos_h_above_cutoff               bool            true        y
 # predict\_T\_then\_h = 4; @@
 # predict\_hprime = 5; @@
 # predict\_Tprime\_then\_h = 6.
-enthalpy_pred_type                  int            1            y
+enthalpy_pred_type                  int            1
 
 # Which quantities do we predict to the edges for computing the ($\rho X$)
 # edge states?  @@
@@ -370,10 +370,10 @@ enthalpy_pred_type                  int            1            y
 # and $X$ separately.  @@
 # {\tt species\_pred\_type} = 2 means predict the full ($\rho X$) itself. @@
 # {\tt species\_pred\_type} = 3 means predict $\rho$ and $X$ separately.
-species_pred_type                   int            1            y
+species_pred_type                   int            1
 
 # turns on second order correction to delta gamma1 term
-use_delta_gamma1_term               bool            true        y
+use_delta_gamma1_term               bool            true
 
 # turn on the etarho term as described in flow chart
 use_etarho                          bool            true
@@ -382,15 +382,15 @@ use_etarho                          bool            true
 add_pb                              bool            false
 
 # order of slopes in piecewise linear Godunov algorithm.  Options are 0, 2, or 4.
-slope_order                         int            4              y
+slope_order                         int            4
 
 # the gravitational acceleration (cm~s$^{-2}$) for plane-parallel geometry
-grav_const                          Real               -1.5e10    y
+grav_const                          Real               -1.5e10
 
 # 0 = no ppm (piecewise linear slopes instead) @@
 # 1 = 1984 ppm @@
 # 2 = Hybrid Sekora/Colella and McCorquodale/Colella 2009/2010 ppm
-ppm_type                            int            1           y
+ppm_type                            int            1
 
 # 0 = use ppm instead for multi-d integrator @@
 # 1 = bilinear
@@ -399,32 +399,32 @@ bds_type                            int            0
 # if 1, then perform parabolic reconstruction on the forces used in
 # the prediction and trace under the parabola to the interfaces the
 # amount that can reach the interface over dt
-ppm_trace_forces                    int            0           y
+ppm_trace_forces                    int            0
 
 
 # what type of coefficient to use inside the velocity divergence constraint. @@
 # {\tt beta0\_type} = 1 uses $\beta_0$; @@
 # {\tt beta0\_type} = 2 uses $\rho_0$ (anelastic); @@
 # {\tt beta0\_type} = 3 uses 1 (small-scale combustion).
-beta0_type                           int            1    y
+beta0_type                           int            1
 
 # how to represent gravity in the $\beta_0$ integration:
 # true = piecewise linear
 # false = piecewise constant
-use_linear_grav_in_beta0             bool            false       y
+use_linear_grav_in_beta0             bool            false
 
 # rotational frequency used for computing centrifugal term in rotation problems.
-rotational_frequency                Real               0.0    y
+rotational_frequency                Real               0.0
 
 # latitude, in radians, for problems with rotation where the domain is
 # only a subset of a full star.
-co_latitude                         Real               0.0      y
+co_latitude                         Real               0.0
 
 # radius used for computing centrifugal term in rotation problems
 rotation_radius                     Real               1.0e6
 
 # include (true) or exclude (false) centrifugal term
-use_centrifugal                bool               true 
+use_centrifugal                bool               true
 
 # maximum mach number before the code aborts
 mach_max_abort                      Real               -1.0
@@ -433,7 +433,7 @@ mach_max_abort                      Real               -1.0
 # value.  This is useful for developing an initial convective field
 # to carry away the energy, while preventing the reactions from going
 # nonlinear.
-drive_initial_convection            bool            false       y
+drive_initial_convection            bool            false
 
 # timestep beyond which we set {\tt drive\_initial\_convection} = F
 stop_initial_convection            int              -1
@@ -447,10 +447,10 @@ restart_with_vel_field              bool            false
 
 # modify the momentum equation to have $(\beta_0/\rho) \nabla (\pi/\beta_0)$
 # instead of just $(1/\rho) \nabla (\pi)$
-use_alt_energy_fix                  bool            true        y
+use_alt_energy_fix                  bool            true
 
 # do we include the explicit omegadot terms in the constraint RHS source S?
-use_omegadot_terms_in_S             bool            true        y
+use_omegadot_terms_in_S             bool            true
 
 #-----------------------------------------------------------------------------
 # category: thermal diffusion
@@ -462,14 +462,14 @@ use_thermal_diffusion               bool            false
 # How to compute the explicit thermal diffusion term.  @@
 # 1 = in terms of $T$; @@
 # 2 = in terms of $\rho,p_0,X$.
-temp_diffusion_formulation          int            2        y
+temp_diffusion_formulation          int            2
 
 # In the thermal diffusion solver, 1 = Crank-Nicholson; 2 = Backward Euler.
-thermal_diffusion_type              int            1        y
+thermal_diffusion_type              int            1
 
 # apply the conductivity limiting---if T, then we set the thermal coefficients
 # all to 0 for $\rho <$ {\tt buoyancy\_cutoff\_factor} * {\tt base\_cutoff\_density}
-limit_conductivity                  bool            false      y
+limit_conductivity                  bool            false
 
 
 
@@ -481,10 +481,10 @@ limit_conductivity                  bool            false      y
 do_burning                          bool            true
 
 # Name of the species to be used in burner threshold
-burner_threshold_species            string          ""          y
+burner_threshold_species            string          ""
 
 # Mass fraction cutoff for burner\_threshold\_species  used in burner threshold
-burner_threshold_cutoff             Real               1.e-10  y
+burner_threshold_cutoff             Real               1.e-10
 
 # break a zone into subzones, call the burner in each subzone and
 # then average the result to the original cell
@@ -492,25 +492,25 @@ do_subgrid_burning                  bool            false
 
 # mass fraction sum tolerance (if they don't sum to 1 within this tolerance,
 # we abort)
-reaction_sum_tol                    Real               1.e-10   y
+reaction_sum_tol                    Real               1.e-10
 
 #-----------------------------------------------------------------------------
 # category: EOS
 #-----------------------------------------------------------------------------
 
-small_temp                          Real               5.e6     y
+small_temp                          Real               5.e6
 
-small_dens                          Real               1.e-5    y
+small_dens                          Real               1.e-5
 
 # When updating temperature, use $T=T(\rho,p_0,X) $ rather than
 # $T=T(\rho,h,X)$.
-use_tfromp                          bool            false    y
+use_tfromp                          bool            false
 
 # In deriving the temperature from the $h$, first subtract off
 # $p_0/\rho$ to define $e$, and use that as the input to the EOS.
-use_eos_e_instead_of_h              bool            false    y
+use_eos_e_instead_of_h              bool            false
 
-use_pprime_in_tfromp                 bool            false      y
+use_pprime_in_tfromp                 bool            false
 
 
 #-----------------------------------------------------------------------------
@@ -521,26 +521,26 @@ use_pprime_in_tfromp                 bool            false      y
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-s0_interp_type                      int            3        y
+s0_interp_type                      int            3
 
 # The interpolation for filling a cell-centered multifab from a 1D edge-centered array. @@
 # 1 = piecewise constant; @@
 # 2 = piecewise linear; @@
 # 3 = quadratic
-w0_interp_type                      int            2        y
+w0_interp_type                      int            2
 
 # The interpolation for filling an edge based multifab from a 1D bin-centered array. @@
 # 1 = Interpolate s0 to cell centers (with s0\_interp\_type), then average to edges; @@
 # 2 = Interpolate s0 to edges directly using linear interpolation; @@
 # 3 = Interpolate s0 to edges directly using quadratic interpolation.
-s0mac_interp_type                   int            1        y
+s0mac_interp_type                   int            1
 
 # The interpolation for putting w0 on edges.  We only compute the normal component. @@
 # 1 = Interpolate w0 to cell centers (with w0\_interp\_type), then average to edges; @@
 # 2 = Interpolate w0 to edges directly using linear interpolation; @@
 # 3 = Interpolate w0 to edges directly using quadratic interpolation; @@
 # 4 = Interpolate w0 to nodes using linear interpolation, then average to edges.
-w0mac_interp_type                   int            1          y
+w0mac_interp_type                   int            1
 
 #-----------------------------------------------------------------------------
 # category: diagnostics, I/O
@@ -550,7 +550,7 @@ w0mac_interp_type                   int            1          y
 print_update_diagnostics     int           (0, 1)
 
 # calculate losses of material through physical grid boundaries
-track_grid_losses            int            0                    y
+track_grid_losses            int            0
 
 # how often (number of coarse timesteps) to compute integral sums (for runtime diagnostics)
 sum_interval                 int           -1
@@ -607,7 +607,7 @@ do_heating                          bool            false
 # category: GPU
 #-----------------------------------------------------------------------------
 
-# The nodal solve is non-deterministic on the GPU. Should it instead be run 
+# The nodal solve is non-deterministic on the GPU. Should it instead be run
 # on the CPU to give a deterministic solution?
 deterministic_nodal_solve           bool false
 

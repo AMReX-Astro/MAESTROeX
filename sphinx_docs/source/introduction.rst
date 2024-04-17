@@ -11,7 +11,7 @@ MAESTROeX models the evolution of low Mach number astrophysical
 flows that are in hydrostatic equilibrium.  The name MAESTROeX itself
 derives from MAESTRO, the original (pure Fortran) low Mach number
 stellar hydrodynamics code.  MAESTROeX began as a rewrite MAESTRO
-in the C++/Fortran framework of AMReX, and has since then gained
+in the C++ framework of AMReX, and has since then gained
 additional algorithmic capabilities.  Henceforth, we will refer
 only to MAESTROeX, although many of the ideas originated in
 MAESTRO before the change to MAESTROeX.
@@ -261,7 +261,7 @@ divergence-free quantity and the gradient of a scalar. For the
 velocity, we can write:
 
 .. math::
-   \Ub^\star = \Ub^d + \nabla \phi 
+   \Ub^\star = \Ub^d + \nabla \phi
    :label: decomposition
 
 where :math:`\Ub^d` is the divergence free portion of the velocity vector,

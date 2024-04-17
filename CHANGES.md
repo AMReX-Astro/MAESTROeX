@@ -1,3 +1,15 @@
+# 24.04
+
+  * clang-tidy fixes (#427, #428, #423, #422, #420, #419, #415, #416,
+    #414, #413)
+
+  * some GPU modernization (#403, #424)
+
+  * the old diagnostic tools have been removed (#417).  Use
+    amrex-astro-diag instead.
+
+  * sync up with AMReX changes (#412)
+
 # 24.01
 
   * Fixed a race condition on GPUs (#402)

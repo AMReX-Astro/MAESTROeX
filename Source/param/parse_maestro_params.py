@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 """This script parses the list of C++ runtime parameters and writes
-the necessary header files to make them available in Maestro's C++
-routines and (optionally)
+the necessary header and source files to make them available in
+Maestro's C++ routines.
 
 parameters have the format:
 
-  name  type  default  need-in-fortran?  ifdef
+  name  type  default  ifdef
 
 the first three (name, type, default) are mandatory:
 
@@ -20,8 +20,6 @@ the first three (name, type, default) are mandatory:
     debug mode (#ifdef AMREX_DEBUG)
 
 the next are optional:
-
-   need-in-fortran: no longer used
 
    ifdef: only define this parameter if the name provided is #ifdef-ed
 
@@ -42,15 +40,15 @@ For a namespace, name, we write out:
   -- name_params.H  (for maestro, included in Maestro.H):
      sets up the namespace and extern parameters
 
-  -- name_declares.H  (for maestro, included in Maestro.cpp):
-     declares the runtime parameters
-
   -- name_queries.H  (for maestro, included in Maestro.cpp):
      does the parmparse query to override the default in C++
 
  -- name_job_info_tests.H
     this tests the current value against the default and outputs
     into a file
+
+ -- runtime_params.cpp
+    has the actual definition of the variables (without extern)
 
 """
 
@@ -61,21 +59,19 @@ import sys
 import runtime_parameters as rp
 
 CWARNING = """
-// This file is automatically created by parse_maestro_params.py.  To update
-// or add runtime parameters, please edit _cpp_parameters and then run
-// mk_params.sh\n
+// This file is automatically created by parse_maestro_params.py at build time.
+// To update or add runtime parameters, please edit _cpp_parameters and rebuild.\n
 """
 
-
-def parse_params(infile, out_directory):
+def read_param_file(infile):
 
     params = []
 
     namespace = None
 
     try:
-        f = open(infile)
-    except IOError:
+        f = open(infile, encoding="UTF-8")
+    except OSError:
         sys.exit("error opening the input file")
 
     for line in f:
@@ -99,8 +95,7 @@ def parse_params(infile, out_directory):
 
         # this splits the line into separate fields.  A field is a
         # single word or a pair in parentheses like "(a, b)"
-        fields = re.findall(
-            r'".+"|[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
+        fields = re.findall(r'".+"|[\w\"\+\.-]+|\([\w+\.-]+\s*,\s*[\w\+\.-]+\)', line)
 
         name = fields[0]
         if name[0] == "(":
@@ -117,17 +112,7 @@ def parse_params(infile, out_directory):
             debug_default = None
 
         try:
-            in_fortran_string = fields[3]
-        except IndexError:
-            in_fortran = 0
-        else:
-            if in_fortran_string.lower().strip() == "y":
-                in_fortran = 1
-            else:
-                in_fortran = 0
-
-        try:
-            ifdef = fields[4]
+            ifdef = fields[3]
         except IndexError:
             ifdef = None
 
@@ -140,46 +125,25 @@ def parse_params(infile, out_directory):
                                debug_default=debug_default,
                                ifdef=ifdef))
 
+    return params
+
+def write_headers_and_source(params, out_directory):
+
     # output
 
     # find all the namespaces
-    namespaces = {q.namespace for q in params}
+    namespaces = sorted({q.namespace for q in params})
 
     for nm in namespaces:
 
         params_nm = [q for q in params if q.namespace == nm]
-        ifdefs = {q.ifdef for q in params_nm}
-
-        # write name_declares.H
-        try:
-            cd = open(f"{out_directory}/{nm}_declares.H", "w")
-        except IOError:
-            sys.exit(f"unable to open {nm}_declares.H for writing")
-
-        cd.write(CWARNING)
-        cd.write(f"#ifndef {nm.upper()}_DECLARES_H\n")
-        cd.write(f"#define {nm.upper()}_DECLARES_H\n")
-
-        cd.write("\n")
-        cd.write(f"namespace {nm} {{\n")
-
-        for ifdef in ifdefs:
-            if ifdef is None:
-                for p in [q for q in params_nm if q.ifdef is None]:
-                    cd.write(p.get_declare_string())
-            else:
-                cd.write(f"#ifdef {ifdef}\n")
-                for p in [q for q in params_nm if q.ifdef == ifdef]:
-                    cd.write(p.get_declare_string())
-                cd.write("#endif\n")
-        cd.write("}\n\n")
-        cd.write("#endif\n")
-        cd.close()
+        # sort by repr since None may be present
+        ifdefs = sorted({q.ifdef for q in params_nm}, key=repr)
 
         # write name_params.H
         try:
-            cp = open(f"{out_directory}/{nm}_params.H", "w")
-        except IOError:
+            cp = open(f"{out_directory}/{nm}_params.H", "w", encoding="UTF-8")
+        except OSError:
             sys.exit(f"unable to open {nm}_params.H for writing")
 
         cp.write(CWARNING)
@@ -189,32 +153,47 @@ def parse_params(infile, out_directory):
         cp.write("\n")
         cp.write(f"namespace {nm} {{\n")
 
-        for p in params_nm:
-            cp.write(p.get_declare_string(with_extern=True))
-
-        cp.write("};\n\n")
+        for ifdef in ifdefs:
+            if ifdef is None:
+                for p in [q for q in params_nm if q.ifdef is None]:
+                    cp.write(p.get_declare_string(with_extern=True))
+            else:
+                cp.write(f"#ifdef {ifdef}\n")
+                for p in [q for q in params_nm if q.ifdef == ifdef]:
+                    cp.write(p.get_declare_string(with_extern=True))
+                cp.write("#endif\n")
+        cp.write("}\n\n")
         cp.write("#endif\n")
         cp.close()
 
-        # write maestro_queries.H
+        # write name_queries.H
         try:
-            cq = open(f"{out_directory}/{nm}_queries.H", "w")
-        except IOError:
+            cq = open(f"{out_directory}/{nm}_queries.H", "w", encoding="UTF-8")
+        except OSError:
             sys.exit(f"unable to open {nm}_queries.H for writing")
 
         cq.write(CWARNING)
 
-        for p in params_nm:
-            cq.write(p.get_default_string())
-            cq.write(p.get_query_string())
+        for ifdef in ifdefs:
+            if ifdef is None:
+                for p in [q for q in params_nm if q.ifdef is None]:
+                    cq.write(p.get_default_string())
+                    cq.write(p.get_query_string())
+                    cq.write("\n")
+            else:
+                cq.write(f"#ifdef {ifdef}\n")
+                for p in [q for q in params_nm if q.ifdef == ifdef]:
+                    cq.write(p.get_default_string())
+                    cq.write(p.get_query_string())
+                    cq.write("\n")
+                cq.write("#endif\n")
             cq.write("\n")
-
         cq.close()
 
         # write the job info tests
         try:
-            jo = open(f"{out_directory}/{nm}_job_info_tests.H", "w")
-        except IOError:
+            jo = open(f"{out_directory}/{nm}_job_info_tests.H", "w", encoding="UTF-8")
+        except OSError:
             sys.exit(f"unable to open {nm}_job_info_tests.H")
 
         for ifdef in ifdefs:
@@ -229,6 +208,40 @@ def parse_params(infile, out_directory):
 
         jo.close()
 
+    # write a single C++ source file that actually defines the parameters
+    # (one file for all namespaces)
+    try:
+        pf = open(f"{out_directory}/runtime_params.cpp", "w", encoding="UTF-8")
+    except OSError:
+        sys.exit(f"unable to open runtime_params.cpp")
+
+    pf.write("#include <AMReX_REAL.H>\n")
+    pf.write("#include <AMReX_Gpu.H>\n")
+
+    for nm in namespaces:
+        pf.write(f"#include <{nm}_params.H>\n")
+    pf.write("\n")
+
+    for nm in namespaces:
+        params_nm = [q for q in params if q.namespace == nm]
+        # sort by repr since None may be present
+        ifdefs = sorted({q.ifdef for q in params_nm}, key=repr)
+
+        pf.write(f"namespace {nm} {{\n")
+
+        for ifdef in ifdefs:
+            if ifdef is None:
+                for p in [q for q in params_nm if q.ifdef is None]:
+                    pf.write(p.get_declare_string())
+            else:
+                pf.write(f"#ifdef {ifdef}\n")
+                for p in [q for q in params_nm if q.ifdef == ifdef]:
+                    pf.write(p.get_declare_string())
+                pf.write("#endif\n")
+        pf.write("}\n\n")
+
+    pf.close()
+
 
 def main():
     """the main driver"""
@@ -240,8 +253,8 @@ def main():
 
     args = parser.parse_args()
 
-    parse_params(args.input_file[0], args.o)
-
+    p = read_param_file(args.input_file[0])
+    write_headers_and_source(p, args.o)
 
 if __name__ == "__main__":
     main()

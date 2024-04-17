@@ -246,12 +246,12 @@ void Maestro::MachfromRhoH(const Vector<MultiFab>& scal,
 
             // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
-                Real velocity = sqrt(u(i, j, k, 0) * u(i, j, k, 0) +
-                                     (u(i, j, k, 1) + w0_arr(i, j, k)) *
-                                         (u(i, j, k, 1) + w0_arr(i, j, k)));
+                Real velocity = std::sqrt(u(i, j, k, 0) * u(i, j, k, 0) +
+                                          (u(i, j, k, 1) + w0_arr(i, j, k)) *
+                                          (u(i, j, k, 1) + w0_arr(i, j, k)));
 #else
-                Real velocity = sqrt(u(i,j,k,0)*u(i,j,k,0) + 
-                    u(i,j,k,1)*u(i,j,k,1) + 
+                Real velocity = std::sqrt(u(i,j,k,0)*u(i,j,k,0) +
+                    u(i,j,k,1)*u(i,j,k,1) +
                     (u(i,j,k,2) + w0_arr(i,j,k))*(u(i,j,k,2) + w0_arr(i,j,k)));
 #endif
 

@@ -317,15 +317,15 @@ void Maestro::Evolve() {
                 const Box& tilebox = mfi.tilebox();
                 const Box& gbox = amrex::grow(tilebox, 1);
 
-                if (   phys_bc[0] == SlipWall
-                    && phys_bc[1] == SlipWall
+                if (   phys_bc[0] == amrex::PhysBCType::slipwall
+                    && phys_bc[1] == amrex::PhysBCType::slipwall
 #if AMREX_SPACEDIM == 3
-                    && phys_bc[2] == SlipWall
+                    && phys_bc[2] == amrex::PhysBCType::slipwall
 #endif
-                    && phys_bc[AMREX_SPACEDIM] == SlipWall
-                    && phys_bc[AMREX_SPACEDIM+1] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM] == amrex::PhysBCType::slipwall
+                    && phys_bc[AMREX_SPACEDIM+1] == amrex::PhysBCType::slipwall
 #if AMREX_SPACEDIM == 3
-                    && phys_bc[AMREX_SPACEDIM+2] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM+2] == amrex::PhysBCType::slipwall
 #endif
                     ) {
 
@@ -359,15 +359,15 @@ void Maestro::Evolve() {
 
                         });
 
-                } else if (    phys_bc[0] == Interior
-                            && phys_bc[1] == Interior
+                } else if (    phys_bc[0] == amrex::PhysBCType::interior
+                            && phys_bc[1] == amrex::PhysBCType::interior
 #if AMREX_SPACEDIM == 3
-                            && phys_bc[2] == Interior
+                            && phys_bc[2] == amrex::PhysBCType::interior
 #endif
-                            && phys_bc[AMREX_SPACEDIM] == Interior
-                            && phys_bc[AMREX_SPACEDIM+1] == Interior
+                            && phys_bc[AMREX_SPACEDIM] == amrex::PhysBCType::interior
+                            && phys_bc[AMREX_SPACEDIM+1] == amrex::PhysBCType::interior
 #if AMREX_SPACEDIM == 3
-                            && phys_bc[AMREX_SPACEDIM+2] == Interior
+                            && phys_bc[AMREX_SPACEDIM+2] == amrex::PhysBCType::interior
 #endif
                 ) {
 
@@ -476,15 +476,15 @@ void Maestro::Evolve() {
                 const Box& tilebox = mfi.tilebox();
                 const Box& gbox = amrex::grow(tilebox, 1);
 
-                if (   phys_bc[0] == SlipWall
-                    && phys_bc[1] == SlipWall
+                if (   phys_bc[0] == amrex::PhysBCType::slipwall
+                    && phys_bc[1] == amrex::PhysBCType::slipwall
 #if AMREX_SPACEDIM == 3
-                    && phys_bc[2] == SlipWall
+                    && phys_bc[2] == amrex::PhysBCType::slipwall
 #endif
-                    && phys_bc[AMREX_SPACEDIM] == SlipWall
-                    && phys_bc[AMREX_SPACEDIM+1] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM] == amrex::PhysBCType::slipwall
+                    && phys_bc[AMREX_SPACEDIM+1] == amrex::PhysBCType::slipwall
 #if AMREX_SPACEDIM == 3
-                    && phys_bc[AMREX_SPACEDIM+2] == SlipWall
+                    && phys_bc[AMREX_SPACEDIM+2] == amrex::PhysBCType::slipwall
 #endif
                     ) {
 
@@ -561,15 +561,15 @@ void Maestro::Evolve() {
                     });
 #endif
 
-                } else if (    phys_bc[0] == Interior
-                            && phys_bc[1] == Interior
+                } else if (    phys_bc[0] == amrex::PhysBCType::interior
+                            && phys_bc[1] == amrex::PhysBCType::interior
 #if AMREX_SPACEDIM == 3
-                            && phys_bc[2] == Interior
+                            && phys_bc[2] == amrex::PhysBCType::interior
 #endif
-                            && phys_bc[AMREX_SPACEDIM] == Interior
-                            && phys_bc[AMREX_SPACEDIM+1] == Interior
+                            && phys_bc[AMREX_SPACEDIM] == amrex::PhysBCType::interior
+                            && phys_bc[AMREX_SPACEDIM+1] == amrex::PhysBCType::interior
 #if AMREX_SPACEDIM == 3
-                            && phys_bc[AMREX_SPACEDIM+2] == Interior
+                            && phys_bc[AMREX_SPACEDIM+2] == amrex::PhysBCType::interior
 #endif
                 ) {
 
@@ -625,11 +625,11 @@ void Maestro::Evolve() {
                         umac_arr(i,j,k) += gphix_arr(i,j,k);
 
                         // impose BCs
-                        if (phys_bc[0] == SlipWall && i == lo[0]) {
+                        if (phys_bc[0] == amrex::PhysBCType::slipwall && i == lo[0]) {
                             umac_arr(i,j,k) = 0.0_rt;
                         }
 
-                        if (phys_bc[AMREX_SPACEDIM] == SlipWall && i == hi[0]+1) {
+                        if (phys_bc[AMREX_SPACEDIM] == amrex::PhysBCType::slipwall && i == hi[0]+1) {
                             umac_arr(i,j,k) = 0.0_rt;
                         }
 
@@ -648,11 +648,11 @@ void Maestro::Evolve() {
                         vmac_arr(i,j,k) += gphiy_arr(i,j,k);
 
                         // impose BCs
-                        if (phys_bc[1] == SlipWall && j == lo[1]) {
+                        if (phys_bc[1] == amrex::PhysBCType::slipwall && j == lo[1]) {
                             vmac_arr(i,j,k) = 0.0_rt;
                         }
 
-                        if (phys_bc[AMREX_SPACEDIM+1] == SlipWall && j == hi[1]+1) {
+                        if (phys_bc[AMREX_SPACEDIM+1] == amrex::PhysBCType::slipwall && j == hi[1]+1) {
                             vmac_arr(i,j,k) = 0.0_rt;
                         }
 
@@ -673,11 +673,11 @@ void Maestro::Evolve() {
                         wmac_arr(i,j,k) += gphiz_arr(i,j,k);
 
                         // impose BCs
-                        if (phys_bc[2] == SlipWall && k == lo[2]) {
+                        if (phys_bc[2] == amrex::PhysBCType::slipwall && k == lo[2]) {
                             wmac_arr(i,j,k) = 0.0_rt;
                         }
 
-                        if (phys_bc[AMREX_SPACEDIM+2] == SlipWall && k == hi[2]+1) {
+                        if (phys_bc[AMREX_SPACEDIM+2] == amrex::PhysBCType::slipwall && k == hi[2]+1) {
                             wmac_arr(i,j,k) = 0.0_rt;
                         }
 

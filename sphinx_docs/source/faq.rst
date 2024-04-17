@@ -5,18 +5,9 @@ Frequently Asked Questions
 Compiling
 =========
 
-#. *What version of the Fortran standard is needed?*
+#. *What version of the C++ is needed?*
 
-   Some features of Fortran 2003 are used, in particular, the
-   ISO_C_BINDING feature of Fortran 2003 is needed to define a long
-   integer type for some MPI operations in Fortran. This is supported
-   by most Fortran compilers even if they don’t support the entire
-   Fortran 2003 standard.
-
-   We also rely on the Fortran 95 standard that specifies that any
-   local allocated arrays are automatically deallocated when a
-   subroutine ends. Fortran 90 does not do this. Most
-   MAESTROeX routines rely on this Fortran 95 feature.
+   We use C++17.  Most modern compilers support the features we need.
 
 
 #. *The code doesn’t compile, but complains right away that there

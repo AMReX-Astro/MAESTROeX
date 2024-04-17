@@ -55,7 +55,7 @@ if __name__ == "__main__":
             fortran_replace_text(f, dir)
         elif f[-8:] == "_8H.html":
             replace_cpp_header_text(f, dir)
-            
+
     # loop over files in class_dir
     for f in sorted(os.listdir(class_dir)):
         replace_cpp_header_text(f, class_dir)

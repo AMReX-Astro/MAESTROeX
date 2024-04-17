@@ -426,8 +426,8 @@ void Maestro::ModifyScalForce(
                              w0_arr(i, j, k, AMREX_SPACEDIM - 1)) /
                             dx[AMREX_SPACEDIM - 1];
 #elif (AMREX_SPACEDIM == 3)
-                    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0] 
-                        +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1] 
+                    Real divu = (umac(i+1,j,k) - umac(i,j,k)) / dx[0]
+                        +(vmac(i,j+1,k) - vmac(i,j,k)) / dx[1]
                         +(wmac(i,j,k+1) - wmac(i,j,k)) / dx[2];
 
                     // add w0 contribution
@@ -445,9 +445,9 @@ void Maestro::ModifyScalForce(
                              vmac(i, j, k) * s0_edge_arr(i, j, k)) /
                                 dx[1];
 #elif (AMREX_SPACEDIM == 3)
-                        Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0] 
-                                                      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] ) 
-                            +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) - 
+                        Real divs0u = s0_arr(i,j,k)*( (umac(i+1,j,k) - umac(i,j,k))/dx[0]
+                                                      +(vmac(i,j+1,k) - vmac(i,j,k))/dx[1] )
+                            +(wmac(i,j,k+1) * s0_edge_arr(i,j,k+1) -
                               wmac(i,j,k  ) * s0_edge_arr(i,j,k))/ dx[2];
 #endif
 
@@ -604,12 +604,12 @@ void Maestro::MakeRhoHForce(
 
                     Real veladv = 0.5 * (vmac(i, j, k) + vmac(i, j + 1, k));
                     rhoh_force(i, j, k) = veladv * gradp0;
-#else 
+#else
                     if (k < base_cutoff_density_coord) {
                         gradp0 = rho0cart(i,j,k) * gravcart(i,j,k);
                     } else if (k == domhi) {
                         // NOTE: this should be zero since p0 is constant up here
-                        gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[2]; 
+                        gradp0 = ( p0cart(i,j,k) - p0cart(i,j-1,k) ) / dx[2];
                     } else {
                         // NOTE: this should be zero since p0 is constant up here
                         gradp0 = ( p0cart(i,j+1,k) - p0cart(i,j,k) ) / dx[2];
@@ -750,7 +750,7 @@ void Maestro::MakeTempForce(
                                  (p0_arr(i, j + 1, k) - p0_arr(i, j - 1, k)) /
                                  dx[1];
                     }
-#else 
+#else
                     if (k == 0) {
                         gradp0 = (p0_arr(i,j,k+1) - p0_arr(i,j,k)) / dx[2];
                     } else if (k == domhi[2]) {

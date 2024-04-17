@@ -113,7 +113,7 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
         for (auto k = 0; k < xn_hi; ++k){
             for (auto comp = 0; comp < NumSpec; ++comp) {
                 xn_zone(k, comp) = 1./NumSpec;
-            } 
+            }
         }
     }
     else {
@@ -136,14 +136,14 @@ void Maestro::MakeNewLevelFromScratch(int lev, Real time, const BoxArray& ba,
                     iss >> xn_zone(k, comp);
                 }
                 ++comp;
-            } 
+            }
         }
         xn_file_s.close();
         if (comp != NumSpec){
         Abort("Number of species in xinfile does not match number in Network");
         }
     }
- 
+
     // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP
 #pragma omp parallel

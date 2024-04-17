@@ -160,7 +160,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             scal_arr(i, j, k, Temp) = eos_state.T;
         });
 
-        
+
         const auto prob_lo = geom[lev].ProbLoArray();
         const auto prob_hi = geom[lev].ProbHiArray();
         const auto dx = geom[lev].CellSizeArray();
