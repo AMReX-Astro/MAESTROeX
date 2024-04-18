@@ -146,7 +146,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
             // weight is the factor by which the volume of a cell at the current level
             // relates to the volume of a cell at the coarsest level of refinement.
             const auto weight =
-                AMREX_SPACEDIM == 2 ? 1.0 / pow(4.0, lev) : 1.0 / pow(8.0, lev);
+                AMREX_SPACEDIM == 2 ? 1.0 / std::pow(4.0, lev) : 1.0 / std::pow(8.0, lev);
 
 #if (AMREX_SPACEDIM == 3)
             // for non-spherical we have to set these to be a valid array as
@@ -404,7 +404,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
         if (nprocs == 1) {
             T_max_data[0] = T_max_local;
         } else {
-            ParallelDescriptor::Gather(&T_max_local, 1, &T_max_data[0], 1,
+            ParallelDescriptor::Gather(&T_max_local, 1, T_max_data.data(), 1,
                                        ioproc);
         }
 
@@ -434,8 +434,8 @@ void Maestro::DiagFile(const int step, const Real t_in,
                 T_max_coords_level[i] = T_max_coords[i];
             }
         } else {
-            ParallelDescriptor::Gather(&T_max_coords[0], 2 * AMREX_SPACEDIM,
-                                       &T_max_coords_level[0],
+            ParallelDescriptor::Gather(T_max_coords.data(), 2 * AMREX_SPACEDIM,
+                                       T_max_coords_level.data(),
                                        2 * AMREX_SPACEDIM, ioproc);
         }
 
@@ -458,7 +458,7 @@ void Maestro::DiagFile(const int step, const Real t_in,
         if (nprocs == 1) {
             enuc_max_data[0] = enuc_max_local;
         } else {
-            ParallelDescriptor::Gather(&enuc_max_local, 1, &enuc_max_data[0], 1,
+            ParallelDescriptor::Gather(&enuc_max_local, 1, enuc_max_data.data(), 1,
                                        ioproc);
         }
 
@@ -484,8 +484,8 @@ void Maestro::DiagFile(const int step, const Real t_in,
                 enuc_max_coords_level[i] = enuc_max_coords[i];
             }
         } else {
-            ParallelDescriptor::Gather(&enuc_max_coords[0], 2 * AMREX_SPACEDIM,
-                                       &enuc_max_coords_level[0],
+            ParallelDescriptor::Gather(enuc_max_coords.data(), 2 * AMREX_SPACEDIM,
+                                       enuc_max_coords_level.data(),
                                        2 * AMREX_SPACEDIM, ioproc);
         }
 

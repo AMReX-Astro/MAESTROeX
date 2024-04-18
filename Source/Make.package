@@ -56,12 +56,11 @@ CEXE_sources += MaestroVelPred.cpp
 ifeq ($(USE_ROTATION), TRUE)
     CEXE_sources += MaestroRotation.cpp
 endif
-CEXE_sources += runparams_defaults.cpp
+CEXE_sources += runtime_params.cpp
 
 CEXE_headers += BaseState.H
 CEXE_headers += BaseStateGeometry.H
 CEXE_headers += Maestro.H
-CEXE_headers += MaestroBCThreads.H
 CEXE_headers += MaestroInletBCs.H
 CEXE_headers += MaestroPlot.H
 CEXE_headers += MaestroUtil.H

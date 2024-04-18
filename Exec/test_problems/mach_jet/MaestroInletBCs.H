@@ -1,6 +1,5 @@
-
-#ifndef _MaestroInletBCs_H_
-#define _MaestroInletBCs_H_
+#ifndef MaestroInletBCs_H
+#define MaestroInletBCs_H
 
 #include <AMReX_BLFort.H>
 

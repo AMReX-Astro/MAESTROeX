@@ -16,7 +16,7 @@ void Maestro::MakeEdgeState1d(BaseState<Real>& s, BaseState<Real>& sedge,
 
 void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                                   BaseState<Real>& sedge_state,
-                                  BaseState<Real>& force_state) {
+                                  BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dSphr()", MakeEdgeState1dSphr);
 
@@ -60,7 +60,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
     const auto w0_arr = w0.const_array();
 
     if (ppm_type == 0) {
-        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(long r) {
+        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(int r) {
             Real slope = 0.0;
 
             // this will hold values at r-1, r and r+1
@@ -119,7 +119,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
         Gpu::synchronize();
 
     } else if (ppm_type == 1) {
-        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(long r) {
+        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(int r) {
             // interpolate s to radial edges
 
             // sm
@@ -220,7 +220,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
         });
         Gpu::synchronize();
     } else if (ppm_type == 2) {
-        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(long r) {
+        ParallelFor(nr_fine, [=] AMREX_GPU_DEVICE(int r) {
             // interpolate s to radial edges, store these temporary values into sedgel
 
             // this will hold values at r-1, r, r+1 and r+2
@@ -315,7 +315,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                         if (sgn * (delam - alpham) >= 1.e-10) {
                             alphap = (-2.0 * delam -
                                       2.0 * sgn *
-                                          sqrt(delam * delam - delam * alpham));
+                                          std::sqrt(delam * delam - delam * alpham));
                         } else {
                             alphap = -2.0 * alpham;
                         }
@@ -329,7 +329,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
                         if (sgn * (delap - alphap) >= 1.e-10) {
                             alpham = (-2.0 * delap -
                                       2.0 * sgn *
-                                          sqrt(delap * delap - delap * alphap));
+                                          std::sqrt(delap * delap - delap * alphap));
                         } else {
                             alpham = -2.0 * alphap;
                         }
@@ -364,7 +364,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
         Gpu::synchronize();
     }
 
-    ParallelFor(nr_fine + 1, [=] AMREX_GPU_DEVICE(long r) {
+    ParallelFor(nr_fine + 1, [=] AMREX_GPU_DEVICE(int r) {
         // Fix center and edge of star by reflecting the extrapolated state.
         // An alternate way would be to compute these values using the entire algorithm,
         // but that would require more ghost cells at several stages.
@@ -387,7 +387,7 @@ void Maestro::MakeEdgeState1dSphr(BaseState<Real>& s_state,
 
 void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     BaseState<Real>& sedge_state,
-                                    BaseState<Real>& force_state) {
+                                    BaseState<Real>& force_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1dPlanar()", MakeEdgeState1dPlanar);
 
@@ -439,7 +439,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
 
             if (ppm_type == 0) {
                 // compute slopes
-                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(long j) {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                     Real slope = 0.0;
                     int r = j + lo;
 
@@ -563,7 +563,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
             } else if (ppm_type == 1) {
                 // interpolate s to radial edges, store these temporary values into sedgel
 
-                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(long j) {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                     int r = j + lo;
 
                     // calculate sm
@@ -718,7 +718,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                 BaseState<Real> sedget_s(base_geom.nr_fine + 1);
                 auto sedget = sedget_s.array();
 
-                ParallelFor(hi - lo + 2, [=] AMREX_GPU_DEVICE(long j) {
+                ParallelFor(hi - lo + 2, [=] AMREX_GPU_DEVICE(int j) {
                     int r = j + lo;
 
                     // left side
@@ -784,7 +784,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                 });
                 Gpu::synchronize();
 
-                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(long j) {
+                ParallelFor(hi - lo + 1, [=] AMREX_GPU_DEVICE(int j) {
                     int r = j + lo;
 
                     // use Colella 2008 limiters
@@ -861,8 +861,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     if (sgn * (delam - alpham) >= 1.e-10) {
                                         alphap = (-2.0 * delam -
                                                   2.0 * sgn *
-                                                      sqrt(delam * delam -
-                                                           delam * alpham));
+                                                      std::sqrt(delam * delam -
+                                                                delam * alpham));
                                     } else {
                                         alphap = -2.0 * alpham;
                                     }
@@ -877,8 +877,8 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
                                     if (sgn * (delap - alphap) >= 1.e-10) {
                                         alpham = (-2.0 * delap -
                                                   2.0 * sgn *
-                                                      sqrt(delap * delap -
-                                                           delap * alphap));
+                                                      std::sqrt(delap * delap -
+                                                                delap * alphap));
                                     } else {
                                         alpham = -2.0 * alphap;
                                     }
@@ -957,7 +957,7 @@ void Maestro::MakeEdgeState1dPlanar(BaseState<Real>& s_state,
             const int hi = base_geom.r_end_coord(n, i);
 
             // solve Riemann problem to get final edge state
-            ParallelFor(hi - lo + 2, [=] AMREX_GPU_DEVICE(long j) {
+            ParallelFor(hi - lo + 2, [=] AMREX_GPU_DEVICE(int j) {
                 int r = j + lo;
 
                 if (r == 0) {

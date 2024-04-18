@@ -35,8 +35,8 @@ A basic GNUmakefile begins with:
 ::
 
       DEBUG   := FALSE
-      USE_MPI := 
-      USE_OMP := 
+      USE_MPI :=
+      USE_OMP :=
 
 Here, ``DEBUG`` is false if we are building an optimized executable.
 Otherwise, the debug version is built—this typically uses less
@@ -53,7 +53,7 @@ The next line sets the compiler to be used for compilation:
 
 The MAESTROeX build system knows what options to use for various
 compiler families. The ``COMP`` flag specifies which compiler to
-use. Allowed values include ``intel``, ``gnu``, ``pgi``, and ``cray``. 
+use. Allowed values include ``intel``, ``gnu``, ``pgi``, and ``cray``.
 
 ``USE_REACT`` set to true will turn on the reactions solvers.
 
@@ -75,7 +75,7 @@ use, as well as any extra, problem-specific files.
 
 ::
 
-    EOS_DIR          := helmholtz   
+    EOS_DIR          := helmholtz
     CONDUCTIVITY_DIR := constant
     NETWORK_DIR      := ignition_simple
 
@@ -107,13 +107,14 @@ By default, some of the runtime parameters are listed in
 ``_parameters`` file in each problem directory.
 
 ::
-   
+
     PROBIN_PARAMETER_DIRS := .
-   
-They are parsed at compile time and the file ``extern.F90``
-is written and compiled. This is a Fortran module that holds the values of
-the runtime parameters and makes them available to any routine via
-``probin_module``.
+
+These are combined with the runtime parameters specified by Microphysics
+and parsed at compile time.  A C++ header and source file is written
+(``extern_parameters.cpp`` and ``extern_parameters.H``) that define
+the parameters and their defaults.
+
 
 The final line in the GNUmakefile includes the rules to actually
 build the executable.
@@ -146,17 +147,16 @@ script (along with any problem-specific parameters) in the same folder.
 The script outputs the ``extern.F90``source file.
 Each line in the ``_cpp_parameters`` file has the form::
 
-  *parameter*    *data-type*    *value*    *need in Fortran?* 
+  *parameter*    *data-type*    *value*    *need in Fortran?*
 
-where *parameter* is the name of the runtime parameter,
-*data-type* is one of {string, Real, int, bool},
-the *value* specifies the default value for the runtime parameter,
-and *need in Fortran?* is marked *y* only if that parameter is
-used in Fortran. Comments are indicated by a ‘#’ character and are
+where *parameter* is the name of the runtime parameter, *data-type* is
+one of {string, Real, int, bool}, the *value* specifies the default
+value for the runtime parameter.  A fourth column, *need in Fortran?*,
+is no longer used.  Comments are indicated by a ‘#’ character and are
 used to produce documentation about the available runtime parameters.
-For the documentation, runtime parameters are grouped together
-in the ``_cpp_parameters`` file into categories. The category headings
-are defined by comments in the ``_cpp_parameters`` file and any comments
+For the documentation, runtime parameters are grouped together in the
+``_cpp_parameters`` file into categories. The category headings are
+defined by comments in the ``_cpp_parameters`` file and any comments
 following that heading are placed into that category.
 
 At runtime, the default values for the parameters can be overridden

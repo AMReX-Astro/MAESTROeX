@@ -1,5 +1,5 @@
-#ifndef BaseStateGeometry_H_
-#define BaseStateGeometry_H_
+#ifndef BaseStateGeometry_H
+#define BaseStateGeometry_H
 
 #include <AMReX_AmrCore.H>
 #include <AMReX_MultiFab.H>
@@ -7,14 +7,14 @@
 
 class BaseStateGeometry {
    public:
-    BaseStateGeometry() noexcept {};
+    BaseStateGeometry() noexcept = default;
 
     void Init(const int max_radial_level_in, const int nr_fine_in,
               const amrex::Real dr_fine_in, const int nr_irreg_in,
               const amrex::Vector<amrex::Geometry>& geom, const int max_level,
               amrex::GpuArray<amrex::Real, 3>& center);
 
-    void ComputeCutoffCoords(const BaseStateArray<amrex::Real>& rho0);
+    void ComputeCutoffCoords(const BaseStateArray<amrex::Real>& rho0) const;
 
     void InitMultiLevel(const int finest_radial_level_in,
                         const BaseStateArray<int>& tag_array);

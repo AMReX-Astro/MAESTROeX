@@ -17,15 +17,17 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
     int ihi = domainBox.hiVect()[0];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[0];
-        bchi[i] = bcs[bc_start_comp + i].hi()[0];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[0];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[0];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
@@ -50,7 +52,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                 slx(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (i == ilo - 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ilo) {
@@ -68,7 +70,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (i == ihi + 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ihi) {
@@ -125,7 +127,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                 slx(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (i == ilo - 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ilo) {
@@ -161,7 +163,7 @@ void Maestro::Slopex(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (i == ihi + 1) {
                         slx(i, j, k, n) = 0.0;
                     } else if (i == ihi) {
@@ -214,15 +216,17 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
     int jhi = domainBox.hiVect()[1];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[1];
-        bchi[i] = bcs[bc_start_comp + i].hi()[1];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[1];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[1];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
@@ -247,7 +251,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                 sly(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (j == jlo - 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jlo) {
@@ -265,7 +269,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (j == jhi + 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jhi) {
@@ -322,7 +326,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                 sly(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (j == jlo - 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jlo) {
@@ -357,7 +361,7 @@ void Maestro::Slopey(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (j == jhi + 1) {
                         sly(i, j, k, n) = 0.0;
                     } else if (j == jhi) {
@@ -410,15 +414,17 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
     int khi = domainBox.hiVect()[2];
 
     // create lo and hi vectors
-    IntVector bclo(ncomp);
-    IntVector bchi(ncomp);
+    Vector<int> bclo_v(ncomp);
+    Vector<int> bchi_v(ncomp);
     for (int i = 0; i < ncomp; ++i) {
-        bclo[i] = bcs[bc_start_comp + i].lo()[2];
-        bchi[i] = bcs[bc_start_comp + i].hi()[2];
+        bclo_v[i] = bcs[bc_start_comp + i].lo()[2];
+        bchi_v[i] = bcs[bc_start_comp + i].hi()[2];
     }
 
-    int* AMREX_RESTRICT bclo_p = bclo.dataPtr();
-    int* AMREX_RESTRICT bchi_p = bchi.dataPtr();
+    AsyncArray<int> bclo(bclo_v.data(), bclo_v.size());
+    AsyncArray<int> bchi(bchi_v.data(), bchi_v.size());
+    int* AMREX_RESTRICT bclo_p = bclo.data();
+    int* AMREX_RESTRICT bchi_p = bchi.data();
 
     if (slope_order == 0) {
         // 1st order
@@ -443,7 +449,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                 slz(i, j, k, n) =
                     sflag * amrex::min(slim, amrex::Math::abs(del));
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (k == klo - 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == klo) {
@@ -461,7 +467,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (k == khi + 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == khi) {
@@ -518,7 +524,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                 slz(i, j, k, n) =
                     dflag * amrex::min(amrex::Math::abs(ds), dlim);
 
-                if (bclo_p[n] == EXT_DIR || bclo_p[n] == HOEXTRAP) {
+                if (bclo_p[n] == amrex::BCType::ext_dir || bclo_p[n] == amrex::BCType::hoextrap) {
                     if (k == klo - 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == klo) {
@@ -554,7 +560,7 @@ void Maestro::Slopez(const Box& bx, Array4<Real> const s,
                     }
                 }
 
-                if (bchi_p[n] == EXT_DIR || bchi_p[n] == HOEXTRAP) {
+                if (bchi_p[n] == amrex::BCType::ext_dir || bchi_p[n] == amrex::BCType::hoextrap) {
                     if (k == khi + 1) {
                         slz(i, j, k, n) = 0.0;
                     } else if (k == khi) {

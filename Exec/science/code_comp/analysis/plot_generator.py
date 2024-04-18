@@ -100,14 +100,14 @@ def plot_generator(args):
     def get_width(ds, xlim=None, ylim=None, zlim=None):
         """ Get the width of the plot. """
 
-        if xlim is None: 
+        if xlim is None:
             xlim = ds.domain_left_edge[0], ds.domain_right_edge[0]
-        else: 
+        else:
             xlim = xlim[0] * cm, xlim[1] * cm
 
-        if ylim is None: 
+        if ylim is None:
             ylim = ds.domain_left_edge[1], ds.domain_right_edge[1]
-        else: 
+        else:
             ylim = ylim[0] * cm, ylim[1] * cm
 
         xwidth = (xlim[1] - xlim[0]).in_cgs()
@@ -116,9 +116,9 @@ def plot_generator(args):
         if ds.domain_dimensions[2] == 1:
             zwidth = 0.0
         else:
-            if zlim is None: 
+            if zlim is None:
                 zlim = ds.domain_left_edge[2], ds.domain_right_edge[2]
-            else: 
+            else:
                 zlim = zlim[0] * cm, zlim[1] * cm
 
             zwidth = (zlim[1] - zlim[0]).in_cgs()
@@ -128,14 +128,14 @@ def plot_generator(args):
     def get_center(ds, xlim=None, ylim=None, zlim=None):
         """ Get the coordinates of the center of the plot. """
 
-        if xlim is None: 
+        if xlim is None:
             xlim = ds.domain_left_edge[0], ds.domain_right_edge[0]
-        else: 
+        else:
             xlim = xlim[0] * cm, xlim[1] * cm
 
-        if ylim is None: 
+        if ylim is None:
             ylim = ds.domain_left_edge[1], ds.domain_right_edge[1]
-        else: 
+        else:
             ylim = ylim[0] * cm, ylim[1] * cm
 
         xctr = 0.5 * (xlim[0] + xlim[1])
@@ -144,9 +144,9 @@ def plot_generator(args):
         if ds.domain_dimensions[2] == 1:
             zctr = 0.0
         else:
-            if zlim is None: 
+            if zlim is None:
                 zlim = ds.domain_left_edge[2], ds.domain_right_edge[2]
-            else: 
+            else:
                 zlim = zlim[0] * cm, zlim[1] * cm
 
             zctr = 0.5 * (zlim[0] + zlim[1])
@@ -157,14 +157,14 @@ def plot_generator(args):
 
     # Loop and generate
     for ds in ts:
-        
+
         settings = {}
         settings['center'] = get_center(ds, args.xlim, args.ylim, args.zlim)
         settings['width'] = get_width(ds, args.xlim, args.ylim, args.zlim)
         settings['normal'] = args.normal
 
         plot = func(ds, fields=field, **settings)
-        if args.cmap: 
+        if args.cmap:
             plot.set_cmap(field=field, cmap=args.cmap)
 
         if args.linthresh:
@@ -180,9 +180,9 @@ def plot_generator(args):
             plot.set_zlim(field, *args.bounds)
 
         if args.time:
-            
+
             time_format = f't = {{time:.{args.time}f}}{{units}}'
-            
+
             plot.annotate_timestamp(corner='upper_left', time_format=time_format,
                     time_unit='s', draw_inset_box=True, inset_box_args={'alpha': 0.0})
 

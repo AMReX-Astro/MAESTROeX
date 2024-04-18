@@ -355,63 +355,71 @@ void Maestro::VelPredInterface(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (bclo) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = utilde(i - 1, j, k, n);
-                        urx(i, j, k, n) = utilde(i - 1, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ulx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 0) = 0.0;
-                    ulx(i, j, k, 1) = urx(i, j, k, 1);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = 0.0;
-                        urx(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        urx(i, j, k, n) = ulx(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = utilde(i - 1, j, k, n);
+                    urx(i, j, k, n) = utilde(i - 1, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ulx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 0) = 0.0;
+                ulx(i, j, k, 1) = urx(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = 0.0;
+                    urx(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    urx(i, j, k, n) = ulx(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (bchi) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = utilde(i, j, k, n);
-                        urx(i, j, k, n) = utilde(i, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ulx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 1) = ulx(i, j, k, 1);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = 0.0;
-                        urx(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        urx(i, j, k, n) = ulx(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = utilde(i, j, k, n);
+                    urx(i, j, k, n) = utilde(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ulx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 1) = ulx(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = 0.0;
+                    urx(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    urx(i, j, k, n) = ulx(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -455,63 +463,71 @@ void Maestro::VelPredInterface(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (bclo) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = utilde(i, j - 1, k, n);
-                        ury(i, j, k, n) = utilde(i, j - 1, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    uly(i, j, k, 0) = ury(i, j, k, 0);
-                    uly(i, j, k, 1) = 0.0;
-                    ury(i, j, k, 1) = 0.0;
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = 0.0;
-                        ury(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = ury(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = utilde(i, j - 1, k, n);
+                    ury(i, j, k, n) = utilde(i, j - 1, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                uly(i, j, k, 0) = ury(i, j, k, 0);
+                uly(i, j, k, 1) = 0.0;
+                ury(i, j, k, 1) = 0.0;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = 0.0;
+                    ury(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = ury(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (bchi) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = utilde(i, j, k, n);
-                        ury(i, j, k, n) = utilde(i, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ury(i, j, k, 0) = uly(i, j, k, 0);
-                    uly(i, j, k, 1) = 0.0;
-                    ury(i, j, k, 1) = 0.0;
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = 0.0;
-                        ury(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ury(i, j, k, n) = uly(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = utilde(i, j, k, n);
+                    ury(i, j, k, n) = utilde(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ury(i, j, k, 0) = uly(i, j, k, 0);
+                uly(i, j, k, 1) = 0.0;
+                ury(i, j, k, 1) = 0.0;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = 0.0;
+                    ury(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ury(i, j, k, n) = uly(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
         // No need to compute uimh(:,:,1) since it's equal to utrans-w0
@@ -589,37 +605,45 @@ void Maestro::VelPredVelocities(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (bclo) {
-                case Inflow:
-                    umac(i, j, k) = utilde(i - 1, j, k, 0);
-                    break;
-                case SlipWall:
-                case NoSlipWall:
-                case Symmetry:
-                    umac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    umac(i, j, k) = amrex::min(umacr, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                umac(i, j, k) = utilde(i - 1, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::noslipwall:
+            case amrex::PhysBCType::symmetry:
+                umac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                umac(i, j, k) = amrex::min(umacr, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (bchi) {
-                case Inflow:
-                    umac(i, j, k) = utilde(i, j, k, 0);
-                    break;
-                case SlipWall:
-                case NoSlipWall:
-                case Symmetry:
-                    umac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    umac(i, j, k) = amrex::max(umacl, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                umac(i, j, k) = utilde(i, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::noslipwall:
+            case amrex::PhysBCType::symmetry:
+                umac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                umac(i, j, k) = amrex::max(umacl, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
     });
@@ -662,37 +686,45 @@ void Maestro::VelPredVelocities(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (bclo) {
-                case Inflow:
-                    vmac(i, j, k) = utilde(i, j - 1, k, 1);
-                    break;
-                case SlipWall:
-                case NoSlipWall:
-                case Symmetry:
-                    vmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    vmac(i, j, k) = amrex::min(vmacr, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vmac(i, j, k) = utilde(i, j - 1, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::noslipwall:
+            case amrex::PhysBCType::symmetry:
+                vmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                vmac(i, j, k) = amrex::min(vmacr, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (bchi) {
-                case Inflow:
-                    vmac(i, j, k) = utilde(i, j, k, 1);
-                    break;
-                case SlipWall:
-                case NoSlipWall:
-                case Symmetry:
-                    vmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    vmac(i, j, k) = amrex::max(vmacl, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vmac(i, j, k) = utilde(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::noslipwall:
+            case amrex::PhysBCType::symmetry:
+                vmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                vmac(i, j, k) = amrex::max(vmacl, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
     });
@@ -771,65 +803,73 @@ void Maestro::VelPredInterface(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (bclo) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = utilde(i - 1, j, k, n);
-                        urx(i, j, k, n) = utilde(i - 1, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ulx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 0) = 0.0;
-                    ulx(i, j, k, 1) = urx(i, j, k, 1);
-                    ulx(i, j, k, 2) = urx(i, j, k, 2);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = 0.0;
-                        urx(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = urx(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = utilde(i - 1, j, k, n);
+                    urx(i, j, k, n) = utilde(i - 1, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ulx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 0) = 0.0;
+                ulx(i, j, k, 1) = urx(i, j, k, 1);
+                ulx(i, j, k, 2) = urx(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = 0.0;
+                    urx(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                urx(i, j, k, 0) = amrex::min(urx(i, j, k, 0), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = urx(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (bchi) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = utilde(i, j, k, n);
-                        urx(i, j, k, n) = utilde(i, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ulx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 0) = 0.0;
-                    urx(i, j, k, 1) = ulx(i, j, k, 1);
-                    urx(i, j, k, 2) = ulx(i, j, k, 2);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulx(i, j, k, n) = 0.0;
-                        urx(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        urx(i, j, k, n) = ulx(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = utilde(i, j, k, n);
+                    urx(i, j, k, n) = utilde(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ulx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 0) = 0.0;
+                urx(i, j, k, 1) = ulx(i, j, k, 1);
+                urx(i, j, k, 2) = ulx(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulx(i, j, k, n) = 0.0;
+                    urx(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                ulx(i, j, k, 0) = amrex::max(ulx(i, j, k, 0), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    urx(i, j, k, n) = ulx(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -882,65 +922,73 @@ void Maestro::VelPredInterface(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (bclo) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = utilde(i, j - 1, k, n);
-                        ury(i, j, k, n) = utilde(i, j - 1, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    uly(i, j, k, 0) = ury(i, j, k, 0);
-                    uly(i, j, k, 1) = 0.0;
-                    ury(i, j, k, 1) = 0.0;
-                    uly(i, j, k, 2) = ury(i, j, k, 2);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = 0.0;
-                        ury(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = ury(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = utilde(i, j - 1, k, n);
+                    ury(i, j, k, n) = utilde(i, j - 1, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                uly(i, j, k, 0) = ury(i, j, k, 0);
+                uly(i, j, k, 1) = 0.0;
+                ury(i, j, k, 1) = 0.0;
+                uly(i, j, k, 2) = ury(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = 0.0;
+                    ury(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                ury(i, j, k, 1) = amrex::min(ury(i, j, k, 1), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = ury(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (bchi) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = utilde(i, j, k, n);
-                        ury(i, j, k, n) = utilde(i, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ury(i, j, k, 0) = uly(i, j, k, 0);
-                    uly(i, j, k, 1) = 0.0;
-                    ury(i, j, k, 1) = 0.0;
-                    ury(i, j, k, 2) = uly(i, j, k, 2);
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        uly(i, j, k, n) = 0.0;
-                        ury(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ury(i, j, k, n) = uly(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = utilde(i, j, k, n);
+                    ury(i, j, k, n) = utilde(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ury(i, j, k, 0) = uly(i, j, k, 0);
+                uly(i, j, k, 1) = 0.0;
+                ury(i, j, k, 1) = 0.0;
+                ury(i, j, k, 2) = uly(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    uly(i, j, k, n) = 0.0;
+                    ury(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                uly(i, j, k, 1) = amrex::max(uly(i, j, k, 1), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ury(i, j, k, n) = uly(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -992,65 +1040,73 @@ void Maestro::VelPredInterface(
         // impose lo side bc's
         if (k == domlo[2]) {
             switch (bclo) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulz(i, j, k, n) = utilde(i, j, k - 1, n);
-                        urz(i, j, k, n) = utilde(i, j, k - 1, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    ulz(i, j, k, 0) = urz(i, j, k, 0);
-                    ulz(i, j, k, 1) = urz(i, j, k, 1);
-                    ulz(i, j, k, 2) = 0.0;
-                    urz(i, j, k, 2) = 0.0;
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulz(i, j, k, n) = 0.0;
-                        urz(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    urz(i, j, k, 2) = amrex::min(urz(i, j, k, 2), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulz(i, j, k, n) = urz(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulz(i, j, k, n) = utilde(i, j, k - 1, n);
+                    urz(i, j, k, n) = utilde(i, j, k - 1, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                ulz(i, j, k, 0) = urz(i, j, k, 0);
+                ulz(i, j, k, 1) = urz(i, j, k, 1);
+                ulz(i, j, k, 2) = 0.0;
+                urz(i, j, k, 2) = 0.0;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulz(i, j, k, n) = 0.0;
+                    urz(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                urz(i, j, k, 2) = amrex::min(urz(i, j, k, 2), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulz(i, j, k, n) = urz(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (k == domhi[2] + 1) {
             switch (bchi) {
-                case Inflow:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulz(i, j, k, n) = utilde(i, j, k, n);
-                        urz(i, j, k, n) = utilde(i, j, k, n);
-                    }
-                    break;
-                case SlipWall:
-                case Symmetry:
-                    urz(i, j, k, 0) = ulz(i, j, k, 0);
-                    urz(i, j, k, 1) = ulz(i, j, k, 1);
-                    ulz(i, j, k, 2) = 0.0;
-                    urz(i, j, k, 2) = 0.0;
-                    break;
-                case NoSlipWall:
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        ulz(i, j, k, n) = 0.0;
-                        urz(i, j, k, n) = 0.0;
-                    }
-                    break;
-                case Outflow:
-                    ulz(i, j, k, 2) = amrex::max(ulz(i, j, k, 2), 0.0);
-                    for (int n = 0; n < AMREX_SPACEDIM; ++n) {
-                        urz(i, j, k, n) = ulz(i, j, k, n);
-                    }
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulz(i, j, k, n) = utilde(i, j, k, n);
+                    urz(i, j, k, n) = utilde(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+                urz(i, j, k, 0) = ulz(i, j, k, 0);
+                urz(i, j, k, 1) = ulz(i, j, k, 1);
+                ulz(i, j, k, 2) = 0.0;
+                urz(i, j, k, 2) = 0.0;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    ulz(i, j, k, n) = 0.0;
+                    urz(i, j, k, n) = 0.0;
+                }
+                break;
+            case amrex::PhysBCType::outflow:
+                ulz(i, j, k, 2) = amrex::max(ulz(i, j, k, 2), 0.0);
+                for (int n = 0; n < AMREX_SPACEDIM; ++n) {
+                    urz(i, j, k, n) = ulz(i, j, k, n);
+                }
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1121,41 +1177,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (physbc[1]) {
-                case Inflow:
-                    ulyz = utilde(i, j - 1, k, 0);
-                    uryz = utilde(i, j - 1, k, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    ulyz = uryz;
-                    break;
-                case NoSlipWall:
-                    ulyz = 0.0;
-                    uryz = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                ulyz = utilde(i, j - 1, k, 0);
+                uryz = utilde(i, j - 1, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                ulyz = uryz;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                ulyz = 0.0;
+                uryz = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (physbc[AMREX_SPACEDIM + 1]) {
-                case Inflow:
-                    ulyz = utilde(i, j, k, 0);
-                    uryz = utilde(i, j, k, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    uryz = ulyz;
-                    break;
-                case NoSlipWall:
-                    ulyz = 0.0;
-                    uryz = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                ulyz = utilde(i, j, k, 0);
+                uryz = utilde(i, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                uryz = ulyz;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                ulyz = 0.0;
+                uryz = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1183,41 +1247,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (k == domlo[2]) {
             switch (physbc[2]) {
-                case Inflow:
-                    ulzy = utilde(i, j, k - 1, 0);
-                    urzy = utilde(i, j, k - 1, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    ulzy = urzy;
-                    break;
-                case NoSlipWall:
-                    ulzy = 0.0;
-                    urzy = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                ulzy = utilde(i, j, k - 1, 0);
+                urzy = utilde(i, j, k - 1, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                ulzy = urzy;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                ulzy = 0.0;
+                urzy = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (k == domhi[2] + 1) {
             switch (physbc[AMREX_SPACEDIM + 2]) {
-                case Inflow:
-                    ulzy = utilde(i, j, k, 0);
-                    urzy = utilde(i, j, k, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    urzy = ulzy;
-                    break;
-                case NoSlipWall:
-                    ulzy = 0.0;
-                    urzy = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                ulzy = utilde(i, j, k, 0);
+                urzy = utilde(i, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                urzy = ulzy;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                ulzy = 0.0;
+                urzy = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1245,41 +1317,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (physbc[0]) {
-                case Inflow:
-                    vlxz = utilde(i - 1, j, k, 1);
-                    vrxz = utilde(i - 1, j, k, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    vlxz = vrxz;
-                    break;
-                case NoSlipWall:
-                    vlxz = 0.0;
-                    vrxz = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vlxz = utilde(i - 1, j, k, 1);
+                vrxz = utilde(i - 1, j, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                vlxz = vrxz;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                vlxz = 0.0;
+                vrxz = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (physbc[AMREX_SPACEDIM]) {
-                case Inflow:
-                    vlxz = utilde(i, j, k, 1);
-                    vrxz = utilde(i, j, k, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    vrxz = vlxz;
-                    break;
-                case NoSlipWall:
-                    vlxz = 0.0;
-                    vrxz = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vlxz = utilde(i, j, k, 1);
+                vrxz = utilde(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                vrxz = vlxz;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                vlxz = 0.0;
+                vrxz = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1307,41 +1387,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (k == domlo[2]) {
             switch (physbc[2]) {
-                case Inflow:
-                    vlzx = utilde(i, j, k - 1, 1);
-                    vrzx = utilde(i, j, k - 1, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    vlzx = vrzx;
-                    break;
-                case NoSlipWall:
-                    vlzx = 0.0;
-                    vrzx = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vlzx = utilde(i, j, k - 1, 1);
+                vrzx = utilde(i, j, k - 1, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                vlzx = vrzx;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                vlzx = 0.0;
+                vrzx = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (k == domhi[2] + 1) {
             switch (physbc[AMREX_SPACEDIM + 2]) {
-                case Inflow:
-                    vlzx = utilde(i, j, k, 1);
-                    vrzx = utilde(i, j, k, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    vrzx = vlzx;
-                    break;
-                case NoSlipWall:
-                    vlzx = 0.0;
-                    vrzx = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vlzx = utilde(i, j, k, 1);
+                vrzx = utilde(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                vrzx = vlzx;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                vlzx = 0.0;
+                vrzx = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1369,41 +1457,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (physbc[0]) {
-                case Inflow:
-                    wlxy = utilde(i - 1, j, k, 2);
-                    wrxy = utilde(i - 1, j, k, 2);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    wlxy = wrxy;
-                    break;
-                case NoSlipWall:
-                    wlxy = 0.0;
-                    wrxy = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                wlxy = utilde(i - 1, j, k, 2);
+                wrxy = utilde(i - 1, j, k, 2);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                wlxy = wrxy;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                wlxy = 0.0;
+                wrxy = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (physbc[AMREX_SPACEDIM]) {
-                case Inflow:
-                    wlxy = utilde(i, j, k, 2);
-                    wrxy = utilde(i, j, k, 2);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    wrxy = wlxy;
-                    break;
-                case NoSlipWall:
-                    wlxy = 0.0;
-                    wrxy = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                wlxy = utilde(i, j, k, 2);
+                wrxy = utilde(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                wrxy = wlxy;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                wlxy = 0.0;
+                wrxy = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1431,41 +1527,49 @@ void Maestro::VelPredTransverse(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (physbc[1]) {
-                case Inflow:
+            case amrex::PhysBCType::inflow:
                     wlyx = utilde(i, j - 1, k, 2);
                     wryx = utilde(i, j - 1, k, 2);
                     break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    wlyx = wryx;
-                    break;
-                case NoSlipWall:
-                    wlyx = 0.0;
-                    wryx = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                wlyx = wryx;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                wlyx = 0.0;
+                wryx = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (physbc[AMREX_SPACEDIM + 1]) {
-                case Inflow:
-                    wlyx = utilde(i, j, k, 2);
-                    wryx = utilde(i, j, k, 2);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case Outflow:
-                    wryx = wlyx;
-                    break;
-                case NoSlipWall:
-                    wlyx = 0.0;
-                    wryx = 0.0;
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                wlyx = utilde(i, j, k, 2);
+                wryx = utilde(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::outflow:
+                wryx = wlyx;
+                break;
+            case amrex::PhysBCType::noslipwall:
+                wlyx = 0.0;
+                wryx = 0.0;
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
 
@@ -1566,37 +1670,45 @@ void Maestro::VelPredVelocities(
         // impose lo side bc's
         if (i == domlo[0]) {
             switch (physbc[0]) {
-                case Inflow:
-                    umac(i, j, k) = utilde(i - 1, j, k, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    umac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    umac(i, j, k) = amrex::min(umacr, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                umac(i, j, k) = utilde(i - 1, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                umac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                umac(i, j, k) = amrex::min(umacr, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
             switch (physbc[AMREX_SPACEDIM]) {
-                case Inflow:
-                    umac(i, j, k) = utilde(i, j, k, 0);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    umac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    umac(i, j, k) = amrex::max(umacl, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                umac(i, j, k) = utilde(i, j, k, 0);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                umac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                umac(i, j, k) = amrex::max(umacl, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
     });
@@ -1644,37 +1756,45 @@ void Maestro::VelPredVelocities(
         // impose lo side bc's
         if (j == domlo[1]) {
             switch (physbc[1]) {
-                case Inflow:
-                    vmac(i, j, k) = utilde(i, j - 1, k, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    vmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    vmac(i, j, k) = amrex::min(vmacr, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vmac(i, j, k) = utilde(i, j - 1, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                vmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                vmac(i, j, k) = amrex::min(vmacr, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
             switch (physbc[AMREX_SPACEDIM + 1]) {
-                case Inflow:
-                    vmac(i, j, k) = utilde(i, j, k, 1);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    vmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    vmac(i, j, k) = amrex::max(vmacl, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                vmac(i, j, k) = utilde(i, j, k, 1);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                vmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                vmac(i, j, k) = amrex::max(vmacl, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
     });
@@ -1732,37 +1852,45 @@ void Maestro::VelPredVelocities(
         // impose hi side bc's
         if (k == domlo[2]) {
             switch (physbc[2]) {
-                case Inflow:
-                    wmac(i, j, k) = utilde(i, j, k - 1, 2);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    wmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    wmac(i, j, k) = amrex::min(wmacr, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                wmac(i, j, k) = utilde(i, j, k - 1, 2);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                wmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                wmac(i, j, k) = amrex::min(wmacr, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
 
             // impose lo side bc's
         } else if (k == domhi[2] + 1) {
             switch (physbc[AMREX_SPACEDIM + 2]) {
-                case Inflow:
-                    wmac(i, j, k) = utilde(i, j, k, 2);
-                    break;
-                case SlipWall:
-                case Symmetry:
-                case NoSlipWall:
-                    wmac(i, j, k) = 0.0;
-                    break;
-                case Outflow:
-                    wmac(i, j, k) = amrex::max(wmacl, 0.0);
-                    break;
-                case Interior:
-                    break;
+            case amrex::PhysBCType::inflow:
+                wmac(i, j, k) = utilde(i, j, k, 2);
+                break;
+            case amrex::PhysBCType::slipwall:
+            case amrex::PhysBCType::symmetry:
+            case amrex::PhysBCType::noslipwall:
+                wmac(i, j, k) = 0.0;
+                break;
+            case amrex::PhysBCType::outflow:
+                wmac(i, j, k) = amrex::max(wmacl, 0.0);
+                break;
+            case amrex::PhysBCType::interior:
+                break;
+            default:
+#ifndef AMREX_USE_GPU
+                amrex::Error("invalid boundary type");
+#endif
             }
         }
     });
