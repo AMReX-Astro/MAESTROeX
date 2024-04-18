@@ -10,6 +10,6 @@ xrb_use_bottom_sponge               integer            0
 sponge_min                          real               0.01d0
 
 # Do refinement above and below given heights (given in cm)
-do_height_based_refinement          integer            1
-height_refine_bottom                real               1.0d3
-height_refine_top                   real               1.2d3
+do_height_based_refinement          integer            0
+height_refine_bottom                real               1.0e3
+height_refine_top                   real               1.2e3

@@ -56,10 +56,7 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
 
     const Real dr_lev = base_geom.dr(lev);
 
-    // do_height_based_refinement          logical            .false.
-    // height_refine_bottom                real               1.0d3
-    // height_refine_top                   real               1.2d3
-
+    // Tag based on height
     if (problem_rp::do_height_based_refinement) {
         ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
             int r = AMREX_SPACEDIM == 2 ? j : k;

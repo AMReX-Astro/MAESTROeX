@@ -26,7 +26,7 @@ amrex.fpe_trap_invalid = 1       # floating point exception
 # GRIDDING AND REFINEMENT
 amr.n_cell             = 512 512
 amr.max_grid_size      = 64
-amr.max_level          = 0       # maximum level number allowed
+amr.max_level          = 1       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
 amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
@@ -62,7 +62,7 @@ maestro.dpdt_factor = 0.0e0
 
 maestro.species_pred_type = 3
 
-# maestro.limit_conductivity = true
+#maestro.limit_conductivity = true
 
 #maestro.anelastic_cutoff_density = 1.e2
 #maestro.base_cutoff_density = 1.e2
@@ -82,7 +82,6 @@ maestro.plot_ad_excess = true
 maestro.small_plot_base_name = PLOTS/smallxrb_
 maestro.small_plot_deltat = -1.0
 #maestro.small_plot_vars = Hnuc X(h1) X(he4) X(c12) magvel vort
-maestro.small_plot_vars = rho p0 tfromp tpert vely X(H1) X(He4) X(C12) X(C13) X(N13) X(N14) X(N15) X(O14) X(O15) X(O16) X(O17) X(O18) X(F17) X(F18) X(F19) X(Ne18) X(Ne19) X(Ne20) X(Mg22) X(Mg24) X(Fe56)
 
 amr.write_plotfile_with_checkpoint = 0
 maestro.output_at_completion = 0
@@ -126,10 +125,7 @@ maestro.max_mg_bottom_nlevels = 4
 problem.pert_seed = 42
 
 # refinement
-# Set this to 1, and amr.max_level = 1
 problem.do_height_based_refinement = 0
-problem.height_refine_bottom = 1.0e3
-problem.height_refine_top    = 1.2e3
 
 # Note that some of the parameters in this
 # namelist are specific to the default EOS,
