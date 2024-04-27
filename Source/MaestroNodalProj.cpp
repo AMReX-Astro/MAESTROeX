@@ -571,7 +571,7 @@ void Maestro::SetBoundaryVelocity(Vector<MultiFab>& vel) {
 
                     BoxList bxlist2 = amrex::complementIn(bxg1, bxlist);
 
-                    for (auto it : bxlist2) {
+                    for (const auto& it : bxlist2) {
                         Box ovlp = it & v_fab.box();
                         if (ovlp.ok()) {
                             v_fab.setVal<RunOn::Device>(0.0, ovlp, idir, 1);
