@@ -45,10 +45,10 @@ problem:
    {\tt wdconvect} & \rightarrow & {\tt model\_6.e8.raw} \nonumber \\
    {\tt spherical\_heat} & \rightarrow & \mathrm{none-it~ is~ generated~ analytically} \nonumber \\\end{aligned}
 
-We use a fortran subroutine
+We use a C++ program
 to interpolate the raw data, yielding the model data, :math:`\rho^{\model},
-T^{\model}, p^{\model}`, and :math:`X^{\model}`. The fortran subroutine
-then uses an iterative procedure to modify the model data so that it
+T^{\model}, p^{\model}`, and :math:`X^{\model}`.  These initial model
+routines generally uses an iterative procedure to modify the model data so that it
 is thermodynamically consistent with the MAESTROeX equation of
 state (EOS), and also satisfies our chosen hydrostatic equilibrium
 (HSE) discretization,

@@ -54,11 +54,9 @@ lines of the form:
 ::
 
     CEXE_sources += file.cpp
-    F90EXE_sources += file.F90
 
-where ``file.cpp`` is a C++ source file and ``file.F90`` is a Fortran
-source file that should be built when this directory is added to the
-list of build directories.
+where ``file.cpp`` is a C++ source file that should be built when this
+directory is added to the list of build directories.
 
 The AMReX build system relies on the ``vpath`` functionality of
 make. In a makefile, the ``vpath`` variable holds search path used to
@@ -74,7 +72,7 @@ Dependencies
 ------------
 
 There is no need to explicitly define the dependencies between the
-source files for Fortran modules. Scripts in
+source files.  Scripts in
 AMReX are run at the start of the build
 process and parse all the source files and make an explicit list of
 the dependency pairs.
@@ -264,7 +262,7 @@ track down memory issues, uninitialized variables, NaNs, etc.
    ``GNUmakefile`` generates an executable with debugging information
    included in the executable (e.g., to be interpreted by the
    debugger, gdb). This will usually add -g to the compile line and
-   also lower the optimization. For gfortran it will add several
+   also lower the optimization. This will add several
    options to catch uninitialize variables, bounds errors, etc.
    The resulting executable will have ``DEBUG`` in its name.
 
@@ -309,7 +307,7 @@ track down memory issues, uninitialized variables, NaNs, etc.
 
 -  ``FSANITIZER``
 
-   For gfortran, gcc, g++, setting ``FSANITIZER=TRUE``
+   For gcc/g++, setting ``FSANITIZER=TRUE``
    in ``GNUmakefile`` will enable the
    address sanitizer support built into GCC. This is enabled through
    integration with https://github.com/google/sanitizers in GCC.

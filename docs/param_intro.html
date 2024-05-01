@@ -18,7 +18,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
@@ -155,14 +155,11 @@
 <span id="sec-runtime-parameters"></span><h1>Runtime Parameters<a class="headerlink" href="#runtime-parameters" title="Link to this heading"></a></h1>
 <section id="introduction-to-runtime-parameters">
 <h2>Introduction to Runtime Parameters<a class="headerlink" href="#introduction-to-runtime-parameters" title="Link to this heading"></a></h2>
-<p>MAESTROeX has 2 sets of runtime parameters—those controlled by
-C++ and those controlled by Fortran. The C++ parameters are set
+<p>MAESTROeX runtime parameters are set
 in the inputs file and managed by the AMReX <code class="docutils literal notranslate"><span class="pre">ParmParse</span></code>
 class. For MAESTROeX-specific parameters, we list the runtime
 parameters in a file <code class="docutils literal notranslate"><span class="pre">Source/param/_cpp_parameters</span></code> and generate the
-C++ code and headers using the <code class="docutils literal notranslate"><span class="pre">Source/param/mk_params.sh</span></code> script—note
-this script needs to be run every time the <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code>
-file is updated.</p>
+C++ code and headers automatically at compilation time.</p>
 <p>The behavior of the network, EOS, and other microphysics routines are
 controlled by a different set of runtime parameters. These parameters are defined
 in plain-text files <code class="docutils literal notranslate"><span class="pre">_parameters</span></code> located in the different
@@ -195,23 +192,7 @@ was implemented for backwards compatibility.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">default</span></code> is the default value of the parameter.</p></li>
 </ul>
 </div></blockquote>
-<p>The next columns are optional, but you need to fill in all of the
-information up to and including any of the optional columns you need
-(e.g., if you are going to provide the fortran name, you also need to
-provide <code class="docutils literal notranslate"><span class="pre">need</span> <span class="pre">in</span> <span class="pre">Fortran?</span></code> and <code class="docutils literal notranslate"><span class="pre">ifdef</span></code>.</p>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">need</span> <span class="pre">in</span> <span class="pre">Fortran?</span></code> is <code class="docutils literal notranslate"><span class="pre">y</span></code> if the runtime parameter should be
-made available in Fortran (through <code class="docutils literal notranslate"><span class="pre">meth_params_module</span></code>).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">ifdef</span></code> provides the name of a preprocessor name that should
-wrap this parameter definition—it will only be compiled in if that
-name is defined to the preprocessor.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">fortran</span> <span class="pre">name</span></code> is the name that the parameter should use in
-Fortran—by default it will be the same as <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">fortran</span> <span class="pre">type</span></code> is the data type of the parameter in Fortran—by
-default it will be the Fortran-equivalent to <code class="docutils literal notranslate"><span class="pre">type</span></code>.</p></li>
-</ul>
-</div></blockquote>
+<p>The next columns are outdated.</p>
 <p>Finally, any comment (starting with <code class="docutils literal notranslate"><span class="pre">#</span></code>) immediately before the
 parameter definition will be used to generate the documentation
 describing the parameters.</p>

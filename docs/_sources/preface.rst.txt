@@ -6,7 +6,7 @@ This documentation is a work in progress. MAESTROeX is rapidly
 evolving, so portions of the text are likely to be incomplete or
 out-of-date.
 
-MAESTROeX is an updated C++/Fortran implementation of the previous
+MAESTROeX is an updated C++ implementation of the previous
 (pure-Fortran) MAESTRO code. Thus, MAESTROeX is able to leverage the
 updated capability of the AMReX software framework for massively
 parallel, block-structured adaptive mesh refinement (AMR)

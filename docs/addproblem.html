@@ -18,7 +18,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
@@ -232,10 +232,10 @@ in the source tree.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PROBIN_PARAMETER_DIRS</span> <span class="o">:=</span> <span class="o">.</span>
 </pre></div>
 </div>
-<p>They are parsed at compile time and the file <code class="docutils literal notranslate"><span class="pre">extern.F90</span></code>
-is written and compiled. This is a Fortran module that holds the values of
-the runtime parameters and makes them available to any routine via
-<code class="docutils literal notranslate"><span class="pre">probin_module</span></code>.</p>
+<p>These are combined with the runtime parameters specified by Microphysics
+and parsed at compile time.  A C++ header and source file is written
+(<code class="docutils literal notranslate"><span class="pre">extern_parameters.cpp</span></code> and <code class="docutils literal notranslate"><span class="pre">extern_parameters.H</span></code>) that define
+the parameters and their defaults.</p>
 <p>The final line in the GNUmakefile includes the rules to actually
 build the executable.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>include $(MAESTROEX_HOME)/Exec/Make.Maestro
@@ -264,15 +264,14 @@ The script outputs the <code class="docutils literal notranslate"><span class="p
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>*parameter*    *data-type*    *value*    *need in Fortran?*
 </pre></div>
 </div>
-<p>where <em>parameter</em> is the name of the runtime parameter,
-<em>data-type</em> is one of {string, Real, int, bool},
-the <em>value</em> specifies the default value for the runtime parameter,
-and <em>need in Fortran?</em> is marked <em>y</em> only if that parameter is
-used in Fortran. Comments are indicated by a ‘#’ character and are
+<p>where <em>parameter</em> is the name of the runtime parameter, <em>data-type</em> is
+one of {string, Real, int, bool}, the <em>value</em> specifies the default
+value for the runtime parameter.  A fourth column, <em>need in Fortran?</em>,
+is no longer used.  Comments are indicated by a ‘#’ character and are
 used to produce documentation about the available runtime parameters.
-For the documentation, runtime parameters are grouped together
-in the <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code> file into categories. The category headings
-are defined by comments in the <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code> file and any comments
+For the documentation, runtime parameters are grouped together in the
+<code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code> file into categories. The category headings are
+defined by comments in the <code class="docutils literal notranslate"><span class="pre">_cpp_parameters</span></code> file and any comments
 following that heading are placed into that category.</p>
 <p>At runtime, the default values for the parameters can be overridden
 either through the inputs file (by adding a line of the form:

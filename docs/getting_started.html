@@ -18,7 +18,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
@@ -156,12 +156,11 @@ standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.</p>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p>MAESTROeX requires a C++ compiler that supports the C++17 standard, a
-Fortran compiler that supports the Fortran 2003 standard, and a C compiler
-that supports the C99 standard. Several compiler suites are supported,
-including GNU, Intel, PGI and Cray. GNU Make (&gt;= 3.82) is also required,
-as is Python (&gt;= 3.6) and standard tools available in any Unix-like
-environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
+<p>MAESTROeX requires a C++ compiler that supports the C++17 standard and
+a C compiler that supports the C99 standard. Several compiler suites
+are supported, including GNU, Intel, LLVM and Cray. GNU Make (&gt;= 3.82)
+is also required, as is Python (&gt;= 3.9) and standard tools available
+in any Unix-like environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
 <p>For running in parallel, an MPI library and/or OpenMP is required.
 For running on GPUs, CUDA 11 or later is required (see <a class="reference internal" href="gpu.html#sec-gpu"><span class="std std-ref">GPU</span></a> for
 more information).</p>
@@ -285,7 +284,7 @@ less-optimized code with debugging runtime checks. Setting
 <p>The dimensionality of the problem must be specified at compile-time.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">COMP</span> <span class="pre">:=</span> <span class="pre">gnu</span></code></p>
-<p>This option specifies the gnu compiler suite (g++/gfortran).
+<p>This option specifies the gnu compiler suite (e.g., g++).
 We will use gnu, which is the preferred compiler suite for MAESTROeX.
 Specifying this compiler will automatically pull in the compiler
 settings as specified in <code class="docutils literal notranslate"><span class="pre">AMREX_HOME/Tools/GNUMake/Make.defs</span></code>.
@@ -424,18 +423,9 @@ related development packages (e.g. libXpm-devel).</p>
 </section>
 <section id="amrpostprocessing-scripts">
 <h3>AmrPostprocessing scripts<a class="headerlink" href="#amrpostprocessing-scripts" title="Link to this heading"></a></h3>
-<p>Several useful analysis scripts (written in Fortran 90) can be found
-in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Postprocessing/F_Src/</span></code>.  The <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> there
-needs to be edited to indicate which of the tools to build. For
-example, to extract the density along a line from the center of a
-plotfile, <code class="docutils literal notranslate"><span class="pre">plt00200</span></code>, in the <span class="math notranslate nohighlight">\(y\)</span>-direction:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fextract</span><span class="o">.</span><span class="n">Linux</span><span class="o">.</span><span class="n">gfortran</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">d</span> <span class="mi">2</span> <span class="o">-</span><span class="n">v</span> <span class="s2">&quot;density&quot;</span> <span class="o">-</span><span class="n">p</span> <span class="n">plt00200</span>
-</pre></div>
-</div>
-<p>These routines are described in § <a class="reference internal" href="analysis.html#sec-analysis"><span class="std std-ref">Analysis</span></a>.</p>
-<p>There is also a python visualization method in
-<code class="docutils literal notranslate"><span class="pre">AmrPostprocessing/python</span></code>. This is described
-in § <span class="xref std std-ref">sec:vis:python</span>.</p>
+<p>Several useful analysis scripts can be found
+in the <code class="docutils literal notranslate"><span class="pre">amrex-astro-diag</span></code> project:</p>
+<p><a class="reference external" href="https://github.com/amrex-astro/amrex-astro-diag">https://github.com/amrex-astro/amrex-astro-diag</a></p>
 </section>
 <section id="visit">
 <h3>VisIt<a class="headerlink" href="#visit" title="Link to this heading"></a></h3>

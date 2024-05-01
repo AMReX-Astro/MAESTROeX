@@ -18,7 +18,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
@@ -200,12 +200,10 @@ number of directories. In each of these directories containing source
 files, there is a <code class="docutils literal notranslate"><span class="pre">Make.package</span></code> file. This file has a number of
 lines of the form:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CEXE_sources</span> <span class="o">+=</span> <span class="n">file</span><span class="o">.</span><span class="n">cpp</span>
-<span class="n">F90EXE_sources</span> <span class="o">+=</span> <span class="n">file</span><span class="o">.</span><span class="n">F90</span>
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">file.cpp</span></code> is a C++ source file and <code class="docutils literal notranslate"><span class="pre">file.F90</span></code> is a Fortran
-source file that should be built when this directory is added to the
-list of build directories.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">file.cpp</span></code> is a C++ source file that should be built when this
+directory is added to the list of build directories.</p>
 <p>The AMReX build system relies on the <code class="docutils literal notranslate"><span class="pre">vpath</span></code> functionality of
 make. In a makefile, the <code class="docutils literal notranslate"><span class="pre">vpath</span></code> variable holds search path used to
 locate source files. When a particular file is needed, the directories
@@ -218,7 +216,7 @@ other version in the source path.</p>
 <section id="dependencies">
 <h3>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading"></a></h3>
 <p>There is no need to explicitly define the dependencies between the
-source files for Fortran modules. Scripts in
+source files.  Scripts in
 AMReX are run at the start of the build
 process and parse all the source files and make an explicit list of
 the dependency pairs.</p>
@@ -382,7 +380,7 @@ track down memory issues, uninitialized variables, NaNs, etc.</p>
 <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> generates an executable with debugging information
 included in the executable (e.g., to be interpreted by the
 debugger, gdb). This will usually add -g to the compile line and
-also lower the optimization. For gfortran it will add several
+also lower the optimization. This will add several
 options to catch uninitialize variables, bounds errors, etc.
 The resulting executable will have <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> in its name.</p>
 </li>
@@ -420,7 +418,7 @@ Linux/Unix <code class="docutils literal notranslate"><span class="pre">feenable
 <code class="docutils literal notranslate"><span class="pre">backtrace_c.cpp</span></code> in AMReX).</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">FSANITIZER</span></code></p>
-<p>For gfortran, gcc, g++, setting <code class="docutils literal notranslate"><span class="pre">FSANITIZER=TRUE</span></code>
+<p>For gcc/g++, setting <code class="docutils literal notranslate"><span class="pre">FSANITIZER=TRUE</span></code>
 in <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> will enable the
 address sanitizer support built into GCC. This is enabled through
 integration with <a class="reference external" href="https://github.com/google/sanitizers">https://github.com/google/sanitizers</a> in GCC.</p>

@@ -18,7 +18,7 @@
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
         <script src="_static/documentation_options.js?v=5929fcd5"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
@@ -72,11 +72,6 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GPU</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#building-gpu-support">Building GPU Support</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#offloading-a-routine-to-gpu">Offloading a routine to GPU</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#c">C++</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#fortran">Fortran</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#profiling-with-gpus">Profiling with GPUs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#basic-gpu-debugging">Basic GPU Debugging</a></li>
 </ul>
@@ -152,9 +147,8 @@ to GPU, and some basic profiling and debugging options.
 Note that currently MAESTROeX only supports NVIDIA GPUs.</p>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p>Since MAESTROeX uses primarily CUDA C++ and CUDA Fortran,
-it requires a recent version of CUDA (e.g., &gt;= 9) and the device
-must have compute capability of &gt;= 6.</p>
+<p>MAESTROeX has only been tested with NVIDIA/CUDA.  In theory AMD/HIP
+should work.</p>
 </section>
 <section id="building-gpu-support">
 <span id="sec-gpubuild"></span><h2>Building GPU Support<a class="headerlink" href="#building-gpu-support" title="Link to this heading"></a></h2>
@@ -167,14 +161,6 @@ to the GNUmakefile:</p>
 not compatible with building with CUDA.
 <code class="docutils literal notranslate"><span class="pre">USE_CUDA</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> and <code class="docutils literal notranslate"><span class="pre">USE_OMP</span> <span class="pre">=</span> <span class="pre">TRUE</span></code> will fail to compile.
 However, you may use MPI with CUDA for additional parallelization.</p>
-<p>Only the IBM and PGI compilers support CUDA Fortran, so the compiler should be set as:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMP</span> <span class="o">:=</span> <span class="n">pgi</span>
-</pre></div>
-</div>
-<p>The integrator used by the Microphysics library must be set to <code class="docutils literal notranslate"><span class="pre">VODE90</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INTEGRATOR_DIR</span>   <span class="o">:=</span> <span class="n">VODE90</span>
-</pre></div>
-</div>
 <p>Depending on which system you are running on, it may be necessary to specify
 the CUDA Capability using the <code class="docutils literal notranslate"><span class="pre">CUDA_ARCH</span></code> flag. The CUDA Capability will
 depend on the specific GPU hardware you are running on. On a Linux system, the
@@ -188,167 +174,8 @@ capability 6.x, the flag should be set to:</p>
 </pre></div>
 </div>
 </section>
-<section id="offloading-a-routine-to-gpu">
-<span id="sec-gpuporting"></span><h2>Offloading a routine to GPU<a class="headerlink" href="#offloading-a-routine-to-gpu" title="Link to this heading"></a></h2>
-<p>In order to offload a routine to the GPU, we insert a <code class="docutils literal notranslate"><span class="pre">#pragma</span> <span class="pre">gpu</span></code>
-statement on the line before the call. This tells the preprocessor to
-generate a CUDA device version of the function, with all the
-additional CUDA GPU management. In addition to this, there are a few
-other modifications required to ensure the function operates correctly
-on the GPU. We summarize these below.</p>
-<section id="c">
-<h3>C++<a class="headerlink" href="#c" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>Make sure that the box <code class="docutils literal notranslate"><span class="pre">lo</span></code> and <code class="docutils literal notranslate"><span class="pre">hi</span></code> are the first two arguments
-and use <code class="docutils literal notranslate"><span class="pre">AMREX_INT_ANYD</span></code> as the macro wrapping <code class="docutils literal notranslate"><span class="pre">bx.loVect()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">bx.hiVect()</span></code></p></li>
-<li><p>Likewise, inplace of <code class="docutils literal notranslate"><span class="pre">AMREX_ZFILL()</span></code>, use <code class="docutils literal notranslate"><span class="pre">AMREX_REAL_ANYD</span></code></p></li>
-<li><p>Scalars must be passed by value to Fortran functions (not by
-reference)</p></li>
-<li><p>Make sure that you change the variable definitions in the Fortran
-code to include value so that the Fortran knows the variables are
-being passed by value rather than by reference. If you don’t do
-this, the code is liable to segfault</p></li>
-<li><p>FArrayBox functions like <code class="docutils literal notranslate"><span class="pre">setVal()</span></code> and <code class="docutils literal notranslate"><span class="pre">saxpy()</span></code> are not on the
-GPU, so you should explicitly write out these operations in C++.
-The MultiFab counterparts are on the GPU.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">BL_TO_FORTRAN_ANYD()</span></code> to wrap MultiFab arguments (and in the header file wrap with <code class="docutils literal notranslate"><span class="pre">BL_FORT_FAB_ARG_3D</span></code>)</p></li>
-</ul>
-<p>To illustrate these modifications, consider the function <code class="docutils literal notranslate"><span class="pre">mk_sponge</span></code>. To call the function on the CPU, we would write</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
-
-<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">AMREX_ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">AMREX_ARLIM_3D</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
-<span class="w">              </span><span class="n">BL_TO_FORTRAN_3D</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
-<span class="w">      </span><span class="n">AMREX_ZFILL</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dt</span><span class="p">);</span>
-<span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-<p>Implementing the changes described above to offload this to GPU, this becomes</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">Box</span><span class="o">&amp;</span><span class="w"> </span><span class="n">tileBox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">tilebox</span><span class="p">();</span>
-
-<span class="cp">#pragma gpu box(tileBox)</span>
-<span class="w">    </span><span class="n">mk_sponge</span><span class="p">(</span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">loVect</span><span class="p">()),</span><span class="w"> </span><span class="n">AMREX_INT_ANYD</span><span class="p">(</span><span class="n">tileBox</span><span class="p">.</span><span class="n">hiVect</span><span class="p">()),</span>
-<span class="w">              </span><span class="n">BL_TO_FORTRAN_ANYD</span><span class="p">(</span><span class="n">sponge_mf</span><span class="p">[</span><span class="n">mfi</span><span class="p">]),</span>
-<span class="w">      </span><span class="n">AMREX_REAL_ANYD</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span><span class="w"> </span><span class="n">dt</span><span class="p">);</span>
-<span class="w"> </span><span class="p">}</span>
-</pre></div>
-</div>
-</section>
-<section id="fortran">
-<h3>Fortran<a class="headerlink" href="#fortran" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>The routine must only operate on a single zone in <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p>
-<ul>
-<li><p>Even for temporary arrays, you cannot write to an <code class="docutils literal notranslate"><span class="pre">i+1</span></code> zone
-(e.g. when doing limiting) – this will cause a race condition.
-If necessary, do extra computation to avoid the temporary arrays.</p></li>
-</ul>
-</li>
-<li><p>Mark the routine with <code class="docutils literal notranslate"><span class="pre">!$gpu</span></code></p></li>
-<li><p>If a module defines its own variables, these variables need to be
-<code class="docutils literal notranslate"><span class="pre">allocatable</span></code> (even if they are scalars) and marked as
-<code class="docutils literal notranslate"><span class="pre">attributes(managed)</span></code>. Additional routines may be needed to
-allocate these variables before they’re used and deallocate them
-when they’re no longer needed.</p>
-<ul>
-<li><p>Examples of this can be seen for the sponge parameters. These are
-marked as <code class="docutils literal notranslate"><span class="pre">allocatable</span></code> and <code class="docutils literal notranslate"><span class="pre">attributes(managed)</span></code> in
-<code class="docutils literal notranslate"><span class="pre">sponge.F90</span></code>, and therefore must be allocated (by <code class="docutils literal notranslate"><span class="pre">init_sponge</span></code>).</p></li>
-</ul>
-</li>
-<li><p>Temporary variables must be defined outside of function calls. E.g. if a
-function call contains <code class="docutils literal notranslate"><span class="pre">foo(x(a:b)/y)</span></code>, you need to define a new variable
-<code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">=</span> <span class="pre">x(a:b)/y</span></code> then pass this into the function as <code class="docutils literal notranslate"><span class="pre">foo(z)</span></code>.</p>
-<ul>
-<li><p>If you don’t do this, you may see the error <code class="docutils literal notranslate"><span class="pre">Array</span> <span class="pre">reshaping</span> <span class="pre">is</span>
-<span class="pre">not</span> <span class="pre">supported</span> <span class="pre">for</span> <span class="pre">device</span> <span class="pre">subprogram</span> <span class="pre">calls</span></code></p></li>
-</ul>
-</li>
-<li><p>If importing a function from another module, make sure to put the
-import within the function/subroutine, and put <code class="docutils literal notranslate"><span class="pre">!</span> <span class="pre">function</span></code> at the
-end of the line, e.g.</p></li>
-</ul>
-<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">use </span><span class="n">my_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">my_func</span><span class="w"> </span><span class="c">! function</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Individual functions should be imported individually (so not <code class="docutils literal notranslate"><span class="pre">use</span>
-<span class="pre">my_module,</span> <span class="pre">only:</span> <span class="pre">func1,</span> <span class="pre">func2</span> <span class="pre">!</span> <span class="pre">function</span></code>) and there must be a
-space either side of the <code class="docutils literal notranslate"><span class="pre">!</span></code></p></li>
-<li><p>Make sure the fortran file is <code class="docutils literal notranslate"><span class="pre">.F90</span></code> rather than <code class="docutils literal notranslate"><span class="pre">.f90</span></code> (and
-remember to update the <code class="docutils literal notranslate"><span class="pre">Make.xx</span></code> file to reflect this). If you
-don’t do this, you will see the error <code class="docutils literal notranslate"><span class="pre">Label</span> <span class="pre">field</span> <span class="pre">of</span> <span class="pre">continuation</span>
-<span class="pre">line</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">blank</span></code></p>
-<ul>
-<li><p>This is required as we use the convention that <code class="docutils literal notranslate"><span class="pre">.F90</span></code> files are
-processed by the preprocessor, and <code class="docutils literal notranslate"><span class="pre">.f90</span></code> files are not. The
-preprocessor will therefore only generate the required device
-function if the file has the correct extension.</p></li>
-</ul>
-</li>
-</ul>
-<p>We can see some of the above modifications by looking at the
-subroutine <code class="docutils literal notranslate"><span class="pre">estdt</span></code> in <code class="docutils literal notranslate"><span class="pre">compute_dt.F90</span></code>:</p>
-<div class="highlight-fortran notranslate"><div class="highlight"><pre><span></span><span class="k">subroutine </span><span class="n">estdt</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span><span class="p">,</span><span class="w"> </span><span class="n">lo</span><span class="p">,</span><span class="w"> </span><span class="n">hi</span><span class="p">,</span><span class="w"> </span><span class="n">dx</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">                 </span><span class="n">scal</span><span class="p">,</span><span class="w">  </span><span class="n">s_lo</span><span class="p">,</span><span class="w"> </span><span class="n">s_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_s</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">u</span><span class="p">,</span><span class="w">     </span><span class="n">u_lo</span><span class="p">,</span><span class="w"> </span><span class="n">u_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_u</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">force</span><span class="p">,</span><span class="w"> </span><span class="n">f_lo</span><span class="p">,</span><span class="w"> </span><span class="n">f_hi</span><span class="p">,</span><span class="w"> </span><span class="n">nc_f</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">divu</span><span class="p">,</span><span class="w">  </span><span class="n">d_lo</span><span class="p">,</span><span class="w"> </span><span class="n">d_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">dSdt</span><span class="p">,</span><span class="w">  </span><span class="n">t_lo</span><span class="p">,</span><span class="w"> </span><span class="n">t_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">w0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">w_lo</span><span class="p">,</span><span class="w"> </span><span class="n">w_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">p0_cart</span><span class="p">,</span><span class="w"> </span><span class="n">p_lo</span><span class="p">,</span><span class="w"> </span><span class="n">p_hi</span><span class="p">,</span><span class="w"> </span><span class="p">&amp;</span>
-<span class="w">         </span><span class="n">gamma1bar_cart</span><span class="p">,</span><span class="w"> </span><span class="n">g_lo</span><span class="p">,</span><span class="w"> </span><span class="n">g_hi</span><span class="p">)</span><span class="w"> </span><span class="k">bind</span><span class="w"> </span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;estdt&quot;</span><span class="p">)</span>
-
-<span class="w">   </span><span class="k">use </span><span class="n">amrex_constants_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">HALF</span>
-<span class="w">   </span><span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">amrex_min</span><span class="w"> </span><span class="c">! function</span>
-<span class="w">   </span><span class="k">use </span><span class="n">amrex_fort_module</span><span class="p">,</span><span class="w"> </span><span class="k">only</span><span class="p">:</span><span class="w"> </span><span class="n">amrex_max</span><span class="w"> </span><span class="c">! function</span>
-
-<span class="w">   </span><span class="c">! input parameters</span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lev</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">umax</span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">         </span><span class="p">,</span><span class="w"> </span><span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="w">   </span><span class="p">)</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="w">   </span><span class="p">...</span>
-
-<span class="w">   </span><span class="c">! local variables</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">spdx</span><span class="p">,</span><span class="w"> </span><span class="n">spdy</span><span class="p">,</span><span class="w"> </span><span class="n">spdz</span><span class="p">,</span><span class="w"> </span><span class="n">spdr</span><span class="p">,</span><span class="w"> </span><span class="n">rho_min</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">fx</span><span class="p">,</span><span class="w"> </span><span class="n">fy</span><span class="p">,</span><span class="w"> </span><span class="n">fz</span><span class="p">,</span><span class="w"> </span><span class="n">dt_temp</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">eps</span><span class="p">,</span><span class="n">denom</span><span class="p">,</span><span class="n">gradp0</span>
-<span class="w">   </span><span class="kt">double precision</span><span class="w"> </span><span class="kd">::</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span>
-<span class="w">   </span><span class="kt">integer</span><span class="w">          </span><span class="kd">::</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span>
-
-<span class="w">   </span><span class="c">!$gpu</span>
-
-<span class="w">   </span><span class="n">rho_min</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.d-20</span>
-<span class="w">   </span><span class="p">...</span>
-
-<span class="w">   </span><span class="k">do </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="w">      </span><span class="k">do </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-<span class="w">         </span><span class="k">do </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lo</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">hi</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="w">        </span><span class="n">spdx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">max</span><span class="p">(</span><span class="n">spdx</span><span class="w"> </span><span class="p">,</span><span class="nb">abs</span><span class="p">(</span><span class="n">u</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
-
-<span class="w">   </span><span class="p">...</span>
-
-<span class="k">end subroutine </span><span class="n">estdt</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Here, we can see that <code class="docutils literal notranslate"><span class="pre">amrex_min</span></code> and <code class="docutils literal notranslate"><span class="pre">amrex_max</span></code> functions from the
-<code class="docutils literal notranslate"><span class="pre">amrex_fort_module</span></code> are marked separately as <code class="docutils literal notranslate"><span class="pre">!</span> <span class="pre">function</span></code>, which tells
-the preprocessor to generate a device version of this function.</p></li>
-<li><p>The scalar <code class="docutils literal notranslate"><span class="pre">lev</span></code> is passed in by value.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">!$gpu</span></code> directive has been inserted after the definition of
-all the variables passed into the routine and all the local
-variables, but before the main body of the function.</p></li>
-<li><p>The routine only operates on values in a single zone of <code class="docutils literal notranslate"><span class="pre">lo:hi</span></code>.</p></li>
-</ul>
-</section>
-</section>
 <section id="profiling-with-gpus">
-<span id="sec-gpuprofile"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Link to this heading"></a></h2>
+<span id="sec-gpuprofile"></span><span id="sec-gpuporting"></span><h2>Profiling with GPUs<a class="headerlink" href="#profiling-with-gpus" title="Link to this heading"></a></h2>
 <p>NVIDIA’s profiler, <code class="docutils literal notranslate"><span class="pre">nvprof</span></code>, is recommended when profiling for GPUs.
 It returns data on how long each kernel launch lasted on the GPU,
 the number of threads and registers used, the occupancy of the GPU
