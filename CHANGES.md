@@ -1,3 +1,14 @@
+# 24.05
+
+  * some coverity, clang-tidy, and other compiler fixes (#430, #437,
+    #442)
+
+  * switch a type narrowing in basestate lambdas (#438)
+
+  * update to Async arrays in the slopes (#404)
+
+  * sync up with Castro's runtime parameter support (#436)
+
 # 24.04
 
   * clang-tidy fixes (#427, #428, #423, #422, #420, #419, #415, #416,
