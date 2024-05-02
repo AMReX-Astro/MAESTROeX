@@ -3,7 +3,7 @@
 using namespace amrex;
 
 void Maestro::MakeEdgeState1d(BaseState<Real>& s, BaseState<Real>& sedge,
-                              BaseState<Real>& force) {
+                              BaseState<Real>& force) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeEdgeState1d()", MakeEdgeState1d);
 

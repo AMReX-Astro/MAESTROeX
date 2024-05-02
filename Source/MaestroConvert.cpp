@@ -30,7 +30,7 @@ void Maestro::PutInPertForm(Vector<MultiFab>& scal, const BaseState<Real>& s0,
     }
 
     AverageDown(scal, comp, 1);
-    FillPatch(t_old, scal, scal, scal, comp, comp, 1, bccomp, bcs);
+    FillPatch(t_old, scal, scal, scal, comp, comp, 1, bccomp, bcs);  // NOLINT(readability-suspicious-call-argument)
 }
 
 void Maestro::PutInPertForm(int level, Vector<MultiFab>& scal,
@@ -58,8 +58,7 @@ void Maestro::PutInPertForm(int level, Vector<MultiFab>& scal,
                      comp, 1, refRatio(level - 1));
     }
 
-    FillPatch(level, t_old, scal[level], scal, scal, comp, comp, 1, bccomp,
-              bcs);
+    FillPatch(level, t_old, scal[level], scal, scal, comp, comp, 1, bccomp,  bcs);  // NOLINT(readability-suspicious-call-argument)
 }
 
 void Maestro::ConvertRhoXToX(Vector<MultiFab>& scal, bool flag) {

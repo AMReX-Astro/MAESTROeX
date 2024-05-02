@@ -14,7 +14,7 @@ outline.
 
 // Inlet BCs defined in header file should go here
 
-void Maestro::SetInletBCs() {
+void Maestro::SetInletBCs() {  // NOLINT(readability-convert-member-functions-to-static)
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SetInletBCs()", SetInletBCs);
 

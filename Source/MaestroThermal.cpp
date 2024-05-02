@@ -202,7 +202,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         } else {
             // lo-side BCs
-            if (bcs[bccomp].lo(idim) == BCType::foextrap) {
+            if (bcs[bccomp].lo(idim) == BCType::foextrap) {  // NOLINT(bugprone-branch-clone)
                 // outflow
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             } else if (bcs[bccomp].lo(idim) == BCType::ext_dir) {
@@ -213,7 +213,7 @@ void Maestro::ApplyThermal(MLABecLaplacian& mlabec,
             }
 
             // hi-side BCs
-            if (bcs[bccomp].hi(idim) == BCType::foextrap) {
+            if (bcs[bccomp].hi(idim) == BCType::foextrap) {  // NOLINT(bugprone-branch-clone)
                 // outflow
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             } else if (bcs[bccomp].hi(idim) == BCType::ext_dir) {
@@ -456,7 +456,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
             mlmg_lobc[idim] = mlmg_hibc[idim] = LinOpBCType::Periodic;
         } else {
             // lo-side BCs
-            if (bcs_s[RhoH].lo(idim) == BCType::foextrap) {
+            if (bcs_s[RhoH].lo(idim) == BCType::foextrap) {  // NOLINT(bugprone-branch-clone)
                 mlmg_lobc[idim] = LinOpBCType::Neumann;
             } else if (bcs_s[RhoH].lo(idim) == BCType::ext_dir) {
                 mlmg_lobc[idim] = LinOpBCType::Dirichlet;
@@ -465,7 +465,7 @@ void Maestro::ThermalConduct(const Vector<MultiFab>& s1, Vector<MultiFab>& s2,
             }
 
             // hi-side BCs
-            if (bcs_s[RhoH].hi(idim) == BCType::foextrap) {
+            if (bcs_s[RhoH].hi(idim) == BCType::foextrap) {  // NOLINT(bugprone-branch-clone)
                 mlmg_hibc[idim] = LinOpBCType::Neumann;
             } else if (bcs_s[RhoH].hi(idim) == BCType::ext_dir) {
                 mlmg_hibc[idim] = LinOpBCType::Dirichlet;

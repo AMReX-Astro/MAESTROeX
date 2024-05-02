@@ -39,17 +39,17 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
 
     if (perturb_model) {
         const auto xcen = center[0];
-        const auto ycen = AMREX_SPACEDIM == 2 ? xrb_pert_height : center[1];
+        const auto ycen = AMREX_SPACEDIM == 2 ? problem_rp::xrb_pert_height : center[1];
 #if AMREX_SPACEDIM == 3
-        const auto zcen = xrb_pert_height;
+        const auto zcen = problem_rp::xrb_pert_height;
 #endif
 
         const auto rad_pert =
-            -xrb_pert_size * xrb_pert_size / (4.0 * std::log(0.5));
+            -problem_rp::xrb_pert_size * problem_rp::xrb_pert_size / (4.0 * std::log(0.5));
 
-        const bool perturb_temp_true = xrb_pert_type == 1;
+        const bool perturb_temp_true = problem_rp::xrb_pert_type == 1;
 
-        const auto xrb_pert_factor_loc = xrb_pert_factor;
+        const auto xrb_pert_factor_loc = problem_rp::xrb_pert_factor;
         const auto rad_pert_loc = rad_pert;
 
         ParallelFor(tileBox, [=] (int i, int j, int k) {
@@ -105,17 +105,17 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
         });
     }
 
-    if (apply_vel_field) {
-        const auto velpert_amplitude_loc = velpert_amplitude;
-        const auto velpert_scale_loc = velpert_scale;
-        const auto num_vortices_loc = num_vortices;
-        const auto velpert_height = velpert_height_loc;
+    if (problem_rp::apply_vel_field) {
+        const auto velpert_amplitude_loc = problem_rp::velpert_amplitude;
+        const auto velpert_scale_loc = problem_rp::velpert_scale;
+        const auto num_vortices_loc = problem_rp::num_vortices;
+        const auto velpert_height = problem_rp::velpert_height_loc;
 
-        const Real offset = (prob_hi[0] - prob_lo[0]) / (num_vortices);
+        const Real offset = (prob_hi[0] - prob_lo[0]) / (problem_rp::num_vortices);
 
         // vortex x-coords
-        RealVector vortices_xloc(num_vortices);
-        for (auto i = 0; i < num_vortices; ++i) {
+        RealVector vortices_xloc(problem_rp::num_vortices);
+        for (auto i = 0; i < problem_rp::num_vortices; ++i) {
             vortices_xloc[i] = (static_cast<Real>(i) + 0.5_rt) * offset;
         }
 
@@ -156,8 +156,8 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
     }
 }
 
-void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
-                                MultiFab& vel) {
+void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,  // NOLINT(readability-convert-member-functions-to-static)
+                                MultiFab& vel)  {
 
     amrex::ignore_unused(lev);
     amrex::ignore_unused(time);
