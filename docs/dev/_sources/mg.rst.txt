@@ -24,13 +24,18 @@ V-cycle.
 The MG solvers are located in amrex/Src/LinearSolvers/F_MG/.
 There are two MG solvers, for cell-centered and nodal data.
 Generally, the routines specific to the cell-centered solver will have
-cc in their name, and those specific to the nodal solver will have
-nd in their name.
+``cc`` in their name, and those specific to the nodal solver will have
+``nd`` in their name.
 
 Support for :math:`\Delta x \ne \Delta y \ne \Delta z`
 
 Data Structures
 ---------------
+
+.. note::
+
+   This information is outdated
+
 
 mg_tower
 ~~~~~~~~
@@ -241,7 +246,7 @@ The allowed values are:
 
 -  mg_bottom_solver / hg_bottom_solver = 4: a special
    bottom solver that extends the range of the multigrid coarsening
-   by aggregrating coarse grids on the original mesh together and
+   by aggregating coarse grids on the original mesh together and
    further coarsening.
 
 You should use the special bottom solver (4) whenever possible, even
@@ -565,9 +570,9 @@ two (optional) thermal diffusion solves, and the final velocity projection.
    the predictor and corrector portions of the main algorithm.
 
    There are two tolerances here. The norm of the residual is required
-   to be reduced by a relative tolerance of 
+   to be reduced by a relative tolerance of
 
-   .. math:: 
+   .. math::
       \epsilon =
        \min \{ \mathtt{eps\_mac\_max}, \mathtt{eps\_mac} \cdot
        \mathtt{mac\_level\_factor}^{(\mathtt{nlevs}-1)} \} .

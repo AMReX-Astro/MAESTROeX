@@ -33,24 +33,24 @@ density and pressure linked via hydrostatic equilibrium:
 
 .. math::
    \frac{\partial \rho X_k}{\partial t} + \nabla \cdot (\rho \Ub X_k) = \rho \omegadot_k
-   
+
 .. math::
    \frac{\partial(\rho h)}{\partial t} =
       -\nabla\cdot(\rho h\Ub) + \frac{Dp_0}{Dt} + \rho\Hnuc + \rho\Hext,
-      
+
 .. math::
    \frac{\partial \Ub}{\partial t} + \Ub \cdot \nabla \Ub +
       \frac{\beta_0}{\rho} \nabla \left (\frac{p^\prime}{\beta_0} \right ) =
       -\frac{\rho^\prime}{\rho} |g| \er
-	  
+
 .. math::
    \nabla \cdot (\beta_0 \Ub) =
-      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right ) 
+      \beta_0 \left ( S - \frac{1}{\gammabar p_0} \frac{\partial p_0}{\partial t} \right )
 
 .. math:: \nabla p_0 = -\rho_0 |g| \er
 
 We discuss each of these equations in further detail below.
-      
+
 
 Lateral Average
 ---------------
@@ -59,9 +59,9 @@ A key concept in the MAESTROeX equation set and algorithm is
 the lateral average.  The lateral average represents the average
 value of a quantity at a given radius in spherical simulations
 (or a given height in planar simulations).  We denote the
-lateral average of a quantity with an overline, e.g., 
+lateral average of a quantity with an overline, e.g.,
 for any quantity :math:`\phi`, we denote
-the average of :math:`\phi` over a layer at constaint radius
+the average of :math:`\phi` over a layer at constant radius
 as :math:`\overline{\phi}`.  For planar problems this routine is
 a trivial average of all the values at a given height.
 For spherical problems there is a
@@ -86,7 +86,7 @@ same spatial averaging operators used
 for all other variables; instead we derive an analytic expression
 for the average expansion velocity and numerically integrate
 this expression to obtain :math:`w_0`.
-      
+
 Mass
 ----
 
@@ -166,7 +166,7 @@ are energy sources due to reactions and user-defined external heating.
 When we are using thermal diffusion, there will be an additional term in
 the enthalpy equation (see § :ref:`sec:flow:diffusion`).
 
-In the original temporal scheme, we utlized a base state enthlpy that effectively
+In the original temporal scheme, we utilized a base state enthlpy that effectively
 represents the average over a layer; its evolution equation can be
 found by laterally averaging :eq:`eq:flow:enthalpy`
 
@@ -201,7 +201,7 @@ Subtracting it from the full enthalpy equation gives:
 .. math::
    \begin{align}
    \frac{\partial(\rho h)'}{\partial t} = &-\Ub\cdot\nabla(\rho h)' - (\rho h)'\nabla\cdot\Ub -
-     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\ 
+     \nabla\cdot\left[(\rho h)_0\Ubt\right] + \nonumber \\
    &\Ubt\cdot\nabla p_0
       + ( \rho\Hnuc - \overline{\rho \Hnuc}) + (\rho\Hext - \overline{\rho \Hext})
    \end{align}
@@ -212,7 +212,7 @@ Base State
 
 The stratified atmosphere is characterized by a one-dimensional
 time-dependent base state, defined by a base state density, :math:`\rho_0`,
-and a base state pressure, :math:`p_0`, in hydrostatic equilibrum:
+and a base state pressure, :math:`p_0`, in hydrostatic equilibrium:
 
 .. math:: \nabla p_0 = -\rho_0 |g| \er
 
@@ -223,7 +223,7 @@ monopole constructed by integrating the base state density for
 spherical geometries.
 
 For the time-dependence, we will define a base state velocity, :math:`w_0`,
-which will adjust the base state from one hydrostatic equilibrum to
+which will adjust the base state from one hydrostatic equilibrium to
 another in response to heating.
 
 For convenience, we define a base state enthalphy, :math:`h_0`, as needed
@@ -250,7 +250,7 @@ Then we define
 once :math:`w_0` at the old and new times is known, and the advective term is computed explicitly.
 Then we can include this for completeness in the update for :math:`\ut.`
 
-	 
+
 Momentum
 --------
 
@@ -366,7 +366,7 @@ here makes it possible to cast the constraint as a
 divergence. :cite:`KP:2012` discuss the general case where we want to
 keep the local variations of :math:`\Gamma_1` (and we explored this in paper
 III). We also look at this in § :ref:`sec_flow_gamma1vary`
-      
+
 Notation
 ========
 
@@ -479,7 +479,7 @@ frequently-used quantities and provides their units.
    incompressible community. In papers on compressible hydrodynamics,
    :math:`\Ub` will usually mean the vector of conserved quantities. In
    incompressible / low speed papers, :math:`\Ub` will mean the velocity vector.
-   
+
 .. _Sec:Time Advancement Algorithm:
 
 Time Advancement Algorithm Ingredients
@@ -487,7 +487,7 @@ Time Advancement Algorithm Ingredients
 
 The full time advancement algorithm is detailed in :cite:`multilevel` for the original
 algorithm and :cite:`MAESTROeX` for the new, simplified algorithm.  We do not repeat
-that here.  
+that here.
 
 The overall flow of the algorithm is depicted in the following flowcharts:
 
@@ -502,7 +502,7 @@ The overall flow of the algorithm is depicted in the following flowcharts:
    Step 6 as they are in Step 2, i.e., they are unchanged by the
    predictor steps. The diffusion steps (4a and 8a) are optional,
    depending on use_thermal_diffusion.
-   
+
 .. figure:: flowchart_4_8.png
    :align: center
 
@@ -783,7 +783,7 @@ Grouping by order of the correction, we have
    :label: eq:gammafull
 
 Keeping to First Order in :math:`\delta\Gamma_1`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The base state evolution equation is the average of :eq:`eq:gammafull` over a layer
 
@@ -1048,7 +1048,7 @@ proceeds as follows.
       (\rho^{\initp} \Hext), p_0^{\initp}] \rightarrow [\rho^{\outp}, (\rho h)^{\outp},
       X_k^{\outp}, T^{\outp}, (\rho \omegadot_k)^{0,\nu} ].`
 
-   #. Compute :math:`S^{0,\nu}` 
+   #. Compute :math:`S^{0,\nu}`
       using :math:`(\rho \omegadot_k)^{0,\nu}` and the initial data.
 
    #. Compute :math:`\overline{S^{0,\nu}} = {\mathrm{\bf Avg}} (S^{0,\nu}).`

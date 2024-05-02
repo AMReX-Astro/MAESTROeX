@@ -1,108 +1,69 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Getting Started &mdash; MAESTROeX  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/theme_overrides.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/theme_overrides.css?v=10589de1" />
 
   
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"Macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}})</script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "macros": {"rhozero": "{\\rho_0}", "pizero": "{\\pi_0}", "pizeroone": "{\\pi_0^{(1)}}", "pizerotwo": "{\\pi_0^{(2)}}", "gammabar": "{\\overline{\\Gamma}_1}", "ptl": "{\\partial}", "eb": "{{\\bf e}}", "fb": "{{\\bf f}}", "ib": "{{\\bf i}}", "Ub": "{{\\bf U}}", "Vb": "{{\\bf V}}", "xb": "{{\\bf x}}", "ut": "{{\\tilde{u}}}", "vt": "{{\\tilde{v}}}", "wt": "{{\\tilde{w}}}", "Ubt": "{\\widetilde{\\Ub}}", "edge": "{{\\rm EDGE}}", "mac": "{{\\rm MAC}}", "trans": "{{\\rm TRANS}}", "nablab": "{\\mathbf{\\nabla}}", "cdotb": "{\\mathbf{\\cdot}}", "half": "{\\frac{1}{2}}", "myhalf": "{\\frac{1}{2}}", "nph": "{{n + \\myhalf}}", "nmh": "{{n - \\myhalf}}", "Hext": "{{H_{\\rm ext}}}", "Hnuc": "{{H_{\\rm nuc}}}", "kth": "{k_{\\rm th}}", "init": "{\\rm init}", "model": "{\\rm model}", "raw": "{\\rm raw}", "pred": "{{\\rm pred}}", "Sbar": "{\\overline{S}}", "inp": "{\\mathrm{in}}", "initp": "{\\mathrm{init}}", "outp": "{\\mathrm{out}}", "uadv": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvone": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV},\\star}}", "uadvonedag": "{\\Ubt^{\\mathrm{ADV},\\dagger,\\star}}", "uadvtwo": "{\\widetilde{\\mathbf{U}}^{\\mathrm{ADV}}}", "uadvtwodag": "{\\Ubt^{\\mathrm{ADV},\\dagger}}", "uadvsdcstar": "{\\mathbf{U}^{\\mathrm{ADV},\\star}}", "uadvsdcpred": "{\\mathbf{U}^{\\mathrm{ADV},\\mathrm{pred}}}", "uadvsdc": "{\\mathbf{U}^{\\mathrm{ADV}}}", "dt": "{\\Delta t}", "dr": "{\\Delta r}", "etarho": "{\\eta_{\\rho}}", "etarhoec": "{\\etarho^{\\rm ec}}", "etarhocc": "{\\etarho^{\\rm cc}}", "etarhoflux": "{\\etarho^{\\rm flux}}", "divetarho": "{\\nabla\\cdot(\\etarho\\eb_r)}", "ow": "{\\overline{w}_0}", "dw": "{\\delta w_0}", "thalf": "{\\frac{3}{2}}", "rhop": "{{\\rho^{\\prime}}}", "omegadot": "{\\dot{\\omega}}", "er": "{\\mathbf{e}_r}", "ex": "{\\mathbf{e}_x}", "ey": "{\\mathbf{e}_y}", "ez": "{\\mathbf{e}_z}", "Omegab": "{{\\bf \\Omega}}", "rb": "{{\\bf r}}", "boxtype": "{{\\tt box\\/}}", "fab": "{{\\tt fab\\/}}", "multifab": "{{\\tt multifab\\/}}", "boxarray": "{{\\tt boxarray\\/}}", "mlboxarray": "{{\\tt ml\\_boxarray\\/}}", "layout": "{{\\tt layout\\/}}", "mllayout": "{{\\tt ml\\_layout\\/}}", "bctower": "{{\\tt bc\\_tower\\/}}", "bclevel": "{{\\tt bc\\_level\\/}}", "mgtower": "{{\\tt mg\\_tower\\/}}", "bndryreg": "{{\\tt bndry\\_reg\\/}}", "runparam": ["{\\index{Runtime parameters!{\\tt #1}}{\\tt #1}}", 1], "runparamidx": ["{\\index{Runtime parameters!{\\tt #1}}}", 1], "code": ["{\\index{Code reference!{\\tt #1}}{\\tt #1}}", 1], "codeidx": ["{\\index{Code reference!{\\tt #1}}}", 1], "otherindex": ["{\\index{#1!#2}}", 2], "fdamp": "{{f_\\mathrm{damp}}}"}}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Adding A New Problem" href="addproblem.html" />
     <link rel="prev" title="Governing Equations" href="flowchart.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
 
           
-            <a href="index.html" class="icon icon-home"> MAESTROeX
           
-
-          
-            
-            <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
-          
+          <a href="index.html" class="icon icon-home">
+            MAESTROeX
+              <img src="_static/maestroex_logo.png" class="logo" alt="Logo"/>
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
     <div class="branch">
         Branch: <a href="./getting_started.html">main</a> | <a href="./dev/getting_started.html">development</a>
     </div>
 
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">MAESTROeX basics</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">MAESTROeX basics</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="preface.html">Preface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to MAESTROeX</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html">Governing Equations</a></li>
 <li class="toctree-l1"><a class="reference internal" href="flowchart.html#numerical-methodology">Numerical Methodology</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Using MAESTROeX</span></p>
+<p class="caption" role="heading"><span class="caption-text">Using MAESTROeX</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
@@ -132,7 +93,7 @@
 <li class="toctree-l1"><a class="reference internal" href="managingjobs.html">Managing Jobs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">MAESTROeX technical details</span></p>
+<p class="caption" role="heading"><span class="caption-text">MAESTROeX technical details</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="lo_density.html">Low Density Cutoffs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="volume_discrepancy.html">Volume Discrepancy Factor</a></li>
@@ -154,103 +115,61 @@
 <li class="toctree-l1"><a class="reference internal" href="enthalpy.html">Notes on Enthalpy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="regtest.html">Regression Testing and Continuous Integration</a></li>
 </ul>
-<p class="caption"><span class="caption-text">API</span></p>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="filelist.html">File list</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classlist.html">Class list</a></li>
 </ul>
-<p class="caption"><span class="caption-text">References</span></p>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="zreferences.html">References</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">MAESTROeX</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Getting Started</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
 <p>In this chapter we give an overview of MAESTROeX, including some of the
 standard problems, how to run the code, some basic runtime parameters,
 and how to look at the output.</p>
-<div class="section" id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>MAESTROeX requires a C++ compiler that supports the C++17 standard, a
-Fortran compiler that supports the Fortran 2003 standard, and a C compiler
-that supports the C99 standard. Several compiler suites are supported,
-including GNU, Intel, PGI and Cray. GNU Make (&gt;= 3.82) is also required,
-as is Python (&gt;= 3.6) and standard tools available in any Unix-like
-environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>MAESTROeX requires a C++ compiler that supports the C++17 standard and
+a C compiler that supports the C99 standard. Several compiler suites
+are supported, including GNU, Intel, LLVM and Cray. GNU Make (&gt;= 3.82)
+is also required, as is Python (&gt;= 3.9) and standard tools available
+in any Unix-like environments (e.g., Perl and <code class="docutils literal notranslate"><span class="pre">sed</span></code>).</p>
 <p>For running in parallel, an MPI library and/or OpenMP is required.
 For running on GPUs, CUDA 11 or later is required (see <a class="reference internal" href="gpu.html#sec-gpu"><span class="std std-ref">GPU</span></a> for
 more information).</p>
-</div>
-<div class="section" id="quick-start">
-<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
 <p>Here we will run the standard reacting_bubble problem (three
 reacting bubbles in a plane-parallel stratified atmosphere) on a
-single processor <a class="footnote-reference brackets" href="#id3" id="id1">1</a>. This test problem was shown in
+single processor <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. This test problem was shown in
 paper 3.</p>
 <ol class="arabic">
 <li><p><em>Get a copy of MAESTROeX</em>.</p>
@@ -279,7 +198,7 @@ There are two ways to access the Microphysics repo: you can use a
 submodule or clone the Microphysics repo itself.</p>
 <p>If you choose to use the submodule, enter the <code class="docutils literal notranslate"><span class="pre">MAESTROeX/</span></code>
 directory and type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="o">--</span><span class="n">init</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="n">init</span>
 </pre></div>
 </div>
 <p>Note that in the future when you pull MAESTROeX, to make sure the
@@ -295,7 +214,7 @@ behavior:</p>
 </div>
 <p>If you choose to use the Microphysics repo directly, it is
 available on github and can be obtained via:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">starkiller</span><span class="o">-</span><span class="n">astro</span><span class="o">/</span><span class="n">Microphysics</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AMReX</span><span class="o">-</span><span class="n">Astro</span><span class="o">/</span><span class="n">Microphysics</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 <p>Next you must specify the path to the Microphysics repository as
@@ -365,7 +284,7 @@ less-optimized code with debugging runtime checks. Setting
 <p>The dimensionality of the problem must be specified at compile-time.</p>
 </li>
 <li><p><code class="docutils literal notranslate"><span class="pre">COMP</span> <span class="pre">:=</span> <span class="pre">gnu</span></code></p>
-<p>This option specifies the gnu compiler suite (g++/gfortran).
+<p>This option specifies the gnu compiler suite (e.g., g++).
 We will use gnu, which is the preferred compiler suite for MAESTROeX.
 Specifying this compiler will automatically pull in the compiler
 settings as specified in <code class="docutils literal notranslate"><span class="pre">AMREX_HOME/Tools/GNUMake/Make.defs</span></code>.
@@ -465,22 +384,24 @@ MAESTROeX are assumed to be in CGS units.</p>
 <p>Visualization of results is described in the next section.</p>
 </li>
 </ol>
-</div>
-<div class="section" id="working-with-the-output">
-<h2>Working with the Output<a class="headerlink" href="#working-with-the-output" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="working-with-the-output">
+<h2>Working with the Output<a class="headerlink" href="#working-with-the-output" title="Link to this heading"></a></h2>
 <p>Visualization and analysis are done on the plotfiles. A number of
 in-house and externally developed tools can work with AMReX-formatted
-plotfiles <a class="footnote-reference brackets" href="#id4" id="id2">2</a>.
+plotfiles <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.
 An example plot of the <code class="docutils literal notranslate"><span class="pre">reacting_bubble</span></code> problem run above is
 shown in the figure below:</p>
-<div class="figure align-center" id="id5">
+<figure class="align-center" id="id5">
 <a class="reference internal image-reference" href="_images/plt00133_tfromp.png"><img alt="AmrPostprocessing plot" src="_images/plt00133_tfromp.png" style="width: 80%;" /></a>
-<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Visualization of the final output of the reacting_bubble problem
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Visualization of the final output of the reacting_bubble problem
 showing the temperature field (as derived from the pressure). This
-plot was done with the AmrPostprocessing tools.</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
-</div>
-<div class="section" id="amrvis">
-<h3>Amrvis<a class="headerlink" href="#amrvis" title="Permalink to this headline">¶</a></h3>
+plot was done with the AmrPostprocessing tools.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="amrvis">
+<h3>Amrvis<a class="headerlink" href="#amrvis" title="Link to this heading"></a></h3>
 <p>Amrvis is an easy-to-use visualization tool developed at LBL for
 2- and 3D datasets which can plot slices through 3D datasets as well
 as volume-renderings. It can also very easily extract 1D lines
@@ -499,24 +420,15 @@ system, you may need to install the lesstif package and any
 related development packages (e.g. lesstif-devel). Depending
 on your Linux system, you may also need to install libXpm and
 related development packages (e.g. libXpm-devel).</p>
-</div>
-<div class="section" id="amrpostprocessing-scripts">
-<h3>AmrPostprocessing scripts<a class="headerlink" href="#amrpostprocessing-scripts" title="Permalink to this headline">¶</a></h3>
-<p>Several useful analysis scripts (written in Fortran 90) can be found
-in <code class="docutils literal notranslate"><span class="pre">amrex/Tools/Postprocessing/F_Src/</span></code>.  The <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> there
-needs to be edited to indicate which of the tools to build. For
-example, to extract the density along a line from the center of a
-plotfile, <code class="docutils literal notranslate"><span class="pre">plt00200</span></code>, in the <span class="math notranslate nohighlight">\(y\)</span>-direction:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fextract</span><span class="o">.</span><span class="n">Linux</span><span class="o">.</span><span class="n">gfortran</span><span class="o">.</span><span class="n">exe</span> <span class="o">-</span><span class="n">d</span> <span class="mi">2</span> <span class="o">-</span><span class="n">v</span> <span class="s2">&quot;density&quot;</span> <span class="o">-</span><span class="n">p</span> <span class="n">plt00200</span>
-</pre></div>
-</div>
-<p>These routines are described in § <a class="reference internal" href="analysis.html#sec-analysis"><span class="std std-ref">Analysis</span></a>.</p>
-<p>There is also a python visualization method in
-<code class="docutils literal notranslate"><span class="pre">AmrPostprocessing/python</span></code>. This is described
-in § <span class="xref std std-ref">sec:vis:python</span>.</p>
-</div>
-<div class="section" id="visit">
-<h3>VisIt<a class="headerlink" href="#visit" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="amrpostprocessing-scripts">
+<h3>AmrPostprocessing scripts<a class="headerlink" href="#amrpostprocessing-scripts" title="Link to this heading"></a></h3>
+<p>Several useful analysis scripts can be found
+in the <code class="docutils literal notranslate"><span class="pre">amrex-astro-diag</span></code> project:</p>
+<p><a class="reference external" href="https://github.com/amrex-astro/amrex-astro-diag">https://github.com/amrex-astro/amrex-astro-diag</a></p>
+</section>
+<section id="visit">
+<h3>VisIt<a class="headerlink" href="#visit" title="Link to this heading"></a></h3>
 <p>VisIt is a DOE-supported visualization tool for 2- and 3D datasets. It
 can do contouring, volume rendering, streamlines, …  , directly from
 AMReX plotfiles. Details on VisIt can be found at:
@@ -525,14 +437,14 @@ started with VisIt is to download a precompiled binary from the VisIt
 webpage.</p>
 <p>Once VisIt is installed, you can open a AMReX plotfile by pointing
 VisIt to the Header file in the plotfile directory.</p>
-</div>
-<div class="section" id="yt">
-<h3>yt<a class="headerlink" href="#yt" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="yt">
+<h3>yt<a class="headerlink" href="#yt" title="Link to this heading"></a></h3>
 <p>yt (version 3.0 and later) can natively read the MAESTROeX plotfiles. See
 the yt documentation or § <a class="reference internal" href="visualization.html#sec-vis-yt"><span class="std std-ref">Visualizing with yt</span></a>.</p>
-</div>
-<div class="section" id="diagnostic-files">
-<h3>Diagnostic Files<a class="headerlink" href="#diagnostic-files" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="diagnostic-files">
+<h3>Diagnostic Files<a class="headerlink" href="#diagnostic-files" title="Link to this heading"></a></h3>
 <p>By default, MAESTROeX outputs global diagnostics each timestep into 3
 files called <code class="docutils literal notranslate"><span class="pre">diag_vel.out</span></code>, <code class="docutils literal notranslate"><span class="pre">diag_temp.out</span></code>, and <code class="docutils literal notranslate"><span class="pre">diag_enuc.out</span></code>
 for spherical problems (ex. <code class="docutils literal notranslate"><span class="pre">wdconvect</span></code>).
@@ -541,10 +453,10 @@ peak temperature, and peak nuclear energy generation rate, respectively.
 Individual problems can provide their own <code class="docutils literal notranslate"><span class="pre">diag.F90</span></code> file to
 produce custom diagnostic output. This information can be plotted
 directly with GNUplot, for example.</p>
-</div>
-</div>
-<div class="section" id="development-model">
-<h2>Development Model<a class="headerlink" href="#development-model" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="development-model">
+<h2>Development Model<a class="headerlink" href="#development-model" title="Link to this heading"></a></h2>
 <p>When you clone MAESTROeX from github, you will be on the main
 branch of the repo. New changes to MAESTROeX are first introduced
 into the development branch in the MAESTROeX git repository.
@@ -557,9 +469,9 @@ including amrex/, Microphysics/, and Castro/.</p>
 <p>If you want to contribute to MAESTROeX’s development, issue a pull-request
 through GitHub from your fork of MAESTROeX and target the development
 branch. (If you mistakenly target main, we can change it for you.)</p>
-</div>
-<div class="section" id="parallel-jobs">
-<h2>Parallel Jobs<a class="headerlink" href="#parallel-jobs" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="parallel-jobs">
+<h2>Parallel Jobs<a class="headerlink" href="#parallel-jobs" title="Link to this heading"></a></h2>
 <p>To run in parallel with MPI, you would set <code class="docutils literal notranslate"><span class="pre">USE_MPI</span> <span class="pre">:=</span> <span class="pre">TRUE</span></code> in your
 GNUmakefile. For a machine with working MPI compiler wrappers
 (mpif90 and mpicc), the build system should find these and
@@ -579,65 +491,50 @@ compiler.  Setting:</p>
 </div>
 <p>in the <code class="docutils literal notranslate"><span class="pre">GNUmakefile</span></code> will enable the proper compiler flags to build
 with OpenMP. Note: not all MAESTROeX modules have OpenMP support.</p>
-<dl class="footnote brackets">
-<dt class="label" id="id3"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>In earlier versions of MAESTROeX this
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>In earlier versions of MAESTROeX this
 problem was called test2</p>
-</dd>
-<dt class="label" id="id4"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>The plotfiles are in the same format as those made
+</aside>
+<aside class="footnote brackets" id="id4" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>The plotfiles are in the same format as those made
 by the BoxLib library upon which MAESTROeX was previously based.</p>
-</dd>
-</dl>
-</div>
-</div>
+</aside>
+</aside>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="addproblem.html" class="btn btn-neutral float-right" title="Adding A New Problem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="flowchart.html" class="btn btn-neutral float-left" title="Governing Equations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="addproblem.html" class="btn btn-neutral float-right" title="Adding A New Problem" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2018-2020, MAESTROeX development tem.
-
-    </p>
+    <p>&#169; Copyright 2018-2023, MAESTROeX development tem.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-    
+  </script>  
 
 
 </body>

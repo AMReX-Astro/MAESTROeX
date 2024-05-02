@@ -26,7 +26,7 @@ ensure that the error does not show any directional bias.
 Note: the BDS advection method does not guarantee that the error be
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
-to define a tri-linear profile for rho subject to the constrants in
+to define a tri-linear profile for rho subject to the constraints in
 the BDS paper (:cite:`bds3d`) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward

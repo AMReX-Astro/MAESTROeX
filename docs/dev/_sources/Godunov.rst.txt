@@ -428,7 +428,7 @@ Computing :math:`\rho^{'\edge}, X_k^{\edge},(\rho h)^{'\edge}`, and :math:`\Ubt^
 
 We call make_edge_scal to compute :math:`\rho^{'\edge}, X_k^{\edge},
 (\rho h)^{'\edge}`, and :math:`\Ubt^{\edge}` at each edge.
-The procedure is the same for each quantitiy, so we shall simply denote
+The procedure is the same for each quantity, so we shall simply denote
 the scalar as :math:`s`. We always need to compute :math:`\rho'` and :math:`X_k` to faces,
 and the choice of energy prediction is as follows:
 
@@ -892,7 +892,7 @@ Then upwind based on :math:`v_{\ib-\half\eb_y}^{1D}`:
    u_{R,\ib-\half\eb_y}^{y|z}, & v_{\ib-\half\eb_y}^{1D} < 0.
    \end{cases}
 
-We use an analogous procedure to compute five more intemediate states,
+We use an analogous procedure to compute five more intermediate states,
 :math:`u_{\ib-\half\eb_z}^{z|y}, v_{\ib-\half\eb_x}^{x|z},
 v_{\ib-\half\eb_z}^{z|x}, w_{\ib-\half\eb_x}^{x|y}`, and
 :math:`w_{\ib-\half\eb_y}^{y|x}`. Then we do a full-dimensional
@@ -1226,18 +1226,18 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
    .. math:: \xi = \frac{x - (i-\myhalf)h}{h}, ~ 0 \le \xi \le 1.
 
 -  **Step 3:** Integrate quadratic profiles to get the average value swept over the face
-     over time.
+   over time.
    Define the following integrals, where :math:`\sigma = |u|\Delta t/h`:
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         \mathcal{I}_{i,+}(\sigma) &=& \frac{1}{\sigma h}\int_{(i+\myhalf)h-\sigma h}^{(i+\myhalf)h}s_i^I(x)dx \\
         \mathcal{I}_{i,-}(\sigma) &=& \frac{1}{\sigma h}\int_{(i-\myhalf)h}^{(i-\myhalf)h+\sigma h}s_i^I(x)dx\end{aligned}
 
-     Plugging in (`[Quadratic Interp] <#Quadratic Interp>`__) gives:
+   Plugging in (`[Quadratic Interp] <#Quadratic Interp>`__) gives:
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         \mathcal{I}_{i,+}(\sigma) &=& s_{j,+} - \frac{\sigma}{2}\left[s_{j,+}-s_{j,-}-\left(1-\frac{2}{3}\sigma\right)s_{6,i}\right], \\
@@ -1247,7 +1247,7 @@ Here are the steps for the :math:`x`-direction. For simplicity, we replace the v
    Perform a 1D extrapolation, without source terms, to get
    left and right edge states. Add the source terms later if desired/necessary.
 
-     .. math::
+   .. math::
 
         \begin{aligned}
         s_{L,i-\myhalf} &=&

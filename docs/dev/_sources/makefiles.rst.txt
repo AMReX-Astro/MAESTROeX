@@ -54,11 +54,9 @@ lines of the form:
 ::
 
     CEXE_sources += file.cpp
-    F90EXE_sources += file.F90
 
-where ``file.cpp`` is a C++ source file and ``file.F90`` is a Fortran
-source file that should be built when this directory is added to the
-list of build directories. 
+where ``file.cpp`` is a C++ source file that should be built when this
+directory is added to the list of build directories.
 
 The AMReX build system relies on the ``vpath`` functionality of
 make. In a makefile, the ``vpath`` variable holds search path used to
@@ -74,10 +72,10 @@ Dependencies
 ------------
 
 There is no need to explicitly define the dependencies between the
-source files for Fortran modules. Scripts in
+source files.  Scripts in
 AMReX are run at the start of the build
 process and parse all the source files and make an explicit list of
-the dependency pairs. 
+the dependency pairs.
 
 Files Created at Compile-time
 -----------------------------
@@ -128,7 +126,7 @@ Problem-specific Files
 
 If a problem has a unique file that is needed as part of the build,
 then that file should be added to a ``Make.package`` file in the
-problem’s directory. 
+problem’s directory.
 
 Note that this is not necessary if you place a custom version of
 a source file in the problem’s directory. Since that file is already
@@ -155,7 +153,7 @@ in the problem’s ``GNUmakefile``.
 
    -  ``helmholtz``
 
-   -  ``gamma_law_general``
+   -  ``gamma_law``
 
    -  ``multigamma``
 
@@ -193,9 +191,7 @@ Core MAESTROeX modules
 ----------------------
 
 Several modules are included in all MAESTROeX builds by default.
-In addition to the AMReX sources, we also include 
-
--  ``MAESTROeX/constants``
+In addition to the AMReX sources, we also include
 
 -  ``MAESTROeX/Source``
 
@@ -245,7 +241,7 @@ that are not found could indicate an incomplete ``vpath``.
 ---------------------------
 
 Typing ``make clean`` deletes the object and module files for the
-current build (i.e., the current choice of ``USE_MPI``, ``DEBUG``, 
+current build (i.e., the current choice of ``USE_MPI``, ``DEBUG``,
 ``COMP``, and ``USE_OMP``). This also removes any of the compile-time
 generated source files. Any other builds are left unchanged.
 
@@ -266,7 +262,7 @@ track down memory issues, uninitialized variables, NaNs, etc.
    ``GNUmakefile`` generates an executable with debugging information
    included in the executable (e.g., to be interpreted by the
    debugger, gdb). This will usually add -g to the compile line and
-   also lower the optimization. For gfortran it will add several
+   also lower the optimization. This will add several
    options to catch uninitialize variables, bounds errors, etc.
    The resulting executable will have ``DEBUG`` in its name.
 
@@ -311,7 +307,7 @@ track down memory issues, uninitialized variables, NaNs, etc.
 
 -  ``FSANITIZER``
 
-   For gfortran, gcc, g++, setting ``FSANITIZER=TRUE``
+   For gcc/g++, setting ``FSANITIZER=TRUE``
    in ``GNUmakefile`` will enable the
    address sanitizer support built into GCC. This is enabled through
    integration with https://github.com/google/sanitizers in GCC.
@@ -329,7 +325,7 @@ Properties for different compilers are already defined in
 ``${AMREX_HOME}/Tools/GNUmake``. Each compiler is given its
 own file in the ``comps/`` sub-directory.  These
 compiler files define the compiler flags for both optimized and debug
-compiling. 
+compiling.
 
 Parallel (MPI) Builds
 ---------------------
@@ -337,6 +333,6 @@ Parallel (MPI) Builds
 When building with MPI, the build system needs to know about the
 location of the MPI libraries. If your local MPI has the ``mpif90``
 and ``mpicxx`` wrappers installed and working, then MAESTROeX will
-attempt to use these. Otherwise, you will need to add a site to the 
+attempt to use these. Otherwise, you will need to add a site to the
 ``sites/`` sub-directory in the AMReX build system specifying the
 details of your environment.

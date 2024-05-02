@@ -26,7 +26,7 @@ system:
 .. math::
 
    \label{eq:molar abundance}
-     Y_i = \frac{n_i}{\rho N_\text{A}} = \frac{\rho_i}{\rho}\frac{1}{A_i} 
+     Y_i = \frac{n_i}{\rho N_\text{A}} = \frac{\rho_i}{\rho}\frac{1}{A_i}
      \equiv \frac{X_i}{A_i}
 
 where we have defined the mass fraction, :math:`X_i = \frac{\rho_i}{\rho}`. Note
@@ -55,8 +55,8 @@ to :math:`\bar{A}` and :math:`\bar{Z}`. Using the chain rule, we have
 .. math::
 
    \label{eq:p_xk}
-     \frac{\ptl p}{\ptl X_k} = p_{X_k} = 
-     \frac{\ptl p}{\ptl \bar{A}}\frac{\ptl \bar{A}}{\ptl X_k} + 
+     \frac{\ptl p}{\ptl X_k} = p_{X_k} =
+     \frac{\ptl p}{\ptl \bar{A}}\frac{\ptl \bar{A}}{\ptl X_k} +
      \frac{\ptl p}{\ptl \bar{Z}}\frac{\ptl \bar{Z}}{\ptl X_k}.
 
 From :eq:`eq:abar` and :eq:`eq:zbar` we have
@@ -67,9 +67,9 @@ From :eq:`eq:abar` and :eq:`eq:zbar` we have
    :label: eq:abar_X_k
 
 .. math::
-   \frac{\ptl \bar{Z}}{\ptl X_k} = 
+   \frac{\ptl \bar{Z}}{\ptl X_k} =
      \left(\frac{Z_k}{A_k}\right)\left(\sum_i \frac{X_i}{A_i}\right)^{-1}
-     - \frac{\bar{Z}}{A_k}\left(\sum_i \frac{X_i}{A_i}\right)^{-1} = 
+     - \frac{\bar{Z}}{A_k}\left(\sum_i \frac{X_i}{A_i}\right)^{-1} =
      -\frac{\bar{A}}{A_k}\left(\bar{Z} - Z_k\right),
    :label: eq:zbar_X_k
 
@@ -92,7 +92,7 @@ second term in :eq:`eq:abar_X_k`. The only place where such terms
 appear in our algorithm is in a sum over all species, such as:
 
 .. math::
-   \sum_i p_{X_i}\dot{\omega}_i = 
+   \sum_i p_{X_i}\dot{\omega}_i =
      -\bar{A}^2\frac{\ptl p}{\ptl\bar{A}}\sum_i \frac{\dot{\omega}_i}{A_i}
      +\bar{A}\frac{\ptl p}{\ptl\bar{A}}\sum_i \dot{\omega}_i
      -\bar{A}\bar{Z}\frac{\ptl p}{\ptl\bar{Z}}\sum_i \frac{\dot{\omega}_i}{A_i}
@@ -126,7 +126,7 @@ from. Then the criterion for stability should be
 
    \begin{aligned}
     \rho_{parcel}(r+\Delta r) - \rho_{background}(r + \Delta r) &>& 0 \\
-    \bigg[\rho_{parcel}(r) + \bigg(\frac{d\rho}{dr}\bigg)_{parcel}\Delta r\bigg] - 
+    \bigg[\rho_{parcel}(r) + \bigg(\frac{d\rho}{dr}\bigg)_{parcel}\Delta r\bigg] -
     \bigg[\rho_{background}(r) + \bigg(\frac{d\rho}{dr}\bigg)_{background}\Delta r\bigg] &>& 0 \end{aligned}
 
 Since the parcel originates at r, :math:`\rho_{parcel}(r) = \rho_{background}(r)` and
@@ -161,17 +161,17 @@ Then we can rearrange :eq:`eqn:lnEOS` to get
 
 .. math::
 
-   \frac{d \ln \rho}{\partial \ln P} = \frac{1}{\chi_\rho} - 
+   \frac{d \ln \rho}{\partial \ln P} = \frac{1}{\chi_\rho} -
      \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
      \frac{d \ln \bar{\mu}}{d \ln P}
 
 Then the general stability criterion is
 
 .. math::
-   \bigg ( \frac{1}{\chi_\rho} - 
+   \bigg ( \frac{1}{\chi_\rho} -
      \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
-     \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{parcel} < 
-     \bigg ( \frac{1}{\chi_\rho} - 
+     \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{parcel} <
+     \bigg ( \frac{1}{\chi_\rho} -
      \frac{\chi_T}{\chi_\rho} \frac{d \ln T}{d \ln P}- \frac{\chi_{\bar{\mu}}}{\chi_\rho}
      \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{background}
    :label: eqn:genStability
@@ -189,7 +189,7 @@ Here’s where various assumptions/simplifications get used.
    chemical equilibrium. Or both of these terms can be neglected in
    the rising parcel. This would be justified if the timescale for
    reactions is long compared to the convective timescale, and either
-   the same is ture for ionization or the fluid is fully ionized.
+   the same is true for ionization or the fluid is fully ionized.
 
 #. If we assume that :math:`\bar{\mu}` remains constant in the parcel, then
    :math:`\frac{d \ln \bar{\mu}}{d \ln P}` drops out for the parcel. In this case,
@@ -199,7 +199,7 @@ Here’s where various assumptions/simplifications get used.
 
    .. math::
 
-      \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} > 
+      \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} >
         \bigg (  \frac{d \ln T}{d \ln P} + \frac{\chi_{\bar{\mu}}}{\chi_T}
         \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{background}
       \label{eqn:Ledoux}
@@ -208,7 +208,7 @@ Here’s where various assumptions/simplifications get used.
    adiabatically.
 
 #. If we assume
-   that the background is in chemical equilibrium and the parcel acheives
+   that the background is in chemical equilibrium and the parcel achieves
    instantaneous chemical equilibrium, then :math:`\bar{\mu} = \bar{\mu}(\rho,T)` for
    the background and the parcel. (Note that we aren’t requiring constant
    composition in the parcel here.)
@@ -218,7 +218,7 @@ Here’s where various assumptions/simplifications get used.
 
    .. math::
 
-      \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} > 
+      \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} >
         \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{background}
       \label{eqn:Schwarz}
 
@@ -231,12 +231,12 @@ Here’s where various assumptions/simplifications get used.
 
    .. math:: d \rho = \frac{\partial \rho}{\partial P} \bigg |_{S} d P + \frac{\partial \rho}{\partial S} \bigg |_{P} dS
 
-   We can subsitute this into :eq:`eqn:basicStability` for stability,
+   We can substitute this into :eq:`eqn:basicStability` for stability,
    and assuming the parcel moves adiabatically, we get
 
    .. math::
 
-      \bigg ( \frac{\partial \rho}{\partial S} \bigg |_{P} \frac{dS}{dr} 
+      \bigg ( \frac{\partial \rho}{\partial S} \bigg |_{P} \frac{dS}{dr}
         \bigg )_{background}< 0
 
    One of Maxwell’s relations is
@@ -250,35 +250,35 @@ Here’s where various assumptions/simplifications get used.
    The stability criterion then becomes
 
    .. math::
-      \bigg ( \frac{d S}{d r} \bigg )_{background} > 0 
+      \bigg ( \frac{d S}{d r} \bigg )_{background} > 0
       :label: eqn:stabilityEntr
 
 Determining which stability criterion we want to enforce in creating the
 initial model is complicated by the phenomenon of semiconvection, which
-occurs when the Ledoux criterion is statisfied but the Schwarzchild is not,
+occurs when the Ledoux criterion is satisfied but the Schwarzchild is not,
 i.e.
 
 .. math::
 
-   \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} < 
+   \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} <
      \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{background} <
-     \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} - 
-     \bigg ( \frac{\chi_{\bar{\mu}}}{\chi_T} 
+     \bigg (  \frac{d \ln T}{d \ln P} \bigg )_{parcel} -
+     \bigg ( \frac{\chi_{\bar{\mu}}}{\chi_T}
      \frac{d \ln \bar{\mu}}{d \ln P} \bigg )_{background}
 
 (Note that :math:`\chi_{\bar{\mu}}` is negative, as pressure is inversely proportional
 to mass per particle, and :math:`\frac{d \ln \bar{\mu}}{d \ln P}` is positive, since
-nuclear reactions sythesize more massive particles in the center of the star.)
+nuclear reactions synthesize more massive particles in the center of the star.)
 In this case, when a rising parcel eventually reaches neutral buoyancy, it will
-have a temperature excess in comparision to it’s surroundings.
+have a temperature excess in comparison to it’s surroundings.
 If the parcel can retain
-it’s identitiy against diffusive mixing with the background long enough for
-significant heat exhange to occur, then the parcel’s temperature will drop, it
+it’s identity against diffusive mixing with the background long enough for
+significant heat exchange to occur, then the parcel’s temperature will drop, it
 will contract increasing it’s density, and the parcel will move inwards.
 The time scale of semiconvection is much longer than the timescale of
 traditional convection.
 
-When we set up an initial model, we want to minimize any initial tendancy
+When we set up an initial model, we want to minimize any initial tendency
 towards convective motions, as we want these to be driven by the heating due
 to nuclear reactions,
 not the initial configuration we supply. Thus I think we want to guard against
@@ -288,7 +288,7 @@ criterion
 .. math::
 
    \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{parcel} =
-   \frac{d \ln T}{d \ln P} \bigg |_{S,\bar{\mu}} > 
+   \frac{d \ln T}{d \ln P} \bigg |_{S,\bar{\mu}} >
      \bigg ( \frac{d \ln T}{d \ln P} \bigg )_{background}
 
 Although this looks like the Schwarschild criterion (and, because I’m not
@@ -319,7 +319,7 @@ different “adiabatic exponents” that we will use:
 
    \begin{aligned}
      \Gamma_1 &\equiv&   \left(\frac{d\ln p}{d\ln\rho}\right)_\text{ad} \\
-     \frac{\Gamma_2}{\Gamma_2-1} &\equiv& 
+     \frac{\Gamma_2}{\Gamma_2-1} &\equiv&
      \left(\frac{d\ln p}{d\ln T}\right)_\text{ad} \\
      \Gamma_3 - 1 &\equiv& \left(\frac{d\ln T}{d\ln\rho}\right)_\text{ad},\end{aligned}
 

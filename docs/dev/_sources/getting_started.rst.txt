@@ -9,14 +9,13 @@ and how to look at the output.
 Requirements
 ============
 
-MAESTROeX requires a C++ compiler that supports the C++17 standard, a
-Fortran compiler that supports the Fortran 2003 standard, and a C compiler 
-that supports the C99 standard. Several compiler suites are supported, 
-including GNU, Intel, PGI and Cray. GNU Make (>= 3.82) is also required, 
-as is Python (>= 3.6) and standard tools available in any Unix-like 
-environments (e.g., Perl and ``sed``). 
+MAESTROeX requires a C++ compiler that supports the C++17 standard and
+a C compiler that supports the C99 standard. Several compiler suites
+are supported, including GNU, Intel, LLVM and Cray. GNU Make (>= 3.82)
+is also required, as is Python (>= 3.9) and standard tools available
+in any Unix-like environments (e.g., Perl and ``sed``).
 
-For running in parallel, an MPI library and/or OpenMP is required. 
+For running in parallel, an MPI library and/or OpenMP is required.
 For running on GPUs, CUDA 11 or later is required (see :ref:`sec:gpu` for
 more information).
 
@@ -58,7 +57,7 @@ paper 3.
    If you choose to use the submodule, enter the ``MAESTROeX/``
    directory and type::
 
-      git submodule --init
+      git submodule init
 
    Note that in the future when you pull MAESTROeX, to make sure the
    Microphysics submodule is also updated you must instead use::
@@ -70,17 +69,17 @@ paper 3.
    behavior::
 
      git config --global submodule.recurse true
-      
+
    If you choose to use the Microphysics repo directly, it is
    available on github and can be obtained via::
 
-       git clone https://github.com/starkiller-astro/Microphysics.git
+       git clone https://github.com/AMReX-Astro/Microphysics.git
 
    Next you must specify the path to the Microphysics repository as
    a global environment variable on your machine, ``MICROPHYSICS_HOME``
 
    You will periodic want to update Microphysics by doing::
-   
+
        git pull
 
    in the ``Microphysics/`` directory.
@@ -154,7 +153,7 @@ paper 3.
 
    -  ``COMP := gnu``
 
-      This option specifies the gnu compiler suite (g++/gfortran).
+      This option specifies the gnu compiler suite (e.g., g++).
       We will use gnu, which is the preferred compiler suite for MAESTROeX.
       Specifying this compiler will automatically pull in the compiler
       settings as specified in ``AMREX_HOME/Tools/GNUMake/Make.defs``.
@@ -307,19 +306,10 @@ related development packages (e.g. libXpm-devel).
 AmrPostprocessing scripts
 -------------------------
 
-Several useful analysis scripts (written in Fortran 90) can be found
-in ``amrex/Tools/Postprocessing/F_Src/``.  The ``GNUmakefile`` there
-needs to be edited to indicate which of the tools to build. For
-example, to extract the density along a line from the center of a
-plotfile, ``plt00200``, in the :math:`y`-direction::
+Several useful analysis scripts can be found
+in the ``amrex-astro-diag`` project:
 
-    fextract.Linux.gfortran.exe -d 2 -v "density" -p plt00200
-
-These routines are described in § :ref:`sec:analysis`.
-
-There is also a python visualization method in
-``AmrPostprocessing/python``. This is described
-in § :ref:`sec:vis:python`.
+https://github.com/amrex-astro/amrex-astro-diag
 
 VisIt
 -----

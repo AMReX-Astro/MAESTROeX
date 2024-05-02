@@ -131,8 +131,10 @@ Usage of Cutoff Densities
 
 .. _Sec:Anelastic Cutoff:
 
-anelastic_cutoff_density
-----------------
+.. index:: maestro.anelastic_cutoff_density
+
+``anelastic_cutoff_density``
+----------------------------
 
 The ``anelastic_cutoff_density`` is the density below which we modify the constraint.
 
@@ -151,8 +153,10 @@ The ``anelastic_cutoff_density`` is the density below which we modify the constr
 
 .. _Sec:Base Cutoff Density:
 
-base_cutoff_density
--------------------
+.. index:: maestro.base_cutoff_density
+
+``base_cutoff_density``
+-----------------------
 
 The ``base_cutoff_density`` is the lowest density that we model.
 
@@ -193,8 +197,10 @@ The ``base_cutoff_density`` is the lowest density that we model.
 -  In ``make_psi`` for plane-parallel, we only compute :math:`\psi` for
    :math:`r < {\tt base\_cutoff\_density\_coord}`.
 
-burning_cutoff
---------------
+.. index:: maestro.burning_cutoff
+
+``burning_cutoff``
+------------------
 
 The burning cutoff determines where we call the reaction network to
 get the nuclear energy generation rate and composition changes. For
@@ -206,8 +212,10 @@ densities below the burning cutoff, we do not call the network.
 -  In ``react_state``, we only call the burner if
    :math:`\rho >` ``burning_cutoff_density``.
 
-buoyancy_cutoff_factor
-----------------------
+.. index:: maestro.buoyancy_cutoff_factor
+
+``buoyancy_cutoff_factor``
+--------------------------
 
 The ``buoyancy_cutoff_factor`` is used to zero out the forcing terms
 to the velocity equation at low densities.

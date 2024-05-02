@@ -47,11 +47,9 @@ at Stony Brook can be used as a starting point and is found here:
 Continuous Integration
 ======================
 
-We use Travis CI to run integration tests on the code and to build and deploy the documentation. The current status of these tests on the development branch can be found here:
+We use Github Actions to run integration tests on the code and to build and deploy the documentation.
 
-.. image:: https://travis-ci.com/AMReX-Astro/MAESTROeX.svg?branch=development
-   :target: https://travis-ci.com/AMReX-Astro/MAESTROeX
-
-Currently, travis runs the `clang static analyzer <https://clang-analyzer.llvm.org/>`_, which finds potential bugs in the code. It also runs a script to convert any tabs in the code into spaces. Both of these are run on pull requests to the MAESTROeX github repo, and are run weekly on the development branch. 
-
-The travis build settings can be found in the ``.travis.yml`` file.
+Currently, Github Actions runs the `clang static analyzer
+<https://clang-analyzer.llvm.org/>`_, which finds potential bugs in
+the code.  This is run on pull requests to the MAESTROeX github
+repo, and are run weekly on the development branch.
