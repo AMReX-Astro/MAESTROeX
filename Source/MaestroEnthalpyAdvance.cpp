@@ -226,7 +226,7 @@ void Maestro::EnthalpyAdvance(
 #endif
 
         // compute enthalpy fluxes
-        MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac, rho0_old,
+        MakeRhoHFlux(scalold, sflux, sedge, umac, w0mac, rho0_old,  // NOLINT(readability-suspicious-call-argument)
                      rho0_edge_old, rho0mac_old, rho0_old, rho0_edge_old,
                      rho0mac_old, rhoh0_old, rhoh0_edge_old, rhoh0mac_old,
                      rhoh0_old, rhoh0_edge_old, rhoh0mac_old, h0mac_old,

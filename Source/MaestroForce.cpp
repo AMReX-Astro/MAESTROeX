@@ -128,9 +128,7 @@ void Maestro::MakeVelForce(
                     if (do_add_utilde_force) {
 
 #if (AMREX_SPACEDIM == 2)
-                        if (j <= -1) {
-                            // do not modify force since dw0/dr=0
-                        } else if (j >= domhi) {
+                        if (j <= -1 || j >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
                             vel_force(i, j, k, 1) -=
@@ -139,12 +137,13 @@ void Maestro::MakeVelForce(
                                 (2.0 * dx[1]);
                         }
 #else
-                        if (k <= -1) {
-                            // do not modify force since dw0/dr=0
-                        } else if (k >= domhi) {
+                        if (k <= -1 || k >= domhi) {
                             // do not modify force since dw0/dr=0
                         } else {
-                            vel_force(i,j,k,2) -= (wedge(i,j,k+1)+wedge(i,j,k))*(w0_arr(i,j,k+1,2)-w0_arr(i,j,k,2)) / (2.0*dx[2]);
+                            vel_force(i,j,k,2) -=
+                                (wedge(i,j,k+1) + wedge(i,j,k)) *
+                                (w0_arr(i,j,k+1,2) - w0_arr(i,j,k,2)) /
+                                (2.0*dx[2]);
                         }
 #endif
                     }

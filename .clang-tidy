@@ -28,6 +28,7 @@ Checks: >
        -modernize-use-using,
      performance-*,
        -performance-avoid-endl,
+       -performance-enum-size,
      portability-*,
      readability-*,
        -readability-avoid-const-params-in-decls,
