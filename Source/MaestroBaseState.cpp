@@ -178,7 +178,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             aux_ambient[iabar] = 1.0_rt / aux_ambient[iabar];
 #endif
 
-            eos_t eos_state;
+            eos_rh_t eos_state;
 
             // use the EOS to make the state consistent
             eos_state.T = t_ambient;
