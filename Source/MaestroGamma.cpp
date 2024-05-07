@@ -38,7 +38,7 @@ void Maestro::MakeGamma1bar(const Vector<MultiFab>& scal,
             const Array4<const Real> p0_arr = p0_cart[lev].array(mfi);
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                eos_t eos_state;
+                eos_rep_t eos_state;
 
                 eos_state.rho = scal_arr(i, j, k, Rho);
 

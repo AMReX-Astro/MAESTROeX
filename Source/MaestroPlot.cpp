@@ -1460,7 +1460,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
 #endif
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                eos_t eos_state;
+                eos_rep_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
                 eos_state.T = state_arr(i, j, k, Temp);
@@ -2191,7 +2191,7 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
             const Array4<Real> deltagamma_arr = deltagamma[lev].array(mfi);
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                eos_t eos_state;
+                eos_rep_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
                 eos_state.T = state_arr(i, j, k, Temp);

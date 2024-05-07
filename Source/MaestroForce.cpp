@@ -758,7 +758,7 @@ void Maestro::MakeTempForce(
                         gradp0 = 0.5 * (p0_arr(i,j,k+1) - p0_arr(i,j,k-1)) / dx[2];
                     }
 #endif
-                    eos_t eos_state;
+                    eos_rep_t eos_state;
 
                     eos_state.T = scal_arr(i, j, k, Temp);
                     eos_state.rho = scal_arr(i, j, k, Rho);
@@ -799,7 +799,7 @@ void Maestro::MakeTempForce(
             } else {
 #if AMREX_SPACEDIM == 3
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    eos_t eos_state;
+                    eos_rep_t eos_state;
 
                     eos_state.T = scal_arr(i, j, k, Temp);
                     eos_state.rho = scal_arr(i, j, k, Rho);
