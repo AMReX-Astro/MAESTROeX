@@ -32,7 +32,7 @@ void Maestro::TfromRhoH(Vector<MultiFab>& scal, const BaseState<Real>& p0) {
             if (use_eos_e_instead_of_h_loc) {
                 // (rho, (h->e)) --> T, p
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    eos_t eos_state;
+                    eos_re_t eos_state;
 
                     eos_state.rho = state(i, j, k, Rho);
                     eos_state.T = state(i, j, k, Temp);

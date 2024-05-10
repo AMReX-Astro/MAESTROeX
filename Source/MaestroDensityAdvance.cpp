@@ -116,17 +116,20 @@ void Maestro::DensityAdvance(
                      FirstSpec, FirstSpec, NumSpec, false);
 
     } else if (species_pred_type == predict_rhoX) {
+        // we are predicting (rho X) to the edges, using the
+        // conservative form of the prediction
         MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s, Nscal,
                      FirstSpec, FirstSpec, NumSpec, true);
     }
 
-    // predict rho or rho' at the edges (depending on species_pred_type)
     if (species_pred_type == predict_rhoprime_and_X ||
         species_pred_type == predict_rho_and_X) {
+        // predict rho or rho' at the edges (depending on species_pred_type)
         MakeEdgeScal(scalold, sedge, umac, scal_force, is_vel, bcs_s, Nscal,
                      Rho, Rho, 1, false);
 
     } else if (species_pred_type == predict_rhoX) {
+        // compute rho = sum(rhoX) at the edges
         for (int lev = 0; lev <= finest_level; ++lev) {
             for (int idim = 0; idim < AMREX_SPACEDIM; ++idim) {
                 MultiFab::Copy(sedge[lev][idim], sedge[lev][idim], FirstSpec,
@@ -153,6 +156,9 @@ void Maestro::DensityAdvance(
     /////////////////////////////////////////////////////////////////
     // Compute fluxes
     /////////////////////////////////////////////////////////////////
+
+    // for which_step .eq. 1, we pass in only the old base state quantities
+    // for which_step .eq. 2, we pass in the old and new for averaging within mkflux
 
     if (which_step == 1) {
         Vector<std::array<MultiFab, AMREX_SPACEDIM> > rho0mac_old(finest_level +
