@@ -622,7 +622,7 @@ void Maestro::FirstDt() {
                 spd.setVal<RunOn::Device>(0.0, tileBox, 0, 1);
 
                 ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                    eos_t eos_state;
+                    eos_rep_t eos_state;
 
                     // compute the sound speed from rho and temp
                     eos_state.rho = scal_arr(i, j, k, Rho);
