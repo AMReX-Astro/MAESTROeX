@@ -259,6 +259,7 @@ ifdef BUILD_GIT_NAME
 endif
 
 $(objEXETempDir)/AMReX_buildInfo.o: .FORCE
+	@if [ ! -d $(objEXETempDir) ]; then mkdir -p $(objEXETempDir); fi
 	$(AMREX_HOME)/Tools/C_scripts/makebuildinfo_C.py \
           --amrex_home "$(AMREX_HOME)" \
           --COMP "$(COMP)" --COMP_VERSION "$(COMP_VERSION)" \
