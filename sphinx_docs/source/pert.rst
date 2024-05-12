@@ -495,7 +495,7 @@ The behavior of ``enthalpy_pred_type`` is:
 
 The combination of ``species_pred_type`` and ``enthalpy_pred_type`` determine how we construct the edge state.  The variations are:
 
-* ``species_pred_type = 1`` (``predict_rhoprime_and_X``) 
+* ``species_pred_type = 1`` (``predict_rhoprime_and_X``)
 
   * ``enthalpy_pred_type = 0`` (``predict_rhoh``) :
 
@@ -741,12 +741,12 @@ Computing :math:`\rho h` at edges
     edges>`__ for computing :math:`\rho_\mathrm{edge}` from :math:`\rho_0` and
   :math:`\rho'_\mathrm{edge}` and then multiply by :math:`h_\mathrm{edge}`.
 
-|  
+|
 | ``species_pred_types``: ``predict_rhoX``:
 | We already have :math:`\sum(\rho X_k)_\mathrm{edge}` and simply multiply by
   :math:`h_\mathrm{edge}`.
 
-|  
+|
 | ``species_pred_types``: ``predict_rho_and_X``:
 | We already have :math:`\rho_\mathrm{edge}` and simply multiply by
   :math:`h_\mathrm{edge}`.
