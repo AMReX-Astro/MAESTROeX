@@ -50,6 +50,7 @@ void Maestro::MakeRhoXFlux(
         }
     }
 
+
     for (int lev = 0; lev <= finest_level; ++lev) {
 #if (AMREX_SPACEDIM == 3)
         MultiFab rho0mac_edgex, rho0mac_edgey, rho0mac_edgez;
@@ -82,18 +83,23 @@ void Maestro::MakeRhoXFlux(
             const Box& zbx = mfi.nodaltilebox(2);
 #endif
 
+            // note: it is assumed here that umac includes the base state velocity, w0
+
             const Array4<Real> sedgex = sedge[lev][0].array(mfi);
             const Array4<Real> sfluxx = sflux[lev][0].array(mfi);
-            const Array4<Real> etarhoflux_arr = etarhoflux[lev].array(mfi);
             const Array4<const Real> umacx = umac[lev][0].array(mfi);
+
             const Array4<Real> sedgey = sedge[lev][1].array(mfi);
             const Array4<Real> sfluxy = sflux[lev][1].array(mfi);
             const Array4<const Real> vmac = umac[lev][1].array(mfi);
+
 #if (AMREX_SPACEDIM == 3)
             const Array4<Real> sedgez = sedge[lev][2].array(mfi);
             const Array4<Real> sfluxz = sflux[lev][2].array(mfi);
             const Array4<const Real> wmac = umac[lev][2].array(mfi);
 #endif
+
+            const Array4<Real> etarhoflux_arr = etarhoflux[lev].array(mfi);
 
             const auto w0_arr = w0.const_array();
 
@@ -301,6 +307,7 @@ void Maestro::MakeRhoXFlux(
             } else {
                 // spherical case
 
+                // note: these edge states are already time-centered
                 const Array4<const Real> rho0_edgex = rho0mac_edgex.array(mfi);
                 const Array4<const Real> rho0_edgey = rho0mac_edgey.array(mfi);
                 const Array4<const Real> rho0_edgez = rho0mac_edgez.array(mfi);
