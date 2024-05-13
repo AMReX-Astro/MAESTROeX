@@ -41,7 +41,7 @@ for var in "${vars[@]}"; do
     #echo $var
     header+="$var "
 
-    # Average current variable which creates (or overwites) plotfile/.slice
+    # Average current variable which creates (or overwrites) plotfile/.slice
     $frms -v "$var" "$plotfile" >> $plotfile/.frms_log
 
     # go into there for file manipulation

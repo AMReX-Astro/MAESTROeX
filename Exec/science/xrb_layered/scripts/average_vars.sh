@@ -40,7 +40,7 @@ for var in "${vars[@]}"; do
     #echo $var
     header+="$var "
 
-    # Average current variable which creates (or overwites) plotfile/.slice
+    # Average current variable which creates (or overwrites) plotfile/.slice
     $faverage -v "$var" "$plotfile" >> $plotfile/.faverage_log
 
     # go into there for file manipulation

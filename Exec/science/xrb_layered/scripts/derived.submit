@@ -12,7 +12,8 @@ RUN_DIR=$1
 echo $RUN_DIR
 
 PLOT_DIR=PLOTS
-PLOT_BASENAME="*xrb_0" # includes the smallplot files
+#PLOT_BASENAME="*xrb_0" # includes the smallplot files
+PLOT_BASENAME="*xrb_" # includes the smallplot files
 #PLOT_BASENAME="xrb_0"
 
 script=~/MAESTROeX/Exec/science/xrb_layered/plotfile_derive/derive2d.gnu.x86-milan.ex

@@ -340,9 +340,6 @@ void main_main()
 
         const MultiFab& lev_data_mf = pf.get(ilev);
 
-#ifdef AMREX_USE_OMP
-#pragma omp parallel
-#endif
         for (MFIter mfi(temp_mf, TilingIfNotGPU()); mfi.isValid(); ++mfi) {
             Box const& bx = mfi.tilebox();
 
