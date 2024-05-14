@@ -1,0 +1,21 @@
+*.ipynb_checkpoints/
+**/.vscode
+*slurm*
+*submit*
+*out*
+*debug*
+log.md
+analysis
+
+# some useful analysis scripts
+scripts/*
+!scripts/average_vars.sh
+!scripts/avg.submit
+!scripts/chainslurm.sh
+!scripts/conv_grad.submit
+!scripts/derived.submit
+!scripts/get_extrema.sh
+!scripts/extrema.submit
+!scripts/rms.submit
+!scripts/rms_vars.sh
+!scripts/run.submit.template

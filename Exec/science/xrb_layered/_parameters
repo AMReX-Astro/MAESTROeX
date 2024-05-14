@@ -1,18 +1,7 @@
 @namespace: problem
 
-# Magnitude of the perturbation.
-xrb_pert_factor                     real               1.d-2               
-
-# Radius of the perturbation.
-xrb_pert_size                       real               5.0d1               
-
-# Type of perturbation @@
-# 1 = Temperature perturbation @@
-# 2 = Density perturbation
-xrb_pert_type                       integer            1                   
-
-# the height location for the perturbation
-xrb_pert_height                     real               -1.0d0
+# seed for the random noise (-1 for random seed)
+pert_seed                           integer            -1
 
 # Turn on (.true.) or off (.false.) sponging at the bottom of the domain.
 xrb_use_bottom_sponge               integer            0
@@ -20,44 +9,7 @@ xrb_use_bottom_sponge               integer            0
 # minimum value to use for the sponge
 sponge_min                          real               0.01d0
 
-# Mass fraction used in {\tt diag.f90} to define where the burning layer @@
-# begins.
-diag_define_layer                real               0.1
-
-# Velocity field initialization
-apply_vel_field                     integer            0
-
-# Initial velocity field vortex scale (2-d); thickness of velocity layer (3-d)
-velpert_scale                       real               1.0d2
-
-# Initial velocity field vortex amplitude
-velpert_amplitude                   real               1.0d2
-
-# Initial velocity field vortex height location (2-d); base of perturbation layer (3-d)
-velpert_height_loc                  real               6.5d3
-
-# thickness of velocity pert transition region (3-d)
-velpert_steep                       real               12.d0
-
-# number of vortices (2-d)
-num_vortices                        integer            1
-
-# look at the deltap diagnostic
-do_deltap_diag                      integer            0
-
-# minimum value to use for species in tag_boxes
-tag_minval                          real               1.0d-4
-
-# maximum value to use for species in tag_boxes
-tag_maxval                          real               0.99d0
-
-# factor to multiply the species by; for tagging off of spec
-# instead of EGR
-tag_xfac                           real                1.d-16
-
-# density tagging
-do_dens_tagging                    integer             0
-
-lo_dens_tag                        real                5.4d5
-hi_dens_tag                        real                1.75d6
-dens_tag_lev_fac                   real                1.0d0
+# Do refinement above and below given heights (given in cm)
+do_height_based_refinement          integer            0
+height_refine_bottom                real               1.0e3
+height_refine_top                   real               1.2e3
