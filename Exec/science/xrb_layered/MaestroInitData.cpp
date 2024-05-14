@@ -39,7 +39,7 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
     const auto dx = geom[lev].CellSizeArray();
 
     if (perturb_model) {
-      
+
         // Generate random seed (or get from input), and RNG
         int seed = 0;
         if (problem_rp::pert_seed != -1) {
@@ -49,14 +49,14 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
             seed = r();
         }
         std::default_random_engine generator(seed);
-        
+
         // Gaussian distribution
         std::normal_distribution<double> noise(1.0, 0.001); // mean of 1, std dev 10^-3
-        
+
         // Loop through data and perturb
         const auto lo = amrex::lbound(tileBox);
         const auto hi = amrex::ubound(tileBox);
-        
+
         // Why for and not parallelfor?
         // Because RNG's are not thread safe. so if we wanted to use ParallelFor, we would have to create a new RNG inside
         // every iteration, but that loses the ability to keep a fixed seed and be fully reproducible.. maybe that wouldn't be so bad
@@ -66,28 +66,28 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
             for (int j = lo.y; j<= hi.y; j++) {
                 for (int i = lo.x; i<= hi.x; i++) {
                     int r = AMREX_SPACEDIM == 2 ? j : k;  // j if 2D, k if 3D
-                    
+
                     Real t0 = s0_arr(lev, r, Temp);
-                    Real temp = t0 * noise(generator);                    
+                    Real temp = t0 * noise(generator);
                     Real dens = s0_arr(lev, r, Rho); // no change
-                    
+
                     // Create new eos object based on these modified values
                     eos_t eos_state;
                     eos_state.T = temp;
                     eos_state.p = p0_arr(lev, r);
                     eos_state.rho = dens;
                     for (auto comp = 0; comp < NumSpec; comp++) {
-                        eos_state.xn[comp] = 
+                        eos_state.xn[comp] =
                             s0_arr(lev, r, FirstSpec + comp) / s0_arr(lev, r, Rho);
                     }
-                    
+
                     auto eos_input_flag = eos_input_tp; // temperature & pressure eos
                     eos(eos_input_flag, eos_state);
                     scal(i, j, k, Rho) = eos_state.rho;
                     scal(i, j, k, RhoH) = eos_state.rho * eos_state.h; // re-compute enthalpy
                     scal(i, j, k, Temp) = eos_state.T;
                     for (auto comp=0; comp < NumSpec; comp++) {
-                        scal(i, j, k, FirstSpec + comp) = 
+                        scal(i, j, k, FirstSpec + comp) =
                             eos_state.rho * eos_state.xn[comp];
                     }
                 }

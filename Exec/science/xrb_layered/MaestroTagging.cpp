@@ -67,5 +67,5 @@ void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
                 tag_array_p[lev + max_lev * r] = TagBox::SET;
             }
         });
-    } 
+    }
 }

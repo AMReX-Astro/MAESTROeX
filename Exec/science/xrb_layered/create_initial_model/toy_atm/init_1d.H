@@ -6,8 +6,8 @@
 //  (T_star) representing the NS, a hyperbolic tangent rise to a
 //  peak temperature (T_base) representing the base of an accreted
 //  layer at r=H_star, an isentropic profile representing the convective
-//  region at ignition, then a radiative profile from r=H_rad. 
-//  Below, three different power-laws set the temperature profile 
+//  region at ignition, then a radiative profile from r=H_rad.
+//  Below, three different power-laws set the temperature profile
 //  T = T0*(y/y0)^del
 //  where y is the column depth (=pressure/gravity) and, del is the power-law
 //  index, and T0 and y0 are the values at the beginning of a given region.
@@ -15,7 +15,7 @@
 //  where helium is burning and generating convection, 2) a stable region
 //  where nothing is burning, 3) a stable region with hot CNO burning.
 
-//  The composition transitions from pure ash, to helium and CNO, to a solar 
+//  The composition transitions from pure ash, to helium and CNO, to a solar
 //  mixture including hydrogen, with initial hydrogen fraction X0 and CNO fraction
 //  Zcno (inputs file).  The CNO is split between o14 and o15 with ratio
 //  determined by their beta decay times (70.621/122.266). Because hot CNO burns
@@ -40,7 +40,7 @@
 //         |     .   .     +__
 //         |     .   .     .  `---   T ~ y^del_2
 //         |     .   .     .      `---+
-//         |     .   .     .          .`-  
+//         |     .   .     .          .`-
 //         |     .   .     .          .   `-   T ~ y^del_3
 //         |     .   .     .          .      `-
 //         |     .   .     .          .         `-
@@ -48,15 +48,15 @@
 //         |      \  /
 //         |      delta
 //         |< H_star>|
-//         |-----<y_2>----| 
-//         |----------<y_3>---------| 
+//         |-----<y_2>----|
+//         |----------<y_3>---------|
 //
 //  The composition profile is:
 //
 //         X
 //         ^
-//         |  star  | reg 1 | reg 2  |  region 3 
-//    1.0  +--------*----------                 
+//         |  star  | reg 1 | reg 2  |  region 3
+//    1.0  +--------*----------
 //         |  ash   .          \
 //         |        .           \    +--------- X0 (hydrogen)
 //         |        .            \  /
@@ -66,8 +66,8 @@
 //         |        .           /    +--------- 1-X0-Zcno (helium)
 //         |        .----------/--------------- Zcno (o14/o15)
 //    0.0  +--------+---------+-----------------> r
-//         |<H_star>|    
-//         |------<y_d>------|     
+//         |<H_star>|
+//         |------<y_d>------|
 //         |
 //
 //  The transition from ash to fuel is a hyperbolic tangent, parametrized
@@ -140,7 +140,7 @@ AMREX_INLINE void init_1d()
     }
     if (std::abs(sum) - 1.0_rt > NumSpec * smallx) {
             amrex::Error("ERROR: fuel mass fractions don't sum to 1");
-    }   
+    }
 
 
 
@@ -196,7 +196,7 @@ AMREX_INLINE void init_1d()
         if (error < err_min) {
             err_min = error;
             n_best = n;
-        } 
+        }
     }
 
     Real dens_base = (1.3 + n_best*0.001)*1.e6;
@@ -217,10 +217,10 @@ AMREX_INLINE void init_1d()
 
         // Composition
         for (int n = 0; n < NumSpec; ++n) {
-            model_hse(i, ispec+n) = xn_star[n] + 
+            model_hse(i, ispec+n) = xn_star[n] +
                 0.5_rt * (xn_base[n] - xn_star[n]) *
-                (1.0_rt + std::tanh((xzn_hse(i) - (problem_rp::xmin + problem_rp::H_star - problem_rp::delta) + problem_rp::delta) / problem_rp::delta)); 
-        } 
+                (1.0_rt + std::tanh((xzn_hse(i) - (problem_rp::xmin + problem_rp::H_star - problem_rp::delta) + problem_rp::delta) / problem_rp::delta));
+        }
 
         // Temperature
         model_hse(i, itemp) = problem_rp::T_star + 0.5_rt * (problem_rp::T_base - problem_rp::T_star) *
@@ -241,7 +241,7 @@ AMREX_INLINE void init_1d()
         for (int i = 0; i < problem_rp::nx; ++i) {
             if (model_hse(i, itemp) > 0.9995 * problem_rp::T_base) {
                 index_base = i+1;
-                break;  
+                break;
             }
         }
     } else {
@@ -348,9 +348,9 @@ AMREX_INLINE void init_1d()
 
                 // set to isothermal if hit threshold
                 if (temp_zone < problem_rp::T_lo) {
-                    temp_zone = problem_rp::T_lo; 
+                    temp_zone = problem_rp::T_lo;
                 }
-            
+
                 // std::cout << "T=" << temp_zone << std::endl;
             }
 
@@ -400,7 +400,7 @@ AMREX_INLINE void init_1d()
 
         // call the EOS one more time for this zone and then go on to the next
         // (t, rho) -> (p)
-     
+
         eos_state.T = temp_zone;
         eos_state.rho = dens_zone;
         for (int n = 0; n < NumSpec; ++n) {
@@ -447,7 +447,7 @@ AMREX_INLINE void init_1d()
 
 
     // integrate down -- using the temperature profile defined above
-  
+
     for (int i = index_base-1; i >= 0; --i) {
 
         Real delx = xzn_hse(i+1) - xzn_hse(i);
@@ -459,7 +459,7 @@ AMREX_INLINE void init_1d()
         }
 
         // use our previous initial guess for density
-     
+
         dens_zone = model_hse(i+1, idens);
 
 
@@ -477,7 +477,7 @@ AMREX_INLINE void init_1d()
             // find the density and pressure that are consistent
 
             // HSE differencing
-        
+
             p_want = model_hse(i+1, ipres) -
                 delx * 0.5_rt * (dens_zone + model_hse(i+1, idens)) * problem_rp::g_const;
 
@@ -541,7 +541,7 @@ AMREX_INLINE void init_1d()
 
     }
 
-    
+
     // auto deltastr = num_to_unitstring(delta);
     auto dxstr = num_to_unitstring(dCoord);
 
@@ -576,7 +576,7 @@ AMREX_INLINE void init_1d()
 
     of.close();
 
-    std::cout << "Saved model to " << outfile << std::endl; 
+    std::cout << "Saved model to " << outfile << std::endl;
 
     // some metadata
     of << "# generated by toy_atm_layered" << std::endl;
@@ -600,11 +600,11 @@ AMREX_INLINE void init_1d()
 
         of2 << std::setprecision(12) << std::setw(20) << xzn_hse(i) << std::endl;
         of2 << std::setprecision(12) << std::setw(20) << eos_state.s << std::endl;
-        of2 << std::setprecision(12) << std::setw(20) << eos_state.cs << std::endl;                
+        of2 << std::setprecision(12) << std::setw(20) << eos_state.cs << std::endl;
     }
 
     // compute the maximum HSE error
-  
+
     Real max_hse_error = -1.e30;
 
     for (int i = 1; i < problem_rp::nx-1; ++i) {
@@ -620,5 +620,5 @@ AMREX_INLINE void init_1d()
     }
 
     std::cout << "maximum HSE error = " << max_hse_error << std::endl;
-  
+
 }
