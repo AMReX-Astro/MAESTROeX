@@ -63,11 +63,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
     }
 
     if (dt < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);  // NOLINT(readability-suspicious-call-argument)
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt * 0.5,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt * 0.5, t_in);
     }
 
     // initialize diagnosis variables

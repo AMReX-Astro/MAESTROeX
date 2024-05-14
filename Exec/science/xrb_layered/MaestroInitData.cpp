@@ -39,7 +39,7 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
     const auto dx = geom[lev].CellSizeArray();
 
     if (perturb_model) {
-        
+      
         // Generate random seed (or get from input), and RNG
         int seed = 0;
         if (problem_rp::pert_seed != -1) {
@@ -94,4 +94,15 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
             }
         }
     }
+}
+
+void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,  // NOLINT(readability-convert-member-functions-to-static)
+                                MultiFab& vel)  {
+
+    amrex::ignore_unused(lev);
+    amrex::ignore_unused(time);
+    amrex::ignore_unused(scal);
+    amrex::ignore_unused(vel);
+
+    Abort("InitLevelDataSphr not implemented.");
 }

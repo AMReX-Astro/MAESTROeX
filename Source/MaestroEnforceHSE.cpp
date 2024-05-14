@@ -3,7 +3,7 @@
 using namespace amrex;
 
 void Maestro::EnforceHSE(const BaseState<Real>& rho0_s, BaseState<Real>& p0_s,
-                         const BaseState<Real>& grav_cell_s) {
+                         const BaseState<Real>& grav_cell_s) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::EnforceHSE()", EnforceHSE);
 

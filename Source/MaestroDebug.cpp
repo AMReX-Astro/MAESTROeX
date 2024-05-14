@@ -3,7 +3,7 @@
 
 using namespace amrex;
 
-void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) {
+void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
 
@@ -23,7 +23,7 @@ void Maestro::PrintBase(const RealVector& base, const bool is_cell_centered) {
 }
 
 void Maestro::PrintBase(const BaseState<Real>& base_s,
-                        const bool is_cell_centered) {
+                        const bool is_cell_centered) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PrintBase()", PrintBase);
 

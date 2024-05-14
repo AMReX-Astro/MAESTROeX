@@ -3,7 +3,7 @@
 using namespace amrex;
 
 void Maestro::MakeGravCell(BaseState<Real>& grav_cell,
-                           const BaseState<Real>& rho0_s) {
+                           const BaseState<Real>& rho0_s) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravCell()", MakeGravCell);
 
@@ -205,7 +205,7 @@ void Maestro::MakeGravCell(BaseState<Real>& grav_cell,
 }
 
 void Maestro::MakeGravEdge(BaseState<Real>& grav_edge_state,
-                           const BaseState<Real>& rho0_state) {
+                           const BaseState<Real>& rho0_state) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeGravEdge()", MakeGravEdge);
 
