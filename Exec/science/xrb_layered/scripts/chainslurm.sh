@@ -31,9 +31,9 @@ fi
 firstcount=1
 
 if [ $oldjob -eq "-1" ]
-then 
+then
     echo chaining $numjobs jobs
-    
+
     echo starting job 1 with no dependency
     aout=`sbatch --parsable ${script}`
     echo "   " jobid: $aout
