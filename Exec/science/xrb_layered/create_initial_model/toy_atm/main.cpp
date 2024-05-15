@@ -42,7 +42,7 @@ main (int   argc,
       // std::cout << "inputs file is " << inputs_name << std::endl;
     }
   } else {
-      std::cout << "No input file. Using defaults" << inputs_name << std::endl; 
+      std::cout << "No input file. Using defaults" << inputs_name << std::endl;
   }
 
 

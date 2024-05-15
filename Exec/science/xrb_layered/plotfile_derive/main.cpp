@@ -94,7 +94,7 @@ void main_main()
     varnames = pf.varNames();
 
     // find variable indices
-    // We want: 
+    // We want:
     // density, temperature, pressure, species
     // vertical velocity, temperature perturbation
     // we will assume here that the species are contiguous, so we will find
@@ -476,10 +476,10 @@ void main_main()
                 // Fluxes
 
                 // Convective heat flux : "Fconv_dT"
-                ga(i,j,k,4) = rho * cp * vely * delT; 
+                ga(i,j,k,4) = rho * cp * vely * delT;
 
                 // Alternate version that should be equivalent : "Fconv_T"
-                // because <vdT> = <v(T-T0)> = <vT> - <v>T0 = <vT> (the vertical velocity averages to zero) 
+                // because <vdT> = <v(T-T0)> = <vT> - <v>T0 = <vT> (the vertical velocity averages to zero)
                 ga(i,j,k,5) = rho * cp * vely * temp;
 
                 // MLT heat flux in the efficient regime : "Fconv_mlt"
