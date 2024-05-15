@@ -957,11 +957,12 @@ class Maestro : public amrex::AmrCore {
                            int comp, int bccomp, const bool is_vel,
                            const bool is_conservative) const;
 #else
+    static
     void MakeDivU(const amrex::Box& bx, amrex::Array4<amrex::Real> const divu,
                   amrex::Array4<amrex::Real> const umac,
                   amrex::Array4<amrex::Real> const vmac,
                   amrex::Array4<amrex::Real> const wmac,
-                  const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
+                  const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
 
     void MakeEdgeScalPredictor(const amrex::MFIter& mfi,
                                amrex::Array4<amrex::Real> const slx,

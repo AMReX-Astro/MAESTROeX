@@ -794,12 +794,11 @@ void Maestro::MakeRhoHFlux(
                         rhoh0mac_edgez.array(mfi);
 
                     ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        if (have_h) {
-                            // enthalpy edge state is h
-                            // this is not supported on irregular-spaced base state
-                        } else if (have_hprime) {
-                            // enthalpy edge state is h'
-                            // this is not supported on irregular-spaced base state
+                        if (have_h || have_rhoh) {
+                            // have_h: enthalpy edge state is h
+                            //         this is not supported on irregular-spaced base state
+                            // have_hprime: enthalpy edge state is h'
+                            //              this is not supported on irregular-spaced base state
                         } else if (have_rhoh) {
                             sfluxx(i, j, k, RhoH) =
                                 umacx(i, j, k) * sedgex(i, j, k, RhoH);
@@ -817,12 +816,11 @@ void Maestro::MakeRhoHFlux(
                     });
 
                     ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        if (have_h) {
-                            // enthalpy edge state is h
-                            // this is not supported on irregular-spaced base state
-                        } else if (have_hprime) {
-                            // enthalpy edge state is h'
-                            // this is not supported on irregular-spaced base state
+                        if (have_h || have_hprime) {
+                            // have_h: enthalpy edge state is h
+                            //         this is not supported on irregular-spaced base state
+                            // have_hprime: enthalpy edge state is h'
+                            //              this is not supported on irregular-spaced base state
                         } else if (have_rhoh) {
                             sfluxy(i, j, k, RhoH) =
                                 vmac(i, j, k) * sedgey(i, j, k, RhoH);
@@ -839,12 +837,11 @@ void Maestro::MakeRhoHFlux(
                     });
 
                     ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                        if (have_h) {
-                            // enthalpy edge state is h
-                            // this is not supported on irregular-spaced base state
-                        } else if (have_hprime) {
-                            // enthalpy edge state is h'
-                            // this is not supported on irregular-spaced base state
+                        if (have_h || have_hprime) {
+                            // have_h: enthalpy edge state is h
+                            //         this is not supported on irregular-spaced base state
+                            // have_hprime: enthalpy edge state is h'
+                            //              this is not supported on irregular-spaced base state
                         } else if (have_rhoh) {
                             sfluxz(i, j, k, RhoH) =
                                 wmac(i, j, k) * sedgez(i, j, k, RhoH);
