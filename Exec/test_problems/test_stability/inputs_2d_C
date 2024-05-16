@@ -49,7 +49,7 @@ maestro.hi_bc = 4 4
 geometry.is_periodic =  0 0
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception

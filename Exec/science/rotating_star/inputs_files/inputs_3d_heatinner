@@ -19,7 +19,7 @@ maestro.hi_bc = 2 2 2
 geometry.is_periodic =  0 0 0
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
@@ -105,9 +105,6 @@ maestro.small_dens = 1.e0
 maestro.small_temp = 1.e5
 maestro.burning_cutoff_density_hi = 5.e6
 maestro.heating_cutoff_density_lo = 5.e5  # apply heating in the inner part of the star only
-
-#SDC 
-maestro.sdc_couple_velocity = true
 
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
