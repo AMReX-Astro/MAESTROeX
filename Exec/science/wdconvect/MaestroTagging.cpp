@@ -4,23 +4,36 @@
 using namespace amrex;
 using namespace problem_rp;
 
-void Maestro::RetagArray(const Box& bx, const int lev) {
+void Maestro::RetagArray(const Box& bx, const int lev) {  // NOLINT(readability-convert-member-functions-to-static)
+
+    amrex::ignore_unused(bx);
+    amrex::ignore_unused(lev);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::RetagArray()", RetagArray);
 
     Abort("Error: RetagArray should not be called for spherical");
 }
 
-void Maestro::TagBoxes(TagBoxArray& tags, const MFIter& mfi, const int lev,
+void Maestro::TagBoxes(TagBoxArray& tags, const MFIter& mfi, const int lev,  // NOLINT(readability-convert-member-functions-to-static)
                        const Real time) {
+
+    amrex::ignore_unused(tags);
+    amrex::ignore_unused(mfi);
+    amrex::ignore_unused(lev);
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagBoxes()", TagBoxes);
 
     Abort("Error: TagBoxes should not be called for spherical");
 }
 
-void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
+void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,  // NOLINT(readability-convert-member-functions-to-static)
                          const MFIter& mfi, const int lev, const Real time) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::StateError()", StateError);
 

@@ -56,6 +56,14 @@ endif
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
+ifeq ($(USE_GPU),TRUE)
+  # We don't currently support host-side OpenMP being enabled
+  # when using GPUs. Throw an error to prevent this case.
+  ifeq ($(USE_OMP),TRUE)
+    $(error OpenMP is not supported by MAESTROeX when building with GPU support)
+  endif
+endif
+
 MAESTROEX_AUTO_SOURCE_DIR := $(TmpBuildDir)/maestroex_sources/$(optionsSuffix).EXE
 
 all: $(executable)

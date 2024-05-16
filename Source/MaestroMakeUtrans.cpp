@@ -461,7 +461,7 @@ void Maestro::MakeUtrans(
 
                     // impose hi side bc's
                 } else if (j == domhi[1] + 1) {
-                    switch (bchi) {
+                    switch (bchi) {  // NOLINT(bugprone-switch-missing-default-case)
                         case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j + 1, k, 1);
                             vry = utilde_arr(i, j + 1, k, 1);
