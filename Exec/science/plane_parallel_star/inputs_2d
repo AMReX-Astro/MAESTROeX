@@ -98,8 +98,6 @@ maestro.eps_hg_bottom      = 1.e-4
 
 # BURNING 
 maestro.do_burning = true
-maestro.burning_cutoff_density = 2.5e7
-maestro.burning_invert_cutoff_density = true
 
 maestro.grav_const = -3.2e-1
 

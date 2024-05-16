@@ -65,7 +65,6 @@ maestro.evolve_base_state     = true
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 1
-maestro.do_reflux             = 0
 
 maestro.use_etarho = true
 maestro.do_sponge = 0

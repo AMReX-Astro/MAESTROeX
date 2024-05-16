@@ -108,9 +108,6 @@ maestro.do_heating = true
 maestro.plot_Hext = true
 maestro.heating_cutoff_density_lo = 5.e6
 
-#SDC 
-maestro.sdc_couple_velocity = true
-
 # ROTATION
 # For the 18M star, I think the Keplerian rot freq is about 1e-5 (if assume its radius is about that of the Sun?)
 maestro.rotational_frequency = 1.e-3
