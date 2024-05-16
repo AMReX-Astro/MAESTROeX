@@ -61,7 +61,7 @@ def doit(maestroex_dir):
 
 if __name__ == "__main__":
 
-    # we need the top-level Castro directory
+    # we need the top-level MAESTROeX directory
 
     p = argparse.ArgumentParser()
     p.add_argument("maestroex_dir", type=str, nargs=1,
