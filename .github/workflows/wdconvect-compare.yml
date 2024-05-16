@@ -1,13 +1,11 @@
-name: reacting_bubble
+name: wdconvect
 
 on: [pull_request]
 jobs:
-  reacting_bubble-2d:
-    runs-on: ubuntu-latest
+  wdconvect-3d:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Get submodules
         run: |
@@ -23,15 +21,17 @@ jobs:
           sudo apt-get update -y -qq
           sudo apt-get -qq -y install curl g++>=9.3.0
 
-      - name: Compile reacting_bubble
+      - name: Compile wdconvect
         run: |
-          cd Exec/test_problems/reacting_bubble
-          make DIM=2 USE_MPI=FALSE -j 4
+          cd Exec/science/wdconvect
+          make USE_OMP=FALSE USE_MPI=FALSE -j 4
 
-      - name: Run reacting_bubble
+      - name: Run wdconvect
         run: |
-          cd Exec/test_problems/reacting_bubble
-          ./Maestro2d.gnu.ex inputs_2d_regression maestro.max_step=10
+          cd Exec/science/wdconvect
+          cp model_files/kepler_new_6.25e8.hybrid.hse.320 .
+          cp inputs_files/inputs_3d_regression.2levels .
+          ./Maestro3d.gnu.ex inputs_3d_regression.2levels
 
       - name: Build the fextrema tool
         run: |
@@ -40,7 +40,7 @@ jobs:
 
       - name: Check the extrema
         run: |
-          cd Exec/test_problems/reacting_bubble
-          ../../../external/amrex/Tools/Plotfile/fextrema.gnu.ex reacting_bubble_2d_plt0000010 > fextrema.out
-          diff fextrema.out ci-benchmarks/reacting_bubble_2d_extrema.out
+          cd Exec/science/wdconvect
+          ../../../external/amrex/Tools/Plotfile/fextrema.gnu.ex wdconvect_plt0000003 > fextrema.out
+          diff fextrema.out ci-benchmarks/wdconvect_3d_extrema.out
 

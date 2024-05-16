@@ -19,7 +19,7 @@ maestro.hi_bc = 0 2 2
 geometry.is_periodic =  1 0 0
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
@@ -98,8 +98,6 @@ maestro.eps_hg_bottom      = 1.e-4
 
 # BURNING 
 maestro.do_burning = true
-maestro.burning_cutoff_density = 2.5e7
-maestro.burning_invert_cutoff_density = true
 
 maestro.grav_const = -3.2e-1
 
