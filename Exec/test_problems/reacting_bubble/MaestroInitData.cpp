@@ -14,6 +14,9 @@ void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
 // initializes data on a specific level
 void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
                             const Array4<Real> scal, const Array4<Real> vel) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelData()", InitLevelData);
 
@@ -91,6 +94,9 @@ void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
 
 void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                                 MultiFab& vel) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
 
