@@ -23,7 +23,7 @@ maestro.hi_bc = 0 4 0
 geometry.is_periodic =  1 0 1
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
@@ -65,7 +65,6 @@ maestro.evolve_base_state     = true
 maestro.do_initial_projection = false
 maestro.init_divu_iter        = 0
 maestro.init_iter             = 1
-maestro.do_reflux             = 0
 
 maestro.use_etarho = true
 maestro.do_sponge = 0
