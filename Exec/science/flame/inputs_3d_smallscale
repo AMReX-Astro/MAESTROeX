@@ -30,7 +30,6 @@ amr.ref_ratio          = 2 2 2 2 2 2 # refinement ratio
 amr.blocking_factor    = 8       # block factor in grid generation
 amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > ngrids
 
-# TAGGING
 
 # TIME STEPPING
 maestro.max_step  = 200
