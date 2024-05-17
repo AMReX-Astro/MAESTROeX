@@ -184,7 +184,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                             if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                                 // is it one of the 8 zones surrounding the center?
+#ifdef _OPENMP
                                 #pragma omp critical
+#endif
                                 if (std::abs(x - center[0]) < dx[0] &&
                                     std::abs(y - center[1]) < dx[1] &&
                                     std::abs(z - center[2]) < dx[2]) {
@@ -213,7 +215,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                     amrex::Math::powi<2>(u(i, j, k, 2) + 0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1))));
 
                                 // max T, location, and velocity at that location (including w0)
+#ifdef _OPENMP
                                 #pragma omp critical
+#endif
                                 if (scal(i, j, k, Temp) > T_max_local) {
                                     T_max_local = scal(i, j, k, Temp);
                                     coord_Tmax_local[0] = x;
@@ -228,7 +232,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                 }
 
                                 // max enuc
+#ifdef _OPENMP
                                 #pragma omp critical
+#endif
                                 if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) > enuc_max_local) {
                                     enuc_max_local = rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho);
                                     coord_enucmax_local[0] = x;
@@ -255,7 +261,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
 #endif
 
                                 // max T, location, and velocity at that location (including w0)
+#ifdef _OPENMP
                                 #pragma omp critical
+#endif
                                 if (scal(i, j, k, Temp) > T_max_local) {
                                     T_max_local = scal(i, j, k, Temp);
                                     coord_Tmax_local[0] = x;
@@ -275,7 +283,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                 }
 
                                 // max enuc
+#ifdef _OPENMP
                                 #pragma omp critical
+#endif
                                 if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) > enuc_max_local) {
                                     enuc_max_local = rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho);
                                     coord_enucmax_local[0] = x;
