@@ -157,7 +157,7 @@ void Maestro::InitLevelData(const int lev, [[maybe_unused]] const Real time, con
     }
 }
 
-void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
+void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,  // NOLINT(readability-convert-member-functions-to-static)
                                 MultiFab& vel) {
 
     amrex::ignore_unused(lev);
