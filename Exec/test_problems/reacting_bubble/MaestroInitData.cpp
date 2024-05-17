@@ -288,6 +288,8 @@ void Perturb(const Real p0_init, const Real* s0, Real* perturbations,
              const Real x, const Real y, const Real z) {
     Real t0 = s0[Temp];
 
+    amrex::ignore_unused(z);
+
 #if (AMREX_SPACEDIM == 2)
 
     Real x1 = 5.0e7;
