@@ -190,7 +190,8 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
 
                 if (std::abs(sumX - 1.0) > reaction_sum_tol) {
 #ifndef AMREX_USE_GPU
-                    amrex::Print() << "ERROR: abundances do not sum to 1";
+                    amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green
+                                   << "ERROR: abundances do not sum to 1" << amrex::ResetDisplay;
 #endif
                     burn_failed = 1.0_rt;
                 }
