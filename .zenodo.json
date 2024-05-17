@@ -2,8 +2,21 @@
     "creators": [
         {
             "affiliation": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
+            "name": "Almgren, Ann",
+            "orcid": "0000-0003-2103-312X"
+        },
+	{
+	    "affiliation": "Department of Physics and Astronomy, Stony Brook University",
+	    "name": "Boyd, Brendan",
+	    "orcid": "0000-0002-5419-9751"
+	},
+        {
             "name": "Fan, Doreen",
             "orcid": "0000-0002-3246-4315"
+        },
+        {
+            "name": "Harpole, Alice",
+            "orcid": "0000-0002-1530-781X"
         },
         {
             "affiliation": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
@@ -11,19 +24,8 @@
             "orcid": "0000-0003-1791-0265"
         },
         {
-            "affiliation": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
-            "name": "Almgren, Ann",
-            "orcid": "0000-0003-2103-312X"
-        },
-        {
-            "affiliation": "Center for Computational Sciences and Engineering, Lawrence Berkeley National Laboratory",
             "name": "Willcox, Donald",
             "orcid": "0000-0003-2300-5165"
-        },
-        {
-            "affiliation": "Department of Physics and Astronomy, Stony Brook University",
-            "name": "Harpole, Alice",
-            "orcid": "0000-0002-1530-781X"
         },
         {
             "affiliation": "Department of Physics and Astronomy, Stony Brook University",
