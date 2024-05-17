@@ -10,7 +10,8 @@ void Maestro::Evolve() {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::Evolve()", Evolve);
 
-    Print() << "Calling Evolve()" << std::endl;
+    amrex::Print() << "\n";
+    amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green << "Beginning main evolution" << amrex::ResetDisplay << std::endl;
 
     // check to make sure spherical is only used for 3d
     if (spherical && AMREX_SPACEDIM != 3) {
