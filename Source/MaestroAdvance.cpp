@@ -109,9 +109,9 @@ void Maestro::AdvanceTimeStep(bool is_initIter) {
 
     bool is_predictor;
 
-    Print() << "\nTimestep " << istep << " starts with TIME = " << t_old
-            << " DT = " << dt << std::endl
-            << std::endl;
+    amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green
+                   << "\nTimestep " << istep << " starts with TIME = " << t_old
+                   << " DT = " << dt << amrex::ResetDisplay << std::endl << std::endl;
 
     if (maestro_verbose > 0) {
         Print() << "Cell Count:" << std::endl;
