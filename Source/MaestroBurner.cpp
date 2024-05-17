@@ -117,6 +117,7 @@ void Maestro::Burner(const Vector<MultiFab>& s_in, Vector<MultiFab>& s_out,
                 // fraction is above the cutoff.
                 if ((rho > burning_cutoff_density_lo &&
                      rho < burning_cutoff_density_hi) &&
+                    (T_in > burning_cutoff_temperature_lo) &&
                     (ispec_threshold < 0 ||
                      (ispec_threshold > 0 && x_test > burner_threshold_cutoff))) {
 
