@@ -281,7 +281,7 @@ namespace: ``maestro``
 
 **hydrodynamics**
 
-.. index:: maestro.do_sponge, maestro.sponge_kappa, maestro.sponge_center_density, maestro.sponge_start_factor, maestro.plot_sponge_fdamp, maestro.anelastic_cutoff_density, maestro.base_cutoff_density, maestro.burning_cutoff_density_lo, maestro.burning_cutoff_density_hi, maestro.heating_cutoff_density_lo, maestro.heating_cutoff_density_hi, maestro.buoyancy_cutoff_factor, maestro.dpdt_factor, maestro.do_planar_invsq_grav, maestro.planar_invsq_mass, maestro.evolve_base_state, maestro.use_exact_base_state, maestro.fix_base_state, maestro.average_base_state, maestro.do_smallscale, maestro.do_eos_h_above_cutoff, maestro.enthalpy_pred_type, maestro.species_pred_type, maestro.use_delta_gamma1_term, maestro.use_etarho, maestro.add_pb, maestro.slope_order, maestro.grav_const, maestro.ppm_type, maestro.bds_type, maestro.ppm_trace_forces, maestro.beta0_type, maestro.use_linear_grav_in_beta0, maestro.rotational_frequency, maestro.co_latitude, maestro.rotation_radius, maestro.use_centrifugal, maestro.mach_max_abort, maestro.drive_initial_convection, maestro.stop_initial_convection, maestro.restart_with_vel_field, maestro.use_alt_energy_fix, maestro.use_omegadot_terms_in_S
+.. index:: maestro.do_sponge, maestro.sponge_kappa, maestro.sponge_center_density, maestro.sponge_start_factor, maestro.plot_sponge_fdamp, maestro.anelastic_cutoff_density, maestro.base_cutoff_density, maestro.burning_cutoff_temperature_lo, maestro.burning_cutoff_density_lo, maestro.burning_cutoff_density_hi, maestro.heating_cutoff_density_lo, maestro.heating_cutoff_density_hi, maestro.buoyancy_cutoff_factor, maestro.dpdt_factor, maestro.do_planar_invsq_grav, maestro.planar_invsq_mass, maestro.evolve_base_state, maestro.use_exact_base_state, maestro.fix_base_state, maestro.average_base_state, maestro.do_smallscale, maestro.do_eos_h_above_cutoff, maestro.enthalpy_pred_type, maestro.species_pred_type, maestro.use_delta_gamma1_term, maestro.use_etarho, maestro.add_pb, maestro.slope_order, maestro.grav_const, maestro.ppm_type, maestro.bds_type, maestro.ppm_trace_forces, maestro.beta0_type, maestro.use_linear_grav_in_beta0, maestro.rotational_frequency, maestro.co_latitude, maestro.rotation_radius, maestro.use_centrifugal, maestro.mach_max_abort, maestro.drive_initial_convection, maestro.stop_initial_convection, maestro.restart_with_vel_field, maestro.use_alt_energy_fix, maestro.use_omegadot_terms_in_S
 
 
 +----------------------------------------+---------------------------------------------------------+---------------+
@@ -308,6 +308,8 @@ namespace: ``maestro``
 | ``base_cutoff_density``                | The density below which we keep the initial model       | -1.0          |
 |                                        | constant. Refer to Section \ref{Sec:Base Cutoff         |               |
 |                                        | Density}                                                |               |
++----------------------------------------+---------------------------------------------------------+---------------+
+| ``burning_cutoff_temperature_lo``      | The temperature below which we disable burning          | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
 | ``burning_cutoff_density_lo``          | The density below which we disable burning              | -1.0          |
 +----------------------------------------+---------------------------------------------------------+---------------+
