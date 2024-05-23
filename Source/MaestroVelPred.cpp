@@ -326,8 +326,8 @@ void Maestro::VelPredInterface(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    int bclo = phys_bc_lo[0];
-    int bchi = phys_bc_hi[0];
+    int bclo = phys_bc_lo(0);
+    int bchi = phys_bc_hi(0);
 
     ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -434,8 +434,8 @@ void Maestro::VelPredInterface(
     });
 
     // y-direction
-    bclo = phys_bc[1];
-    bchi = phys_bc[AMREX_SPACEDIM + 1];
+    bclo = phys_bc.lo(1);
+    bchi = phys_bc.hi(1);
 
     ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -574,8 +574,8 @@ void Maestro::VelPredVelocities(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    int bclo = phys_bc[0];
-    int bchi = phys_bc[AMREX_SPACEDIM];
+    int bclo = phys_bc.lo(0);
+    int bchi = phys_bc.hi(0);
 
     ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
@@ -649,8 +649,8 @@ void Maestro::VelPredVelocities(
     });
 
     // y-direction
-    bclo = phys_bc[1];
-    bchi = phys_bc[AMREX_SPACEDIM + 1];
+    bclo = phys_bc.lo(1);
+    bchi = phys_bc.hi(1);
 
     ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         // use the traced force if ppm_trace_forces = 1
@@ -773,8 +773,8 @@ void Maestro::VelPredInterface(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    int bclo = phys_bc[0];
-    int bchi = phys_bc[AMREX_SPACEDIM];
+    int bclo = phys_bc.lo(0);
+    int bchi = phys_bc.hi(0);
 
     ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -890,8 +890,8 @@ void Maestro::VelPredInterface(
     });
 
     // y-direction
-    bclo = phys_bc.lo[1];
-    bchi = phys_bc.hi[1];
+    bclo = phys_bc.lo(1);
+    bchi = phys_bc.hi(1);
 
     ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -1009,8 +1009,8 @@ void Maestro::VelPredInterface(
     });
 
     // z-direction
-    bclo = phys_bc.lo[2];
-    bchi = phys_bc.hi[2];
+    bclo = phys_bc.lo(2);
+    bchi = phys_bc.hi(2);
 
     ParallelFor(mzbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {

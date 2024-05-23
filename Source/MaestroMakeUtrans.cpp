@@ -413,7 +413,7 @@ void Maestro::MakeUtrans(
             }
 
             // create vtrans
-            int bclo = phys_bc.lo(1)
+            int bclo = phys_bc.lo(1);
             int bchi = phys_bc.hi(1);
 
             ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
