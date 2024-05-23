@@ -326,8 +326,8 @@ void Maestro::VelPredInterface(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    int bclo = phys_bc[0];
-    int bchi = phys_bc[AMREX_SPACEDIM];
+    int bclo = phys_bc_lo[0];
+    int bchi = phys_bc_hi[0];
 
     ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -890,8 +890,8 @@ void Maestro::VelPredInterface(
     });
 
     // y-direction
-    bclo = phys_bc[1];
-    bchi = phys_bc[AMREX_SPACEDIM + 1];
+    bclo = phys_bc.lo[1];
+    bchi = phys_bc.hi[1];
 
     ParallelFor(mybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -1009,8 +1009,8 @@ void Maestro::VelPredInterface(
     });
 
     // z-direction
-    bclo = phys_bc[2];
-    bchi = phys_bc[AMREX_SPACEDIM + 2];
+    bclo = phys_bc.lo[2];
+    bchi = phys_bc.hi[2];
 
     ParallelFor(mzbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
@@ -1155,10 +1155,8 @@ void Maestro::VelPredTransverse(
     const auto domhi = domainBox.hiVect3d();
     const auto rel_eps_local = rel_eps;
 
-    GpuArray<int, AMREX_SPACEDIM * 2> physbc;
-    for (int n = 0; n < AMREX_SPACEDIM * 2; ++n) {
-        physbc[n] = phys_bc[n];
-    }
+    const int* AMREX_RESTRICT physbc_lo = phys_bc.lo();
+    const int* AMREX_RESTRICT physbc_hi= phys_bc.hi();
 
     // uimhyz, 1, 2
     Box imhbox = amrex::grow(mfi.tilebox(), 0, 1);
@@ -1176,7 +1174,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (j == domlo[1]) {
-            switch (physbc[1]) {
+            switch (physbc_lo[1]) {
             case amrex::PhysBCType::inflow:
                 ulyz = utilde(i, j - 1, k, 0);
                 uryz = utilde(i, j - 1, k, 0);
@@ -1200,7 +1198,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 1]) {
+            switch (physbc_hi[1]) {
             case amrex::PhysBCType::inflow:
                 ulyz = utilde(i, j, k, 0);
                 uryz = utilde(i, j, k, 0);
@@ -1246,7 +1244,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (k == domlo[2]) {
-            switch (physbc[2]) {
+            switch (physbc_lo[2]) {
             case amrex::PhysBCType::inflow:
                 ulzy = utilde(i, j, k - 1, 0);
                 urzy = utilde(i, j, k - 1, 0);
@@ -1270,7 +1268,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (k == domhi[2] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 2]) {
+            switch (physbc_hi[2]) {
             case amrex::PhysBCType::inflow:
                 ulzy = utilde(i, j, k, 0);
                 urzy = utilde(i, j, k, 0);
@@ -1316,7 +1314,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (i == domlo[0]) {
-            switch (physbc[0]) {
+            switch (physbc_lo[0]) {
             case amrex::PhysBCType::inflow:
                 vlxz = utilde(i - 1, j, k, 1);
                 vrxz = utilde(i - 1, j, k, 1);
@@ -1340,7 +1338,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
-            switch (physbc[AMREX_SPACEDIM]) {
+            switch (physbc_hi[0]) {
             case amrex::PhysBCType::inflow:
                 vlxz = utilde(i, j, k, 1);
                 vrxz = utilde(i, j, k, 1);
@@ -1386,7 +1384,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (k == domlo[2]) {
-            switch (physbc[2]) {
+            switch (physbc_lo[2]) {
             case amrex::PhysBCType::inflow:
                 vlzx = utilde(i, j, k - 1, 1);
                 vrzx = utilde(i, j, k - 1, 1);
@@ -1410,7 +1408,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (k == domhi[2] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 2]) {
+            switch (physbc_hi[2]) {
             case amrex::PhysBCType::inflow:
                 vlzx = utilde(i, j, k, 1);
                 vrzx = utilde(i, j, k, 1);
@@ -1456,7 +1454,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (i == domlo[0]) {
-            switch (physbc[0]) {
+            switch (physbc_lo[0]) {
             case amrex::PhysBCType::inflow:
                 wlxy = utilde(i - 1, j, k, 2);
                 wrxy = utilde(i - 1, j, k, 2);
@@ -1480,7 +1478,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
-            switch (physbc[AMREX_SPACEDIM]) {
+            switch (physbc_hi[0]) {
             case amrex::PhysBCType::inflow:
                 wlxy = utilde(i, j, k, 2);
                 wrxy = utilde(i, j, k, 2);
@@ -1526,7 +1524,7 @@ void Maestro::VelPredTransverse(
 
         // impose lo side bc's
         if (j == domlo[1]) {
-            switch (physbc[1]) {
+            switch (physbc_lo[1]) {
             case amrex::PhysBCType::inflow:
                     wlyx = utilde(i, j - 1, k, 2);
                     wryx = utilde(i, j - 1, k, 2);
@@ -1550,7 +1548,7 @@ void Maestro::VelPredTransverse(
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 1]) {
+            switch (physbc_hi[1]) {
             case amrex::PhysBCType::inflow:
                 wlyx = utilde(i, j, k, 2);
                 wryx = utilde(i, j, k, 2);
@@ -1622,10 +1620,8 @@ void Maestro::VelPredVelocities(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    GpuArray<int, AMREX_SPACEDIM * 2> physbc;
-    for (int n = 0; n < AMREX_SPACEDIM * 2; ++n) {
-        physbc[n] = phys_bc[n];
-    }
+    const int* AMREX_RESTRICT physbc_lo = phys_bc.lo();
+    const int* AMREX_RESTRICT physbc_hi= phys_bc.hi();
 
     // x-direction
     ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
@@ -1669,7 +1665,7 @@ void Maestro::VelPredVelocities(
 
         // impose lo side bc's
         if (i == domlo[0]) {
-            switch (physbc[0]) {
+            switch (physbc_lo[0]) {
             case amrex::PhysBCType::inflow:
                 umac(i, j, k) = utilde(i - 1, j, k, 0);
                 break;
@@ -1691,7 +1687,7 @@ void Maestro::VelPredVelocities(
 
             // impose hi side bc's
         } else if (i == domhi[0] + 1) {
-            switch (physbc[AMREX_SPACEDIM]) {
+            switch (physbc_hi[0]) {
             case amrex::PhysBCType::inflow:
                 umac(i, j, k) = utilde(i, j, k, 0);
                 break;
@@ -1755,7 +1751,7 @@ void Maestro::VelPredVelocities(
 
         // impose lo side bc's
         if (j == domlo[1]) {
-            switch (physbc[1]) {
+            switch (physbc_lo[1]) {
             case amrex::PhysBCType::inflow:
                 vmac(i, j, k) = utilde(i, j - 1, k, 1);
                 break;
@@ -1777,7 +1773,7 @@ void Maestro::VelPredVelocities(
 
             // impose hi side bc's
         } else if (j == domhi[1] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 1]) {
+            switch (physbc_hi[1]) {
             case amrex::PhysBCType::inflow:
                 vmac(i, j, k) = utilde(i, j, k, 1);
                 break;
@@ -1851,7 +1847,7 @@ void Maestro::VelPredVelocities(
 
         // impose hi side bc's
         if (k == domlo[2]) {
-            switch (physbc[2]) {
+            switch (physbc_lo[2]) {
             case amrex::PhysBCType::inflow:
                 wmac(i, j, k) = utilde(i, j, k - 1, 2);
                 break;
@@ -1873,7 +1869,7 @@ void Maestro::VelPredVelocities(
 
             // impose lo side bc's
         } else if (k == domhi[2] + 1) {
-            switch (physbc[AMREX_SPACEDIM + 2]) {
+            switch (physbc_hi[2]) {
             case amrex::PhysBCType::inflow:
                 wmac(i, j, k) = utilde(i, j, k, 2);
                 break;
