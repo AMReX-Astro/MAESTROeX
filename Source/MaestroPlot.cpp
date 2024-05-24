@@ -1682,43 +1682,41 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
             Array4<const Real> const u = vel[lev].array(mfi);
             Array4<Real> const vort = vorticity[lev].array(mfi);
 
-            const int* AMREX_RESTRICT physbc_lo = phys_bc.lo();
-            const int* AMREX_RESTRICT physbc_hi= phys_bc.hi();
 
 #if (AMREX_SPACEDIM == 2)
+            bool fix_lo_x = (phys_bc.lo(0) == amrex::PhysBCType::inflow || phys_bc.lo(0) == amrex::PhysBCType::slipwall ||
+                                 phys_bc.lo(0) == amrex::PhysBCType::noslipwall);
+            bool fix_hi_x = (phys_bc.hi(0) == amrex::PhysBCType::inflow || phys_bc.hi(0) == amrex::PhysBCType::slipwall ||
+                             phys_bc.hi(0) == amrex::PhysBCType::noslipwall);
+            bool fix_lo_y = (phys_bc.lo(1) == amrex::PhysBCType::inflow || phys_bc.lo(1) == amrex::PhysBCType::slipwall ||
+                                 phys_bc.lo(1) == amrex::PhysBCType::noslipwall);
+            bool fix_hi_y = (phys_bc.hi(1) == amrex::PhysBCType::inflow || phys_bc.hi(1) == amrex::PhysBCType::slipwall ||
+                             phys_bc.hi(1) == amrex::PhysBCType::noslipwall);
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
                 Real uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
 
-                if (i == ilo && (physbc_lo[0] == amrex::PhysBCType::inflow || physbc_lo[0] == amrex::PhysBCType::slipwall ||
-                                 physbc_lo[0] == amrex::PhysBCType::noslipwall)) {
+                if (i == ilo && fix_lo_x) {
                     vx = (u(i + 1, j, k, 1) + 3.0 * u(i, j, k, 1) -
                           4.0 * u(i - 1, j, k, 1)) /
                          hx;
                     uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
 
-                } else if (i == ihi + 1 &&
-                           (physbc_hi[0] == amrex::PhysBCType::inflow ||
-                            physbc_hi[0] == amrex::PhysBCType::slipwall ||
-                            physbc_hi[0] == amrex::PhysBCType::noslipwall)) {
+                } else if (i == ihi + 1 && fix_hi_x) {
                     vx = -(u(i - 1, j, k, 1) + 3.0 * u(i, j, k, 1) -
                            4.0 * u(i + 1, j, k, 1)) /
                          hx;
                     uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
                 }
 
-                if (j == jlo && (physbc_lo[1] == amrex::PhysBCType::inflow || physbc_lo[1] == amrex::PhysBCType::slipwall ||
-                                 physbc_lo[1] == amrex::PhysBCType::noslipwall)) {
+                if (j == jlo && fix_lo_y) {
                     vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 0)) / hx;
                     uy = (u(i, j + 1, k, 0) + 3.0 * u(i, j, k, 0) -
                           4.0 * u(i, j - 1, k, 0)) /
                          hy;
 
-                } else if (j == jhi + 1 &&
-                           (physbc_hi[1] == amrex::PhysBCType::inflow ||
-                            physbc_hi[1] == amrex::PhysBCType::slipwall ||
-                            physbc_hi[1] == amrex::PhysBCType::noslipwall)) {
+                } else if (j == jhi + 1 && fix_hi_y) {
                     vx = 0.5 * (u(i + 1, j, k, 1) - u(i - 1, j, k, 1)) / hx;
                     uy = -(u(i, j - 1, k, 0) + 3.0 * u(i, j, k, 0) -
                            4.0 * u(i, j + 1, k, 0)) /
@@ -1728,7 +1726,22 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
                 vort(i, j, k) = vx - uy;
             });
 
-#else
+# else
+            bool fix_lo_x =
+                (phys_bc.lo(0) == amrex::PhysBCType::inflow || phys_bc.lo(0) == amrex::PhysBCType::noslipwall);
+            bool fix_hi_x = (phys_bc.hi(0) == amrex::PhysBCType::inflow ||
+                             phys_bc.hi(0) == amrex::PhysBCType::noslipwall);
+
+            bool fix_lo_y =
+                (phys_bc.lo(1) == amrex::PhysBCType::inflow || phys_bc.lo(1) == amrex::PhysBCType::noslipwall);
+            bool fix_hi_y = (phys_bc.hi(1) == amrex::PhysBCType::inflow ||
+                             phys_bc.hi(1) == amrex::PhysBCType::noslipwall);
+
+            bool fix_lo_z =
+                (phys_bc.lo(2) == amrex::PhysBCType::inflow || phys_bc.lo(2) == amrex::PhysBCType::noslipwall);
+            bool fix_hi_z = (phys_bc.hi(2) == amrex::PhysBCType::inflow ||
+                             phys_bc.hi(2) == amrex::PhysBCType::noslipwall);
+
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real uy = 0.5 * (u(i, j + 1, k, 0) - u(i, j - 1, k, 0)) / hy;
                 Real uz = 0.5 * (u(i, j, k + 1, 0) - u(i, j, k - 1, 0)) / hz;
@@ -1736,21 +1749,6 @@ void Maestro::MakeVorticity(const Vector<MultiFab>& vel,
                 Real vz = 0.5 * (u(i, j, k + 1, 1) - u(i, j, k - 1, 1)) / hz;
                 Real wx = 0.5 * (u(i + 1, j, k, 2) - u(i - 1, j, k, 2)) / hx;
                 Real wy = 0.5 * (u(i, j + 1, k, 2) - u(i, j - 1, k, 2)) / hy;
-
-                bool fix_lo_x =
-                    (physbc_lo[0] == amrex::PhysBCType::inflow || physbc_lo[0] == amrex::PhysBCType::noslipwall);
-                bool fix_hi_x = (physbc_hi[0] == amrex::PhysBCType::inflow ||
-                                 physbc_hi[0] == amrex::PhysBCType::noslipwall);
-
-                bool fix_lo_y =
-                    (physbc_lo[1] == amrex::PhysBCType::inflow || physbc_lo[1] == amrex::PhysBCType::noslipwall);
-                bool fix_hi_y = (physbc_hi[1] == amrex::PhysBCType::inflow ||
-                                 physbc_hi[1] == amrex::PhysBCType::noslipwall);
-
-                bool fix_lo_z =
-                    (physbc_lo[2] == amrex::PhysBCType::inflow || physbc_lo[2] == amrex::PhysBCType::noslipwall);
-                bool fix_hi_z = (physbc_hi[2] == amrex::PhysBCType::inflow ||
-                                 physbc_hi[2] == amrex::PhysBCType::noslipwall);
 
                 // First do all the faces
                 if (fix_lo_x && i == ilo) {
