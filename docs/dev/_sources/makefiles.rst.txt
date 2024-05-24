@@ -277,7 +277,7 @@ track down memory issues, uninitialized variables, NaNs, etc.
    This can be useful with compiler flags that trap floating point
    exceptions (FPEs), but checks on floating point exceptions can also
    be enabled through runtime parameters passed to AMReX’s
-   backtrace functionlity:
+   backtrace functionality:
 
    -  ``amrex.fpe_trap_invalid``: enabling FPE trapping for
       invalid operations (e.g. ``0 * inf``, ``sqrt(-1)``)
