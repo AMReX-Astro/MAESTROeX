@@ -56,6 +56,14 @@ endif
 
 include $(AMREX_HOME)/Tools/GNUMake/Make.defs
 
+ifeq ($(USE_GPU),TRUE)
+  # We don't currently support host-side OpenMP being enabled
+  # when using GPUs. Throw an error to prevent this case.
+  ifeq ($(USE_OMP),TRUE)
+    $(error OpenMP is not supported by MAESTROeX when building with GPU support)
+  endif
+endif
+
 MAESTROEX_AUTO_SOURCE_DIR := $(TmpBuildDir)/maestroex_sources/$(optionsSuffix).EXE
 
 all: $(executable)
@@ -259,6 +267,7 @@ ifdef BUILD_GIT_NAME
 endif
 
 $(objEXETempDir)/AMReX_buildInfo.o: .FORCE
+	@if [ ! -d $(objEXETempDir) ]; then mkdir -p $(objEXETempDir); fi
 	$(AMREX_HOME)/Tools/C_scripts/makebuildinfo_C.py \
           --amrex_home "$(AMREX_HOME)" \
           --COMP "$(COMP)" --COMP_VERSION "$(COMP_VERSION)" \

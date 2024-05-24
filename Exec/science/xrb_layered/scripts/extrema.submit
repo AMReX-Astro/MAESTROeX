@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH --account=m3018
+#SBATCH --output=slurm.extrema.%j.out
+#SBATCH --constraint=cpu
+###SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
+#SBATCH --nodes=1
+
+#SBATCH --qos=regular
+
+###SBATCH --qos=shared
+###SBATCH --ntasks=1
+###SBATCH --mem=1GB
+
+
+###SBATCH --mail-type=end
+###SBATCH --mail-type=all
+###SBATCH --mail-user=simon.guichandut@mail.mcgill.ca
+
+RUN_DIR=$1
+
+PLOT_DIR=PLOTS
+PLOT_BASENAME="xrb_0"
+
+VARS="tfromp MachNumber Hnuc"
+
+echo $RUN_DIR
+
+fextrema=$AMREX_HOME/Tools/Plotfile/fextrema.gnu.x86-milan.ex
+$fextrema -v "$VARS" $RUN_DIR/$PLOT_DIR/$PLOT_BASENAME* > $RUN_DIR/"extrema.txt"
+
+echo "done"

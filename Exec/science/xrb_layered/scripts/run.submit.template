@@ -1,0 +1,105 @@
+#!/bin/bash
+#SBATCH --account=m3018
+#SBATCH --constraint=cpu
+#SBATCH --output=slurm.run1.%j.out
+
+#SBATCH --nodes=1
+###SBATCH --nodes=2
+###SBATCH --nodes=4
+
+#SBATCH --ntasks-per-node=64
+###SBATCH --ntasks-per-node=128
+
+###SBATCH --ntasks-per-node=100
+###SBATCH --ntasks-per-node=50 
+###SBATCH --ntasks-per-node=20
+
+###SBATCH --time=00:02:00
+###SBATCH --qos=debug
+
+#SBATCH --time=10:00:00
+#SBATCH --qos=regular
+
+#SBATCH --mail-type=end
+#SBATCH --mail-user=simon.guichandut@mail.mcgill.ca
+
+XRB=$MAESTROEX_HOME/Exec/science/xrb_layered
+MAESTRO_EXEC=$XRB/Maestro2d.gnu.x86-milan.MPI.ex
+XRB_SCRATCH=$PSCRATCH/xrb_layered
+
+INPUTS=inputs
+RUN_DIR="RUN1"
+
+cd $XRB_SCRATCH/$RUN_DIR
+mkdir -p PLOTS
+mkdir -p CHECKS
+
+# Look for check file
+# https://amrex-astro.github.io/workflow/nersc-workflow.html
+function find_chk_file {
+    # find_chk_file takes a single argument -- the wildcard pattern
+    # for checkpoint files to look through
+    chk=$1
+
+    # find the latest 2 restart files.  This way if the latest didn't
+    # complete we fall back to the previous one.
+    temp_files=$(find CHECKS -maxdepth 1 -name "${chk}" -print | sort | tail -2)
+    restartFile=""
+    for f in ${temp_files}
+    do
+        # the Header is the last thing written -- check if it's there, otherwise,
+        # fall back to the second-to-last check file written
+        if [ -f ${f}/Header ]; then
+            restartFile="${f}"
+        fi
+    done
+}
+
+# look for 7-digit chk file
+find_chk_file "*chk???????"
+
+# restartString will be empty if no chk files are found -- i.e. new run
+if [ "${restartFile}" = "" ]; then
+    #restartString=""
+
+    rm output.txt # we are starting over
+
+    # In this case, we need to run the first step not in parallel
+    ${MAESTRO_EXEC} ${INPUTS} maestro.max_step=1
+    restartString="maestro.restart_file=CHECKS/chk0000001"
+
+else
+    restartString="maestro.restart_file=${restartFile}"
+fi
+echo $restartString
+
+# Dump checkfile near end of job run time
+(sleep 595m && echo -e "\n    Nearing end of job, dumping checkfile now\n" && touch dump_and_continue)& 
+
+# debug this bash script
+#${MAESTRO_EXEC} ${INPUTS} ${restartString}
+
+# srun command
+# -n is total number of tasks
+# -c is cpus per task
+# in perlmutter: 2*floor(128/#tasks per node)
+# some examples below
+
+# 64 tasks
+# 1 node, -c = 2*floor(128/64) = 4
+#srun -n 64 --cpu-bind=cores -c 4 ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt
+
+# 128 tasks
+# 1 node, -c = 2*floor(128/128) = 2
+##srun -n 64 --cpu-bind=cores -c 2 ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt
+
+# 100 tasks
+# 1 node, -c = 2*floor(128/100) = 2
+#srun -n 100 --cpu-bind=cores -c 2 ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt
+# 2 nodes, -c = 2*floor(128/50) = 4
+#srun -n 50 --cpu-bind=cores -c 4 ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt
+# 5 nodes, -c = 2*floor(128/20) = 12
+#srun -n 20 --cpu-bind=cores -c 12 ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt
+
+# General command
+srun -n $((SLURM_NNODES * SLURM_NTASKS_PER_NODE)) --cpu-bind=cores -c $((256 / SLURM_NTASKS_PER_NODE)) ${MAESTRO_EXEC} ${INPUTS} ${restartString} >> output.txt

@@ -63,11 +63,9 @@ void Maestro::DiagFile(const int step, const Real t_in,
     }
 
     if (dt < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);  // NOLINT(readability-suspicious-call-argument)
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt * 0.5,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt * 0.5, t_in);
     }
 
     // initialize diagnosis variables
@@ -180,122 +178,92 @@ void Maestro::DiagFile(const int step, const Real t_in,
 
                         // For spherical, we only consider cells inside of where the
                         // sponging begins
-                        if (cell_valid &&
-                            (!spherical ||
-                             scal(i, j, k, Rho) >=
-                                 sponge_start_factor * sponge_center_density)) {
+                        if (cell_valid && (!spherical || scal(i, j, k, Rho) >=
+                                           sponge_start_factor * sponge_center_density)) {
                             Real vel = 0.0;
                             if (spherical) {
 #if (AMREX_SPACEDIM == 3)
                                 // is it one of the 8 zones surrounding the center?
-                                if (amrex::Math::abs(x - center[0]) < dx[0] &&
-                                    amrex::Math::abs(y - center[1]) < dx[1] &&
-                                    amrex::Math::abs(z - center[2]) < dx[2]) {
+#ifdef _OPENMP
+                                #pragma omp critical
+#endif
+                                if (std::abs(x - center[0]) < dx[0] &&
+                                    std::abs(y - center[1]) < dx[1] &&
+                                    std::abs(z - center[2]) < dx[2]) {
                                     ncenter_level++;
 
                                     T_center_level += scal(i, j, k, Temp);
 
                                     vel_center_level[0] +=
-                                        u(i, j, k, 0) +
-                                        0.5 * (w0macx(i, j, k) +
-                                               w0macx(i + 1, j, k));
+                                        u(i, j, k, 0) + 0.5 * (w0macx(i, j, k) + w0macx(i + 1, j, k));
                                     vel_center_level[1] +=
-                                        u(i, j, k, 1) +
-                                        0.5 * (w0macy(i, j, k) +
-                                               w0macy(i, j + 1, k));
+                                        u(i, j, k, 1) + 0.5 * (w0macy(i, j, k) + w0macy(i, j + 1, k));
                                     vel_center_level[2] +=
-                                        u(i, j, k, 2) +
-                                        0.5 * (w0macz(i, j, k) +
-                                               w0macz(i, j, k + 1));
+                                        u(i, j, k, 2) + 0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1));
                                 }
 
                                 // velr is the projection of the velocity (including w0) onto
                                 // the radial unit vector
                                 // Real velr = u(i,j,k,0)*normal_arr(i,j,k,0) + \ //
-                        //     u(i,j,k,1)*normal_arr(i,j,k,1) + \ //
-                        //     u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
+                                //     u(i,j,k,1)*normal_arr(i,j,k,1) + \ //
+                                //     u(i,j,k,2)*normal_arr(i,j,k,2) + w0r(i,j,k);
 
                                 // vel is the magnitude of the velocity, including w0
                                 vel = std::sqrt(
-                                    (u(i, j, k, 0) +
-                                     0.5 * (w0macx(i, j, k) +
-                                            w0macx(i + 1, j, k))) *
-                                        (u(i, j, k, 0) +
-                                         0.5 * (w0macx(i, j, k) +
-                                                w0macx(i + 1, j, k))) +
-                                    (u(i, j, k, 1) +
-                                     0.5 * (w0macy(i, j, k) +
-                                            w0macy(i, j + 1, k))) *
-                                        (u(i, j, k, 1) +
-                                         0.5 * (w0macy(i, j, k) +
-                                                w0macy(i, j + 1, k))) +
-                                    (u(i, j, k, 2) +
-                                     0.5 * (w0macz(i, j, k) +
-                                            w0macz(i, j, k + 1))) *
-                                        (u(i, j, k, 2) +
-                                         0.5 * (w0macz(i, j, k) +
-                                                w0macz(i, j, k + 1))));
+                                    amrex::Math::powi<2>(u(i, j, k, 0) + 0.5 * (w0macx(i, j, k) + w0macx(i + 1, j, k))) +
+                                    amrex::Math::powi<2>(u(i, j, k, 1) + 0.5 * (w0macy(i, j, k) + w0macy(i, j + 1, k))) +
+                                    amrex::Math::powi<2>(u(i, j, k, 2) + 0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1))));
 
                                 // max T, location, and velocity at that location (including w0)
+#ifdef _OPENMP
+                                #pragma omp critical
+#endif
                                 if (scal(i, j, k, Temp) > T_max_local) {
                                     T_max_local = scal(i, j, k, Temp);
                                     coord_Tmax_local[0] = x;
                                     coord_Tmax_local[1] = y;
                                     coord_Tmax_local[2] = z;
                                     vel_Tmax_local[0] =
-                                        u(i, j, k, 0) +
-                                        0.5 * (w0macx(i, j, k) +
-                                               w0macx(i + 1, j, k));
+                                        u(i, j, k, 0) + 0.5 * (w0macx(i, j, k) + w0macx(i + 1, j, k));
                                     vel_Tmax_local[1] =
-                                        u(i, j, k, 1) +
-                                        0.5 * (w0macy(i, j, k) +
-                                               w0macy(i, j + 1, k));
+                                        u(i, j, k, 1) + 0.5 * (w0macy(i, j, k) + w0macy(i, j + 1, k));
                                     vel_Tmax_local[2] =
-                                        u(i, j, k, 2) +
-                                        0.5 * (w0macz(i, j, k) +
-                                               w0macz(i, j, k + 1));
+                                        u(i, j, k, 2) + 0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1));
                                 }
 
                                 // max enuc
-                                if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) >
-                                    enuc_max_local) {
-                                    enuc_max_local = rho_Hnuc_arr(i, j, k) /
-                                                     scal(i, j, k, Rho);
+#ifdef _OPENMP
+                                #pragma omp critical
+#endif
+                                if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) > enuc_max_local) {
+                                    enuc_max_local = rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho);
                                     coord_enucmax_local[0] = x;
                                     coord_enucmax_local[1] = y;
                                     coord_enucmax_local[2] = z;
                                     vel_enucmax_local[0] =
-                                        u(i, j, k, 0) +
-                                        0.5 * (w0macx(i, j, k) +
-                                               w0macx(i + 1, j, k));
+                                        u(i, j, k, 0) + 0.5 * (w0macx(i, j, k) + w0macx(i + 1, j, k));
                                     vel_enucmax_local[1] =
-                                        u(i, j, k, 1) +
-                                        0.5 * (w0macy(i, j, k) +
-                                               w0macy(i, j + 1, k));
+                                        u(i, j, k, 1) + 0.5 * (w0macy(i, j, k) + w0macy(i, j + 1, k));
                                     vel_enucmax_local[2] =
-                                        u(i, j, k, 2) +
-                                        0.5 * (w0macz(i, j, k) +
-                                               w0macz(i, j, k + 1));
+                                        u(i, j, k, 2) + 0.5 * (w0macz(i, j, k) + w0macz(i, j, k + 1));
                                 }
 #endif
                             } else {
                                 // vel is the magnitude of the velocity, including w0
 #if (AMREX_SPACEDIM == 2)
-                                Real vert_vel =
-                                    u(i, j, k, 1) +
-                                    0.5 * (w0_arr(lev, j) + w0_arr(lev, j + 1));
-                                vel = std::sqrt(u(i, j, k, 0) * u(i, j, k, 0) +
-                                                vert_vel * vert_vel);
+                                Real vert_vel = u(i, j, k, 1) + 0.5 * (w0_arr(lev, j) + w0_arr(lev, j + 1));
+                                vel = std::sqrt(u(i, j, k, 0) * u(i, j, k, 0) + vert_vel * vert_vel);
 #else
-                                Real vert_vel =
-                                    u(i, j, k, 2) +
-                                    0.5 * (w0_arr(lev, k) + w0_arr(lev, k + 1));
+                                Real vert_vel = u(i, j, k, 2) + 0.5 * (w0_arr(lev, k) + w0_arr(lev, k + 1));
                                 vel = std::sqrt(u(i, j, k, 0) * u(i, j, k, 0) +
                                                 u(i, j, k, 1) * u(i, j, k, 1) +
                                                 vert_vel * vert_vel);
 #endif
 
                                 // max T, location, and velocity at that location (including w0)
+#ifdef _OPENMP
+                                #pragma omp critical
+#endif
                                 if (scal(i, j, k, Temp) > T_max_local) {
                                     T_max_local = scal(i, j, k, Temp);
                                     coord_Tmax_local[0] = x;
@@ -307,21 +275,19 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                     vel_Tmax_local[1] = u(i, j, k, 1);
 #if (AMREX_SPACEDIM == 2)
                                     vel_Tmax_local[1] +=
-                                        0.5 *
-                                        (w0_arr(lev, j) + w0_arr(lev, j + 1));
+                                        0.5 * (w0_arr(lev, j) + w0_arr(lev, j + 1));
 #else
                                     vel_Tmax_local[2] =
-                                        u(i, j, k, 2) +
-                                        0.5 * (w0_arr(lev, k) +
-                                               w0_arr(lev, k + 1));
+                                        u(i, j, k, 2) + 0.5 * (w0_arr(lev, k) + w0_arr(lev, k + 1));
 #endif
                                 }
 
                                 // max enuc
-                                if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) >
-                                    enuc_max_local) {
-                                    enuc_max_local = rho_Hnuc_arr(i, j, k) /
-                                                     scal(i, j, k, Rho);
+#ifdef _OPENMP
+                                #pragma omp critical
+#endif
+                                if (rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho) > enuc_max_local) {
+                                    enuc_max_local = rho_Hnuc_arr(i, j, k) / scal(i, j, k, Rho);
                                     coord_enucmax_local[0] = x;
                                     coord_enucmax_local[1] = y;
 #if (AMREX_SPACEDIM == 3)
@@ -331,13 +297,10 @@ void Maestro::DiagFile(const int step, const Real t_in,
                                     vel_enucmax_local[1] = u(i, j, k, 1);
 #if (AMREX_SPACEDIM == 2)
                                     vel_enucmax_local[1] +=
-                                        0.5 *
-                                        (w0_arr(lev, j) + w0_arr(lev, j + 1));
+                                        0.5 * (w0_arr(lev, j) + w0_arr(lev, j + 1));
 #else
                                     vel_enucmax_local[2] =
-                                        u(i, j, k, 2) +
-                                        0.5 * (w0_arr(lev, k) +
-                                               w0_arr(lev, k + 1));
+                                        u(i, j, k, 2) + 0.5 * (w0_arr(lev, k) + w0_arr(lev, k + 1));
 #endif
                                 }
                             }
@@ -349,30 +312,25 @@ void Maestro::DiagFile(const int step, const Real t_in,
                             eos_state.rho = scal(i, j, k, Rho);
                             for (auto comp = 0; comp < NumSpec; ++comp) {
                                 eos_state.xn[comp] =
-                                    scal(i, j, k, FirstSpec + comp) /
-                                    eos_state.rho;
+                                    scal(i, j, k, FirstSpec + comp) / eos_state.rho;
                             }
 #if NAUX_NET > 0
                             for (auto comp = 0; comp < NumAux; ++comp) {
                                 eos_state.aux[comp] =
-                                    scal(i, j, k, FirstAux + comp) /
-                                    eos_state.rho;
+                                    scal(i, j, k, FirstAux + comp) / eos_state.rho;
                             }
 #endif
 
                             eos(eos_input_rt, eos_state);
 
                             // kinetic, internal, and nuclear energies
-                            kin_ener_level +=
-                                weight * scal(i, j, k, Rho) * vel * vel;
-                            int_ener_level +=
-                                weight * scal(i, j, k, Rho) * eos_state.e;
+                            kin_ener_level += weight * scal(i, j, k, Rho) * vel * vel;
+                            int_ener_level += weight * scal(i, j, k, Rho) * eos_state.e;
                             nuc_ener_level += weight * rho_Hnuc_arr(i, j, k);
 
                             // max vel and Mach number
-                            U_max_level = amrex::max(U_max_level, vel);
-                            Mach_max_level =
-                                amrex::max(Mach_max_level, vel / eos_state.cs);
+                            U_max_level = std::max(U_max_level, vel);
+                            Mach_max_level = std::max(Mach_max_level, vel / eos_state.cs);
                         }
                     }
                 }
@@ -507,8 +465,8 @@ void Maestro::DiagFile(const int step, const Real t_in,
             int_ener += int_ener_level;
             nuc_ener += nuc_ener_level;
 
-            U_max = amrex::max(U_max, U_max_level);
-            Mach_max = amrex::max(Mach_max, Mach_max_level);
+            U_max = std::max(U_max, U_max_level);
+            Mach_max = std::max(Mach_max, Mach_max_level);
 
             // if T_max_level is the new max, then copy the location as well
             if (T_max_level > T_max) {

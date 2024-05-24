@@ -131,7 +131,7 @@ void Maestro::InitLevelDataSphr(const int lev, [[maybe_unused]] const Real time,
             }
 
             // initialize (rho h) and T using the EOS
-            eos_t eos_state;
+            eos_rh_t eos_state;
             eos_state.T = scal_arr(i, j, k, Temp);
             eos_state.p = p0_arr(i, j, k);
             eos_state.rho = scal_arr(i, j, k, Rho);

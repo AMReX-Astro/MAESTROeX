@@ -136,7 +136,7 @@ void Maestro::UpdateScal(
 
                     if (do_eos_h_above_cutoff &&
                         snew_arr(i, j, k, Rho) <= base_cutoff_density) {
-                        eos_t eos_state;
+                        eos_rh_t eos_state;
 
                         eos_state.rho = snew_arr(i, j, k, Rho);
                         eos_state.T = sold_arr(i, j, k, Temp);

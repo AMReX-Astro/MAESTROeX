@@ -17,7 +17,7 @@ geometry.is_periodic =  0 0 0
 maestro.max_step = 1
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # tolerances for the initial projection
 maestro.eps_init_proj_cart = 1.e-12

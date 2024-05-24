@@ -358,11 +358,9 @@ Vector<const MultiFab*> Maestro::PlotFileMF(
     }
 
     if (dt_in < small_dt) {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, small_dt, t_in);  // NOLINT(readability-suspicious-call-argument)
     } else {
-        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in * 0.5,
-              t_in);
+        React(s_in, stemp, rho_Hext, rho_omegadot, rho_Hnuc, p0_in, dt_in * 0.5, t_in);
     }
 
     if (plot_spec || plot_omegadot) {
@@ -760,7 +758,7 @@ Vector<const MultiFab*> Maestro::SmallPlotFileMF(
 }
 
 // set plotfile variable names
-Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
+Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::PlotFileVarNames()", PlotFileVarNames);
 
@@ -829,7 +827,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
     // add velocities
     for (int i = 0; i < AMREX_SPACEDIM; ++i) {
         std::string x = "vel";
-        x += (120 + i);
+        x += (static_cast<char>(120 + i));
         names[cnt++] = x;
     }
 
@@ -891,7 +889,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         // add gpi
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             std::string x = "gpi";
-            x += (120 + i);
+            x += (static_cast<char>(120 + i));
             names[cnt++] = x;
         }
     }
@@ -932,7 +930,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
         // w0 and divw0
         for (int i = 0; i < AMREX_SPACEDIM; ++i) {
             std::string x = "w0";
-            x += (120 + i);
+            x += (static_cast<char>(120 + i));
             names[cnt++] = x;
         }
         names[cnt++] = "divw0";
@@ -959,7 +957,7 @@ Vector<std::string> Maestro::PlotFileVarNames(int* nPlot) const {
 
 // set plotfile variable names
 Vector<std::string> Maestro::SmallPlotFileVarNames(
-    int* nPlot, Vector<std::string> varnames) const {
+    int* nPlot, Vector<std::string> varnames) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::SmallPlotFileVarNames()", SmallPlotFileVarNames);
 
@@ -1023,7 +1021,7 @@ Vector<std::string> Maestro::SmallPlotFileVarNames(
     }
 
     names.shrink_to_fit();
-    *nPlot = names.size();
+    *nPlot = static_cast<int>(names.size());
 
     return names;
 }
@@ -1238,8 +1236,6 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
 
 void Maestro::WriteBuildInfo() {
     std::string PrettyLine = std::string(78, '=') + "\n";
-    std::string OtherLine = std::string(78, '-') + "\n";
-    std::string SkipSpace = std::string(8, ' ');
 
     // build information
     std::cout << PrettyLine;
@@ -1464,7 +1460,7 @@ void Maestro::MakeAdExcess(const Vector<MultiFab>& state,
 #endif
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                eos_t eos_state;
+                eos_rep_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
                 eos_state.T = state_arr(i, j, k, Temp);
@@ -2195,7 +2191,7 @@ void Maestro::MakeDeltaGamma(const Vector<MultiFab>& state,
             const Array4<Real> deltagamma_arr = deltagamma[lev].array(mfi);
 
             ParallelFor(tileBox, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
-                eos_t eos_state;
+                eos_rep_t eos_state;
 
                 eos_state.rho = state_arr(i, j, k, Rho);
                 eos_state.T = state_arr(i, j, k, Temp);
