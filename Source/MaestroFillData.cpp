@@ -418,7 +418,7 @@ void Maestro::FillUmacGhost(
 
                 // hi z-faces
                 if (k == domhi[2] + 2) {
-                    switch (bchi]) {  // NOLINT(bugprone-switch-missing-default-case)
+                    switch (bchi) {  // NOLINT(bugprone-switch-missing-default-case)
                         case amrex::PhysBCType::inflow:
                             umac(i, j, k - 1) = 0.0;
                             vmac(i, j, k - 1) = 0.0;
