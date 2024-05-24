@@ -326,8 +326,8 @@ void Maestro::VelPredInterface(
     const auto domlo = domainBox.loVect3d();
     const auto domhi = domainBox.hiVect3d();
 
-    int bclo = phys_bc_lo(0);
-    int bchi = phys_bc_hi(0);
+    int bclo = phys_bc.lo(0);
+    int bchi = phys_bc.hi(0);
 
     ParallelFor(mxbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
         if (ppm_type == 0) {
