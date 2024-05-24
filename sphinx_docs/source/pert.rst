@@ -913,7 +913,7 @@ features in the momentum plots shown in :numref:`fig:mom_filaments`.
    ``use_tfromp = T``
 
 Using ``use_tfromp = F`` and ``dpdt_factor`` :math:`>` 0 results in many runs
-crashing very quickly and gives unphyiscal temperature profiles as seen in
+crashing very quickly and gives unphysical temperature profiles as seen in
 :numref:`fig:tfrompF_unphys`.
 
 
