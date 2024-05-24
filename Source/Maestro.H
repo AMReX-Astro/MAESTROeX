@@ -1734,7 +1734,7 @@ class Maestro : public amrex::AmrCore {
                           amrex::Array4<amrex::Real> const ury,
                           amrex::Array4<amrex::Real> const uimhy,
                           const amrex::Box& domainBox,
-                          const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                          const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 
     void VelPredVelocities(const amrex::MFIter& mfi,
                            amrex::Array4<const amrex::Real> const utilde,
@@ -1755,7 +1755,7 @@ class Maestro : public amrex::AmrCore {
                            amrex::Array4<const amrex::Real> const force,
                            amrex::Array4<const amrex::Real> const w0_cart_in,
                            const amrex::Box& domainBox,
-                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 #else
     void VelPredInterface(const amrex::MFIter& mfi,
                           amrex::Array4<const amrex::Real> const utilde,
@@ -1779,7 +1779,7 @@ class Maestro : public amrex::AmrCore {
                           amrex::Array4<amrex::Real> const urz,
                           amrex::Array4<amrex::Real> const uimhz,
                           const amrex::Box& domainBox,
-                          const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                          const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 
     void VelPredTransverse(const amrex::MFIter& mfi,
                            amrex::Array4<const amrex::Real> const utilde,
@@ -1802,7 +1802,7 @@ class Maestro : public amrex::AmrCore {
                            amrex::Array4<amrex::Real> const wimhxy,
                            amrex::Array4<amrex::Real> const wimhyx,
                            const amrex::Box& domainBox,
-                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 
     void VelPredVelocities(const amrex::MFIter& mfi,
                            amrex::Array4<const amrex::Real> const utilde,
@@ -1836,7 +1836,7 @@ class Maestro : public amrex::AmrCore {
                            amrex::Array4<const amrex::Real> const force,
                            amrex::Array4<const amrex::Real> const w0_cart_in,
                            const amrex::Box& domainBox,
-                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx);
+                           const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const;
 #endif
     ////////////////////////
 

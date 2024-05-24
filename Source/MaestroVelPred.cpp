@@ -301,7 +301,7 @@ void Maestro::VelPredInterface(
     Array4<const Real> const Ipv, Array4<Real> const ulx,
     Array4<Real> const urx, Array4<Real> const uimhx, Array4<Real> const uly,
     Array4<Real> const ury, Array4<Real> const uimhy, const Box& domainBox,
-    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) {
+    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredInterface()", VelPredInterface);
 
@@ -551,7 +551,7 @@ void Maestro::VelPredVelocities(
     Array4<const Real> const uimhx, Array4<const Real> const uly,
     Array4<const Real> const ury, Array4<const Real> const uimhy,
     Array4<const Real> const force, Array4<const Real> const w0_cart_in,
-    const Box& domainBox, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) {
+    const Box& domainBox, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredVelocities()", VelPredVelocities);
 
@@ -742,7 +742,7 @@ void Maestro::VelPredInterface(
     Array4<Real> const ulx, Array4<Real> const urx, Array4<Real> const uimhx,
     Array4<Real> const uly, Array4<Real> const ury, Array4<Real> const uimhy,
     Array4<Real> const ulz, Array4<Real> const urz, Array4<Real> const uimhz,
-    const Box& domainBox, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) {
+    const Box& domainBox, const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredInterface()", VelPredInterface);
 
@@ -1138,7 +1138,7 @@ void Maestro::VelPredTransverse(
     Array4<Real> const uimhyz, Array4<Real> const uimhzy,
     Array4<Real> const vimhxz, Array4<Real> const vimhzx,
     Array4<Real> const wimhxy, Array4<Real> const wimhyx, const Box& domainBox,
-    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) {
+    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredTransverse()", VelPredTransverse);
 
@@ -1611,7 +1611,7 @@ void Maestro::VelPredVelocities(
     Array4<const Real> const vimhzx, Array4<const Real> const wimhxy,
     Array4<const Real> const wimhyx, Array4<const Real> const force,
     Array4<const Real> const w0_cart_in, const Box& domainBox,
-    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) {
+    const amrex::GpuArray<Real, AMREX_SPACEDIM> dx) const {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::VelPredVelocities()", VelPredVelocities);
 
