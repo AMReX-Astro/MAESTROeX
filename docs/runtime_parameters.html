@@ -603,79 +603,83 @@ constant. Refer to Section ref{Sec:Base Cutoff
 Density}</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_lo</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_temperature_lo</span></code></p></td>
+<td><p>The temperature below which we disable burning</p></td>
+<td><p>-1.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_lo</span></code></p></td>
 <td><p>The density below which we disable burning</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_hi</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">burning_cutoff_density_hi</span></code></p></td>
 <td><p>The density above which we disable burning</p></td>
 <td><p>1.e100</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">heating_cutoff_density_lo</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heating_cutoff_density_lo</span></code></p></td>
 <td><p>The density below which we disable heating</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">heating_cutoff_density_hi</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">heating_cutoff_density_hi</span></code></p></td>
 <td><p>The density above which we disable heating</p></td>
 <td><p>1.e100</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">buoyancy_cutoff_factor</span></code></p></td>
 <td><p>The multiplicative factor (over base_cutoff_density)
 below which we do zero out the buoyancy term in the
 momentum equation.</p></td>
 <td><p>5.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dpdt_factor</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dpdt_factor</span></code></p></td>
 <td><p>factor in front of the volume discrepancy term (0.0 =
 off)</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">do_planar_invsq_grav</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_planar_invsq_grav</span></code></p></td>
 <td><p>are we doing 1/r<span class="math notranslate nohighlight">\(^2\)</span> gravity for plane-parallel</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">planar_invsq_mass</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">planar_invsq_mass</span></code></p></td>
 <td><p>the point mass for planar 1/r<span class="math notranslate nohighlight">\(^2\)</span> gravity</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">evolve_base_state</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">evolve_base_state</span></code></p></td>
 <td><p>turn on (true) or off (false) basestate evolution</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_exact_base_state</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_exact_base_state</span></code></p></td>
 <td><p>turn on (true) or off (false) irregularly-spaced
 basestate</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fix_base_state</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fix_base_state</span></code></p></td>
 <td><p>if true, don’t call average to reset the base state at
 all, even during initialization</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">average_base_state</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">average_base_state</span></code></p></td>
 <td><p>turn on (true) or off (false) basestate evolution that
 uses averages of cell-centered data instead of
 advecting</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">do_smallscale</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_smallscale</span></code></p></td>
 <td><p>force <span class="math notranslate nohighlight">\(\rho_0 = (\rho h)_0 = 0\)</span>, {\tt
 evolve\_base\_state = F} and {\tt beta\_type} = 3</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">do_eos_h_above_cutoff</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">do_eos_h_above_cutoff</span></code></p></td>
 <td><p>After the advective enthalpy update, recompute the
 enthalpy if we are below the base cutoff density.</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enthalpy_pred_type</span></code></p></td>
 <td><p>predict_rhoh = 0;  predict_rhohprime = 1;  predict_h
 = 2;  predict_T_then_rhohprime = 3;
 predict_T_then_h = 4;  predict_hprime = 5;
 predict_Tprime_then_h = 6.</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">species_pred_type</span></code></p></td>
 <td><p>Which quantities do we predict to the edges for
 computing the (<span class="math notranslate nohighlight">\(\rho X\)</span>) edge states?   {\tt
 species\_pred\_type} = 1 means predict <span class="math notranslate nohighlight">\(\rho^\prime\)</span>
@@ -685,48 +689,48 @@ species\_pred\_type} = 3 means predict <span class="math notranslate nohighlight
 separately.</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_delta_gamma1_term</span></code></p></td>
 <td><p>turns on second order correction to delta gamma1 term</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_etarho</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_etarho</span></code></p></td>
 <td><p>turn on the etarho term as described in flow chart</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">add_pb</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">add_pb</span></code></p></td>
 <td><p>turns on pressure correction to make the top an
 impenetrable boundary</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">slope_order</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">slope_order</span></code></p></td>
 <td><p>order of slopes in piecewise linear Godunov algorithm.
 Options are 0, 2, or 4.</p></td>
 <td><p>4</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">grav_const</span></code></p></td>
 <td><p>the gravitational acceleration (cm~s<span class="math notranslate nohighlight">\(^{-2}\)</span>) for plane-
 parallel geometry</p></td>
 <td><p>-1.5e10</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_type</span></code></p></td>
 <td><p>0 = no ppm (piecewise linear slopes instead)  1 = 1984
 ppm  2 = Hybrid Sekora/Colella and McCorquodale/Colella
 2009/2010 ppm</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bds_type</span></code></p></td>
 <td><p>0 = use ppm instead for multi-d integrator  1 =
 bilinear</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ppm_trace_forces</span></code></p></td>
 <td><p>if 1, then perform parabolic reconstruction on the
 forces used in the prediction and trace under the
 parabola to the interfaces the amount that can reach
 the interface over dt</p></td>
 <td><p>0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">beta0_type</span></code></p></td>
 <td><p>what type of coefficient to use inside the velocity
 divergence constraint.  {\tt beta0\_type} = 1 uses
 <span class="math notranslate nohighlight">\(\beta_0\)</span>;  {\tt beta0\_type} = 2 uses <span class="math notranslate nohighlight">\(\rho_0\)</span>
@@ -734,47 +738,47 @@ divergence constraint.  {\tt beta0\_type} = 1 uses
 combustion).</p></td>
 <td><p>1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_linear_grav_in_beta0</span></code></p></td>
 <td><p>how to represent gravity in the <span class="math notranslate nohighlight">\(\beta_0\)</span> integration:
 true = piecewise linear false = piecewise constant</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rotational_frequency</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rotational_frequency</span></code></p></td>
 <td><p>rotational frequency used for computing centrifugal
 term in rotation problems.</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">co_latitude</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">co_latitude</span></code></p></td>
 <td><p>latitude, in radians, for problems with rotation where
 the domain is only a subset of a full star.</p></td>
 <td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rotation_radius</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rotation_radius</span></code></p></td>
 <td><p>radius used for computing centrifugal term in rotation
 problems</p></td>
 <td><p>1.0e6</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_centrifugal</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_centrifugal</span></code></p></td>
 <td><p>include (true) or exclude (false) centrifugal term</p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mach_max_abort</span></code></p></td>
 <td><p>maximum mach number before the code aborts</p></td>
 <td><p>-1.0</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">drive_initial_convection</span></code></p></td>
 <td><p>freeze the temperature used in the reaction network to
 the initial value.  This is useful for developing an
 initial convective field to carry away the energy,
 while preventing the reactions from going nonlinear.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">stop_initial_convection</span></code></p></td>
 <td><p>timestep beyond which we set {tt
 drive_initial_convection} = F</p></td>
 <td><p>-1</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">restart_with_vel_field</span></code></p></td>
 <td><p>restart the simulation using a result from a {tt
 drive_initial_convection} = T run note that this uses
 the restart variable to specify which file to restart
@@ -783,13 +787,13 @@ the restart file, the time and timestep number are
 zeroed.</p></td>
 <td><p>false</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_alt_energy_fix</span></code></p></td>
 <td><p>modify the momentum equation to have <span class="math notranslate nohighlight">\((\beta_0/\rho)
 \nabla (\pi/\beta_0)\)</span> instead of just <span class="math notranslate nohighlight">\((1/\rho) \nabla
 (\pi)\)</span></p></td>
 <td><p>true</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">use_omegadot_terms_in_S</span></code></p></td>
 <td><p>do we include the explicit omegadot terms in the
 constraint RHS source S?</p></td>
 <td><p>true</p></td>
