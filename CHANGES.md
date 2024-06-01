@@ -1,3 +1,23 @@
+# 24.06
+
+  * added burning_cutoff_temperature_lo parameter (#465)
+
+  * fixed an OpenMP race condition in the diagnostics (#455)
+
+  * colorized the verbose stepping output (#463)
+
+  * added more CI checks (#458, #459, #462)
+
+  * fixed some clang-tidy issues (#443, #457)
+
+  * disallow OpenMP + GPUs (#456)
+
+  * documentation improvements (#450)
+
+  * fix a race condition in the build system dependencies (#448)
+
+  * add `eos_rh_t` in places to speed up the EOS calls (#446)
+
 # 24.05
 
   * some coverity, clang-tidy, and other compiler fixes (#430, #437,
