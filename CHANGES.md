@@ -1,3 +1,7 @@
+# 24.07
+
+  * fix some AMReX namespace issues (#471)
+
 # 24.06
 
   * added burning_cutoff_temperature_lo parameter (#465)
