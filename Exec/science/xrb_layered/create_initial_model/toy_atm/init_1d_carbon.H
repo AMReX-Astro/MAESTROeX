@@ -1,85 +1,26 @@
-//  Adapted from original AMReX-Astro code
-//  (github.com/AMReX-Astro/initial_models/tree/main/toy_atm/init_1d.H)
-//  by Simon Guichandut (2023).
-
-//  Create a 1-d hydrostatic, atmosphere with an isothermal region
-//  (T_star) representing the NS, a hyperbolic tangent rise to a
-//  peak temperature (T_base) representing the base of an accreted
-//  layer at r=H_star, an isentropic profile representing the convective
-//  region at ignition, then a radiative profile from r=H_rad.
-//  Below, three different power-laws set the temperature profile
-//  T = T0*(y/y0)^del
-//  where y is the column depth (=pressure/gravity) and, del is the power-law
-//  index, and T0 and y0 are the values at the beginning of a given region.
-//  Those regions have different physics: 1) an adiabatic zone
-//  where helium is burning and generating convection, 2) a stable region
-//  where nothing is burning, 3) a stable region with hot CNO burning.
-
-//  The composition transitions from pure ash, to helium and CNO, to a solar
-//  mixture including hydrogen, with initial hydrogen fraction X0 and CNO fraction
-//  Zcno (inputs file).  The CNO is split between o14 and o15 with ratio
-//  determined by their beta decay times (70.621/122.266). Because hot CNO burns
-//  hydrogen at a constant rate:
-//  X = X0(1-y/yd),
-//  where yd is the depletion column depth, another input parameter.
-
-//  This can serve as an initial model for a He-triggered XRB with an
-//  overlying hydrogen rich shell.
-
-//  The temperature profile is:
-//
-//         T
-//         ^
-//         |
-//  T_base +        /\
-//         |       /  \
-//         |      /  . \
-//  T_star +-----+      \  T ~ y^del_1 (del_1~del_ad)
-//         |     .   .   \
-//         |     .   .    \
-//         |     .   .     +__
-//         |     .   .     .  `---   T ~ y^del_2
-//         |     .   .     .      `---+
-//         |     .   .     .          .`-
-//         |     .   .     .          .   `-   T ~ y^del_3
-//         |     .   .     .          .      `-
-//         |     .   .     .          .         `-
-//         +-----+---+-----+---------------------> r
-//         |      \  /
-//         |      delta
-//         |< H_star>|
-//         |-----<y_2>----|
-//         |----------<y_3>---------|
-//
-//  The composition profile is:
+// See the header of init_1d.H for the full explanation
+// The difference here is that carbon is included in the helium layer
+// following a power law Zc(y) = (y/y0)^del
+// Then the helium fraction is Y = 1-X-Zc-Zcno
+// Zcno is still just made up of o14/o15
 //
 //         X
 //         ^
 //         |  star  | reg 1 | reg 2  |  region 3
-//    1.0  +--------*----------
-//         |  ash   .          \
-//         |        .           \    +--------- X0 (hydrogen)
-//         |        .            \  /
-//         |        .             \/
-//         |        .             /\
-//         |        .            /  \
-//         |        .           /    +--------- 1-X0-Zcno (helium)
+//    1.0  +--------*  -------- (he4)
+//         |  ash   . /        \
+//         |        . \         \    +--------- X0 (hydrogen)
+//         |        .  \         \  /
+//         |        .   \ (c12)   \/
+//         |        .    \        /\
+//         |        .     \      /  \
+//         |        .      \    /    +--------- 1-X0-Zcno (helium)
 //         |        .----------/--------------- Zcno (o14/o15)
 //    0.0  +--------+---------+-----------------> r
 //         |<H_star>|
 //         |------<y_d>------|
 //         |
 //
-//  The transition from ash to fuel is a hyperbolic tangent, parametrized
-//  by delta (the half-width of the tanh), and starting at H_star.
-//
-//  The model is placed into HSE by the following differencing:
-//
-//   (1/dr) [ <P>_i - <P>_{i-1} ] = (1/2) [ <rho>_i + <rho>_{i-1} ] g
-//
-//  This will be iterated over in tandem with the EOS call,
-//  P(i-1) = P_eos(rho(i-1), T(i-1), X(i-1))
-
 
 #include <AMReX_Array.H>
 
@@ -92,7 +33,7 @@
 
 using namespace amrex;
 
-AMREX_INLINE void init_1d()
+AMREX_INLINE void init_1d_carbon()
 {
 
     // define convenient indices for the scalars
@@ -112,6 +53,7 @@ AMREX_INLINE void init_1d()
     // get the species indices
     int ih1 = network_spec_index("hydrogen-1");
     int ihe4 = network_spec_index("helium-4");
+    int ic12 = network_spec_index("carbon-12");
     int io14 = network_spec_index("oxygen-14");
     int io15 = network_spec_index("oxygen-15");
     int iash = network_spec_index(problem_rp::ash_name);
@@ -124,14 +66,16 @@ AMREX_INLINE void init_1d()
     xn_star[iash] = 1.0;
 
     // the composition of the first layer above the star
-    // First we'll set the cno to the correct relative abundance, and the rest will be helium
-    // Later, we'll replace some of the helium with hydrogen according
+    // First we'll set the cno to the correct relative abundance of oxygen,
+    // the prescribed carbon power law, and the rest will be helium
+    // Later, we'll replace some of the helium/carbon with hydrogen according
     // to column depth, or pressure
 
     Real xn_base[NumSpec] = {smallx};
     xn_base[io15] = problem_rp::Zcno / (1.0 + 70.621/122.266);
     xn_base[io14] = problem_rp::Zcno - xn_base[io15];
-    xn_base[ihe4] = 1.0 - problem_rp::Zcno;
+    xn_base[ic12] = pow(problem_rp::y1/problem_rp::carbon_y, problem_rp::carbon_del);
+    xn_base[ihe4] = 1.0 - xn_base[ic12] - problem_rp::Zcno;
 
     // check if they sum to 1
     double sum{0.0};
@@ -141,7 +85,6 @@ AMREX_INLINE void init_1d()
     if (std::abs(sum) - 1.0_rt > NumSpec * smallx) {
             amrex::Error("ERROR: fuel mass fractions don't sum to 1");
     }
-
 
 
     // Create a 1-d uniform grid that is identical to the mesh that we are
@@ -339,11 +282,17 @@ AMREX_INLINE void init_1d()
 
                 temp_zone = current_T0 * pow(y_want/current_y0, current_del);
 
+                if (y_want > problem_rp::y2) {
+                    xn[ic12] = pow(y_want/problem_rp::carbon_y, problem_rp::carbon_del);
+                } else {
+                    xn[ic12] = 0.0;
+                }
+
                 xn[ih1] = problem_rp::X0 * (1 - y_want/problem_rp::yd);
-                xn[ihe4] = 1.0 - problem_rp::Zcno - xn[ih1];
+                xn[ihe4] = 1.0 - problem_rp::Zcno - xn[ic12] - xn[ih1];
                 if (xn[ih1] < 0) {
                     xn[ih1] = 0;
-                    xn[ihe4] = 1.0 - problem_rp::Zcno;
+                    xn[ihe4] = 1.0 - problem_rp::Zcno - xn[ic12];
                 }
 
                 // set to isothermal if hit threshold

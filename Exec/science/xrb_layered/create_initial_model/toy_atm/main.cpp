@@ -22,6 +22,7 @@
 #include <network.H>
 #include <eos.H>
 #include <init_1d.H>
+#include <init_1d_carbon.H>
 
 std::string inputs_name = "";
 
@@ -54,7 +55,11 @@ main (int   argc,
 
   eos_init(problem_rp::small_temp, problem_rp::small_dens);
 
-  init_1d();
+  if (problem_rp::add_carbon) {
+    init_1d_carbon();
+  } else {
+    init_1d();
+  }
 
   amrex::Finalize();
 
