@@ -1734,7 +1734,7 @@ class Maestro : public amrex::AmrCore {
                           amrex::Array4<amrex::Real> const ury,
                           amrex::Array4<amrex::Real> const uimhy,
                           const amrex::Box& domainBox,
-                          const amrex::GpuArray<amrex::Real, AMREX_SPACEDIM> dx) const;
+                          const amrex::GpuArray<amrex::Real, AMREX_SPACEDIM>& dx) const;
 
     void VelPredVelocities(const amrex::MFIter& mfi,
                            amrex::Array4<const amrex::Real> const utilde,
