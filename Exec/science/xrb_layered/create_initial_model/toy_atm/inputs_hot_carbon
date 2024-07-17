@@ -1,0 +1,32 @@
+problem.model_prefix = "toy_atm_hot_carbon"
+
+problem.nx = 1024
+problem.xmin = 0.0
+problem.xmax = 3072.0
+
+problem.g_const = -1.29e14
+
+problem.T_star = 1.0e8
+problem.H_star = 1120.0
+problem.delta  = 5.0
+
+problem.T_base = 3.5e8
+
+problem.y1 = 4.5e8
+problem.del1 = 0.37
+problem.y2 = 5.6e7
+problem.del2 = 0.12
+problem.y3 = 2.0e7
+problem.del3 = 0.22
+
+problem.low_density_cutoff = 1.e-4
+problem.T_lo   = 1.e6
+
+problem.X0 = 0.7
+problem.Zcno = 0.02
+problem.yd = 3.7e7
+
+problem.add_carbon = 1
+problem.carbon_y = 5.9e8
+problem.carbon_del = 3.16
+

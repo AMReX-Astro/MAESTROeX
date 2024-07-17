@@ -33,6 +33,9 @@ X0             real         0.7
 Zcno           real         0.02
 yd             real         1.e7
 ash_name       character    "iron-56"
+add_carbon     integer      0
+carbon_y       real         5.e8
+carbon_del     real         3.0
 
 # Other
 index_base_from_temp  integer   0
