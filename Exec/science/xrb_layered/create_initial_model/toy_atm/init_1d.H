@@ -182,7 +182,7 @@ AMREX_INLINE void init_1d()
     // We know the pressure (from y1) and the temperature
     Real pres_base = -problem_rp::g_const * problem_rp::y1;
 
-    // However there is know (p,T) input option, so we need to iterate
+    // However there is no (p,T) input option, so we need to iterate
     // to find the base density.
     // We know that it is roughly 1.3-1.5e6 (Initial_Model notebook)
 
