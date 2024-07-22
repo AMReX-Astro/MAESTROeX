@@ -267,9 +267,10 @@ AMREX_INLINE void init_1d_carbon()
                 dens_zone = problem_rp::low_density_cutoff;
                 temp_zone = problem_rp::T_lo;
 
-                // if here, assume we're at low column and X is constant
+                // if here, assume we're at low column and X is constant, and no carbon
                 xn[ih1] = problem_rp::X0;
                 xn[ihe4] = 1.0 - problem_rp::X0 - problem_rp::Zcno;
+                xn[ic12] = 0.0;
 
             } else {
 
