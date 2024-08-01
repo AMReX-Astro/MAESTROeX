@@ -1,3 +1,13 @@
+# 24.08
+
+  * change access to phys_bc to use BCRec (#469)
+
+  * update xrb_layered initial model (#474, #476)
+
+  * Microphysics sync (#475)
+
+  * code cleanups (#466)
+
 # 24.07
 
   * fix some AMReX namespace issues (#471)
