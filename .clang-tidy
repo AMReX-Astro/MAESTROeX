@@ -25,7 +25,6 @@ Checks: >
      modernize-*,
        -modernize-avoid-c-arrays,
        -modernize-use-trailing-return-type,
-       -modernize-use-using,
      performance-*,
        -performance-avoid-endl,
        -performance-enum-size,
@@ -34,17 +33,18 @@ Checks: >
        -readability-avoid-const-params-in-decls,
        -readability-braces-around-statements,
        -readability-else-after-return,
+       -readability-enum-initial-value,
        -readability-function-cognitive-complexity,
        -readability-function-size,
        -readability-identifier-length,
        -readability-implicit-bool-conversion,
        -readability-isolate-declaration,
        -readability-magic-numbers,
+       -readability-math-missing-parentheses,
        -readability-named-parameter,
        -readability-simplify-boolean-expr,
        -readability-static-accessed-through-instance,
      mpi-*,
      openmp-*,
-       -openmp-use-default-none
 
 HeaderFilterRegex: '(/Source/*|/Source/param/*|/Util/model_parser|/Util/simple_log|^\./|^tmp_build_dir/maestroex_sources/*/).*\.H$'
