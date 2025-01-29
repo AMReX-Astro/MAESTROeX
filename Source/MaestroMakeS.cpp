@@ -353,7 +353,7 @@ void Maestro::MakeRHCCforNodalProj(Vector<MultiFab>& rhcc,
         }
     }
 
-    // averge down and fill ghost cells using first-order extrapolation
+    // average down and fill ghost cells using first-order extrapolation
     AverageDown(rhcc, 0, 1);
     FillPatch(t_old, rhcc, rhcc, rhcc, 0, 0, 1, 0, bcs_f);
 }
