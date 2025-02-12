@@ -4,6 +4,13 @@ Models the convection and burning in the envelope of a neutron star, where hydro
 has previously been depleted by the hot CNO cycle, leaving a pure helium layer at 
 large depths, where the burst will ignite.
 
+Appears in:
+
+  * `Hydrodynamical simulations of proton ingestion flashes in Type I X-ray Bursts`
+     Guichandut, S.; Zingale, M.; Cumming, A, 2023. 
+     https://arxiv.org/abs/2405.08952
+
+
 This is the multidimensional version of a calculation previously done in MESA in:
 
   * `The imprint of convection on Type I X-ray bursts: Pauses in photospheric
@@ -13,7 +20,6 @@ This is the multidimensional version of a calculation previously done in MESA in
 
 ## initial model
 
-* `xrb_layered_3cm.hse`
+* `toy_atm_hot_3cm.hse`
 
-An initial MESA model is placed into eulerian HSE using the lagrangian_planar routines
-from AMREX/initial_models. More detail in create_initial_model/README.md.
+Build using a MESA model as a guide. More details in `create_initial_model/`.

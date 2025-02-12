@@ -308,6 +308,9 @@ anelastic_cutoff_density            Real               -1.0
 # Refer to Section \ref{Sec:Base Cutoff Density}
 base_cutoff_density                 Real               -1.0
 
+# The temperature below which we disable burning
+burning_cutoff_temperature_lo       Real               -1.0
+
 # The density below which we disable burning
 burning_cutoff_density_lo           Real               -1.0
 

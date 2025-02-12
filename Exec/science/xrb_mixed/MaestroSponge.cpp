@@ -60,7 +60,7 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
     }
 
     if (maestro_verbose >= 1) {
-        if (xrb_use_bottom_sponge) {
+        if (problem_rp::xrb_use_bottom_sponge) {
             Print() << "inner sponge: r_sp      , r_tp      : " << r_sp << ", "
                     << r_tp << std::endl;
         }

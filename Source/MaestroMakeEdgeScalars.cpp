@@ -648,7 +648,7 @@ void Maestro::MakeEdgeScalEdges(
 void Maestro::MakeDivU(const Box& bx, Array4<Real> const divu,
                        Array4<Real> const umac, Array4<Real> const vmac,
                        Array4<Real> const wmac,
-                       const GpuArray<Real, AMREX_SPACEDIM> dx) const {
+                       const GpuArray<Real, AMREX_SPACEDIM> dx) {
     // timer for profiling
     BL_PROFILE_VAR("Maestro::MakeDivU()", MakeDivU);
 

@@ -23,6 +23,9 @@ void Maestro::RetagArray(const Box& bx, const int lev) {
 
 void Maestro::TagBoxes(TagBoxArray& tags, const MFIter& mfi, const int lev,
                        const Real time) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::TagBoxes()", TagBoxes);
 
@@ -45,6 +48,9 @@ void Maestro::TagBoxes(TagBoxArray& tags, const MFIter& mfi, const int lev,
 
 void Maestro::StateError(TagBoxArray& tags, const MultiFab& state_mf,
                          const MFIter& mfi, const int lev, const Real time) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::StateError()", StateError);
 

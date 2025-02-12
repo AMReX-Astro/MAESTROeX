@@ -4,16 +4,24 @@ using namespace amrex;
 using namespace problem_rp;
 
 // initializes data on a specific level
-void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,
+void Maestro::InitLevelData(const int lev, const Real time, const MFIter& mfi,  // NOLINT(readability-convert-member-functions-to-static)
                             const Array4<Real> scal, const Array4<Real> vel) {
-    Abort("Planar InitLevelData not implemented.");
+    amrex::ignore_unused(lev);
+    amrex::ignore_unused(time);
+    amrex::ignore_unused(mfi);
+    amrex::ignore_unused(scal);
+    amrex::ignore_unused(vel);
+
+    amrex::Abort("Planar InitLevelData not implemented.");
 }
 
 void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                                 MultiFab& vel) {
+
+    amrex::ignore_unused(time);
+
     // timer for profiling
     BL_PROFILE_VAR("Maestro::InitLevelDataSphr()", InitLevelDataSphr);
-    const int max_lev = base_geom.max_radial_level + 1;
 
 #ifdef _OPENMP
 #pragma omp parallel
@@ -57,11 +65,11 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
         }
     }
 
-    Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_f, 0);
+    Put1dArrayOnCart(lev, temp_vec, temp_mf, false, false, bcs_f, 0);
     MultiFab::Copy(scal, temp_mf, 0, Temp, 1, 0);
 
     // initialize p0_cart
-    Put1dArrayOnCart(lev, p0_init, p0_cart, 0, 0);
+    Put1dArrayOnCart(lev, p0_init, p0_cart, false, false);
 
     // initialize species
     for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -70,7 +78,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
                 temp_arr(l, r) = s0_init_arr(l, r, FirstSpec + comp);
             }
         }
-        Put1dArrayOnCart(lev, temp_vec, temp_mf, 0, 0, bcs_s, FirstSpec + comp);
+        Put1dArrayOnCart(lev, temp_vec, temp_mf, false, false, bcs_s, FirstSpec + comp);
         MultiFab::Copy(scal, temp_mf, 0, FirstSpec + comp, 1, 0);
     }
 
@@ -162,7 +170,6 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
 
 
         const auto prob_lo = geom[lev].ProbLoArray();
-        const auto prob_hi = geom[lev].ProbHiArray();
         const auto dx = geom[lev].CellSizeArray();
 
         const auto center_p = center;
@@ -179,11 +186,7 @@ void Maestro::InitLevelDataSphr(const int lev, const Real time, MultiFab& scal,
             const Real z = prob_lo[2] + (Real(k) + 0.5) * dx[2] - center_p[2];
 
             // set perturbational velocity to zero
-            Real vpert[3];
-
-            for (auto n = 0; n < 3; ++n) {
-                vpert[n] = 0.0;
-            }
+            Real vpert[3]{};
 
             // compute distance to the center of the star
             Real rloc = std::sqrt(x * x + y * y + z * z);

@@ -41,7 +41,7 @@ maestro.hi_bc = 0 0
 geometry.is_periodic =  1 1
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # HYDRODYNAMICS options
 maestro.base_cutoff_density = 1.e-10

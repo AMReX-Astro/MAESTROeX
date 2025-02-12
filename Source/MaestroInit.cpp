@@ -141,7 +141,8 @@ void Maestro::Init() {
 
         // initial projection
         if (do_initial_projection) {
-            Print() << "Doing initial projection" << std::endl;
+            amrex::Print() << "\n";
+            amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green << "Doing initial projection" << amrex::ResetDisplay << std::endl;
             InitProj();
 
             if (plot_int > 0 || plot_deltat > 0) {
@@ -166,7 +167,8 @@ void Maestro::Init() {
         // divu iters - also update dt at end of each divu_iter
         if (init_divu_iter > 0) {
             for (int i = 1; i <= init_divu_iter; ++i) {
-                Print() << "Doing initial divu iteration #" << i << std::endl;
+                amrex::Print() << "\n";
+                amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green << "Doing initial divu iteration #" << i << amrex::ResetDisplay << std::endl;
                 DivuIter(i);
             }
 
@@ -198,7 +200,9 @@ void Maestro::Init() {
 
         // initial (pressure) iters
         for (int i = 1; i <= init_iter; ++i) {
-            Print() << "Doing initial pressure iteration #" << i << std::endl;
+            amrex::Print() << "\n";
+            amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green
+                           << "Doing initial pressure iteration #" << i << amrex::ResetDisplay << std::endl;
             InitIter();
         }
 

@@ -15,7 +15,7 @@ maestro.hi_bc = 0 0 0
 geometry.is_periodic =  1 1 1
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # EOS parameters
 maestro.small_temp = 1.e5

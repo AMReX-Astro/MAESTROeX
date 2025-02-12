@@ -82,8 +82,8 @@ void Maestro::MakeUtrans(
             }
 
             // create utrans
-            int bclo = phys_bc[0];
-            int bchi = phys_bc[AMREX_SPACEDIM];
+            int bclo = phys_bc.lo(0);
+            int bchi = phys_bc.hi(0);
 
             ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real ulx = 0.0;
@@ -182,8 +182,8 @@ void Maestro::MakeUtrans(
             }
 
             // create vtrans
-            int bclo = phys_bc[1];
-            int bchi = phys_bc[AMREX_SPACEDIM + 1];
+            int bclo = phys_bc.lo(1);
+            int bchi = phys_bc.hi(1);
 
             ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vly = 0.0;
@@ -298,8 +298,8 @@ void Maestro::MakeUtrans(
             }
 
             // create utrans
-            int bclo = phys_bc[0];
-            int bchi = phys_bc[AMREX_SPACEDIM];
+            int bclo = phys_bc.lo(0);
+            int bchi = phys_bc.hi(0);
 
             ParallelFor(xbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real ulx = 0.0;
@@ -413,8 +413,8 @@ void Maestro::MakeUtrans(
             }
 
             // create vtrans
-            int bclo = phys_bc[1];
-            int bchi = phys_bc[AMREX_SPACEDIM + 1];
+            int bclo = phys_bc.lo(1);
+            int bchi = phys_bc.hi(1);
 
             ParallelFor(ybx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real vly = 0.0;
@@ -461,7 +461,7 @@ void Maestro::MakeUtrans(
 
                     // impose hi side bc's
                 } else if (j == domhi[1] + 1) {
-                    switch (bchi) {
+                    switch (bchi) {  // NOLINT(bugprone-switch-missing-default-case)
                         case amrex::PhysBCType::inflow:
                             vly = utilde_arr(i, j + 1, k, 1);
                             vry = utilde_arr(i, j + 1, k, 1);
@@ -529,8 +529,8 @@ void Maestro::MakeUtrans(
             }
 
             // create wtrans
-            int bclo = phys_bc[2];
-            int bchi = phys_bc[AMREX_SPACEDIM + 2];
+            int bclo = phys_bc.lo(2);
+            int bchi = phys_bc.hi(2);
 
             ParallelFor(zbx, [=] AMREX_GPU_DEVICE(int i, int j, int k) {
                 Real wlz = 0.0;

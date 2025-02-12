@@ -664,13 +664,14 @@ void Maestro::FirstDt() {
                 Real spdy = spd.max<RunOn::Device>(tileBox, 0) / dx[1];
                 Real pforcey =
                     vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 1);
+#if AMREX_SPACEDIM == 2
                 Real spdz = spdy * 0.1;  // for 2d make sure this is < spdy
-                uz /= AMREX_SPACEDIM == 2 ? dx[1] : dx[2];
-#if (AMREX_SPACEDIM == 3)
-                spdz = spd.max<RunOn::Device>(tileBox, 0) / dx[2];
+#else
+                Real spdz = spd.max<RunOn::Device>(tileBox, 0) / dx[2];
                 Real pforcez =
                     vel_force[lev][mfi].maxabs<RunOn::Device>(tileBox, 2);
 #endif
+                uz /= AMREX_SPACEDIM == 2 ? dx[1] : dx[2];
 
                 // use advective constraint unless velocities are zero everywhere
                 // in which case we use the sound speed

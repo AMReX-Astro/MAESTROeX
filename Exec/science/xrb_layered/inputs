@@ -18,7 +18,7 @@ maestro.hi_bc = 0 2 2
 geometry.is_periodic =  1 0 0
 
 # VERBOSITY
-maestro.v              = 1       # verbosity
+maestro.maestro_verbose              = 1       # verbosity
 
 # DEBUG FOR NAN
 amrex.fpe_trap_invalid = 1       # floating point exception
@@ -34,8 +34,6 @@ amr.refine_grid_layout = 0       # chop grids up into smaller grids if nprocs > 
 
 amr.v = 1                        # AMR verbosity
 
-# TAGGING
-maestro.temperr = 6.5e8 6.5e8 6.5e8
 
 # TIME STEPPING
 maestro.max_step  = 30000000
