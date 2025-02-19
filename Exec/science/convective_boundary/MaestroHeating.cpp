@@ -40,12 +40,12 @@ void Maestro::MakeHeating(Vector<MultiFab>& rho_Hext,
                 if (problem_rp::do_cooling) {
 
                     const Real L_x = prob_hi[0];
-    
+
                     Real x = (Real(i) + 0.5) * dx[0] + prob_lo[0];
                     Real y = (Real(j) + 0.5) * dx[1] + prob_lo[1];
                     Real top_y = prob_hi[1];
                     Real delta_y = top_y - y;
-    
+
                     // Exponential decay from the top boundary
                     Real er = std::exp(- delta_y * delta_y / 1.e11);
                     rho_Hext_arr(i, j, k) = er * problem_rp::constant_heat_flux;

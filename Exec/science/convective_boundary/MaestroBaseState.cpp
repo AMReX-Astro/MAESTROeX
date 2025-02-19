@@ -39,7 +39,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
     // define some helper functions with lambdas
     auto get_rho0 = [=](Real z) {
-        // return the background density 
+        // return the background density
         return rho_b * std::pow(1.0_rt + 8.0_rt * X_b * z / (9.0_rt - 8.0_rt * X_b) / D, alpha);
     };
 
