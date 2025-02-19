@@ -1,3 +1,5 @@
+// Initialize and perturb the temperature
+
 #include <Maestro.H>
 #include <random>
 

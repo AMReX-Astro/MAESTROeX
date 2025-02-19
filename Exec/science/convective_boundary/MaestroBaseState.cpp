@@ -1,3 +1,5 @@
+// Initialize analytic hydrostatic background
+
 #include <Maestro.H>
 
 using namespace amrex;
