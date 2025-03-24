@@ -1,3 +1,7 @@
+# 25.02
+
+  * CI fixes (#478, #481,#482)
+
 # 24.08
 
   * change access to phys_bc to use BCRec (#469)

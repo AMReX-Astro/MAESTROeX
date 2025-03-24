@@ -10,7 +10,7 @@ import sys
 whitelist = ["maestro.lo_bc",
              "maestro.hi_bc"]
 
-# we don't have all of the radiation parametrs in the _cpp_parameters
+# we don't have all of the radiation parameters in the _cpp_parameters
 # yet, so we won't check these namespaces
 
 namespace_ignore = []
