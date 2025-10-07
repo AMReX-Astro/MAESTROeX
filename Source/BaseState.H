@@ -238,10 +238,6 @@ class BaseState {
 
     T* dataPtr() noexcept { return base_data.dataPtr(); };
 
-    AMREX_GPU_HOST_DEVICE [[nodiscard]] AMREX_FORCE_INLINE T* dataPtr() const noexcept {
-        return this->dptr;
-    }
-
     /// scalar addition to the whole base state
     template <class U>
     friend BaseState<U> operator+(const U val, const BaseState<U>& p);
