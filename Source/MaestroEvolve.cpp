@@ -14,9 +14,11 @@ void Maestro::Evolve() {
     amrex::Print() << amrex::Font::Bold << amrex::FGColor::Green << "Beginning main evolution" << amrex::ResetDisplay << std::endl;
 
     // check to make sure spherical is only used for 3d
-    if (spherical && AMREX_SPACEDIM != 3) {
+#if AMREX_SPACEDIM < 3
+    if (spherical) {
         Abort("spherical = 1 and dm != 3");
     }
+#endif
 
     // index for diag array buffer
     int diag_index = 0;
