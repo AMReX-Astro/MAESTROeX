@@ -32,6 +32,7 @@ Checks: >
      readability-*,
        -readability-avoid-const-params-in-decls,
        -readability-braces-around-statements,
+       -readability-convert-member-functions-to-static,
        -readability-else-after-return,
        -readability-enum-initial-value,
        -readability-function-cognitive-complexity,
