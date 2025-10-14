@@ -49,7 +49,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
     };
 
     const int n = lev;
-    eos_t eos_state;
+    eos_rh_t eos_state;
 
     for (auto r = 0; r < base_geom.nr(n); ++r) {
         Real z = geom[lev].ProbLo(AMREX_SPACEDIM - 1) +
@@ -57,6 +57,7 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
 
         eos_state.rho = get_rho0(z);
         // Print() << "z/D = " << z/D << ",  rho/rho_t = " << eos_state.rho/rho_t << std::endl;
+
         auto X0 = X_b * (1.0_rt - z / D);
         eos_state.p = get_p0(eos_state.rho, X0);
         for (auto comp = 0; comp < NumSpec; ++comp) {
@@ -64,8 +65,18 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
         }
         eos_state.xn[iH2O] = X0;
         eos_state.xn[iH] = 1.0_rt - X0;
-
         eos(eos_input_rp, eos_state);
+
+        // These prints validate that we are putting in the intended model for rho, p, composition
+        // Print() << "z = " << z << std::endl;
+        // Print() << "rho = " << eos_state.rho << std::endl;
+        // Print() << "p = " << eos_state.p << std::endl;
+        // Print() << "X(H20) = " << eos_state.xn[iH2O] << std::endl;
+        // Print() << "X(H2) = " << eos_state.xn[iH] << std::endl;
+        // Print() << "" << std::endl;
+
+        // Temperature (eos self-consistency check)
+        // Print() << "T_0 = " << T_0 << " " << "T_eos = " << eos_state.T << std::endl;
 
         s0_init_arr(n, r, Rho) = eos_state.rho;
         s0_init_arr(n, r, RhoH) = eos_state.rho * eos_state.h;
@@ -73,8 +84,8 @@ void Maestro::InitBaseState(BaseState<Real>& rho0, BaseState<Real>& rhoh0,
             s0_init_arr(n, r, FirstSpec + comp) =
                 eos_state.rho * eos_state.xn[comp];
         }
-        p0_init_arr(n, r) = get_p0(eos_state.rho, X0);
-        s0_init_arr(n, r, Temp) = T_0;
+        p0_init_arr(n, r) = eos_state.p;
+        s0_init_arr(n, r, Temp) = eos_state.T;
     }
 
     // copy s0_init and p0_init into rho0, rhoh0, p0, and tempbar
