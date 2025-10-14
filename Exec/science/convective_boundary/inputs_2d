@@ -23,7 +23,7 @@ maestro.v              = 1       # verbosity
 # amrex.fpe_trap_invalid = 1       # floating point exception
 
 # GRIDDING AND REFINEMENT
-amr.n_cell             = 512 512
+amr.n_cell             = 32 32
 amr.max_grid_size      = 64
 amr.max_level          = 0       # maximum level number allowed
 maestro.regrid_int     = 2       # how often to regrid
@@ -105,23 +105,27 @@ maestro.eps_hg_max         = 1.e-10
 maestro.hg_level_factor    = 10.
 maestro.eps_hg_bottom      = 1.e-4
 
-&probin
+#&probin
+#
+#  ! override the default values of the probin namelist values here
+#
+#  !extern
+#
+#  ! Note that some of the parameters in this
+#  ! namelist are specific to the default EOS,
+#  ! network, and/or integrator used in the
+#  ! makefile. If you try a different set of
+#  ! microphysics routines be sure to check that
+#  ! the parameters in here are consistent, as
+#  ! Fortran does not like seeing unknown variables
+#  ! in the namelist.
+#
+#  eos_gamma = 4.0d0/3.0d0
+#  eos_assume_neutral = .true.
+#  const_conductivity = 1.0d-3
+#
+#/
 
-  ! override the default values of the probin namelist values here
-
-  !extern
-
-  ! Note that some of the parameters in this
-  ! namelist are specific to the default EOS,
-  ! network, and/or integrator used in the
-  ! makefile. If you try a different set of
-  ! microphysics routines be sure to check that
-  ! the parameters in here are consistent, as
-  ! Fortran does not like seeing unknown variables
-  ! in the namelist.
-
-  eos_gamma = 4.0d0/3.0d0
-  eos_assume_neutral = .true.
-  const_conductivity = 1.0d-3
-
-/
+eos.eos_gamma = 1.3333333333333334e0
+eos.eos_assume_neutral = 1
+conductivity.const_conductivity = 1.0e-3
