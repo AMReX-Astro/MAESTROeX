@@ -26,8 +26,8 @@ AMREX_HOME ?= $(TOP)/external/amrex
 # disable AMReX Fortran by default
 BL_NO_FORT ?= TRUE
 
-# Require C++17
-CXXSTD := c++17
+# Require C++20
+CXXSTD := c++20
 
 # Check to make sure that Microphysics actually exists,
 # using an arbitrary file that must exist to check.
