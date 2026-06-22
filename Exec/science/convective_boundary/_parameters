@@ -1,0 +1,17 @@
+@namespace: problem
+
+# flux boundary condition
+do_cooling               integer   1
+constant_heat_flux       real      -1.0e6
+
+# seed for the random noise (-1 for random seed)
+pert_seed                integer   2024
+
+# initial analytic model parameters
+g0                       real      -2479.0
+rho_t                    real      16.e-5
+T_0                      real      165.0
+k_B                      real      1.38e-16
+m_p                      real      1.67e-24
+X_b                      real      0.2
+N_rho                    real      3.0

@@ -1,0 +1,7 @@
+# The simple network is used for 2-fluid problems.  Fluids 'A' and 'B'
+# have the same properties, but are named differently so we can keep
+# track of them independently.
+
+# name   short name    aion     zion
+  H2     H2            2.0      1.0
+  H2O    H2O           18.0     9.0
