@@ -166,7 +166,7 @@ ensure that the error does not show any directional bias.</p>
 independent of the advection direction—small differences can
 arise. What’s happening here is that within each cell BDS is trying
 to define a tri-linear profile for rho subject to the constraints in
-the BDS paper (<span id="id1">[<a class="reference internal" href="zreferences.html#id28" title="A. Nonaka, S. May, A. S. Almgren, and J. B. Bell. A Three-Dimensional, Unsplit Godunov Method for Scalar Conservation Laws. SIAM J. Sci. Comput., 33(4):2039–2062, 2011.">NonakaMayAlmgrenBell11</a>]</span>) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
+the BDS paper (<span class="bibtex-citation" id="id1">[<a class="reference internal" href="zreferences.html#id28" title="A. Nonaka, S. May, A. S. Almgren, and J. B. Bell. A Three-Dimensional, Unsplit Godunov Method for Scalar Conservation Laws. SIAM J. Sci. Comput., 33(4):2039–2062, 2011.">NonakaMayAlmgrenBell11</a>]</span>) (constraints 1 and 2 on p. 2044 after eq. 3.4). We
 do not solve the L2 minimization problem exactly so we iterate up to
 3 times using a simple heuristic algorithm designed to work toward
 the constraint. The iteration will give different results depending
@@ -203,7 +203,7 @@ the fill_3d_module module, and then calls average to
 put it back onto a 1D radial array. This way we test the accuracy
 of our procedure to map between the 1D radial and 3D Cartesian
 states. The output from this test was described in detail
-in <span id="id2">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
+in <span class="bibtex-citation" id="id2">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
 </section>
 <section id="test-basestate">
 <h2>test_basestate<a class="headerlink" href="#test-basestate" title="Link to this heading"></a></h2>
@@ -214,8 +214,8 @@ the base state velocity, <span class="math notranslate nohighlight">\(w_0\)</spa
 the heating and this is used to advect the base state density
 and compute the new pressure, <span class="math notranslate nohighlight">\(p_0\)</span>. An early version of
 this routine was used for the plane-parallel expansion test
-in <span id="id3">[<a class="reference internal" href="zreferences.html#id5" title="A. S. Almgren, J. B. Bell, C. A. Rendleman, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. II. Energy Evolution. \apj , 649:927-938, October 2006. arXiv:arXiv:astro-ph/0606496, doi:10.1086/507089.">AlmgrenBellRendlemanZingale06b</a>]</span>. This version of the test was also shown
-for a spherical, self-gravitating star in <span id="id4">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
+in <span class="bibtex-citation" id="id3">[<a class="reference internal" href="zreferences.html#id5" title="A. S. Almgren, J. B. Bell, C. A. Rendleman, and M. Zingale. Low Mach Number Modeling of Type Ia Supernovae. II. Energy Evolution. \apj , 649:927-938, October 2006. arXiv:arXiv:astro-ph/0606496, doi:10.1086/507089.">AlmgrenBellRendlemanZingale06b</a>]</span>. This version of the test was also shown
+for a spherical, self-gravitating star in <span class="bibtex-citation" id="id4">[<a class="reference internal" href="zreferences.html#id7" title="A. Nonaka, A. S. Almgren, J. B. Bell, M. J. Lijewski, C. M. Malone, and M. Zingale. MAESTRO: An Adaptive Low Mach Number Hydrodynamics Algorithm for Stellar Flows. \apjs , 188:358-383, June 2010. arXiv:1005.0112, doi:10.1088/0067-0049/188/2/358.">NonakaAlmgrenBell+10</a>]</span>.</p>
 </section>
 <section id="test-diffusion">
 <h2>test_diffusion<a class="headerlink" href="#test-diffusion" title="Link to this heading"></a></h2>
@@ -226,7 +226,7 @@ based on the explicit thermal diffusion timescale and loops
 over calls to the thermal diffusion solver. A Gaussian remains
 Gaussian when diffusing, so an explicit error can be computed
 by comparing to the analytic solution. This test is
-described in <span id="id5">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>.</p>
+described in <span class="bibtex-citation" id="id5">[<a class="reference internal" href="zreferences.html#id8" title="C. M. Malone, A. Nonaka, A. S. Almgren, J. B. Bell, and M. Zingale. Multidimensional Modeling of Type I X-ray Bursts. I. Two-dimensional Convection Prior to the Outburst of a Pure $^4$He Accretor. \apj , 728:118-+, February 2011. arXiv:1012.0609, doi:10.1088/0004-637X/728/2/118.">MaloneNonakaAlmgren+11</a>]</span>.</p>
 </section>
 <section id="test-eos">
 <h2>test_eos<a class="headerlink" href="#test-eos" title="Link to this heading"></a></h2>
