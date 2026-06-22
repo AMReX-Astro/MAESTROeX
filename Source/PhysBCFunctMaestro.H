@@ -4,10 +4,14 @@
 #include <AMReX_PhysBCFunct.H>
 
 extern "C" {
-typedef void (*BndryFuncDefaultMaestro)(
-    const amrex::Array4<amrex::Real>& scal, const amrex::Box& bx,
-    const amrex::Box& domainBox, const amrex::Real* dx, const amrex::BCRec bcs,
-    const amrex::Real* gridlo, const int comp);
+using BndryFuncDefaultMaestro =
+    void (*)(const amrex::Array4<amrex::Real>& scal,
+             const amrex::Box& bx,
+             const amrex::Box& domainBox,
+             const amrex::Real* dx,
+             const amrex::BCRec bcs,
+             const amrex::Real* gridlo,
+             const int comp);
 }
 
 /// This version calls function working on array
