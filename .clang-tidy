@@ -2,7 +2,7 @@ Checks: >
      -*,
      bugprone-*,
        -bugprone-implicit-widening-of-multiplication-result,
-       -budprone-easily-swappable-parameters,
+       -bugprone-easily-swappable-parameters,
      clang-analyzer-*,
      clang-diagnostic-*,
      cppcoreguidelines-*,
