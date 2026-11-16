@@ -1,3 +1,4 @@
+#include <numbers>
 
 #include <Maestro.H>
 
@@ -78,7 +79,7 @@ void Maestro::SpongeInit(const BaseState<Real>& rho0_s) {
             r_tp_outer = r_sp_outer + 4.0 * drdxfac * base_geom.dr(0);
         } else {
             r_tp_outer = r_sp_outer +
-                         4.0 * 2.0 / std::sqrt(3) * base_geom.r_cc_loc(0, 0);
+                         4.0 * 2.0 / std::numbers::sqrt3 * base_geom.r_cc_loc(0, 0);
         }
     }
 

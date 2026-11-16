@@ -38,7 +38,7 @@ void Maestro::Average(const Vector<MultiFab>& phi, BaseState<Real>& phibar,
             // compute number of cells at any given height for each level
             if (AMREX_SPACEDIM == 2) {
                 ncell(lev) = domainBox.bigEnd(0) + 1;
-            } else if (AMREX_SPACEDIM == 3) {
+            } else if (AMREX_SPACEDIM == 3) {  // NOLINT(misc-redundant-expression)
                 ncell(lev) =
                     (domainBox.bigEnd(0) + 1) * (domainBox.bigEnd(1) + 1);
             }

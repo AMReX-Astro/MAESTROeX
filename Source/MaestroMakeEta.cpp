@@ -32,11 +32,11 @@ void Maestro::MakeEtarho(const Vector<MultiFab>& etarho_flux) {
         const Box& domainBox = geom[lev].Domain();
 
         // compute number of cells at any given height for each level
-        if (AMREX_SPACEDIM == 2) {
+#if AMREX_SPACEDIM == 2
             ncell(lev) = domainBox.bigEnd(0) + 1;
-        } else if (AMREX_SPACEDIM == 3) {
+#else
             ncell(lev) = (domainBox.bigEnd(0) + 1) * (domainBox.bigEnd(1) + 1);
-        }
+#endif
 
         // Loop over boxes (make sure mfi takes a cell-centered multifab as an argument)
 #ifdef _OPENMP

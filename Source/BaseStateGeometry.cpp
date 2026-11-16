@@ -48,7 +48,7 @@ void BaseStateGeometry::Init(const int max_radial_level_in,
     // compute center(:)
     if (octant) {
         for (auto i = 0; i < 3; ++i) {
-            if (!(spherical && AMREX_SPACEDIM == 3 && probLo[i] == 0.0)) {
+            if (!(spherical && AMREX_SPACEDIM == 3 && probLo[i] == 0.0)) {  // NOLINT(misc-redundant-expression)
                 Abort("ERROR: octant requires spherical with prob_lo = 0.0");
             }
             center[i] = 0.0;
