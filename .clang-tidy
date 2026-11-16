@@ -19,6 +19,7 @@ Checks: >
        -cppcoreguidelines-pro-*,
        -cppcoreguidelines-use-enum-class,
      misc-*,
+       -misc-confusable-identifiers,
        -misc-const-correctness,
        -misc-include-cleaner,
        -misc-non-private-member-variables-in-classes,
