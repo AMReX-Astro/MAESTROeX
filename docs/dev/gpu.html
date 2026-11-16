@@ -184,7 +184,7 @@ to report some generic timings that may be useful in categorizing an application
 To yield a consistent timing of a routine, a timer will need to be wrapped
 around an <code class="docutils literal notranslate"><span class="pre">MFIter</span></code> loop that encompasses the entire set of GPU launches
 contained within. For example:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">BL_PROFILE_VAR</span><span class="p">(</span><span class="s">&quot;A_NAME&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">blp</span><span class="p">);</span><span class="w">     </span><span class="c1">// Profiling start</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">BL_PROFILE_VAR</span><span class="p">(</span><span class="s">"A_NAME"</span><span class="p">,</span><span class="w"> </span><span class="n">blp</span><span class="p">);</span><span class="w">     </span><span class="c1">// Profiling start</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MFIter</span><span class="w"> </span><span class="n">mfi</span><span class="p">(</span><span class="n">mf</span><span class="p">);</span><span class="w"> </span><span class="n">mfi</span><span class="p">.</span><span class="n">isValid</span><span class="p">();</span><span class="w"> </span><span class="o">++</span><span class="n">mfi</span><span class="p">)</span>
 <span class="p">{</span>
 <span class="w">    </span><span class="c1">// code that runs on the GPU</span>
