@@ -26,6 +26,7 @@ Checks: >
        -misc-no-recursion,
      modernize-*,
        -modernize-avoid-c-arrays,
+       -modernize-use-ranges,
        -modernize-use-trailing-return-type,
      performance-*,
        -performance-avoid-endl,
