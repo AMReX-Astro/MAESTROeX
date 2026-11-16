@@ -27,7 +27,7 @@ def doit(maestroex_dir):
     param_file = maestroex / "Source" / "param" / "_cpp_parameters"
     params = parse_maestro_params.read_param_file(str(param_file))
 
-    namespaces = set(p.namespace for p in params)
+    namespaces = {p.namespace for p in params}
     runtime_parameters = [f"{p.namespace}.{p.name}" for p in params]
 
     pattern = re.compile(r"[A-Za-z0-9_]+\.[A-Za-z0-9_]+", re.IGNORECASE)
