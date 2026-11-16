@@ -343,12 +343,8 @@ Real QuadInterp(const Real x, const Real x0, const Real x1, const Real x2,
                  (x - x0) * (x - x1);
 
     if (limit) {
-        if (y > amrex::max(y0, amrex::max(y1, y2))) {
-            y = amrex::max(y0, amrex::max(y1, y2));
-        }
-        if (y < amrex::min(y0, amrex::min(y1, y2))) {
-            y = amrex::min(y0, amrex::min(y1, y2));
-        }
+        y = std::min(y, std::max({y0, y1, y2}));
+        y = std::max(y, std::min({y0, y1, y2}));
     }
 
     return y;

@@ -1170,17 +1170,17 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
             jobInfoFile << " level: " << i << "\n";
             jobInfoFile << "   number of boxes = " << grids[i].size() << "\n";
             jobInfoFile << "   maximum zones   = ";
-            for (int n = 0; n < BL_SPACEDIM; n++) {
+            for (int n = 0; n < AMREX_SPACEDIM; n++) {
                 jobInfoFile << geom[i].Domain().length(n) << " ";
             }
             jobInfoFile << "\n\n";
         }
 
         jobInfoFile << " Boundary conditions\n";
-        Vector<int> lo_bc_out(BL_SPACEDIM), hi_bc_out(BL_SPACEDIM);
+        Vector<int> lo_bc_out(AMREX_SPACEDIM), hi_bc_out(AMREX_SPACEDIM);
         ParmParse pp("maestro");
-        pp.getarr("lo_bc", lo_bc_out, 0, BL_SPACEDIM);
-        pp.getarr("hi_bc", hi_bc_out, 0, BL_SPACEDIM);
+        pp.getarr("lo_bc", lo_bc_out, 0, AMREX_SPACEDIM);
+        pp.getarr("hi_bc", hi_bc_out, 0, AMREX_SPACEDIM);
 
         // these names correspond to the integer flags setup in the
         // Castro_setup.cpp
@@ -1189,14 +1189,12 @@ void Maestro::WriteJobInfo(const std::string& dir) const {
 
         jobInfoFile << "   -x: " << names_bc[lo_bc_out[0]] << "\n";
         jobInfoFile << "   +x: " << names_bc[hi_bc_out[0]] << "\n";
-        if (BL_SPACEDIM >= 2) {
-            jobInfoFile << "   -y: " << names_bc[lo_bc_out[1]] << "\n";
-            jobInfoFile << "   +y: " << names_bc[hi_bc_out[1]] << "\n";
-        }
-        if (BL_SPACEDIM == 3) {
-            jobInfoFile << "   -z: " << names_bc[lo_bc_out[2]] << "\n";
-            jobInfoFile << "   +z: " << names_bc[hi_bc_out[2]] << "\n";
-        }
+        jobInfoFile << "   -y: " << names_bc[lo_bc_out[1]] << "\n";
+        jobInfoFile << "   +y: " << names_bc[hi_bc_out[1]] << "\n";
+#if AMREX_SPACEDIM == 3
+        jobInfoFile << "   -z: " << names_bc[lo_bc_out[2]] << "\n";
+        jobInfoFile << "   +z: " << names_bc[hi_bc_out[2]] << "\n";
+#endif
 
         jobInfoFile << "\n\n";
 
