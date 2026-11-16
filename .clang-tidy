@@ -47,6 +47,7 @@ Checks: >
        -readability-named-parameter,
        -readability-simplify-boolean-expr,
        -readability-static-accessed-through-instance,
+       -readability-use-std-min-max,
      mpi-*,
      openmp-*,
        -openmp-use-default-none
